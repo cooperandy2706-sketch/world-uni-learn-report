@@ -44,7 +44,7 @@ export const useAuthStore = create<AuthStore>((set, _get) => ({
 
       if (session?.user) {
         const profileResult = await fetchWithTimeout(
-          supabase.from('users').select('*').eq('id', session.user.id).single(),
+          supabase.from('users').select('*').eq('id', session.user.id).single().then((r: any) => r),
           6000
         )
         const profile = (profileResult as any)?.data ?? null
@@ -61,7 +61,7 @@ export const useAuthStore = create<AuthStore>((set, _get) => ({
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         const result = await fetchWithTimeout(
-          supabase.from('users').select('*').eq('id', session.user.id).single(),
+          supabase.from('users').select('*').eq('id', session.user.id).single().then((r: any) => r),
           6000
         )
         const profile = (result as any)?.data ?? null
