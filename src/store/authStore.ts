@@ -14,7 +14,7 @@ interface AuthStore extends AuthState {
 }
 
 // Helper: fetch with a hard timeout so a dropped connection never freezes the app
-async function fetchWithTimeout<T>(promise: Promise<T>, ms = 6000): Promise<T | null> {
+async function fetchWithTimeout<T>(promise: Promise<T> | PromiseLike<T>, ms = 6000): Promise<T | null> {
   try {
     return await Promise.race([
       promise,
