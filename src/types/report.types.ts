@@ -1,5 +1,5 @@
 // src/types/report.types.ts
-import type { ReportCard, Student, Score, Attendance, School, Term, AcademicYear, Class } from './database.types'
+import type { ReportCard, Student, Attendance, School, Term, AcademicYear, Class } from './database.types'
 
 export interface ReportCardData {
   report: ReportCard

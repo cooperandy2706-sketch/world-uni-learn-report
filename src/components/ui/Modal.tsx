@@ -1,6 +1,5 @@
 // src/components/ui/Modal.tsx
 import { useEffect, type ReactNode } from 'react'
-import type { CSSProperties } from 'react'
 
 interface ModalProps {
   open: boolean; onClose: () => void; title?: string; subtitle?: string

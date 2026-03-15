@@ -11,7 +11,7 @@ import Modal from '../../components/ui/Modal'
 const schema = z.object({
   name:     z.string().min(1, 'Class name is required'),
   level:    z.string().optional(),
-  capacity: z.coerce.number().optional(),
+  capacity: z.coerce.number().optional().nullable(),
 })
 type FormData = z.infer<typeof schema>
 
@@ -77,7 +77,7 @@ export default function ClassesPage() {
   const [search, setSearch] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({ resolver: zodResolver(schema) })
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({ resolver: zodResolver(schema) as any })
 
   const filtered = useMemo(() =>
     classes.filter(c => !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.level?.toLowerCase().includes(search.toLowerCase())),

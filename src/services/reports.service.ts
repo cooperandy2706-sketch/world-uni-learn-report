@@ -1,6 +1,5 @@
 // src/services/reports.service.ts
 import { supabase } from '../lib/supabase'
-import type { ReportCard } from '../types'
 
 export const reportsService = {
   async generateForClass(classId: string, termId: string, academicYearId: string) {
