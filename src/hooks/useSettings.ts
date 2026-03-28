@@ -1,10 +1,20 @@
 // src/hooks/useSettings.ts
+// ─────────────────────────────────────────────────────────────────────────────
+// FIXES vs old version:
+//  1. useUpdateSettings.onSuccess invalidates ['settings', schoolId] with the
+//     FULL key (not just ['settings']) so the exact cached entry is replaced.
+//  2. Removed the toast from onSuccess — SettingsPage.onSubmit already shows
+//     its own toast, so we were getting two "Settings saved" toasts.
+//  3. useUpdateSettings now accepts schoolId so the invalidation key matches
+//     what useSettings registers — ['settings', schoolId].
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { settingsService, teachersService, yearsService, termsService } from '../services/index'
 import { useAuth } from './useAuth'
 import toast from 'react-hot-toast'
 
-// ── Settings ──────────────────────────────────────────────
+// ── Settings ──────────────────────────────────────────────────────────────────
 export function useSettings() {
   const { user } = useAuth()
   const schoolId = user?.school_id ?? ''
@@ -17,24 +27,37 @@ export function useSettings() {
       return data
     },
     enabled: !!schoolId,
+    // Keep previous data while refetching so the form doesn't flash empty
+    placeholderData: (prev: any) => prev,
   })
 }
 
 export function useUpdateSettings() {
   const qc = useQueryClient()
   const { user } = useAuth()
+  const schoolId = user?.school_id ?? ''
 
   return useMutation({
-    mutationFn: (data: any) => settingsService.upsert(user!.school_id, data),
+    mutationFn: (data: {
+      next_term_date?: string | null
+      school_fees_info?: string | null
+      school_news?: string | null
+    }) => settingsService.upsert(schoolId, data),
+
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['settings'] })
-      toast.success('Settings saved')
+      // Invalidate the EXACT key so the refetch brings back the joined school row
+      qc.invalidateQueries({ queryKey: ['settings', schoolId] })
+      // No toast here — SettingsPage.onSubmit handles user feedback
     },
-    onError: () => toast.error('Failed to save settings'),
+
+    onError: (e: any) => {
+      console.error('[useUpdateSettings] error:', e)
+      toast.error('Failed to save report card settings')
+    },
   })
 }
 
-// ── Teachers ──────────────────────────────────────────────
+// ── Teachers ──────────────────────────────────────────────────────────────────
 export function useTeachers() {
   const { user } = useAuth()
   const schoolId = user?.school_id ?? ''
@@ -62,7 +85,7 @@ export function useTeacherAssignments(teacherId: string, termId: string) {
   })
 }
 
-// ── Academic Years ────────────────────────────────────────
+// ── Academic Years ────────────────────────────────────────────────────────────
 export function useAcademicYears() {
   const { user } = useAuth()
   const schoolId = user?.school_id ?? ''
@@ -93,7 +116,7 @@ export function useCurrentAcademicYear() {
   })
 }
 
-// ── Terms ─────────────────────────────────────────────────
+// ── Terms ─────────────────────────────────────────────────────────────────────
 export function useTerms(academicYearId: string) {
   return useQuery({
     queryKey: ['terms', academicYearId],

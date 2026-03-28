@@ -114,19 +114,41 @@ export default function SettingsPage() {
 
   async function onSubmit(data: FormData) {
     try {
-      await settingsService.updateSchool(user!.school_id, {
-        name: data.school_name, motto: data.school_motto,
-        email: data.school_email, phone: data.school_phone,
-        address: data.school_address, headteacher_name: data.headteacher_name,
-      })
-      await updateSettings.mutateAsync({
-        next_term_date: data.next_term_date,
-        school_fees_info: data.school_fees_info,
-        school_news: data.school_news,
-      })
+      // Update school info
+      const { error: schoolError } = await supabase
+        .from('schools')
+        .update({
+          name: data.school_name,
+          motto: data.school_motto,
+          email: data.school_email,
+          phone: data.school_phone,
+          address: data.school_address,
+          headteacher_name: data.headteacher_name,
+        })
+        .eq('id', user!.school_id)
+      if (schoolError) throw schoolError
+
+      // Upsert school_settings (creates if missing)
+      const { error: settingsError } = await supabase
+        .from('school_settings')
+        .upsert({
+          school_id: user!.school_id,
+          next_term_date: data.next_term_date || null,
+          school_fees_info: data.school_fees_info || null,
+          school_news: data.school_news || null,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'school_id' })
+      if (settingsError) throw settingsError
+
+      // Refresh settings in cache
+      await supabase.from('school_settings').select('*, school:schools(*)').eq('school_id', user!.school_id).single()
+
       toast.success('Settings saved successfully')
-    } catch {
-      toast.error('Failed to save settings')
+      // Force reload settings
+      window.location.reload()
+    } catch (err: any) {
+      console.error('Settings save error:', err)
+      toast.error(err?.message ?? 'Failed to save settings')
     }
   }
 

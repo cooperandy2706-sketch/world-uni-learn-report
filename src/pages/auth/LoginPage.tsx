@@ -57,8 +57,8 @@ export default function LoginPage() {
 
         .auth-input {
           width: 100%;
-          background: rgba(255,255,255,0.06);
-          border: 1px solid rgba(255,255,255,0.12);
+          background: rgba(33, 115, 221, 0.06);
+          border: 1px solid rgba(202, 199, 53, 0.12);
           border-radius: 10px;
           padding: 12px 44px 12px 14px;
           font-size: 14px;
