@@ -20,12 +20,8 @@ export default function App() {
             fontSize: '14px',
             fontFamily: 'DM Sans, sans-serif',
           },
-          success: {
-            iconTheme: { primary: '#22c55e', secondary: '#fff' },
-          },
-          error: {
-            iconTheme: { primary: '#ef4444', secondary: '#fff' },
-          },
+          success: { iconTheme: { primary: '#22c55e', secondary: '#fff' } },
+          error:   { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
         }}
       />
     </QueryClientProvider>

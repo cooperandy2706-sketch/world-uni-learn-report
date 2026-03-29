@@ -1,7 +1,7 @@
 {
-  "name": "GEM ESTEV Report System",
-  "short_name": "ESTEV Reports",
-  "description": "GES School Report Card Management",
+  "name": "WULA Reports",
+  "short_name": "WULA",
+  "description": "World Uni-Learn Academy — GES School Report Card Management System",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8f7ff",
@@ -11,12 +11,14 @@
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
