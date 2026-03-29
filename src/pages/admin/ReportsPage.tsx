@@ -170,6 +170,9 @@ export default function ReportsPage() {
   const [attModal, setAttModal]             = useState<any>(null)
   const [attData, setAttData]               = useState({ total_days:'', days_present:'' })
   const [savingAtt, setSavingAtt]           = useState(false)
+  const [feesModal, setFeesModal]           = useState<any>(null)
+  const [feesData, setFeesData]             = useState({ fees_amount:'', fees_paid:'', fees_arrears:'', other_fees:[] as any[] })
+  const [savingFees, setSavingFees]         = useState(false)
 
   const { data: reports = [], isLoading } = useReportsByClassTerm(selectedClass, (term as any)?.id ?? '')
   const generateReports = useGenerateReports()
@@ -220,6 +223,37 @@ export default function ReportsPage() {
     toast.success(`Attendance saved for ${attModal.student?.full_name}`)
     setAttModal(null)
     setAttData({ total_days:'', days_present:'' })
+  }
+
+  // ── Save fees ─────────────────────────────────────────────
+  async function saveFees() {
+    if (!feesModal) return
+    setSavingFees(true)
+    const arrears = Math.max(0, Number(feesData.fees_amount) - Number(feesData.fees_paid))
+    const { error } = await supabase.from('students').update({
+      fees_amount:  Number(feesData.fees_amount) || 0,
+      fees_paid:    Number(feesData.fees_paid) || 0,
+      fees_arrears: arrears,
+      other_fees:   feesData.other_fees,
+    }).eq('id', feesModal.student_id)
+    setSavingFees(false)
+    if (error) { toast.error(error.message); return }
+    toast.success('Fees saved for ' + feesModal.student?.full_name)
+    setFeesModal(null)
+  }
+
+  async function openFeesModal(r: any) {
+    // Load current fees for this student
+    const { data } = await supabase.from('students')
+      .select('fees_amount,fees_paid,fees_arrears,other_fees')
+      .eq('id', r.student_id).maybeSingle()
+    setFeesData({
+      fees_amount:  data?.fees_amount?.toString() ?? '',
+      fees_paid:    data?.fees_paid?.toString() ?? '',
+      fees_arrears: data?.fees_arrears?.toString() ?? '',
+      other_fees:   data?.other_fees ?? [],
+    })
+    setFeesModal(r)
   }
 
   // ── Export all classes ────────────────────────────────────
@@ -400,10 +434,16 @@ export default function ReportsPage() {
                           <span style={{ width:28, height:28, borderRadius:8, background:g.color+'18', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:800, color:g.color }}>{g.grade}</span>
                         </td>
                         <td style={{ padding:'11px 14px' }}>
+                          <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
                           <button className="rpt-act" onClick={() => { setAttModal(r); setAttData({ total_days:'', days_present:'' }) }}
-                            style={{ padding:'4px 10px', borderRadius:7, border:'1px solid #e5e7eb', background:'#f9fafb', fontSize:12, cursor:'pointer', transition:'all .15s', color:'#374151', fontWeight:500 }}>
-                            📋 Attendance
+                            style={{ padding:'4px 8px', borderRadius:7, border:'1px solid #e5e7eb', background:'#f9fafb', fontSize:11, cursor:'pointer', transition:'all .15s', color:'#374151', fontWeight:500 }}>
+                            📋 Att.
                           </button>
+                          <button className="rpt-act" onClick={() => openFeesModal(r)}
+                            style={{ padding:'4px 8px', borderRadius:7, border:'1px solid #fca5a5', background:'#fef2f2', fontSize:11, cursor:'pointer', transition:'all .15s', color:'#dc2626', fontWeight:600 }}>
+                            💰 Fees
+                          </button>
+                        </div>
                         </td>
                         <td style={{ padding:'11px 14px' }}>
                           <span style={{ fontSize:11, fontWeight:800, padding:'3px 10px', borderRadius:99, background:r.is_approved?'#f0fdf4':'#fffbeb', color:r.is_approved?'#16a34a':'#d97706', border:`1px solid ${r.is_approved?'#bbf7d0':'#fde68a'}` }}>
@@ -449,6 +489,81 @@ export default function ReportsPage() {
           </div>
         ))}
       </div>
+
+      {/* ── Fees modal ── */}
+      <Modal open={!!feesModal} onClose={() => setFeesModal(null)}
+        title="Fees & Arrears"
+        subtitle={feesModal?.student?.full_name}
+        size="md"
+        footer={
+          <div style={{ display:'flex', gap:8 }}>
+            <Btn variant="secondary" onClick={() => setFeesModal(null)}>Cancel</Btn>
+            <Btn variant="danger" onClick={saveFees} loading={savingFees}>💾 Save Fees</Btn>
+          </div>
+        }>
+        {feesModal && (
+          <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+            <div style={{ background:'#fef2f2', border:'1px solid #fca5a5', borderRadius:8, padding:'10px 14px', fontSize:12, color:'#dc2626' }}>
+              Enter the fee details for <strong>{feesModal.student?.full_name}</strong>. Outstanding balance will automatically appear on their report card.
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+              {[
+                { label:'Total Fees (GH₵)', key:'fees_amount', placeholder:'e.g. 500' },
+                { label:'Amount Paid (GH₵)', key:'fees_paid', placeholder:'e.g. 300' },
+              ].map(({ label, key, placeholder }) => (
+                <div key={key}>
+                  <label style={{ display:'block', fontSize:11, fontWeight:700, color:'#374151', marginBottom:5, textTransform:'uppercase', letterSpacing:'.05em' }}>{label}</label>
+                  <input type="number" placeholder={placeholder}
+                    value={(feesData as any)[key]}
+                    onChange={e => {
+                      const val = e.target.value
+                      const newData = { ...feesData, [key]: val }
+                      const arrears = Math.max(0, Number(newData.fees_amount||0) - Number(newData.fees_paid||0))
+                      setFeesData({ ...newData, fees_arrears: arrears.toString() })
+                    }}
+                    style={{ width:'100%', padding:'9px 12px', borderRadius:9, border:'1.5px solid #e5e7eb', fontSize:13, outline:'none', fontFamily:'"DM Sans",sans-serif', boxSizing:'border-box' as any }} />
+                </div>
+              ))}
+            </div>
+            {feesData.fees_amount && feesData.fees_paid && (
+              <div style={{ background: Number(feesData.fees_arrears) > 0 ? '#fef2f2' : '#f0fdf4', border:`1px solid ${Number(feesData.fees_arrears) > 0 ? '#fca5a5' : '#bbf7d0'}`, borderRadius:8, padding:'8px 12px', display:'flex', justifyContent:'space-between' }}>
+                <span style={{ fontSize:12, fontWeight:700, color: Number(feesData.fees_arrears) > 0 ? '#dc2626' : '#16a34a' }}>
+                  {Number(feesData.fees_arrears) > 0 ? '⚠ Arrears' : '✓ Fully Paid'}
+                </span>
+                <span style={{ fontSize:13, fontWeight:800, color: Number(feesData.fees_arrears) > 0 ? '#dc2626' : '#16a34a' }}>
+                  GH₵ {Number(feesData.fees_arrears).toFixed(2)}
+                </span>
+              </div>
+            )}
+
+            {/* Other fees */}
+            <div>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+                <label style={{ fontSize:11, fontWeight:700, color:'#374151', textTransform:'uppercase', letterSpacing:'.05em' }}>Other Fees (Bus, Uniform, etc.)</label>
+                <button onClick={() => setFeesData(f => ({ ...f, other_fees: [...f.other_fees, { label:'', amount:'', paid:'' }] }))}
+                  style={{ padding:'4px 10px', borderRadius:7, border:'1.5px solid #ddd6fe', background:'#f5f3ff', color:'#6d28d9', fontSize:11, fontWeight:600, cursor:'pointer', fontFamily:'"DM Sans",sans-serif' }}>
+                  + Add
+                </button>
+              </div>
+              {feesData.other_fees.map((f, i) => (
+                <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px 28px', gap:6, marginBottom:6, alignItems:'center' }}>
+                  <input placeholder="e.g. Bus Fee" value={f.label}
+                    onChange={e => { const arr=[...feesData.other_fees]; arr[i]={...arr[i],label:e.target.value}; setFeesData(d=>({...d,other_fees:arr})) }}
+                    style={{ padding:'7px 10px', borderRadius:8, border:'1.5px solid #e5e7eb', fontSize:12, outline:'none', fontFamily:'"DM Sans",sans-serif' }}/>
+                  <input type="number" placeholder="Amount" value={f.amount}
+                    onChange={e => { const arr=[...feesData.other_fees]; arr[i]={...arr[i],amount:e.target.value}; setFeesData(d=>({...d,other_fees:arr})) }}
+                    style={{ padding:'7px 10px', borderRadius:8, border:'1.5px solid #e5e7eb', fontSize:12, outline:'none', fontFamily:'"DM Sans",sans-serif' }}/>
+                  <input type="number" placeholder="Paid" value={f.paid}
+                    onChange={e => { const arr=[...feesData.other_fees]; arr[i]={...arr[i],paid:e.target.value}; setFeesData(d=>({...d,other_fees:arr})) }}
+                    style={{ padding:'7px 10px', borderRadius:8, border:'1.5px solid #e5e7eb', fontSize:12, outline:'none', fontFamily:'"DM Sans",sans-serif' }}/>
+                  <button onClick={() => setFeesData(d => ({ ...d, other_fees: d.other_fees.filter((_,j)=>j!==i) }))}
+                    style={{ width:28, height:28, borderRadius:7, border:'none', background:'#fef2f2', color:'#dc2626', cursor:'pointer', fontSize:13 }}>🗑️</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* ── Attendance modal ── */}
       <Modal open={!!attModal} onClose={() => setAttModal(null)}

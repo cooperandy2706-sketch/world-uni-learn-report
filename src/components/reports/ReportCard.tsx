@@ -24,6 +24,7 @@ export default function ReportCard({ report, school, term, year, settings, reado
   const [htRemark, setHtRemark]         = useState(report?.headteacher_remarks ?? '')
   const [attEdit, setAttEdit]           = useState({ total_days: '', days_present: '', days_absent: '' })
   const [savingAtt, setSavingAtt]       = useState(false)
+  const [studentFees, setStudentFees]   = useState<any>(null)
 
   useEffect(() => {
     setTeacherRemark(report?.class_teacher_remarks ?? '')
@@ -35,14 +36,17 @@ export default function ReportCard({ report, school, term, year, settings, reado
   }, [report?.student_id, report?.term_id])
 
   async function load() {
-    const [{ data: sc }, { data: att }] = await Promise.all([
+    const [{ data: sc }, { data: att }, { data: sf }] = await Promise.all([
       supabase.from('scores').select('*, subject:subjects(id,name,code)')
         .eq('student_id', report.student_id).eq('term_id', report.term_id).order('subject(name)'),
       supabase.from('attendance').select('*')
         .eq('student_id', report.student_id).eq('term_id', report.term_id).maybeSingle(),
+      supabase.from('students').select('fees_amount,fees_paid,fees_arrears,other_fees')
+        .eq('id', report.student_id).maybeSingle(),
     ])
     setScores(sc ?? [])
     setAttendance(att)
+    setStudentFees(sf)
     if (att) {
       setAttEdit({ total_days: att.total_days ?? '', days_present: att.days_present ?? '', days_absent: att.days_absent ?? '' })
     }
@@ -274,6 +278,43 @@ export default function ReportCard({ report, school, term, year, settings, reado
             </div>
           </div>
         </div>
+
+        {/* ── FEES & ARREARS ── only shows if there is a balance */}
+        {studentFees && ((studentFees.fees_arrears > 0) || (studentFees.other_fees?.length > 0)) && (
+          <div className="rc-section-gap" style={{ marginBottom:8, border:'1.5px solid #fca5a5', borderRadius:6, overflow:'hidden' }}>
+            <div style={{ background:'#dc2626', padding:'5px 10px' }}>
+              <span style={{ fontSize:9.5, fontWeight:700, color:'#fff', textTransform:'uppercase', letterSpacing:'.06em' }}>⚠ Outstanding Fees</span>
+            </div>
+            <div style={{ padding:'8px 10px' }}>
+              {studentFees.fees_arrears > 0 && (
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'4px 0', borderBottom:'.5px solid #fee2e2', marginBottom:4 }}>
+                  <span style={{ fontSize:11, color:'#374151', fontWeight:600 }}>School Fees Arrears</span>
+                  <div style={{ textAlign:'right' }}>
+                    <span style={{ fontSize:12, fontWeight:800, color:'#dc2626' }}>GH₵ {Number(studentFees.fees_arrears).toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+              {(studentFees.other_fees ?? []).filter((f:any) => (f.amount - (f.paid??0)) > 0).map((f:any, i:number) => (
+                <div key={i} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'3px 0', borderBottom:'.5px solid #fee2e2' }}>
+                  <span style={{ fontSize:11, color:'#374151' }}>{f.label}</span>
+                  <span style={{ fontSize:11, fontWeight:700, color:'#dc2626' }}>GH₵ {(Number(f.amount) - Number(f.paid??0)).toFixed(2)}</span>
+                </div>
+              ))}
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:6, paddingTop:5, borderTop:'1px solid #fca5a5' }}>
+                <span style={{ fontSize:11, fontWeight:700, color:'#dc2626' }}>Total Outstanding</span>
+                <span style={{ fontSize:13, fontWeight:800, color:'#dc2626' }}>
+                  GH₵ {(
+                    Number(studentFees.fees_arrears ?? 0) +
+                    (studentFees.other_fees ?? []).reduce((s:number, f:any) => s + Math.max(0, Number(f.amount) - Number(f.paid??0)), 0)
+                  ).toFixed(2)}
+                </span>
+              </div>
+              <p style={{ fontSize:9.5, color:'#b91c1c', marginTop:4, fontStyle:'italic' }}>
+                Please settle all outstanding fees at the school accounts office before collecting the original report card.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* ── FOOTER ── */}
         <div style={{ borderTop:'2px solid #1e3a8a', paddingTop:7 }}>
