@@ -1,11 +1,14 @@
 // src/components/layout/Header.tsx
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
+import NotificationBell from './NotificationBell'
 
 export default function Header() {
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
+
+  const isAdmin = user?.role === 'admin'
 
   return (
     <header style={{
@@ -42,6 +45,7 @@ export default function Header() {
 
       {/* Right */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {isAdmin && <NotificationBell />}
         <div style={{ width: 1, height: 24, background: '#f0eefe', margin: '0 4px' }} />
         <div style={{
           width: 36, height: 36, borderRadius: '50%',

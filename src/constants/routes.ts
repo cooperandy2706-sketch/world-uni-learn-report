@@ -16,10 +16,17 @@ export const ROUTES = {
   ADMIN_REPORTS: '/admin/reports',
   ADMIN_ANALYTICS: '/admin/analytics',
   ADMIN_SETTINGS: '/admin/settings',
+  ADMIN_TIMETABLE:    '/admin/timetable',
+ADMIN_ANNOUNCEMENTS:'/admin/announcements',
+ADMIN_SYLLABUS:     '/admin/syllabus',
+ADMIN_WEEKLY_GOALS: '/admin/weekly-goals',
 
   // Teacher
   TEACHER_DASHBOARD: '/teacher/dashboard',
   TEACHER_MY_CLASSES: '/teacher/my-classes',
   TEACHER_SCORE_ENTRY: '/teacher/score-entry',
   TEACHER_REPORTS: '/teacher/reports',
+  TEACHER_TIMETABLE:     '/teacher/timetable',
+TEACHER_NOTIFICATIONS: '/teacher/notifications',
+
 } as const

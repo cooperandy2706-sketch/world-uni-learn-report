@@ -16,6 +16,10 @@ const adminLinks = [
   { to: ROUTES.ADMIN_REPORTS,        label: 'Reports',        icon: '📄',  emoji: true },
   { to: ROUTES.ADMIN_ANALYTICS,      label: 'Analytics',      icon: '📊',  emoji: true },
   { to: ROUTES.ADMIN_SETTINGS,       label: 'Settings',       icon: '⚙️',  emoji: true },
+  { to: ROUTES.ADMIN_TIMETABLE,     label: 'Timetable',       icon: '📅', emoji: true },
+{ to: ROUTES.ADMIN_ANNOUNCEMENTS, label: 'Announcements',    icon: '📢', emoji: true },
+{ to: ROUTES.ADMIN_SYLLABUS,      label: 'Syllabus',         icon: '📚', emoji: true },
+{ to: ROUTES.ADMIN_WEEKLY_GOALS,  label: 'Weekly Goals',     icon: '🎯', emoji: true },
 ]
 
 const teacherLinks = [
@@ -23,6 +27,8 @@ const teacherLinks = [
   { to: ROUTES.TEACHER_MY_CLASSES,  label: 'My Classes',  icon: '🏫',  emoji: true },
   { to: ROUTES.TEACHER_SCORE_ENTRY, label: 'Score Entry', icon: '✏️',  emoji: true },
   { to: ROUTES.TEACHER_REPORTS,     label: 'Reports',     icon: '📄',  emoji: true },
+  { to: ROUTES.TEACHER_TIMETABLE,     label: 'Timetable',      icon: '📅', emoji: true },
+{ to: ROUTES.TEACHER_NOTIFICATIONS, label: 'Notifications',  icon: '🔔', emoji: true },
 ]
 
 // ── The GES-inspired logo mark ────────────────────────────
