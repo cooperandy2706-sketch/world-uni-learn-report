@@ -3,6 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import Sidebar from './Sidebar'
 import Header from './Header'
+import BottomNav from './BottomNav'
 import { ROUTES } from '../../constants/routes'
 
 interface AppLayoutProps { requiredRole?: 'admin' | 'teacher' }
@@ -26,14 +27,26 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
   }
 
   return (
-    <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:'#f8f7ff', fontFamily:'"DM Sans",system-ui,sans-serif' }}>
-      <Sidebar />
-      <div style={{ display:'flex', flex:1, flexDirection:'column', overflow:'hidden', minWidth:0 }}>
-        <Header />
-        <main style={{ flex:1, overflowY:'auto', padding:'28px 32px 48px' }}>
-          <Outlet />
-        </main>
+    <>
+      <style>{`
+        @media (max-width: 767px) {
+          .app-sidebar { display: none !important; }
+          .app-main { padding: 16px 14px 80px !important; }
+          .app-header { padding: 0 14px !important; }
+        }
+      `}</style>
+      <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:'#f8f7ff', fontFamily:'"DM Sans",system-ui,sans-serif' }}>
+        <div className="app-sidebar">
+          <Sidebar />
+        </div>
+        <div style={{ display:'flex', flex:1, flexDirection:'column', overflow:'hidden', minWidth:0 }}>
+          <Header />
+          <main className="app-main" style={{ flex:1, overflowY:'auto', padding:'28px 32px 48px' }}>
+            <Outlet />
+          </main>
+        </div>
       </div>
-    </div>
+      <BottomNav />
+    </>
   )
 }
