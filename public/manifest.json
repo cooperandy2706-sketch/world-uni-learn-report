@@ -1,6 +1,6 @@
 {
-  "name": "WULA Reports",
-  "short_name": "WULA",
+  "name": "World UniLearn",
+  "short_name": "World UniLearn",
   "description": "World Uni-Learn Academy — GES School Report Card Management System",
   "start_url": "/",
   "display": "standalone",
