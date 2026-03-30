@@ -3,88 +3,91 @@ import { supabase } from '../lib/supabase'
 
 export const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY ?? ''
 
-function urlBase64ToUint8Array(base64String: string) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4)
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
-  const rawData = window.atob(base64)
-  const outputArray = new Uint8Array(rawData.length)
-  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i)
-  return outputArray
+function urlBase64ToUint8Array(base64: string) {
+  const pad = '='.repeat((4 - base64.length % 4) % 4)
+  const b64 = (base64 + pad).replace(/-/g, '+').replace(/_/g, '/')
+  const raw = atob(b64)
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)))
 }
 
-export async function subscribeToPush(userId: string): Promise<boolean> {
+export async function requestAndSubscribe(userId: string): Promise<'granted' | 'denied' | 'unsupported' | 'error'> {
   try {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      console.log('Push not supported in this browser')
-      return false
+    // 1. Browser support check
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+      console.warn('[Push] Not supported in this browser')
+      return 'unsupported'
     }
 
-    // Request notification permission
+    // 2. Check VAPID key
+    if (!VAPID_PUBLIC_KEY) {
+      console.error('[Push] VITE_VAPID_PUBLIC_KEY is not set in environment variables')
+      return 'error'
+    }
+
+    // 3. Request permission — this shows the browser popup
     const permission = await Notification.requestPermission()
-    if (permission !== 'granted') {
-      console.log('Permission denied:', permission)
-      return false
+    console.log('[Push] Permission:', permission)
+    if (permission !== 'granted') return 'denied'
+
+    // 4. Wait for SW to be ready
+    const reg = await navigator.serviceWorker.ready
+    console.log('[Push] SW ready:', reg.scope)
+
+    // 5. Unsubscribe old subscription if exists
+    const existing = await reg.pushManager.getSubscription()
+    if (existing) {
+      console.log('[Push] Removing old subscription')
+      await existing.unsubscribe()
     }
 
-    // Wait for SW to be ready (it should already be registered from main.tsx)
-    const reg = await navigator.serviceWorker.ready
-    console.log('SW ready:', reg.scope)
-
-    // Check if already subscribed
-    const existing = await reg.pushManager.getSubscription()
-    if (existing) await existing.unsubscribe()
-
-    // Subscribe with VAPID key
+    // 6. Subscribe with VAPID
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     })
+    console.log('[Push] Subscribed:', sub.endpoint.slice(0, 50) + '...')
 
-    const subJson = sub.toJSON()
-    const keys = subJson.keys as any
+    const json = sub.toJSON()
+    const keys = json.keys as any
 
-    // Save subscription to Supabase
+    // 7. Save to Supabase
     const { error } = await supabase.from('push_subscriptions').upsert({
-      user_id: userId,
+      user_id:  userId,
       endpoint: sub.endpoint,
-      p256dh: keys.p256dh,
-      auth: keys.auth,
+      p256dh:   keys.p256dh,
+      auth:     keys.auth,
     }, { onConflict: 'endpoint' })
 
     if (error) {
-      console.error('Push save error:', error)
-      return false
+      console.error('[Push] Save error:', error)
+      return 'error'
     }
 
-    console.log('Push subscription saved successfully')
-    return true
+    console.log('[Push] Saved to database ✓')
+    return 'granted'
   } catch (e: any) {
-    console.error('Push subscribe error:', e.message)
-    return false
-  }
-}
-
-export async function unsubscribeFromPush(): Promise<void> {
-  try {
-    const reg = await navigator.serviceWorker.ready
-    const sub = await reg.pushManager.getSubscription()
-    if (sub) {
-      await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
-      await sub.unsubscribe()
-    }
-  } catch (e) {
-    console.error('Unsubscribe error:', e)
+    console.error('[Push] Error:', e.message)
+    return 'error'
   }
 }
 
 export async function isPushSubscribed(): Promise<boolean> {
   try {
     if (!('serviceWorker' in navigator)) return false
-    const reg = await navigator.serviceWorker.getRegistration('/sw.js')
+    const reg = await navigator.serviceWorker.getRegistration()
     if (!reg) return false
     const sub = await reg.pushManager.getSubscription()
     return !!sub
-  } catch {
-    return false
-  }
+  } catch { return false }
+}
+
+export async function unsubscribe(): Promise<void> {
+  try {
+    const reg = await navigator.serviceWorker.getRegistration()
+    const sub = await reg?.pushManager.getSubscription()
+    if (sub) {
+      await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
+      await sub.unsubscribe()
+    }
+  } catch (e) { console.error('[Push] Unsubscribe error:', e) }
 }

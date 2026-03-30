@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import NotificationBell from './NotificationBell'
+import { requestAndSubscribe, isPushSubscribed, VAPID_PUBLIC_KEY } from '../../utils/pushNotifications'
 
 export default function Header() {
   const { user, signOut, isAdmin } = useAuth()
@@ -12,6 +13,18 @@ export default function Header() {
   const navigate        = useNavigate()
   const [open, setOpen] = useState(false)
   const [signing, setSigning] = useState(false)
+  const [pushEnabled, setPushEnabled] = useState<boolean|null>(null)
+
+  useEffect(() => {
+    if (!isAdmin) isPushSubscribed().then(s => setPushEnabled(s))
+  }, [isAdmin])
+
+  async function enablePush() {
+    setOpen(false)
+    const result = await requestAndSubscribe(user!.id)
+    if (result === 'granted') { setPushEnabled(true); alert('🔔 Notifications enabled!') }
+    else if (result === 'denied') alert('Notifications blocked. Go to browser Settings → Allow notifications for this site.')
+  }
   const ref = useRef<HTMLDivElement>(null)
 
   // Close on outside click
@@ -43,6 +56,7 @@ export default function Header() {
     { icon: '🔔', label: 'Notifications',  path: '/teacher/notifications' },
     { icon: '📅', label: 'My Timetable',   path: '/teacher/timetable' },
     { icon: '📚', label: 'My Classes',     path: '/teacher/my-classes' },
+    ...(!pushEnabled && VAPID_PUBLIC_KEY ? [{ icon: '🔕', label: 'Enable Push Alerts', action: enablePush, highlight: true }] : []),
     { divider: true },
     { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
   ]
@@ -192,7 +206,7 @@ export default function Header() {
                         </span>
                         <span style={{
                           fontSize:13, fontWeight:500,
-                          color: item.danger ? '#dc2626' : '#374151',
+                          color: item.danger ? '#dc2626' : item.highlight ? '#d97706' : '#374151',
                         }}>
                           {item.label}
                           {item.label === 'Sign Out' && signing && '…'}

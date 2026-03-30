@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
+import EnablePushButton from '../../components/ui/EnablePushButton'
 
 const TYPE_ICON:any={info:'ℹ️',class_reminder:'🔔',announcement:'📢',meeting:'📅',test:'📝',exam:'📋',reminder:'⏰',holiday:'🎉'}
 
@@ -74,6 +75,9 @@ export default function TeacherNotificationsPage(){
             </button>
           )}
         </div>
+
+        {/* Push enable prompt */}
+        <EnablePushButton />
 
         {/* Tabs */}
         <div style={{display:'flex',gap:4,marginBottom:18,background:'#f5f3ff',borderRadius:12,padding:4,width:'fit-content'}}>
