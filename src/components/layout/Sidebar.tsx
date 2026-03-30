@@ -90,7 +90,7 @@ export default function Sidebar() {
               <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase', lineHeight: 1 }}>World</div>
               <div style={{ fontFamily: '"Playfair Display", serif', fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2, marginTop: 2 }}>
                 Uni-Learn<br/>
-                <span style={{ fontSize: 11, fontWeight: 400, color: 'rgba(255,255,255,0.6)', fontFamily: '"DM Sans",sans-serif' }}>Report System</span>
+                <span style={{ fontSize: 11, fontWeight: 400, color: 'rgba(255,255,255,0.6)', fontFamily: '"DM Sans",sans-serif' }}>School Management System</span>
               </div>
             </div>
           </div>
