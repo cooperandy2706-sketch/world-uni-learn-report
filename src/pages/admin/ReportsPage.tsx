@@ -31,7 +31,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
 }
 
 // ── A4 print single ───────────────────────────────────────
-function printSingle(studentName: string) {
+function printSingle(studentName: string, isBW: boolean = false) {
   const el = document.getElementById('single-report-print-area')
   if (!el) return
   // Wait for async data inside ReportCard
@@ -44,7 +44,11 @@ function printSingle(studentName: string) {
       <style>
         *{box-sizing:border-box;margin:0;padding:0}
         body{font-family:'DM Sans',sans-serif;background:#fff}
-        @media print{@page{size:A4 portrait;margin:8mm}body{padding:0}}
+        @media print{
+          @page{size:A4 portrait;margin:8mm}
+          body{padding:0}
+          .rc-wrap { ${isBW ? 'filter: grayscale(100%) !important;' : ''} }
+        }
       </style>
       </head><body>${el.innerHTML}</body></html>`)
     win.document.close()
@@ -54,7 +58,7 @@ function printSingle(studentName: string) {
 }
 
 // ── A4 print bulk ─────────────────────────────────────────
-function printBulk(className: string) {
+function printBulk(className: string, isBW: boolean = false) {
   const el = document.getElementById('bulk-report-print-area')
   if (!el) return
   setTimeout(() => {
@@ -67,7 +71,11 @@ function printBulk(className: string) {
         *{box-sizing:border-box;margin:0;padding:0}
         body{font-family:'DM Sans',sans-serif;background:#fff}
         .page-break{page-break-after:always;break-after:page}
-        @media print{@page{size:A4 portrait;margin:8mm}body{padding:0}}
+        @media print{
+          @page{size:A4 portrait;margin:8mm}
+          body{padding:0}
+          .rc-wrap { ${isBW ? 'filter: grayscale(100%) !important;' : ''} }
+        }
       </style>
       </head><body>${el.innerHTML}</body></html>`)
     win.document.close()
@@ -148,10 +156,11 @@ async function downloadPDF(studentName: string) {
     pdf.save(`Report_${studentName.replace(/\s+/g, '_')}.pdf`)
     toast.success('PDF downloaded!', { id: toastId })
   } catch (e: any) {
-    // Restore element visibility on error
+    console.error('PDF failed:', e)
+    toast.error('PDF failed: ' + (e.message || 'Unknown error'), { id: toastId })
+  } finally {
     const el2 = document.getElementById('single-report-print-area')
     if (el2) el2.style.display = 'none'
-    toast.error('PDF failed: ' + e.message, { id: toastId })
   }
 }
 
@@ -170,9 +179,11 @@ export default function ReportsPage() {
   const [attModal, setAttModal]             = useState<any>(null)
   const [attData, setAttData]               = useState({ total_days:'', days_present:'' })
   const [savingAtt, setSavingAtt]           = useState(false)
+  const [fetchingAtt, setFetchingAtt]       = useState(false)
   const [feesModal, setFeesModal]           = useState<any>(null)
   const [feesData, setFeesData]             = useState({ fees_amount:'', fees_paid:'', fees_arrears:'', other_fees:[] as any[] })
   const [savingFees, setSavingFees]         = useState(false)
+  const [isBW, setIsBW]                     = useState(false)
 
   const { data: reports = [], isLoading } = useReportsByClassTerm(selectedClass, (term as any)?.id ?? '')
   const generateReports = useGenerateReports()
@@ -225,6 +236,39 @@ export default function ReportsPage() {
     setAttData({ total_days:'', days_present:'' })
   }
 
+  // ── Sync attendance from daily records ────────────────────
+  async function syncFromRegister() {
+    if (!attModal) return
+    setFetchingAtt(true)
+    try {
+      const { data, error } = await supabase
+        .from('attendance_records')
+        .select('status')
+        .eq('student_id', attModal.student_id)
+        .eq('term_id', attModal.term_id)
+
+      if (error) throw error
+
+      if (!data || data.length === 0) {
+        toast.error('No daily records found for this student/term')
+        return
+      }
+
+      const total = data.length
+      const present = data.filter((r: any) => r.status === 'present' || r.status === 'late').length
+
+      setAttData({
+        total_days: total.toString(),
+        days_present: present.toString(),
+      })
+      toast.success(`Synced ${total} daily records ✓`)
+    } catch (e: any) {
+      toast.error('Sync failed: ' + e.message)
+    } finally {
+      setFetchingAtt(false)
+    }
+  }
+
   // ── Save fees ─────────────────────────────────────────────
   async function saveFees() {
     if (!feesModal) return
@@ -269,7 +313,9 @@ export default function ReportsPage() {
           .from('report_cards')
           .select('*, student:students(*, class:classes(id,name))')
           .eq('class_id', cls.id).eq('term_id', (term as any).id).order('overall_position')
+        
         if (!classReports?.length) continue
+
         const enriched = await Promise.all(classReports.map(async (r: any) => {
           const [{ data: sc }, { data: att }] = await Promise.all([
             supabase.from('scores').select('*, subject:subjects(id,name,code)').eq('student_id', r.student_id).eq('term_id', (term as any).id),
@@ -277,9 +323,16 @@ export default function ReportsPage() {
           ])
           return { ...r, _scores: sc ?? [], _attendance: att }
         }))
-        const html = buildClassHTML(enriched, cls.name, school, term, year, settings)
+
+        const html = buildClassHTML(enriched, cls.name, school, term, year, settings, isBW)
         const win = window.open('', '_blank', 'width=900,height=700')
-        if (win) { win.document.write(html); win.document.close(); win.focus(); await new Promise(r => setTimeout(r, 600)); win.print() }
+        if (win) {
+          win.document.write(html)
+          win.document.close()
+          win.focus()
+          await new Promise(r => setTimeout(r, 600))
+          win.print()
+        }
         await new Promise(r => setTimeout(r, 1200))
       }
       toast.success('Export complete')
@@ -299,7 +352,7 @@ export default function ReportsPage() {
       `}</style>
 
       <div style={{ fontFamily:'"DM Sans",system-ui,sans-serif', animation:'_rfadeIn .4s ease' }}>
-
+        
         {/* ── Header ── */}
         <div style={{ marginBottom:22, display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
           <div>
@@ -320,7 +373,7 @@ export default function ReportsPage() {
                 Exporting {exportProgress.current}/{exportProgress.total}: <strong>{exportProgress.className}</strong>
               </p>
               <div style={{ height:5, background:'#fde68a', borderRadius:99, overflow:'hidden' }}>
-                <div style={{ height:'100%', width:`${Math.round(exportProgress.current/exportProgress.total*100)}%`, background:'linear-gradient(90deg,#f59e0b,#fbbf24)', borderRadius:99, transition:'width .4s' }} />
+                <div style={{ height:'100%', width:`${Math.round(exportProgress.current / exportProgress.total * 100)}%`, background:'linear-gradient(90deg,#f59e0b,#fbbf24)', borderRadius:99, transition:'width .4s' }} />
               </div>
             </div>
           </div>
@@ -344,7 +397,7 @@ export default function ReportsPage() {
               {(reports as any[]).length > 0 && <>
                 {approvedCount < reports.length && <Btn variant="success" onClick={approveAll}>✅ Approve All</Btn>}
                 <Btn variant="info" onClick={() => setBulkPreviewOpen(true)}>👁️ Preview All</Btn>
-                <Btn variant="secondary" onClick={() => printBulk(selectedClassName)}>🖨️ Print Class</Btn>
+                <Btn variant="secondary" onClick={() => printBulk(selectedClassName, isBW)}>🖨️ Print Class</Btn>
               </>}
             </div>
           </div>
@@ -377,9 +430,9 @@ export default function ReportsPage() {
             {/* Summary */}
             <div style={{ background:'#fff', borderRadius:14, padding:'12px 18px', border:'1.5px solid #f0eefe', marginBottom:14, display:'flex', flexWrap:'wrap', gap:20, alignItems:'center' }}>
               {[
-                { label:'Class', value:selectedClassName },
-                { label:'Students', value:reports.length },
-                { label:'Approved', value:`${approvedCount} / ${reports.length}` },
+                { label:'Class', value: selectedClassName },
+                { label:'Students', value: reports.length },
+                { label:'Approved', value: `${approvedCount} / ${reports.length}` },
               ].map(s => (
                 <div key={s.label}>
                   <div style={{ fontSize:10, color:'#9ca3af', fontWeight:700, textTransform:'uppercase', letterSpacing:'.06em' }}>{s.label}</div>
@@ -389,7 +442,7 @@ export default function ReportsPage() {
               <div style={{ flex:1, minWidth:140 }}>
                 <div style={{ fontSize:10, color:'#9ca3af', fontWeight:700, textTransform:'uppercase', letterSpacing:'.06em', marginBottom:4 }}>Progress</div>
                 <div style={{ height:7, background:'#f0eefe', borderRadius:99, overflow:'hidden' }}>
-                  <div style={{ height:'100%', width:approvalPct+'%', background:approvalPct===100?'linear-gradient(90deg,#16a34a,#22c55e)':'linear-gradient(90deg,#7c3aed,#a78bfa)', borderRadius:99, transition:'width .8s' }} />
+                  <div style={{ height:'100%', width:approvalPct+'%', background: approvalPct===100?'linear-gradient(90deg,#16a34a,#22c55e)':'linear-gradient(90deg,#7c3aed,#a78bfa)', borderRadius:99, transition:'width .8s' }} />
                 </div>
                 <div style={{ fontSize:11, color:'#6b7280', marginTop:3 }}>{approvalPct}% approved</div>
               </div>
@@ -400,7 +453,7 @@ export default function ReportsPage() {
               <table style={{ width:'100%', borderCollapse:'collapse' }}>
                 <thead>
                   <tr style={{ background:'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom:'1.5px solid #ede9fe' }}>
-                    {['#','Student','Average','Position','Grade','Attendance','Status','Actions'].map(h => (
+                    {['#', 'Student', 'Average', 'Position', 'Grade', 'Attendance', 'Status', 'Actions'].map(h => (
                       <th key={h} style={{ padding:'11px 14px', textAlign:'left', fontSize:11, fontWeight:700, color:'#6d28d9', textTransform:'uppercase', letterSpacing:'.06em', whiteSpace:'nowrap' }}>{h}</th>
                     ))}
                   </tr>
@@ -409,8 +462,8 @@ export default function ReportsPage() {
                   {(reports as any[]).map((r: any, i: number) => {
                     const g = getGradeInfo(r.average_score ?? 0)
                     return (
-                      <tr key={r.id} className="rpt-row" style={{ borderBottom: i < reports.length-1 ? '1px solid #faf5ff':'none', transition:'background .12s', animation:`_rfadeUp .3s ease ${i*.02}s both` }}>
-                        <td style={{ padding:'11px 14px', fontSize:i<3?18:13, fontWeight:700 }}>
+                      <tr key={r.id} className="rpt-row" style={{ borderBottom: i < reports.length-1 ? '1px solid #faf5ff' : 'none', transition:'background .12s', animation:`_rfadeUp .3s ease ${i*.02}s both` }}>
+                        <td style={{ padding:'11px 14px', fontSize: i<3?18:13, fontWeight:700 }}>
                           {['🥇','🥈','🥉'][i] ?? `#${i+1}`}
                         </td>
                         <td style={{ padding:'11px 14px' }}>
@@ -425,7 +478,7 @@ export default function ReportsPage() {
                           </div>
                         </td>
                         <td style={{ padding:'11px 14px' }}>
-                          <span style={{ fontSize:15, fontWeight:800, color:g.color }}>{(r.average_score??0).toFixed(1)}%</span>
+                          <span style={{ fontSize:15, fontWeight:800, color:g.color }}>{(r.average_score ?? 0).toFixed(1)}%</span>
                         </td>
                         <td style={{ padding:'11px 14px', fontSize:13, color:'#374151', fontWeight:500 }}>
                           {ordinal(r.overall_position ?? 0)} / {r.total_students}
@@ -435,18 +488,18 @@ export default function ReportsPage() {
                         </td>
                         <td style={{ padding:'11px 14px' }}>
                           <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
-                          <button className="rpt-act" onClick={() => { setAttModal(r); setAttData({ total_days:'', days_present:'' }) }}
-                            style={{ padding:'4px 8px', borderRadius:7, border:'1px solid #e5e7eb', background:'#f9fafb', fontSize:11, cursor:'pointer', transition:'all .15s', color:'#374151', fontWeight:500 }}>
-                            📋 Att.
-                          </button>
-                          <button className="rpt-act" onClick={() => openFeesModal(r)}
-                            style={{ padding:'4px 8px', borderRadius:7, border:'1px solid #fca5a5', background:'#fef2f2', fontSize:11, cursor:'pointer', transition:'all .15s', color:'#dc2626', fontWeight:600 }}>
-                            💰 Fees
-                          </button>
-                        </div>
+                            <button className="rpt-act" onClick={() => { setAttModal(r); setAttData({ total_days:'', days_present:'' }) }}
+                              style={{ padding:'4px 8px', borderRadius:7, border:'1.5px solid #e5e7eb', background:'#f9fafb', fontSize:11, cursor:'pointer', transition:'all .15s', color:'#374151', fontWeight:500 }}>
+                              📋 Att.
+                            </button>
+                            <button className="rpt-act" onClick={() => openFeesModal(r)}
+                              style={{ padding:'4px 8px', borderRadius:7, border:'1.5px solid #fca5a5', background:'#fef2f2', fontSize:11, cursor:'pointer', transition:'all .15s', color:'#dc2626', fontWeight:600 }}>
+                              💰 Fees
+                            </button>
+                          </div>
                         </td>
                         <td style={{ padding:'11px 14px' }}>
-                          <span style={{ fontSize:11, fontWeight:800, padding:'3px 10px', borderRadius:99, background:r.is_approved?'#f0fdf4':'#fffbeb', color:r.is_approved?'#16a34a':'#d97706', border:`1px solid ${r.is_approved?'#bbf7d0':'#fde68a'}` }}>
+                          <span style={{ fontSize:11, fontWeight:800, padding:'3px 10px', borderRadius:99, background: r.is_approved ? '#f0fdf4' : '#fffbeb', color: r.is_approved ? '#16a34a' : '#d97706', border:`1px solid ${r.is_approved ? '#bbf7d0' : '#fde68a'}` }}>
                             {r.is_approved ? '✓ Approved' : '⏳ Pending'}
                           </span>
                         </td>
@@ -454,10 +507,10 @@ export default function ReportsPage() {
                           <div style={{ display:'flex', gap:4 }}>
                             <button className="rpt-act" title="View" onClick={() => setViewingReport(r)}
                               style={{ width:30, height:30, borderRadius:8, border:'none', background:'#f5f3ff', color:'#6d28d9', cursor:'pointer', fontSize:14, transition:'all .15s' }}>👁️</button>
-                            <button className="rpt-act" title="Print"
-                              onClick={() => { setViewingReport(r); setTimeout(() => printSingle(r.student?.full_name??''), 700) }}
+                            <button className="rpt-act" title="Print" 
+                              onClick={() => { setViewingReport(r); setTimeout(() => printSingle(r.student?.full_name??'', isBW), 700) }}
                               style={{ width:30, height:30, borderRadius:8, border:'none', background:'#f5f3ff', color:'#6d28d9', cursor:'pointer', fontSize:14, transition:'all .15s' }}>🖨️</button>
-                            <button className="rpt-act" title="Download PDF"
+                            <button className="rpt-act" title="Download PDF" 
                               onClick={() => { setViewingReport(r); setTimeout(() => downloadPDF(r.student?.full_name??''), 700) }}
                               style={{ width:30, height:30, borderRadius:8, border:'none', background:'#f5f3ff', color:'#6d28d9', cursor:'pointer', fontSize:14, transition:'all .15s' }}>⬇️</button>
                             {!r.is_approved && (
@@ -479,13 +532,13 @@ export default function ReportsPage() {
       {/* ── Hidden print areas ── */}
       <div id="single-report-print-area" style={{ display:'none' }}>
         {viewingReport && (
-          <ReportCard report={viewingReport} school={school} term={term} year={year} settings={settings} readonly />
+          <ReportCard report={viewingReport} school={school} term={term} year={year} settings={settings} isBW={isBW} setIsBW={setIsBW} readonly />
         )}
       </div>
       <div id="bulk-report-print-area" style={{ display:'none' }}>
         {(reports as any[]).map((r: any, i: number) => (
           <div key={r.id} className={i < reports.length-1 ? 'page-break' : ''}>
-            <ReportCard report={r} school={school} term={term} year={year} settings={settings} readonly />
+            <ReportCard report={r} school={school} term={term} year={year} settings={settings} isBW={isBW} setIsBW={setIsBW} readonly />
           </div>
         ))}
       </div>
@@ -576,10 +629,19 @@ export default function ReportsPage() {
             <Btn variant="success" onClick={saveAttendance} loading={savingAtt}>💾 Save</Btn>
           </div>
         }>
+        {/* Attendance modal content */}
         {attModal && (
           <div style={{ display:'flex', flexDirection:'column', gap:14, padding:'4px 0' }}>
-            <div style={{ background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:8, padding:'10px 14px', fontSize:12, color:'#15803d' }}>
-              Attendance for <strong>{attModal.student?.full_name}</strong> — {(term as any)?.name}
+            <div style={{ background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:8, padding:'10px 14px', fontSize:12, color:'#15803d', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+              <div>
+                Attendance for <strong>{attModal.student?.full_name}</strong> — {(term as any)?.name}
+              </div>
+              <button
+                onClick={syncFromRegister}
+                disabled={fetchingAtt}
+                style={{ background:'#fff', border:'1.5px solid #16a34a', color:'#16a34a', padding:'4px 10px', borderRadius:7, fontSize:11, fontWeight:700, cursor:'pointer', transition:'all .15s', display:'flex', alignItems:'center', gap:5 }}>
+                {fetchingAtt ? '⏳...' : '🔄 Use Register'}
+              </button>
             </div>
             {[
               { label:'Total School Days', key:'total_days', placeholder:'e.g. 65' },
@@ -611,12 +673,13 @@ export default function ReportsPage() {
             {viewingReport && !viewingReport.is_approved && (
               <Btn variant="success" onClick={() => { approveReport.mutate(viewingReport.id); setViewingReport(null) }}>✅ Approve</Btn>
             )}
-            <Btn variant="info" onClick={() => printSingle(viewingReport?.student?.full_name ?? '')}>🖨️ Print A4</Btn>
+            <Btn variant="info" onClick={() => printSingle(viewingReport?.student?.full_name ?? '', isBW)}>🖨️ Print A4</Btn>
             <Btn variant="warning" onClick={() => downloadPDF(viewingReport?.student?.full_name ?? '')}>⬇️ Download PDF</Btn>
           </div>
         }>
         {viewingReport && (
           <ReportCard report={viewingReport} school={school} term={term} year={year} settings={settings}
+            isBW={isBW} setIsBW={setIsBW}
             onRemarksUpdate={remarks => updateRemarks.mutate({ reportId: viewingReport.id, remarks })} />
         )}
       </Modal>
@@ -629,7 +692,7 @@ export default function ReportsPage() {
         footer={
           <div style={{ display:'flex', gap:8 }}>
             <Btn variant="secondary" onClick={() => setBulkPreviewOpen(false)}>Close</Btn>
-            <Btn variant="info" onClick={() => { setBulkPreviewOpen(false); setTimeout(() => printBulk(selectedClassName), 300) }}>
+            <Btn variant="info" onClick={() => { setBulkPreviewOpen(false); setTimeout(() => printBulk(selectedClassName, isBW), 300) }}>
               🖨️ Print All {reports.length} Reports
             </Btn>
           </div>
@@ -642,10 +705,10 @@ export default function ReportsPage() {
                 <span style={{ fontSize:12, fontWeight:700, color:'#6d28d9', background:'#f5f3ff', padding:'3px 10px', borderRadius:99 }}>
                   {ordinal(i+1)} · {r.student?.full_name}
                 </span>
-                <button onClick={() => { setBulkPreviewOpen(false); setViewingReport(r); setTimeout(() => printSingle(r.student?.full_name??''), 700) }}
+                <button onClick={() => { setBulkPreviewOpen(false); setViewingReport(r); setTimeout(() => printSingle(r.student?.full_name??'', isBW), 700) }}
                   style={{ padding:'5px 12px', borderRadius:8, border:'none', background:'#f5f3ff', color:'#6d28d9', fontSize:12, fontWeight:600, cursor:'pointer' }}>🖨️ Print This</button>
               </div>
-              <ReportCard report={r} school={school} term={term} year={year} settings={settings} readonly />
+              <ReportCard report={r} school={school} term={term} year={year} settings={settings} isBW={isBW} setIsBW={setIsBW} readonly />
             </div>
           ))}
         </div>
@@ -655,7 +718,7 @@ export default function ReportsPage() {
 }
 
 // ── Build HTML for export-all ─────────────────────────────
-function buildClassHTML(reports: any[], className: string, school: any, term: any, year: any, settings: any): string {
+function buildClassHTML(reports: any[], className: string, school: any, term: any, year: any, settings: any, isBW: boolean = false): string {
   const GS = [{g:'A',min:80,c:'#16a34a'},{g:'B',min:70,c:'#2563eb'},{g:'C',min:60,c:'#7c3aed'},{g:'D',min:50,c:'#d97706'},{g:'E',min:40,c:'#ea580c'},{g:'F',min:0,c:'#dc2626'}]
   const getG = (n: number) => GS.find(g => n >= g.min) ?? GS[5]
   const ord = (n: number) => { const s=['th','st','nd','rd'],v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]) }
@@ -665,62 +728,61 @@ function buildClassHTML(reports: any[], className: string, school: any, term: an
     const att    = r._attendance
     const st     = r.student ?? {}
     const total  = scores.reduce((s: number, x: any) => s + (x.total_score ?? 0), 0)
-    const rows   = scores.map((s: any, si: number) => {
-      const g = getG(s.total_score ?? 0)
-      return `<tr style="background:${si%2===0?'#fff':'#f8fafc'}">
-        <td style="padding:4px 7px;font-size:11px;font-weight:500">${s.subject?.name??'—'}</td>
-        <td style="padding:4px 7px;font-size:11px;text-align:center">${s.class_score??'—'}</td>
-        <td style="padding:4px 7px;font-size:11px;text-align:center">${s.exam_score??'—'}</td>
-        <td style="padding:4px 7px;font-size:11px;text-align:center;font-weight:700;color:${(s.total_score??0)>=50?'#15803d':'#dc2626'}">${s.total_score?.toFixed(1)??'—'}</td>
-        <td style="padding:4px 7px;font-size:11px;text-align:center;font-weight:800;color:${g.c}">${g.g}</td>
-        <td style="padding:4px 7px;font-size:11px;text-align:center">${s.position?ord(s.position):'—'}</td>
-        <td style="padding:4px 7px;font-size:10px;color:#64748b">${s.teacher_remarks??'—'}</td>
-      </tr>`
-    }).join('')
-
-    return `<div style="page-break-after:${idx<reports.length-1?'always':'auto'};padding:12px 16px;font-family:'DM Sans',sans-serif;max-width:760px;margin:0 auto;font-size:12px">
-      <div style="text-align:center;border-bottom:2.5px solid #1e3a8a;padding-bottom:10px;margin-bottom:10px">
-        ${school?.logo_url?`<img src="${school.logo_url}" style="height:48px;object-fit:contain;margin-bottom:4px"/>`:'' }
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#1e3a8a">${school?.name??'School'}</div>
-        ${school?.motto?`<div style="font-size:10px;color:#64748b;font-style:italic">${school.motto}</div>`:''}
-        <div style="margin-top:7px;background:#1e3a8a;color:#fff;padding:3px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em">
+    
+    return `<div style="page-break-after:${idx<reports.length-1?'always':'auto'};padding:12px 16px;font-family:'DM Sans',sans-serif;max-width:800px;margin:0 auto;font-size:13.5px;color:#000;background:#fff;filter:${isBW?'grayscale(100%)':'none'}" class="rc-wrap">
+      <div style="text-align:center;border-bottom:${isBW?'3px solid #000':'2.5px solid #1e3a8a'};padding-bottom:10px;margin-bottom:12px">
+        ${(school?.logo_url)?`<img src="${school.logo_url}" style="height:48px;object-fit:contain;margin-bottom:4px;filter:${isBW?'grayscale(100%)':'none'}"/>`:'' }
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:${isBW?'#000':'#1e3a8a'}">${school?.name??'School'}</div>
+        ${school?.motto?`<div style="font-size:10.5px;color:${isBW?'#000':'#64748b'};font-style:italic">${school.motto}</div>`:''}
+        <div style="margin-top:7px;background:${isBW?'#000':'#1e3a8a'};color:#fff;padding:4px;border-radius:3px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em">
           Student Report Card — ${(term as any)?.name??''} · ${(year as any)?.name??''}
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 14px;background:#f8fafc;border:.5px solid #e2e8f0;border-radius:6px;padding:7px 10px;margin-bottom:8px;font-size:11.5px">
-        ${[['Student Name',st.full_name],['Student ID',st.student_id??'—'],['Class',st.class?.name??className],['Gender',st.gender??'—'],['House',st.house??'—']].map(([l,v])=>`<div><span style="color:#64748b;font-weight:600;font-size:10px">${l}:</span> <strong>${v}</strong></div>`).join('')}
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 14px;background:${isBW?'none':'#f8fafc'};border:${isBW?'1px solid #000':'.5px solid #e2e8f0'};border-radius:6px;padding:7px 10px;margin-bottom:10px;font-size:12px">
+        ${[['Student Name',st.full_name],['Student ID',st.student_id??'—'],['Class',st.class?.name??className],['Gender',st.gender??'—'],['House',st.house??'—']].map(([l,v])=>`<div><span style="color:${isBW?'#000':'#64748b'};font-weight:700;font-size:10px">${l}:</span> <strong style="color:#000">${v}</strong></div>`).join('')}
       </div>
-      ${att?`<div style="background:#eff6ff;border:.5px solid #dbeafe;border-radius:5px;padding:5px 10px;margin-bottom:8px;font-size:11px;display:flex;gap:16px">
-        <span style="color:#1e40af;font-weight:700;font-size:10px;text-transform:uppercase">Attendance</span>
+      ${att?`<div style="background:${isBW?'none':'#eff6ff'};border:${isBW?'1px solid #000':'.5px solid #dbeafe'};border-radius:5px;padding:6px 12px;margin-bottom:10px;font-size:12px;display:flex;gap:16px;font-weight:700">
+        <span style="color:${isBW?'#000':'#1e40af'};font-weight:800;font-size:10px;text-transform:uppercase">Attendance</span>
         <span>Total: <strong>${att.total_days}</strong></span>
-        <span>Present: <strong style="color:#16a34a">${att.days_present}</strong></span>
-        <span>Absent: <strong style="color:#dc2626">${att.days_absent}</strong></span>
+        <span>Present: <strong style="color:${isBW?'#000':'#16a34a'}">${att.days_present}</strong></span>
+        <span>Absent: <strong style="color:${isBW?'#000':'#dc2626'}">${att.days_absent}</strong></span>
       </div>`:''}
-      <table style="width:100%;border-collapse:collapse;margin-bottom:8px">
-        <thead><tr style="background:#1e3a8a">
-          ${['Subject','Class (50%)','Exam (50%)','Total','Grade','Position','Remarks'].map(h=>`<th style="padding:4px 7px;color:#fff;font-size:9px;font-weight:700;text-align:left;text-transform:uppercase">${h}</th>`).join('')}
+      <table style="width:100%;border-collapse:collapse;margin-bottom:10px;border:${isBW?'1px solid #000':'none'}">
+        <thead><tr style="background:${isBW?'#f1f5f9':'#1e3a8a'}">
+          ${['Subject','Class','Exam','Total','Grade','Pos.','Remarks'].map(h=>`<th style="padding:4px 7px;color:${isBW?'#000':'#fff'};font-size:9.5px;font-weight:700;text-align:left;text-transform:uppercase;border:${isBW?'1px solid #000':'none'}">${h}</th>`).join('')}
         </tr></thead>
-        <tbody>${rows}</tbody>
+        <tbody>${scores.map((s:any, si:number)=>{
+          const g = getG(s.total_score??0)
+          return `<tr style="background:${(isBW? 'none' : (si%2===0?'#fff':'#f8fafc'))};border-bottom:${isBW?'1px solid #000':'.5px solid #e2e8f0'}">
+            <td style="padding:4px 7px;font-size:12px;font-weight:700;color:#000;border-right:${isBW?'1px solid #000':'none'}">${s.subject?.name??'—'}</td>
+            <td style="padding:4px 7px;font-size:11px;text-align:center;border-right:${isBW?'1px solid #000':'none'}">${s.class_score??'—'}</td>
+            <td style="padding:4px 7px;font-size:11px;text-align:center;border-right:${isBW?'1px solid #000':'none'}">${s.exam_score??'—'}</td>
+            <td style="padding:4px 7px;font-size:12px;text-align:center;font-weight:800;color:${isBW?'#000':((s.total_score??0)>=50?'#15803d':'#dc2626')};border-right:${isBW?'1px solid #000':'none'}">${s.total_score?.toFixed(1)??'—'}</td>
+            <td style="padding:4px 7px;font-size:11px;text-align:center;font-weight:800;color:${isBW?'#000':g.c};border-right:${isBW?'1px solid #000':'none'}">${g.g}</td>
+            <td style="padding:4px 7px;font-size:11px;text-align:center;border-right:${isBW?'1px solid #000':'none'}">${s.position?ord(s.position):'—'}</td>
+            <td style="padding:4px 7px;font-size:10px;color:${isBW?'#000':'#475569'}">${s.teacher_remarks??'—'}</td>
+          </tr>`
+        }).join('')}</tbody>
       </table>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
         ${[['Total Marks',total.toFixed(1)],['Average',((r.average_score??0).toFixed(1))+'%'],['Position',r.overall_position?ord(r.overall_position)+' / '+r.total_students:'—']].map(([l,v])=>`
-        <div style="background:#f8fafc;border:.5px solid #e2e8f0;border-radius:6px;padding:6px 10px;text-align:center">
-          <div style="font-size:8.5px;color:#64748b;font-weight:700;text-transform:uppercase">${l}</div>
-          <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#1e3a8a">${v}</div>
+        <div style="background:${isBW?'none':'#f8fafc'};border:${isBW?'1px solid #000':'.5px solid #e2e8f0'};border-radius:6px;padding:8px 10px;text-align:center">
+          <div style="font-size:9.5px;color:${isBW?'#000':'#64748b'};font-weight:700;text-transform:uppercase;margin-bottom:2px">${l}</div>
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:800;color:${isBW?'#000':'#1e3a8a'}">${v}</div>
         </div>`).join('')}
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
         ${[['Class Teacher\'s Remarks',r.class_teacher_remarks??'—'],['Headteacher\'s Remarks',r.headteacher_remarks??'—']].map(([l,v])=>`
-        <div style="border:.5px solid #e2e8f0;border-radius:6px;padding:8px 10px">
-          <div style="font-size:8.5px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:4px">${l}</div>
-          <p style="font-size:11px;color:#334155;min-height:18px;margin:0">${v}</p>
-          <div style="margin-top:10px;border-top:.5px solid #e2e8f0;padding-top:4px;font-size:9px;color:#94a3b8">Signature: _____________________&nbsp; Date: _________</div>
+        <div style="border:${isBW?'1px solid #000':'.5px solid #e2e8f0'};border-radius:6px;padding:8px 10px">
+          <div style="font-size:10px;font-weight:800;color:${isBW?'#000':'#64748b'};text-transform:uppercase;margin-bottom:4px">${l}</div>
+          <p style="font-size:11.5px;color:#000;font-weight:600;min-height:20px;margin:0">${v}</p>
+          <div style="margin-top:12px;border-top:${isBW?'1px solid #000':'.5px solid #e2e8f0'};padding-top:4px;font-size:10px;color:${isBW?'#000':'#94a3b8'};font-weight:600">Signature: _____________________&nbsp; Date: _________</div>
         </div>`).join('')}
       </div>
-      <div style="border-top:2px solid #1e3a8a;padding-top:6px">
-        ${(settings as any)?.next_term_date?`<p style="font-size:10px;font-weight:600;color:#1e3a8a;margin-bottom:2px">📅 Next Term: ${(settings as any).next_term_date}</p>`:''}
-        ${(settings as any)?.school_fees_info?`<p style="font-size:9.5px;color:#475569;margin-bottom:2px">💰 ${(settings as any).school_fees_info}</p>`:''}
-        <p style="font-size:8.5px;color:#94a3b8;margin-top:4px;text-align:center">Generated by World Uni-Learn Report · ${school?.name??''} · ${(term as any)?.name??''} ${(year as any)?.name??''}</p>
+      <div style="border-top:${isBW?'3px solid #000':'2px solid #1e3a8a'};padding-top:7px">
+        ${(settings as any)?.next_term_date?`<p style="font-size:10px;font-weight:700;color:${isBW?'#000':'#1e3a8a'};margin-bottom:2px">📅 Next Term: ${(settings as any).next_term_date}</p>`:''}
+        ${(settings as any)?.school_fees_info?`<p style="font-size:10px;color:#000;margin-bottom:2px;font-weight:600">💰 Fees Info: ${(settings as any).school_fees_info}</p>`:''}
+        <p style="font-size:9px;color:${isBW?'#000':'#94a3b8'};margin-top:4px;text-align:center;font-weight:500">Generated by World Uni-Learn Report · ${school?.name??''} · ${(term as any)?.name??''} ${(year as any)?.name??''}</p>
       </div>
     </div>`
   }).join('')
@@ -728,6 +790,14 @@ function buildClassHTML(reports: any[], className: string, school: any, term: an
   return `<!DOCTYPE html><html><head>
     <title>Reports – ${className}</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"/>
-    <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:#fff}@media print{@page{size:A4 portrait;margin:8mm}body{padding:0}}</style>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'DM Sans',sans-serif;background:#fff}
+      @media print{
+        @page{size:A4 portrait;margin:8mm}
+        body{padding:0}
+        .rc-wrap { ${isBW ? 'filter: grayscale(100%) !important;' : ''} }
+      }
+    </style>
     </head><body>${cards}</body></html>`
 }

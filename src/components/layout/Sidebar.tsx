@@ -20,6 +20,7 @@ const adminLinks = [
   { to: ROUTES.ADMIN_ANNOUNCEMENTS, label: 'Announcements', icon: '📢', emoji: true },
   { to: ROUTES.ADMIN_SYLLABUS, label: 'Syllabus', icon: '📚', emoji: true },
   { to: ROUTES.ADMIN_WEEKLY_GOALS, label: 'Weekly Goals', icon: '🎯', emoji: true },
+  { to: ROUTES.ADMIN_ATTENDANCE, label: 'Attendance', icon: '📋', emoji: true },
 ]
 
 const teacherLinks = [
@@ -31,6 +32,7 @@ const teacherLinks = [
   { to: ROUTES.TEACHER_NOTIFICATIONS, label: 'Notifications', icon: '🔔', emoji: true },
   { to: ROUTES.TEACHER_SYLLABUS, label: 'Syllabus', icon: '📚', emoji: true },
   { to: ROUTES.TEACHER_LESSON_TRACKER, label: 'Lesson Tracker', icon: '⏱️', emoji: true },
+  { to: ROUTES.TEACHER_ATTENDANCE, label: 'Attendance', icon: '📋', emoji: true },
 ]
 
 // ── The GES-inspired logo mark ────────────────────────────

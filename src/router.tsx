@@ -28,6 +28,8 @@ import TeacherTimetablePage from './pages/teacher/TimetablePage'
 import TeacherNotificationsPage from './pages/teacher/NotificationsPage'
 import TeacherSyllabusPage from './pages/teacher/SyllabusPage'
 import LessonTrackerPage from './pages/teacher/LessonTrackerPage'
+import TeacherAttendancePage from './pages/teacher/AttendancePage'
+import AdminAttendancePage from './pages/admin/AttendancePage'
 
 import {
   RouteErrorPage,
@@ -72,6 +74,7 @@ export const router = createBrowserRouter([
           { path: 'announcements', element: <AnnouncementsPage /> },
           { path: 'syllabus', element: <SyllabusPage /> },
           { path: 'weekly-goals', element: <WeeklyGoalsPage /> },
+          { path: 'attendance', element: <AdminAttendancePage /> },
         ],
       },
       {
@@ -87,6 +90,7 @@ export const router = createBrowserRouter([
           { path: 'notifications', element: <TeacherNotificationsPage /> },
           { path: 'syllabus', element: <TeacherSyllabusPage /> },
           { path: 'lesson-tracker', element: <LessonTrackerPage /> },
+          { path: 'attendance', element: <TeacherAttendancePage /> },
         ],
       },
 

@@ -20,6 +20,7 @@ export const ROUTES = {
   ADMIN_ANNOUNCEMENTS: '/admin/announcements',
   ADMIN_SYLLABUS: '/admin/syllabus',
   ADMIN_WEEKLY_GOALS: '/admin/weekly-goals',
+  ADMIN_ATTENDANCE: '/admin/attendance',
 
   // Teacher
   TEACHER_DASHBOARD: '/teacher/dashboard',
@@ -30,5 +31,6 @@ export const ROUTES = {
   TEACHER_NOTIFICATIONS: '/teacher/notifications',
   TEACHER_SYLLABUS: '/teacher/syllabus',
   TEACHER_LESSON_TRACKER: '/teacher/lesson-tracker',
+  TEACHER_ATTENDANCE: '/teacher/attendance',
 
 } as const

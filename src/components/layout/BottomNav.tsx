@@ -9,7 +9,7 @@ const adminLinks = [
   { to: '/admin/dashboard', icon: '⊞', label: 'Home' },
   { to: '/admin/students', icon: '👥', label: 'Students' },
   { to: '/admin/reports', icon: '📄', label: 'Reports' },
-  { to: '/admin/timetable', icon: '📅', label: 'Timetable' },
+  { to: '/admin/attendance', icon: '📋', label: 'Register' },
   { to: '/admin/announcements', icon: '📢', label: 'Posts' },
 ]
 
@@ -18,7 +18,7 @@ const teacherLinks = [
   { to: '/teacher/score-entry', icon: '✏️', label: 'Scores' },
   { to: '/teacher/timetable', icon: '📅', label: 'Timetable' },
   { to: '/teacher/lesson-tracker', icon: '⏱️', label: 'Tracker' },
-  { to: '/teacher/syllabus', icon: '📚', label: 'Syllabus' },
+  { to: '/teacher/attendance', icon: '📋', label: 'Register' },
 ]
 
 export default function BottomNav() {

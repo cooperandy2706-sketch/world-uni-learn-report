@@ -2,7 +2,7 @@
 // Shows once per version — bump APP_VERSION to re-trigger for all users
 import { useState, useEffect } from 'react'
 
-const APP_VERSION = '1.4.0'
+const APP_VERSION = '1.5.0'
 const STORAGE_KEY = `wula_seen_whats_new_v${APP_VERSION}`
 
 // ── Changelog entries — edit this array to add new features ──────────────────
@@ -15,6 +15,20 @@ const FEATURES: {
     highlight?: boolean  // draws extra attention
     steps?: string[]     // optional step list shown below description
 }[] = [
+    {
+        icon: '📋',
+        title: 'Daily Morning Register',
+        description: 'Teachers can now record daily attendance with a single tap. The system automatically calculates term-level totals for report cards.',
+        badge: 'NEW',
+        badgeColor: '#10b981',
+        highlight: true,
+        steps: [
+            'Class Teachers: Visit the "Register" tab every morning by 9 AM.',
+            'Quick-mark: Mark all students present with one click, then adjust.',
+            'Auto-sync: Daily logs automatically update the report card summaries.',
+            'Admin: Monitor attendance in real-time from the Admin Portal.',
+        ]
+    },
     {
         icon: '✨',
         title: 'AI Lesson Plan Generator',
