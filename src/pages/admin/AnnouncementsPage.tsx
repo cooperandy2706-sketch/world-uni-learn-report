@@ -36,7 +36,7 @@ export default function AnnouncementsPage(){
   const [announcements,setAnnouncements]=useState<any[]>([])
   const [loading,setLoading]=useState(true)
   const [modalOpen,setModalOpen]=useState(false)
-  const [form,setForm]=useState({title:'',body:'',type:'announcement',target_role:'all',meeting_date:'',meeting_link:'',is_pinned:false})
+  const [form,setForm]=useState({title:'',body:'',type:'announcement',target_role:'all',meeting_date:'',meeting_link:'',is_pinned:false,send_push:false})
   const [saving,setSaving]=useState(false)
   const [teachers,setTeachers]=useState<any[]>([])
   const [tab,setTab]=useState<'all'|'announcement'|'meeting'|'reminder'>('all')
@@ -84,10 +84,22 @@ export default function AnnouncementsPage(){
       if(notifs.length>0) await supabase.from('notifications').insert(notifs)
     }
 
+    // Attempt to invoke Push Notification Edge Function if requested
+    if (form.send_push) {
+      try {
+        const { error: pushError } = await supabase.functions.invoke('send-push', {
+          body: { title: form.title, body: form.body, target_school_id: user!.school_id }
+        })
+        if (pushError) console.error("Push Error: ", pushError)
+      } catch (err) {
+        console.error("Failed to send push: ", err)
+      }
+    }
+
     toast.success('Posted successfully')
     setSaving(false)
     setModalOpen(false)
-    setForm({title:'',body:'',type:'announcement',target_role:'all',meeting_date:'',meeting_link:'',is_pinned:false})
+    setForm({title:'',body:'',type:'announcement',target_role:'all',meeting_date:'',meeting_link:'',is_pinned:false,send_push:false})
     load()
   }
 
@@ -270,10 +282,22 @@ export default function AnnouncementsPage(){
                     style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
                 </div>
               )}
-              <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',fontSize:13,color:'#374151'}}>
-                <input type="checkbox" checked={form.is_pinned} onChange={e=>setForm(f=>({...f,is_pinned:e.target.checked}))}/>
-                📌 Pin this post (shows at top)
-              </label>
+              <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',fontSize:13,color:'#374151'}}>
+                  <input type="checkbox" checked={form.is_pinned} onChange={e=>setForm(f=>({...f,is_pinned:e.target.checked}))}/>
+                  📌 Pin this post (shows at top)
+                </label>
+                
+                <div style={{background:'#f5f3ff',border:'1.5px solid #6d28d9',borderRadius:10,padding:'12px',marginTop:8}}>
+                  <label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer',fontSize:13,color:'#111827',fontWeight:600}}>
+                    <input type="checkbox" checked={form.send_push} onChange={e=>setForm(f=>({...f,send_push:e.target.checked}))} style={{marginTop:3,accentColor:'#6d28d9'}}/>
+                    <div>
+                      <div>📡 Send Live Push Notification</div>
+                      <div style={{fontSize:11,color:'#6b7280',fontWeight:500,marginTop:2}}>Instantly alerts locked/closed devices (WhatsApp style)</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:20}}>

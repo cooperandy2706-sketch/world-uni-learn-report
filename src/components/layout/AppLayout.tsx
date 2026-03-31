@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import BottomNav from './BottomNav'
+import EnablePushButton from '../ui/EnablePushButton'
 import { ROUTES } from '../../constants/routes'
 
 interface AppLayoutProps { requiredRole?: 'admin' | 'teacher' }
@@ -42,6 +43,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
         <div style={{ display:'flex', flex:1, flexDirection:'column', overflow:'hidden', minWidth:0 }}>
           <Header />
           <main className="app-main" style={{ flex:1, overflowY:'auto', padding:'28px 32px 48px' }}>
+            <EnablePushButton />
             <Outlet />
           </main>
         </div>
