@@ -184,6 +184,7 @@ export default function ReportsPage() {
   const [feesData, setFeesData]             = useState({ fees_amount:'', fees_paid:'', fees_arrears:'', other_fees:[] as any[] })
   const [savingFees, setSavingFees]         = useState(false)
   const [isBW, setIsBW]                     = useState(false)
+  const [showOverallPosition, setShowOverallPosition] = useState(true)
 
   const { data: reports = [], isLoading } = useReportsByClassTerm(selectedClass, (term as any)?.id ?? '')
   const generateReports = useGenerateReports()
@@ -324,7 +325,7 @@ export default function ReportsPage() {
           return { ...r, _scores: sc ?? [], _attendance: att }
         }))
 
-        const html = buildClassHTML(enriched, cls.name, school, term, year, settings, isBW)
+        const html = buildClassHTML(enriched, cls.name, school, term, year, settings, isBW, showOverallPosition)
         const win = window.open('', '_blank', 'width=900,height=700')
         if (win) {
           win.document.write(html)
@@ -532,13 +533,19 @@ export default function ReportsPage() {
       {/* ── Hidden print areas ── */}
       <div id="single-report-print-area" style={{ display:'none' }}>
         {viewingReport && (
-          <ReportCard report={viewingReport} school={school} term={term} year={year} settings={settings} isBW={isBW} setIsBW={setIsBW} readonly />
+          <ReportCard report={viewingReport} school={school} term={term} year={year} settings={settings}
+            isBW={isBW} setIsBW={setIsBW}
+            showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
+            readonly />
         )}
       </div>
       <div id="bulk-report-print-area" style={{ display:'none' }}>
         {(reports as any[]).map((r: any, i: number) => (
           <div key={r.id} className={i < reports.length-1 ? 'page-break' : ''}>
-            <ReportCard report={r} school={school} term={term} year={year} settings={settings} isBW={isBW} setIsBW={setIsBW} readonly />
+            <ReportCard report={r} school={school} term={term} year={year} settings={settings}
+              isBW={isBW} setIsBW={setIsBW}
+              showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
+              readonly />
           </div>
         ))}
       </div>
@@ -680,6 +687,7 @@ export default function ReportsPage() {
         {viewingReport && (
           <ReportCard report={viewingReport} school={school} term={term} year={year} settings={settings}
             isBW={isBW} setIsBW={setIsBW}
+            showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
             onRemarksUpdate={remarks => updateRemarks.mutate({ reportId: viewingReport.id, remarks })} />
         )}
       </Modal>
@@ -708,7 +716,10 @@ export default function ReportsPage() {
                 <button onClick={() => { setBulkPreviewOpen(false); setViewingReport(r); setTimeout(() => printSingle(r.student?.full_name??'', isBW), 700) }}
                   style={{ padding:'5px 12px', borderRadius:8, border:'none', background:'#f5f3ff', color:'#6d28d9', fontSize:12, fontWeight:600, cursor:'pointer' }}>🖨️ Print This</button>
               </div>
-              <ReportCard report={r} school={school} term={term} year={year} settings={settings} isBW={isBW} setIsBW={setIsBW} readonly />
+              <ReportCard report={r} school={school} term={term} year={year} settings={settings}
+                isBW={isBW} setIsBW={setIsBW}
+                showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
+                readonly />
             </div>
           ))}
         </div>
@@ -718,7 +729,7 @@ export default function ReportsPage() {
 }
 
 // ── Build HTML for export-all ─────────────────────────────
-function buildClassHTML(reports: any[], className: string, school: any, term: any, year: any, settings: any, isBW: boolean = false): string {
+function buildClassHTML(reports: any[], className: string, school: any, term: any, year: any, settings: any, isBW: boolean = false, showOverallPosition: boolean = true): string {
   const GS = [{g:'A',min:80,c:'#16a34a'},{g:'B',min:70,c:'#2563eb'},{g:'C',min:60,c:'#7c3aed'},{g:'D',min:50,c:'#d97706'},{g:'E',min:40,c:'#ea580c'},{g:'F',min:0,c:'#dc2626'}]
   const getG = (n: number) => GS.find(g => n >= g.min) ?? GS[5]
   const ord = (n: number) => { const s=['th','st','nd','rd'],v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]) }
@@ -749,7 +760,7 @@ function buildClassHTML(reports: any[], className: string, school: any, term: an
       </div>`:''}
       <table style="width:100%;border-collapse:collapse;margin-bottom:10px;border:${isBW?'1px solid #000':'none'}">
         <thead><tr style="background:${isBW?'#f1f5f9':'#1e3a8a'}">
-          ${['Subject','Class','Exam','Total','Grade','Pos.','Remarks'].map(h=>`<th style="padding:4px 7px;color:${isBW?'#000':'#fff'};font-size:9.5px;font-weight:700;text-align:left;text-transform:uppercase;border:${isBW?'1px solid #000':'none'}">${h}</th>`).join('')}
+          ${['Subject', 'Class', 'Exam', 'Total', 'Grade', ...(showOverallPosition ? ['Pos.'] : []), 'Remarks'].map(h=>`<th style="padding:4px 7px;color:${isBW?'#000':'#fff'};font-size:9.5px;font-weight:700;text-align:left;text-transform:uppercase;border:${isBW?'1px solid #000':'none'}">${h}</th>`).join('')}
         </tr></thead>
         <tbody>${scores.map((s:any, si:number)=>{
           const g = getG(s.total_score??0)
@@ -759,13 +770,17 @@ function buildClassHTML(reports: any[], className: string, school: any, term: an
             <td style="padding:4px 7px;font-size:11px;text-align:center;border-right:${isBW?'1px solid #000':'none'}">${s.exam_score??'—'}</td>
             <td style="padding:4px 7px;font-size:12px;text-align:center;font-weight:800;color:${isBW?'#000':((s.total_score??0)>=50?'#15803d':'#dc2626')};border-right:${isBW?'1px solid #000':'none'}">${s.total_score?.toFixed(1)??'—'}</td>
             <td style="padding:4px 7px;font-size:11px;text-align:center;font-weight:800;color:${isBW?'#000':g.c};border-right:${isBW?'1px solid #000':'none'}">${g.g}</td>
-            <td style="padding:4px 7px;font-size:11px;text-align:center;border-right:${isBW?'1px solid #000':'none'}">${s.position?ord(s.position):'—'}</td>
+            ${showOverallPosition ? `<td style="padding:4px 7px;font-size:11px;text-align:center;border-right:${isBW?'1px solid #000':'none'}">${s.position?ord(s.position):'—'}</td>` : ''}
             <td style="padding:4px 7px;font-size:10px;color:${isBW?'#000':'#475569'}">${s.teacher_remarks??'—'}</td>
           </tr>`
         }).join('')}</tbody>
       </table>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
-        ${[['Total Marks',total.toFixed(1)],['Average',((r.average_score??0).toFixed(1))+'%'],['Position',r.overall_position?ord(r.overall_position)+' / '+r.total_students:'—']].map(([l,v])=>`
+      <div style="display:grid;grid-template-columns:repeat(${showOverallPosition ? 3 : 2},1fr);gap:8px;margin-bottom:10px">
+        ${[
+          ['Total Marks', total.toFixed(1)],
+          ['Average', ((r.average_score??0).toFixed(1))+'%'],
+          ...(showOverallPosition ? [['Position', r.overall_position?ord(r.overall_position)+' / '+r.total_students:'—']] : [])
+        ].map(([l,v])=>`
         <div style="background:${isBW?'none':'#f8fafc'};border:${isBW?'1px solid #000':'.5px solid #e2e8f0'};border-radius:6px;padding:8px 10px;text-align:center">
           <div style="font-size:9.5px;color:${isBW?'#000':'#64748b'};font-weight:700;text-transform:uppercase;margin-bottom:2px">${l}</div>
           <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:800;color:${isBW?'#000':'#1e3a8a'}">${v}</div>

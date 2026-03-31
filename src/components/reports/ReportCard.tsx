@@ -14,10 +14,19 @@ interface ReportCardProps {
   year: any
   settings: any
   readonly?: boolean
+  isBW?: boolean
+  setIsBW?: (val: boolean) => void
+  showOverallPosition?: boolean
+  onToggleOverallPosition?: (val: boolean) => void
   onRemarksUpdate?: (remarks: { class_teacher_remarks?: string; headteacher_remarks?: string }) => void
 }
 
-export default function ReportCard({ report, school, term, year, settings, readonly, onRemarksUpdate }: ReportCardProps) {
+export default function ReportCard({
+  report, school, term, year, settings, readonly,
+  isBW: isBWProp, setIsBW: setIsBWProp,
+  showOverallPosition = true, onToggleOverallPosition,
+  onRemarksUpdate
+}: ReportCardProps) {
   const [scores, setScores] = useState<any[]>([])
   const [attendance, setAttendance] = useState<any>(null)
   const [teacherRemark, setTeacherRemark] = useState(report?.class_teacher_remarks ?? '')
@@ -25,7 +34,9 @@ export default function ReportCard({ report, school, term, year, settings, reado
   const [attEdit, setAttEdit] = useState({ total_days: '', days_present: '', days_absent: '' })
   const [savingAtt, setSavingAtt] = useState(false)
   const [studentFees, setStudentFees] = useState<any>(null)
-  const [isBW, setIsBW] = useState(false)
+  const [isBWInternal, setIsBWInternal] = useState(false)
+  const isBW = isBWProp ?? isBWInternal
+  const setIsBW = setIsBWProp ?? setIsBWInternal
 
   useEffect(() => {
     setTeacherRemark(report?.class_teacher_remarks ?? '')
@@ -117,10 +128,16 @@ export default function ReportCard({ report, school, term, year, settings, reado
         {/* ── PRINT SETTINGS ── */}
         <div className="no-print" data-html2canvas-ignore="true" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid #f1f5f9' }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: '#1e3a8a' }}>🖨️ Print Settings</div>
-          <label className="rc-bw-toggle">
-            <input type="checkbox" checked={isBW} onChange={e => setIsBW(e.target.checked)} />
-            <span>Black & White Mode</span>
-          </label>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+            <label className="rc-bw-toggle">
+              <input type="checkbox" checked={showOverallPosition} onChange={e => onToggleOverallPosition?.(e.target.checked)} />
+              <span>Show Rank / Position</span>
+            </label>
+            <label className="rc-bw-toggle">
+              <input type="checkbox" checked={isBW} onChange={e => setIsBW(e.target.checked)} />
+              <span>Black & White Mode</span>
+            </label>
+          </div>
         </div>
 
         {/* ── HEADER ── */}
@@ -202,7 +219,7 @@ export default function ReportCard({ report, school, term, year, settings, reado
                 <th style={{ textAlign: 'center', width: 70 }}>Exam Score<br /><span style={{ fontSize: 9, opacity: .9 }}>(50%)</span></th>
                 <th style={{ textAlign: 'center', width: 60 }}>Total</th>
                 <th style={{ textAlign: 'center', width: 50 }}>Grade</th>
-                <th style={{ textAlign: 'center', width: 65 }}>Position</th>
+                {showOverallPosition && <th style={{ textAlign: 'center', width: 65 }}>Position</th>}
                 <th>Teacher's Remarks</th>
               </tr>
             </thead>
@@ -222,7 +239,7 @@ export default function ReportCard({ report, school, term, year, settings, reado
                     <td style={{ textAlign: 'center' }}>
                       <span style={{ fontWeight: 800, color: isBW ? '#000' : g.color, background: isBW ? '#f1f5f9' : g.color + '18', padding: '2px 6px', borderRadius: 4, fontSize: 12, border: isBW ? '1px solid #000' : 'none' }}>{g.grade}</span>
                     </td>
-                    <td style={{ textAlign: 'center', fontSize: 11, fontWeight: 700 }}>{s.position ? ordinal(s.position) : '—'}</td>
+                    {showOverallPosition && <td style={{ textAlign: 'center', fontSize: 11, fontWeight: 700 }}>{s.position ? ordinal(s.position) : '—'}</td>}
                     <td style={{ fontSize: 11, color: isBW ? '#000' : '#475569' }}>{s.teacher_remarks ?? '—'}</td>
                   </tr>
                 )
@@ -232,11 +249,11 @@ export default function ReportCard({ report, school, term, year, settings, reado
         </div>
 
         {/* ── SUMMARY TILES ── */}
-        <div className="rc-section-gap" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8, marginBottom: 8 }}>
+        <div className="rc-section-gap" style={{ display: 'grid', gridTemplateColumns: `repeat(${showOverallPosition ? 4 : 3}, 1fr)`, gap: 8, marginBottom: 8 }}>
           {[
             { label: 'Total Marks', value: totalMarks.toFixed(1) },
             { label: 'Average Score', value: `${avg.toFixed(1)}%` },
-            { label: 'Overall Position', value: report?.overall_position ? `${ordinal(report.overall_position)} / ${report.total_students}` : '—' },
+            ...(showOverallPosition ? [{ label: 'Overall Position', value: report?.overall_position ? `${ordinal(report.overall_position)} / ${report.total_students}` : '—' }] : []),
             { label: 'Overall Grade', value: `${overallGrade.grade} — ${overallGrade.label}` },
           ].map(({ label, value }) => (
             <div key={label} className="rc-summary-tile" style={{ background: isBW ? 'none' : '#f8fafc', border: isBW ? '1px solid #000' : '.5px solid #e2e8f0', borderRadius: 6, padding: '8px 12px', textAlign: 'center' }}>
