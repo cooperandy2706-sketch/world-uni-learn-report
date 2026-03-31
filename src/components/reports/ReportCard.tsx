@@ -18,6 +18,7 @@ interface ReportCardProps {
   setIsBW?: (val: boolean) => void
   showOverallPosition?: boolean
   onToggleOverallPosition?: (val: boolean) => void
+  hideSettings?: boolean
   onRemarksUpdate?: (remarks: { class_teacher_remarks?: string; headteacher_remarks?: string }) => void
 }
 
@@ -25,6 +26,7 @@ export default function ReportCard({
   report, school, term, year, settings, readonly,
   isBW: isBWProp, setIsBW: setIsBWProp,
   showOverallPosition = true, onToggleOverallPosition,
+  hideSettings = false,
   onRemarksUpdate
 }: ReportCardProps) {
   const [scores, setScores] = useState<any[]>([])
@@ -126,19 +128,21 @@ export default function ReportCard({
       <div className="rc-wrap">
 
         {/* ── PRINT SETTINGS ── */}
-        <div className="no-print" data-html2canvas-ignore="true" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid #f1f5f9' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#1e3a8a' }}>🖨️ Print Settings</div>
-          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            <label className="rc-bw-toggle">
-              <input type="checkbox" checked={showOverallPosition} onChange={e => onToggleOverallPosition?.(e.target.checked)} />
-              <span>Show Rank / Position</span>
-            </label>
-            <label className="rc-bw-toggle">
-              <input type="checkbox" checked={isBW} onChange={e => setIsBW(e.target.checked)} />
-              <span>Black & White Mode</span>
-            </label>
+        {!hideSettings && (
+          <div className="no-print" data-html2canvas-ignore="true" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid #f1f5f9' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#1e3a8a' }}>🖨️ Print Settings</div>
+            <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+              <label className="rc-bw-toggle">
+                <input type="checkbox" checked={showOverallPosition} onChange={e => onToggleOverallPosition?.(e.target.checked)} />
+                <span>Show Rank / Position</span>
+              </label>
+              <label className="rc-bw-toggle">
+                <input type="checkbox" checked={isBW} onChange={e => setIsBW(e.target.checked)} />
+                <span>Black & White Mode</span>
+              </label>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* ── HEADER ── */}
         <div className="rc-section-gap" style={{ textAlign: 'center', borderBottom: isBW ? '3px solid #000' : '2.5px solid #1e3a8a', paddingBottom: 10, marginBottom: 12 }}>

@@ -98,60 +98,10 @@ async function downloadPDF(studentName: string) {
       import('html2canvas'),
     ])
 
-    // Make element visible temporarily for capture
-    el.style.display = 'block'
-    el.style.position = 'fixed'
-    el.style.top = '-9999px'
-    el.style.left = '0'
-    el.style.width = '794px'
-    el.style.background = '#fff'
-
-    await new Promise(r => setTimeout(r, 300))
-
-    const canvas = await html2canvas(el, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      logging: false,
-    })
-
-    el.style.display = 'none'
-    el.style.position = ''
-    el.style.top = ''
-    el.style.left = ''
-    el.style.width = ''
-
-    const imgData = canvas.toDataURL('image/jpeg', 0.92)
+    // Capture logic extracted for reuse
+    const canvas = await captureElement(el, html2canvas)
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' })
-
-    const pageW = pdf.internal.pageSize.getWidth()   // 595.28 pt
-    const pageH = pdf.internal.pageSize.getHeight()  // 841.89 pt
-    const imgW  = canvas.width
-    const imgH  = canvas.height
-    const ratio = pageW / imgW
-    const scaledH = imgH * ratio
-
-    if (scaledH <= pageH) {
-      pdf.addImage(imgData, 'JPEG', 0, 0, pageW, scaledH)
-    } else {
-      // Multi-page: slice canvas
-      const rowH = Math.floor(pageH / ratio)
-      let srcY = 0
-      while (srcY < imgH) {
-        const sliceH = Math.min(rowH, imgH - srcY)
-        const pg = document.createElement('canvas')
-        pg.width = imgW
-        pg.height = sliceH
-        const ctx = pg.getContext('2d')!
-        ctx.fillStyle = '#ffffff'
-        ctx.fillRect(0, 0, pg.width, pg.height)
-        ctx.drawImage(canvas, 0, srcY, imgW, sliceH, 0, 0, imgW, sliceH)
-        if (srcY > 0) pdf.addPage()
-        pdf.addImage(pg.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, pageW, sliceH * ratio)
-        srcY += sliceH
-      }
-    }
+    addCanvasToPDF(canvas, pdf)
 
     pdf.save(`Report_${studentName.replace(/\s+/g, '_')}.pdf`)
     toast.success('PDF downloaded!', { id: toastId })
@@ -161,6 +111,113 @@ async function downloadPDF(studentName: string) {
   } finally {
     const el2 = document.getElementById('single-report-print-area')
     if (el2) el2.style.display = 'none'
+  }
+}
+
+async function captureElement(originalEl: HTMLElement, html2canvas: any) {
+  // 1. Create a dedicated capture container
+  const container = document.createElement('div')
+  container.style.position = 'fixed'
+  container.style.top = '-10000px'
+  container.style.left = '0'
+  container.style.width = '794px'
+  container.style.height = 'auto'
+  container.style.background = '#fff'
+  container.style.zIndex = '-9999'
+  container.style.overflow = 'hidden'
+  document.body.appendChild(container)
+
+  // 2. Clone the element to avoid modifying the original React-managed DOM
+  const clone = originalEl.cloneNode(true) as HTMLElement
+  clone.style.display = 'block'
+  clone.style.visibility = 'visible'
+  clone.style.width = '100%'
+  clone.style.position = 'relative'
+  clone.style.top = '0'
+  clone.style.left = '0'
+  container.appendChild(clone)
+
+  // 3. Wait for layout and potential image loads
+  await new Promise(r => setTimeout(r, 600))
+
+  try {
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      windowWidth: 1024, // Use a wider window width to ensure responsive layouts don't squish
+    })
+    return canvas
+  } finally {
+    // 4. Cleanup
+    document.body.removeChild(container)
+  }
+}
+
+function addCanvasToPDF(canvas: HTMLCanvasElement, pdf: any) {
+  const imgData = canvas.toDataURL('image/jpeg', 0.92)
+  const pageW = pdf.internal.pageSize.getWidth()   // 595.28 pt
+  const pageH = pdf.internal.pageSize.getHeight()  // 841.89 pt
+  const imgW  = canvas.width
+  const imgH  = canvas.height
+  const ratio = pageW / imgW
+  const scaledH = imgH * ratio
+
+  if (scaledH <= pageH) {
+    pdf.addImage(imgData, 'JPEG', 0, 0, pageW, scaledH)
+  } else {
+    // Multi-page: slice canvas
+    const rowH = Math.floor(pageH / ratio)
+    let srcY = 0
+    while (srcY < imgH) {
+      const sliceH = Math.min(rowH, imgH - srcY)
+      const pg = document.createElement('canvas')
+      pg.width = imgW
+      pg.height = sliceH
+      const ctx = pg.getContext('2d')!
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, pg.width, pg.height)
+      ctx.drawImage(canvas, 0, srcY, imgW, sliceH, 0, 0, imgW, sliceH)
+      if (srcY > 0 || pdf.internal.getNumberOfPages() > 1) pdf.addPage()
+      pdf.addImage(pg.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, pageW, sliceH * ratio)
+      srcY += sliceH
+    }
+  }
+}
+
+async function downloadBulkPDF(reports: any[], className: string) {
+  if (!reports?.length) { toast.error('No reports found'); return }
+  const toastId = toast.loading(`Preparing bulk PDF export for ${className}…`)
+  
+  const container = document.getElementById('bulk-report-print-area')
+  if (!container) { toast.error('Print area not found', { id: toastId }); return }
+
+  // Note: We NO LONGER modify the container visibility/position here
+  // because captureElement handles cloning and isolation.
+
+  try {
+    const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+      import('jspdf'),
+      import('html2canvas'),
+    ])
+
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' })
+    const studentDivs = Array.from(container.children) as HTMLElement[]
+    
+    for (let i = 0; i < studentDivs.length; i++) {
+      toast.loading(`Capturing report ${i + 1} of ${studentDivs.length}…`, { id: toastId })
+      const canvas = await captureElement(studentDivs[i], html2canvas)
+      if (i > 0) pdf.addPage()
+      addCanvasToPDF(canvas, pdf)
+    }
+
+    pdf.save(`Bulk_Reports_${className.replace(/\s+/g, '_')}.pdf`)
+    toast.success('Bulk PDF downloaded!', { id: toastId })
+  } catch (e: any) {
+    console.error('Bulk PDF failed:', e)
+    toast.error('Bulk PDF failed: ' + (e.message || 'Unknown error'), { id: toastId })
   }
 }
 
@@ -399,9 +456,23 @@ export default function ReportsPage() {
                 {approvedCount < reports.length && <Btn variant="success" onClick={approveAll}>✅ Approve All</Btn>}
                 <Btn variant="info" onClick={() => setBulkPreviewOpen(true)}>👁️ Preview All</Btn>
                 <Btn variant="secondary" onClick={() => printBulk(selectedClassName, isBW)}>🖨️ Print Class</Btn>
+                <Btn variant="danger" onClick={() => downloadBulkPDF(reports, selectedClassName)}>📥 Export PDF</Btn>
               </>}
             </div>
           </div>
+          {(reports as any[]).length > 0 && (
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1.5px solid #f3f4f6', display: 'flex', gap: 20, alignItems: 'center' }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#4b5563' }}>Global Print Settings:</span>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+                <input type="checkbox" checked={showOverallPosition} onChange={e => setShowOverallPosition(e.target.checked)} />
+                <span>Show Rank / Position</span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+                <input type="checkbox" checked={isBW} onChange={e => setIsBW(e.target.checked)} />
+                <span>Black & White Mode</span>
+              </label>
+            </div>
+          )}
         </div>
 
         {/* ── Empty states ── */}
@@ -536,6 +607,7 @@ export default function ReportsPage() {
           <ReportCard report={viewingReport} school={school} term={term} year={year} settings={settings}
             isBW={isBW} setIsBW={setIsBW}
             showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
+            hideSettings={true}
             readonly />
         )}
       </div>
@@ -545,6 +617,7 @@ export default function ReportsPage() {
             <ReportCard report={r} school={school} term={term} year={year} settings={settings}
               isBW={isBW} setIsBW={setIsBW}
               showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
+              hideSettings={true}
               readonly />
           </div>
         ))}
@@ -704,8 +777,21 @@ export default function ReportsPage() {
               🖨️ Print All {reports.length} Reports
             </Btn>
           </div>
-        }>
+        }
+      >
         <div style={{ display:'flex', flexDirection:'column', gap:32 }}>
+          <div style={{ background: '#f9fafb', padding: '12px 18px', borderRadius: 12, border: '1px solid #e5e7eb', display: 'flex', gap: 20, alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#4b5563' }}>Bulk Settings:</span>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+              <input type="checkbox" checked={showOverallPosition} onChange={e => setShowOverallPosition(e.target.checked)} />
+              <span>Show Rank / Position</span>
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+              <input type="checkbox" checked={isBW} onChange={e => setIsBW(e.target.checked)} />
+              <span>Black & White Mode</span>
+            </label>
+          </div>
+
           {(reports as any[]).map((r: any, i: number) => (
             <div key={r.id}>
               {i > 0 && <div style={{ height:2, background:'#f0eefe', marginBottom:32 }} />}
@@ -719,6 +805,7 @@ export default function ReportsPage() {
               <ReportCard report={r} school={school} term={term} year={year} settings={settings}
                 isBW={isBW} setIsBW={setIsBW}
                 showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
+                hideSettings={true}
                 readonly />
             </div>
           ))}
