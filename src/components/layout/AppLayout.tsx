@@ -5,6 +5,7 @@ import Sidebar from './Sidebar'
 import Header from './Header'
 import BottomNav from './BottomNav'
 import EnablePushButton from '../ui/EnablePushButton'
+import WhatsNewModal from '../ui/WhatsNewModal'
 import { ROUTES } from '../../constants/routes'
 
 interface AppLayoutProps { requiredRole?: 'admin' | 'teacher' }
@@ -49,6 +50,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
         </div>
       </div>
       <BottomNav />
+      <WhatsNewModal />
     </>
   )
 }
