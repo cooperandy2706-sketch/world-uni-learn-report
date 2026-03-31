@@ -5,30 +5,32 @@ import { useAuth } from '../../hooks/useAuth'
 import { ROUTES } from '../../constants/routes'
 
 const adminLinks = [
-  { to: ROUTES.ADMIN_DASHBOARD,      label: 'Dashboard',      icon: '⊞',  emoji: true },
-  { to: ROUTES.ADMIN_STUDENTS,       label: 'Students',       icon: '👥',  emoji: true },
-  { to: ROUTES.ADMIN_TEACHERS,       label: 'Teachers',       icon: '👨‍🏫', emoji: true },
-  { to: ROUTES.ADMIN_CLASSES,        label: 'Classes',        icon: '🏫',  emoji: true },
-  { to: ROUTES.ADMIN_SUBJECTS,       label: 'Subjects',       icon: '📚',  emoji: true },
-  { to: ROUTES.ADMIN_DEPARTMENTS,    label: 'Departments',    icon: '🏛️',  emoji: true },
-  { to: ROUTES.ADMIN_ACADEMIC_YEARS, label: 'Academic Years', icon: '📅',  emoji: true },
-  { to: ROUTES.ADMIN_TERMS,          label: 'Terms',          icon: '📆',  emoji: true },
-  { to: ROUTES.ADMIN_REPORTS,        label: 'Reports',        icon: '📄',  emoji: true },
-  { to: ROUTES.ADMIN_ANALYTICS,      label: 'Analytics',      icon: '📊',  emoji: true },
-  { to: ROUTES.ADMIN_SETTINGS,       label: 'Settings',       icon: '⚙️',  emoji: true },
-  { to: ROUTES.ADMIN_TIMETABLE,     label: 'Timetable',       icon: '📅', emoji: true },
-{ to: ROUTES.ADMIN_ANNOUNCEMENTS, label: 'Announcements',    icon: '📢', emoji: true },
-{ to: ROUTES.ADMIN_SYLLABUS,      label: 'Syllabus',         icon: '📚', emoji: true },
-{ to: ROUTES.ADMIN_WEEKLY_GOALS,  label: 'Weekly Goals',     icon: '🎯', emoji: true },
+  { to: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', icon: '⊞', emoji: true },
+  { to: ROUTES.ADMIN_STUDENTS, label: 'Students', icon: '👥', emoji: true },
+  { to: ROUTES.ADMIN_TEACHERS, label: 'Teachers', icon: '👨‍🏫', emoji: true },
+  { to: ROUTES.ADMIN_CLASSES, label: 'Classes', icon: '🏫', emoji: true },
+  { to: ROUTES.ADMIN_SUBJECTS, label: 'Subjects', icon: '📚', emoji: true },
+  { to: ROUTES.ADMIN_DEPARTMENTS, label: 'Departments', icon: '🏛️', emoji: true },
+  { to: ROUTES.ADMIN_ACADEMIC_YEARS, label: 'Academic Years', icon: '📅', emoji: true },
+  { to: ROUTES.ADMIN_TERMS, label: 'Terms', icon: '📆', emoji: true },
+  { to: ROUTES.ADMIN_REPORTS, label: 'Reports', icon: '📄', emoji: true },
+  { to: ROUTES.ADMIN_ANALYTICS, label: 'Analytics', icon: '📊', emoji: true },
+  { to: ROUTES.ADMIN_SETTINGS, label: 'Settings', icon: '⚙️', emoji: true },
+  { to: ROUTES.ADMIN_TIMETABLE, label: 'Timetable', icon: '📅', emoji: true },
+  { to: ROUTES.ADMIN_ANNOUNCEMENTS, label: 'Announcements', icon: '📢', emoji: true },
+  { to: ROUTES.ADMIN_SYLLABUS, label: 'Syllabus', icon: '📚', emoji: true },
+  { to: ROUTES.ADMIN_WEEKLY_GOALS, label: 'Weekly Goals', icon: '🎯', emoji: true },
 ]
 
 const teacherLinks = [
-  { to: ROUTES.TEACHER_DASHBOARD,   label: 'Dashboard',   icon: '⊞',  emoji: true },
-  { to: ROUTES.TEACHER_MY_CLASSES,  label: 'My Classes',  icon: '🏫',  emoji: true },
-  { to: ROUTES.TEACHER_SCORE_ENTRY, label: 'Score Entry', icon: '✏️',  emoji: true },
-  { to: ROUTES.TEACHER_REPORTS,     label: 'Reports',     icon: '📄',  emoji: true },
-  { to: ROUTES.TEACHER_TIMETABLE,     label: 'Timetable',      icon: '📅', emoji: true },
-{ to: ROUTES.TEACHER_NOTIFICATIONS, label: 'Notifications',  icon: '🔔', emoji: true },
+  { to: ROUTES.TEACHER_DASHBOARD, label: 'Dashboard', icon: '⊞', emoji: true },
+  { to: ROUTES.TEACHER_MY_CLASSES, label: 'My Classes', icon: '🏫', emoji: true },
+  { to: ROUTES.TEACHER_SCORE_ENTRY, label: 'Score Entry', icon: '✏️', emoji: true },
+  { to: ROUTES.TEACHER_REPORTS, label: 'Reports', icon: '📄', emoji: true },
+  { to: ROUTES.TEACHER_TIMETABLE, label: 'Timetable', icon: '📅', emoji: true },
+  { to: ROUTES.TEACHER_NOTIFICATIONS, label: 'Notifications', icon: '🔔', emoji: true },
+  { to: ROUTES.TEACHER_SYLLABUS, label: 'Syllabus', icon: '📚', emoji: true },
+  { to: ROUTES.TEACHER_LESSON_TRACKER, label: 'Lesson Tracker', icon: '⏱️', emoji: true },
 ]
 
 // ── The GES-inspired logo mark ────────────────────────────
@@ -43,10 +45,10 @@ function LogoMark() {
     }}>
       {/* Graduation cap SVG */}
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L2 7l10 5 10-5-10-5z" fill="white" opacity="0.95"/>
-        <path d="M2 17c0 0 3.5 3 10 3s10-3 10-3" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.7"/>
-        <path d="M2 7v10" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.6"/>
-        <path d="M12 12v8" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.8"/>
+        <path d="M12 2L2 7l10 5 10-5-10-5z" fill="white" opacity="0.95" />
+        <path d="M2 17c0 0 3.5 3 10 3s10-3 10-3" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.7" />
+        <path d="M2 7v10" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.6" />
+        <path d="M12 12v8" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.8" />
       </svg>
     </div>
   )
@@ -89,7 +91,7 @@ export default function Sidebar() {
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase', lineHeight: 1 }}>World</div>
               <div style={{ fontFamily: '"Playfair Display", serif', fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2, marginTop: 2 }}>
-                Uni-Learn<br/>
+                Uni-Learn<br />
                 <span style={{ fontSize: 11, fontWeight: 400, color: 'rgba(255,255,255,0.6)', fontFamily: '"DM Sans",sans-serif' }}>School Management System</span>
               </div>
             </div>

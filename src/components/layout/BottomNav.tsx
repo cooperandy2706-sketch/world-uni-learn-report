@@ -6,19 +6,19 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 
 const adminLinks = [
-  { to: '/admin/dashboard',     icon: '⊞',  label: 'Home' },
-  { to: '/admin/students',      icon: '👥',  label: 'Students' },
-  { to: '/admin/reports',       icon: '📄',  label: 'Reports' },
-  { to: '/admin/timetable',     icon: '📅',  label: 'Timetable' },
-  { to: '/admin/announcements', icon: '📢',  label: 'Posts' },
+  { to: '/admin/dashboard', icon: '⊞', label: 'Home' },
+  { to: '/admin/students', icon: '👥', label: 'Students' },
+  { to: '/admin/reports', icon: '📄', label: 'Reports' },
+  { to: '/admin/timetable', icon: '📅', label: 'Timetable' },
+  { to: '/admin/announcements', icon: '📢', label: 'Posts' },
 ]
 
 const teacherLinks = [
-  { to: '/teacher/dashboard',     icon: '⊞',  label: 'Home' },
-  { to: '/teacher/score-entry',   icon: '✏️',  label: 'Scores' },
-  { to: '/teacher/reports',       icon: '📄',  label: 'Reports' },
-  { to: '/teacher/timetable',     icon: '📅',  label: 'Timetable' },
-  { to: '/teacher/notifications', icon: '🔔',  label: 'Alerts',  notify: true },
+  { to: '/teacher/dashboard', icon: '⊞', label: 'Home' },
+  { to: '/teacher/score-entry', icon: '✏️', label: 'Scores' },
+  { to: '/teacher/timetable', icon: '📅', label: 'Timetable' },
+  { to: '/teacher/lesson-tracker', icon: '⏱️', label: 'Tracker' },
+  { to: '/teacher/syllabus', icon: '📚', label: 'Syllabus' },
 ]
 
 export default function BottomNav() {
@@ -83,7 +83,7 @@ export default function BottomNav() {
         {links.map(link => {
           const isActive = location.pathname === link.to ||
             (link.to !== '/admin/dashboard' && link.to !== '/teacher/dashboard' &&
-             location.pathname.startsWith(link.to))
+              location.pathname.startsWith(link.to))
 
           return (
             <NavLink key={link.to} to={link.to}
