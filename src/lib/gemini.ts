@@ -20,16 +20,21 @@ export interface GeneratedLessonPlan {
   subject: string
 }
 
+// Model fallback chain — tries each in order until one succeeds
+const MODEL_CHAIN = [
+  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash-latest',
+  'gemini-2.0-flash',
+]
+
 /**
- * Generates a detailed lesson plan using Gemini Flash (free tier).
- * The prompt instructs the model to embed real image URLs from Wikimedia / Unsplash
- * so teachers see visual aids inline.
+ * Generates a detailed lesson plan. Tries models in fallback order
+ * so a quota error on one model automatically retries with the next.
  */
 export async function generateLessonPlan(input: LessonPlanInput): Promise<GeneratedLessonPlan> {
   if (!API_KEY) throw new Error('VITE_GEMINI_API_KEY is not set in your .env file.')
 
   const genAI = new GoogleGenerativeAI(API_KEY)
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
   const bulletsText = input.bullets.filter(b => b.trim()).map(b => `- ${b}`).join('\n')
 
@@ -109,19 +114,42 @@ Include ONE relevant image using this EXACT format (choose a real, descriptive U
 
 IMPORTANT RULES:
 - Write in clear, professional English suitable for a teacher to use directly.
-- The image URL must be a real, working Unsplash URL (format: https://source.unsplash.com/800x400/?keyword).
+- The image URL must use the format: https://source.unsplash.com/800x400/?keyword
 - Keep explanations detailed but accessible to the specified class level.
 - Do NOT add any text before or after the Markdown — return ONLY the Markdown.
 `.trim()
 
-  const result = await model.generateContent(prompt)
-  const response = await result.response
-  const markdown = response.text()
+  let lastError: Error | null = null
 
-  return {
-    markdown,
-    generatedAt: new Date().toISOString(),
-    topic: input.topic,
-    subject: input.subject,
+  for (const modelName of MODEL_CHAIN) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName })
+      const result = await model.generateContent(prompt)
+      const markdown = result.response.text()
+      return {
+        markdown,
+        generatedAt: new Date().toISOString(),
+        topic: input.topic,
+        subject: input.subject,
+      }
+    } catch (err: any) {
+      const is429 = err?.message?.includes('429') || err?.message?.includes('quota')
+      const is404 = err?.message?.includes('404') || err?.message?.includes('not found')
+      if (is429 || is404) {
+        lastError = err
+        continue // try next model
+      }
+      // For other errors (auth, network) fail immediately
+      throw new Error(`AI Error: ${err.message ?? String(err)}`)
+    }
   }
+
+  // All models exhausted
+  throw new Error(
+    '⚠️ Your Gemini API key has exceeded its free quota for today. ' +
+    'This resets every 24 hours — please try again tomorrow, or visit ' +
+    'https://aistudio.google.com to check your usage. ' +
+    `(Last error: ${lastError?.message?.slice(0, 120)})`
+  )
 }
+
