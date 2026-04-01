@@ -1,11 +1,11 @@
 // src/pages/teacher/ScoreEntryPage.tsx
 // GES SBA Style — students in rows, subjects in columns
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
-import { TEACHER_REMARKS } from '../../constants/remarks'
+import { TEACHER_REMARKS, getRandomRemark, GRADE_REMARKS } from '../../constants/remarks'
 import toast from 'react-hot-toast'
 
 // ── constants ─────────────────────────────────────────────
@@ -162,14 +162,50 @@ export default function ScoreEntryPage() {
 
   // ── score update ──────────────────────────────────────
   const updateScore = useCallback((sid: string, subId: string, field: 'cs'|'es'|'remarks', val: string) => {
-    setScoreMap(prev => ({
-      ...prev,
-      [sid]: { ...prev[sid], [subId]: { ...prev[sid]?.[subId], [field]: val } }
-    }))
+    setScoreMap(prev => {
+      const current = prev[sid]?.[subId] ?? { cs: '', es: '', remarks: '', submitted: false }
+      const updated = { ...current, [field]: val }
+
+      // Auto-populate remark if both scores are present and remark is empty
+      if ((field === 'cs' || field === 'es') && updated.remarks === '') {
+        const csVal = field === 'cs' ? val : updated.cs
+        const esVal = field === 'es' ? val : updated.es
+        
+        if (csVal !== '' && esVal !== '') {
+          const total = (parseFloat(csVal)||0) + (parseFloat(esVal)||0)
+          const grade = getGrade(total).grade
+          updated.remarks = getRandomRemark(grade)
+        }
+      }
+
+      return {
+        ...prev,
+        [sid]: { ...prev[sid], [subId]: updated }
+      }
+    })
     setDirty(true)
     if (autoSaveRef.current) clearTimeout(autoSaveRef.current)
     autoSaveRef.current = setTimeout(() => handleSave(false), 2500)
   }, [])
+
+  const autoFillRemarks = () => {
+    setScoreMap(prev => {
+      const next = { ...prev }
+      students.forEach(s => {
+        subjects.forEach(sub => {
+          const sc = next[s.id]?.[sub.id]
+          if (sc && sc.cs !== '' && sc.es !== '' && !sc.remarks) {
+            const total = (parseFloat(sc.cs)||0) + (parseFloat(sc.es)||0)
+            const grade = getGrade(total).grade
+            next[s.id][sub.id] = { ...sc, remarks: getRandomRemark(grade) }
+          }
+        })
+      })
+      return next
+    })
+    setDirty(true)
+    toast.success('Missing remarks auto-filled ✨')
+  }
 
   // ── calculations ──────────────────────────────────────
   function getTotal(sid: string, subId: string): number {
@@ -500,34 +536,34 @@ export default function ScoreEntryPage() {
                           const bgBase = rowIdx % 2 === 0 ? '#fff' : '#fafafa'
 
                           return (
-                            <>
+                            <Fragment key={stu.id + sub.id}>
                               {/* CS */}
-                              <td key={sub.id+'cs'} style={{ background: isActive ? '#faf5ff' : bgBase, borderLeft:'2px solid #ede9fe', textAlign:'center', padding:'4px' }}
+                              <td style={{ background: isActive ? '#faf5ff' : bgBase, borderLeft:'2px solid #ede9fe', textAlign:'center', padding:'4px' }}
                                 onClick={() => setActiveCell({ sid:stu.id, subId:sub.id, field:'cs' })}>
                                 <TinyInput value={sc.cs} max={classWeight} disabled={isLocked}
                                   onChange={v => updateScore(stu.id, sub.id, 'cs', v)} />
                                 {csOver && <div style={{ fontSize:8, color:'#dc2626' }}>max {classWeight}</div>}
                               </td>
                               {/* ES */}
-                              <td key={sub.id+'es'} style={{ background: isActive ? '#faf5ff' : bgBase, textAlign:'center', padding:'4px' }}
+                              <td style={{ background: isActive ? '#faf5ff' : bgBase, textAlign:'center', padding:'4px' }}
                                 onClick={() => setActiveCell({ sid:stu.id, subId:sub.id, field:'es' })}>
                                 <TinyInput value={sc.es} max={examWeight} disabled={isLocked}
                                   onChange={v => updateScore(stu.id, sub.id, 'es', v)} />
                                 {esOver && <div style={{ fontSize:8, color:'#dc2626' }}>max {examWeight}</div>}
                               </td>
                               {/* Total */}
-                              <td key={sub.id+'tot'} className="total-col" style={{ textAlign:'center', padding:'4px 6px' }}>
+                              <td className="total-col" style={{ textAlign:'center', padding:'4px 6px' }}>
                                 {total > 0
                                   ? <span style={{ fontSize:13, fontWeight:800, color: total >= 50 ? '#16a34a' : '#dc2626' }}>{total.toFixed(1)}</span>
                                   : <span style={{ color:'#d1d5db', fontSize:11 }}>—</span>}
                               </td>
                               {/* Grade */}
-                              <td key={sub.id+'gr'} style={{ textAlign:'center', padding:'4px 3px', background: rowIdx % 2 === 0 ? '#fff' : '#fafafa' }}>
+                              <td style={{ textAlign:'center', padding:'4px 3px', background: rowIdx % 2 === 0 ? '#fff' : '#fafafa' }}>
                                 {g
                                   ? <span className="grade-badge" style={{ background:g.color+'18', color:g.color }}>{g.grade}</span>
                                   : <span style={{ color:'#d1d5db', fontSize:11 }}>—</span>}
                               </td>
-                            </>
+                            </Fragment>
                           )
                         })}
 
@@ -564,16 +600,16 @@ export default function ScoreEntryPage() {
                       const csAvg = students.reduce((s,st) => s + (parseFloat(scoreMap[st.id]?.[sub.id]?.cs)||0), 0) / Math.max(1, students.filter(st => scoreMap[st.id]?.[sub.id]?.cs !== '').length)
                       const esAvg = students.reduce((s,st) => s + (parseFloat(scoreMap[st.id]?.[sub.id]?.es)||0), 0) / Math.max(1, students.filter(st => scoreMap[st.id]?.[sub.id]?.es !== '').length)
                       return (
-                        <>
-                          <td key={sub.id+'cs-f'} style={{ textAlign:'center', borderLeft:'2px solid #ede9fe', fontSize:11, color:'#6d28d9' }}>{isNaN(csAvg) ? '—' : csAvg.toFixed(1)}</td>
-                          <td key={sub.id+'es-f'} style={{ textAlign:'center', fontSize:11, color:'#0891b2' }}>{isNaN(esAvg) ? '—' : esAvg.toFixed(1)}</td>
-                          <td key={sub.id+'tot-f'} style={{ textAlign:'center', fontSize:12, fontWeight:800, color: avg >= 50 ? '#16a34a' : avg > 0 ? '#dc2626' : '#d1d5db' }}>
+                        <Fragment key={sub.id}>
+                          <td style={{ textAlign:'center', borderLeft:'2px solid #ede9fe', fontSize:11, color:'#6d28d9' }}>{isNaN(csAvg) ? '—' : csAvg.toFixed(1)}</td>
+                          <td style={{ textAlign:'center', fontSize:11, color:'#0891b2' }}>{isNaN(esAvg) ? '—' : esAvg.toFixed(1)}</td>
+                          <td style={{ textAlign:'center', fontSize:12, fontWeight:800, color: avg >= 50 ? '#16a34a' : avg > 0 ? '#dc2626' : '#d1d5db' }}>
                             {avg > 0 ? avg.toFixed(1) : '—'}
                           </td>
-                          <td key={sub.id+'gr-f'} style={{ textAlign:'center' }}>
+                          <td style={{ textAlign:'center' }}>
                             {g ? <span className="grade-badge" style={{ background:g.color+'18', color:g.color }}>{g.grade}</span> : '—'}
                           </td>
-                        </>
+                        </Fragment>
                       )
                     })}
                     <td colSpan={3} style={{ textAlign:'center', background:'#fffbeb', fontSize:11, color:'#92400e' }}>
@@ -587,9 +623,15 @@ export default function ScoreEntryPage() {
             {/* Remarks row below table */}
             {students.length > 0 && subjects.length > 0 && !isLocked && (
               <div style={{ padding:'14px 20px', borderTop:'1px solid #faf5ff', background:'#fafafa' }}>
-                <p style={{ fontSize:11, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:10 }}>
-                  📝 Remarks (per student per subject)
-                </p>
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+                  <p style={{ fontSize:11, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.06em', margin:0 }}>
+                    📝 Remarks (per student per subject)
+                  </p>
+                  <button onClick={autoFillRemarks}
+                    style={{ fontSize:10, fontWeight:700, color:'#6d28d9', background:'#f5f3ff', border:'1px solid #ddd6fe', padding:'4px 10px', borderRadius:6, cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
+                    ✨ Auto-fill Missing Remarks
+                  </button>
+                </div>
                 <div style={{ display:'flex', flexWrap:'wrap', gap:10 }}>
                   {students.map(stu => (
                     subjects.map(sub => {
@@ -601,7 +643,7 @@ export default function ScoreEntryPage() {
                           <select value={sc.remarks} onChange={e => updateScore(stu.id, sub.id, 'remarks', e.target.value)}
                             style={{ fontSize:11, border:'none', outline:'none', background:'transparent', color:'#374151', cursor:'pointer', maxWidth:180, fontFamily:'"DM Sans",sans-serif' }}>
                             <option value="">No remark…</option>
-                            {TEACHER_REMARKS.map(r => <option key={r} value={r}>{r}</option>)}
+                            {(GRADE_REMARKS[getGrade(getTotal(stu.id, sub.id)).grade] || TEACHER_REMARKS).map(r => <option key={r} value={r}>{r}</option>)}
                           </select>
                         </div>
                       )

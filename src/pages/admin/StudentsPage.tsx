@@ -1,6 +1,6 @@
 // src/pages/admin/StudentsPage.tsx
 import { useState, useRef, useMemo } from 'react'
-import { supabase } from '../../lib/supabase'
+import { supabase, adminSupabase } from '../../lib/supabase'
 import { useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -152,6 +152,12 @@ export default function StudentsPage() {
   const [importLoading, setImportLoading] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  
+  // New: Account Creation State
+  const [accountModalOpen, setAccountModalOpen] = useState(false)
+  const [accountStudent, setAccountStudent] = useState<any>(null)
+  const [accountLoading, setAccountLoading] = useState(false)
+  const [accountData, setAccountData] = useState({ email: '', password: '' })
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({ resolver: zodResolver(schema) })
 
@@ -206,6 +212,59 @@ export default function StudentsPage() {
   async function handleDelete(id: string, name: string) {
     if (!confirm(`Remove "${name}"? This cannot be undone.`)) return
     await deleteStudent.mutateAsync(id)
+  }
+
+  async function handleCreateAccount() {
+    if (!accountData.email || !accountData.password) {
+      toast.error('Please enter both email and password')
+      return
+    }
+    
+    setAccountLoading(true)
+    try {
+      // 1. Create the Auth user using the admin client
+      const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
+        email: accountData.email,
+        password: accountData.password,
+        email_confirm: true,
+        user_metadata: { full_name: accountStudent.full_name }
+      })
+
+      if (authError) throw authError
+      const newUser = authData.user
+
+      // 2. Create the profile in public.users (or update if trigger exists)
+      const { error: profileError } = await adminSupabase
+        .from('users')
+        .upsert({
+          id: newUser.id,
+          school_id: user!.school_id,
+          full_name: accountStudent.full_name,
+          email: accountData.email,
+          role: 'student',
+          is_active: true
+        })
+
+      if (profileError) throw profileError
+
+      // 3. Link the student record to the new user_id
+      const { error: linkError } = await supabase
+        .from('students')
+        .update({ user_id: newUser.id })
+        .eq('id', accountStudent.id)
+
+      if (linkError) throw linkError
+
+      toast.success('Student account created successfully!')
+      setAccountModalOpen(false)
+      setAccountData({ email: '', password: '' })
+      qc.invalidateQueries({ queryKey: ['students'] })
+    } catch (err: any) {
+      console.error('Account creation failed:', err)
+      toast.error(err.message || 'Failed to create student account')
+    } finally {
+      setAccountLoading(false)
+    }
   }
 
   async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
@@ -422,11 +481,20 @@ export default function StudentsPage() {
                     <td style={{ padding: '12px 16px' }}>
                       <div style={{ display: 'flex', gap: 4 }}>
                         <button className="action-btn" onClick={() => { setViewingStudent(s); setViewModal(true) }}
-                          style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="View">👁️</button>
+                          style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="View Profile">👁️</button>
+                        
+                        {!s.user_id && (
+                          <button className="action-btn" onClick={() => { setAccountStudent(s); setAccountData(prev => ({ ...prev, email: s.guardian_email || '' })); setAccountModalOpen(true) }}
+                            style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#ecfdf5', color: '#059669', cursor: 'pointer', fontSize: 13, transition: 'all 0.15s' }} title="Create Portal Login">🔑</button>
+                        )}
+                        {s.user_id && (
+                          <div style={{ width: 30, height: 30, borderRadius: 8, background: '#f0fdf4', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }} title="Account Linked">✅</div>
+                        )}
+
                         <button className="action-btn" onClick={() => openEdit(s)}
-                          style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="Edit">✏️</button>
+                          style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="Edit Details">✏️</button>
                         <button className="del-btn" onClick={() => handleDelete(s.id, s.full_name)}
-                          style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="Remove">🗑️</button>
+                          style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="Remove Student">🗑️</button>
                       </div>
                     </td>
                   </tr>
@@ -555,6 +623,47 @@ export default function StudentsPage() {
               </div>
             </div>
           )}
+        </Modal>
+
+        {/* ── CREATE ACCOUNT MODAL ── */}
+        <Modal open={accountModalOpen} onClose={() => setAccountModalOpen(false)} 
+          title="Create Student Portal Login" 
+          subtitle={`Set up a secure login for ${accountStudent?.full_name}`}
+          footer={<>
+            <Btn variant="secondary" onClick={() => setAccountModalOpen(false)}>Cancel</Btn>
+            <Btn onClick={handleCreateAccount} loading={accountLoading}>Create Account</Btn>
+          </>}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ padding: '12px 16px', background: '#fef3c7', borderRadius: 10, border: '1px solid #fde68a', color: '#92400e', fontSize: 13 }}>
+              <strong>Note:</strong> This will create a permanent login for the student to access their grades and dashboard.
+            </div>
+            
+            <Field label="Login Email">
+              <StyledInput 
+                type="email" 
+                placeholder="student@school.com" 
+                value={accountData.email}
+                onChange={e => setAccountData(prev => ({ ...prev, email: e.target.value }))}
+              />
+            </Field>
+            
+            <Field label="Set Password">
+              <div style={{ position: 'relative' }}>
+                <StyledInput 
+                  type="text" 
+                  placeholder="Choose a password" 
+                  value={accountData.password}
+                  onChange={e => setAccountData(prev => ({ ...prev, password: e.target.value }))}
+                />
+                <button 
+                  type="button"
+                  onClick={() => setAccountData(prev => ({ ...prev, password: Math.random().toString(36).slice(-8) }))}
+                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: '#ede9fe', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#6d28d9', cursor: 'pointer' }}
+                >Generate</button>
+              </div>
+            </Field>
+          </div>
         </Modal>
       </div>
     </>

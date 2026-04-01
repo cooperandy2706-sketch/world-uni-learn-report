@@ -29,7 +29,15 @@ import TeacherNotificationsPage from './pages/teacher/NotificationsPage'
 import TeacherSyllabusPage from './pages/teacher/SyllabusPage'
 import LessonTrackerPage from './pages/teacher/LessonTrackerPage'
 import TeacherAttendancePage from './pages/teacher/AttendancePage'
+import TeacherStudentsPage from './pages/teacher/TeacherStudentsPage'
+import TeacherAssignmentsPage from './pages/teacher/AssignmentsPage'
+import StudentAssignmentsPage from './pages/student/StudentAssignmentsPage'
+import TakeAssignmentPage from './pages/student/TakeAssignmentPage'
 import AdminAttendancePage from './pages/admin/AttendancePage'
+import SchoolRegistrationPage from './pages/auth/SchoolRegistrationPage'
+import SuperAdminDashboard from './pages/admin/SuperAdminDashboard'
+import StudentDashboard from './pages/student/StudentDashboard'
+import ComingSoonPage from './pages/admin/ComingSoonPage'
 
 import {
   RouteErrorPage,
@@ -51,6 +59,7 @@ export const router = createBrowserRouter([
         element: <AuthLayout />,
         children: [
           { path: '/login', element: <AuthPage /> },
+          { path: '/register-school', element: <SchoolRegistrationPage /> },
           { path: 'forgot-password', element: <ForgotPasswordPage /> },
         ],
       },
@@ -90,10 +99,87 @@ export const router = createBrowserRouter([
           { path: 'notifications', element: <TeacherNotificationsPage /> },
           { path: 'syllabus', element: <TeacherSyllabusPage /> },
           { path: 'lesson-tracker', element: <LessonTrackerPage /> },
+          { path: 'students', element: <TeacherStudentsPage /> },
+          { path: 'assignments', element: <TeacherAssignmentsPage /> },
           { path: 'attendance', element: <TeacherAttendancePage /> },
         ],
       },
 
+      {
+        path: 'super-admin',
+        element: <AppLayout requiredRole="super_admin" />,
+        children: [
+          { index: true, element: <Navigate to="/super-admin/dashboard" replace /> },
+          { path: 'dashboard', element: <SuperAdminDashboard /> },
+          { path: 'schools', element: <SuperAdminDashboard /> },
+          {
+            path: 'quizzes',
+            element: (
+              <ComingSoonPage
+                title="Monthly Global Quizzes"
+                description="A centralized system to create and push standardized monthly assessments to all registered schools on the platform."
+                icon="📝"
+              />
+            ),
+          },
+          {
+            path: 'messaging',
+            element: (
+              <ComingSoonPage
+                title="Global Platform Messaging"
+                description="Broadcast emergency alerts, system updates, or platform-wide announcements to all school administrators and Teachers."
+                icon="💬"
+              />
+            ),
+          },
+          {
+            path: 'analytics',
+            element: (
+              <ComingSoonPage
+                title="Leaderboards & Analytics"
+                description="Deep insights into school performance, student growth metrics, and platform-wide engagement benchmarks."
+                icon="🏅"
+              />
+            ),
+          },
+          {
+            path: 'resources',
+            element: (
+              <ComingSoonPage
+                title="Global Resource Library"
+                description="Coordinate and share digital textbooks, teaching guides, and premium learning materials across all schools."
+                icon="📚"
+              />
+            ),
+          },
+        ],
+      },
+      {
+        path: 'student',
+        element: <AppLayout requiredRole="student" />,
+        children: [
+          { index: true, element: <Navigate to="/student/dashboard" replace /> },
+          { path: 'dashboard', element: <StudentDashboard /> },
+          { 
+            path: 'results', 
+            element: <ComingSoonPage 
+              title="My Academic Results" 
+              description="View your performance across all subjects, download termly report cards, and track your progress over time." 
+              icon="📊" 
+            /> 
+          },
+          { path: 'assignments', element: <StudentAssignmentsPage /> },
+          { path: 'assignments/:id', element: <TakeAssignmentPage /> },
+          { 
+            path: 'schedule', 
+            element: <ComingSoonPage 
+              title="My Class Schedule" 
+              description="Stay on top of your daily classes, exams, and extracurricular activities with your personalized timetable." 
+              icon="📅" 
+            /> 
+          },
+        ],
+      },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

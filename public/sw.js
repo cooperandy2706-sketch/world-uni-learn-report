@@ -13,26 +13,39 @@ self.addEventListener('activate', (e) => {
 
 // Push event — fires when server sends a notification
 self.addEventListener('push', (e) => {
-  console.log('[SW] Push received:', e.data?.text())
+  const rawData = e.data?.text() || ''
+  console.log('[SW] Push received raw:', rawData)
   
-  let data = { title: 'WULA Reports', body: 'You have a new notification', url: '/', icon: '/icon-192.png' }
+  let data = { 
+    title: 'WULA Reports', 
+    body: 'You have a new notification', 
+    url: '/', 
+    icon: '/icon-192.png' 
+  }
   
   try {
-    if (e.data) data = { ...data, ...e.data.json() }
+    if (rawData) {
+      const parsed = JSON.parse(rawData)
+      data = { ...data, ...parsed }
+    }
   } catch (err) {
-    data.body = e.data?.text() || data.body
+    console.warn('[SW] Push data was not JSON, using as body text:', rawData)
+    data.body = rawData || data.body
   }
+
+  console.log('[SW] Showing notification:', data.title)
 
   e.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
       icon: data.icon || '/icon-192.png',
-      badge: '/icon-192.png',
-      vibrate: [200, 100, 200, 100, 200],
       tag: 'wula-notification',
       renotify: true,
+      requireInteraction: true, // This keeps it on screen until you click it
       data: { url: data.url || '/' },
     })
+    .then(() => console.log('[SW] Notification shown successfully'))
+    .catch(err => console.error('[SW] showNotification failed:', err))
   )
 })
 

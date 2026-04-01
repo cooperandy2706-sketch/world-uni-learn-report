@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { supabase } from '../../lib/supabase'
+import { supabase, adminSupabase } from '../../lib/supabase'
 import { useTeachers } from '../../hooks/useTeachers'
 import { useClasses } from '../../hooks/useClasses'
 import { useSubjects } from '../../hooks/useSubjects'
@@ -126,13 +126,42 @@ export default function TeachersPage() {
         qc.invalidateQueries({ queryKey:['teachers'] })
       } else {
         const pw = data.password || 'teacher123'
-        const { data: result, error } = await supabase.rpc('create_teacher_account', {
-          p_email: data.email, p_password: pw, p_full_name: data.full_name,
-          p_school_id: user!.school_id, p_staff_id: data.staff_id||null,
-          p_phone: data.phone||null, p_qualification: data.qualification||null,
+        
+        // 1. Create the Auth user using the admin client
+        const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
+          email: data.email,
+          password: pw,
+          email_confirm: true,
+          user_metadata: { full_name: data.full_name }
         })
-        if (error) throw error
-        if ((result as any)?.success === false) throw new Error((result as any).error)
+        if (authError) throw authError
+        const newUser = authData.user
+
+        // 2. Create the profile in public.users (using admin client to ensure role is set)
+        const { error: profileError } = await adminSupabase
+          .from('users')
+          .upsert({
+            id: newUser.id,
+            school_id: user!.school_id,
+            full_name: data.full_name,
+            email: data.email,
+            phone: data.phone || null,
+            role: 'teacher',
+            is_active: true
+          })
+        if (profileError) throw profileError
+
+        // 3. Create the record in public.teachers
+        const { error: teacherError } = await adminSupabase
+          .from('teachers')
+          .insert({
+            user_id: newUser.id,
+            school_id: user!.school_id,
+            staff_id: data.staff_id || null,
+            qualification: data.qualification || null
+          })
+        if (teacherError) throw teacherError
+
         toast.success(`✅ Created · ${data.email} · Password: ${pw}`, { duration:8000 })
         qc.invalidateQueries({ queryKey:['teachers'] })
       }
@@ -143,12 +172,16 @@ export default function TeachersPage() {
   async function handleDelete(t: any) {
     if (!confirm(`Remove ${t.user?.full_name}? This deletes their account permanently.`)) return
     try {
-      await supabase.from('teacher_assignments').delete().eq('teacher_id', t.id)
-      await supabase.from('weekly_goals').delete().eq('teacher_id', t.id)
-      await supabase.from('teachers').delete().eq('id', t.id)
-      await supabase.from('users').delete().eq('id', t.user_id)
-      // Delete auth via RPC
-      await supabase.rpc('delete_teacher_account', { p_user_id: t.user_id })
+      // Use adminSupabase to ensure we bypass RLS for cleanup if needed
+      await adminSupabase.from('teacher_assignments').delete().eq('teacher_id', t.id)
+      await adminSupabase.from('weekly_goals').delete().eq('teacher_id', t.id)
+      await adminSupabase.from('teachers').delete().eq('id', t.id)
+      await adminSupabase.from('users').delete().eq('id', t.user_id)
+      
+      // Delete auth user using the admin client
+      const { error: authDeleteError } = await adminSupabase.auth.admin.deleteUser(t.user_id)
+      if (authDeleteError) throw authDeleteError
+
       qc.invalidateQueries({ queryKey:['teachers'] })
       toast.success('Teacher removed')
     } catch(e:any) { toast.error(e.message??'Failed') }
@@ -180,7 +213,7 @@ export default function TeachersPage() {
 
   async function addAssignment() {
     if (!newClassId || !newSubjectId || !term?.id) { toast.error('Select class, subject and ensure there is an active term'); return }
-    const { error } = await supabase.from('teacher_assignments').insert({
+    const { error } = await adminSupabase.from('teacher_assignments').insert({
       teacher_id: assigningTeacher.id, class_id: newClassId, subject_id: newSubjectId,
       term_id: (term as any).id, academic_year_id: (term as any).academic_year_id,
       is_class_teacher: isClassTeacher, school_id: user!.school_id,
@@ -195,7 +228,7 @@ export default function TeachersPage() {
   }
 
   async function removeAssignment(id: string) {
-    await supabase.from('teacher_assignments').delete().eq('id', id)
+    await adminSupabase.from('teacher_assignments').delete().eq('id', id)
     setAssignments(prev => prev.filter(a => a.id !== id))
     toast.success('Removed')
   }
@@ -203,7 +236,9 @@ export default function TeachersPage() {
   async function handleResetPassword() {
     if (!newPassword || newPassword.length < 6) { toast.error('Min 6 characters'); return }
     setResetting(true)
-    const { error } = await supabase.rpc('reset_teacher_password', { p_user_id: resetTeacher.user_id, p_new_password: newPassword })
+    const { error } = await adminSupabase.auth.admin.updateUserById(resetTeacher.user_id, {
+      password: newPassword
+    })
     setResetting(false)
     if (error) { toast.error(error.message); return }
     toast.success(`Password reset for ${resetTeacher.user?.full_name}`)

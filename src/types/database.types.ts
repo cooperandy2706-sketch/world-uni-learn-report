@@ -1,5 +1,5 @@
 // src/types/database.types.ts
-export type Role = 'admin' | 'teacher'
+export type Role = 'super_admin' | 'admin' | 'teacher' | 'student'
 export type Gender = 'male' | 'female'
 export type TermName = 'Term 1' | 'Term 2' | 'Term 3'
 export type RemarkType = 'teacher' | 'headteacher'
@@ -87,6 +87,7 @@ export interface User {
   avatar_url?: string
   is_active: boolean
   created_at: string
+  school?: School
 }
 
 export interface Teacher {
@@ -133,6 +134,7 @@ export interface Student {
   address?: string
   photo_url?: string
   is_active: boolean
+  user_id?: string
   created_at: string
   // joined
   class?: Class

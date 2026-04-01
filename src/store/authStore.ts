@@ -28,14 +28,27 @@ export const useAuthStore = create<AuthStore>((set) => ({
     const session = data.session
 
     if (session?.user) {
+      // Fetch profile first
       const { data: profile } = await supabase
         .from('users')
         .select('*')
         .eq('id', session.user.id)
         .single()
 
+      if (profile) {
+        // Fetch school separately to avoid 406 errors if relationship is missing
+        if (profile.school_id) {
+          const { data: school } = await supabase
+            .from('schools')
+            .select('*')
+            .eq('id', profile.school_id)
+            .single()
+          if (school) profile.school = school
+        }
+      }
+
       set({
-        user: profile ?? null,
+        user: profile as User ?? null,
         session,
         loading: false,
         initialized: true,
@@ -57,8 +70,19 @@ export const useAuthStore = create<AuthStore>((set) => ({
           .eq('id', session.user.id)
           .single()
 
+        if (profile) {
+          if (profile.school_id) {
+            const { data: school } = await supabase
+              .from('schools')
+              .select('*')
+              .eq('id', profile.school_id)
+              .single()
+            if (school) profile.school = school
+          }
+        }
+
         set({
-          user: profile ?? null,
+          user: profile as User ?? null,
           session,
         })
       } else {

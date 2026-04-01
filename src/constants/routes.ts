@@ -31,6 +31,21 @@ export const ROUTES = {
   TEACHER_NOTIFICATIONS: '/teacher/notifications',
   TEACHER_SYLLABUS: '/teacher/syllabus',
   TEACHER_LESSON_TRACKER: '/teacher/lesson-tracker',
+  TEACHER_STUDENTS: '/teacher/students',
+  TEACHER_ASSIGNMENTS: '/teacher/assignments',
   TEACHER_ATTENDANCE: '/teacher/attendance',
 
+  // Student
+  STUDENT_DASHBOARD: '/student/dashboard',
+  STUDENT_ASSIGNMENTS: '/student/assignments',
+  STUDENT_RESULTS: '/student/results',
+  STUDENT_SCHEDULE: '/student/schedule',
+
+  // Super Admin
+  SUPER_ADMIN_DASHBOARD: '/super-admin/dashboard',
+  SUPER_ADMIN_SCHOOLS: '/super-admin/schools',
+  SUPER_ADMIN_QUIZZES: '/super-admin/quizzes',
+  SUPER_ADMIN_MESSAGING: '/super-admin/messaging',
+  SUPER_ADMIN_ANALYTICS: '/super-admin/analytics',
+  SUPER_ADMIN_RESOURCES: '/super-admin/resources',
 } as const

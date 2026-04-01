@@ -26,13 +26,31 @@ const adminLinks = [
 const teacherLinks = [
   { to: ROUTES.TEACHER_DASHBOARD, label: 'Dashboard', icon: '⊞', emoji: true },
   { to: ROUTES.TEACHER_MY_CLASSES, label: 'My Classes', icon: '🏫', emoji: true },
+  { to: ROUTES.TEACHER_STUDENTS, label: 'Students', icon: '👥', emoji: true },
   { to: ROUTES.TEACHER_SCORE_ENTRY, label: 'Score Entry', icon: '✏️', emoji: true },
   { to: ROUTES.TEACHER_REPORTS, label: 'Reports', icon: '📄', emoji: true },
   { to: ROUTES.TEACHER_TIMETABLE, label: 'Timetable', icon: '📅', emoji: true },
   { to: ROUTES.TEACHER_NOTIFICATIONS, label: 'Notifications', icon: '🔔', emoji: true },
   { to: ROUTES.TEACHER_SYLLABUS, label: 'Syllabus', icon: '📚', emoji: true },
   { to: ROUTES.TEACHER_LESSON_TRACKER, label: 'Lesson Tracker', icon: '⏱️', emoji: true },
+  { to: ROUTES.TEACHER_ASSIGNMENTS, label: 'Assignments', icon: '📝', emoji: true },
   { to: ROUTES.TEACHER_ATTENDANCE, label: 'Attendance', icon: '📋', emoji: true },
+]
+
+const superAdminLinks = [
+  { to: ROUTES.SUPER_ADMIN_DASHBOARD, label: 'Platform Hub', icon: '🏰', emoji: true },
+  { to: ROUTES.SUPER_ADMIN_SCHOOLS, label: 'School Registry', icon: '🏫', emoji: true },
+  { to: ROUTES.SUPER_ADMIN_QUIZZES, label: 'Monthly Quizzes', icon: '📝', emoji: true },
+  { to: ROUTES.SUPER_ADMIN_MESSAGING, label: 'Global Messaging', icon: '💬', emoji: true },
+  { to: ROUTES.SUPER_ADMIN_ANALYTICS, label: 'Leaderboards', icon: '🏅', emoji: true },
+  { to: ROUTES.SUPER_ADMIN_RESOURCES, label: 'Learning Materials', icon: '📚', emoji: true },
+]
+
+const studentLinks = [
+  { to: ROUTES.STUDENT_DASHBOARD, label: 'My Portal', icon: '🏠', emoji: true },
+  { to: ROUTES.STUDENT_ASSIGNMENTS, label: 'Assignments', icon: '📝', emoji: true },
+  { to: ROUTES.STUDENT_RESULTS, label: 'Academic Results', icon: '📊', emoji: true },
+  { to: ROUTES.STUDENT_SCHEDULE, label: 'My Schedule', icon: '📅', emoji: true },
 ]
 
 // ── The GES-inspired logo mark ────────────────────────────
@@ -57,8 +75,8 @@ function LogoMark() {
 }
 
 export default function Sidebar() {
-  const { user, signOut, isAdmin } = useAuth()
-  const links = isAdmin ? adminLinks : teacherLinks
+  const { user, signOut, isAdmin, isSuperAdmin, isStudent } = useAuth()
+  const links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : teacherLinks
   const [hovered, setHovered] = useState<string | null>(null)
 
   return (
@@ -101,9 +119,9 @@ export default function Sidebar() {
 
           {/* Role badge */}
           <div style={{ marginTop: 12, display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 99, padding: '4px 10px' }}>
-            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#f59e0b', animation: 'none' }} />
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: isSuperAdmin ? '#10b981' : isStudent ? '#7c3aed' : '#f59e0b' }} />
             <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
-              {isAdmin ? 'Admin Console' : 'Teacher Portal'}
+              {isSuperAdmin ? 'Platform Master' : isStudent ? 'Student Portal' : isAdmin ? 'Admin Console' : 'Teacher Portal'}
             </span>
           </div>
         </div>

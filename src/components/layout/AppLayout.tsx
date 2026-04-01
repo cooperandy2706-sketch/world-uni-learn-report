@@ -8,7 +8,7 @@ import EnablePushButton from '../ui/EnablePushButton'
 import WhatsNewModal from '../ui/WhatsNewModal'
 import { ROUTES } from '../../constants/routes'
 
-interface AppLayoutProps { requiredRole?: 'admin' | 'teacher' }
+interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 'student' }
 
 export default function AppLayout({ requiredRole }: AppLayoutProps) {
   const { user, loading, initialized } = useAuth()
@@ -24,8 +24,28 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
   }
 
   if (!user) return <Navigate to={ROUTES.LOGIN} replace />
+  
   if (requiredRole && user.role !== requiredRole) {
+    if (user.role === 'super_admin') return <Navigate to="/super-admin/dashboard" replace />
+    if (user.role === 'student') return <Navigate to="/student/dashboard" replace />
     return <Navigate to={user.role === 'admin' ? ROUTES.ADMIN_DASHBOARD : ROUTES.TEACHER_DASHBOARD} replace />
+  }
+
+  // Pending School Guard (Non-super-admins)
+  if (user.role !== 'super_admin' && user.school?.status === 'pending') {
+    return (
+      <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center', background: '#f8f7ff', flexDirection: 'column' }}>
+        <div style={{ fontSize: 60, marginBottom: 24 }}>⏳</div>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: '#1e0646', marginBottom: 12 }}>Awaiting Approval</h2>
+        <p style={{ maxWidth: 460, color: '#64748b', lineHeight: 1.6, marginBottom: 32 }}>
+          Your school registration is being reviewed by the platform administrators. 
+          You will have access to your dashboard once your school is confirmed (usually within 24 hours).
+        </p>
+        <button onClick={() => window.location.reload()} style={{ padding: '12px 24px', borderRadius: 10, background: '#f59e0b', color: '#1e0646', border: 'none', fontWeight: 700, cursor: 'pointer' }}>
+          Check Status
+        </button>
+      </div>
+    )
   }
 
   return (

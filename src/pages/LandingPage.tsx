@@ -176,7 +176,9 @@ function Hero() {
   return (
     <section style={{
       minHeight: '100vh', position: 'relative', overflow: 'hidden',
-      background: 'linear-gradient(135deg, #1e0646 0%, #3b0764 40%, #5b21b6 100%)',
+      background: 'linear-gradient(135deg, rgba(30, 6, 70, 0.7) 0%, rgba(59, 7, 100, 0.75) 40%, rgba(91, 33, 182, 0.8) 100%), url("/kids2.JPG")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {/* Background Decor */}
@@ -237,6 +239,19 @@ function Hero() {
               onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)' }}
             >
               Get Started Now <span style={{ fontSize: 18 }}>→</span>
+            </Link>
+
+            <Link to="/register-school" style={{
+              padding: '16px 36px', borderRadius: 12, fontSize: 16, fontWeight: 700,
+              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
+              color: '#fff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8,
+              backdropFilter: 'blur(10px)',
+              transition: 'transform 0.2s, background 0.2s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.background = 'rgba(255,255,255,0.2)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
+            >
+              Register School for Free
             </Link>
           </div>
         </div>
@@ -438,7 +453,15 @@ function Workflow() {
 function CTA() {
   const { ref, inView } = useInView()
   return (
-    <section ref={ref} style={{ padding: '120px 24px', background: '#1e0646', position: 'relative', overflow: 'hidden' }}>
+    <section ref={ref} style={{ 
+      padding: '120px 24px', 
+      background: 'linear-gradient(rgba(30, 6, 70, 0.65), rgba(30, 6, 70, 0.85)), url("/kids2.JPG")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed',
+      position: 'relative', 
+      overflow: 'hidden' 
+    }}>
       <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 600, height: 600, background: '#f59e0b', borderRadius: '50%', filter: 'blur(150px)', opacity: 0.15, pointerEvents: 'none' }} className="pulse-dot" />
       
       <div style={{
@@ -453,14 +476,27 @@ function CTA() {
         <p style={{ fontSize: 17, color: 'rgba(237, 233, 254, 0.8)', lineHeight: 1.75, marginBottom: 40 }}>
           Bring your students, teachers, and administration onto one seamless, powerful learning and management platform today.
         </p>
-        <Link to={ROUTES.LOGIN} style={{
-          padding: '18px 48px', borderRadius: 999, fontSize: 18, fontWeight: 700,
-          background: '#f59e0b', color: '#1e0646', textDecoration: 'none', display: 'inline-block',
-          boxShadow: '0 4px 30px rgba(245,158,11,0.3)', transition: 'transform 0.2s, background 0.2s',
-        }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.background = '#fbbf24' }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = '#f59e0b' }}
-        >Get Started Today</Link>
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link to={ROUTES.LOGIN} style={{
+            padding: '18px 48px', borderRadius: 999, fontSize: 18, fontWeight: 700,
+            background: '#f59e0b', color: '#1e0646', textDecoration: 'none', display: 'inline-block',
+            boxShadow: '0 4px 30px rgba(245,158,11,0.3)', transition: 'transform 0.2s, background 0.2s',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.background = '#fbbf24' }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = '#f59e0b' }}
+          >Sign In to Portal</Link>
+
+          <Link to="/register-school" style={{
+            padding: '18px 48px', borderRadius: 999, fontSize: 18, fontWeight: 700,
+            background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)',
+            color: '#fff', textDecoration: 'none', display: 'inline-block',
+            backdropFilter: 'blur(10px)',
+            transition: 'transform 0.2s, background 0.2s',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.background = 'rgba(255,255,255,0.2)' }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
+          >Register School for Free</Link>
+        </div>
       </div>
     </section>
   )

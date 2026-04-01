@@ -10,15 +10,15 @@ import { settingsService } from '../../services/index'
 import toast from 'react-hot-toast'
 
 const schema = z.object({
-  school_name:      z.string().min(1, 'School name is required'),
-  school_motto:     z.string().optional(),
-  school_email:     z.string().email('Invalid email').optional().or(z.literal('')),
-  school_phone:     z.string().optional(),
-  school_address:   z.string().optional(),
+  school_name: z.string().min(1, 'School name is required'),
+  school_motto: z.string().optional(),
+  school_email: z.string().email('Invalid email').optional().or(z.literal('')),
+  school_phone: z.string().optional(),
+  school_address: z.string().optional(),
   headteacher_name: z.string().optional(),
-  next_term_date:   z.string().optional(),
+  next_term_date: z.string().optional(),
   school_fees_info: z.string().optional(),
-  school_news:      z.string().optional(),
+  school_news: z.string().optional(),
 })
 type FormData = z.infer<typeof schema>
 
@@ -26,9 +26,9 @@ type FormData = z.infer<typeof schema>
 function Btn({ children, onClick, variant = 'primary', type = 'button', disabled, loading, style, form }: any) {
   const [hov, setHov] = useState(false)
   const v: Record<string, React.CSSProperties> = {
-    primary:   { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
+    primary: { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
     secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
-    ghost:     { background: hov ? '#f5f3ff' : 'transparent', color: '#6b7280', border: 'none' },
+    ghost: { background: hov ? '#f5f3ff' : 'transparent', color: '#6b7280', border: 'none' },
   }
   return (
     <button type={type} form={form} onClick={onClick} disabled={disabled}
@@ -98,15 +98,15 @@ export default function SettingsPage() {
     if (settings) {
       const school = (settings as any).school
       reset({
-        school_name:      school?.name ?? '',
-        school_motto:     school?.motto ?? '',
-        school_email:     school?.email ?? '',
-        school_phone:     school?.phone ?? '',
-        school_address:   school?.address ?? '',
+        school_name: school?.name ?? '',
+        school_motto: school?.motto ?? '',
+        school_email: school?.email ?? '',
+        school_phone: school?.phone ?? '',
+        school_address: school?.address ?? '',
         headteacher_name: school?.headteacher_name ?? '',
-        next_term_date:   settings.next_term_date ?? '',
+        next_term_date: settings.next_term_date ?? '',
         school_fees_info: settings.school_fees_info ?? '',
-        school_news:      settings.school_news ?? '',
+        school_news: settings.school_news ?? '',
       })
       setLogoUrl(school?.logo_url ?? null)
     }
@@ -128,16 +128,13 @@ export default function SettingsPage() {
         .eq('id', user!.school_id)
       if (schoolError) throw schoolError
 
-      // Upsert school_settings (creates if missing)
-      const { error: settingsError } = await supabase
-        .from('school_settings')
-        .upsert({
-          school_id: user!.school_id,
-          next_term_date: data.next_term_date || null,
-          school_fees_info: data.school_fees_info || null,
-          school_news: data.school_news || null,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'school_id' })
+      // Use RPC to safely upsert settings without duplicate key errors
+      const { error: settingsError } = await supabase.rpc('upsert_school_settings', {
+        p_school_id: user!.school_id,
+        p_next_term_date: data.next_term_date || null,
+        p_school_fees_info: data.school_fees_info || null,
+        p_school_news: data.school_news || null,
+      })
       if (settingsError) throw settingsError
 
       // Refresh settings in cache

@@ -12,7 +12,8 @@ import { ROUTES } from '../../constants/routes'
 interface Stats {
   students: number; teachers: number; classes: number
   subjects: number; reportsGenerated: number; totalStudentsForReports: number
-  pendingScores: number; unreadMessages: number
+  pendingScores: number; unreadMessages: number; totalAssignments: number
+  totalSubmissions: number
 }
 interface TopStudent {
   student_id: string; full_name: string; class_name: string
@@ -129,6 +130,7 @@ export default function DashboardPage() {
   const [topStudents, setTopStudents] = useState<TopStudent[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [classStats, setClassStats] = useState<ClassStat[]>([])
+  const [recentSubmissions, setRecentSubmissions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
   const [activeMsg, setActiveMsg] = useState<Message | null>(null)
@@ -155,7 +157,7 @@ export default function DashboardPage() {
 
   async function loadAll() {
     setLoading(true)
-    await Promise.all([loadStats(), loadTopStudents(), loadMessages(), loadClassStats()])
+    await Promise.all([loadStats(), loadTopStudents(), loadMessages(), loadClassStats(), loadRecentSubmissions()])
     setLoading(false)
   }
 
@@ -163,13 +165,15 @@ export default function DashboardPage() {
     const sid = user!.school_id
     const [
       { count: students }, { count: teachers }, { count: classes },
-      { count: subjects }, { count: msgs },
+      { count: subjects }, { count: msgs }, { count: assigns }, { count: subs }
     ] = await Promise.all([
       supabase.from('students').select('*', { count: 'exact', head: true }).eq('school_id', sid).eq('is_active', true),
       supabase.from('teachers').select('*', { count: 'exact', head: true }).eq('school_id', sid),
       supabase.from('classes').select('*', { count: 'exact', head: true }).eq('school_id', sid),
       supabase.from('subjects').select('*', { count: 'exact', head: true }).eq('school_id', sid),
       supabase.from('messages').select('*', { count: 'exact', head: true }).eq('school_id', sid).eq('is_read', false),
+      supabase.from('assignments').select('*', { count: 'exact', head: true }).eq('school_id', sid),
+      supabase.from('assignment_submissions').select('*, assignment:assignments!inner(*)', { count: 'exact', head: true }).eq('assignments.school_id', sid)
     ])
 
     let reports = 0, totalForReports = students ?? 0, pendingScores = 0
@@ -187,7 +191,19 @@ export default function DashboardPage() {
       subjects: subjects ?? 0, reportsGenerated: reports,
       totalStudentsForReports: totalForReports,
       pendingScores, unreadMessages: msgs ?? 0,
+      totalAssignments: assigns ?? 0,
+      totalSubmissions: subs ?? 0
     })
+  }
+
+  async function loadRecentSubmissions() {
+    const { data } = await supabase
+      .from('assignment_submissions')
+      .select('*, student:students(full_name), assignment:assignments!inner(title, subject:subjects(name))')
+      .eq('assignments.school_id', user!.school_id)
+      .order('submitted_at', { ascending: false })
+      .limit(5)
+    setRecentSubmissions(data ?? [])
   }
 
   async function loadTopStudents() {
@@ -384,6 +400,8 @@ export default function DashboardPage() {
           <StatCard icon="👨‍🏫" label="Teachers" value={stats?.teachers ?? 0} color="#0891b2" bg="#ecfeff" link={ROUTES.ADMIN_TEACHERS} />
           <StatCard icon="🏫" label="Classes" value={stats?.classes ?? 0} color="#16a34a" bg="#f0fdf4" link={ROUTES.ADMIN_CLASSES} />
           <StatCard icon="📚" label="Subjects" value={stats?.subjects ?? 0} color="#d97706" bg="#fffbeb" link={ROUTES.ADMIN_SUBJECTS} />
+          <StatCard icon="📝" label="Quizzes" value={stats?.totalAssignments ?? 0} color="#7c3aed" bg="#f5f3ff" link={ROUTES.ADMIN_ANALYTICS} />
+          <StatCard icon="✅" label="Submissions" value={stats?.totalSubmissions ?? 0} color="#10b981" bg="#ecfdf5" link={ROUTES.ADMIN_ANALYTICS} />
           <StatCard icon="📄" label="Reports Done" value={stats?.reportsGenerated ?? 0} color="#7c3aed" bg="#f5f3ff" link={ROUTES.ADMIN_REPORTS} />
           <StatCard icon="⏳" label="Pending Scores" value={stats?.pendingScores ?? 0} color="#dc2626" bg="#fef2f2" link={ROUTES.ADMIN_REPORTS} pulse={(stats?.pendingScores ?? 0) > 0} />
           <StatCard icon="💬" label="Unread Messages" value={stats?.unreadMessages ?? 0} color="#6d28d9" bg="#f5f3ff" link="#messages" pulse={(stats?.unreadMessages ?? 0) > 0} />

@@ -7,7 +7,7 @@ import NotificationBell from './NotificationBell'
 import { requestAndSubscribe, isPushSubscribed, VAPID_PUBLIC_KEY } from '../../utils/pushNotifications'
 
 export default function Header() {
-  const { user, signOut, isAdmin } = useAuth()
+  const { user, signOut, isAdmin, isSuperAdmin } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
   const navigate = useNavigate()
@@ -63,7 +63,17 @@ export default function Header() {
     { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
   ]
 
-  const menu = isAdmin ? adminMenu : teacherMenu
+  const superAdminMenu = [
+    { icon: '🏰', label: 'Platform Hub', path: '/super-admin/dashboard' },
+    { icon: '🏫', label: 'School Registry', path: '/super-admin/schools' },
+    { icon: '📝', label: 'Global Quizzes', path: '/super-admin/quizzes' },
+    { icon: '💬', label: 'Global Messaging', path: '/super-admin/messaging' },
+    { icon: '🏅', label: 'Leaderboards', path: '/super-admin/analytics' },
+    { divider: true },
+    { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
+  ]
+
+  const menu = isSuperAdmin ? superAdminMenu : isAdmin ? adminMenu : teacherMenu
 
   return (
     <>
@@ -87,7 +97,18 @@ export default function Header() {
 
         {/* ── Left: term badge ── */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {year && term ? (
+          {isSuperAdmin ? (
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 7,
+              background: 'linear-gradient(135deg, #ecfdf5, #dcfce7)',
+              border: '1px solid #10b98140', borderRadius: 99, padding: '6px 14px',
+            }}>
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#10b981', animation: '_hdr_pulse 2s infinite' }} />
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#065f46', letterSpacing: '0.05em' }}>
+                GLOBAL SYSTEM CORE &nbsp;·&nbsp; ONLINE
+              </span>
+            </div>
+          ) : year && term ? (
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 7,
               background: 'linear-gradient(135deg,#f5f3ff,#ede9fe)',
@@ -129,10 +150,14 @@ export default function Header() {
               {/* Avatar circle */}
               <div style={{
                 width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                background: 'linear-gradient(135deg,#7c3aed,#6d28d9)',
+                background: isSuperAdmin 
+                  ? 'linear-gradient(135deg, #059669, #10b981)' 
+                  : 'linear-gradient(135deg,#7c3aed,#6d28d9)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 13, fontWeight: 800, color: '#fff',
-                boxShadow: '0 2px 8px rgba(109,40,217,.3)',
+                boxShadow: isSuperAdmin 
+                  ? '0 2px 8px rgba(16,185,129,.4)' 
+                  : '0 2px 8px rgba(109,40,217,.3)',
               }}>
                 {user?.full_name?.charAt(0).toUpperCase()}
               </div>
@@ -165,7 +190,9 @@ export default function Header() {
                 <div style={{ padding: '14px 16px', borderBottom: '1px solid #f5f3ff', display: 'flex', gap: 10, alignItems: 'center' }}>
                   <div style={{
                     width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-                    background: 'linear-gradient(135deg,#7c3aed,#6d28d9)',
+                    background: isSuperAdmin 
+                      ? 'linear-gradient(135deg, #059669, #10b981)' 
+                      : 'linear-gradient(135deg,#7c3aed,#6d28d9)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 16, fontWeight: 800, color: '#fff',
                   }}>
@@ -174,8 +201,13 @@ export default function Header() {
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.full_name}</div>
                     <div style={{ fontSize: 11, color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
-                    <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 99, background: '#f5f3ff', color: '#6d28d9', textTransform: 'capitalize', display: 'inline-block', marginTop: 2 }}>
-                      {user?.role}
+                    <span style={{ 
+                      fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 99, 
+                      background: isSuperAdmin ? '#ecfdf5' : '#f5f3ff', 
+                      color: isSuperAdmin ? '#059669' : '#6d28d9', 
+                      textTransform: 'capitalize', display: 'inline-block', marginTop: 2 
+                    }}>
+                      {user?.role?.replace('_', ' ')}
                     </span>
                   </div>
                 </div>
