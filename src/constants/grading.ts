@@ -2,12 +2,12 @@
 import type { GradeInfo } from '../types'
 
 export const GRADE_SCALE: GradeInfo[] = [
-  { grade: 'A', label: 'Excellent',    min: 80, max: 100, color: '#16a34a' },
-  { grade: 'B', label: 'Very Good',    min: 70, max: 79,  color: '#2563eb' },
-  { grade: 'C', label: 'Good',         min: 60, max: 69,  color: '#7c3aed' },
-  { grade: 'D', label: 'Credit',       min: 50, max: 59,  color: '#d97706' },
-  { grade: 'E', label: 'Pass',         min: 40, max: 49,  color: '#ea580c' },
-  { grade: 'F', label: 'Fail',         min: 0,  max: 39,  color: '#dc2626' },
+  { grade: 'A', label: 'Excellent', min: 80,  max: 100, color: '#16a34a' },
+  { grade: 'B', label: 'Very Good', min: 70,  max: 79.9, color: '#2563eb' },
+  { grade: 'C', label: 'Good',      min: 60,  max: 69.9, color: '#7c3aed' },
+  { grade: 'D', label: 'Credit',    min: 50,  max: 59.9, color: '#d97706' },
+  { grade: 'E', label: 'Pass',      min: 40,  max: 49.9, color: '#ea580c' },
+  { grade: 'F', label: 'Fail',      min: 0,   max: 39.9, color: '#dc2626' },
 ]
 
 export const MAX_CLASS_SCORE = 50

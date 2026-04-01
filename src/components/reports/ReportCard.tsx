@@ -20,6 +20,9 @@ interface ReportCardProps {
   onToggleOverallPosition?: (val: boolean) => void
   hideSettings?: boolean
   onRemarksUpdate?: (remarks: { class_teacher_remarks?: string; headteacher_remarks?: string }) => void
+  // Pre-loaded data — when provided the component uses these directly instead of fetching
+  scores?: any[]
+  attendance?: any
 }
 
 export default function ReportCard({
@@ -27,10 +30,13 @@ export default function ReportCard({
   isBW: isBWProp, setIsBW: setIsBWProp,
   showOverallPosition = true, onToggleOverallPosition,
   hideSettings = false,
-  onRemarksUpdate
+  onRemarksUpdate,
+  scores: scoresProp,
+  attendance: attendanceProp,
 }: ReportCardProps) {
-  const [scores, setScores] = useState<any[]>([])
-  const [attendance, setAttendance] = useState<any>(null)
+  // Use pre-loaded props as initial state when provided (e.g. from ReportsPage)
+  const [scores, setScores] = useState<any[]>(scoresProp ?? [])
+  const [attendance, setAttendance] = useState<any>(attendanceProp ?? null)
   const [teacherRemark, setTeacherRemark] = useState(report?.class_teacher_remarks ?? '')
   const [htRemark, setHtRemark] = useState(report?.headteacher_remarks ?? '')
   const [attEdit, setAttEdit] = useState({ total_days: '', days_present: '', days_absent: '' })
@@ -40,30 +46,55 @@ export default function ReportCard({
   const isBW = isBWProp ?? isBWInternal
   const setIsBW = setIsBWProp ?? setIsBWInternal
 
+  // Sync scores/attendance when the parent passes new data (e.g. navigating students)
+  useEffect(() => {
+    if (scoresProp) setScores(scoresProp)
+  }, [scoresProp])
+
+  useEffect(() => {
+    if (attendanceProp !== undefined) {
+      setAttendance(attendanceProp)
+      if (attendanceProp) {
+        setAttEdit({
+          total_days: attendanceProp.total_days ?? '',
+          days_present: attendanceProp.days_present ?? '',
+          days_absent: attendanceProp.days_absent ?? '',
+        })
+      }
+    }
+  }, [attendanceProp])
+
   useEffect(() => {
     setTeacherRemark(report?.class_teacher_remarks ?? '')
     setHtRemark(report?.headteacher_remarks ?? '')
   }, [report?.id])
 
   useEffect(() => {
-    if (report?.student_id && report?.term_id) load()
+    // Only fetch from DB if no scores were passed as props
+    if (report?.student_id && report?.term_id && !scoresProp) load()
+    // Always fetch student fees (not passed as a prop)
+    if (report?.student_id) loadFees()
   }, [report?.student_id, report?.term_id])
 
   async function load() {
-    const [{ data: sc }, { data: att }, { data: sf }] = await Promise.all([
+    const [{ data: sc }, { data: att }] = await Promise.all([
       supabase.from('scores').select('*, subject:subjects(id,name,code)')
         .eq('student_id', report.student_id).eq('term_id', report.term_id).order('subject(name)'),
       supabase.from('attendance').select('*')
         .eq('student_id', report.student_id).eq('term_id', report.term_id).maybeSingle(),
-      supabase.from('students').select('fees_amount,fees_paid,fees_arrears,other_fees')
-        .eq('id', report.student_id).maybeSingle(),
     ])
     setScores(sc ?? [])
     setAttendance(att)
-    setStudentFees(sf)
     if (att) {
       setAttEdit({ total_days: att.total_days ?? '', days_present: att.days_present ?? '', days_absent: att.days_absent ?? '' })
     }
+  }
+
+  async function loadFees() {
+    const { data: sf } = await supabase
+      .from('students').select('fees_amount,fees_paid,fees_arrears,other_fees')
+      .eq('id', report.student_id).maybeSingle()
+    setStudentFees(sf)
   }
 
   async function saveAttendance() {
@@ -92,8 +123,12 @@ export default function ReportCard({
 
   const student = report?.student
   const classInfo = student?.class
+  const validScores = scores.filter(r => (r.total_score ?? 0) > 0 || r.class_score != null)
   const totalMarks = scores.reduce((s, r) => s + (r.total_score ?? 0), 0)
-  const avg = report?.average_score ?? 0
+  // Compute avg from live scores — fall back to report?.average_score if scores not yet loaded
+  const avg = validScores.length > 0
+    ? parseFloat((validScores.reduce((s, r) => s + (r.total_score ?? 0), 0) / validScores.length).toFixed(2))
+    : (report?.average_score ?? 0)
   const overallGrade = getGradeInfo(avg)
 
   return (

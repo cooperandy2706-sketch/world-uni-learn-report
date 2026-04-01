@@ -7,8 +7,11 @@ export function calculateTotal(classScore: number, examScore: number): number {
 }
 
 export function getGradeInfo(total: number): GradeInfo {
+  // Use only g.min for matching (descending order) — no upper-bound check.
+  // The old `total <= g.max` guard created gaps for decimal averages:
+  // e.g. 69.5 failed C (max 69) and every grade above, defaulting to F.
   return (
-    GRADE_SCALE.find((g) => total >= g.min && total <= g.max) ??
+    GRADE_SCALE.find((g) => total >= g.min) ??
     GRADE_SCALE[GRADE_SCALE.length - 1]
   )
 }

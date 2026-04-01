@@ -189,22 +189,41 @@ export default function ScoreEntryPage() {
   }, [])
 
   const autoFillRemarks = () => {
+    // Refresh ALL entries that have both scores — including already-filled ones.
+    // Count is computed synchronously from current scoreMap (before the lazy setter runs).
+    let eligible = 0
+    Object.keys(scoreMap).forEach(sid => {
+      Object.keys(scoreMap[sid] ?? {}).forEach(subId => {
+        const sc = scoreMap[sid][subId]
+        if (sc && sc.cs !== '' && sc.es !== '') eligible++
+      })
+    })
+
+    if (eligible === 0) {
+      toast('No scores entered yet — enter Class Score and Exam Score first')
+      return
+    }
+
     setScoreMap(prev => {
-      const next = { ...prev }
-      students.forEach(s => {
-        subjects.forEach(sub => {
-          const sc = next[s.id]?.[sub.id]
-          if (sc && sc.cs !== '' && sc.es !== '' && !sc.remarks) {
-            const total = (parseFloat(sc.cs)||0) + (parseFloat(sc.es)||0)
+      const next: ScoreMap = {}
+      Object.keys(prev).forEach(sid => {
+        next[sid] = {}
+        Object.keys(prev[sid]).forEach(subId => {
+          const sc = prev[sid][subId]
+          // Refresh remark for ANY entry with both scores (overwrite existing)
+          if (sc && sc.cs !== '' && sc.es !== '') {
+            const total = (parseFloat(sc.cs) || 0) + (parseFloat(sc.es) || 0)
             const grade = getGrade(total).grade
-            next[s.id][sub.id] = { ...sc, remarks: getRandomRemark(grade) }
+            next[sid][subId] = { ...sc, remarks: getRandomRemark(grade) }
+          } else {
+            next[sid][subId] = { ...sc }
           }
         })
       })
       return next
     })
     setDirty(true)
-    toast.success('Missing remarks auto-filled ✨')
+    toast.success(`${eligible} remark${eligible > 1 ? 's' : ''} refreshed ✨`)
   }
 
   // ── calculations ──────────────────────────────────────
@@ -256,6 +275,8 @@ export default function ScoreEntryPage() {
         subjects.forEach(sub => {
           const sc = scoreMap[s.id]?.[sub.id]
           if (!sc || (sc.cs === '' && sc.es === '')) return
+          const csVal = parseFloat(sc.cs) || 0
+          const esVal = parseFloat(sc.es) || 0
           upserts.push({
             student_id: s.id,
             subject_id: sub.id,
@@ -263,8 +284,9 @@ export default function ScoreEntryPage() {
             term_id: term!.id,
             academic_year_id: year!.id,
             teacher_id: teacherRecord.id,
-            class_score: parseFloat(sc.cs) || 0,
-            exam_score: parseFloat(sc.es) || 0,
+            class_score: csVal,
+            exam_score: esVal,
+            // total_score is a GENERATED column — DB computes it from class_score + exam_score
             teacher_remarks: sc.remarks || null,
             is_submitted: sc.submitted ?? false,
           })
@@ -628,8 +650,9 @@ export default function ScoreEntryPage() {
                     📝 Remarks (per student per subject)
                   </p>
                   <button onClick={autoFillRemarks}
+                    title="Generates a fresh grade-appropriate remark for every student/subject with scores entered — overwrites existing remarks"
                     style={{ fontSize:10, fontWeight:700, color:'#6d28d9', background:'#f5f3ff', border:'1px solid #ddd6fe', padding:'4px 10px', borderRadius:6, cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
-                    ✨ Auto-fill Missing Remarks
+                    🔄 Refresh All Remarks
                   </button>
                 </div>
                 <div style={{ display:'flex', flexWrap:'wrap', gap:10 }}>

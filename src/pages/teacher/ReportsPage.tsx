@@ -244,19 +244,24 @@ export default function TeacherReportsPage() {
   }
 
   // ── derived ───────────────────────────────────────────────────────────────
-  const avg = scores.length > 0
-    ? scores.reduce((s, sc) => s + (sc.total_score ?? 0), 0) / scores.length
+  const scoredSubjects = scores.filter(sc => (sc.total_score ?? 0) > 0)
+  const avg = scoredSubjects.length > 0
+    ? parseFloat((scoredSubjects.reduce((s, sc) => s + (sc.total_score ?? 0), 0) / scoredSubjects.length).toFixed(2))
     : 0
   const overallGrade   = avg > 0 ? getGrade(avg) : null
   const passCount      = scores.filter(sc => (sc.total_score ?? 0) >= 50).length
   const selectedClassName = (classOptions as any[]).find(c => c.id === selectedClass)?.name ?? ''
 
+  // fakeReport: ensure student_id and term_id are always present so ReportCard can load fees
   const fakeReport = reportCard
     ? {
         ...reportCard,
+        student_id: selectedStudent?.id ?? reportCard.student_id,
+        term_id: term?.id ?? reportCard.term_id,
         student: { ...selectedStudent, class: { id: selectedClass, name: selectedClassName } },
         class_teacher_remarks: teacherRemark,
         headteacher_remarks: htRemark,
+        average_score: avg, // pass live avg so ReportCard summary tile is always accurate
       }
     : null
 
