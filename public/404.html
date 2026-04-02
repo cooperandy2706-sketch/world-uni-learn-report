@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404: Lost in the Library | World Uni-Learn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --secondary: #6d28d9;
+            --accent: #a78bfa;
+            --bg-start: #f5f3ff;
+            --bg-end: #c4b5fd;
+            --text: #1e1b4b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @keyframes meshMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(-45deg, #f5f3ff, #ede9fe, #ddd6fe, #c4b5fd);
+            background-size: 400% 400%;
+            animation: meshMove 15s ease infinite;
+            padding: 20px;
+            overflow: hidden;
+            color: var(--text);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 40px 100px rgba(109, 40, 217, 0.12);
+            border-radius: 40px;
+            padding: 60px 40px;
+            max-width: 560px;
+            width: 100%;
+            text-align: center;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+            position: relative;
+            z-index: 10;
+        }
+
+        .visual-area {
+            position: relative;
+            width: 220px;
+            height: 160px;
+            margin: 0 auto 40px;
+        }
+
+        .book-icon {
+            font-size: 90px;
+            animation: float 4s ease-in-out infinite;
+            display: block;
+        }
+
+        .orbital {
+            position: absolute;
+            inset: -20px;
+            border: 2px dashed rgba(124, 58, 237, 0.2);
+            border-radius: 50%;
+            animation: spin 10s linear infinite;
+        }
+
+        .orbital-outer {
+            position: absolute;
+            inset: -40px;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            border-radius: 50%;
+            animation: spin 15s linear infinite reverse;
+        }
+
+        .error-code {
+            font-family: 'Syne', sans-serif;
+            font-size: 110px;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(135deg, #6d28d9, #7c3aed, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 12px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .badge {
+            position: absolute;
+            bottom: 12px;
+            right: -25px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            transform: rotate(12deg);
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 32px;
+            margin-bottom: 14px;
+            letter-spacing: -0.02em;
+        }
+
+        p {
+            color: #4b5563;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .btn {
+            height: 54px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--text);
+            color: white;
+            box-shadow: 0 10px 30px rgba(30, 27, 75, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background: #000;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text);
+            border: 2px solid #f1f5f9;
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 480px) {
+            .btn-group { grid-template-columns: 1fr; }
+            .error-code { font-size: 80px; }
+            h1 { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card">
+        <div class="visual-area">
+            <span class="book-icon">📚</span>
+            <div class="orbital"></div>
+            <div class="orbital-outer"></div>
+        </div>
+
+        <div class="error-code">
+            404
+            <div class="badge">LOST</div>
+        </div>
+
+        <h1>Lost in the Library?</h1>
+        <p>The resource you're searching for has vanished from the shelves. Let's get you back to the main halls.</p>
+
+        <div class="btn-group">
+            <a href="/" class="btn btn-primary">🏠 Back to Dashboard</a>
+            <a href="javascript:history.back()" class="btn btn-secondary">← Go Back Home</a>
+        </div>
+
+        <div style="margin-top: 40px; opacity: 0.5; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; color: var(--primary);">
+            WULA LEARNING PLATFORM
+        </div>
+    </div>
+</body>
+</html>

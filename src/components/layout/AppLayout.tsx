@@ -1,9 +1,11 @@
 // src/components/layout/AppLayout.tsx
+import { useState, useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import BottomNav from './BottomNav'
+import SplashScreen from './SplashScreen'
 import EnablePushButton from '../ui/EnablePushButton'
 import WhatsNewModal from '../ui/WhatsNewModal'
 import { ROUTES } from '../../constants/routes'
@@ -12,15 +14,29 @@ interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 
 
 export default function AppLayout({ requiredRole }: AppLayoutProps) {
   const { user, loading, initialized } = useAuth()
+  const [showSplash, setShowSplash] = useState(true)
 
-  if (!initialized || loading) {
-    return (
-      <div style={{ display:'flex', height:'100vh', alignItems:'center', justifyContent:'center', background:'#f8f7ff', flexDirection:'column', gap:16, fontFamily:'system-ui,sans-serif' }}>
-        <style>{`@keyframes _spin { to { transform:rotate(360deg) } }`}</style>
-        <div style={{ width:44, height:44, borderRadius:'50%', border:'4px solid #ede9fe', borderTopColor:'#6d28d9', animation:'_spin 0.8s linear infinite' }} />
-        <p style={{ fontSize:14, color:'#6b7280' }}>Loading World Uni-Learn…</p>
-      </div>
-    )
+  useEffect(() => {
+    // Keep splash for at least 2s to allow animations to play and app to settle
+    const timer = setTimeout(() => {
+      if (initialized && !loading) {
+        setShowSplash(false)
+      }
+    }, 2000)
+
+    return () => clearTimeout(timer)
+  }, [initialized, loading])
+
+  // Also check if we should hide it once auth completes (if it took > 2s)
+  useEffect(() => {
+    if (initialized && !loading) {
+      const t = setTimeout(() => setShowSplash(false), 200) // Small grace period
+      return () => clearTimeout(t)
+    }
+  }, [initialized, loading])
+
+  if (showSplash) {
+    return <SplashScreen />
   }
 
   if (!user) return <Navigate to={ROUTES.LOGIN} replace />
@@ -32,7 +48,8 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
   }
 
   // Pending School Guard (Non-super-admins)
-  if (user.role !== 'super_admin' && user.school?.status === 'pending') {
+  const userSchool = user.school as any
+  if (user.role !== 'super_admin' && userSchool?.status === 'pending') {
     return (
       <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center', background: '#f8f7ff', flexDirection: 'column' }}>
         <div style={{ fontSize: 60, marginBottom: 24 }}>⏳</div>

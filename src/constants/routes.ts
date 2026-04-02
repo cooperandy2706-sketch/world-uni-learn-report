@@ -33,6 +33,7 @@ export const ROUTES = {
   TEACHER_LESSON_TRACKER: '/teacher/lesson-tracker',
   TEACHER_STUDENTS: '/teacher/students',
   TEACHER_ASSIGNMENTS: '/teacher/assignments',
+  TEACHER_SUBJECTS: '/teacher/subjects',
   TEACHER_ATTENDANCE: '/teacher/attendance',
 
   // Student
@@ -48,4 +49,5 @@ export const ROUTES = {
   SUPER_ADMIN_MESSAGING: '/super-admin/messaging',
   SUPER_ADMIN_ANALYTICS: '/super-admin/analytics',
   SUPER_ADMIN_RESOURCES: '/super-admin/resources',
+  SUPER_ADMIN_SUBJECTS: '/super-admin/subjects',
 } as const

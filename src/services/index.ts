@@ -159,3 +159,10 @@ export const settingsService = {
     return supabase.from('schools').update(data).eq('id', schoolId).select().single()
   },
 }
+
+// ── Schools ───────────────────────────────────────────────
+export const schoolsService = {
+  async getAll() {
+    return supabase.from('schools').select('*').order('name')
+  },
+}

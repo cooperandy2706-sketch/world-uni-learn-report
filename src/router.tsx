@@ -33,10 +33,20 @@ import TeacherStudentsPage from './pages/teacher/TeacherStudentsPage'
 import TeacherAssignmentsPage from './pages/teacher/AssignmentsPage'
 import StudentAssignmentsPage from './pages/student/StudentAssignmentsPage'
 import TakeAssignmentPage from './pages/student/TakeAssignmentPage'
+import StudentResultsPage from './pages/student/ResultsPage'
+import StudentSchedulePage from './pages/student/SchedulePage'
 import AdminAttendancePage from './pages/admin/AttendancePage'
 import SchoolRegistrationPage from './pages/auth/SchoolRegistrationPage'
 import SuperAdminDashboard from './pages/admin/SuperAdminDashboard'
+import GlobalQuizzesPage from './pages/admin/GlobalQuizzesPage'
+import GlobalResourcesPage from './pages/admin/GlobalResourcesPage'
 import StudentDashboard from './pages/student/StudentDashboard'
+import TakeGlobalQuizPage from './pages/student/TakeGlobalQuizPage'
+import StudentSubjectsPage from './pages/student/StudentSubjectsPage'
+import StudentSubjectDetailsPage from './pages/student/StudentSubjectDetailsPage'
+import TeacherSubjectsPage from './pages/teacher/TeacherSubjectsPage'
+import TeacherSubjectDetailsPage from './pages/teacher/TeacherSubjectDetailsPage'
+import PlatformSubjectsPage from './pages/admin/PlatformSubjectsPage'
 import ComingSoonPage from './pages/admin/ComingSoonPage'
 
 import {
@@ -102,6 +112,8 @@ export const router = createBrowserRouter([
           { path: 'students', element: <TeacherStudentsPage /> },
           { path: 'assignments', element: <TeacherAssignmentsPage /> },
           { path: 'attendance', element: <TeacherAttendancePage /> },
+          { path: 'subjects', element: <TeacherSubjectsPage /> },
+          { path: 'subjects/:id', element: <TeacherSubjectDetailsPage /> },
         ],
       },
 
@@ -114,13 +126,7 @@ export const router = createBrowserRouter([
           { path: 'schools', element: <SuperAdminDashboard /> },
           {
             path: 'quizzes',
-            element: (
-              <ComingSoonPage
-                title="Monthly Global Quizzes"
-                description="A centralized system to create and push standardized monthly assessments to all registered schools on the platform."
-                icon="📝"
-              />
-            ),
+            element: <GlobalQuizzesPage />,
           },
           {
             path: 'messaging',
@@ -144,13 +150,11 @@ export const router = createBrowserRouter([
           },
           {
             path: 'resources',
-            element: (
-              <ComingSoonPage
-                title="Global Resource Library"
-                description="Coordinate and share digital textbooks, teaching guides, and premium learning materials across all schools."
-                icon="📚"
-              />
-            ),
+            element: <GlobalResourcesPage />,
+          },
+          {
+            path: 'subjects',
+            element: <PlatformSubjectsPage />,
           },
         ],
       },
@@ -160,24 +164,13 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="/student/dashboard" replace /> },
           { path: 'dashboard', element: <StudentDashboard /> },
-          { 
-            path: 'results', 
-            element: <ComingSoonPage 
-              title="My Academic Results" 
-              description="View your performance across all subjects, download termly report cards, and track your progress over time." 
-              icon="📊" 
-            /> 
-          },
+          { path: 'results', element: <StudentResultsPage /> },
           { path: 'assignments', element: <StudentAssignmentsPage /> },
           { path: 'assignments/:id', element: <TakeAssignmentPage /> },
-          { 
-            path: 'schedule', 
-            element: <ComingSoonPage 
-              title="My Class Schedule" 
-              description="Stay on top of your daily classes, exams, and extracurricular activities with your personalized timetable." 
-              icon="📅" 
-            /> 
-          },
+          { path: 'global-quizzes/:id', element: <TakeGlobalQuizPage /> },
+          { path: 'schedule', element: <StudentSchedulePage /> },
+          { path: 'subjects', element: <StudentSubjectsPage /> },
+          { path: 'subjects/:id', element: <StudentSubjectDetailsPage /> },
         ],
       },
       { path: '*', element: <NotFoundPage /> },

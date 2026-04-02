@@ -1,33 +1,52 @@
 // src/components/layout/BottomNav.tsx
-// Mobile bottom navigation bar — shows only on screens < 768px
 import { NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { 
+  LayoutDashboard, Users, FileSpreadsheet, ClipboardCheck, 
+  Megaphone, PencilLine, Calendar, Timer, BookOpen, 
+  ShieldCheck, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School
+} from 'lucide-react'
 
 const adminLinks = [
-  { to: '/admin/dashboard', icon: '⊞', label: 'Home' },
-  { to: '/admin/students', icon: '👥', label: 'Students' },
-  { to: '/admin/reports', icon: '📄', label: 'Reports' },
-  { to: '/admin/attendance', icon: '📋', label: 'Register' },
-  { to: '/admin/announcements', icon: '📢', label: 'Posts' },
+  { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Home' },
+  { to: '/admin/students', icon: Users, label: 'Students' },
+  { to: '/admin/reports', icon: FileSpreadsheet, label: 'Reports' },
+  { to: '/admin/attendance', icon: ClipboardCheck, label: 'Register' },
+  { to: '/admin/announcements', icon: Megaphone, label: 'Posts' },
 ]
 
 const teacherLinks = [
-  { to: '/teacher/dashboard', icon: '⊞', label: 'Home' },
-  { to: '/teacher/score-entry', icon: '✏️', label: 'Scores' },
-  { to: '/teacher/timetable', icon: '📅', label: 'Timetable' },
-  { to: '/teacher/lesson-tracker', icon: '⏱️', label: 'Tracker' },
-  { to: '/teacher/attendance', icon: '📋', label: 'Register' },
+  { to: '/teacher/dashboard', icon: LayoutDashboard, label: 'Home' },
+  { to: '/teacher/score-entry', icon: PencilLine, label: 'Scores' },
+  { to: '/teacher/timetable', icon: Calendar, label: 'Schedule' },
+  { to: '/teacher/lesson-tracker', icon: Timer, label: 'Tracker' },
+  { to: '/teacher/attendance', icon: ClipboardCheck, label: 'Register' },
+  { to: '/teacher/subjects', icon: BookOpen, label: 'Library' },
+]
+
+const superAdminLinks = [
+  { to: '/super-admin/dashboard', icon: ShieldCheck, label: 'Hub' },
+  { to: '/super-admin/schools', icon: School, label: 'Schools' },
+  { to: '/super-admin/quizzes', icon: ClipboardList, label: 'Quizzes' },
+  { to: '/super-admin/messaging', icon: MessageSquare, label: 'News' },
+]
+
+const studentLinks = [
+  { to: '/student/dashboard', icon: Home, label: 'Portal' },
+  { to: '/student/assignments', icon: ClipboardList, label: 'Tasks' },
+  { to: '/student/subjects', icon: BookOpen, label: 'Library' },
+  { to: '/student/results', icon: BarChart3, label: 'Results' },
+  { to: '/student/schedule', icon: Calendar, label: 'Schedule' },
 ]
 
 export default function BottomNav() {
-  const { user, isAdmin } = useAuth()
+  const { user, isAdmin, isSuperAdmin, isStudent } = useAuth()
   const location = useLocation()
   const [unread, setUnread] = useState(0)
   const [visible, setVisible] = useState(false)
 
-  // Only show on mobile
   useEffect(() => {
     function check() { setVisible(window.innerWidth < 768) }
     check()
@@ -35,7 +54,6 @@ export default function BottomNav() {
     return () => window.removeEventListener('resize', check)
   }, [])
 
-  // Load unread count for teachers
   useEffect(() => {
     if (!isAdmin && user) {
       loadUnread()
@@ -55,79 +73,78 @@ export default function BottomNav() {
 
   if (!visible) return null
 
-  const links = isAdmin ? adminLinks : teacherLinks
+  const links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : teacherLinks
 
   return (
     <>
       <style>{`
         @keyframes _bn_in { from{opacity:0;transform:translateY(100%)} to{opacity:1;transform:translateY(0)} }
-        .bn-item { transition: all 0.15s; }
-        .bn-item:active { transform: scale(0.92); }
-        .bn-active .bn-icon { background: linear-gradient(135deg,#7c3aed,#6d28d9); }
-        .bn-active .bn-label { color: #6d28d9; font-weight: 700; }
-        .bn-active .bn-icon span { filter: none; }
+        .bn-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex: 1; }
+        .bn-item:active { transform: scale(0.95); }
+        .bn-active .bn-icon-box { background: rgba(124, 58, 237, 0.1) !important; transform: translateY(-2px); }
+        .bn-active .bn-label { color: #6d28d9; font-weight: 700; transform: translateY(-1px); }
       `}</style>
 
       <nav style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000,
-        background: 'rgba(255,255,255,0.96)',
-        backdropFilter: 'blur(20px)',
-        borderTop: '1px solid #f0eefe',
-        boxShadow: '0 -4px 24px rgba(109,40,217,0.1)',
+        background: 'rgba(255,255,255,0.9)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderTop: '1px solid rgba(109,40,217,0.08)',
+        boxShadow: '0 -8px 30px rgba(0,0,0,0.04)',
         display: 'flex', alignItems: 'center',
-        padding: '0 4px 4px',
-        paddingBottom: 'max(4px, env(safe-area-inset-bottom))',
-        animation: '_bn_in 0.4s ease',
+        padding: '8px 12px',
+        paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+        animation: '_bn_in 0.5s ease',
         fontFamily: '"DM Sans", sans-serif',
       }}>
-        {links.map(link => {
-          const isActive = location.pathname === link.to ||
-            (link.to !== '/admin/dashboard' && link.to !== '/teacher/dashboard' &&
-              location.pathname.startsWith(link.to))
+        {links.map(({ to, icon: Icon, label, notify }: any) => {
+          const isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to))
 
           return (
-            <NavLink key={link.to} to={link.to}
+            <NavLink key={to} to={to}
               className={isActive ? 'bn-item bn-active' : 'bn-item'}
               style={{
-                flex: 1, display: 'flex', flexDirection: 'column',
+                display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
-                gap: 3, padding: '8px 4px',
-                textDecoration: 'none',
+                gap: 4, textDecoration: 'none',
               }}>
-              {/* Icon pill */}
-              <div className="bn-icon" style={{
-                width: 44, height: 28, borderRadius: 99,
-                background: isActive
-                  ? 'linear-gradient(135deg,#7c3aed,#6d28d9)'
-                  : 'transparent',
+              
+              <div className="bn-icon-box" style={{
+                width: 52, height: 32, borderRadius: 16,
+                background: 'transparent',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 18, transition: 'all 0.2s',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 position: 'relative',
               }}>
-                <span style={{ fontSize: 16, lineHeight: 1 }}>{link.icon}</span>
-                {/* Notification badge */}
-                {(link as any).notify && unread > 0 && (
+                <Icon 
+                  size={22} 
+                  strokeWidth={isActive ? 2.5 : 2} 
+                  color={isActive ? '#6d28d9' : '#64748b'} 
+                />
+                
+                {notify && unread > 0 && (
                   <span style={{
-                    position: 'absolute', top: -4, right: -2,
+                    position: 'absolute', top: -2, right: 10,
                     minWidth: 16, height: 16, borderRadius: 99,
-                    background: '#dc2626', color: '#fff',
-                    fontSize: 9, fontWeight: 800,
+                    background: '#ef4444', color: '#fff',
+                    fontSize: 10, fontWeight: 800,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    border: '1.5px solid #fff', padding: '0 3px',
+                    border: '2px solid #fff', padding: '0 4px',
+                    boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)',
                   }}>
                     {unread > 9 ? '9+' : unread}
                   </span>
                 )}
               </div>
 
-              {/* Label */}
               <span className="bn-label" style={{
-                fontSize: 10, fontWeight: 500,
-                color: isActive ? '#6d28d9' : '#6b7280',
-                transition: 'all 0.15s',
-                letterSpacing: isActive ? '0' : '-0.01em',
+                fontSize: 11, fontWeight: 500,
+                color: isActive ? '#6d28d9' : '#64748b',
+                transition: 'all 0.2s',
+                letterSpacing: '-0.01em',
               }}>
-                {link.label}
+                {label}
               </span>
             </NavLink>
           )

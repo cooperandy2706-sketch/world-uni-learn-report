@@ -2,7 +2,7 @@
 // Shows once per version — bump APP_VERSION to re-trigger for all users
 import { useState, useEffect } from 'react'
 
-const APP_VERSION = '1.5.0'
+const APP_VERSION = '1.6.0'
 const STORAGE_KEY = `wula_seen_whats_new_v${APP_VERSION}`
 
 // ── Changelog entries — edit this array to add new features ──────────────────
@@ -15,6 +15,33 @@ const FEATURES: {
     highlight?: boolean  // draws extra attention
     steps?: string[]     // optional step list shown below description
 }[] = [
+    {
+        icon: '🛡️',
+        title: 'Premium Startup Experience',
+        description: 'Enjoy a brand-new, high-end startup animation inspired by professional desktop apps like Microsoft Word. The new splash screen provides a stable, elegant bridge while your data initializes.',
+        badge: 'NEW',
+        badgeColor: '#fbbf24',
+        highlight: true,
+    },
+    {
+        icon: '📐',
+        title: 'Collapsible Navigation',
+        description: 'Maximize your workspace with our new collapsible sidebar. Toggle between a full-width and icon-only mode to get more room for your reports and builders.',
+        badge: 'NEW',
+        badgeColor: '#7c3aed',
+        steps: [
+            'Desktop: Click the ◀ toggle button on the sidebar edge.',
+            'Responsive: The sidebar automatically adapts to your screen size.',
+            'Persistent: Your preference is saved even after you log out.',
+        ]
+    },
+    {
+        icon: '💎',
+        title: 'Professional Vector Icons',
+        description: 'We have replaced all emojis with sharp, professional Lucide vector icons for a cleaner, more consistent enterprise aesthetic across the entire platform.',
+        badge: 'UPGRADE',
+        badgeColor: '#0891b2',
+    },
     {
         icon: '📋',
         title: 'Daily Morning Register',

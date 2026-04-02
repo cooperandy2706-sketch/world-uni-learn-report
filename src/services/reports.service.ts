@@ -19,6 +19,12 @@ export const reportsService = {
       .eq('class_id', classId)
       .eq('term_id', termId)
 
+    // Fetch all attendance totals for the term
+    const { data: attRows } = await supabase
+      .from('attendance')
+      .select('student_id, total_days, days_present')
+      .eq('term_id', termId)
+
     // Calculate report for each student
     const reports = students.map((student) => {
       const studentScores = scores?.filter((s) => s.student_id === student.id) ?? []
@@ -26,6 +32,11 @@ export const reportsService = {
       const averageScore = studentScores.length
         ? Number((totalMarks / studentScores.length).toFixed(2))
         : 0
+
+      const att = attRows?.find(a => a.student_id === student.id)
+      const attendancePercent = att && att.total_days > 0 
+        ? Math.round((att.days_present / att.total_days) * 100) 
+        : null
 
       return {
         student_id: student.id,
@@ -35,6 +46,7 @@ export const reportsService = {
         total_marks: totalMarks,
         average_score: averageScore,
         total_students: students.length,
+        attendance_percent: attendancePercent,
       }
     })
 

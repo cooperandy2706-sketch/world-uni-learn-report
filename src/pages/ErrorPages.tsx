@@ -187,66 +187,92 @@ export function OfflinePage() {
 // ══════════════════════════════════════════════════════════════
 // 2. 404 NOT FOUND
 // ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// 2. 404 NOT FOUND (PREMIUM REDESIGN)
+// ══════════════════════════════════════════════════════════════
 export function NotFoundPage() {
   const navigate = useNavigate()
+  
   return (
     <>
-      <style>{styles}</style>
-      <div className="ep-wrap" style={{ background:'#faf5ff' }}>
-        <BlobBg color1="#7c3aed" color2="#a78bfa" />
+      <style>{`
+        ${styles}
+        @keyframes _mesh {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes _float_ring {
+          0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+          50%      { transform: translateY(-20px) scale(1.1); opacity: 0.6; }
+        }
+        .mesh-bg {
+          background: linear-gradient(-45deg, #f5f3ff, #ede9fe, #ddd6fe, #c4b5fd);
+          background-size: 400% 400%;
+          animation: _mesh 15s ease infinite;
+        }
+        .glass-card {
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          box-shadow: 0 40px 100px rgba(109, 40, 217, 0.12);
+          border-radius: 40px;
+        }
+      `}</style>
 
-        {/* Floating dots */}
-        {[...Array(6)].map((_,i) => (
-          <div key={i} style={{
-            position:'absolute',
-            width: 8 + (i%3)*4, height: 8 + (i%3)*4,
-            borderRadius:'50%',
-            background:`rgba(109,40,217,${0.08+(i*0.04)})`,
-            top:`${15+i*12}%`, left:`${8+i*15}%`,
-            animation:`_ep_float ${3+i*0.5}s ease-in-out ${i*0.3}s infinite`,
-          }}/>
-        ))}
+      <div className="ep-wrap mesh-bg">
+        {/* Dynamic Blobs */}
+        <div style={{ position: 'absolute', top: '10%', right: '10%', width: 400, height: 400, background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)', filter: 'blur(60px)', animation: '_ep_blob 12s infinite' }} />
+        <div style={{ position: 'absolute', bottom: '10%', left: '10%', width: 500, height: 500, background: 'radial-gradient(circle, rgba(167,139,250,0.1) 0%, transparent 70%)', filter: 'blur(80px)', animation: '_ep_blob 18s infinite reverse' }} />
 
-        <div className="ep-content">
-          {/* Big 404 */}
-          <div style={{ position:'relative', marginBottom:8 }}>
-            <div className="ep-code" style={{
-              fontSize:120, color:'transparent',
-              backgroundImage:'linear-gradient(135deg,#7c3aed,#a78bfa,#c4b5fd)',
-              WebkitBackgroundClip:'text', backgroundClip:'text',
-              filter:'drop-shadow(0 0 40px rgba(124,58,237,0.3))',
-            }}>
-              404
-            </div>
-            {/* Shimmer overlay */}
-            <div style={{
-              position:'absolute', inset:0,
-              background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)',
-              backgroundSize:'200% 100%',
-              animation:'_ep_shimmer 3s ease infinite',
-              WebkitBackgroundClip:'text', backgroundClip:'text',
-            }}/>
+        <div className="ep-content glass-card" style={{ padding: '60px 40px', maxWidth: 560 }}>
+          
+          {/* Lost 3D Bookshelf Concept */}
+          <div style={{ position: 'relative', width: 220, height: 160, margin: '0 auto 40px' }}>
+             <div style={{ fontSize: 90, animation: '_ep_float 4s ease-in-out infinite' }}>📚</div>
+             {/* Orbital Rings */}
+             <div style={{ position: 'absolute', inset: -20, border: '2px dashed rgba(124,58,237,0.2)', borderRadius: '50%', animation: '_ep_spin 10s linear infinite' }} />
+             <div style={{ position: 'absolute', inset: -40, border: '1px solid rgba(124,58,237,0.1)', borderRadius: '50%', animation: '_ep_spin 15s linear infinite reverse' }} />
+             <div style={{ position: 'absolute', top: -10, right: 0, fontSize: 32, animation: '_ep_float 3s ease-in-out 1s infinite' }}>❓</div>
           </div>
 
-          {/* Floating emoji */}
-          <div style={{ fontSize:52, marginBottom:16, animation:'_ep_float 3s ease-in-out infinite', display:'block' }}>
-            🔍
+          <div style={{ position: 'relative', display: 'inline-block', marginBottom: 12 }}>
+            <div className="ep-code" style={{ 
+              fontSize: 110, color: 'transparent',
+              backgroundImage: 'linear-gradient(135deg, #6d28d9, #7c3aed, #a78bfa)',
+              WebkitBackgroundClip: 'text', backgroundClip: 'text',
+              filter: 'drop-shadow(0 4px 12px rgba(109,40,217,0.2))'
+            }}>404</div>
+            <div style={{ position: 'absolute', bottom: 12, right: -20, background: '#7c3aed', color: '#fff', padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 800, transform: 'rotate(12deg)' }}>LOST</div>
           </div>
 
-          <h2 className="ep-title" style={{ fontSize:26, color:'#1e1b4b', marginBottom:10 }}>Page not found</h2>
-          <p className="ep-sub" style={{ color:'#6b7280', marginBottom:32 }}>
-            The page you're looking for doesn't exist or has been moved. Double-check the URL or head back home.
+          <h2 className="ep-title" style={{ fontSize: 32, color: '#1e1b4b', marginBottom: 14, letterSpacing: '-0.02em' }}>
+            Lost in the Library?
+          </h2>
+          <p className="ep-sub" style={{ color: '#4b5563', marginBottom: 40, fontSize: 16, maxWidth: 400, margin: '0 auto 40px' }}>
+            The resource you're hunting for has vanished from the shelves. Let's get you back to the main halls.
           </p>
 
-          <div style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
-            <button className="ep-btn" onClick={() => navigate('/')}
-              style={{ background:'linear-gradient(135deg,#7c3aed,#6d28d9)', color:'#fff', boxShadow:'0 4px 20px rgba(109,40,217,0.35)' }}>
-              🏠 Go Home
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <button className="ep-btn" onClick={() => navigate('/')} style={{ 
+              background: '#1e1b4b', color: '#fff', justifyContent: 'center', height: 54, 
+              boxShadow: '0 10px 30px rgba(30,27,75,0.2)', borderRadius: 18
+            }}>
+              🏠 Back to Dashboard
             </button>
-            <button className="ep-btn" onClick={() => navigate(-1)}
-              style={{ background:'#fff', color:'#374151', border:'1.5px solid #e5e7eb', boxShadow:'0 2px 8px rgba(0,0,0,0.06)' }}>
-              ← Go Back
+            <button className="ep-btn" onClick={() => navigate(-1)} style={{ 
+              background: '#fff', color: '#1e1b4b', border: '2px solid #f1f5f9', justifyContent: 'center', height: 54,
+              borderRadius: 18, boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+            }}>
+              ← Go Back Previous
             </button>
+          </div>
+
+          {/* Quick Support Links */}
+          <div style={{ marginTop: 48, display: 'flex', gap: 24, justifyContent: 'center', opacity: 0.6 }}>
+             <button onClick={() => navigate('/login')} style={{ background: 'none', border: 'none', fontSize: 11, fontWeight: 700, color: '#7c3aed', cursor: 'pointer', textTransform: 'uppercase' }}>Login Portal</button>
+             <button onClick={() => location.reload()} style={{ background: 'none', border: 'none', fontSize: 11, fontWeight: 700, color: '#7c3aed', cursor: 'pointer', textTransform: 'uppercase' }}>Re-Sync Session</button>
           </div>
         </div>
       </div>

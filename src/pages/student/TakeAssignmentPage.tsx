@@ -211,7 +211,7 @@ export default function TakeAssignmentPage() {
       `}</style>
 
       <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderBottom: '1.5px solid #f0eefe', padding: '12px 0' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 20px', display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase' }}>{assignment.subject?.name}</div>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>{assignment.title}</h2>

@@ -138,6 +138,22 @@ export default function TeacherAttendancePage() {
     setSaving(true)
 
     try {
+      // 1. Verify if attendance was already logged today for this class
+      const { data: alreadyLogged } = await supabase
+        .from('attendance_records')
+        .select('id')
+        .eq('class_id', myClass.id)
+        .eq('date', todayDate)
+        .limit(1)
+
+      if (alreadyLogged && alreadyLogged.length > 0) {
+        toast.error('Attendance has already been submitted for this class today!')
+        localStorage.setItem(TODAY_KEY(user!.id), '1')
+        setSubmittedToday(true)
+        setSaving(false)
+        return
+      }
+
       for (const student of students) {
         const mark = marks[student.id] ?? 'present'
         const isPresent = mark === 'present' || mark === 'late'

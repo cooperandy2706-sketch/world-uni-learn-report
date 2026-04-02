@@ -7,7 +7,7 @@ import NotificationBell from './NotificationBell'
 import { requestAndSubscribe, isPushSubscribed, VAPID_PUBLIC_KEY } from '../../utils/pushNotifications'
 
 export default function Header() {
-  const { user, signOut, isAdmin, isSuperAdmin } = useAuth()
+  const { user, signOut, isAdmin, isSuperAdmin, isStudent } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
   const navigate = useNavigate()
@@ -54,9 +54,10 @@ export default function Header() {
   const teacherMenu = [
     { icon: '⊞', label: 'Dashboard', path: '/teacher/dashboard' },
     { icon: '🔔', label: 'Notifications', path: '/teacher/notifications' },
+    { icon: '📚', label: 'Library', path: '/teacher/subjects' },
     { icon: '📄', label: 'Reports', path: '/teacher/reports', },
     { icon: '📅', label: 'My Timetable', path: '/teacher/timetable' },
-    { icon: '📚', label: 'My Classes', path: '/teacher/my-classes' },
+    { icon: '👥', label: 'My Classes', path: '/teacher/my-classes' },
     { icon: '⏱️', label: 'Tracker', path: '/teacher/lesson-tracker' },
     ...(!pushEnabled && VAPID_PUBLIC_KEY ? [{ icon: '🔕', label: 'Enable Push Alerts', action: enablePush, highlight: true }] : []),
     { divider: true },
@@ -73,7 +74,17 @@ export default function Header() {
     { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
   ]
 
-  const menu = isSuperAdmin ? superAdminMenu : isAdmin ? adminMenu : teacherMenu
+  const studentMenu = [
+    { icon: '🏠', label: 'My Portal', path: '/student/dashboard' },
+    { icon: '📝', label: 'Assignments', path: '/student/assignments' },
+    { icon: '📚', label: 'Library', path: '/student/subjects' },
+    { icon: '📊', label: 'Academic Results', path: '/student/results' },
+    { icon: '📅', label: 'My Schedule', path: '/student/schedule' },
+    { divider: true },
+    { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
+  ]
+
+  const menu = isSuperAdmin ? superAdminMenu : isStudent ? studentMenu : isAdmin ? adminMenu : teacherMenu
 
   return (
     <>
@@ -152,7 +163,7 @@ export default function Header() {
                 width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
                 background: isSuperAdmin 
                   ? 'linear-gradient(135deg, #059669, #10b981)' 
-                  : 'linear-gradient(135deg,#7c3aed,#6d28d9)',
+                  : isStudent ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' : 'linear-gradient(135deg,#7c3aed,#6d28d9)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 13, fontWeight: 800, color: '#fff',
                 boxShadow: isSuperAdmin 
@@ -192,7 +203,7 @@ export default function Header() {
                     width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
                     background: isSuperAdmin 
                       ? 'linear-gradient(135deg, #059669, #10b981)' 
-                      : 'linear-gradient(135deg,#7c3aed,#6d28d9)',
+                      : isStudent ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' : 'linear-gradient(135deg,#7c3aed,#6d28d9)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 16, fontWeight: 800, color: '#fff',
                   }}>
