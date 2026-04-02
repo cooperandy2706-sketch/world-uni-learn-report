@@ -4,8 +4,8 @@
   "description": "World Uni-Learn Academy — GES School Report Card Management System",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f8f7ff",
-  "theme_color": "#6d28d9",
+  "background_color": "#ffffff",
+  "theme_color": "#fbbf24",
   "orientation": "portrait",
   "icons": [
     {

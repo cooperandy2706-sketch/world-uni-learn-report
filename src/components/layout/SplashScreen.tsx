@@ -46,19 +46,34 @@ export default function SplashScreen() {
           display: flex; align-items: center; justify-content: center;
           font-family: "DM Sans", system-ui, sans-serif;
           padding: 20px;
-          background: #f8f7ff;
+          background: transparent !important;
           transition: background 0.5s ease;
         }
 
-        /* Desktop App / Standalone Mode Styling */
+        /* Force body transparency during splash */
+        body { background: transparent !important; }
+
+        /* Desktop View: Card Only Focus */
+        @media (min-width: 1024px) {
+          .sp-card {
+            box-shadow: 0 40px 120px rgba(0,0,0,0.2) !important;
+            border: 1px solid #f1f5f9;
+          }
+          .sp-branding, .sp-footer {
+            opacity: 0.4;
+          }
+        }
+
+        /* PWA Standalone Mode: Maximum Minimalism */
         @media (display-mode: standalone) {
           .sp-container {
-            background: transparent !important;
+            background: #ffffff !important;
           }
           .sp-card {
-            box-shadow: 0 30px 100px rgba(0,0,0,0.4) !important;
+            box-shadow: none !important;
+            border: none;
           }
-          .sp-footer, .sp-branding {
+          .sp-branding, .sp-footer {
             display: none !important;
           }
         }
