@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { ROUTES } from '../../constants/routes'
-import { 
-  LayoutDashboard, Users, UserCheck, School, BookOpen, Building2, 
-  Calendar, FileSpreadsheet, BarChart3, Settings, Megaphone, 
-  Target, ClipboardCheck, PencilLine, Bell, Timer, ClipboardList, 
+import {
+  LayoutDashboard, Users, UserCheck, School, BookOpen, Building2,
+  Calendar, FileSpreadsheet, BarChart3, Settings, Megaphone,
+  Target, ClipboardCheck, PencilLine, Bell, Timer, ClipboardList,
   MessageSquare, Trophy, ShieldCheck, LogOut, Book,
   ChevronLeft, ChevronRight
 } from 'lucide-react'
@@ -86,7 +86,7 @@ export default function Sidebar() {
   const { user, signOut, isAdmin, isSuperAdmin, isStudent } = useAuth()
   const links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : teacherLinks
   const [hovered, setHovered] = useState<string | null>(null)
-  
+
   // ── Collapsed State (Persistent) ────────────────────────────
   const [collapsed, setCollapsed] = useState(() => {
     const s = localStorage.getItem('sidebar_collapsed')
@@ -149,8 +149,8 @@ export default function Sidebar() {
             </div>
           </div>
 
-          <div style={{ 
-            marginTop: 14, display: collapsed ? 'none' : 'inline-flex', alignItems: 'center', gap: 6, 
+          <div style={{
+            marginTop: 14, display: collapsed ? 'none' : 'inline-flex', alignItems: 'center', gap: 6,
             background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 99, padding: '4px 12px',
             opacity: collapsed ? 0 : 1, transition: 'all 0.2s'
           }}>
@@ -180,17 +180,17 @@ export default function Sidebar() {
                     boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
                     height: 44,
                   }}>
-                  <Icon 
-                    size={20} 
-                    strokeWidth={isActive ? 2.5 : 2} 
+                  <Icon
+                    size={20}
+                    strokeWidth={isActive ? 2.5 : 2}
                     color={isActive ? '#fbbf24' : hovered === to ? '#fff' : 'rgba(255,255,255,0.5)'}
                     style={{ transition: 'all 0.2s', flexShrink: 0 }}
                   />
                   {!collapsed && (
-                    <span style={{ 
-                      fontSize: 13.5, 
-                      fontWeight: isActive ? 700 : 500, 
-                      color: isActive ? '#fff' : hovered === to ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.6)', 
+                    <span style={{
+                      fontSize: 13.5,
+                      fontWeight: isActive ? 700 : 500,
+                      color: isActive ? '#fff' : hovered === to ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.6)',
                       transition: 'all 0.22s',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -218,12 +218,18 @@ export default function Sidebar() {
           }}>
             <div style={{
               width: 36, height: 36, borderRadius: 12, flexShrink: 0,
-              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+              background: (user?.school as any)?.logo_url ? '#fff' : 'linear-gradient(135deg, #fbbf24, #f59e0b)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 15, fontWeight: 900, color: '#fff',
-              boxShadow: '0 4px 12px rgba(245,158,11,0.3)',
+              boxShadow: (user?.school as any)?.logo_url ? '0 1px 4px rgba(0,0,0,0.1)' : '0 4px 12px rgba(245,158,11,0.3)',
+              overflow: 'hidden',
+              border: (user?.school as any)?.logo_url ? '1px solid rgba(255,255,255,0.1)' : 'none',
             }}>
-              {user?.full_name?.charAt(0).toUpperCase()}
+              {(user?.school as any)?.logo_url ? (
+                <img src={(user.school as any).logo_url} alt="School" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              ) : (
+                user?.full_name?.charAt(0).toUpperCase()
+              )}
             </div>
             {!collapsed && (
               <div style={{ minWidth: 0, flex: 1 }}>

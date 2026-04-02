@@ -161,16 +161,22 @@ export default function Header() {
               {/* Avatar circle */}
               <div style={{
                 width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                background: isSuperAdmin 
-                  ? 'linear-gradient(135deg, #059669, #10b981)' 
-                  : isStudent ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' : 'linear-gradient(135deg,#7c3aed,#6d28d9)',
+                background: (user?.school as any)?.logo_url ? '#fff' : (isSuperAdmin
+                  ? 'linear-gradient(135deg, #059669, #10b981)'
+                  : isStudent ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' : 'linear-gradient(135deg,#7c3aed,#6d28d9)'),
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 13, fontWeight: 800, color: '#fff',
-                boxShadow: isSuperAdmin 
-                  ? '0 2px 8px rgba(16,185,129,.4)' 
-                  : '0 2px 8px rgba(109,40,217,.3)',
+                boxShadow: (user?.school as any)?.logo_url ? '0 1px 4px rgba(0,0,0,0.1)' : (isSuperAdmin
+                  ? '0 2px 8px rgba(16,185,129,.4)'
+                  : '0 2px 8px rgba(109,40,217,.3)'),
+                overflow: 'hidden',
+                border: '1px solid rgba(0,0,0,0.05)',
               }}>
-                {user?.full_name?.charAt(0).toUpperCase()}
+                {(user?.school as any)?.logo_url ? (
+                  <img src={(user.school as any).logo_url} alt="School" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                ) : (
+                  user?.full_name?.charAt(0).toUpperCase()
+                )}
               </div>
               {/* Name — hidden on mobile */}
               <div style={{ display: 'flex', flexDirection: 'column' }}
@@ -201,8 +207,8 @@ export default function Header() {
                 <div style={{ padding: '14px 16px', borderBottom: '1px solid #f5f3ff', display: 'flex', gap: 10, alignItems: 'center' }}>
                   <div style={{
                     width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-                    background: isSuperAdmin 
-                      ? 'linear-gradient(135deg, #059669, #10b981)' 
+                    background: isSuperAdmin
+                      ? 'linear-gradient(135deg, #059669, #10b981)'
                       : isStudent ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' : 'linear-gradient(135deg,#7c3aed,#6d28d9)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 16, fontWeight: 800, color: '#fff',
@@ -212,11 +218,11 @@ export default function Header() {
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.full_name}</div>
                     <div style={{ fontSize: 11, color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
-                    <span style={{ 
-                      fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 99, 
-                      background: isSuperAdmin ? '#ecfdf5' : '#f5f3ff', 
-                      color: isSuperAdmin ? '#059669' : '#6d28d9', 
-                      textTransform: 'capitalize', display: 'inline-block', marginTop: 2 
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 99,
+                      background: isSuperAdmin ? '#ecfdf5' : '#f5f3ff',
+                      color: isSuperAdmin ? '#059669' : '#6d28d9',
+                      textTransform: 'capitalize', display: 'inline-block', marginTop: 2
                     }}>
                       {user?.role?.replace('_', ' ')}
                     </span>
