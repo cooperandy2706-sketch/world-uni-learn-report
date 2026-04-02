@@ -14,29 +14,14 @@ interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 
 
 export default function AppLayout({ requiredRole }: AppLayoutProps) {
   const { user, loading, initialized } = useAuth()
-  const [showSplash, setShowSplash] = useState(true)
 
-  useEffect(() => {
-    // Keep splash for at least 2s to allow animations to play and app to settle
-    const timer = setTimeout(() => {
-      if (initialized && !loading) {
-        setShowSplash(false)
-      }
-    }, 2000)
-
-    return () => clearTimeout(timer)
-  }, [initialized, loading])
-
-  // Also check if we should hide it once auth completes (if it took > 2s)
-  useEffect(() => {
-    if (initialized && !loading) {
-      const t = setTimeout(() => setShowSplash(false), 200) // Small grace period
-      return () => clearTimeout(t)
-    }
-  }, [initialized, loading])
-
-  if (showSplash) {
-    return <SplashScreen />
+  if (!initialized || loading) {
+    return (
+      <div style={{ display:'flex', height:'100vh', alignItems:'center', justifyContent:'center', background:'#f8f7ff' }}>
+        <style>{`@keyframes _spin { to { transform:rotate(360deg) } }`}</style>
+        <div style={{ width:24, height:24, borderRadius:'50%', border:'2.5px solid #ede9fe', borderTopColor:'#6d28d9', animation:'_spin 0.8s linear infinite' }} />
+      </div>
+    )
   }
 
   if (!user) return <Navigate to={ROUTES.LOGIN} replace />

@@ -1,11 +1,24 @@
-// src/App.tsx
+import { useState, useEffect } from 'react'
 import { RouterProvider } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { router } from './router'
 import { queryClient } from './lib/queryClient'
+import SplashScreen from './components/layout/SplashScreen'
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true)
+
+  useEffect(() => {
+    // Show splash for 2s on every fresh load/refresh
+    const timer = setTimeout(() => setShowSplash(false), 2000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (showSplash) {
+    return <SplashScreen />
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
