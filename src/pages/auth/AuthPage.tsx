@@ -101,7 +101,19 @@ export default function AuthPage() {
     setLoading(false)
     if (err) { setError('Invalid email or password.'); return }
     const u = useAuthStore.getState().user
-    navigate(u?.role === 'admin' ? ROUTES.ADMIN_DASHBOARD : ROUTES.TEACHER_DASHBOARD, { replace: true })
+    if (!u) return
+
+    const roleRedirects: Record<string, string> = {
+      admin: ROUTES.ADMIN_DASHBOARD,
+      super_admin: '/super-admin/dashboard',
+      teacher: ROUTES.TEACHER_DASHBOARD,
+      student: ROUTES.STUDENT_DASHBOARD,
+      bursar: ROUTES.BURSAR_DASHBOARD,
+      staff: ROUTES.STAFF_DASHBOARD,
+    }
+
+    const dest = roleRedirects[u.role] || ROUTES.TEACHER_DASHBOARD
+    navigate(dest, { replace: true })
   }
 
   async function handleRegister(e: React.FormEvent) {

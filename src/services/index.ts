@@ -108,6 +108,8 @@ export const yearsService = {
 }
 
 // ── Terms ─────────────────────────────────────────────────
+import { scholarshipService } from './bursar.service'
+
 export const termsService = {
   async getAll(academicYearId: string) {
     return supabase
@@ -134,6 +136,31 @@ export const termsService = {
     return supabase.from('terms').update({ is_locked: false }).eq('id', id).select().single()
   },
   async setCurrent(id: string, schoolId: string) {
+    // Check if there is an active term already that we are switching away from
+    const { data: old } = await supabase.from('terms').select('id, academic_year_id').eq('school_id', schoolId).eq('is_current', true).maybeSingle()
+    
+    // Automatically perform financial rollover for the old term
+    if (old && old.id !== id) {
+      await scholarshipService.rolloverTermArrears(schoolId, old.id)
+
+      // Auto-migrate Fee Structures from the old term into the new one (if the new term is empty)
+      const { data: newStructs } = await supabase.from('fee_structures').select('id').eq('term_id', id).limit(1)
+      if (!newStructs || newStructs.length === 0) {
+        const { data: oldStructs } = await supabase.from('fee_structures').select('*').eq('term_id', old.id)
+        if (oldStructs && oldStructs.length > 0) {
+          const { data: newTerm } = await supabase.from('terms').select('academic_year_id').eq('id', id).single()
+          if (newTerm) {
+            const mapped = oldStructs.map(s => ({
+              school_id: s.school_id, class_id: s.class_id, term_id: id,
+              academic_year_id: newTerm.academic_year_id, fee_name: s.fee_name,
+              amount: s.amount, description: s.description
+            }))
+            await supabase.from('fee_structures').insert(mapped)
+          }
+        }
+      }
+    }
+
     await supabase.from('terms').update({ is_current: false }).eq('school_id', schoolId)
     return supabase.from('terms').update({ is_current: true }).eq('id', id).select().single()
   },
@@ -158,6 +185,57 @@ export const settingsService = {
   async updateSchool(schoolId: string, data: any) {
     return supabase.from('schools').update(data).eq('id', schoolId).select().single()
   },
+}
+
+// ── Agenda ────────────────────────────────────────────────
+export const agendaService = {
+  async getAgendas(schoolId: string, termId: string) {
+    return supabase.from('term_agendas')
+      .select('*')
+      .eq('school_id', schoolId)
+      .eq('term_id', termId)
+      .order('week_number', { ascending: true })
+      .order('created_at', { ascending: true })
+  },
+  async getTeacherResponses(schoolId: string, agendaId: string) {
+    return supabase.from('term_agenda_responses')
+      .select('*, teacher:teachers(id, user:users(full_name))')
+      .eq('school_id', schoolId)
+      .eq('agenda_id', agendaId)
+  },
+  async upsertAgenda(data: any) {
+    return supabase.from('term_agendas').upsert(data).select().single()
+  },
+  async publishAgenda(id: string, published: boolean) {
+    return supabase.from('term_agendas').update({ is_published: published }).eq('id', id)
+  },
+  async deleteAgenda(id: string) {
+    return supabase.from('term_agendas').delete().eq('id', id)
+  },
+  // Teacher ops
+  async getPublishedAgendas(schoolId: string, termId: string) {
+    return supabase.from('term_agendas')
+      .select('*')
+      .eq('school_id', schoolId)
+      .eq('term_id', termId)
+      .eq('is_published', true)
+      .order('week_number', { ascending: true })
+  },
+  async getResponse(teacherId: string, agendaId: string) {
+    return supabase.from('term_agenda_responses')
+      .select('*')
+      .eq('teacher_id', teacherId)
+      .eq('agenda_id', agendaId)
+      .maybeSingle()
+  },
+  async submitResponse(data: any) {
+    return supabase.from('term_agenda_responses').upsert(data).select().single()
+  },
+  async replyToStruggle(responseId: string, reply: string) {
+    return supabase.from('term_agenda_responses')
+      .update({ admin_reply: reply, updated_at: new Date().toISOString() })
+      .eq('id', responseId)
+  }
 }
 
 // ── Schools ───────────────────────────────────────────────

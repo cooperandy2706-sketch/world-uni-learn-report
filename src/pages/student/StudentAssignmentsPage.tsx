@@ -11,6 +11,7 @@ export default function StudentAssignmentsPage() {
   const navigate = useNavigate()
   
   const [viewMode, setViewMode] = useState<'class' | 'global'>('class')
+  const [selectedGlobalSubject, setSelectedGlobalSubject] = useState<string | null>(null)
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('all')
   const [isLoading, setIsLoading] = useState(true)
 
@@ -47,7 +48,7 @@ export default function StudentAssignmentsPage() {
         supabase
           .from('global_quizzes')
           .select('*, subject:subjects(name)')
-          .eq('school_id', student.school_id)
+          .or(`school_id.eq.${student.school_id},school_id.is.null`)
           .eq('is_published', true)
           .order('created_at', { ascending: false }),
         
@@ -103,11 +104,26 @@ export default function StudentAssignmentsPage() {
   }, [viewMode, assignments, submissions, globalQuizzes, globalSubmissions])
 
   const filtered = activeList.filter(a => {
-    if (filter === 'all') return true
-    if (filter === 'pending') return a.status !== 'completed'
-    if (filter === 'completed') return a.status === 'completed'
+    if (filter !== 'all') {
+      if (filter === 'pending' && a.status === 'completed') return false
+      if (filter === 'completed' && a.status !== 'completed') return false
+    }
+    if (viewMode === 'global' && selectedGlobalSubject) {
+      return (a.subject_id || 'general') === selectedGlobalSubject
+    }
     return true
   })
+
+  const globalSubjects = useMemo(() => {
+    const subjectsMap = new Map<string, { id: string, name: string, count: number }>()
+    globalQuizzes.forEach(q => {
+      const sid = q.subject_id || 'general'
+      const sname = q.subject?.name || 'General'
+      if (!subjectsMap.has(sid)) subjectsMap.set(sid, { id: sid, name: sname, count: 0 })
+      subjectsMap.get(sid)!.count++
+    })
+    return Array.from(subjectsMap.values()).filter(s => s.count > 0)
+  }, [globalQuizzes])
 
   return (
     <>
@@ -134,10 +150,16 @@ export default function StudentAssignmentsPage() {
           <div className={`view-tab ${viewMode === 'class' ? 'active' : 'inactive'}`} onClick={() => setViewMode('class')}>
             🏫 Class Work
           </div>
-          <div className={`view-tab ${viewMode === 'global' ? 'active' : 'inactive'}`} onClick={() => setViewMode('global')}>
+          <div className={`view-tab ${viewMode === 'global' ? 'active' : 'inactive'}`} onClick={() => { setViewMode('global'); setSelectedGlobalSubject(null); }}>
             🌍 Global Challenges
           </div>
         </div>
+
+        {viewMode === 'global' && selectedGlobalSubject && (
+           <button onClick={() => setSelectedGlobalSubject(null)} style={{ background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: '#374151', cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+             ← Back to Subjects
+           </button>
+        )}
 
         {/* ── Status Filter Tabs ── */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 24, background: '#fff', padding: 6, borderRadius: 12, border: '1.5px solid #f0eefe', width: 'fit-content' }}>
@@ -157,11 +179,34 @@ export default function StudentAssignmentsPage() {
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
              <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading your tasks...</p>
           </div>
+        ) : viewMode === 'global' && !selectedGlobalSubject ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+            {globalSubjects.length === 0 ? (
+               <div style={{ background: '#fff', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
+                 <div style={{ fontSize: 48, marginBottom: 12 }}>🌍</div>
+                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No challenges yet!</h3>
+                 <p style={{ fontSize: 13, color: '#9ca3af' }}>The school hasn't published any global quizzes.</p>
+               </div>
+            ) : globalSubjects.map(sub => (
+              <div key={sub.id} className="assign-card" onClick={() => setSelectedGlobalSubject(sub.id)} style={{ 
+                background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
+                boxShadow: '0 2px 8px rgba(109,40,217,0.05)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16
+              }}>
+                <div style={{ width: 48, height: 48, borderRadius: 14, background: '#f5f3ff', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+                  📚
+                </div>
+                <div>
+                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{sub.name}</h3>
+                  <p style={{ fontSize: 13, color: '#6b7280', margin: 0, fontWeight: 600 }}>{sub.count} Quizzes Available</p>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : filtered.length === 0 ? (
           <div style={{ background: '#fff', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>{viewMode === 'global' ? '🌍' : '🎉'}</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>All caught up!</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>You have no {filter !== 'all' ? filter : ''} {viewMode === 'global' ? 'global quizzes' : 'assignments'} at the moment.</p>
+            <p style={{ fontSize: 13, color: '#9ca3af' }}>You have no {filter !== 'all' ? filter : ''} {viewMode === 'global' ? 'global quizzes in this subject' : 'assignments'} at the moment.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>

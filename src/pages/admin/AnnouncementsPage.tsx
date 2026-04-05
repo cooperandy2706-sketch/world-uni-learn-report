@@ -39,19 +39,28 @@ export default function AnnouncementsPage(){
   const [form,setForm]=useState({title:'',body:'',type:'announcement',target_role:'all',meeting_date:'',meeting_link:'',is_pinned:false,send_push:false})
   const [saving,setSaving]=useState(false)
   const [teachers,setTeachers]=useState<any[]>([])
+  const [students,setStudents]=useState<any[]>([])
   const [tab,setTab]=useState<'all'|'announcement'|'meeting'|'reminder'>('all')
+
+  const AUDIENCE_CONFIG: any = {
+    all:     { label: 'Everyone', icon: '🌐', bg: '#f0fdf4', color: '#16a34a' },
+    staff:   { label: 'Staff Only', icon: '👨‍🏫', bg: '#eff6ff', color: '#0369a1' },
+    student: { label: 'Students Only', icon: '🎓', bg: '#fdf4ff', color: '#a21caf' },
+  }
 
   useEffect(()=>{load()},[])
 
   async function load(){
     setLoading(true)
-    const [{data:ann},{data:t}]=await Promise.all([
+    const [{data:ann},{data:t},{data:stu}]=await Promise.all([
       supabase.from('announcements').select('*,from_user:users(full_name),reads:announcement_reads(id)')
         .eq('school_id',user!.school_id).order('is_pinned',{ascending:false}).order('created_at',{ascending:false}),
       supabase.from('teachers').select('id,user:users(id,full_name,email)').eq('school_id',user!.school_id),
+      supabase.from('students').select('id,user_id,full_name').eq('school_id',user!.school_id).eq('is_active',true),
     ])
     setAnnouncements(ann??[])
     setTeachers(t??[])
+    setStudents(stu??[])
     setLoading(false)
   }
 
@@ -71,18 +80,30 @@ export default function AnnouncementsPage(){
     }).select().single()
     if(error){toast.error(error.message);setSaving(false);return}
 
-    // Send notifications to all teachers
-    const targetTeachers=form.target_role==='all'||form.target_role==='teacher'?teachers:[]
-    if(targetTeachers.length>0){
-      const notifs=targetTeachers.map((t:any)=>({
-        school_id:user!.school_id,
-        user_id:t.user?.id,
-        title:form.title,
-        body:form.body.slice(0,120),
-        type:form.type,
-      })).filter((n:any)=>n.user_id)
-      if(notifs.length>0) await supabase.from('notifications').insert(notifs)
+    // Send notifications to targeted audience
+    const notifs: any[] = []
+
+    // Staff notifications (teachers)
+    if (form.target_role === 'all' || form.target_role === 'staff') {
+      teachers.forEach((t: any) => {
+        if (t.user?.id) notifs.push({
+          school_id: user!.school_id, user_id: t.user.id,
+          title: form.title, body: form.body.slice(0, 120), type: form.type,
+        })
+      })
     }
+
+    // Student notifications
+    if (form.target_role === 'all' || form.target_role === 'student') {
+      students.forEach((s: any) => {
+        if (s.user_id) notifs.push({
+          school_id: user!.school_id, user_id: s.user_id,
+          title: form.title, body: form.body.slice(0, 120), type: form.type,
+        })
+      })
+    }
+
+    if (notifs.length > 0) await supabase.from('notifications').insert(notifs)
 
     // Attempt to invoke Push Notification Edge Function if requested
     if (form.send_push) {
@@ -133,7 +154,7 @@ export default function AnnouncementsPage(){
         <div style={{marginBottom:22,display:'flex',alignItems:'flex-start',justifyContent:'space-between',flexWrap:'wrap',gap:12}}>
           <div>
             <h1 style={{fontFamily:'"Playfair Display",serif',fontSize:26,fontWeight:700,color:'#111827',margin:0}}>Announcements</h1>
-            <p style={{fontSize:13,color:'#6b7280',marginTop:3}}>Post announcements, schedule meetings and send reminders to teachers</p>
+            <p style={{fontSize:13,color:'#6b7280',marginTop:3}}>Post announcements, schedule meetings and send reminders to staff & students</p>
           </div>
           <Btn onClick={()=>setModalOpen(true)}>✏️ New Post</Btn>
         </div>
@@ -143,8 +164,8 @@ export default function AnnouncementsPage(){
           {[
             {label:'Total Posts',value:announcements.length,icon:'📢',color:'#6d28d9'},
             {label:'Meetings',value:announcements.filter(a=>a.type==='meeting').length,icon:'📅',color:'#0369a1'},
-            {label:'Pinned',value:announcements.filter(a=>a.is_pinned).length,icon:'📌',color:'#d97706'},
-            {label:'Teachers',value:teachers.length,icon:'👨‍🏫',color:'#16a34a'},
+            {label:'Staff',value:teachers.length,icon:'👨‍🏫',color:'#16a34a'},
+            {label:'Students',value:students.length,icon:'🎓',color:'#a21caf'},
           ].map(s=>(
             <div key={s.label} style={{background:'#fff',borderRadius:14,padding:'14px 16px',border:'1.5px solid #f0eefe',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
               <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
@@ -198,7 +219,7 @@ export default function AnnouncementsPage(){
                       <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:3,flexWrap:'wrap'}}>
                         <h3 style={{fontSize:14,fontWeight:700,color:'#111827',margin:0}}>{a.title}</h3>
                         <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:99,background:tc.bg,color:tc.color}}>{tc.label}</span>
-                        {a.target_role!=='all'&&<span style={{fontSize:10,fontWeight:600,padding:'2px 8px',borderRadius:99,background:'#f5f3ff',color:'#6d28d9'}}>{a.target_role}</span>}
+                        {(()=>{ const ac=AUDIENCE_CONFIG[a.target_role]||AUDIENCE_CONFIG.all; return <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:99,background:ac.bg,color:ac.color}}>{ac.icon} {ac.label}</span> })()}
                       </div>
                       <p style={{fontSize:13,color:'#374151',margin:'0 0 8px',lineHeight:1.5}}>{a.body}</p>
                       {a.meeting_date&&(
@@ -260,12 +281,20 @@ export default function AnnouncementsPage(){
               </div>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
                 <div>
-                  <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Send To</label>
-                  <select value={form.target_role} onChange={e=>setForm(f=>({...f,target_role:e.target.value}))}
-                    style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',cursor:'pointer'}}>
-                    <option value="all">All Teachers</option>
-                    <option value="teacher">Teachers Only</option>
-                  </select>
+                  <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Audience</label>
+                  <div style={{display:'flex',gap:6}}>
+                    {(['all','staff','student'] as const).map(r=>{
+                      const ac=AUDIENCE_CONFIG[r]
+                      const sel=form.target_role===r
+                      return(
+                        <button key={r} onClick={()=>setForm(f=>({...f,target_role:r}))}
+                          style={{flex:1,padding:'8px 4px',borderRadius:10,border:`1.5px solid ${sel?ac.color:'#e5e7eb'}`,background:sel?ac.bg:'#fff',cursor:'pointer',textAlign:'center',transition:'all .15s'}}>
+                          <div style={{fontSize:16}}>{ac.icon}</div>
+                          <div style={{fontSize:10,fontWeight:700,color:sel?ac.color:'#6b7280',marginTop:2}}>{ac.label}</div>
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
                 {form.type==='meeting'&&(
                   <div>

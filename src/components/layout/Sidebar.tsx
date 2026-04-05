@@ -1,20 +1,26 @@
-// src/components/layout/Sidebar.tsx
 import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '../../hooks/useAuth'
+import { dailyFeesService } from '../../services/bursar.service'
+import { supabase } from '../../lib/supabase'
 import { ROUTES } from '../../constants/routes'
 import {
   LayoutDashboard, Users, UserCheck, School, BookOpen, Building2,
   Calendar, FileSpreadsheet, BarChart3, Settings, Megaphone,
   Target, ClipboardCheck, PencilLine, Bell, Timer, ClipboardList,
   MessageSquare, Trophy, ShieldCheck, LogOut, Book,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, Wallet, Banknote, Receipt, TrendingDown,
+  TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag,
+  Package, ShoppingCart, RefreshCcw, Gamepad2
 } from 'lucide-react'
 
 const adminLinks = [
   { to: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
   { to: ROUTES.ADMIN_STUDENTS, label: 'Students', icon: Users },
   { to: ROUTES.ADMIN_TEACHERS, label: 'Teachers', icon: UserCheck },
+  { to: ROUTES.ADMIN_OTHER_STAFF, label: 'Other Staff', icon: Users },
+  { to: '/admin/bursars', label: 'Bursar Staff', icon: Wallet },
   { to: ROUTES.ADMIN_CLASSES, label: 'Classes', icon: School },
   { to: ROUTES.ADMIN_SUBJECTS, label: 'Subjects', icon: BookOpen },
   { to: ROUTES.ADMIN_DEPARTMENTS, label: 'Departments', icon: Building2 },
@@ -28,6 +34,8 @@ const adminLinks = [
   { to: ROUTES.ADMIN_SYLLABUS, label: 'Syllabus', icon: Book },
   { to: ROUTES.ADMIN_WEEKLY_GOALS, label: 'Weekly Goals', icon: Target },
   { to: ROUTES.ADMIN_ATTENDANCE, label: 'Attendance', icon: ClipboardCheck },
+  { to: ROUTES.ADMIN_MESSAGES, label: 'Messages', icon: MessageSquare },
+  { to: '/admin/agenda', label: 'Term Agenda', icon: ClipboardList },
 ]
 
 const teacherLinks = [
@@ -43,6 +51,10 @@ const teacherLinks = [
   { to: ROUTES.TEACHER_ASSIGNMENTS, label: 'Assignments', icon: ClipboardList },
   { to: ROUTES.TEACHER_SUBJECTS, label: 'Library', icon: BookOpen },
   { to: ROUTES.TEACHER_ATTENDANCE, label: 'Attendance', icon: ClipboardCheck },
+  { to: '/teacher/daily-fees', label: 'Daily Collections', icon: CreditCard },
+  { to: ROUTES.TEACHER_MESSAGES, label: 'Messages', icon: MessageSquare },
+  { to: '/teacher/agenda', label: 'Term Agenda', icon: ClipboardList },
+  { to: ROUTES.TEACHER_TYPING_GAME, label: 'Typing Nitro', icon: Gamepad2 },
 ]
 
 const superAdminLinks = [
@@ -60,6 +72,22 @@ const studentLinks = [
   { to: ROUTES.STUDENT_ASSIGNMENTS, label: 'Assignments', icon: ClipboardList },
   { to: ROUTES.STUDENT_RESULTS, label: 'Academic Results', icon: BarChart3 },
   { to: ROUTES.STUDENT_SCHEDULE, label: 'My Schedule', icon: Calendar },
+  { to: ROUTES.STUDENT_TYPING_GAME, label: 'Typing Nitro', icon: Gamepad2 },
+]
+
+const bursarLinks = [
+  { to: ROUTES.BURSAR_DASHBOARD,  label: 'Dashboard',   icon: LayoutDashboard },
+  { to: ROUTES.BURSAR_STUDENTS,   label: 'Students',    icon: Users },
+  { to: ROUTES.BURSAR_FEES,       label: 'School Fees',  icon: CreditCard },
+  { to: '/bursar/daily-fees',     label: 'Daily Fees',   icon: Wallet },
+  { to: ROUTES.BURSAR_INVENTORY,  label: 'School Store', icon: ShoppingBag },
+  { to: ROUTES.BURSAR_DEBTORS,    label: 'Debtors List', icon: AlertCircle },
+  { to: ROUTES.BURSAR_BILL_SHEET, label: 'Bill Sheet',   icon: FileText },
+  { to: ROUTES.BURSAR_PAYROLL,    label: 'Payroll',      icon: Wallet },
+  { to: ROUTES.BURSAR_INCOME,     label: 'Income',       icon: TrendingUp },
+  { to: ROUTES.BURSAR_EXPENSES,   label: 'Expenses',     icon: TrendingDown },
+  { to: ROUTES.BURSAR_REPORTS,    label: 'Financial Reports', icon: FileSpreadsheet },
+  { to: ROUTES.BURSAR_ANALYTICS,  label: 'Analytics',    icon: BarChart3 },
 ]
 
 // ── Logo Mark ────────────────────────────
@@ -83,8 +111,52 @@ function LogoMark() {
 }
 
 export default function Sidebar() {
-  const { user, signOut, isAdmin, isSuperAdmin, isStudent } = useAuth()
-  const links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : teacherLinks
+  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
+  
+  // Check if teacher is allowed to collect daily fees
+  const { data: collectorAuth, isLoading: loadingAuth } = useQuery({
+    queryKey: ['daily-fee-auth', user?.id],
+    queryFn: async () => {
+      const res = await dailyFeesService.isTeacherCollector(user?.id!)
+      return res?.data || null
+    },
+    enabled: isTeacher && !!user?.id
+  })
+
+  // Live unread message count for the Messages badge
+  const [unreadMsgs, setUnreadMsgs] = useState(0)
+  useEffect(() => {
+    if (!user?.id || isStudent || isBursar) return
+    async function fetchUnread() {
+      const { data: memberRows } = await supabase
+        .from('chat_members')
+        .select('conversation_id, last_read_at')
+        .eq('user_id', user!.id)
+      if (!memberRows?.length) return
+      let total = 0
+      for (const m of memberRows) {
+        const { count } = await supabase
+          .from('chat_messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('conversation_id', m.conversation_id)
+          .gt('created_at', m.last_read_at ?? '1970-01-01')
+          .neq('sender_id', user!.id)
+        total += count ?? 0
+      }
+      setUnreadMsgs(total)
+    }
+    fetchUnread()
+    const interval = setInterval(fetchUnread, 30000)
+    return () => clearInterval(interval)
+  }, [user?.id, isStudent, isBursar])
+
+  let links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : teacherLinks
+  
+  // Hide daily collections from unauthorized teachers
+  if (isTeacher && !loadingAuth && !collectorAuth) {
+    links = links.filter(l => l.label !== 'Daily Collections')
+  }
+
   const [hovered, setHovered] = useState<string | null>(null)
 
   // ── Collapsed State (Persistent) ────────────────────────────
@@ -180,12 +252,24 @@ export default function Sidebar() {
                     boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
                     height: 44,
                   }}>
-                  <Icon
-                    size={20}
-                    strokeWidth={isActive ? 2.5 : 2}
-                    color={isActive ? '#fbbf24' : hovered === to ? '#fff' : 'rgba(255,255,255,0.5)'}
-                    style={{ transition: 'all 0.2s', flexShrink: 0 }}
-                  />
+                  {/* Icon with optional unread dot */}
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                    <Icon
+                      size={20}
+                      strokeWidth={isActive ? 2.5 : 2}
+                      color={isActive ? '#fbbf24' : hovered === to ? '#fff' : 'rgba(255,255,255,0.5)'}
+                      style={{ transition: 'all 0.2s', display: 'block' }}
+                    />
+                    {label === 'Messages' && unreadMsgs > 0 && collapsed && (
+                      <span style={{
+                        position: 'absolute', top: -5, right: -6,
+                        background: '#ef4444', color: '#fff',
+                        fontSize: 9, fontWeight: 800, borderRadius: 99,
+                        padding: '0 3px', minWidth: 14, textAlign: 'center', lineHeight: '14px',
+                        border: '1.5px solid #1e0646',
+                      }}>{unreadMsgs > 99 ? '99+' : unreadMsgs}</span>
+                    )}
+                  </div>
                   {!collapsed && (
                     <span style={{
                       fontSize: 13.5,
@@ -194,12 +278,22 @@ export default function Sidebar() {
                       transition: 'all 0.22s',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis'
+                      textOverflow: 'ellipsis',
+                      flex: 1,
                     }}>
                       {label}
                     </span>
                   )}
-                  {!collapsed && isActive && <div style={{ marginLeft: 'auto', width: 4, height: 4, borderRadius: '50%', background: '#fbbf24', boxShadow: '0 0 8px #fbbf24' }} />}
+                  {/* Expanded unread pill */}
+                  {!collapsed && label === 'Messages' && unreadMsgs > 0 && (
+                    <span style={{
+                      background: '#ef4444', color: '#fff', fontSize: 10, fontWeight: 800,
+                      borderRadius: 99, padding: '1px 6px', marginLeft: 'auto', flexShrink: 0,
+                    }}>{unreadMsgs > 99 ? '99+' : unreadMsgs}</span>
+                  )}
+                  {!collapsed && isActive && label !== 'Messages' && (
+                    <div style={{ marginLeft: 'auto', width: 4, height: 4, borderRadius: '50%', background: '#fbbf24', boxShadow: '0 0 8px #fbbf24' }} />
+                  )}
                 </div>
               )}
             </NavLink>

@@ -1,8 +1,7 @@
-// src/pages/admin/DashboardPage.tsx
-// Balanced school operations hub — not just reports
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useAuthStore } from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { getGradeInfo } from '../../utils/grading'
@@ -74,6 +73,7 @@ function StatCard({ icon, label, value, color, bg, link, pulse, sub }: {
 
 // ═══════════════════════════════════════════════════════════
 export default function DashboardPage() {
+  const { setFirstLoadComplete } = useAuthStore()
   const { user } = useAuth()
   const navigate = useNavigate()
   const { data: term } = useCurrentTerm()
@@ -92,7 +92,10 @@ export default function DashboardPage() {
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
 
   useEffect(() => {
-    if (!user?.school_id) return
+    if (!user?.school_id) {
+      setFirstLoadComplete(true)
+      return
+    }
     loadAll()
     const channel = supabase.channel('dashboard-msgs')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `school_id=eq.${user.school_id}` }, () => loadMessages())
@@ -101,9 +104,12 @@ export default function DashboardPage() {
   }, [user?.school_id, term?.id])
 
   async function loadAll() {
-    setLoading(true)
-    await Promise.all([loadStats(), loadTopStudents(), loadMessages(), loadClassStats(), loadRecentActivity(), loadAnnouncements()])
-    setLoading(false)
+    try {
+      await Promise.all([loadStats(), loadTopStudents(), loadMessages(), loadClassStats(), loadRecentActivity(), loadAnnouncements()])
+    } finally {
+      setLoading(false)
+      setFirstLoadComplete(true)
+    }
   }
 
   async function loadStats() {

@@ -1,5 +1,82 @@
 // src/types/database.types.ts
-export type Role = 'super_admin' | 'admin' | 'teacher' | 'student'
+export type Role = 'super_admin' | 'admin' | 'teacher' | 'student' | 'bursar' | 'staff'
+export type PaymentMethod = 'cash' | 'momo' | 'bank' | 'cheque'
+
+export interface FeeStructure {
+  id: string
+  school_id: string
+  class_id: string
+  term_id: string
+  academic_year_id: string
+  fee_name: string
+  amount: number
+  description?: string
+  created_at: string
+  // joined
+  class?: { id: string; name: string }
+  term?: { id: string; name: string }
+}
+
+export interface FeePayment {
+  id: string
+  school_id: string
+  student_id: string
+  fee_structure_id?: string
+  term_id: string
+  academic_year_id: string
+  amount_paid: number
+  payment_date: string
+  payment_method: PaymentMethod
+  reference_number?: string
+  notes?: string
+  recorded_by?: string
+  created_at: string
+  // joined
+  student?: { id: string; full_name: string; student_id?: string; class?: { name: string } }
+  fee_structure?: FeeStructure
+}
+
+export interface StaffPayroll {
+  id: string
+  school_id: string
+  user_id: string
+  month: string
+  basic_salary: number
+  allowances: number
+  deductions: number
+  net_salary: number
+  is_paid: boolean
+  paid_date?: string
+  notes?: string
+  created_at: string
+  // joined
+  user?: { id: string; full_name: string; email: string; role: Role }
+}
+
+export interface IncomeRecord {
+  id: string
+  school_id: string
+  category: string
+  description?: string
+  amount: number
+  date: string
+  reference?: string
+  recorded_by?: string
+  created_at: string
+}
+
+export interface ExpenseRecord {
+  id: string
+  school_id: string
+  category: string
+  description: string
+  amount: number
+  date: string
+  vendor?: string
+  approved_by?: string
+  recorded_by?: string
+  created_at: string
+}
 export type Gender = 'male' | 'female'
 export type TermName = 'Term 1' | 'Term 2' | 'Term 3'
 export type RemarkType = 'teacher' | 'headteacher'
@@ -85,6 +162,7 @@ export interface User {
   role: Role
   phone?: string
   avatar_url?: string
+  designation?: string
   is_active: boolean
   created_at: string
   school?: School
@@ -133,6 +211,8 @@ export interface Student {
   guardian_email?: string
   address?: string
   photo_url?: string
+  scholarship_type?: 'none' | 'full' | 'partial'
+  scholarship_percentage?: number
   is_active: boolean
   user_id?: string
   created_at: string

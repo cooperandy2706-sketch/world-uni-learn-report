@@ -31,6 +31,7 @@ import LessonTrackerPage from './pages/teacher/LessonTrackerPage'
 import TeacherAttendancePage from './pages/teacher/AttendancePage'
 import TeacherStudentsPage from './pages/teacher/TeacherStudentsPage'
 import TeacherAssignmentsPage from './pages/teacher/AssignmentsPage'
+import TeacherAssignmentDetailsPage from './pages/teacher/TeacherAssignmentDetailsPage'
 import StudentAssignmentsPage from './pages/student/StudentAssignmentsPage'
 import TakeAssignmentPage from './pages/student/TakeAssignmentPage'
 import StudentResultsPage from './pages/student/ResultsPage'
@@ -46,8 +47,34 @@ import StudentSubjectsPage from './pages/student/StudentSubjectsPage'
 import StudentSubjectDetailsPage from './pages/student/StudentSubjectDetailsPage'
 import TeacherSubjectsPage from './pages/teacher/TeacherSubjectsPage'
 import TeacherSubjectDetailsPage from './pages/teacher/TeacherSubjectDetailsPage'
+import TeacherDailyFeesPage from './pages/teacher/TeacherDailyFeesPage'
 import PlatformSubjectsPage from './pages/admin/PlatformSubjectsPage'
 import ComingSoonPage from './pages/admin/ComingSoonPage'
+import BursarStaffPage from './pages/admin/BursarStaffPage'
+import GlobalMessagingPage from './pages/admin/GlobalMessagingPage'
+import GlobalAnalyticsPage from './pages/admin/GlobalAnalyticsPage'
+import MessagingPage from './pages/messaging/MessagingPage'
+import TeacherGlobalQuizDetailsPage from './pages/teacher/TeacherGlobalQuizDetailsPage'
+import TeacherTakeGlobalQuizPage from './pages/teacher/TeacherTakeGlobalQuizPage'
+import AdminAgendaPage from './pages/admin/AgendaPage'
+import TeacherAgendaPage from './pages/teacher/AgendaPage'
+import OtherStaffPage from './pages/admin/OtherStaffPage'
+import StaffDashboard from './pages/staff/DashboardPage'
+import TypingGamePage from './pages/shared/TypingGamePage'
+
+// Bursar pages
+import BursarDashboard from './pages/bursar/DashboardPage'
+import BursarFeesPage from './pages/bursar/FeesPage'
+import BursarDailyFeesPage from './pages/bursar/DailyFeesPage'
+import BursarDebtorsPage from './pages/bursar/DebtorsPage'
+import BursarPayrollPage from './pages/bursar/PayrollPage'
+import BursarIncomePage from './pages/bursar/IncomePage'
+import BursarExpensesPage from './pages/bursar/ExpensesPage'
+import BursarAnalyticsPage from './pages/bursar/AnalyticsPage'
+import BursarBillSheetPage from './pages/bursar/BillSheetPage'
+import BursarReportsPage from './pages/bursar/ReportsPage'
+import BursarInventoryPage from './pages/bursar/InventoryPage'
+import BursarStudentsPage from './pages/bursar/StudentsPage'
 
 import {
   RouteErrorPage,
@@ -81,6 +108,7 @@ export const router = createBrowserRouter([
           { path: 'dashboard', element: <AdminDashboard /> },
           { path: 'students', element: <StudentsPage /> },
           { path: 'teachers', element: <TeachersPage /> },
+          { path: 'other-staff', element: <OtherStaffPage /> },
           { path: 'classes', element: <ClassesPage /> },
           { path: 'subjects', element: <SubjectsPage /> },
           { path: 'departments', element: <DepartmentsPage /> },
@@ -94,6 +122,28 @@ export const router = createBrowserRouter([
           { path: 'syllabus', element: <SyllabusPage /> },
           { path: 'weekly-goals', element: <WeeklyGoalsPage /> },
           { path: 'attendance', element: <AdminAttendancePage /> },
+          { path: 'bursars', element: <BursarStaffPage /> },
+          { path: 'messages', element: <MessagingPage /> },
+          { path: 'agenda', element: <AdminAgendaPage /> },
+        ],
+      },
+      {
+        path: 'bursar',
+        element: <AppLayout requiredRole="bursar" />,
+        children: [
+          { index: true, element: <Navigate to="/bursar/dashboard" replace /> },
+          { path: 'dashboard',  element: <BursarDashboard /> },
+          { path: 'fees',       element: <BursarFeesPage /> },
+          { path: 'daily-fees', element: <BursarDailyFeesPage /> },
+          { path: 'debtors',    element: <BursarDebtorsPage /> },
+          { path: 'payroll',    element: <BursarPayrollPage /> },
+          { path: 'income',     element: <BursarIncomePage /> },
+          { path: 'expenses',   element: <BursarExpensesPage /> },
+          { path: 'analytics',  element: <BursarAnalyticsPage /> },
+          { path: 'bill-sheet', element: <BursarBillSheetPage /> },
+          { path: 'reports',    element: <BursarReportsPage /> },
+          { path: 'inventory',  element: <BursarInventoryPage /> },
+          { path: 'students',   element: <BursarStudentsPage /> },
         ],
       },
       {
@@ -111,9 +161,16 @@ export const router = createBrowserRouter([
           { path: 'lesson-tracker', element: <LessonTrackerPage /> },
           { path: 'students', element: <TeacherStudentsPage /> },
           { path: 'assignments', element: <TeacherAssignmentsPage /> },
+          { path: 'assignments/:id', element: <TeacherAssignmentDetailsPage /> },
+          { path: 'global-quizzes/:id', element: <TeacherGlobalQuizDetailsPage /> },
+          { path: 'global-quizzes/:id/take', element: <TeacherTakeGlobalQuizPage /> },
           { path: 'attendance', element: <TeacherAttendancePage /> },
+          { path: 'daily-fees', element: <TeacherDailyFeesPage /> },
           { path: 'subjects', element: <TeacherSubjectsPage /> },
           { path: 'subjects/:id', element: <TeacherSubjectDetailsPage /> },
+          { path: 'messages', element: <MessagingPage /> },
+          { path: 'agenda', element: <TeacherAgendaPage /> },
+          { path: 'typing-game', element: <TypingGamePage /> },
         ],
       },
 
@@ -130,23 +187,11 @@ export const router = createBrowserRouter([
           },
           {
             path: 'messaging',
-            element: (
-              <ComingSoonPage
-                title="Global Platform Messaging"
-                description="Broadcast emergency alerts, system updates, or platform-wide announcements to all school administrators and Teachers."
-                icon="💬"
-              />
-            ),
+            element: <MessagingPage />,
           },
           {
             path: 'analytics',
-            element: (
-              <ComingSoonPage
-                title="Leaderboards & Analytics"
-                description="Deep insights into school performance, student growth metrics, and platform-wide engagement benchmarks."
-                icon="🏅"
-              />
-            ),
+            element: <GlobalAnalyticsPage />,
           },
           {
             path: 'resources',
@@ -171,6 +216,15 @@ export const router = createBrowserRouter([
           { path: 'schedule', element: <StudentSchedulePage /> },
           { path: 'subjects', element: <StudentSubjectsPage /> },
           { path: 'subjects/:id', element: <StudentSubjectDetailsPage /> },
+          { path: 'typing-game', element: <TypingGamePage /> },
+        ],
+      },
+      {
+        path: 'staff',
+        element: <AppLayout requiredRole="staff" />,
+        children: [
+          { index: true, element: <Navigate to="/staff/dashboard" replace /> },
+          { path: 'dashboard', element: <StaffDashboard /> },
         ],
       },
       { path: '*', element: <NotFoundPage /> },

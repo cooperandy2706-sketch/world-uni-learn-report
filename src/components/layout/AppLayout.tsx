@@ -8,9 +8,10 @@ import BottomNav from './BottomNav'
 import SplashScreen from './SplashScreen'
 import EnablePushButton from '../ui/EnablePushButton'
 import WhatsNewModal from '../ui/WhatsNewModal'
+import AnnouncementPopup from '../ui/AnnouncementPopup'
 import { ROUTES } from '../../constants/routes'
 
-interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 'student' }
+interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 'student' | 'bursar' | 'staff' }
 
 export default function AppLayout({ requiredRole }: AppLayoutProps) {
   const { user, loading, initialized } = useAuth()
@@ -28,7 +29,9 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
   
   if (requiredRole && user.role !== requiredRole) {
     if (user.role === 'super_admin') return <Navigate to="/super-admin/dashboard" replace />
-    if (user.role === 'student') return <Navigate to="/student/dashboard" replace />
+    if (user.role === 'student')    return <Navigate to="/student/dashboard" replace />
+    if (user.role === 'bursar')     return <Navigate to={ROUTES.BURSAR_DASHBOARD} replace />
+    if (user.role === 'staff')      return <Navigate to={ROUTES.STAFF_DASHBOARD}  replace />
     return <Navigate to={user.role === 'admin' ? ROUTES.ADMIN_DASHBOARD : ROUTES.TEACHER_DASHBOARD} replace />
   }
 
@@ -73,6 +76,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
       </div>
       <BottomNav />
       <WhatsNewModal />
+      <AnnouncementPopup />
     </>
   )
 }

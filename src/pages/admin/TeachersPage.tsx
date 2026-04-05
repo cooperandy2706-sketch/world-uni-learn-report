@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { supabase, adminSupabase } from '../../lib/supabase'
+import { supabase } from '../../lib/supabase'
 import { useTeachers } from '../../hooks/useTeachers'
 import { useClasses } from '../../hooks/useClasses'
 import { useSubjects } from '../../hooks/useSubjects'
@@ -101,6 +101,12 @@ export default function TeachersPage() {
   const [resetTeacher, setResetTeacher]   = useState<any>(null)
   const [newPassword, setNewPassword]     = useState('')
   const [resetting, setResetting]         = useState(false)
+  // Reassign & Remove
+  const [removeModal, setRemoveModal]     = useState(false)
+  const [removingTeacher, setRemovingTeacher] = useState<any>(null)
+  const [removingAssignments, setRemovingAssignments] = useState<any[]>([])
+  const [replacementTeacherId, setReplacementTeacherId] = useState('')
+  const [removing, setRemoving]           = useState(false)
 
   const { register, handleSubmit, reset, formState:{ errors, isSubmitting } } = useForm<TForm>({ resolver: zodResolver(schema) as any })
 
@@ -127,40 +133,29 @@ export default function TeachersPage() {
       } else {
         const pw = data.password || 'teacher123'
         
-        // 1. Create the Auth user using the admin client
-        const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
-          email: data.email,
-          password: pw,
-          email_confirm: true,
-          user_metadata: { full_name: data.full_name }
+        const { data: res, error } = await supabase.functions.invoke('admin-ops', {
+          body: {
+            action: 'create-user',
+            payload: {
+              email: data.email,
+              password: pw,
+              full_name: data.full_name,
+              role: 'teacher',
+              target_school_id: user!.school_id,
+              phone: data.phone || null,
+              metadata: {
+                staff_id: data.staff_id || null,
+                qualification: data.qualification || null
+              }
+            }
+          }
         })
-        if (authError) throw authError
-        const newUser = authData.user
-
-        // 2. Create the profile in public.users (using admin client to ensure role is set)
-        const { error: profileError } = await adminSupabase
-          .from('users')
-          .upsert({
-            id: newUser.id,
-            school_id: user!.school_id,
-            full_name: data.full_name,
-            email: data.email,
-            phone: data.phone || null,
-            role: 'teacher',
-            is_active: true
-          })
-        if (profileError) throw profileError
-
-        // 3. Create the record in public.teachers
-        const { error: teacherError } = await adminSupabase
-          .from('teachers')
-          .insert({
-            user_id: newUser.id,
-            school_id: user!.school_id,
-            staff_id: data.staff_id || null,
-            qualification: data.qualification || null
-          })
-        if (teacherError) throw teacherError
+        
+        if (error) {
+           // Provide a clear fallback if the wrapper fails
+           throw new Error(error.message || 'Server error occurred')
+        }
+        if (res?.error) throw new Error(res.error)
 
         toast.success(`✅ Created · ${data.email} · Password: ${pw}`, { duration:8000 })
         qc.invalidateQueries({ queryKey:['teachers'] })
@@ -169,22 +164,57 @@ export default function TeachersPage() {
     } catch(e:any) { toast.error(e.message??'Failed') }
   }
 
-  async function handleDelete(t: any) {
-    if (!confirm(`Remove ${t.user?.full_name}? This deletes their account permanently.`)) return
-    try {
-      // Use adminSupabase to ensure we bypass RLS for cleanup if needed
-      await adminSupabase.from('teacher_assignments').delete().eq('teacher_id', t.id)
-      await adminSupabase.from('weekly_goals').delete().eq('teacher_id', t.id)
-      await adminSupabase.from('teachers').delete().eq('id', t.id)
-      await adminSupabase.from('users').delete().eq('id', t.user_id)
-      
-      // Delete auth user using the admin client
-      const { error: authDeleteError } = await adminSupabase.auth.admin.deleteUser(t.user_id)
-      if (authDeleteError) throw authDeleteError
+  async function openRemoveModal(t: any) {
+    setRemovingTeacher(t)
+    setReplacementTeacherId('')
+    // Load this teacher's active assignments
+    const { data } = await supabase.from('teacher_assignments')
+      .select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)')
+      .eq('teacher_id', t.id)
+    setRemovingAssignments(data ?? [])
+    setRemoveModal(true)
+  }
 
-      qc.invalidateQueries({ queryKey:['teachers'] })
-      toast.success('Teacher removed')
-    } catch(e:any) { toast.error(e.message??'Failed') }
+  async function handleReassignAndDeactivate() {
+    if (!removingTeacher) return
+    const hasAssignments = removingAssignments.length > 0
+    if (hasAssignments && !replacementTeacherId) {
+      toast.error('Please select a replacement teacher to take over the classes')
+      return
+    }
+    setRemoving(true)
+    try {
+      // 1. Reassign all teacher_assignments to the replacement
+      if (hasAssignments && replacementTeacherId) {
+        await supabase.from('teacher_assignments')
+          .update({ teacher_id: replacementTeacherId })
+          .eq('teacher_id', removingTeacher.id)
+
+        // 2. Transfer class_teacher role on classes table
+        await supabase.from('classes')
+          .update({ class_teacher_id: replacementTeacherId })
+          .eq('class_teacher_id', removingTeacher.id)
+      }
+
+      // 3. Soft-deactivate the user (keeps all historical scores, records, etc.)
+      await supabase.from('users')
+        .update({ is_active: false })
+        .eq('id', removingTeacher.user_id)
+
+      qc.invalidateQueries({ queryKey: ['teachers'] })
+      toast.success(`${removingTeacher.user?.full_name} has been deactivated${hasAssignments ? ' and classes reassigned' : ''}`)
+      setRemoveModal(false)
+      setRemovingTeacher(null)
+    } catch (e: any) {
+      toast.error(e.message ?? 'Failed to remove')
+    }
+    setRemoving(false)
+  }
+
+  async function handleReactivate(t: any) {
+    await supabase.from('users').update({ is_active: true }).eq('id', t.user_id)
+    qc.invalidateQueries({ queryKey: ['teachers'] })
+    toast.success(`${t.user?.full_name} reactivated`)
   }
 
   async function openAssign(t: any) {
@@ -213,12 +243,19 @@ export default function TeachersPage() {
 
   async function addAssignment() {
     if (!newClassId || !newSubjectId || !term?.id) { toast.error('Select class, subject and ensure there is an active term'); return }
-    const { error } = await adminSupabase.from('teacher_assignments').insert({
+    const { error } = await supabase.from('teacher_assignments').insert({
       teacher_id: assigningTeacher.id, class_id: newClassId, subject_id: newSubjectId,
       term_id: (term as any).id, academic_year_id: (term as any).academic_year_id,
-      is_class_teacher: isClassTeacher, school_id: user!.school_id,
+      is_class_teacher: isClassTeacher
     })
-    if (error) { toast.error(error.message); return }
+    if (error) {
+       if (error.message.includes('unique constraint')) {
+         toast.error('This teacher is already assigned to this Class & Subject!');
+       } else {
+         toast.error(error.message);
+       }
+       return 
+    }
     toast.success('Assignment added')
     setNewClassId(''); setNewSubjectId(''); setIsClassTeacher(false)
     const { data } = await supabase.from('teacher_assignments')
@@ -228,7 +265,7 @@ export default function TeachersPage() {
   }
 
   async function removeAssignment(id: string) {
-    await adminSupabase.from('teacher_assignments').delete().eq('id', id)
+    await supabase.from('teacher_assignments').delete().eq('id', id)
     setAssignments(prev => prev.filter(a => a.id !== id))
     toast.success('Removed')
   }
@@ -236,11 +273,12 @@ export default function TeachersPage() {
   async function handleResetPassword() {
     if (!newPassword || newPassword.length < 6) { toast.error('Min 6 characters'); return }
     setResetting(true)
-    const { error } = await adminSupabase.auth.admin.updateUserById(resetTeacher.user_id, {
-      password: newPassword
+    const { data, error } = await supabase.functions.invoke('admin-ops', {
+      body: { action: 'reset-password', payload: { target_user_id: resetTeacher.user_id, password: newPassword } }
     })
     setResetting(false)
     if (error) { toast.error(error.message); return }
+    if (data?.error) { toast.error(data.error); return }
     toast.success(`Password reset for ${resetTeacher.user?.full_name}`)
     setResetModal(false); setNewPassword('')
   }
@@ -380,10 +418,17 @@ export default function TeachersPage() {
                     style={{padding:'7px 0',borderRadius:8,border:'1px solid #ddd6fe',background:'transparent',color:'#6d28d9',fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:'"DM Sans",sans-serif'}}>
                     🔑 Reset Password
                   </button>
-                  <button onClick={()=>handleDelete(t)}
-                    style={{padding:'7px 0',borderRadius:8,border:'1px solid #fecaca',background:'transparent',color:'#ef4444',fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:'"DM Sans",sans-serif'}}>
-                    🗑️ Remove
-                  </button>
+                  {t.user?.is_active !== false ? (
+                    <button onClick={()=>openRemoveModal(t)}
+                      style={{padding:'7px 0',borderRadius:8,border:'1px solid #fecaca',background:'transparent',color:'#ef4444',fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:'"DM Sans",sans-serif'}}>
+                      🗑️ Remove
+                    </button>
+                  ) : (
+                    <button onClick={()=>handleReactivate(t)}
+                      style={{padding:'7px 0',borderRadius:8,border:'1px solid #bbf7d0',background:'transparent',color:'#16a34a',fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:'"DM Sans",sans-serif'}}>
+                      ✅ Reactivate
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -599,6 +644,61 @@ export default function TeachersPage() {
           <Field label="New Password">
             <Input type="password" value={newPassword} onChange={(e:any)=>setNewPassword(e.target.value)} placeholder="Min 6 characters"/>
           </Field>
+        </div>
+      </Modal>
+
+      {/* ── REASSIGN & REMOVE MODAL ── */}
+      <Modal open={removeModal} onClose={()=>setRemoveModal(false)}
+        title="Remove Staff Member" subtitle={removingTeacher?.user?.full_name} size="md"
+        footer={
+          <div style={{display:'flex',gap:8}}>
+            <Btn variant="secondary" onClick={()=>setRemoveModal(false)}>Cancel</Btn>
+            <Btn variant="danger" onClick={handleReassignAndDeactivate} loading={removing}>
+              {removingAssignments.length > 0 ? '🔄 Reassign & Deactivate' : '🗑️ Deactivate'}
+            </Btn>
+          </div>
+        }>
+        <div style={{display:'flex',flexDirection:'column',gap:16}}>
+
+          {/* Info banner */}
+          <div style={{background:'#fffbeb',border:'1px solid #fde68a',borderRadius:12,padding:'12px 16px',fontSize:12,color:'#92400e',lineHeight:1.6}}>
+            ⚠️ This will <b>deactivate</b> {removingTeacher?.user?.full_name}'s account. Their <b>historical records</b> (scores, reports, lesson logs) will be <b>preserved</b>. They will no longer be able to log in.
+          </div>
+
+          {/* Show what they currently have assigned */}
+          {removingAssignments.length > 0 ? (
+            <>
+              <div>
+                <h4 style={{fontSize:12,fontWeight:700,color:'#374151',marginBottom:10}}>📚 Active Assignments ({removingAssignments.length})</h4>
+                <div style={{display:'flex',flexDirection:'column',gap:6,maxHeight:180,overflowY:'auto'}}>
+                  {removingAssignments.map((a:any) => (
+                    <div key={a.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 12px',background:'#fef2f2',borderRadius:10,border:'1px solid #fecaca'}}>
+                      <span style={{fontSize:12,fontWeight:700,color:'#dc2626',flex:1}}>🏫 {a.class?.name}</span>
+                      <span style={{fontSize:12,color:'#b91c1c'}}>📗 {a.subject?.name}</span>
+                      <span style={{fontSize:10,color:'#9ca3af'}}>{a.term?.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pick replacement */}
+              <div>
+                <h4 style={{fontSize:12,fontWeight:700,color:'#374151',marginBottom:8}}>🔄 Transfer Classes To</h4>
+                <select value={replacementTeacherId} onChange={e=>setReplacementTeacherId(e.target.value)}
+                  style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1.5px solid #e5e7eb',fontSize:13,fontFamily:'"DM Sans",sans-serif',cursor:'pointer'}}>
+                  <option value="">— Select replacement teacher —</option>
+                  {(teachers as any[]).filter(t => t.id !== removingTeacher?.id && t.user?.is_active !== false).map(t => (
+                    <option key={t.id} value={t.id}>{t.user?.full_name} {t.staff_id ? `(${t.staff_id})` : ''}</option>
+                  ))}
+                </select>
+                <p style={{fontSize:11,color:'#6b7280',marginTop:6}}>All {removingAssignments.length} class/subject assignments and class teacher roles will be transferred to this person.</p>
+              </div>
+            </>
+          ) : (
+            <div style={{background:'#f0fdf4',border:'1px solid #bbf7d0',borderRadius:12,padding:'12px 16px',fontSize:12,color:'#166534'}}>
+              ✅ This teacher has <b>no active class assignments</b>. You can safely deactivate them.
+            </div>
+          )}
         </div>
       </Modal>
     </>

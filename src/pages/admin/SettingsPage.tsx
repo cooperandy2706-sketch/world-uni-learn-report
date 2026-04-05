@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase'
 import { useSettings, useUpdateSettings } from '../../hooks/useSettings'
 import { useAuth } from '../../hooks/useAuth'
 import { settingsService } from '../../services/index'
+import { useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 const schema = z.object({
@@ -84,6 +85,7 @@ function StyledTextarea({ ...props }: React.TextareaHTMLAttributes<HTMLTextAreaE
 // ═══════════════════════════════════════════════════════════
 export default function SettingsPage() {
   const { user } = useAuth()
+  const qc = useQueryClient()
   const { data: settings, isLoading } = useSettings()
   const updateSettings = useUpdateSettings()
   const [logoUploading, setLogoUploading] = useState(false)
@@ -114,7 +116,7 @@ export default function SettingsPage() {
 
   async function onSubmit(data: FormData) {
     try {
-      // Update school info
+      // 1. Update school identity fields directly
       const { error: schoolError } = await supabase
         .from('schools')
         .update({
@@ -128,7 +130,7 @@ export default function SettingsPage() {
         .eq('id', user!.school_id)
       if (schoolError) throw schoolError
 
-      // Use RPC to safely upsert settings without duplicate key errors
+      // 2. Upsert report-card settings via RPC
       const { error: settingsError } = await supabase.rpc('upsert_school_settings', {
         p_school_id: user!.school_id,
         p_next_term_date: data.next_term_date || null,
@@ -137,12 +139,10 @@ export default function SettingsPage() {
       })
       if (settingsError) throw settingsError
 
-      // Refresh settings in cache
-      await supabase.from('school_settings').select('*, school:schools(*)').eq('school_id', user!.school_id).single()
+      // 3. Invalidate cache so useSettings refetches fresh data (no page reload needed)
+      await qc.invalidateQueries({ queryKey: ['settings', user!.school_id] })
 
       toast.success('Settings saved successfully')
-      // Force reload settings
-      window.location.reload()
     } catch (err: any) {
       console.error('Settings save error:', err)
       toast.error(err?.message ?? 'Failed to save settings')

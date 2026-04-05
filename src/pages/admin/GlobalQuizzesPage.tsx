@@ -136,18 +136,21 @@ export default function AdminGlobalQuizzesPage() {
   })
 
   useEffect(() => {
-    if (user?.school_id) {
+    if (user?.id) {
       loadData()
       loadQuizzes()
     }
-  }, [user?.school_id])
+  }, [user?.id, user?.school_id])
 
   async function loadData() {
     try {
-      const { data: subs } = await supabase
-        .from('subjects')
-        .select('*')
-        .eq('school_id', user!.school_id)
+      const query = supabase.from('subjects').select('*')
+      if (user?.role === 'super_admin') {
+        query.or(`school_id.is.null${user?.school_id ? `,school_id.eq.${user.school_id}` : ''}`)
+      } else {
+        query.eq('school_id', user!.school_id)
+      }
+      const { data: subs } = await query.order('name')
       setSubjects(subs ?? [])
     } catch (err) {
       console.error('Failed to load subjects:', err)
@@ -157,11 +160,17 @@ export default function AdminGlobalQuizzesPage() {
   async function loadQuizzes() {
     setIsLoading(true)
     try {
-      const { data, error } = await supabase
+      const query = supabase
         .from('global_quizzes')
         .select('*, subject:subjects(name)')
-        .eq('school_id', user!.school_id)
-        .order('created_at', { ascending: false })
+
+      if (user?.role === 'super_admin') {
+        query.or(`school_id.is.null${user?.school_id ? `,school_id.eq.${user.school_id}` : ''}`)
+      } else {
+        query.eq('school_id', user!.school_id)
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false })
 
       if (error) throw error
       

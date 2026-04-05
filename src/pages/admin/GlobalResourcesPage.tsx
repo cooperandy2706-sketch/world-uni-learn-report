@@ -195,11 +195,13 @@ export default function GlobalResourcesPage() {
 
   async function loadData() {
     try {
-      const { data: subs } = await supabase
-        .from('subjects')
-        .select('*')
-        .is('school_id', null)
-        .order('name')
+      const query = supabase.from('subjects').select('*')
+      if (user?.role === 'super_admin') {
+        query.or(`school_id.is.null${user?.school_id ? `,school_id.eq.${user.school_id}` : ''}`)
+      } else {
+        query.is('school_id', null)
+      }
+      const { data: subs } = await query.order('name')
       setSubjects(subs ?? [])
     } catch (err) {
       console.error('Failed to load subjects:', err)
@@ -262,7 +264,7 @@ export default function GlobalResourcesPage() {
     }
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(publish: boolean = true) {
     if (!form.title || !form.subject_id || !form.content) {
       toast.error('Please fill in title, subject, and provide the content payload')
       return
@@ -276,8 +278,27 @@ export default function GlobalResourcesPage() {
 
     setIsSubmitting(true)
     try {
-      const payload = { ...form, school_id: null }
-      const { error } = await supabase.from('global_resources').insert(payload)
+      const dbPayload = {
+        title: form.title,
+        description: form.description,
+        subject_id: form.subject_id || null, // Map "" to null for UUID column
+        content_type: form.content_type,
+        content: form.content,
+        is_published: publish,
+        topic: form.topic,
+        cover_image_url: form.cover_image_url,
+        school_id: null
+      }
+
+      let error = null
+      if ((form as any).id) {
+        const { error: updErr } = await supabase.from('global_resources').update(dbPayload).eq('id', (form as any).id)
+        error = updErr
+      } else {
+        const { error: insErr } = await supabase.from('global_resources').insert(dbPayload)
+        error = insErr
+      }
+
       if (error) {
         if (error.code === '42P01') {
            throw new Error('Database Error: global_resources table has not been created in Supabase yet. Run the SQL schema!')
@@ -285,7 +306,7 @@ export default function GlobalResourcesPage() {
         throw error
       }
 
-      toast.success('Resource created successfully')
+      toast.success(publish ? 'Resource published successfully' : 'Draft saved successfully')
       setEditorMode(false)
       setForm({
         title: '',
@@ -299,7 +320,8 @@ export default function GlobalResourcesPage() {
       })
       loadResources()
     } catch (err: any) {
-      toast.error(err.message || 'Failed to create global resource')
+      console.error('PUBLISH ERROR:', err)
+      toast.error(err.message || err.details || 'Failed to update global resource')
     } finally {
       setIsSubmitting(false)
     }
@@ -352,8 +374,8 @@ export default function GlobalResourcesPage() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 12 }}>
-             <Btn variant="secondary" onClick={() => toast('Draft saved locally (mock)')}>Save Draft</Btn>
-             <Btn onClick={handleSubmit} loading={isSubmitting}>Publish to Platform</Btn>
+             <Btn variant="secondary" onClick={() => handleSubmit(false)} loading={isSubmitting} disabled={isSubmitting}>Save Draft</Btn>
+             <Btn onClick={() => handleSubmit(true)} loading={isSubmitting} disabled={isSubmitting}>Publish to Platform</Btn>
           </div>
         </div>
 
@@ -527,7 +549,19 @@ export default function GlobalResourcesPage() {
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Distribute standard learning materials mapped to the global curriculum.</p>
           </div>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <Btn onClick={() => setEditorMode(true)}>➕ Upload Material</Btn>
+            <Btn onClick={() => {
+              setForm({
+                title: '',
+                description: '',
+                subject_id: '',
+                content_type: 'passage',
+                content: '',
+                is_published: false,
+                topic: '',
+                cover_image_url: ''
+              })
+              setEditorMode(true)
+            }}>➕ Upload Material</Btn>
           </div>
         </div>
 
@@ -572,7 +606,17 @@ export default function GlobalResourcesPage() {
                          </span>
                       )}
                     </div>
-                    <button onClick={() => handleDelete(res.id)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, color: '#f87171' }}>🗑️</button>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => { 
+                        setForm({
+                          ...res,
+                          // Extra mapping to ensure no objects are passed
+                          id: res.id
+                        })
+                        setEditorMode(true)
+                      }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, color: '#64748b' }}>✏️</button>
+                      <button onClick={() => handleDelete(res.id)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, color: '#f87171' }}>🗑️</button>
+                    </div>
                   </div>
                   
                   <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: '0 0 4px 0' }}>

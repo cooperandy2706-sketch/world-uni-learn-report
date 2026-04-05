@@ -1,6 +1,6 @@
 // src/pages/admin/StudentsPage.tsx
 import { useState, useRef, useMemo } from 'react'
-import { supabase, adminSupabase } from '../../lib/supabase'
+import { supabase } from '../../lib/supabase'
 import { useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -222,38 +222,22 @@ export default function StudentsPage() {
     
     setAccountLoading(true)
     try {
-      // 1. Create the Auth user using the admin client
-      const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
-        email: accountData.email,
-        password: accountData.password,
-        email_confirm: true,
-        user_metadata: { full_name: accountStudent.full_name }
+      const { data, error } = await supabase.functions.invoke('admin-ops', {
+        body: {
+          action: 'create-user',
+          payload: {
+            email: accountData.email,
+            password: accountData.password,
+            full_name: accountStudent.full_name,
+            role: 'student',
+            target_school_id: user!.school_id,
+            metadata: { link_id: accountStudent.id }
+          }
+        }
       })
 
-      if (authError) throw authError
-      const newUser = authData.user
-
-      // 2. Create the profile in public.users (or update if trigger exists)
-      const { error: profileError } = await adminSupabase
-        .from('users')
-        .upsert({
-          id: newUser.id,
-          school_id: user!.school_id,
-          full_name: accountStudent.full_name,
-          email: accountData.email,
-          role: 'student',
-          is_active: true
-        })
-
-      if (profileError) throw profileError
-
-      // 3. Link the student record to the new user_id
-      const { error: linkError } = await supabase
-        .from('students')
-        .update({ user_id: newUser.id })
-        .eq('id', accountStudent.id)
-
-      if (linkError) throw linkError
+      if (error) throw error
+      if (data?.error) throw new Error(data.error)
 
       toast.success('Student account created successfully!')
       setAccountModalOpen(false)

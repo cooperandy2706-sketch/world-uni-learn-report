@@ -62,9 +62,10 @@ export const scoresService = {
   },
 
   async updatePositions(scores: { id: string; position: number }[]) {
-    const updates = scores.map(({ id, position }) =>
-      supabase.from('scores').update({ position }).eq('id', id)
-    )
-    return Promise.all(updates)
+    // Single bulk upsert instead of N individual UPDATE queries (O(1) vs O(n))
+    return supabase
+      .from('scores')
+      .upsert(scores, { onConflict: 'id' })
+      .select('id, position')
   },
 }

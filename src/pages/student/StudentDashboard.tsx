@@ -1,7 +1,6 @@
-// src/pages/student/StudentDashboard.tsx
-// Full student hub — live data: assignments, results preview, timetable, announcements
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuthStore } from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
@@ -13,6 +12,7 @@ const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
 function timeToMins(t: string) { const [h, m] = (t ?? '00:00').split(':').map(Number); return h * 60 + m }
 
 export default function StudentDashboard() {
+  const { setFirstLoadComplete } = useAuthStore()
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
@@ -40,7 +40,11 @@ export default function StudentDashboard() {
         .select('*, class:classes(id,name), school:schools(name)')
         .eq('user_id', user.id)
         .single()
-      if (!student) { setLoading(false); return }
+      if (!student) { 
+        setLoading(false)
+        setFirstLoadComplete(true)
+        return 
+      }
       setStudentData(student)
 
       // Load all data in parallel
@@ -106,8 +110,12 @@ export default function StudentDashboard() {
       const present = recs.filter((r: any) => r.status === 'present' || r.status === 'late').length
       setAttendanceSummary({ total: recs.length, present })
 
-    } catch (e) { console.error(e) }
-    finally { setLoading(false) }
+    } catch (e) { 
+      console.error(e) 
+    } finally { 
+      setLoading(false)
+      setFirstLoadComplete(true)
+    }
   }
 
   const currentMins = now.getHours() * 60 + now.getMinutes()
@@ -195,6 +203,33 @@ export default function StudentDashboard() {
               <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 2 }}>{s.sub}</div>
             </div>
           ))}
+        </div>
+        
+        {/* ── Typing Game Teaser ── */}
+        <div style={{
+          background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
+          borderRadius: 18, padding: '20px 24px', marginBottom: 22, color: '#fff',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          boxShadow: '0 10px 25px rgba(49, 46, 129, 0.2)', position: 'relative', overflow: 'hidden',
+          animation: '_sfu .5s ease .15s both'
+        }}>
+          <div style={{ position: 'absolute', right: -30, top: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(0, 243, 255, 0.05)' }} />
+          <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 20 }}>
+            <div style={{
+              width: 50, height: 50, borderRadius: 14, background: 'linear-gradient(135deg, #00f3ff, #ff00ff)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24,
+              boxShadow: '0 0 20px rgba(0, 243, 255, 0.4)'
+            }}>🏎️</div>
+            <div>
+              <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: 18, fontWeight: 700, margin: '0 0 4px' }}>Turbo Typing Challenge</h3>
+              <p style={{ fontSize: 13, opacity: 0.8, margin: 0 }}>Can you divert the cars before they clash? Level up your speed!</p>
+            </div>
+          </div>
+          <Link to={ROUTES.STUDENT_TYPING_GAME} style={{
+            position: 'relative', zIndex: 1, padding: '10px 20px', borderRadius: 12,
+            background: '#fff', color: '#312e81', fontSize: 13, fontWeight: 800,
+            textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          }}>PLAY NITRO →</Link>
         </div>
 
         {/* ── Main Grid ── */}

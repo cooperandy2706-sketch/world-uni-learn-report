@@ -18,6 +18,7 @@ export function useAuth() {
     isTeacher: user?.role === 'teacher',
     isSuperAdmin: user?.role === 'super_admin',
     isStudent: user?.role === 'student',
+    isBursar: user?.role === 'bursar',
     isAuthenticated: !!user,
     signIn,
     signOut,

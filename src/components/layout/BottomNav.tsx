@@ -2,28 +2,31 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
+import { dailyFeesService } from '../../services/bursar.service'
 import { 
   LayoutDashboard, Users, FileSpreadsheet, ClipboardCheck, 
   Megaphone, PencilLine, Calendar, Timer, BookOpen, 
-  ShieldCheck, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School
+  ShieldCheck, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School,
+  CreditCard, Wallet, Gamepad2
 } from 'lucide-react'
 
 const adminLinks = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Home' },
   { to: '/admin/students', icon: Users, label: 'Students' },
-  { to: '/admin/reports', icon: FileSpreadsheet, label: 'Reports' },
   { to: '/admin/attendance', icon: ClipboardCheck, label: 'Register' },
   { to: '/admin/announcements', icon: Megaphone, label: 'Posts' },
+  { to: '/admin/messages', icon: MessageSquare, label: 'Messages', notify: true },
 ]
 
 const teacherLinks = [
   { to: '/teacher/dashboard', icon: LayoutDashboard, label: 'Home' },
   { to: '/teacher/score-entry', icon: PencilLine, label: 'Scores' },
-  { to: '/teacher/timetable', icon: Calendar, label: 'Schedule' },
-  { to: '/teacher/lesson-tracker', icon: Timer, label: 'Tracker' },
   { to: '/teacher/attendance', icon: ClipboardCheck, label: 'Register' },
-  { to: '/teacher/subjects', icon: BookOpen, label: 'Library' },
+  { to: '/teacher/daily-fees', icon: CreditCard, label: 'Fees' },
+  { to: '/teacher/messages', icon: MessageSquare, label: 'Messages', notify: true },
+  { to: '/teacher/typing-game', icon: Gamepad2, label: 'Nitro' },
 ]
 
 const superAdminLinks = [
@@ -39,13 +42,40 @@ const studentLinks = [
   { to: '/student/subjects', icon: BookOpen, label: 'Library' },
   { to: '/student/results', icon: BarChart3, label: 'Results' },
   { to: '/student/schedule', icon: Calendar, label: 'Schedule' },
+  { to: '/student/typing-game', icon: Gamepad2, label: 'Nitro' },
+]
+
+const bursarLinks = [
+  { to: '/bursar/dashboard', icon: LayoutDashboard, label: 'Home' },
+  { to: '/bursar/fees', icon: CreditCard, label: 'Fees' },
+  { to: '/bursar/daily-fees', icon: Wallet, label: 'Daily Fees' },
+  { to: '/bursar/debtors', icon: School, label: 'Classes' },
+  { to: '/bursar/payroll', icon: Wallet, label: 'Payroll' },
+  { to: '/bursar/analytics', icon: BarChart3, label: 'Stats' },
 ]
 
 export default function BottomNav() {
-  const { user, isAdmin, isSuperAdmin, isStudent } = useAuth()
+  const { user, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
   const location = useLocation()
   const [unread, setUnread] = useState(0)
   const [visible, setVisible] = useState(false)
+
+  // Check if teacher is allowed to collect daily fees
+  const { data: collectorAuth, isLoading: loadingAuth } = useQuery({
+    queryKey: ['daily-fee-auth', user?.id],
+    queryFn: async () => {
+      const res = await dailyFeesService.isTeacherCollector(user?.id!)
+      return res?.data || null
+    },
+    enabled: isTeacher && !!user?.id
+  })
+
+  let links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : teacherLinks
+
+  // Hide daily collections from unauthorized teachers
+  if (isTeacher && !loadingAuth && !collectorAuth) {
+    links = links.filter(l => l.label !== 'Fees')
+  }
 
   useEffect(() => {
     function check() { setVisible(window.innerWidth < 768) }
@@ -73,7 +103,6 @@ export default function BottomNav() {
 
   if (!visible) return null
 
-  const links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : teacherLinks
 
   return (
     <>

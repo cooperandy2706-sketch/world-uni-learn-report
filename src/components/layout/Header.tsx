@@ -7,7 +7,7 @@ import NotificationBell from './NotificationBell'
 import { requestAndSubscribe, isPushSubscribed, VAPID_PUBLIC_KEY } from '../../utils/pushNotifications'
 
 export default function Header() {
-  const { user, signOut, isAdmin, isSuperAdmin, isStudent } = useAuth()
+  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
   const navigate = useNavigate()
@@ -44,6 +44,8 @@ export default function Header() {
 
   const adminMenu = [
     { icon: '⊞', label: 'Dashboard', path: '/admin/dashboard' },
+    { icon: '👥', label: 'Students', path: '/admin/students' },
+    { icon: '📄', label: 'Reports', path: '/admin/reports' },
     { icon: '⚙️', label: 'Settings', path: '/admin/settings' },
     { icon: '📊', label: 'Analytics', path: '/admin/analytics' },
     { icon: '📢', label: 'Announcements', path: '/admin/announcements' },
@@ -54,6 +56,7 @@ export default function Header() {
   const teacherMenu = [
     { icon: '⊞', label: 'Dashboard', path: '/teacher/dashboard' },
     { icon: '🔔', label: 'Notifications', path: '/teacher/notifications' },
+    { icon: '✏️', label: 'Score Entry', path: '/teacher/score-entry' },
     { icon: '📚', label: 'Library', path: '/teacher/subjects' },
     { icon: '📄', label: 'Reports', path: '/teacher/reports', },
     { icon: '📅', label: 'My Timetable', path: '/teacher/timetable' },
@@ -84,7 +87,17 @@ export default function Header() {
     { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
   ]
 
-  const menu = isSuperAdmin ? superAdminMenu : isStudent ? studentMenu : isAdmin ? adminMenu : teacherMenu
+  const bursarMenu = [
+    { icon: '⊞', label: 'Dashboard', path: '/bursar/dashboard' },
+    { icon: '💵', label: 'School Fees', path: '/bursar/fees' },
+    { icon: '🏫', label: 'Class Tracking', path: '/bursar/debtors' },
+    { icon: '💼', label: 'Payroll', path: '/bursar/payroll' },
+    { icon: '📈', label: 'Analytics', path: '/bursar/analytics' },
+    { divider: true },
+    { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
+  ]
+
+  const menu = isSuperAdmin ? superAdminMenu : isStudent ? studentMenu : isAdmin ? adminMenu : isBursar ? bursarMenu : teacherMenu
 
   return (
     <>

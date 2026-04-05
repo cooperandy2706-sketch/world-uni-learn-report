@@ -1,5 +1,6 @@
 // src/pages/teacher/AssignmentsPage.tsx
 import { useState, useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
@@ -119,9 +120,9 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
 
 export default function AssignmentsPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [assignments, setAssignments] = useState<any[]>([])
   const [classes, setClasses] = useState<any[]>([])
-  const [subjects, setSubjects] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -141,6 +142,24 @@ export default function AssignmentsPage() {
     }
   })
 
+  // Global Quizzes & View Mode
+  const [viewMode, setViewMode] = useState<'class' | 'global'>('class')
+  const [selectedGlobalSubject, setSelectedGlobalSubject] = useState<string | null>(null)
+  const [globalQuizzes, setGlobalQuizzes] = useState<any[]>([])
+
+  // Store raw assignments so we can filter dynamically
+  const [teacherAssignments, setTeacherAssignments] = useState<any[]>([])
+
+  // Derive subjects dynamically based on selected class
+  const availableSubjects = useMemo(() => {
+    if (!form.class_id || !user?.id) return []
+    // Get assignments that match form.class_id
+    const assigns = teacherAssignments.filter((a: any) => a.class?.id === form.class_id)
+    const unique = Array.from(new Map(assigns.map((a: any) => [a.subject?.id, a.subject])).values()).filter(Boolean) as any[]
+    return unique
+  }, [form.class_id, teacherAssignments])
+
+
   useEffect(() => {
     if (user?.id) {
       loadData()
@@ -159,10 +178,9 @@ export default function AssignmentsPage() {
         .eq('teacher_id', teacher.id)
 
       const uniqueClasses = Array.from(new Map(assigns?.map(a => [a.class?.id, a.class])).values()).filter(Boolean) as any[]
-      const uniqueSubjects = Array.from(new Map(assigns?.map(a => [a.subject?.id, a.subject])).values()).filter(Boolean) as any[]
       
+      setTeacherAssignments(assigns ?? [])
       setClasses(uniqueClasses)
-      setSubjects(uniqueSubjects)
       if (assigns && assigns.length > 0) {
         setForm(prev => ({ ...prev, term_id: assigns[0].term_id }))
       }
@@ -177,16 +195,26 @@ export default function AssignmentsPage() {
       const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
       if (!teacher) return
 
-      const { data, error } = await supabase
-        .from('assignments')
-        .select('*, class:classes(name), subject:subjects(name)')
-        .eq('teacher_id', teacher.id)
-        .order('created_at', { ascending: false })
+      const [classRes, globalRes] = await Promise.all([
+        supabase
+          .from('assignments')
+          .select('*, class:classes(name), subject:subjects(name)')
+          .eq('teacher_id', teacher.id)
+          .order('created_at', { ascending: false }),
+        
+        supabase
+          .from('global_quizzes')
+          .select('*, subject:subjects(name)')
+          .or(`school_id.eq.${user!.school_id},school_id.is.null`)
+          .eq('is_published', true)
+          .order('created_at', { ascending: false })
+      ])
 
-      if (error) throw error
+      if (classRes.error) throw classRes.error
+      if (globalRes.error) throw globalRes.error
       
-      // Fetch submission counts for each assignment
-      const assignmentsWithCounts = await Promise.all((data ?? []).map(async (a) => {
+      // Fetch submission counts for class assignment
+      const assignmentsWithCounts = await Promise.all((classRes.data ?? []).map(async (a) => {
         const { count } = await supabase
           .from('assignment_submissions')
           .select('*', { count: 'exact', head: true })
@@ -195,12 +223,39 @@ export default function AssignmentsPage() {
       }))
 
       setAssignments(assignmentsWithCounts)
+      
+      const globalWithCounts = await Promise.all((globalRes.data ?? []).map(async (g) => {
+         const { count } = await supabase
+           .from('global_quiz_submissions')
+           .select('*', { count: 'exact', head: true })
+           .eq('quiz_id', g.id)
+         return { ...g, total_submissions: count ?? 0 }
+      }))
+      
+      setGlobalQuizzes(globalWithCounts)
+
     } catch (err: any) {
       toast.error(err.message || 'Failed to load assignments')
     } finally {
       setIsLoading(false)
     }
   }
+
+  const globalSubjects = useMemo(() => {
+    const subjectsMap = new Map<string, { id: string, name: string, count: number }>()
+    globalQuizzes.forEach(q => {
+      const sid = q.subject_id || 'general'
+      const sname = q.subject?.name || 'General'
+      if (!subjectsMap.has(sid)) subjectsMap.set(sid, { id: sid, name: sname, count: 0 })
+      subjectsMap.get(sid)!.count++
+    })
+    return Array.from(subjectsMap.values()).filter(s => s.count > 0)
+  }, [globalQuizzes])
+
+  const filteredGlobal = useMemo(() => {
+    if (!selectedGlobalSubject) return []
+    return globalQuizzes.filter(q => (q.subject_id || 'general') === selectedGlobalSubject)
+  }, [globalQuizzes, selectedGlobalSubject])
 
   function addQuestion() {
     const newQ: Question = {
@@ -306,11 +361,86 @@ export default function AssignmentsPage() {
           <Btn onClick={() => setModalOpen(true)}>➕ Create New Assignment</Btn>
         </div>
 
+        {/* ── Main View Switcher ── */}
+        <div style={{ background: '#f5f3ff', padding: 8, borderRadius: 18, display: 'flex', gap: 8, marginBottom: 24, maxWidth: 500 }}>
+          <div onClick={() => setViewMode('class')} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'class' ? { background: '#fff', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: '#6b7280' }) }}>
+            🏫 My Class Assignments
+          </div>
+          <div onClick={() => { setViewMode('global'); setSelectedGlobalSubject(null); }} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'global' ? { background: '#fff', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: '#6b7280' }) }}>
+            🌍 Global Challenges
+          </div>
+        </div>
+
+        {viewMode === 'global' && selectedGlobalSubject && (
+           <button onClick={() => setSelectedGlobalSubject(null)} style={{ background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: '#374151', cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+             ← Back to Subjects
+           </button>
+        )}
+
         {/* ── List ── */}
         {isLoading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
             <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading assignments…</p>
+          </div>
+        ) : viewMode === 'global' && !selectedGlobalSubject ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+            {globalSubjects.length === 0 ? (
+               <div style={{ background: '#fff', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
+                 <div style={{ fontSize: 48, marginBottom: 12 }}>🌍</div>
+                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No challenges yet!</h3>
+                 <p style={{ fontSize: 13, color: '#9ca3af' }}>The school hasn't published any global quizzes.</p>
+               </div>
+            ) : globalSubjects.map(sub => (
+              <div key={sub.id} className="assign-card" onClick={() => setSelectedGlobalSubject(sub.id)} style={{ 
+                background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
+                boxShadow: '0 2px 8px rgba(109,40,217,0.05)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.2s'
+              }}>
+                <div style={{ width: 48, height: 48, borderRadius: 14, background: '#f5f3ff', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+                  📚
+                </div>
+                <div>
+                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{sub.name}</h3>
+                  <p style={{ fontSize: 13, color: '#6b7280', margin: 0, fontWeight: 600 }}>{sub.count} Quizzes Available</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : viewMode === 'global' && selectedGlobalSubject ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
+             {filteredGlobal.length === 0 ? (
+               <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1/-1' }}>No quizzes here.</div>
+             ) : filteredGlobal.map((g, i) => (
+               <div key={g.id} style={{ 
+                 background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
+                 boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.3s ease ${i * 0.05}s both`,
+                 position: 'relative'
+               }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, background: '#f5f3ff', color: '#7c3aed', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      {g.subject?.name || 'General'}
+                    </span>
+                  </div>
+                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{g.title}</h3>
+                  <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{g.description}</p>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
+                    <div style={{ background: '#faf5ff', borderRadius: 12, padding: '10px 12px' }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{g.content?.questions?.length || 0} items</div>
+                    </div>
+                    <div style={{ background: '#f0fdf4', borderRadius: 12, padding: '10px 12px' }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>School Wide</div>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: '#059669' }}>{g.total_submissions || 0} Taking</div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', borderTop: '1px solid #f5f3ff', paddingTop: 14, gap: 10 }}>
+                     <button onClick={() => navigate(`/teacher/global-quizzes/${g.id}/take`)} style={{ padding: '6px 12px', background: '#fff', color: '#4c1d95', border: '1.5px solid #e0e7ff', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Preview Quiz</button>
+                     <button onClick={() => navigate(`/teacher/global-quizzes/${g.id}`)} style={{ padding: '6px 12px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>See My Students →</button>
+                  </div>
+               </div>
+             ))}
           </div>
         ) : assignments.length === 0 ? (
           <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
@@ -354,11 +484,14 @@ export default function AssignmentsPage() {
                   <div style={{ fontSize: 11, color: '#9ca3af' }}>
                     {a.due_date ? `Due: ${formatDate(a.due_date)}` : 'No due date'}
                   </div>
-                  {a.duration_minutes > 0 && (
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 4 }}>
-                       ⏱️ {a.duration_minutes}m limit
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                    {a.duration_minutes > 0 && (
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 4 }}>
+                         ⏱️ {a.duration_minutes}m limit
+                      </div>
+                    )}
+                    <button onClick={() => navigate(`/teacher/assignments/${a.id}`)} style={{ padding: '6px 12px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#6d28d9'} onMouseLeave={e => e.currentTarget.style.background = '#7c3aed'}>View Submissions →</button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -404,7 +537,7 @@ export default function AssignmentsPage() {
                 <Field label="Subject *">
                   <StyledSelect value={form.subject_id} onChange={e => setForm(prev => ({ ...prev, subject_id: e.target.value }))}>
                     <option value="">Select subject...</option>
-                    {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    {availableSubjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </StyledSelect>
                 </Field>
               </div>

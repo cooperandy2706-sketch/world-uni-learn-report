@@ -99,7 +99,12 @@ export default function TermsPage() {
   })
   const setCurrent = useMutation({
     mutationFn: (id: string) => termsService.setCurrent(id, user!.school_id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['terms'] }); qc.invalidateQueries({ queryKey: ['term-current'] }); toast.success('Current term updated') },
+    onSuccess: () => { 
+      qc.invalidateQueries({ queryKey: ['terms'] })
+      qc.invalidateQueries({ queryKey: ['term-current'] })
+      toast.success('Current term updated and financial records rolled over successfully') 
+    },
+    onError: () => toast.error('Failed to change term. Could not compute rollovers.'),
   })
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({ resolver: zodResolver(schema) })
@@ -241,9 +246,11 @@ export default function TermsPage() {
                     {/* Actions */}
                     <div style={{ display: 'flex', gap: 7 }}>
                       {!t.is_current && (
-                        <Btn variant="success" onClick={() => setCurrent.mutate(t.id)} loading={setCurrent.isPending}
+                        <Btn variant="success" onClick={() => {
+                          if (confirm(`Set "${t.name}" as the current term? This will automatically compute and roll over all student financial debts from the old term into arrears.`)) setCurrent.mutate(t.id)
+                        }} loading={setCurrent.isPending}
                           style={{ flex: 1, justifyContent: 'center', padding: '8px 10px', fontSize: 12 }}>
-                          📌 Set Current
+                          📌 {setCurrent.isPending ? 'Rolling over...' : 'Set Current'}
                         </Btn>
                       )}
                       {t.is_locked ? (

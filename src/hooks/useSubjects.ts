@@ -9,13 +9,14 @@ export function useSubjects() {
   const schoolId = user?.school_id ?? ''
 
   return useQuery({
-    queryKey: ['subjects', schoolId],
+    queryKey: ['subjects', schoolId || 'global'],
     queryFn: async () => {
       const { data, error } = await subjectsService.getAll(schoolId)
       if (error) throw error
       return data ?? []
     },
-    enabled: !!schoolId,
+    // Always enabled, since Super Admin (schoolId === null) should still load global subjects
+    enabled: true,
   })
 }
 

@@ -8,6 +8,7 @@ export const ROUTES = {
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_STUDENTS: '/admin/students',
   ADMIN_TEACHERS: '/admin/teachers',
+  ADMIN_OTHER_STAFF: '/admin/other-staff',
   ADMIN_CLASSES: '/admin/classes',
   ADMIN_SUBJECTS: '/admin/subjects',
   ADMIN_DEPARTMENTS: '/admin/departments',
@@ -21,6 +22,8 @@ export const ROUTES = {
   ADMIN_SYLLABUS: '/admin/syllabus',
   ADMIN_WEEKLY_GOALS: '/admin/weekly-goals',
   ADMIN_ATTENDANCE: '/admin/attendance',
+  ADMIN_MESSAGES: '/admin/messages',
+  ADMIN_AGENDA: '/admin/agenda',
 
   // Teacher
   TEACHER_DASHBOARD: '/teacher/dashboard',
@@ -35,12 +38,32 @@ export const ROUTES = {
   TEACHER_ASSIGNMENTS: '/teacher/assignments',
   TEACHER_SUBJECTS: '/teacher/subjects',
   TEACHER_ATTENDANCE: '/teacher/attendance',
+  TEACHER_MESSAGES: '/teacher/messages',
+  TEACHER_AGENDA: '/teacher/agenda',
+  TEACHER_TYPING_GAME: '/teacher/typing-game',
 
   // Student
   STUDENT_DASHBOARD: '/student/dashboard',
   STUDENT_ASSIGNMENTS: '/student/assignments',
   STUDENT_RESULTS: '/student/results',
   STUDENT_SCHEDULE: '/student/schedule',
+  STUDENT_TYPING_GAME: '/student/typing-game',
+
+  // Bursar
+  BURSAR_DASHBOARD:  '/bursar/dashboard',
+  BURSAR_FEES:       '/bursar/fees',
+  BURSAR_DEBTORS:    '/bursar/debtors',
+  BURSAR_PAYROLL:    '/bursar/payroll',
+  BURSAR_INCOME:     '/bursar/income',
+  BURSAR_EXPENSES:   '/bursar/expenses',
+  BURSAR_ANALYTICS:  '/bursar/analytics',
+  BURSAR_BILL_SHEET: '/bursar/bill-sheet',
+  BURSAR_REPORTS:    '/bursar/reports',
+  BURSAR_INVENTORY:  '/bursar/inventory',
+  BURSAR_STUDENTS:   '/bursar/students',
+
+  // Other Staff
+  STAFF_DASHBOARD: '/staff/dashboard',
 
   // Super Admin
   SUPER_ADMIN_DASHBOARD: '/super-admin/dashboard',
@@ -50,4 +73,5 @@ export const ROUTES = {
   SUPER_ADMIN_ANALYTICS: '/super-admin/analytics',
   SUPER_ADMIN_RESOURCES: '/super-admin/resources',
   SUPER_ADMIN_SUBJECTS: '/super-admin/subjects',
+  SUPER_ADMIN_MESSAGES: '/super-admin/messaging',
 } as const

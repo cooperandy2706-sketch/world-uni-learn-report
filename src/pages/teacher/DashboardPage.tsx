@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useAuthStore } from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { getGradeInfo, calculateAverage, calculatePassRate } from '../../utils/grading'
@@ -31,6 +32,7 @@ function timeAgo(ts: string) {
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 export default function TeacherDashboardPage() {
+  const { setFirstLoadComplete } = useAuthStore()
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
@@ -64,7 +66,11 @@ export default function TeacherDashboardPage() {
     setLoading(true)
     try {
       const { data: teacher } = await supabase.from('teachers').select('*').eq('user_id', user!.id).single()
-      if (!teacher) { setLoading(false); return }
+      if (!teacher) { 
+        setLoading(false)
+        setFirstLoadComplete(true)
+        return 
+      }
       setTeacherRecord(teacher)
 
       // Load all in parallel
@@ -81,7 +87,7 @@ export default function TeacherDashboardPage() {
         term?.id ? supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name,code)').eq('teacher_id', teacher.id).eq('term_id', term.id) : { data: [] },
         supabase.from('scores').select('id,updated_at,total_score,grade,student:students(full_name),subject:subjects(name),class:classes(name)').eq('teacher_id', teacher.id).order('updated_at', { ascending: false }).limit(5),
         supabase.from('assignments').select('*', { count: 'exact', head: true }).eq('teacher_id', teacher.id).eq('school_id', user!.school_id),
-        supabase.from('assignment_submissions').select('submitted_at,score_percent,student:students(full_name),assignment:assignments!inner(title,teacher_id)').eq('assignments.teacher_id', teacher.id).order('submitted_at', { ascending: false }).limit(6),
+        supabase.from('assignment_submissions').select('submitted_at,score,total_possible,student:students(full_name),assignments!inner(title,teacher_id)').eq('assignments.teacher_id', teacher.id).order('submitted_at', { ascending: false }).limit(6),
         supabase.from('announcements').select('*').eq('school_id', user!.school_id).order('created_at', { ascending: false }).limit(3),
       ])
 
@@ -101,9 +107,14 @@ export default function TeacherDashboardPage() {
           .eq('teacher_id', teacher.id)
           .eq('term_id', term.id)
           .eq('day_of_week', todayDay)
-          .order('timetable_periods(sort_order)', { ascending: true })
+          // Sort happens on client after fetch because Supabase can struggle to order by related columns depending on schema
         const lessons = (slots ?? []).filter((s: any) => !s.period?.is_break)
-          .sort((a: any, b: any) => (a.period?.start_time ?? '').localeCompare(b.period?.start_time ?? ''))
+          .sort((a: any, b: any) => {
+            const aSort = a.period?.sort_order ?? 999;
+            const bSort = b.period?.sort_order ?? 999;
+            if (aSort !== bSort) return aSort - bSort;
+            return (a.period?.start_time ?? '').localeCompare(b.period?.start_time ?? '')
+          })
         setTodayLessons(lessons)
       }
 
@@ -135,8 +146,12 @@ export default function TeacherDashboardPage() {
       setPendingCount(classStatsData.reduce((s: number, c: any) => s + c.pendingEntries, 0))
       setSubmittedCount(classStatsData.reduce((s: number, c: any) => s + c.submitted, 0))
 
-    } catch (e) { console.error(e) }
-    finally { setLoading(false) }
+    } catch (e) { 
+      console.error(e) 
+    } finally { 
+      setLoading(false)
+      setFirstLoadComplete(true)
+    }
   }
 
   async function sendMessage() {
@@ -263,14 +278,27 @@ export default function TeacherDashboardPage() {
                 { label: 'Scores Entered', value: submittedCount, icon: '✅', color: '#16a34a', bg: '#f0fdf4' },
                 { label: 'Pending Entry', value: pendingCount, icon: '⏳', color: pendingCount > 0 ? '#d97706' : '#16a34a', bg: pendingCount > 0 ? '#fffbeb' : '#f0fdf4', pulse: pendingCount > 0 },
                 { label: 'My Quizzes', value: myQuizCount, icon: '📝', color: '#7c3aed', bg: '#f5f3ff' },
-              ].map((s, i) => (
-                <div key={i} style={{ background: '#fff', borderRadius: 13, padding: '14px 15px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.06)', position: 'relative', overflow: 'hidden', animation: `_fu .4s ease ${.15 + i * .05}s both` }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 9, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, marginBottom: 7 }}>{s.icon}</div>
-                  {(s as any).pulse && <span style={{ position: 'absolute', top: 9, right: 9, width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', animation: '_pu 1.5s infinite' }} />}
-                  <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 24, fontWeight: 700, color: s.color, lineHeight: 1 }}><AnimNum to={s.value} /></div>
-                  <div style={{ fontSize: 11, color: '#6b7280', marginTop: 3 }}>{s.label}</div>
-                </div>
-              ))}
+                { label: 'Nitro Typer', value: 'Play', icon: '🏎️', color: '#00f3ff', bg: '#0a0a1f', isLink: true, to: ROUTES.TEACHER_TYPING_GAME },
+              ].map((s, i) => {
+                const CardInner = (
+                  <div style={{
+                    background: (s as any).isLink ? '#0a0a2f' : '#fff', borderRadius: 13, padding: '14px 15px',
+                    border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.06)',
+                    position: 'relative', overflow: 'hidden', animation: `_fu .4s ease ${.15 + i * .05}s both`, height: '100%'
+                  }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 9, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, marginBottom: 7 }}>{s.icon}</div>
+                    {(s as any).pulse && <span style={{ position: 'absolute', top: 9, right: 9, width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', animation: '_pu 1.5s infinite' }} />}
+                    <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 24, fontWeight: 700, color: s.color, lineHeight: 1 }}>{typeof (s.value) === 'number' ? <AnimNum to={s.value} /> : s.value}</div>
+                    <div style={{ fontSize: 11, color: (s as any).isLink ? 'rgba(255,255,255,0.6)' : '#6b7280', marginTop: 3 }}>{s.label}</div>
+                    {(s as any).isLink && <div style={{ position: 'absolute', right: -10, bottom: -10, fontSize: 40, opacity: 0.1, transform: 'rotate(-20deg)' }}>🏁</div>}
+                  </div>
+                )
+
+                if ((s as any).isLink) {
+                  return <Link key={i} to={(s as any).to} style={{ textDecoration: 'none' }}>{CardInner}</Link>
+                }
+                return <div key={i}>{CardInner}</div>
+              })}
             </div>
 
             {/* ── Main grid ── */}
@@ -379,14 +407,14 @@ export default function TeacherDashboardPage() {
                       <Link to={ROUTES.TEACHER_ASSIGNMENTS} style={{ fontSize: 12, fontWeight: 600, color: '#6d28d9', textDecoration: 'none' }}>Manage quizzes →</Link>
                     </div>
                     {recentQuizSubs.map((s: any, i: number) => {
-                      const pct = s.score_percent ?? 0
+                      const pct = s.total_possible > 0 ? (s.score / s.total_possible) * 100 : 0
                       const g = getGradeInfo(pct)
                       return (
                         <div key={i} className="td-row"
                           style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 20px', borderBottom: i < recentQuizSubs.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background .12s' }}>
                           <div style={{ width: 30, height: 30, borderRadius: 8, background: g.color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: g.color, flexShrink: 0 }}>{g.grade}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.student?.full_name} — {s.assignment?.title}</p>
+                            <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.student?.full_name} — {s.assignments?.title}</p>
                             <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>{timeAgo(s.submitted_at)}</p>
                           </div>
                           <span style={{ fontSize: 13, fontWeight: 800, color: g.color, flexShrink: 0 }}>{pct.toFixed(0)}%</span>
