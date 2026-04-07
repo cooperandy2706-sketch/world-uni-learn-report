@@ -45,6 +45,7 @@ import StudentDashboard from './pages/student/StudentDashboard'
 import TakeGlobalQuizPage from './pages/student/TakeGlobalQuizPage'
 import StudentSubjectsPage from './pages/student/StudentSubjectsPage'
 import StudentSubjectDetailsPage from './pages/student/StudentSubjectDetailsPage'
+import StudentLibraryPage from './pages/student/StudentLibraryPage'
 import TeacherSubjectsPage from './pages/teacher/TeacherSubjectsPage'
 import TeacherSubjectDetailsPage from './pages/teacher/TeacherSubjectDetailsPage'
 import TeacherDailyFeesPage from './pages/teacher/TeacherDailyFeesPage'
@@ -217,6 +218,7 @@ export const router = createBrowserRouter([
           { path: 'subjects', element: <StudentSubjectsPage /> },
           { path: 'subjects/:id', element: <StudentSubjectDetailsPage /> },
           { path: 'typing-game', element: <TypingGamePage /> },
+          { path: 'library', element: <StudentLibraryPage /> },
         ],
       },
       {

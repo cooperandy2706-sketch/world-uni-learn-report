@@ -18,7 +18,7 @@ interface GlobalResourceData {
 }
 
 // ── Markdown Components ─────────────────────────────────────
-function MarkdownToolbar({ onClick }: { onClick: (type: string) => void }) {
+function MarkdownToolbar({ onClick, onUpload }: { onClick: (type: string) => void, onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void }) {
   const tools = [
     { label: 'B', type: 'bold', title: 'Bold' },
     { label: 'I', type: 'italic', title: 'Italic' },
@@ -27,10 +27,12 @@ function MarkdownToolbar({ onClick }: { onClick: (type: string) => void }) {
     { label: 'List', type: 'list', title: 'Bullet List' },
     { label: 'Quote', type: 'quote', title: 'Blockquote' },
     { label: 'Divider', type: 'hr', title: 'Horizontal Line' },
+    { label: '🔗 Link', type: 'link', title: 'Insert Link' },
+    { label: '🖼️ Image URL', type: 'image', title: 'Insert Image URL' },
   ]
 
   return (
-    <div style={{ display: 'flex', gap: 6, marginBottom: 12, background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #e2e8f0' }}>
+    <div style={{ display: 'flex', gap: 6, marginBottom: 12, background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #e2e8f0', flexWrap: 'wrap' }}>
       {tools.map(t => (
         <button key={t.type} onClick={() => onClick(t.type)} title={t.title} style={{ 
           background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8,
@@ -40,6 +42,14 @@ function MarkdownToolbar({ onClick }: { onClick: (type: string) => void }) {
           {t.label}
         </button>
       ))}
+      <label style={{ 
+        background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: 8,
+        padding: '6px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s',
+        color: '#065f46', display: 'flex', alignItems: 'center'
+      }} onMouseOver={e=>e.currentTarget.style.background='#d1fae5'} onMouseOut={e=>e.currentTarget.style.background='#ecfdf5'} title="Upload image directly into passage">
+        📁 Upload Image
+        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={onUpload} />
+      </label>
     </div>
   )
 }
@@ -173,6 +183,8 @@ export default function GlobalResourcesPage() {
       case 'list': before = '- '; newSelectionOffset = 2; break
       case 'quote': before = '> '; newSelectionOffset = 2; break
       case 'hr': before = '\n---\n'; newSelectionOffset = 5; break
+      case 'link': before = '[Link Text]('; after = ')'; newSelectionOffset = 2; break
+      case 'image': before = '![Image Alt]('; after = ')'; newSelectionOffset = 2; break
     }
 
     const newVal = fullText.substring(0, start) + before + selected + after + fullText.substring(end)
@@ -183,6 +195,41 @@ export default function GlobalResourcesPage() {
       el.focus()
       el.setSelectionRange(start + newSelectionOffset, end + newSelectionOffset)
     }, 0)
+  }
+
+
+  async function handleInlineImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    toast.loading('Uploading inline image...', { id: 'inlineUpload' })
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `inline_${Math.random()}.${fileExt}`
+      const filePath = `passages/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('learning-materials')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('learning-materials')
+        .getPublicUrl(filePath)
+
+      // Insert markdown string
+      const str = `\\n![Uploaded Image](${publicUrl})\\n`
+      setForm(p => {
+        if (!textareaRef.current) return { ...p, content: p.content + str }
+        const el = textareaRef.current
+        const start = el.selectionStart
+        return { ...p, content: p.content.substring(0, start) + str + p.content.substring(el.selectionEnd) }
+      })
+      toast.success('Image inserted!', { id: 'inlineUpload' })
+    } catch (err: any) {
+      toast.error('Failed to upload image.', { id: 'inlineUpload' })
+    }
   }
 
   // Upload State
@@ -454,7 +501,7 @@ export default function GlobalResourcesPage() {
                   {form.content_type === 'passage' ? (
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                        <Field label="Detailed Educational Passage (Broad writing area)">
-                          <MarkdownToolbar onClick={insertMarkdown} />
+                          <MarkdownToolbar onClick={insertMarkdown} onUpload={handleInlineImageUpload} />
                           <textarea 
                             ref={textareaRef}
                             value={form.content}

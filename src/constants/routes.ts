@@ -48,6 +48,7 @@ export const ROUTES = {
   STUDENT_RESULTS: '/student/results',
   STUDENT_SCHEDULE: '/student/schedule',
   STUDENT_TYPING_GAME: '/student/typing-game',
+  STUDENT_LIBRARY: '/student/library',
 
   // Bursar
   BURSAR_DASHBOARD:  '/bursar/dashboard',

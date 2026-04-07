@@ -122,6 +122,39 @@ export default function AdminGlobalQuizzesPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // ── Submissions panel ──
+  const [submissionsQuiz, setSubmissionsQuiz] = useState<any | null>(null)
+  const [submissions, setSubmissions] = useState<any[]>([])
+  const [subsLoading, setSubsLoading] = useState(false)
+  const [subsSearch, setSubsSearch] = useState('')
+
+  async function openSubmissions(quiz: any) {
+    setSubmissionsQuiz(quiz)
+    setSubsSearch('')
+    setSubsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('global_quiz_submissions')
+        .select(`
+          id, score, total_possible, duration_taken_seconds,
+          student:students(
+            id, student_id,
+            user:users(full_name, email),
+            class:classes(name),
+            school:schools(name)
+          )
+        `)
+        .eq('quiz_id', quiz.id)
+        .order('score', { ascending: false })
+      if (error) throw error
+      setSubmissions(data ?? [])
+    } catch (err: any) {
+      toast.error('Failed to load submissions: ' + err.message)
+    } finally {
+      setSubsLoading(false)
+    }
+  }
+
   // Builder State
   const [form, setForm] = useState<GlobalQuizData>({
     title: '',
@@ -280,14 +313,33 @@ export default function AdminGlobalQuizzesPage() {
     }
   }
 
+  const filteredSubs = submissions.filter(s => {
+    if (!subsSearch) return true
+    const q = subsSearch.toLowerCase()
+    return (
+      s.student?.user?.full_name?.toLowerCase().includes(q) ||
+      s.student?.school?.name?.toLowerCase().includes(q) ||
+      s.student?.class?.name?.toLowerCase().includes(q) ||
+      s.student?.student_id?.toLowerCase().includes(q)
+    )
+  })
+
+  const avgScore = submissions.length
+    ? submissions.reduce((acc, s) => acc + (s.total_possible > 0 ? (s.score / s.total_possible) * 100 : 0), 0) / submissions.length
+    : 0
+
+  const passCount = submissions.filter(s => s.total_possible > 0 && (s.score / s.total_possible) >= 0.5).length
+
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _spin { to{transform:rotate(360deg)} }
         @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes _slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
         .q-card { background: #fff; border: 1.5px solid #f0eefe; border-radius: 14px; padding: 18px; margin-bottom: 16px; position: relative; }
         .q-card:hover { border-color: #7c3aed; }
+        .sub-row:hover { background: #faf5ff !important; }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
@@ -332,10 +384,15 @@ export default function AdminGlobalQuizzesPage() {
                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{q.title}</h3>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18, marginTop: 16 }}>
-                  <div style={{ background: '#faf5ff', borderRadius: 12, padding: '10px 12px' }}>
+                  <button
+                    onClick={() => openSubmissions(q)}
+                    style={{ background: '#faf5ff', borderRadius: 12, padding: '10px 12px', border: '1.5px solid #ede9fe', cursor: 'pointer', textAlign: 'left', transition: 'all .15s' }}
+                    onMouseOver={e => (e.currentTarget.style.background = '#ede9fe')}
+                    onMouseOut={e => (e.currentTarget.style.background = '#faf5ff')}
+                  >
                     <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Submissions</div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{q.submission_count} Students</div>
-                  </div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{q.submission_count} Students 👁</div>
+                  </button>
                   <div style={{ background: '#f0fdf4', borderRadius: 12, padding: '10px 12px' }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
                     <div style={{ fontSize: 14, fontWeight: 800, color: '#059669' }}>{q.content?.questions?.length || 0} items</div>
@@ -358,6 +415,117 @@ export default function AdminGlobalQuizzesPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* ── SUBMISSIONS DRAWER ── */}
+        {submissionsQuiz && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', justifyContent: 'flex-end' }} onClick={(e) => { if (e.target === e.currentTarget) setSubmissionsQuiz(null) }}>
+            <div style={{ width: '100%', maxWidth: 620, background: '#fff', boxShadow: '-20px 0 60px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', animation: '_slideIn .3s cubic-bezier(0.16,1,0.3,1)', overflowY: 'auto' }}>
+              
+              {/* Header */}
+              <div style={{ padding: '24px 28px 20px', borderBottom: '1.5px solid #f0eefe', position: 'sticky', top: 0, background: '#fff', zIndex: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: '#7c3aed', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>📊 Quiz Submissions</div>
+                    <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: '#111827', margin: 0 }}>{submissionsQuiz.title}</h2>
+                    <p style={{ fontSize: 12, color: '#9ca3af', margin: '4px 0 0' }}>Subject: {submissionsQuiz.subject?.name || 'General'} · {submissionsQuiz.content?.questions?.length || 0} Questions</p>
+                  </div>
+                  <button onClick={() => setSubmissionsQuiz(null)} style={{ border: '1.5px solid #e5e7eb', background: '#fff', borderRadius: 10, width: 36, height: 36, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>×</button>
+                </div>
+
+                {/* Stats bar */}
+                {!subsLoading && submissions.length > 0 && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginTop: 16 }}>
+                    {[
+                      { label: 'Total Attempts', value: String(submissions.length), color: '#7c3aed', bg: '#f5f3ff' },
+                      { label: 'Avg Score', value: `${avgScore.toFixed(1)}%`, color: avgScore >= 50 ? '#059669' : '#dc2626', bg: avgScore >= 50 ? '#f0fdf4' : '#fef2f2' },
+                      { label: 'Pass Rate', value: `${Math.round((passCount / submissions.length) * 100)}%`, color: '#f59e0b', bg: '#fffbeb' },
+                    ].map(s => (
+                      <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '10px 14px' }}>
+                        <div style={{ fontSize: 9, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>{s.label}</div>
+                        <div style={{ fontSize: 18, fontWeight: 900, color: s.color }}>{s.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Search */}
+                {submissions.length > 0 && (
+                  <input
+                    type="text" value={subsSearch} onChange={e => setSubsSearch(e.target.value)}
+                    placeholder="Search by name, school, class…"
+                    style={{ width: '100%', boxSizing: 'border-box', marginTop: 12, padding: '9px 14px', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: 13, fontFamily: '"DM Sans",sans-serif', outline: 'none' }}
+                    onFocus={e => e.target.style.borderColor = '#7c3aed'} onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                  />
+                )}
+              </div>
+
+              {/* Body */}
+              <div style={{ flex: 1, padding: '16px 28px 40px' }}>
+                {subsLoading ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#7c3aed', animation: '_spin .8s linear infinite' }} />
+                    <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading student results…</p>
+                  </div>
+                ) : filteredSubs.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                    <div style={{ fontSize: 40, marginBottom: 10 }}>📭</div>
+                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 17, fontWeight: 700, color: '#111827', marginBottom: 6 }}>
+                      {submissions.length === 0 ? 'No submissions yet' : 'No matching students'}
+                    </h3>
+                    <p style={{ fontSize: 13, color: '#9ca3af' }}>
+                      {submissions.length === 0 ? "Students haven't taken this quiz yet." : 'Try a different search.'}
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', marginBottom: 12 }}>
+                      Showing {filteredSubs.length} of {submissions.length} submission{submissions.length !== 1 ? 's' : ''}
+                    </div>
+                    {filteredSubs.map((sub, idx) => {
+                      const pct = sub.total_possible > 0 ? Math.round((sub.score / sub.total_possible) * 100) : 0
+                      const passed = pct >= 50
+                      const mins = sub.duration_taken_seconds ? Math.floor(sub.duration_taken_seconds / 60) : null
+                      const secs = sub.duration_taken_seconds ? sub.duration_taken_seconds % 60 : null
+                      return (
+                        <div key={sub.id} className="sub-row" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 12px', borderRadius: 13, marginBottom: 6, background: '#fafafa', border: '1.5px solid #f0eefe', transition: 'background .12s' }}>
+                          {/* Rank */}
+                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: idx === 0 ? '#fbbf24' : idx === 1 ? '#e5e7eb' : idx === 2 ? '#f59e0b' : '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900, color: idx < 3 ? '#fff' : '#7c3aed', flexShrink: 0 }}>
+                            {idx + 1}
+                          </div>
+                          {/* Avatar */}
+                          <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, color: '#fff', flexShrink: 0 }}>
+                            {(sub.student?.user?.full_name || '?').charAt(0).toUpperCase()}
+                          </div>
+                          {/* Info */}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {sub.student?.user?.full_name || 'Unknown Student'}
+                            </div>
+                            <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>
+                              {[sub.student?.school?.name, sub.student?.class?.name, sub.student?.student_id].filter(Boolean).join(' · ')}
+                            </div>
+                            <div style={{ fontSize: 10, color: '#d1d5db', marginTop: 2 }}>
+                              Submitted
+                              {mins !== null ? ` · ⏱ ${mins}m ${secs}s` : ''}
+                            </div>
+                          </div>
+                          {/* Score */}
+                          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                            <div style={{ fontSize: 16, fontWeight: 900, color: passed ? '#059669' : '#dc2626' }}>{pct}%</div>
+                            <div style={{ fontSize: 10, color: '#9ca3af', fontWeight: 600 }}>{sub.score}/{sub.total_possible} pts</div>
+                            <div style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 99, background: passed ? '#f0fdf4' : '#fef2f2', color: passed ? '#059669' : '#dc2626', marginTop: 3 }}>
+                              {passed ? '✓ Pass' : '✗ Fail'}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 

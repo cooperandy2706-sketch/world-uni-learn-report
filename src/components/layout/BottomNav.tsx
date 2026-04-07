@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Users, FileSpreadsheet, ClipboardCheck, 
   Megaphone, PencilLine, Calendar, Timer, BookOpen, 
   ShieldCheck, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School,
-  CreditCard, Wallet, Gamepad2
+  CreditCard, Wallet, Gamepad2, Library
 } from 'lucide-react'
 
 const adminLinks = [
@@ -40,7 +40,7 @@ const superAdminLinks = [
 const studentLinks = [
   { to: '/student/dashboard', icon: Home, label: 'Portal' },
   { to: '/student/assignments', icon: ClipboardList, label: 'Tasks' },
-  { to: '/student/subjects', icon: BookOpen, label: 'Library' },
+  { to: '/student/library', icon: Library, label: 'Library' },
   { to: '/student/results', icon: BarChart3, label: 'Results' },
   { to: '/student/schedule', icon: Calendar, label: 'Schedule' },
   { to: '/student/typing-game', icon: Gamepad2, label: 'Nitro' },

@@ -232,6 +232,34 @@ export default function StudentDashboard() {
           }}>PLAY NITRO →</Link>
         </div>
 
+        {/* ── Global Library Teaser ── */}
+        <div style={{
+          background: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)',
+          borderRadius: 18, padding: '20px 24px', marginBottom: 22, color: '#fff',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          boxShadow: '0 10px 25px rgba(6, 78, 59, 0.2)', position: 'relative', overflow: 'hidden',
+          animation: '_sfu .5s ease .2s both'
+        }}>
+          <div style={{ position: 'absolute', right: -30, top: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+          <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 20 }}>
+            <div style={{
+              width: 50, height: 50, borderRadius: 14, background: 'linear-gradient(135deg, #6ee7b7, #34d399)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24,
+              boxShadow: '0 0 20px rgba(52, 211, 153, 0.4)'
+            }}>📚</div>
+            <div>
+              <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: 18, fontWeight: 700, margin: '0 0 4px' }}>Global Learning Library</h3>
+              <p style={{ fontSize: 13, opacity: 0.8, margin: 0 }}>Read passages, watch videos & explore study materials published for you.</p>
+            </div>
+          </div>
+          <Link to={ROUTES.STUDENT_LIBRARY} style={{
+            position: 'relative', zIndex: 1, padding: '10px 20px', borderRadius: 12,
+            background: '#fff', color: '#064e3b', fontSize: 13, fontWeight: 800,
+            textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            whiteSpace: 'nowrap',
+          }}>OPEN →</Link>
+        </div>
+
         {/* ── Main Grid ── */}
         <div className="sd-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20 }}>
 
@@ -440,9 +468,10 @@ export default function StudentDashboard() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 {[
-                  { icon: '📊', label: 'My Results', to: ROUTES.STUDENT_RESULTS },
-                  { icon: '📅', label: 'Class Schedule', to: ROUTES.STUDENT_SCHEDULE },
-                  { icon: '📝', label: 'Assignments & Quizzes', to: ROUTES.STUDENT_ASSIGNMENTS },
+                   { icon: '📚', label: 'Global Library', to: ROUTES.STUDENT_LIBRARY },
+                   { icon: '📊', label: 'My Results', to: ROUTES.STUDENT_RESULTS },
+                   { icon: '📅', label: 'Class Schedule', to: ROUTES.STUDENT_SCHEDULE },
+                   { icon: '📝', label: 'Assignments & Quizzes', to: ROUTES.STUDENT_ASSIGNMENTS },
                 ].map(({ icon, label, to }) => (
                   <Link key={label} to={to} className="sd-link"
                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 10, background: '#faf5ff', textDecoration: 'none' }}>

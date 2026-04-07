@@ -12,7 +12,7 @@ import {
   MessageSquare, Trophy, ShieldCheck, LogOut, Book,
   ChevronLeft, ChevronRight, Wallet, Banknote, Receipt, TrendingDown,
   TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag,
-  Package, ShoppingCart, RefreshCcw, Gamepad2
+  Package, ShoppingCart, RefreshCcw, Gamepad2, Library
 } from 'lucide-react'
 
 const adminLinks = [
@@ -70,6 +70,7 @@ const superAdminLinks = [
 const studentLinks = [
   { to: ROUTES.STUDENT_DASHBOARD, label: 'My Portal', icon: LayoutDashboard },
   { to: ROUTES.STUDENT_ASSIGNMENTS, label: 'Assignments', icon: ClipboardList },
+  { to: ROUTES.STUDENT_LIBRARY, label: 'Global Library', icon: Library },
   { to: ROUTES.STUDENT_RESULTS, label: 'Academic Results', icon: BarChart3 },
   { to: ROUTES.STUDENT_SCHEDULE, label: 'My Schedule', icon: Calendar },
   { to: ROUTES.STUDENT_TYPING_GAME, label: 'Typing Nitro', icon: Gamepad2 },
