@@ -9,11 +9,11 @@ export default function TeacherSubjectDetailsPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
-  
+
   const [subject, setSubject] = useState<any>(null)
   const [resources, setResources] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  
+
   // Reading Modal for Text Passages
   const [activePassage, setActivePassage] = useState<any>(null)
 
@@ -88,8 +88,8 @@ export default function TeacherSubjectDetailsPage() {
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', maxWidth: 1200, margin: '0 auto' }}>
-        
-        <button onClick={() => navigate('/teacher/subjects')} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontWeight: 700, cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 99, transition: 'background 0.2s' }} onMouseOver={e=>e.currentTarget.style.background='#f3f4f6'} onMouseOut={e=>e.currentTarget.style.background='transparent'}>
+
+        <button onClick={() => navigate('/teacher/subjects')} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontWeight: 700, cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 99, transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#f3f4f6'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
           ← Back to Library
         </button>
 
@@ -117,80 +117,80 @@ export default function TeacherSubjectDetailsPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
             {Object.entries(groupedResources).map(([topic, items]) => (
               <div key={topic}>
-                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
-                    <h2 style={{ fontSize: 14, fontWeight: 800, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{topic}</h2>
-                    <div style={{ height: 1.5, flex: 1, background: 'linear-gradient(90deg, #ddd6fe, transparent)' }} />
-                 </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+                  <h2 style={{ fontSize: 14, fontWeight: 800, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{topic}</h2>
+                  <div style={{ height: 1.5, flex: 1, background: 'linear-gradient(90deg, #ddd6fe, transparent)' }} />
+                </div>
 
-                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 }}>
-                    {items.map((res, i) => (
-                      <div key={res.id} className="res-card" style={{ animation: `_fadeUp 0.4s ease ${i * 0.05}s both` }}>
-                        
-                        {/* Visual Header based on Content Type or Cover Image */}
-                        <div style={{ 
-                          height: 180, width: '100%', position: 'relative', overflow: 'hidden',
-                          background: res.cover_image_url ? '#000' : (
-                                      res.content_type === 'video' ? '#0f172a' : 
-                                      res.content_type === 'google_doc' ? '#ffffff' :
-                                      res.content_type === 'passage' ? 'linear-gradient(135deg, #fef3c7, #fde68a)' : 
-                                      'linear-gradient(135deg, #e0e7ff, #c7d2fe)' )
-                        }}>
-                           {res.cover_image_url ? (
-                               <img src={res.cover_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                           ) : res.content_type === 'video' ? (
-                              res.content.includes('youtube') || res.content.includes('youtu.be') ? (
-                                 <iframe 
-                                   src={extractEmbedUrl(res.content)} 
-                                   title={res.title} 
-                                   allowFullScreen
-                                   style={{ width: '100%', height: '100%', border: 'none' }}
-                                 />
-                              ) : (
-                                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>▶️</div>
-                              )
-                           ) : res.content_type === 'google_doc' ? (
-                               <iframe 
-                                 src={extractEmbedUrl(res.content)} 
-                                 title={res.title} 
-                                 allowFullScreen
-                                 style={{ width: '100%', height: '100%', border: 'none', background: '#f8fafc' }}
-                               />
-                           ) : res.content_type === 'passage' ? (
-                              <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 50 }}>📄</div>
-                           ) : (
-                              <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 50 }}>🔗</div>
-                           )}
-                           
-                           {/* Type Badge Floating */}
-                           <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: 99, color: '#fff', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                             {res.content_type === 'video' ? '📺 Video' : res.content_type === 'google_doc' ? '📄 Doc' : res.content_type === 'passage' ? '📝 Reading' : '🔗 Link'}
-                           </div>
-                        </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 }}>
+                  {items.map((res, i) => (
+                    <div key={res.id} className="res-card" style={{ animation: `_fadeUp 0.4s ease ${i * 0.05}s both` }}>
 
-                        <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                          <h3 style={{ fontSize: 19, fontWeight: 700, color: '#1e293b', margin: '0 0 8px 0', lineHeight: 1.3 }}>{res.title}</h3>
-                          <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 24px 0', flex: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{res.description}</p>
-                          
-                          {/* Actions */}
-                          {res.content_type === 'google_doc' && (
-                            <a href={res.content} target="_blank" rel="noreferrer" style={{ display: 'block', textAlign: 'center', background: '#f8fafc', border: '1px solid #e2e8f0', color: '#0f172a', padding: '12px', borderRadius: 12, textDecoration: 'none', fontWeight: 700, fontSize: 13, transition: 'all 0.2s' }} onMouseOver={e=>e.currentTarget.style.background='#f1f5f9'} onMouseOut={e=>e.currentTarget.style.background='#f8fafc'}>
-                              View Study Resource 📄
-                            </a>
-                          )}
-                          {res.content_type === 'link' && (
-                            <a href={res.content} target="_blank" rel="noreferrer" style={{ display: 'block', textAlign: 'center', background: '#eff6ff', color: '#2563eb', padding: '12px', borderRadius: 12, textDecoration: 'none', fontWeight: 700, fontSize: 13, transition: 'all 0.2s' }} onMouseOver={e=>e.currentTarget.style.background='#dbeafe'} onMouseOut={e=>e.currentTarget.style.background='#eff6ff'}>
-                              Open Link ↗
-                            </a>
-                          )}
-                          {(res.content_type === 'passage' || res.content_type === 'video') && (
-                            <button onClick={() => setActivePassage(res)} style={{ width: '100%', background: '#1e293b', color: '#fff', padding: '12px', borderRadius: 12, fontWeight: 700, fontSize: 13, cursor: 'pointer', transition: 'all 0.2s', border: 'none' }} onMouseOver={e=>e.currentTarget.style.background='#334155'} onMouseOut={e=>e.currentTarget.style.background='#1e293b'}>
-                              {res.content_type === 'video' ? 'Preview Video 📺' : 'Open Reader 📖'}
-                            </button>
-                          )}
+                      {/* Visual Header based on Content Type or Cover Image */}
+                      <div style={{
+                        height: 180, width: '100%', position: 'relative', overflow: 'hidden',
+                        background: res.cover_image_url ? '#000' : (
+                          res.content_type === 'video' ? '#0f172a' :
+                            res.content_type === 'google_doc' ? '#ffffff' :
+                              res.content_type === 'passage' ? 'linear-gradient(135deg, #fef3c7, #fde68a)' :
+                                'linear-gradient(135deg, #e0e7ff, #c7d2fe)')
+                      }}>
+                        {res.cover_image_url ? (
+                          <img src={res.cover_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : res.content_type === 'video' ? (
+                          res.content.includes('youtube') || res.content.includes('youtu.be') ? (
+                            <iframe
+                              src={extractEmbedUrl(res.content)}
+                              title={res.title}
+                              allowFullScreen
+                              style={{ width: '100%', height: '100%', border: 'none' }}
+                            />
+                          ) : (
+                            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>▶️</div>
+                          )
+                        ) : res.content_type === 'google_doc' ? (
+                          <iframe
+                            src={extractEmbedUrl(res.content)}
+                            title={res.title}
+                            allowFullScreen
+                            style={{ width: '100%', height: '100%', border: 'none', background: '#f8fafc' }}
+                          />
+                        ) : res.content_type === 'passage' ? (
+                          <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 50 }}>📄</div>
+                        ) : (
+                          <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 50 }}>🔗</div>
+                        )}
+
+                        {/* Type Badge Floating */}
+                        <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: 99, color: '#fff', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          {res.content_type === 'video' ? '📺 Video' : res.content_type === 'google_doc' ? '📄 Doc' : res.content_type === 'passage' ? '📝 Reading' : '🔗 Link'}
                         </div>
                       </div>
-                    ))}
-                 </div>
+
+                      <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <h3 style={{ fontSize: 19, fontWeight: 700, color: '#1e293b', margin: '0 0 8px 0', lineHeight: 1.3 }}>{res.title}</h3>
+                        <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 24px 0', flex: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{res.description}</p>
+
+                        {/* Actions */}
+                        {res.content_type === 'google_doc' && (
+                          <a href={res.content} target="_blank" rel="noreferrer" style={{ display: 'block', textAlign: 'center', background: '#f8fafc', border: '1px solid #e2e8f0', color: '#0f172a', padding: '12px', borderRadius: 12, textDecoration: 'none', fontWeight: 700, fontSize: 13, transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#f1f5f9'} onMouseOut={e => e.currentTarget.style.background = '#f8fafc'}>
+                            View Study Resource 📄
+                          </a>
+                        )}
+                        {res.content_type === 'link' && (
+                          <a href={res.content} target="_blank" rel="noreferrer" style={{ display: 'block', textAlign: 'center', background: '#eff6ff', color: '#2563eb', padding: '12px', borderRadius: 12, textDecoration: 'none', fontWeight: 700, fontSize: 13, transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#dbeafe'} onMouseOut={e => e.currentTarget.style.background = '#eff6ff'}>
+                            Open Link ↗
+                          </a>
+                        )}
+                        {(res.content_type === 'passage' || res.content_type === 'video') && (
+                          <button onClick={() => setActivePassage(res)} style={{ width: '100%', background: '#1e293b', color: '#fff', padding: '12px', borderRadius: 12, fontWeight: 700, fontSize: 13, cursor: 'pointer', transition: 'all 0.2s', border: 'none' }} onMouseOver={e => e.currentTarget.style.background = '#334155'} onMouseOut={e => e.currentTarget.style.background = '#1e293b'}>
+                            {res.content_type === 'video' ? 'Preview Video 📺' : 'Open Reader 📖'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -201,11 +201,11 @@ export default function TeacherSubjectDetailsPage() {
           {activePassage && (
             <div style={{ background: '#f8fafc', padding: '24px 32px', borderRadius: 16, border: '1px solid #e2e8f0', minHeight: '300px', maxHeight: '65vh', overflowY: 'auto' }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 12 }}>Curriculum Preview (Markdown)</div>
-              
+
               <div className="markdown-content" style={{ fontFamily: 'Georgia, serif', fontSize: 17, lineHeight: 1.8, color: '#334155' }}>
                 <ReactMarkdown>{activePassage.content}</ReactMarkdown>
               </div>
-              
+
               <div style={{ marginTop: 40, borderTop: '1px solid #e2e8f0', paddingTop: 20, textAlign: 'center' }}>
                 <button onClick={() => setActivePassage(null)} style={{ background: '#111827', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: 10, fontWeight: 700, cursor: 'pointer' }}>Close Reader</button>
               </div>

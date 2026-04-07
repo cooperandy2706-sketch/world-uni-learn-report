@@ -1,5 +1,6 @@
 // src/components/layout/BottomNav.tsx
 import { NavLink, useLocation } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { useAuth } from '../../hooks/useAuth'
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -59,6 +60,7 @@ export default function BottomNav() {
   const location = useLocation()
   const [unread, setUnread] = useState(0)
   const [visible, setVisible] = useState(false)
+  const [isGameFullScreen, setIsGameFullScreen] = useState(false)
 
   // Check if teacher is allowed to collect daily fees
   const { data: collectorAuth, isLoading: loadingAuth } = useQuery({
@@ -85,6 +87,12 @@ export default function BottomNav() {
   }, [])
 
   useEffect(() => {
+    const handler = (e: any) => setIsGameFullScreen(e.detail)
+    window.addEventListener('game-fullscreen-toggle', handler)
+    return () => window.removeEventListener('game-fullscreen-toggle', handler)
+  }, [])
+
+  useEffect(() => {
     if (!isAdmin && user) {
       loadUnread()
       const t = setInterval(loadUnread, 30000)
@@ -101,7 +109,38 @@ export default function BottomNav() {
     setUnread(count ?? 0)
   }
 
-  if (!visible) return null
+  if (!visible && !isGameFullScreen) return null
+
+  if (isGameFullScreen) {
+    return (
+      <nav style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10000,
+        background: 'linear-gradient(90deg, #0a0a1f, #1a1a4b)',
+        borderTop: '1px solid #00f3ff',
+        padding: '16px',
+        paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: '0 -10px 40px rgba(0, 243, 255, 0.3)',
+        fontFamily: '"DM Sans", sans-serif',
+      }}>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+        >
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00f3ff', boxShadow: '0 0 10px #00f3ff' }} />
+          <span style={{ 
+            color: '#00f3ff', fontWeight: 900, fontSize: 13, 
+            letterSpacing: '0.2em', textTransform: 'uppercase',
+            textShadow: '0 0 10px rgba(0, 243, 255, 0.5)'
+          }}>
+            WELL GAME FULL SCREEN
+          </span>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00f3ff', boxShadow: '0 0 10px #00f3ff' }} />
+        </motion.div>
+      </nav>
+    )
+  }
 
 
   return (
