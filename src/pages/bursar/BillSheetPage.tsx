@@ -31,7 +31,7 @@ export default function BillSheetPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from('students')
-        .select('id, full_name, student_id, scholarship_type, scholarship_percentage, guardian_name, guardian_phone, guardian_email, class:classes(id,name)')
+        .select('id, full_name, student_id, scholarship_type, scholarship_percentage, guardian_name, guardian_phone, guardian_email, fees_arrears, class:classes(id,name)')
         .eq('school_id', schoolId)
         .eq('is_active', true)
         .order('full_name')
@@ -284,7 +284,10 @@ export default function BillSheetPage() {
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{(s.class as any)?.name ?? 'No class'} {s.student_id ? `· ${s.student_id}` : ''}</div>
+                    <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2, display: 'flex', justifyContent: 'space-between' }}>
+                      <span>{(s.class as any)?.name ?? 'No class'} {s.student_id ? `· ${s.student_id}` : ''}</span>
+                      {Number(s.fees_arrears) > 0 && <span style={{ color: '#dc2626', fontWeight: 800 }}>{GHS(Number(s.fees_arrears))}</span>}
+                    </div>
                   </div>
                   <ChevronRight size={14} color={selectedStudentId === s.id ? '#6d28d9' : '#d1d5db'} />
                 </div>

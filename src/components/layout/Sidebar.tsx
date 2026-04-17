@@ -12,7 +12,8 @@ import {
   MessageSquare, Trophy, ShieldCheck, LogOut, Book,
   ChevronLeft, ChevronRight, Wallet, Banknote, Receipt, TrendingDown,
   TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag,
-  Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap
+  Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap,
+  Smartphone
 } from 'lucide-react'
 
 const adminLinks = [
@@ -37,6 +38,7 @@ const adminLinks = [
   { to: ROUTES.ADMIN_MESSAGES, label: 'Messages', icon: MessageSquare },
   { to: '/admin/agenda', label: 'Term Agenda', icon: ClipboardList },
   { to: '/admin/admissions', label: 'Admissions', icon: GraduationCap },
+  { to: ROUTES.ADMIN_SMS, label: 'SMS Messaging', icon: Smartphone },
 ]
 
 const teacherLinks = [
@@ -90,6 +92,7 @@ const bursarLinks = [
   { to: ROUTES.BURSAR_EXPENSES, label: 'Expenses', icon: TrendingDown },
   { to: ROUTES.BURSAR_REPORTS, label: 'Financial Reports', icon: FileSpreadsheet },
   { to: ROUTES.BURSAR_ANALYTICS, label: 'Analytics', icon: BarChart3 },
+  { to: ROUTES.BURSAR_SMS, label: 'SMS Reminders', icon: Smartphone },
 ]
 
 // ── Logo Mark ────────────────────────────

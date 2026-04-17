@@ -158,7 +158,7 @@ export default function FeesPage() {
     recordPayment.mutate({
       school_id: schoolId,
       student_id: pf.student_id,
-      fee_structure_id: pf.fee_structure_id || null,
+      fee_structure_id: (pf.fee_structure_id && pf.fee_structure_id !== 'arrears') ? pf.fee_structure_id : null,
       term_id: term?.id ?? null,
       academic_year_id: (year as any)?.id ?? null,
       amount_paid: parseFloat(pf.amount_paid),
@@ -361,14 +361,53 @@ export default function FeesPage() {
                     />
                     <select value={pf.student_id} onChange={e => setPf(p => ({ ...p, student_id: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }}>
                       <option value="">— Select from {filteredStudents.length} {filteredStudents.length === 1 ? 'student' : 'students'} —</option>
-                      {filteredStudents.map((s: any) => <option key={s.id} value={s.id}>{s.full_name} {s.student_id ? `(${s.student_id})` : ''} - {(s.class as any)?.name ?? 'No class'}</option>)}
+                      {filteredStudents.map((s: any) => (
+                        <option key={s.id} value={s.id}>
+                          {s.full_name} {s.student_id ? `(${s.student_id})` : ''} — {(s.class as any)?.name ?? 'No class'} 
+                          {Number(s.fees_arrears) > 0 ? ` (⚠️ Arrears: ${GHS(Number(s.fees_arrears))})` : ''}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 )},
                 { label: 'Fee Type (optional)', children: (
-                  <select value={pf.fee_structure_id} onChange={e => { const s = structures.find((x: any) => x.id === e.target.value) as any; setPf(p => ({ ...p, fee_structure_id: e.target.value, amount_paid: s ? String(s.amount) : p.amount_paid })) }} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}>
+                  <select 
+                    value={pf.fee_structure_id} 
+                    onChange={e => { 
+                      const val = e.target.value;
+                      const s = structures.find((x: any) => x.id === val) as any; 
+                      const selStu = (students as any[]).find((s: any) => s.id === pf.student_id);
+                      
+                      let amt = pf.amount_paid;
+                      if (val === 'arrears' && selStu) {
+                        amt = String(selStu.fees_arrears);
+                      } else if (s) {
+                        amt = String(s.amount);
+                      }
+
+                      setPf(p => ({ ...p, fee_structure_id: val, amount_paid: amt }));
+                    }} 
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}
+                  >
                     <option value="">— General / Custom —</option>
-                    {(structures as any[]).map((s: any) => <option key={s.id} value={s.id}>{s.fee_name} — {GHS(s.amount)} ({s.class?.name})</option>)}
+                    {(() => {
+                      const selStu = (students as any[]).find((s: any) => s.id === pf.student_id);
+                      const filtered = selStu 
+                        ? (structures as any[]).filter((s: any) => s.class_id === selStu.class?.id)
+                        : (structures as any[]);
+                      return (
+                        <>
+                          {selStu && Number(selStu.fees_arrears) > 0 && (
+                            <option value="arrears" style={{ fontWeight: 'bold', color: '#dc2626' }}>
+                              ⚠️ Previous Arrears — {GHS(Number(selStu.fees_arrears))}
+                            </option>
+                          )}
+                          {filtered.map((s: any) => (
+                            <option key={s.id} value={s.id}>{s.fee_name} — {GHS(s.amount)} ({s.class?.name})</option>
+                          ))}
+                        </>
+                      );
+                    })()}
                   </select>
                 )},
                 { label: 'Amount Paid (GH₵)', children: <input type="number" min="0" step="0.01" value={pf.amount_paid} onChange={e => setPf(p => ({ ...p, amount_paid: e.target.value }))} placeholder="0.00" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} /> },
@@ -448,30 +487,56 @@ export default function FeesPage() {
 
         {/* ── FEE STRUCTURES TAB ── */}
         {tab === 'structures' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-            {loadingStructures ? <div style={{ padding: '40px', color: '#9ca3af', fontSize: 13 }}>Loading…</div> : (structures as any[]).length === 0 ? (
-              <div style={{ gridColumn: '1/-1', background: '#fff', borderRadius: 16, padding: '60px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+            {loadingStructures ? (
+              <div style={{ padding: '40px', color: '#9ca3af', fontSize: 13, textAlign: 'center' }}>Loading…</div>
+            ) : (structures as any[]).length === 0 ? (
+              <div style={{ background: '#fff', borderRadius: 16, padding: '60px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                 <Settings size={40} color="#d1d5db" style={{ marginBottom: 12 }} />
                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No fee structures yet</h3>
                 <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>Create fee types for each class and term</p>
                 <Btn onClick={() => setStructureModal(true)}><Plus size={14} /> Create First Fee Type</Btn>
               </div>
-            ) : (structures as any[]).map((s: any) => (
-              <div key={s.id} style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-                  <div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{s.fee_name}</div>
-                    <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{s.class?.name} · {s.term?.name}</div>
+            ) : (() => {
+              // Group structures by class
+              const grouped: Record<string, { name: string; items: any[] }> = {};
+              (structures as any[]).forEach((s: any) => {
+                const cId = s.class_id || 'general';
+                const cName = s.class?.name || 'General Fees';
+                if (!grouped[cId]) grouped[cId] = { name: cName, items: [] };
+                grouped[cId].items.push(s);
+              });
+
+              return Object.entries(grouped).map(([cId, g]) => (
+                <div key={cId}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, padding: '0 4px' }}>
+                    <h3 style={{ fontSize: 14, fontWeight: 800, color: '#111827', margin: 0, textTransform: 'uppercase', letterSpacing: '.05em' }}>{g.name}</h3>
+                    <div style={{ height: 1, flex: 1, background: '#f3f4f6' }} />
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', background: '#f5f3ff', padding: '2px 10px', borderRadius: 99 }}>{g.items.length} types</span>
                   </div>
-                  <button onClick={() => { if (confirm('Delete this fee structure?')) feeStructuresService.delete(s.id).then(() => qc.invalidateQueries({ queryKey: ['fee-structures'] })) }}
-                    style={{ width: 28, height: 28, borderRadius: 7, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Trash2 size={13} />
-                  </button>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                    {g.items.map((s: any) => (
+                      <div key={s.id} style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, position: 'relative', zIndex: 1 }}>
+                          <div>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{s.fee_name}</div>
+                            <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{s.term?.name}</div>
+                          </div>
+                          <button onClick={() => { if (confirm('Delete this fee structure?')) feeStructuresService.delete(s.id).then(() => qc.invalidateQueries({ queryKey: ['fee-structures'] })) }}
+                            style={{ width: 28, height: 28, borderRadius: 7, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                        <div style={{ fontSize: 24, fontWeight: 900, color: '#16a34a', fontFamily: '"Playfair Display",serif', position: 'relative', zIndex: 1 }}>{GHS(s.amount)}</div>
+                        {s.description && <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 6, position: 'relative', zIndex: 1 }}>{s.description}</p>}
+                        {/* Subtle background decoration */}
+                        <div style={{ position: 'absolute', bottom: -10, right: -10, fontSize: 60, opacity: 0.03, pointerEvents: 'none', color: '#6d28d9' }}>💰</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div style={{ fontSize: 24, fontWeight: 900, color: '#16a34a', fontFamily: '"Playfair Display",serif' }}>{GHS(s.amount)}</div>
-                {s.description && <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 6 }}>{s.description}</p>}
-              </div>
-            ))}
+              ));
+            })()}
           </div>
         )}
       </div>

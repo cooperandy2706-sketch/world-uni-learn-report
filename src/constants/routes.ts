@@ -24,6 +24,7 @@ export const ROUTES = {
   ADMIN_ATTENDANCE: '/admin/attendance',
   ADMIN_MESSAGES: '/admin/messages',
   ADMIN_AGENDA: '/admin/agenda',
+  ADMIN_SMS: '/admin/sms',
 
   // Teacher
   TEACHER_DASHBOARD: '/teacher/dashboard',
@@ -62,6 +63,7 @@ export const ROUTES = {
   BURSAR_REPORTS:    '/bursar/reports',
   BURSAR_INVENTORY:  '/bursar/inventory',
   BURSAR_STUDENTS:   '/bursar/students',
+  BURSAR_SMS:        '/bursar/sms',
 
   // Other Staff
   STAFF_DASHBOARD: '/staff/dashboard',

@@ -254,6 +254,7 @@ export default function SettingsPage() {
           {([
             { id: 'school', label: '🏫 School Info' },
             { id: 'report', label: '📄 Report Card' },
+            { id: 'sms', label: '📱 SMS Integration' },
             { id: 'account', label: '👤 Account' },
           ] as const).map(tab => (
             <button key={tab.id} className="tab-btn" onClick={() => setActiveTab(tab.id)}
@@ -322,6 +323,41 @@ export default function SettingsPage() {
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 600, color: '#92400e', marginBottom: 3 }}>Report Card Preview</p>
                     <p style={{ fontSize: 12, color: '#78350f' }}>Go to the <strong>Reports</strong> page, select a class, generate reports, then click the 👁️ icon to preview a student's report card with all footer information.</p>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ── SMS INTEGRATION TAB ── */}
+            {activeTab === 'sms' && (
+              <>
+                <FieldGroup title="SMS Service Status" icon="📱">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                    <div style={{ background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', border: '1.5px solid #86efac', borderRadius: 14, padding: '24px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+                      <h4 style={{ fontSize: 18, fontWeight: 700, color: '#166534', margin: '0 0 8px' }}>Global SMS Service Active</h4>
+                      <p style={{ fontSize: 13, color: '#15803d', margin: 0 }}>
+                        The SMS messaging service is centrally managed and provided by the system developer. 
+                        Your school is currently authorized to send bulk messages and fee reminders.
+                      </p>
+                    </div>
+
+                    <div style={{ padding: '0 10px' }}>
+                      <h4 style={{ fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 12 }}>Usage Information</h4>
+                      <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#4b5563', lineHeight: 1.6 }}>
+                        <li>All messages are sent via the world-uni-learn global Hubtel account.</li>
+                        <li>Each message segment (160 characters) consumes credits from the system pool.</li>
+                        <li>Your school's usage is logged for administrative and billing purposes.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </FieldGroup>
+
+                <div style={{ background: '#fef2f2', border: '1.5px solid #fecaca', borderRadius: 14, padding: '14px 18px', display: 'flex', gap: 12, alignItems: 'center', cursor: 'help' }} title="Contact developer for billing details">
+                  <span style={{ fontSize: 18, flexShrink: 0 }}>💰</span>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: '#991b1b', marginBottom: 2 }}>Pricing & Billing</p>
+                    <p style={{ fontSize: 12, color: '#b91c1c' }}>Contact the system administrator to check your current SMS credit usage or to purchase additional capacity for your school.</p>
                   </div>
                 </div>
               </>

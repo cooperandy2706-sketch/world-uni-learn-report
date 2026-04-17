@@ -63,6 +63,7 @@ import OtherStaffPage from './pages/admin/OtherStaffPage'
 import StaffDashboard from './pages/staff/DashboardPage'
 import TypingGamePage from './pages/shared/TypingGamePage'
 import AdminAdmissions from './pages/admin/AdminAdmissions'
+import SMSPage from './pages/shared/SMSPage'
 
 // Bursar pages
 import BursarDashboard from './pages/bursar/DashboardPage'
@@ -127,7 +128,8 @@ export const router = createBrowserRouter([
           { path: 'bursars', element: <BursarStaffPage /> },
           { path: 'messages', element: <MessagingPage /> },
           { path: 'agenda', element: <AdminAgendaPage /> },
-          { path: 'admissions', element: <AdminAdmissions /> },  // ← NEW
+          { path: 'admissions', element: <AdminAdmissions /> },
+          { path: 'sms', element: <SMSPage /> },
         ],
       },
       {
@@ -147,6 +149,7 @@ export const router = createBrowserRouter([
           { path: 'reports', element: <BursarReportsPage /> },
           { path: 'inventory', element: <BursarInventoryPage /> },
           { path: 'students', element: <BursarStudentsPage /> },
+          { path: 'sms', element: <SMSPage /> },
         ],
       },
       {
