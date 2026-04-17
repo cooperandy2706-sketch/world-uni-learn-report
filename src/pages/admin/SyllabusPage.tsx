@@ -56,7 +56,9 @@ export default function SyllabusPage(){
   }
 
   async function upload(){
-    if(!form.class_id||!form.subject_id||!form.title){toast.error('Fill in all fields');return}
+    if(!form.class_id||!form.title){toast.error('Fill in all fields');return}
+    // subject_id is mandatory only if it's NOT a combined scheme
+    const isCombined = form.subject_id === 'combined';
     if(!form.file){toast.error('Select a file to upload');return}
     setUploading(true)
     try{
@@ -68,7 +70,7 @@ export default function SyllabusPage(){
       const {error:dbErr}=await supabase.from('syllabus').insert({
         school_id:user!.school_id,
         class_id:form.class_id,
-        subject_id:form.subject_id,
+        subject_id:isCombined ? null : form.subject_id,
         term_id:(term as any)?.id,
         title:form.title,
         file_url:publicUrl,
@@ -155,7 +157,11 @@ export default function SyllabusPage(){
                 </div>
                 <div style={{display:'flex',gap:6,marginBottom:12,flexWrap:'wrap'}}>
                   <span style={{fontSize:11,fontWeight:600,padding:'2px 8px',borderRadius:99,background:'#f5f3ff',color:'#6d28d9'}}>{s.class?.name}</span>
-                  <span style={{fontSize:11,fontWeight:600,padding:'2px 8px',borderRadius:99,background:'#eff6ff',color:'#0369a1'}}>{s.subject?.name}</span>
+                  {s.subject ? (
+                    <span style={{fontSize:11,fontWeight:600,padding:'2px 8px',borderRadius:99,background:'#eff6ff',color:'#0369a1'}}>{s.subject.name}</span>
+                  ) : (
+                    <span style={{fontSize:11,fontWeight:700,padding:'2px 10px',borderRadius:99,background:'linear-gradient(135deg,#fae8ff,#f5d0fe)',color:'#a21caf',border:'1px solid #f0abfc'}}>✨ Combined Scheme</span>
+                  )}
                 </div>
                 <div style={{fontSize:11,color:'#9ca3af',marginBottom:12}}>
                   Uploaded by {s.uploader?.full_name??'Admin'} · {new Date(s.created_at).toLocaleDateString('en-GB')}
@@ -195,6 +201,7 @@ export default function SyllabusPage(){
                   <select value={(form as any)[field]} onChange={e=>setForm(f=>({...f,[field]:e.target.value}))}
                     style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',cursor:'pointer'}}>
                     <option value="">Select…</option>
+                    {field==='subject_id' && <option value="combined" style={{fontWeight:700,color:'#7c3aed'}}>📂 Combined Scheme (All Subjects)</option>}
                     {options.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}
                   </select>
                 </div>

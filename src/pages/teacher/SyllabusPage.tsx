@@ -43,7 +43,7 @@ export default function TeacherSyllabusPage() {
     const filtered = syllabus.filter(s => {
         const matchSearch = !search ||
             s.title?.toLowerCase().includes(search.toLowerCase()) ||
-            s.subject?.name?.toLowerCase().includes(search.toLowerCase())
+            (s.subject && s.subject.name?.toLowerCase().includes(search.toLowerCase()))
         const matchClass = !filterClass || s.class_id === filterClass
         return matchSearch && matchClass
     })
@@ -130,7 +130,11 @@ export default function TeacherSyllabusPage() {
                                                     </div>
                                                 </div>
                                                 <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
-                                                    <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: '#eff6ff', color: '#0369a1' }}>{s.subject?.name}</span>
+                                                    {s.subject ? (
+                                                        <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: '#eff6ff', color: '#0369a1' }}>{s.subject.name}</span>
+                                                    ) : (
+                                                        <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 10px', borderRadius: 99, background: 'linear-gradient(135deg,#fae8ff,#f5d0fe)', color: '#a21caf', border: '1px solid #f0abfc' }}>✨ Combined Subject Scheme</span>
+                                                    )}
                                                     <span style={{ fontSize: 11, color: '#9ca3af' }}>by {s.uploader?.full_name ?? 'Admin'}</span>
                                                 </div>
                                                 <div style={{ fontSize: 10, color: '#9ca3af', marginBottom: 12 }}>
