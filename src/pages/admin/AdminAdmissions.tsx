@@ -257,7 +257,10 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
   const { data: suppliesForBanner = [] } = useQuery({
     queryKey: ['supplies', schoolId, selClass, selYear],
     queryFn: async () => {
-      if (!selClass) return [] 
+      if (!selClass) {
+        const { data } = await suppliesService.listAll(schoolId, selYear || null)
+        return data || []
+      }
       const { data } = await suppliesService.listForClass(schoolId, selClass, selYear || null)
       return data || []
     }
@@ -1284,57 +1287,57 @@ function printWelcomePack({ bills, supplies, scholarships, feeStructures = [], c
   <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'DM Sans',sans-serif;color:#111827;background:#fff;padding:40px 48px;font-size:13px;line-height:1.5}
+    body{font-family:'DM Sans',sans-serif;color:#111827;background:#fff;padding:20px 24px;font-size:12px;line-height:1.4}
 
     /* ── Cover strip ── */
-    .cover{background:linear-gradient(135deg,#1e0646 0%,#4c1d95 60%,#1e0646 100%);color:#fff;padding:32px 36px;border-radius:16px;margin-bottom:36px;display:flex;align-items:center;justify-content:space-between}
-    .cover-left .school{font-family:'Playfair Display',serif;font-size:28px;letter-spacing:0.02em}
-    .cover-left .doc-title{font-size:18px;font-weight:800;color:#fbbf24;text-transform:uppercase;letter-spacing:0.1em;margin-top:6px}
-    .cover-left .meta{font-size:12px;color:#c4b5fd;margin-top:6px}
-    .cover-badge{background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.25);border-radius:12px;padding:16px 22px;text-align:center;min-width:140px}
-    .cover-badge .amount{font-size:26px;font-weight:800;color:#fbbf24}
-    .cover-badge .label{font-size:10px;color:#c4b5fd;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
+    .cover{background:linear-gradient(135deg,#1e0646 0%,#4c1d95 60%,#1e0646 100%);color:#fff;padding:16px 22px;border-radius:12px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+    .cover-left .school{font-family:'Playfair Display',serif;font-size:22px;letter-spacing:0.02em}
+    .cover-left .doc-title{font-size:14px;font-weight:800;color:#fbbf24;text-transform:uppercase;letter-spacing:0.1em;margin-top:3px}
+    .cover-left .meta{font-size:11px;color:#c4b5fd;margin-top:3px}
+    .cover-badge{background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.25);border-radius:10px;padding:10px 16px;text-align:center;min-width:120px}
+    .cover-badge .amount{font-size:20px;font-weight:800;color:#fbbf24}
+    .cover-badge .label{font-size:9px;color:#c4b5fd;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px}
 
     /* ── Notice ── */
-    .notice{background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:12px 18px;margin-bottom:28px;font-size:12px;color:#92400e;line-height:1.8}
+    .notice{background:#fffbeb;border:1.5px solid #fde68a;border-radius:8px;padding:7px 14px;margin-bottom:12px;font-size:11px;color:#92400e;line-height:1.6}
 
     /* ── Section headings ── */
-    .section-title{font-family:'Playfair Display',serif;font-size:17px;color:#1e0646;border-bottom:3px solid #1e0646;padding-bottom:8px;margin:28px 0 16px}
-    .category-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-radius:8px 8px 0 0;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em}
+    .section-title{font-family:'Playfair Display',serif;font-size:14px;color:#1e0646;border-bottom:2px solid #1e0646;padding-bottom:4px;margin:14px 0 8px}
+    .category-bar{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;border-radius:6px 6px 0 0;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em}
 
     /* ── Tables ── */
-    table{width:100%;border-collapse:collapse;border:1px solid #e5e7eb;margin-bottom:16px}
-    th{background:#f3f4f6;padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;letter-spacing:0.05em}
-    td{padding:10px 12px;border-bottom:1px solid #f3f4f6;vertical-align:top}
+    table{width:100%;border-collapse:collapse;border:1px solid #e5e7eb;margin-bottom:8px}
+    th{background:#f3f4f6;padding:5px 9px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:#6b7280;letter-spacing:0.05em}
+    td{padding:5px 9px;border-bottom:1px solid #f3f4f6;vertical-align:top}
     tr:last-child td{border-bottom:none}
     .amount-cell{text-align:right;font-weight:700}
-    .badge-opt{font-size:10px;background:#fef3c7;color:#d97706;font-weight:700;padding:2px 7px;border-radius:99px}
-    .badge-req{font-size:10px;background:#d1fae5;color:#059669;font-weight:700;padding:2px 7px;border-radius:99px}
+    .badge-opt{font-size:9px;background:#fef3c7;color:#d97706;font-weight:700;padding:1px 6px;border-radius:99px}
+    .badge-req{font-size:9px;background:#d1fae5;color:#059669;font-weight:700;padding:1px 6px;border-radius:99px}
     .item-name-bold{font-weight:700}
-    .item-desc{font-size:11px;color:#6b7280;margin-top:3px;font-style:italic}
-    .opt-tag{display:inline-block;font-size:9px;background:#fef3c7;color:#d97706;font-weight:700;padding:1px 6px;border-radius:99px;margin-left:6px;vertical-align:middle}
-    .checkbox{width:16px;height:16px;border:1.5px solid #9ca3af;border-radius:3px;display:inline-block;margin:0 auto}
+    .item-desc{font-size:10px;color:#6b7280;margin-top:1px;font-style:italic}
+    .opt-tag{display:inline-block;font-size:9px;background:#fef3c7;color:#d97706;font-weight:700;padding:1px 5px;border-radius:99px;margin-left:4px;vertical-align:middle}
+    .checkbox{width:14px;height:14px;border:1.5px solid #9ca3af;border-radius:3px;display:inline-block;margin:0 auto}
 
     /* ── Totals ── */
-    .total-block{background:#1e0646;color:#fff;padding:14px 20px;border-radius:0 0 10px 10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
-    .total-block .label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a5b4fc}
-    .total-block .value{font-size:22px;font-weight:800;color:#fbbf24}
+    .total-block{background:#1e0646;color:#fff;padding:8px 14px;border-radius:0 0 8px 8px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .total-block .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a5b4fc}
+    .total-block .value{font-size:17px;font-weight:800;color:#fbbf24}
 
     /* ── Scholarships ── */
-    .scholar-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px}
-    .scholar-card{border:1.5px solid #10b98133;border-radius:10px;padding:12px 16px;background:#f0fdf4}
-    .scholar-name{font-weight:700;font-size:13px;color:#065f46}
-    .scholar-type{display:inline-block;padding:2px 10px;border-radius:99px;font-size:10px;font-weight:700;margin-top:4px}
+    .scholar-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+    .scholar-card{border:1.5px solid #10b98133;border-radius:8px;padding:8px 12px;background:#f0fdf4}
+    .scholar-name{font-weight:700;font-size:12px;color:#065f46}
+    .scholar-type{display:inline-block;padding:1px 8px;border-radius:99px;font-size:9px;font-weight:700;margin-top:3px}
 
     /* ── Signature ── */
-    .sig-section{margin-top:36px;border-top:2px dashed #e5e7eb;padding-top:24px}
-    .sig-notice{font-size:12px;color:#374151;line-height:1.8;margin-bottom:20px}
-    .sig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
-    .sig-line{border-top:1.5px solid #374151;padding-top:7px;font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;text-align:center;margin-top:40px}
+    .sig-section{margin-top:18px;border-top:2px dashed #e5e7eb;padding-top:14px}
+    .sig-notice{font-size:11px;color:#374151;line-height:1.6;margin-bottom:12px}
+    .sig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .sig-line{border-top:1.5px solid #374151;padding-top:5px;font-size:9px;font-weight:700;text-transform:uppercase;color:#6b7280;text-align:center;margin-top:30px}
 
     /* ── Divider ── */
     .page-break{page-break-after:always}
-    @media print{body{padding:16px 20px}.page-break{page-break-after:always}}
+    @media print{body{padding:12px 16px}.page-break{page-break-after:always}}
   </style>
   </head><body>
 
@@ -1781,7 +1784,7 @@ export default function AdminAdmissions() {
     queryKey: ['supplies', schoolId, sharedClass, sharedYear],
     queryFn: async () => {
       if (!sharedClass) {
-        const { data } = await suppliesService.list(schoolId, null, sharedYear || null)
+        const { data } = await suppliesService.listAll(schoolId, sharedYear || null)
         return data || []
       }
       // Single query: class-specific supplies UNION school-wide (class_id IS NULL)
