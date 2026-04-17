@@ -12,7 +12,7 @@ import {
   MessageSquare, Trophy, ShieldCheck, LogOut, Book,
   ChevronLeft, ChevronRight, Wallet, Banknote, Receipt, TrendingDown,
   TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag,
-  Package, ShoppingCart, RefreshCcw, Gamepad2, Library
+  Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap
 } from 'lucide-react'
 
 const adminLinks = [
@@ -36,6 +36,7 @@ const adminLinks = [
   { to: ROUTES.ADMIN_ATTENDANCE, label: 'Attendance', icon: ClipboardCheck },
   { to: ROUTES.ADMIN_MESSAGES, label: 'Messages', icon: MessageSquare },
   { to: '/admin/agenda', label: 'Term Agenda', icon: ClipboardList },
+  { to: '/admin/admissions', label: 'Admissions', icon: GraduationCap },
 ]
 
 const teacherLinks = [
@@ -77,18 +78,18 @@ const studentLinks = [
 ]
 
 const bursarLinks = [
-  { to: ROUTES.BURSAR_DASHBOARD,  label: 'Dashboard',   icon: LayoutDashboard },
-  { to: ROUTES.BURSAR_STUDENTS,   label: 'Students',    icon: Users },
-  { to: ROUTES.BURSAR_FEES,       label: 'School Fees',  icon: CreditCard },
-  { to: '/bursar/daily-fees',     label: 'Daily Fees',   icon: Wallet },
-  { to: ROUTES.BURSAR_INVENTORY,  label: 'School Store', icon: ShoppingBag },
-  { to: ROUTES.BURSAR_DEBTORS,    label: 'Debtors List', icon: AlertCircle },
-  { to: ROUTES.BURSAR_BILL_SHEET, label: 'Bill Sheet',   icon: FileText },
-  { to: ROUTES.BURSAR_PAYROLL,    label: 'Payroll',      icon: Wallet },
-  { to: ROUTES.BURSAR_INCOME,     label: 'Income',       icon: TrendingUp },
-  { to: ROUTES.BURSAR_EXPENSES,   label: 'Expenses',     icon: TrendingDown },
-  { to: ROUTES.BURSAR_REPORTS,    label: 'Financial Reports', icon: FileSpreadsheet },
-  { to: ROUTES.BURSAR_ANALYTICS,  label: 'Analytics',    icon: BarChart3 },
+  { to: ROUTES.BURSAR_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
+  { to: ROUTES.BURSAR_STUDENTS, label: 'Students', icon: Users },
+  { to: ROUTES.BURSAR_FEES, label: 'School Fees', icon: CreditCard },
+  { to: '/bursar/daily-fees', label: 'Daily Fees', icon: Wallet },
+  { to: ROUTES.BURSAR_INVENTORY, label: 'School Store', icon: ShoppingBag },
+  { to: ROUTES.BURSAR_DEBTORS, label: 'Debtors List', icon: AlertCircle },
+  { to: ROUTES.BURSAR_BILL_SHEET, label: 'Bill Sheet', icon: FileText },
+  { to: ROUTES.BURSAR_PAYROLL, label: 'Payroll', icon: Wallet },
+  { to: ROUTES.BURSAR_INCOME, label: 'Income', icon: TrendingUp },
+  { to: ROUTES.BURSAR_EXPENSES, label: 'Expenses', icon: TrendingDown },
+  { to: ROUTES.BURSAR_REPORTS, label: 'Financial Reports', icon: FileSpreadsheet },
+  { to: ROUTES.BURSAR_ANALYTICS, label: 'Analytics', icon: BarChart3 },
 ]
 
 // ── Logo Mark ────────────────────────────
@@ -113,7 +114,7 @@ function LogoMark() {
 
 export default function Sidebar() {
   const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
-  
+
   // Check if teacher is allowed to collect daily fees
   const { data: collectorAuth, isLoading: loadingAuth } = useQuery({
     queryKey: ['daily-fee-auth', user?.id],
@@ -152,7 +153,7 @@ export default function Sidebar() {
   }, [user?.id, isStudent, isBursar])
 
   let links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : teacherLinks
-  
+
   // Hide daily collections from unauthorized teachers
   if (isTeacher && !loadingAuth && !collectorAuth) {
     links = links.filter(l => l.label !== 'Daily Collections')

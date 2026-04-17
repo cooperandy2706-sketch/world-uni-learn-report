@@ -62,6 +62,7 @@ import TeacherAgendaPage from './pages/teacher/AgendaPage'
 import OtherStaffPage from './pages/admin/OtherStaffPage'
 import StaffDashboard from './pages/staff/DashboardPage'
 import TypingGamePage from './pages/shared/TypingGamePage'
+import AdminAdmissions from './pages/admin/AdminAdmissions'
 
 // Bursar pages
 import BursarDashboard from './pages/bursar/DashboardPage'
@@ -126,6 +127,7 @@ export const router = createBrowserRouter([
           { path: 'bursars', element: <BursarStaffPage /> },
           { path: 'messages', element: <MessagingPage /> },
           { path: 'agenda', element: <AdminAgendaPage /> },
+          { path: 'admissions', element: <AdminAdmissions /> },  // ← NEW
         ],
       },
       {
@@ -133,18 +135,18 @@ export const router = createBrowserRouter([
         element: <AppLayout requiredRole="bursar" />,
         children: [
           { index: true, element: <Navigate to="/bursar/dashboard" replace /> },
-          { path: 'dashboard',  element: <BursarDashboard /> },
-          { path: 'fees',       element: <BursarFeesPage /> },
+          { path: 'dashboard', element: <BursarDashboard /> },
+          { path: 'fees', element: <BursarFeesPage /> },
           { path: 'daily-fees', element: <BursarDailyFeesPage /> },
-          { path: 'debtors',    element: <BursarDebtorsPage /> },
-          { path: 'payroll',    element: <BursarPayrollPage /> },
-          { path: 'income',     element: <BursarIncomePage /> },
-          { path: 'expenses',   element: <BursarExpensesPage /> },
-          { path: 'analytics',  element: <BursarAnalyticsPage /> },
+          { path: 'debtors', element: <BursarDebtorsPage /> },
+          { path: 'payroll', element: <BursarPayrollPage /> },
+          { path: 'income', element: <BursarIncomePage /> },
+          { path: 'expenses', element: <BursarExpensesPage /> },
+          { path: 'analytics', element: <BursarAnalyticsPage /> },
           { path: 'bill-sheet', element: <BursarBillSheetPage /> },
-          { path: 'reports',    element: <BursarReportsPage /> },
-          { path: 'inventory',  element: <BursarInventoryPage /> },
-          { path: 'students',   element: <BursarStudentsPage /> },
+          { path: 'reports', element: <BursarReportsPage /> },
+          { path: 'inventory', element: <BursarInventoryPage /> },
+          { path: 'students', element: <BursarStudentsPage /> },
         ],
       },
       {
@@ -182,26 +184,11 @@ export const router = createBrowserRouter([
           { index: true, element: <Navigate to="/super-admin/dashboard" replace /> },
           { path: 'dashboard', element: <SuperAdminDashboard /> },
           { path: 'schools', element: <SuperAdminDashboard /> },
-          {
-            path: 'quizzes',
-            element: <GlobalQuizzesPage />,
-          },
-          {
-            path: 'messaging',
-            element: <MessagingPage />,
-          },
-          {
-            path: 'analytics',
-            element: <GlobalAnalyticsPage />,
-          },
-          {
-            path: 'resources',
-            element: <GlobalResourcesPage />,
-          },
-          {
-            path: 'subjects',
-            element: <PlatformSubjectsPage />,
-          },
+          { path: 'quizzes', element: <GlobalQuizzesPage /> },
+          { path: 'messaging', element: <MessagingPage /> },
+          { path: 'analytics', element: <GlobalAnalyticsPage /> },
+          { path: 'resources', element: <GlobalResourcesPage /> },
+          { path: 'subjects', element: <PlatformSubjectsPage /> },
         ],
       },
       {

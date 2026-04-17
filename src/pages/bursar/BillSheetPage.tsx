@@ -46,11 +46,14 @@ export default function BillSheetPage() {
       (s.student_id && s.student_id.toLowerCase().includes(studentSearch.toLowerCase()))
     ), [students, studentSearch])
 
-  // Load bill data for selected student
+  // Load bill data for selected student.
+  // staleTime: 0 ensures we always fetch fresh data when the user returns from
+  // viewing a different term — prevents stale fees_arrears from poisoning the bill.
   const { data: billData, isLoading: loadingBill } = useQuery({
     queryKey: ['bill-sheet', selectedStudentId, term?.id],
     queryFn: () => billSheetService.getStudentBillData(selectedStudentId, term?.id!, schoolId),
     enabled: !!selectedStudentId && !!term?.id && !!schoolId,
+    staleTime: 0,
   })
 
   const selectedStudent = (students as any[]).find((s: any) => s.id === selectedStudentId)

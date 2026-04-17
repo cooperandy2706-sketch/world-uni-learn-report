@@ -27,6 +27,8 @@ export default function DebtorsPage() {
 
 
 
+  // staleTime: 0 — always refetch when navigating back from a different term
+  // so that fees_arrears is never served from stale cache.
   const { data: students = [] } = useQuery({
     queryKey: ['students-class-debt', selectedClass, schoolId],
     queryFn: async () => {
@@ -36,6 +38,7 @@ export default function DebtorsPage() {
       return data ?? []
     },
     enabled: !!schoolId,
+    staleTime: 0,
   })
 
   const { data: structures = [] } = useQuery({

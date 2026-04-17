@@ -66,11 +66,13 @@ export default function FeesPage() {
     enabled: !!schoolId,
   })
 
-  // Students
+  // Students — staleTime: 0 ensures fees_arrears is always fresh when returning
+  // from an old-term view, so the arrears banner / allocation preview is correct.
   const { data: students = [] } = useQuery({
     queryKey: ['students-all', schoolId],
     queryFn: async () => { const { data } = await supabase.from('students').select('id, full_name, student_id, scholarship_type, scholarship_percentage, fees_arrears, class:classes(id,name)').eq('school_id', schoolId).eq('is_active', true).order('full_name'); return data ?? [] },
     enabled: !!schoolId,
+    staleTime: 0,
   })
 
   const filteredStudents = useMemo(() => {

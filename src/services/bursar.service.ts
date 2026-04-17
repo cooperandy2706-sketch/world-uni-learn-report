@@ -437,10 +437,34 @@ export const billSheetService = {
     // Tuition payments (includes both arrears and current term payments)
     const tuitionPaid = payments.reduce((s: number, p: any) => s + (p.amount_paid || 0), 0)
 
-    // Arrears
-    // student.fees_arrears is the CURRENT balance. To show a term bill, we need the arrears at start of term.
-    const arrearsPaidThisTerm = payments.reduce((s: number, p: any) => s + Number(p.arrears_paid || 0), 0)
-    const startingArrears = Number(student?.fees_arrears || 0) + arrearsPaidThisTerm
+    // Arrears — reconstruct the opening arrears balance for THIS specific term.
+    //
+    // ⚠️  DO NOT use student.fees_arrears directly here. That field is a single
+    //     mutable number representing the student's CURRENT live arrears balance.
+    //     It becomes wrong for historical terms because later payments have already
+    //     reduced it, making the bill for an old term show inflated or incorrect arrears.
+    //
+    // CORRECT approach: read the opening arrears from the payment history.
+    //   • Sort term payments by date (ascending) → first payment.
+    //   • openingArrears = firstPayment.arrears_paid + firstPayment.arrears_balance_after
+    //     (= the arrears balance that existed BEFORE the first payment of this term)
+    //   • If there are no payments this term: fall back to student.fees_arrears
+    //     (only safe for the current / most-recent open term).
+    let startingArrears = 0
+    if (payments.length > 0) {
+      // Sort ascending by payment_date to find the earliest payment this term.
+      const sortedPayments = [...payments].sort(
+        (a: any, b: any) => new Date(a.payment_date).getTime() - new Date(b.payment_date).getTime()
+      )
+      const firstPayment = sortedPayments[0]
+      // The arrears balance BEFORE the first payment = arrears_paid + arrears_balance_after
+      startingArrears = Number(firstPayment.arrears_paid || 0) + Number(firstPayment.arrears_balance_after || 0)
+    } else {
+      // No payments yet this term — use the current live balance.
+      // This is only accurate for the current/open term; for old closed terms
+      // with no payments the arrears would genuinely be 0.
+      startingArrears = Number(student?.fees_arrears || 0)
+    }
 
     // Totals
     const totalCharges = startingArrears + netTuition + expectedFeeding + expectedStudies
