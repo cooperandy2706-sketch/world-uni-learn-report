@@ -116,11 +116,27 @@ export default function ScoreEntryPage() {
     if (!selectedClass || !teacherRecord?.id || !term?.id) return
     setLoading(true)
 
-    // Subjects the teacher is assigned for this class
-    const assignedSubjects = assignments
+    const isClassTeacher = assignments.some((a:any) => a.class?.id === selectedClass && a.is_class_teacher)
+    let assignedSubjects: Subject[] = assignments
       .filter((a:any) => a.class?.id === selectedClass)
       .map((a:any) => a.subject)
       .filter(Boolean) as Subject[]
+
+    if (isClassTeacher) {
+      const { data: allAssignments } = await supabase
+        .from('teacher_assignments')
+        .select('subject:subjects(id,name,code)')
+        .eq('class_id', selectedClass)
+        .eq('term_id', term!.id)
+      
+      const distinctSubjects = new Map()
+      allAssignments?.forEach((a:any) => {
+        if (a.subject) distinctSubjects.set(a.subject.id, a.subject)
+      })
+      // Ensure the subjects they were directly assigned are also included just in case
+      assignedSubjects.forEach(s => distinctSubjects.set(s.id, s))
+      assignedSubjects = Array.from(distinctSubjects.values()) as Subject[]
+    }
 
     // Students in the class
     const { data: stds } = await supabase
@@ -130,13 +146,12 @@ export default function ScoreEntryPage() {
       .eq('is_active', true)
       .order('full_name')
 
-    // All scores for this teacher/class/term
+    // All scores for this class/term (regardless of who entered them, so class teachers see everything)
     const { data: existingScores } = await supabase
       .from('scores')
-      .select('student_id,subject_id,class_score,exam_score,teacher_remarks,is_submitted')
+      .select('student_id,subject_id,class_score,exam_score,teacher_remarks,is_submitted,teacher_id')
       .eq('class_id', selectedClass)
       .eq('term_id', term!.id)
-      .eq('teacher_id', teacherRecord.id)
 
     // Build score map
     const map: ScoreMap = {}

@@ -35,6 +35,7 @@ export default function SyllabusPage(){
   const [modalOpen,setModalOpen]=useState(false)
   const [form,setForm]=useState({class_id:'',subject_id:'',title:'',file:null as File|null})
   const [selectedClass,setSelectedClass]=useState('')
+  const [viewingFile, setViewingFile] = useState<{ url: string, name: string } | null>(null)
 
   useEffect(()=>{load()},[selectedClass,term?.id])
   useEffect(()=>{ loadSubjects() },[])
@@ -56,9 +57,9 @@ export default function SyllabusPage(){
   }
 
   async function upload(){
-    if(!form.class_id||!form.title){toast.error('Fill in all fields');return}
-    // subject_id is mandatory only if it's NOT a combined scheme
     const isCombined = form.subject_id === 'combined';
+    if(!form.title){toast.error('Title is required');return}
+    if(!isCombined && !form.class_id){toast.error('Class is required');return}
     if(!form.file){toast.error('Select a file to upload');return}
     setUploading(true)
     try{
@@ -69,7 +70,7 @@ export default function SyllabusPage(){
       const {data:{publicUrl}}=supabase.storage.from('syllabus').getPublicUrl(path)
       const {error:dbErr}=await supabase.from('syllabus').insert({
         school_id:user!.school_id,
-        class_id:form.class_id,
+        class_id:isCombined ? null : form.class_id,
         subject_id:isCombined ? null : form.subject_id,
         term_id:(term as any)?.id,
         title:form.title,
@@ -98,7 +99,7 @@ export default function SyllabusPage(){
     load()
   }
 
-  const filtered=selectedClass?syllabus.filter(s=>s.class_id===selectedClass):syllabus
+  const filtered=selectedClass?syllabus.filter(s=>s.class_id===selectedClass || s.class_id===null):syllabus
 
   return(
     <>
@@ -156,7 +157,11 @@ export default function SyllabusPage(){
                   </div>
                 </div>
                 <div style={{display:'flex',gap:6,marginBottom:12,flexWrap:'wrap'}}>
-                  <span style={{fontSize:11,fontWeight:600,padding:'2px 8px',borderRadius:99,background:'#f5f3ff',color:'#6d28d9'}}>{s.class?.name}</span>
+                  {!s.class_id ? (
+                      <span style={{fontSize:11,fontWeight:700,padding:'2px 8px',borderRadius:99,background:'#fef3c7',color:'#d97706'}}>🌍 All Classes</span>
+                  ) : (
+                      <span style={{fontSize:11,fontWeight:600,padding:'2px 8px',borderRadius:99,background:'#f5f3ff',color:'#6d28d9'}}>{s.class?.name}</span>
+                  )}
                   {s.subject ? (
                     <span style={{fontSize:11,fontWeight:600,padding:'2px 8px',borderRadius:99,background:'#eff6ff',color:'#0369a1'}}>{s.subject.name}</span>
                   ) : (
@@ -167,10 +172,10 @@ export default function SyllabusPage(){
                   Uploaded by {s.uploader?.full_name??'Admin'} · {new Date(s.created_at).toLocaleDateString('en-GB')}
                 </div>
                 <div style={{display:'flex',gap:6}}>
-                  <a href={s.file_url} target="_blank" rel="noreferrer"
-                    style={{flex:1,padding:'7px',borderRadius:8,border:'1.5px solid #ddd6fe',background:'#f5f3ff',color:'#6d28d9',fontSize:12,fontWeight:600,textAlign:'center',textDecoration:'none',display:'block'}}>
+                  <button onClick={() => setViewingFile({ url: s.file_url, name: s.title })}
+                    style={{flex:1,padding:'7px',borderRadius:8,border:'1.5px solid #ddd6fe',background:'#f5f3ff',color:'#6d28d9',fontSize:12,fontWeight:600,textAlign:'center',cursor:'pointer',display:'block'}}>
                     👁️ View
-                  </a>
+                  </button>
                   <a href={s.file_url} download={s.file_name}
                     style={{flex:1,padding:'7px',borderRadius:8,border:'1.5px solid #ddd6fe',background:'#f5f3ff',color:'#6d28d9',fontSize:12,fontWeight:600,textAlign:'center',textDecoration:'none',display:'block'}}>
                     ⬇️ Download
@@ -193,7 +198,7 @@ export default function SyllabusPage(){
             <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:19,fontWeight:700,color:'#111827',marginBottom:18}}>📤 Upload Syllabus</h3>
             <div style={{display:'flex',flexDirection:'column',gap:14}}>
               {[
-                {label:'Class *',field:'class_id',options:(classes as any[]).map(c=>({id:c.id,name:c.name}))},
+                {label:'Class',field:'class_id',options:(classes as any[]).map(c=>({id:c.id,name:c.name}))},
                 {label:'Subject *',field:'subject_id',options:subjects.map(s=>({id:s.id,name:s.name}))},
               ].map(({label,field,options})=>(
                 <div key={field}>
@@ -224,6 +229,24 @@ export default function SyllabusPage(){
               <Btn onClick={upload} loading={uploading}>📤 Upload</Btn>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Document Viewer Modal */}
+      {viewingFile && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.75)', display: 'flex', flexDirection: 'column', zIndex: 9999, backdropFilter: 'blur(4px)', animation: '_syl_fi .2s ease' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', background: '#111827', color: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,.3)' }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontFamily: '"DM Sans",sans-serif', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{viewingFile.name}</h3>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                    <a href={viewingFile.url} download target="_blank" rel="noreferrer" style={{ color: '#d1d5db', textDecoration: 'none', fontSize: 14, fontWeight: 600, padding: '6px 12px', borderRadius: 6, background: 'rgba(255,255,255,.1)' }}>
+                        ⬇️ Download
+                    </a>
+                    <button onClick={() => setViewingFile(null)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 28, cursor: 'pointer', lineHeight: 1, padding: 0 }}>&times;</button>
+                </div>
+            </div>
+            <div style={{ flex: 1, background: '#e5e7eb', overflow: 'hidden' }}>
+                <iframe src={viewingFile.url} style={{ width: '100%', height: '100%', border: 'none' }} title={viewingFile.name} />
+            </div>
         </div>
       )}
     </>

@@ -12,6 +12,7 @@ export default function TeacherSyllabusPage() {
     const [search, setSearch] = useState('')
     const [filterClass, setFilterClass] = useState('')
     const [classes, setClasses] = useState<any[]>([])
+    const [viewingFile, setViewingFile] = useState<{ url: string, name: string } | null>(null)
 
     useEffect(() => { if (user && term) load() }, [user, term])
 
@@ -31,7 +32,7 @@ export default function TeacherSyllabusPage() {
         const [{ data: syl }, { data: cls }] = await Promise.all([
             supabase.from('syllabus')
                 .select('*, class:classes(id,name), subject:subjects(id,name), uploader:users(full_name)')
-                .in('class_id', classIds)
+                .or(`class_id.in.(${classIds.join(',')}),class_id.is.null`)
                 .order('created_at', { ascending: false }),
             supabase.from('classes').select('id,name').in('id', classIds).order('name'),
         ])
@@ -44,15 +45,25 @@ export default function TeacherSyllabusPage() {
         const matchSearch = !search ||
             s.title?.toLowerCase().includes(search.toLowerCase()) ||
             (s.subject && s.subject.name?.toLowerCase().includes(search.toLowerCase()))
-        const matchClass = !filterClass || s.class_id === filterClass
+        const matchClass = !filterClass || s.class_id === filterClass || s.class_id === null
         return matchSearch && matchClass
     })
 
     // Group by class
+    const generalItems = filtered.filter(s => s.class_id === null)
     const grouped = classes.map(c => ({
         class: c,
         items: filtered.filter(s => s.class_id === c.id),
     })).filter(g => g.items.length > 0)
+
+    const groupedGroups: Array<{ class: { id: string | null, name: string }, items: any[] }> = []
+    if (generalItems.length > 0) {
+        groupedGroups.push({
+            class: { id: null, name: '🌍 School-Wide / All Classes' },
+            items: generalItems
+        })
+    }
+    grouped.forEach(g => groupedGroups.push(g))
 
     return (
         <>
@@ -101,11 +112,11 @@ export default function TeacherSyllabusPage() {
                     </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                        {grouped.map(({ class: cls, items }) => (
-                            <div key={cls.id}>
+                        {groupedGroups.map(({ class: cls, items }) => (
+                            <div key={cls.id || 'general'}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#7c3aed' }} />
-                                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: '#1e1b4b', margin: 0 }}>
+                                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: cls.id ? '#7c3aed' : '#d97706' }} />
+                                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: cls.id ? '#1e1b4b' : '#92400e', margin: 0 }}>
                                         {cls.name}
                                     </h3>
                                     <span style={{ fontSize: 11, color: '#9ca3af' }}>{items.length} file{items.length !== 1 ? 's' : ''}</span>
@@ -141,10 +152,10 @@ export default function TeacherSyllabusPage() {
                                                     Uploaded {new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                 </div>
                                                 <div style={{ display: 'flex', gap: 6 }}>
-                                                    <a href={s.file_url} target="_blank" rel="noreferrer"
-                                                        style={{ flex: 1, padding: '7px', borderRadius: 8, border: '1.5px solid #ddd6fe', background: '#f5f3ff', color: '#6d28d9', fontSize: 12, fontWeight: 600, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
+                                                    <button onClick={() => setViewingFile({ url: s.file_url, name: s.title })}
+                                                        style={{ flex: 1, padding: '7px', borderRadius: 8, border: '1.5px solid #ddd6fe', background: '#f5f3ff', color: '#6d28d9', fontSize: 12, fontWeight: 600, textAlign: 'center', cursor: 'pointer', display: 'block' }}>
                                                         👁️ View
-                                                    </a>
+                                                    </button>
                                                     <a href={s.file_url} download={s.file_name}
                                                         style={{ flex: 1, padding: '7px', borderRadius: 8, border: '1.5px solid #ddd6fe', background: '#f5f3ff', color: '#6d28d9', fontSize: 12, fontWeight: 600, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
                                                         ⬇️ Download
@@ -159,6 +170,24 @@ export default function TeacherSyllabusPage() {
                     </div>
                 )}
             </div>
+
+            {/* Document Viewer Modal */}
+            {viewingFile && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.75)', display: 'flex', flexDirection: 'column', zIndex: 9999, backdropFilter: 'blur(4px)', animation: '_syl_fi .2s ease' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', background: '#111827', color: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,.3)' }}>
+                        <h3 style={{ margin: 0, fontSize: 16, fontFamily: '"DM Sans",sans-serif', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{viewingFile.name}</h3>
+                        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                            <a href={viewingFile.url} download target="_blank" rel="noreferrer" style={{ color: '#d1d5db', textDecoration: 'none', fontSize: 14, fontWeight: 600, padding: '6px 12px', borderRadius: 6, background: 'rgba(255,255,255,.1)' }}>
+                                ⬇️ Download
+                            </a>
+                            <button onClick={() => setViewingFile(null)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 28, cursor: 'pointer', lineHeight: 1, padding: 0 }}>&times;</button>
+                        </div>
+                    </div>
+                    <div style={{ flex: 1, background: '#e5e7eb', overflow: 'hidden' }}>
+                        <iframe src={viewingFile.url} style={{ width: '100%', height: '100%', border: 'none' }} title={viewingFile.name} />
+                    </div>
+                </div>
+            )}
         </>
     )
 }

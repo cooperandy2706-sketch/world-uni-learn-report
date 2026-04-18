@@ -27,6 +27,7 @@ const teacherLinks = [
   { to: '/teacher/attendance', icon: ClipboardCheck, label: 'Register' },
   { to: '/teacher/daily-fees', icon: CreditCard, label: 'Fees' },
   { to: '/teacher/messages', icon: MessageSquare, label: 'Messages', notify: true },
+  { to: '/teacher/syllabus', icon: BookOpen, label: 'Syllabus' },
   { to: '/teacher/typing-game', icon: Gamepad2, label: 'Nitro' },
 ]
 
