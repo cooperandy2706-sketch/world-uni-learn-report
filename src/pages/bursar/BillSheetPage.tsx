@@ -10,6 +10,14 @@ import { Printer, FileText, Search, GraduationCap, AlertCircle, CheckCircle2, Ch
 
 const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
 
+const CREST_SVG = `
+  <svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="28" cy="28" r="26" fill="none" stroke="#4c1d95" stroke-width="1.5"/>
+    <polygon points="28,9 32.5,21.5 46,21.5 35,29 39,42 28,34 17,42 21,29 10,21.5 23.5,21.5"
+      fill="none" stroke="#4c1d95" stroke-width="1.3" stroke-linejoin="round"/>
+    <circle cx="28" cy="28" r="4.5" fill="#4c1d95" opacity="0.75"/>
+  </svg>`
+
 export default function BillSheetPage() {
   const { user } = useAuth()
   const schoolId = user?.school_id ?? ''
@@ -135,8 +143,8 @@ export default function BillSheetPage() {
     }
 
     const logoHtml = school?.logo_url
-      ? '<img src="' + school.logo_url + '" alt="School Logo" />'
-      : '<div style="width:72px;height:72px;border-radius:12px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#6d28d9">' + (school?.name ?? 'S').charAt(0) + '</div>'
+      ? `<img src="${school.logo_url}" alt="School Logo" style="width: 72px; height: 72px; border-radius: 12px; object-fit: contain; border: 1.5px solid #ede9fe; padding: 4px; background: #fff;" />`
+      : `<div style="width:72px;height:72px;border-radius:12px;background:#f5f3ff;display:flex;align-items:center;justify-content:center;border:1.5px solid #ede9fe;">${CREST_SVG}</div>`
 
     const scholarshipBadge = d.scholarship.type !== 'none'
       ? ' <span class="scholarship-badge">\u{1F393} ' + (d.scholarship.type === 'full' ? 'Full' : d.scholarship.percentage + '%') + ' Scholarship</span>'
@@ -152,62 +160,70 @@ export default function BillSheetPage() {
 
     const html = [
       '<!DOCTYPE html><html><head><title>Fee Statement \u2014 ' + stu.full_name + '</title>',
+      '<link rel="preconnect" href="https://fonts.googleapis.com">',
+      '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
+      '<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">',
       '<style>',
       '* { margin:0; padding:0; box-sizing:border-box; }',
-      'body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; padding: 32px; max-width: 780px; margin: 0 auto; color: #1f2937; }',
-      '.header { display: flex; align-items: center; gap: 20px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 3px solid #1e0646; }',
-      '.header img { width: 72px; height: 72px; border-radius: 12px; object-fit: cover; }',
-      '.school-name { font-size: 22px; font-weight: 800; color: #1e0646; margin-bottom: 2px; }',
-      '.school-sub { font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: .1em; }',
-      '.doc-title { text-align: center; font-size: 16px; font-weight: 800; color: #1e0646; text-transform: uppercase; letter-spacing: .15em; margin: 20px 0; padding: 10px; background: #f8fafc; border-radius: 8px; }',
-      '.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }',
-      '.info-box { background: #f8fafc; border-radius: 10px; padding: 14px 16px; }',
-      '.info-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #6b7280; margin-bottom: 4px; }',
-      '.info-val { font-size: 14px; font-weight: 700; color: #111827; }',
-      '.info-val-sm { font-size: 12px; color: #374151; }',
-      '.section { margin-bottom: 22px; }',
-      '.section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: #6d28d9; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid #ede9fe; }',
+      'body { font-family: "DM Sans", sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; color: #111827; background: #f8fafc; }',
+      '.container { background: #fff; border-radius: 16px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; overflow: hidden; }',
+      '.watermark { position: absolute; top: 15%; left: 50%; transform: translate(-50%, -15%) rotate(-15deg); font-size: 100px; font-weight: 900; color: rgba(76, 29, 149, 0.02); pointer-events: none; z-index: 0; text-transform: uppercase; white-space: nowrap; }',
+      '.content { position: relative; z-index: 1; }',
+      '.header { display: flex; align-items: center; gap: 24px; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #4c1d95; }',
+      '.school-info { flex: 1; }',
+      '.school-name { font-family: "Playfair Display", serif; font-size: 24px; font-weight: 900; color: #1e0646; margin-bottom: 4px; }',
+      '.school-sub { font-size: 11px; color: #6b7280; font-weight: 500; }',
+      '.doc-title { text-align: center; font-size: 12px; font-weight: 900; color: #4c1d95; text-transform: uppercase; letter-spacing: .2em; margin-bottom: 32px; background: #f5f3ff; padding: 8px; border-radius: 8px; }',
+      '.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }',
+      '.info-box { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 12px; padding: 16px; }',
+      '.info-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: #6b7280; margin-bottom: 6px; }',
+      '.info-val { font-size: 15px; font-weight: 700; color: #111827; }',
+      '.info-val-sm { font-size: 11px; color: #6b7280; margin-top: 2px; }',
+      '.section { margin-bottom: 28px; }',
+      '.section-title { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .15em; color: #4c1d95; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #ede9fe; }',
       'table { width: 100%; border-collapse: collapse; }',
-      '.fee-table th { padding:10px 14px; text-align:left; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6d28d9; background:#faf5ff; }',
-      '.fee-table th:last-child { text-align:right; }',
-      '.subtotal { background:#faf5ff; font-weight:800; } .subtotal td { padding:10px 14px; font-size:14px; }',
-      '.grand-total { border-top:3px solid #1e0646; } .grand-total td { padding:14px; font-size:16px; font-weight:900; }',
-      '.status-badge { display:inline-block; padding:6px 20px; border-radius:99px; font-size:13px; font-weight:800; letter-spacing:.06em; }',
-      '.scholarship-badge { display:inline-block; background:#f0fdf4; color:#16a34a; padding:4px 12px; border-radius:99px; font-size:11px; font-weight:700; margin-left:8px; }',
-      '.footer { margin-top:30px; padding-top:16px; border-top:1px solid #e5e7eb; text-align:center; font-size:10px; color:#9ca3af; }',
-      '.signature-row { display:grid; grid-template-columns: 1fr 1fr; gap:40px; margin-top:40px; }',
-      '.sig-line { border-top: 1px solid #1f2937; padding-top: 6px; font-size: 11px; color: #6b7280; text-align:center; }',
-      '@media print { body { padding: 16px; } }',
+      '.fee-table th { padding:12px 16px; text-align:left; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:#fff; background:#4c1d95; }',
+      '.fee-table th:first-child { border-radius: 8px 0 0 0; }',
+      '.fee-table th:last-child { border-radius: 0 8px 0 0; text-align:right; }',
+      '.fee-table td { padding:12px 16px; font-size:13px; border-bottom:1px solid #f1f5f9; }',
+      '.subtotal { background:#f8fafc; font-weight:700; }',
+      '.grand-total-box { background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 12px; padding: 24px; color: #fff; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(76, 29, 149, 0.15); }',
+      '.grand-label { font-size: 11px; font-weight: 700; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }',
+      '.grand-val { font-size: 28px; font-weight: 900; }',
+      '.status-badge { display:inline-block; padding:8px 24px; border-radius:99px; font-size:12px; font-weight:900; letter-spacing:.1em; text-transform: uppercase; }',
+      '.footer { margin-top:40px; padding-top:24px; border-top:1px dashed #cbd5e1; text-align:center; font-size:10px; color:#9ca3af; line-height: 1.6; }',
+      '.signature-row { display:grid; grid-template-columns: 1fr 1fr; gap:60px; margin-top:48px; }',
+      '.sig-line { border-top: 1.5px solid #111827; padding-top: 8px; font-size: 11px; font-weight: 700; color: #111827; text-align:center; }',
+      '@media print { body { padding: 0; background: #fff; } .container { box-shadow: none; padding: 20px; } }',
       '</style></head><body>',
-      '<div class="header">' + logoHtml + '<div>',
-      '<div class="school-name">' + (school?.name ?? 'School') + '</div>',
-      '<div class="school-sub">' + (school?.address ?? '') + '</div>',
-      '<div class="school-sub">' + (school?.phone ?? '') + (school?.email ? ' \u00B7 ' + school.email : '') + '</div>',
+      '<div class="container">',
+      '<div class="watermark">' + (school?.name?.split(' ')[0] || 'STATEMENT') + '</div>',
+      '<div class="content">',
+      '<div class="header">' + logoHtml + '<div class="school-info">',
+      '<div class="school-name">' + (school?.name || 'School') + '</div>',
+      '<div class="school-sub">📍 ' + (school?.address || '') + '</div>',
+      '<div class="school-sub">📞 ' + (school?.phone || '') + (school?.email ? ' &middot; ✉️ ' + school.email : '') + '</div>',
       '</div></div>',
-      '<div class="doc-title">Student Fee Statement</div>',
+      '<div class="doc-title">Official Student Fee Statement</div>',
       '<div class="info-grid">',
-      '<div class="info-box"><div class="info-label">Student Name</div><div class="info-val">' + stu.full_name + scholarshipBadge + '</div><div class="info-val-sm" style="margin-top:4px">ID: ' + (stu.student_id ?? '\u2014') + ' \u00B7 Class: ' + ((stu.class as any)?.name ?? '\u2014') + '</div></div>',
-      '<div class="info-box"><div class="info-label">Guardian / Parent</div><div class="info-val">' + (stu.guardian_name ?? '\u2014') + '</div><div class="info-val-sm" style="margin-top:4px">' + (stu.guardian_phone ?? '') + (stu.guardian_email ? ' \u00B7 ' + stu.guardian_email : '') + '</div></div>',
-      '<div class="info-box"><div class="info-label">Academic Term</div><div class="info-val">' + (term?.name ?? '\u2014') + '</div><div class="info-val-sm" style="margin-top:4px">' + ((year as any)?.name ?? '') + '</div></div>',
-      '<div class="info-box"><div class="info-label">Statement Date</div><div class="info-val">' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div><div class="info-val-sm" style="margin-top:4px">Ref: BILL-' + (stu.student_id || stu.id?.slice(0, 6).toUpperCase()) + '</div></div>',
+      '<div class="info-box"><div class="info-label">Student Information</div><div class="info-val">' + stu.full_name + scholarshipBadge + '</div><div class="info-val-sm">ID: ' + (stu.student_id || stu.id?.slice(0, 8).toUpperCase()) + ' | Class: ' + ((stu.class as any)?.name || 'N/A') + '</div></div>',
+      '<div class="info-box"><div class="info-label">Billing Period</div><div class="info-val">' + (term?.name || 'Academic Term') + '</div><div class="info-val-sm">' + ((year as any)?.name || '') + ' | Statements Ref: #' + (stu.student_id || stu.id?.slice(0, 6).toUpperCase()) + '</div></div>',
       '</div>',
-      '<div class="section"><div class="section-title">Fee Charges</div>',
-      '<table class="fee-table"><thead><tr><th>Fee Item</th><th style="text-align:right">Amount</th></tr></thead>',
-      '<tbody>' + arrearsRow + (feeRows || (customRows && !arrearsRow ? '' : '<tr><td colspan="2" style="padding:14px;text-align:center;color:#9ca3af;font-size:12px">No fee structures defined for this class</td></tr>')) + customRows,
-      tuitionSubtotal + scholarshipRow + '</tbody></table></div>',
+      '<div class="section"><div class="section-title">Tuition & Term Charges</div>',
+      '<table class="fee-table"><thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead>',
+      '<tbody>' + arrearsRow + (feeRows || '<tr><td colspan="2" style="padding:16px;text-align:center;color:#9ca3af;font-size:12px">No specific fee structures recorded</td></tr>') + customRows + scholarshipRow + '</tbody>',
+      '<tfoot><tr class="subtotal"><td>Subtotal Charges</td><td style="text-align:right">' + GHS(grandTotalCharges) + '</td></tr></tfoot></table></div>',
       dailySection,
-      '<div class="section"><div class="section-title">Payments Received</div>',
-      '<table class="fee-table"><thead><tr><th>Date</th><th>Description</th><th>Method</th><th style="text-align:right">Amount</th></tr></thead>',
+      '<div class="section"><div class="section-title">Payments & Credits</div>',
+      '<table class="fee-table"><thead><tr><th>Date</th><th>Item</th><th>Method</th><th style="text-align:right">Paid</th></tr></thead>',
       '<tbody>' + paymentRows + '</tbody>' + paymentsFooter + '</table></div>',
-      '<table style="margin-bottom:24px"><tbody>',
-      '<tr style="background:#faf5ff"><td style="padding:10px 14px;font-size:13px;font-weight:700;color:#374151">Total Charges</td><td style="padding:10px 14px;text-align:right;font-weight:800;font-size:14px">' + GHS(grandTotalCharges) + '</td></tr>',
-      '<tr style="background:#f0fdf4"><td style="padding:10px 14px;font-size:13px;font-weight:700;color:#16a34a">Total Paid</td><td style="padding:10px 14px;text-align:right;font-weight:800;font-size:14px;color:#16a34a">\u2212 ' + GHS(d.summary.totalPaid) + '</td></tr>',
-      '<tr class="grand-total"><td style="color:#1e0646">BALANCE DUE</td><td style="text-align:right;color:' + (grandBalance > 0 ? '#dc2626' : '#16a34a') + '">' + GHS(grandBalance) + '</td></tr>',
-      '</tbody></table>',
-      '<div style="text-align:center;margin-bottom:24px"><span class="status-badge" style="background:' + st.bg + ';color:' + st.color + '">' + st.label + '</span></div>',
-      '<div class="signature-row"><div><div class="sig-line">Bursar\'s Signature / Date</div></div><div><div class="sig-line">Parent / Guardian\'s Signature</div></div></div>',
-      '<div class="footer"><p>This is an official fee statement issued by ' + (school?.name ?? 'the school') + '.</p><p>For enquiries, contact the bursary office' + (school?.phone ? ' at ' + school.phone : '') + '.</p></div>',
-      '<script>window.print()<\/script>',
+      '<div class="grand-total-box"><div><div class="grand-label">Current Balance Outstanding</div><div class="grand-val">' + GHS(grandBalance) + '</div></div>',
+      '<div><div class="status-badge" style="background:' + st.bg + ';color:' + st.color + '">' + st.label + '</div></div></div>',
+      '<div class="signature-row"><div><div style="height:40px"></div><div class="sig-line">Bursar\'s Approval / Stamp</div></div><div><div style="height:40px"></div><div class="sig-line">Parent / Guardian Signature</div></div></div>',
+      '<div class="footer"><p>This is an electronically generated official document. <br/> For clarifications, please visit the bursary office or call ' + (school?.phone || 'the school') + '.</p>',
+      '<p style="margin-top:8px">&copy; ' + new Date().getFullYear() + ' ' + (school?.name || 'School System') + '. All Rights Reserved.</p></div>',
+      '</div></div>',
+      '<script>setTimeout(() => window.print(), 500)<\/script>',
       '</body></html>',
     ].join('\n')
 

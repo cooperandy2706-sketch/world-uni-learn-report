@@ -234,11 +234,50 @@ export default function TeacherAttendancePage() {
 
         @media (max-width: 640px) {
           .att-grid-header { display: none !important; }
-          .att-row { flex-direction: column !important; align-items: stretch !important; gap: 14px !important; padding: 18px !important; }
-          .att-row-mark { width: 100% !important; justify-content: space-between !important; }
-          .att-row-stats { width: 100% !important; justify-content: flex-start !important; border-top: 1px solid #f3f4f6; padding-top: 10px; margin-top: 4px; }
+          .att-list { 
+            display: grid !important; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+            gap: 16px !important;
+          }
+          .att-row { 
+            flex-direction: column !important; 
+            align-items: stretch !important; 
+            gap: 16px !important; 
+            padding: 20px !important; 
+            border-radius: 16px !important;
+            border: 1.5px solid #f0eefe !important;
+            box-shadow: 0 4px 12px rgba(109,40,217,.04) !important;
+          }
+          .att-row-mark { 
+            width: 100% !important; 
+            justify-content: space-between !important; 
+            gap: 10px !important;
+          }
+          .att-btn {
+            flex: 1 !important;
+            padding: 12px 8px !important;
+            height: auto !important;
+          }
+          .att-row-stats { 
+            width: 100% !important; 
+            justify-content: space-between !important; 
+            border-top: 1px dashed #f1f5f9; 
+            padding-top: 12px; 
+            margin-top: 4px; 
+          }
           .att-header-right { width: 100%; justify-content: center; }
-          .att-submit-bar { flex-direction: column; align-items: stretch !important; gap: 14px; }
+          .att-submit-bar { 
+            position: sticky;
+            bottom: 20px;
+            z-index: 50;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            padding: 16px;
+            border-radius: 20px;
+            border: 1.5px solid #ede9fe;
+            box-shadow: 0 10px 30px rgba(109,40,217,0.15);
+            margin-bottom: 20px;
+          }
         }
       `}</style>
 
@@ -373,7 +412,7 @@ export default function TeacherAttendancePage() {
                 )}
               </div>
 
-              <div>
+              <div className="att-list">
                 {students.map((s, i) => {
                   const mark = marks[s.id] ?? 'present'
                   const totals = termTotals[s.id]
@@ -413,26 +452,31 @@ export default function TeacherAttendancePage() {
 
                       {/* Mark buttons (only if not submitted today) */}
                       {!submittedToday && (
-                        <div className="att-row-mark" style={{ display: 'flex', gap: 6, width: 220, justifyContent: 'center' }}>
-                          {([
-                            { m: 'present' as Mark, label: '✓ Present', active: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
-                            { m: 'absent' as Mark, label: '✗ Absent', active: '#dc2626', bg: '#fef2f2', border: '#fca5a5' },
-                            { m: 'late' as Mark, label: '⏳ Late', active: '#d97706', bg: '#fffbeb', border: '#fde68a' },
+                        <div className="att-row-mark" style={{ display: 'flex', gap: 8, width: 220, justifyContent: 'center' }}>
+                          {( [
+                            { m: 'present' as Mark, label: 'Present', icon: '✓', active: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
+                            { m: 'absent' as Mark, label: 'Absent', icon: '✗', active: '#dc2626', bg: '#fef2f2', border: '#fca5a5' },
+                            { m: 'late' as Mark, label: 'Late', icon: '⏳', active: '#d97706', bg: '#fffbeb', border: '#fde68a' },
                           ]).map(opt => (
                             <button
                               key={opt.m}
                               className="att-btn"
                               onClick={() => setMark(s.id, opt.m)}
                               style={{
-                                padding: '5px 10px',
-                                fontSize: 11,
+                                padding: '8px 12px',
+                                fontSize: 12,
                                 background: mark === opt.m ? opt.active : opt.bg,
                                 color: mark === opt.m ? '#fff' : opt.active,
                                 border: `1.5px solid ${opt.border}`,
-                                boxShadow: mark === opt.m ? `0 2px 6px ${opt.active}30` : 'none',
+                                boxShadow: mark === opt.m ? `0 2px 8px ${opt.active}40` : 'none',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: 2
                               }}
                             >
-                              {opt.label}
+                              <span style={{ fontSize: 16 }}>{opt.icon}</span>
+                              <span style={{ fontSize: 10, fontWeight: 900 }}>{opt.label}</span>
                             </button>
                           ))}
                         </div>

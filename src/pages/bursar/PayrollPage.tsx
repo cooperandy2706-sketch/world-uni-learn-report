@@ -13,6 +13,14 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveCont
 
 const GHS = (n: number) => `GH₵ ${Number(n || 0).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
 
+const CREST_SVG = `
+  <svg width="48" height="48" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="28" cy="28" r="26" fill="none" stroke="#4c1d95" stroke-width="1.5"/>
+    <polygon points="28,9 32.5,21.5 46,21.5 35,29 39,42 28,34 17,42 21,29 10,21.5 23.5,21.5"
+      fill="none" stroke="#4c1d95" stroke-width="1.3" stroke-linejoin="round"/>
+    <circle cx="28" cy="28" r="4.5" fill="#4c1d95" opacity="0.75"/>
+  </svg>`
+
 function Btn({ children, onClick, variant = 'primary', disabled, style }: any) {
   const [h, setH] = useState(false)
   const v: any = {
@@ -141,26 +149,28 @@ export default function PayrollPage() {
     const win = window.open('', '_blank', 'width=300,height=600')
     if (!win) return
     win.document.write(`<html><head><style>
-      body{font-family:monospace;padding:10px;width:80mm;margin:0;font-size:11px}
-      .c{text-align:center}.hr{border-top:1px dashed #000;margin:8px 0}.b{font-weight:bold}
-      table{width:100%;border-collapse:collapse}td{padding:2px 0}
-      .net{font-size:14px;margin-top:8px;border:1px solid #000;padding:4px;display:block}
-    </style></head><body onload="window.print()">
-      <div class="c b">${school?.name?.toUpperCase() || 'PAYSLIP'}</div>
-      <div class="c">${school?.address || ''}</div>
+      body{font-family:monospace;padding:20px;width:80mm;margin:0;font-size:12px;color:#000}
+      .c{text-align:center}.hr{border-top:1px dashed #000;margin:10px 0}.b{font-weight:bold}
+      table{width:100%;border-collapse:collapse}td{padding:4px 0}
+      .school{font-size:14px;margin-bottom:2px}
+      .mode{font-size:10px;margin-top:10px;text-transform:uppercase;letter-spacing:1px}
+    </style></head><body onload="setTimeout(() => window.print(), 500)">
+      <div class="c b school">${school?.name?.toUpperCase() || 'OFFICIAL PAYSLIP'}</div>
+      <div class="c" style="font-size:10px">${school?.address || ''}</div>
       <div class="hr"></div>
-      <div class="b">PAYMENT RECEIPT</div>
-      <div>Staff: ${row.user?.full_name || 'Staff Member'}</div>
+      <div class="c b" style="font-size:11px;margin-bottom:10px">PAYMENT RECEIPT</div>
+      <div>Staff: <span class="b">${row.user?.full_name || 'Staff Member'}</span></div>
       <div>Date: ${row.paid_date || format(new Date(), 'dd/MM/yyyy')}</div>
       <div class="hr"></div>
       <table>
-        <tr><td>${desc}</td><td align="right">${GHS(net)}</td></tr>
+        <tr><td>${desc}</td><td align="right" class="b">${GHS(net)}</td></tr>
       </table>
       <div class="hr"></div>
-      <div>Mode: ${(row.payment_method || 'CASH').toUpperCase()}</div>
-      ${row.bank_reference ? `<div>Ref: ${row.bank_reference}</div>` : ''}
+      <div class="b">Total Paid: ${GHS(net)}</div>
+      <div class="mode">Mode: ${(row.payment_method || 'CASH').toUpperCase()}</div>
+      ${row.bank_reference ? `<div style="font-size:9px">Ref: ${row.bank_reference}</div>` : ''}
       <div class="hr"></div>
-      <div class="c">Thank You!</div>
+      <div class="c" style="font-size:10px">Powered by World-Uni Learn</div>
     </body></html>`)
     win.document.close()
   }
@@ -170,44 +180,80 @@ export default function PayrollPage() {
     const desc = type === 'monthly' ? `Monthly Salary` : row.description || `${type} Allowance`;
     const win = window.open('', '_blank', 'width=800,height=900')
     if (!win) return
-    win.document.write(`<html><head><style>
-      body{font-family:'Inter',sans-serif;padding:40px;color:#1e293b;background:#fff}
-      .header{display:flex;justify-content:space-between;border-bottom:2px solid #1e0646;padding-bottom:20px;margin-bottom:30px}
-      .school-name{font-size:24px;font-weight:900;color:#1e0646;margin:0}
-      .box{border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:20px;background:#f8fafc}
-      .grid{display:grid;grid-template-columns:1fr 1fr;gap:40px}
-      table{width:100%;border-collapse:collapse}th{text-align:left;font-size:11px;text-transform:uppercase;color:#64748b;padding-bottom:10px}
-      td{padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:14px}
-    </style></head><body onload="window.print()">
-      <div class="header">
-        <div>
-          <div class="school-name">${school?.name || 'School System'}</div>
-          <div style="font-size:13px;color:#64748b;margin-top:4px">${school?.address || ''}</div>
+    const logoHtml = school?.logo_url 
+      ? `<img src="${school.logo_url}" style="width: 72px; height: 72px; border-radius: 50%; object-fit: contain; border: 1.5px solid #ede9fe; padding: 4px; background: #fff;" />`
+      : CREST_SVG
+
+    win.document.write(`<html><head><title>Payslip - ${row.user?.full_name}</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+      <style>
+        body{font-family:'DM Sans',sans-serif;padding:60px;color:#1e293b;background:#f8fafc;min-height:100vh;display:flex;justify-content:center;align-items:flex-start}
+        .container{width:100%;max-width:800px;background:#fff;padding:50px;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.04);position:relative;overflow:hidden}
+        .watermark{position:absolute;top:20%;left:50%;transform:translate(-50%,-20%) rotate(-15deg);font-size:100px;font-weight:900;color:rgba(76,29,149,0.02);white-space:nowrap;pointer-events:none;z-index:0}
+        .content{position:relative;z-index:1}
+        .header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #4c1d95;padding-bottom:25px;margin-bottom:40px}
+        .school-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#1e0646;margin:0}
+        .box{border:1px solid #f1f5f9;border-radius:16px;padding:24px;margin-bottom:30px;background:#f8fafc;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+        .box div b{display:block;font-size:10px;text-transform:uppercase;color:#64748b;letter-spacing:0.1em;margin-bottom:6px}
+        .box div span{font-size:18px;font-weight:800;color:#111827}
+        table{width:100%;border-collapse:collapse}
+        th{text-align:left;font-size:11px;text-transform:uppercase;color:#64748b;padding-bottom:15px;letter-spacing:0.1em;border-bottom:1px solid #e2e8f0}
+        td{padding:15px 0;border-bottom:1px solid #f1f5f9;font-size:14px;color:#334155}
+        .total-row{margin-top:50px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#4c1d95,#2e1065);padding:24px 30px;border-radius:16px;color:#fff;box-shadow:0 8px 20px rgba(76,29,149,0.15)}
+        .total-row .val{font-size:28px;font-weight:900}
+        .footer{margin-top:60px;text-align:center;font-size:10px;color:#94a3b8;border-top:1px dashed #e2e8f0;padding-top:20px}
+        @media print{body{padding:0;background:#fff} .container{box-shadow:none;border-radius:0;padding:20px}}
+      </style></head><body onload="setTimeout(() => window.print(), 500)">
+      <div class="container">
+        <div class="watermark">OFFICIAL PAYSLIP</div>
+        <div class="content">
+          <div class="header">
+            <div style="display:flex;align-items:center;gap:20px">
+              ${logoHtml}
+              <div>
+                <div class="school-name">${school?.name || 'School System'}</div>
+                <div style="font-size:13px;color:#64748b;margin-top:4px">📍 ${school?.address || ''}</div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="text-transform:uppercase;font-size:11px;font-weight:900;color:#6d28d9;letter-spacing:0.2em;background:#f5f3ff;padding:6px 12px;border-radius:6px">Salary Voucher</div>
+              <div style="font-size:16px;font-weight:700;margin-top:8px;color:#111827">${month}</div>
+            </div>
+          </div>
+          <div class="box">
+            <div><b>Employee Name</b><span>${row.user?.full_name}</span></div>
+            <div style="text-align:right"><b>Process Status</b><span style="color:#059669">COMPLETED</span></div>
+            <div><b>Payment Date</b><span>${row.paid_date || format(new Date(), 'dd MMMM yyyy')}</span></div>
+            <div style="text-align:right"><b>Method</b><span style="text-transform:uppercase">${row.payment_method || 'Cash'}</span></div>
+          </div>
+          <table><thead><tr><th>Description of Payment</th><th align="right">Amount Allocated</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600">${desc}</td><td align="right" style="font-weight:800;color:#111827">${GHS(net)}</td></tr>
+            </tbody>
+          </table>
+          <div class="total-row">
+            <div>
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;opacity:0.8;margin-bottom:4px">Net Amount Disbursed</div>
+              <div class="val">${GHS(net)}</div>
+            </div>
+            <div style="text-align:right">
+              ${row.bank_reference ? `<div style="font-size:12px;opacity:0.9">Ref: ${row.bank_reference}</div>` : ''}
+              <div style="font-size:10px;text-transform:uppercase;margin-top:4px;opacity:0.7">${new Date().toLocaleString()}</div>
+            </div>
+          </div>
+          <div style="margin-top:60px;display:grid;grid-template-columns:1fr 1fr;gap:60px">
+            <div style="border-top:1.5px solid #111827;padding-top:10px;text-align:center;font-size:11px;font-weight:700">Accountant / Bursar Signature</div>
+            <div style="border-top:1.5px solid #111827;padding-top:10px;text-align:center;font-size:11px;font-weight:700">Employee Signature</div>
+          </div>
+          <div class="footer">
+            This is an electronically generated document. &copy; ${new Date().getFullYear()} ${school?.name || 'School System'}
+          </div>
         </div>
-        <div style="text-align:right">
-          <div style="text-transform:uppercase;font-size:12px;font-weight:800;color:#6d28d9">Payment Voucher</div>
-          <div style="font-size:16px;font-weight:700;margin-top:4px">${month}</div>
-        </div>
-      </div>
-      <div class="box">
-        <div class="grid">
-          <div><div style="font-size:11px;color:#64748b;font-weight:700">EMPLOYEE</div><div style="font-size:18px;font-weight:900">${row.user?.full_name}</div></div>
-          <div style="text-align:right"><div style="font-size:11px;color:#64748b;font-weight:700">STATUS</div><div style="font-size:16px;font-weight:800;color:#059669">PAID</div></div>
-        </div>
-      </div>
-      <table><thead><tr><th>Description</th><th align="right">Amount</th></tr></thead>
-        <tbody>
-          <tr><td>${desc}</td><td align="right">${GHS(net)}</td></tr>
-        </tbody>
-      </table>
-      <div style="margin-top:40px;border-top:2px solid #f1f5f9;padding-top:20px;display:flex;justify-content:space-between">
-        <div>
-          <div style="font-size:12px;color:#64748b">Payment Method: <b>${(row.payment_method||'Cash').toUpperCase()}</b></div>
-          ${row.bank_reference ? `<div style="font-size:12px;color:#64748b">Ref: ${row.bank_reference}</div>` : ''}
-        </div>
-        <div style="font-size:18px;font-weight:900;color:#059669">TOTAL: ${GHS(net)}</div>
       </div>
     </body></html>`)
+    win.document.close()
   }
 
   // Renderers

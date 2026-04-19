@@ -14,7 +14,6 @@ const schema = z.object({
   school_name: z.string().min(1, 'School name is required'),
   school_motto: z.string().optional(),
   school_email: z.string().email('Invalid email').optional().or(z.literal('')),
-  school_phone: z.string().optional(),
   school_address: z.string().optional(),
   headteacher_name: z.string().optional(),
   next_term_date: z.string().optional(),
@@ -290,8 +289,8 @@ export default function SettingsPage() {
                       <StyledInput {...register('school_phone')} placeholder="030 000 0000" />
                     </Field>
                     <div style={{ gridColumn: '1 / -1' }}>
-                      <Field label="Physical Address">
-                        <StyledInput {...register('school_address')} placeholder="School physical address" />
+                      <Field label="School Address / P.O. Box">
+                        <StyledInput {...register('school_address')} placeholder="e.g. P.O. Box 000, Accra, Ghana" />
                       </Field>
                     </div>
                   </div>
@@ -345,7 +344,7 @@ export default function SettingsPage() {
                     <div style={{ padding: '0 10px' }}>
                       <h4 style={{ fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 12 }}>Usage Information</h4>
                       <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#4b5563', lineHeight: 1.6 }}>
-                        <li>All messages are sent via the world-uni-learn global Hubtel account.</li>
+                        <li>All messages are sent via the world-uni-learn global Africa's Talking account.</li>
                         <li>Each message segment (160 characters) consumes credits from the system pool.</li>
                         <li>Your school's usage is logged for administrative and billing purposes.</li>
                       </ul>

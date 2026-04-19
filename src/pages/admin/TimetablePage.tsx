@@ -169,7 +169,13 @@ export default function TimetablePage() {
   }, [subjects])
 
   useEffect(() => { loadPeriods(); loadSubjectsTeachers() }, [])
-  useEffect(() => { if (selectedClass && (term as any)?.id) loadSlots() }, [selectedClass, (term as any)?.id])
+  useEffect(() => { if (selectedClass && (term as any)?.id) loadSlots() }, [selectedClass, mergedClasses, (term as any)?.id])
+
+  // Clear merged classes when swapping class selector to prevent state leakage
+  useEffect(() => {
+    setMergedClasses([])
+    setPendingMerged([])
+  }, [selectedClass])
 
   // ── Data loaders ──
   async function loadPeriods() {
@@ -190,10 +196,12 @@ export default function TimetablePage() {
 
   async function loadSlots() {
     setLoading(true)
+    const targetClasses = [selectedClass, ...mergedClasses].filter(Boolean)
     const [{ data: sl }, { data: asgn }] = await Promise.all([
       supabase.from('timetable_slots')
         .select('*,subject:subjects(id,name),teacher:teachers(id,user:users(full_name)),period:timetable_periods(id,name,start_time,end_time)')
-        .eq('class_id', selectedClass).eq('term_id', (term as any).id),
+        .in('class_id', targetClasses)
+        .eq('term_id', (term as any).id),
       supabase.from('teacher_assignments')
         .select('teacher:teachers(id,user:users(full_name))')
         .eq('class_id', selectedClass).eq('term_id', (term as any).id),
@@ -206,7 +214,7 @@ export default function TimetablePage() {
   }
 
   function getSlot(day: number, periodId: string) {
-    return slots.find(s => s.day_of_week === day && s.period_id === periodId)
+    return slots.find(s => s.day_of_week === day && s.period_id === periodId && s.class_id === selectedClass)
   }
 
   function openEdit(day: number, periodId: string) {
@@ -224,8 +232,8 @@ export default function TimetablePage() {
     const targetClasses = [selectedClass, ...mergedClasses]
 
     if (editForm.subject_id === '') {
-      // Clear slot in all merged classes
-      const ids = slots.filter(s => s.day_of_week === editing.day && s.period_id === editing.period_id).map(s => s.id)
+      // Clear slot in all merged classes and selected class
+      const ids = slots.filter(s => s.day_of_week === editing.day && s.period_id === editing.period_id && targetClasses.includes(s.class_id)).map(s => s.id)
       if (ids.length) await supabase.from('timetable_slots').delete().in('id', ids)
     } else {
       const basePayload = {
@@ -371,7 +379,11 @@ export default function TimetablePage() {
         (classByClass[b.id]?.length || 0) - (classByClass[a.id]?.length || 0)
       )
 
+      const mergedClassIds = new Set(mergedClasses)
+
       for (const cls of sortedClasses) {
+        if (mergedClassIds.has(cls.id) && cls.id !== selectedClass) continue // Skip classes mirroring the selected class
+
         const clsId = cls.id
         const assigns = classByClass[clsId]
         if (!assigns?.length) continue
@@ -402,8 +414,8 @@ export default function TimetablePage() {
           if (classBusy[day][period.id]) return false
           if (teacherBusy[day][period.id].has(teacher_id)) return false
           if (extracurricularSlots.find(es => es.day === day && es.periodId === period.id)) return false
-          if ((subjectPerDay[subject_id]?.[day] ?? 0) >= 1) return false // once per day max
-          if ((teacherDailyCount[teacher_id]?.[day] ?? 0) >= 3) return false
+          if ((subjectPerDay[subject_id]?.[day] ?? 0) >= (isPrimaryStyle ? 2 : 1)) return false // primary style constraint
+          if ((teacherDailyCount[teacher_id]?.[day] ?? 0) >= (isPrimaryStyle ? teachablePeriods.length : 3)) return false
 
           // Place it
           classBusy[day][period.id] = true
@@ -476,7 +488,7 @@ export default function TimetablePage() {
               const teacherDayCnt = teacherDailyCount[a.teacher_id]?.[day] ?? 0
               if (classBusy[day][p.id]) break
               if (teacherBusy[day][p.id].has(a.teacher_id)) continue
-              if (teacherDayCnt >= 4) continue // hard cap — very rarely hit
+              if (teacherDayCnt >= (isPrimaryStyle ? teachablePeriods.length : 4)) continue // allow primary teachers to teach all day
 
               // Allow subject twice per day ONLY for primary-style or gap fill
               if (subjectDayCount >= (isPrimaryStyle ? 2 : 1)) continue
@@ -502,9 +514,12 @@ export default function TimetablePage() {
         }
       }
 
-      // 3. Wipe & insert
+      // 3. Wipe & insert only those actually generated to avoid wiping locked classes
       setGenProgress('Writing to database…')
-      await supabase.from('timetable_slots').delete().eq('term_id', (term as any).id).eq('school_id', user!.school_id)
+      const targetClassIdsForWipe = Array.from(new Set(newSlots.map(s => s.class_id).concat(mergedClasses)))
+      if (targetClassIdsForWipe.length > 0) {
+        await supabase.from('timetable_slots').delete().eq('term_id', (term as any).id).in('class_id', targetClassIdsForWipe)
+      }
 
       const CHUNK = 400
       for (let i = 0; i < newSlots.length; i += CHUNK) {
@@ -857,7 +872,7 @@ export default function TimetablePage() {
 
         {/* Warning */}
         <div style={{ background: '#fef2f2', borderRadius: 10, padding: '10px 14px', fontSize: 12, color: '#b91c1c', lineHeight: 1.5, marginBottom: 18, border: '1px solid #fecaca' }}>
-          ⚠️ <strong>This replaces ALL timetable slots</strong> for every class in this term. Save any manual work before proceeding.
+          ⚠️ <strong>This replaces the timetable slots for all assigned classes</strong> in this term. Unassigned classes will be completely ignored and preserved.
         </div>
 
         {/* School style info */}

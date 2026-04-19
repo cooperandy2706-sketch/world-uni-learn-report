@@ -79,6 +79,19 @@ export const teachersService = {
   async deleteAssignment(id: string) {
     return supabase.from('teacher_assignments').delete().eq('id', id)
   },
+  async getLetters(teacherId: string) {
+    return supabase
+      .from('hr_letters')
+      .select('*, author:users!created_by(id, full_name)')
+      .eq('teacher_id', teacherId)
+      .order('created_at', { ascending: false })
+  },
+  async saveLetter(data: any) {
+    return supabase.from('hr_letters').insert(data).select().single()
+  },
+  async deleteLetter(id: string) {
+    return supabase.from('hr_letters').delete().eq('id', id)
+  },
 }
 
 // ── Academic Years ───────────────────────────────────────

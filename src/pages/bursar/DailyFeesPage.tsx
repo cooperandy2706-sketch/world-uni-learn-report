@@ -11,6 +11,13 @@ import { Settings, Users, Monitor, Save, UserPlus, Trash2, CheckCircle, PencilLi
 
 const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
 
+const CREST_SVG = `
+  <svg width="40" height="40" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="28" cy="28" r="26" fill="none" stroke="#4c1d95" stroke-width="2"/>
+    <polygon points="28,9 32.5,21.5 46,21.5 35,29 39,42 28,34 17,42 21,29 10,21.5 23.5,21.5"
+      fill="#4c1d95" stroke="#4c1d95" stroke-width="1.3" stroke-linejoin="round"/>
+  </svg>`
+
 function Btn({ children, onClick, variant = 'primary', style, loading }: any) {
   const [h, setH] = useState(false)
   const v: any = {
@@ -26,79 +33,149 @@ function Btn({ children, onClick, variant = 'primary', style, loading }: any) {
   )
 }
 
-function RecordTab({ schoolId, term, students, configArray, user }: any) {
+function RecordTab({ schoolId, term, students, configArray, user, school }: any) {
   const qc = useQueryClient()
   const [recDate, setRecDate] = useState(() => new Date().toISOString().split('T')[0])
   const [recClass, setRecClass] = useState('')
-  const [recType, setRecType] = useState('feeding')
-  const [recEntries, setRecEntries] = useState<Record<string, string>>({})
+  const [recEntries, setRecEntries] = useState<Record<string, { feeding: string; studies: string }>>({})
 
-  const { data: recCollections = [], isLoading: loadingCollections } = useQuery({
+  const { data: recCollections = [], isLoading: loadingCollections, refetch: refetchCollections } = useQuery({
     queryKey: ['daily-fees-day', schoolId, term?.id, recDate],
     queryFn: async () => { const { data } = await dailyFeesService.getCollectionsByDate(schoolId, term?.id!, recDate); return data ?? [] },
     enabled: !!schoolId && !!term?.id && !!recDate
   })
 
+  // 1. Fetch Attendance for blockers
+  const { data: dayAttendance = [], isLoading: loadingAtt } = useQuery({
+    queryKey: ['day-attendance', recClass, recDate],
+    queryFn: async () => {
+      const { data } = await supabase.from('attendance_records').select('student_id, status').eq('class_id', recClass).eq('date', recDate)
+      return data ?? []
+    },
+    enabled: !!recClass && !!recDate
+  })
+
+  const isRegisterSubmitted = dayAttendance.length > 0
+  const isAbsent = (sid: string) => dayAttendance.find(a => a.student_id === sid)?.status === 'absent'
+
   const recStudents = useMemo(() => students.filter((s:any) => s.class?.id === recClass), [students, recClass])
   
-  const defaultAmount = useMemo(() => {
-    const classRate = (configArray || []).find((c: any) => c.class_id === recClass)
-    return recType === 'feeding' ? (classRate?.expected_feeding_fee || 0) : (classRate?.expected_studies_fee || 0)
-  }, [configArray, recClass, recType])
+  const classRate = useMemo(() => (configArray || []).find((c: any) => c.class_id === recClass), [configArray, recClass])
 
   useEffect(() => {
-    const newEntries: Record<string, string> = {}
-    let hasChanges = false
+    const newEntries: Record<string, { feeding: string; studies: string }> = {}
     recStudents.forEach((s: any) => {
-      const existing = recCollections.find((c: any) => c.student_id === s.id && c.fee_type === recType)
-      if (existing) newEntries[s.id] = String(existing.amount)
+      const f = recCollections.find((c: any) => c.student_id === s.id && c.fee_type === 'feeding')
+      const st = recCollections.find((c: any) => c.student_id === s.id && c.fee_type === 'studies')
+      newEntries[s.id] = {
+        feeding: f ? String(f.amount) : '',
+        studies: st ? String(st.amount) : ''
+      }
     })
-    setRecEntries(prev => {
-      if (JSON.stringify(prev) !== JSON.stringify(newEntries)) return newEntries
-      return prev
-    })
-  }, [recStudents, recCollections, recType])
+    setRecEntries(newEntries)
+  }, [recStudents, recCollections])
 
   const saveAll = useMutation({
     mutationFn: async () => {
-      const promises = Object.entries(recEntries).map(async ([studentId, amountStr]) => {
-        const amt = parseFloat(amountStr)
-        if (isNaN(amt) || amt <= 0) return null 
-        const existing = recCollections.find((c: any) => c.student_id === studentId && c.fee_type === recType)
-        if (existing) {
-          if (existing.amount === amt) return null
-          return supabase.from('daily_fees_collected').update({ amount: amt }).eq('id', existing.id)
-        } else {
-          return supabase.from('daily_fees_collected').insert({
-            school_id: schoolId, term_id: term?.id, student_id: studentId,
-            fee_type: recType, amount: amt, date: recDate, collected_by: user!.id
+      const toUpsert: any[] = []
+      recStudents.forEach((s: any) => {
+        if (isAbsent(s.id)) return // Skip absent
+        const entry = recEntries[s.id] || { feeding: '', studies: '' }
+        
+        const process = (type: 'feeding' | 'studies', val: string) => {
+          const amt = parseFloat(val)
+          if (isNaN(amt) || amt <= 0) return
+          const existing = recCollections.find((c: any) => c.student_id === s.id && c.fee_type === type)
+          
+          toUpsert.push({
+            id: existing?.id,
+            school_id: schoolId,
+            term_id: term?.id,
+            student_id: s.id,
+            fee_type: type,
+            amount: amt,
+            date: recDate,
+            collected_by: user!.id
           })
         }
+
+        process('feeding', entry.feeding)
+        process('studies', entry.studies)
       })
-      await Promise.all(promises)
+
+      if (toUpsert.length === 0) return
+      const { error } = await supabase.from('daily_fees_collected').upsert(toUpsert, { onConflict: 'id' })
+      if (error) throw error
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey:['daily-fees-day'] }); toast.success('Saved!') },
+    onSuccess: () => { refetchCollections(); toast.success('Fees Saved Successfully!') },
     onError: (e: any) => toast.error(e.message)
   })
+
+  // Quick action for a student
+  const payBoth = (sid: string) => {
+    const classRate = (configArray || []).find((c: any) => c.class_id === recClass)
+    setRecEntries(prev => ({
+      ...prev,
+      [sid]: {
+        feeding: String(classRate?.expected_feeding_fee || 0),
+        studies: String(classRate?.expected_studies_fee || 0)
+      }
+    }))
+  }
 
   const printRegister = () => {
     const w = window.open('', '_blank')
     if (!w) return
+    const logoHtml = school?.logo_url 
+      ? `<img src="${school.logo_url}" style="height: 50px; border-radius: 8px;" />`
+      : CREST_SVG
+
     w.document.write(`
       <html><head><title>Daily Collection Register</title>
-      <style>body{font-family:sans-serif;padding:20px} table{width:100%;border-collapse:collapse;margin-top:20px} th,td{border:1px solid #ccc;padding:8px;text-align:left}</style>
+      <style>
+        body{font-family:system-ui,-apple-system,sans-serif;padding:30px;color:#1e293b} 
+        .header{display:flex;align-items:center;gap:15px;margin-bottom:25px;border-bottom:2px solid #4c1d95;padding-bottom:15px}
+        .school-name{font-size:20px;font-weight:800;color:#1e0646}
+        h2{margin:20px 0 10px;font-size:16px;text-transform:uppercase;letter-spacing:0.1em;color:#4c1d95}
+        .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;background:#f8fafc;padding:15px;border-radius:10px;margin-bottom:20px;font-size:12px}
+        .meta-item b{display:block;color:#64748b;text-transform:uppercase;font-size:10px;margin-bottom:4px}
+        table{width:100%;border-collapse:collapse} 
+        th{background:#4c1d95;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;padding:12px;text-align:left}
+        td{border-bottom:1px solid #e2e8f0;padding:12px;font-size:13px}
+        .footer{margin-top:40px;font-size:10px;color:#94a3b8;text-align:center;border-top:1px dashed #cbd5e1;padding-top:20px}
+      </style>
       </head><body>
-      <h2>Daily Collection Register (${recType.toUpperCase()})</h2>
-      <p><strong>Class:</strong> ${((students as any[]).find((s:any)=>s.class?.id===recClass)?.class as any)?.name || recClass} | <strong>Date:</strong> ${recDate} | <strong>Collected By:</strong> ${user?.full_name}</p>
+      <div class="header">
+        ${logoHtml}
+        <div>
+          <div class="school-name">${school?.name || 'School System'}</div>
+          <div style="font-size:12px;color:#64748b">${school?.address || ''}</div>
+        </div>
+      </div>
+      <h2>Daily Collection Register</h2>
+      <div class="meta">
+        <div class="meta-item"><b>Class</b>${((students as any[]).find((s:any)=>s.class?.id===recClass)?.class as any)?.name || recClass}</div>
+        <div class="meta-item"><b>Date</b>${new Date(recDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+        <div class="meta-item"><b>Staff In Charge</b>${user?.full_name}</div>
+      </div>
       <table>
-        <thead><tr><th>Student</th><th>Amount (GHS)</th><th>Signature/Notes</th></tr></thead>
+        <thead><tr><th>Student Name</th><th>Feeding (GHS)</th><th>Studies (GHS)</th><th>Total</th></tr></thead>
         <tbody>
-          ${recStudents.map((s:any) => `<tr><td>${s.full_name}</td><td>${recEntries[s.id] || ''}</td><td></td></tr>`).join('')}
+          ${recStudents.map((s:any) => {
+            const ent = recEntries[s.id] || { feeding: '0', studies: '0' }
+            const f = Number(ent.feeding || 0)
+            const st = Number(ent.studies || 0)
+            return `<tr><td style="font-weight:600">${s.full_name}</td><td>${f > 0 ? GHS(f) : '—'}</td><td>${st > 0 ? GHS(st) : '—'}</td><td style="font-weight:700">${GHS(f + st)}</td></tr>`
+          }).join('')}
         </tbody>
       </table>
-      <script>window.print()</script>
+      <div class="footer">
+        Official daily fee record generated from the Bursar Portal. &copy; ${new Date().getFullYear()} ${school?.name || 'School System'}
+      </div>
+      <script>setTimeout(() => window.print(), 500)</script>
       </body></html>
     `)
+    w.document.close()
   }
 
   return (
@@ -119,47 +196,83 @@ function RecordTab({ schoolId, term, students, configArray, user }: any) {
             })}
           </select>
         </div>
-        <div style={{ flex: '1 1 180px' }}>
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Fee Type</label>
-          <select value={recType} onChange={e => setRecType(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', outline: 'none' }}>
-            <option value="feeding">Feeding Fee</option>
-            <option value="studies">Studies Fee</option>
-          </select>
-        </div>
       </div>
 
       {!recClass ? (
-        <div style={{ padding: '40px 20px', textAlign: 'center', background: '#f8fafc', borderRadius: 12, border: '1.5px dashed #e5e7eb', color: '#6b7280' }}>
-          Select a class to load the student register.
+        <div style={{ padding: '60px 20px', textAlign: 'center', background: '#f8fafc', borderRadius: 16, border: '1.5px dashed #e5e7eb', color: '#6b7280' }}>
+          <div style={{ fontSize: 32, marginBottom: 10 }}>🏫</div>
+          Select a class to load the register.
+        </div>
+      ) : loadingAtt ? (
+        <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Checking attendance records...</div>
+      ) : !isRegisterSubmitted ? (
+        <div style={{ padding: '60px 20px', textAlign: 'center', background: '#fef2f2', borderRadius: 16, border: '1.5px solid #fecaca', color: '#dc2626' }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🛑</div>
+          <h3 style={{ margin: '0 0 8px', fontWeight: 800 }}>ATTENDANCE NOT YET SUBMITTED</h3>
+          <p style={{ margin: 0, fontSize: 13, opacity: 0.8 }}>Morning register must be submitted before recording fees.</p>
         </div>
       ) : (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-            <button onClick={() => { const nd:any={}; recStudents.forEach((s:any)=>nd[s.id]=String(defaultAmount)); setRecEntries(nd) }} style={{ background: '#e0e7ff', color: '#4338ca', border: 'none', padding: '6px 12px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Set All to GH₵ {defaultAmount}</button>
-            <button onClick={printRegister} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#f5f3ff', color: '#6d28d9', border: 'none', padding: '6px 12px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}><Printer size={14}/> Print Record</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20, alignItems: 'center' }}>
+            <h3 style={{ fontSize: 14, fontWeight: 800, color: '#111827', margin: 0 }}>Register for {recStudents.length} Students</h3>
+            <Btn onClick={printRegister} variant="ghost" style={{ boxShadow: 'none' }}><Printer size={14}/> Print PDF</Btn>
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'hidden' }}>
-            <tbody>
-              {recStudents.map((stu: any) => {
-                const existAmt = recEntries[stu.id] || ''
-                const hasDB = recCollections.some((c:any) => c.student_id === stu.id && c.fee_type === recType)
-                return (
-                  <tr key={stu.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={{ padding: '10px 16px', fontSize: 13, width: '60%' }}>{stu.full_name}</td>
-                    <td style={{ padding: '10px 16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: 12, color: '#9ca3af', fontWeight: 600 }}>GH₵</span>
-                        <input type="number" step="0.5" value={existAmt} onChange={e => setRecEntries(p => ({...p, [stu.id]: e.target.value}))} style={{ width: 80, padding: '6px 10px', borderRadius: 6, border: `1.5px solid ${existAmt?'#34d399':'#e5e7eb'}`, outline: 'none' }} />
-                        {hasDB && <CheckCircle size={14} color="#10b981"/>}
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16, marginBottom: 30 }}>
+            {recStudents.map((stu: any) => {
+              const entry = recEntries[stu.id] || { feeding: '', studies: '' }
+              const absent = isAbsent(stu.id)
+              const feedPaid = !!recCollections.find(c => c.student_id === stu.id && c.fee_type === 'feeding')
+              const studiesPaid = !!recCollections.find(c => c.student_id === stu.id && c.fee_type === 'studies')
+
+              return (
+                <div key={stu.id} style={{ 
+                  background: absent ? '#f9fafb' : '#fff', 
+                  borderRadius: 16, 
+                  padding: 18, 
+                  border: `1.5px solid ${absent ? '#e5e7eb' : '#f0eefe'}`,
+                  opacity: absent ? 0.7 : 1,
+                  boxShadow: absent ? 'none' : '0 2px 8px rgba(109,40,217,0.03)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: absent ? '#94a3b8' : '#111827' }}>{stu.full_name}</div>
+                      <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{stu.student_id || 'REGISTERED STUDENT'}</div>
+                    </div>
+                    {absent ? (
+                      <span style={{ fontSize: 10, fontWeight: 900, padding: '3px 10px', borderRadius: 99, background: '#fef2f2', color: '#dc2626', border: '1px solid #fee2e2' }}>🛑 ABSENT</span>
+                    ) : (
+                      <button onClick={() => payBoth(stu.id)} style={{ fontSize: 10, fontWeight: 900, padding: '3px 10px', borderRadius: 99, background: '#f0fdf4', color: '#16a34a', border: '1px solid #dcfce7', cursor: 'pointer' }}>⚡ PAY BOTH</button>
+                    )}
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Feeding 🥘</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <input type="number" step="0.1" disabled={absent} value={entry.feeding} onChange={e => setRecEntries(p => ({...p, [stu.id]: { ...p[stu.id], feeding: e.target.value }}))} 
+                          style={{ width: '100%', padding: '7px 10px', borderRadius: 8, border: `1.5px solid ${feedPaid ? '#34d399' : '#e5e7eb'}`, fontSize: 13, outline: 'none', background: absent ? '#f3f4f6' : '#fff' }} />
+                        {feedPaid && <span style={{ color: '#10b981' }}>✓</span>}
                       </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-          <div style={{ marginTop: 24, textAlign: 'right' }}>
-            <Btn onClick={() => saveAll.mutate()} loading={saveAll.isPending}><Save size={16}/> Save Register</Btn>
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Studies 📚</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <input type="number" step="0.1" disabled={absent} value={entry.studies} onChange={e => setRecEntries(p => ({...p, [stu.id]: { ...p[stu.id], studies: e.target.value }}))} 
+                          style={{ width: '100%', padding: '7px 10px', borderRadius: 8, border: `1.5px solid ${studiesPaid ? '#34d399' : '#e5e7eb'}`, fontSize: 13, outline: 'none', background: absent ? '#f3f4f6' : '#fff' }} />
+                        {studiesPaid && <span style={{ color: '#10b981' }}>✓</span>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          <div style={{ position: 'sticky', zIndex: 100, bottom: 20 }}>
+             <Btn onClick={() => saveAll.mutate()} loading={saveAll.isPending} style={{ width: '100%', height: 50, borderRadius: 16, fontSize: 15, boxShadow: '0 8px 30px rgba(109,40,217,0.3)' }}>
+                <Save size={18}/> SAVE REGISTER ENTRIES
+             </Btn>
           </div>
         </div>
       )}
@@ -172,6 +285,12 @@ export default function DailyFeesPage() {
   const qc = useQueryClient()
   const schoolId = user?.school_id ?? ''
   const { data: term } = useCurrentTerm()
+
+  const { data: school } = useQuery({
+    queryKey: ['school-info', schoolId],
+    queryFn: async () => { const { data } = await supabase.from('schools').select('*').eq('id', schoolId).single(); return data },
+    enabled: !!schoolId,
+  })
   
   const [tab, setTab] = useState<'config' | 'collectors' | 'overview' | 'record'>('overview')
 
@@ -456,7 +575,7 @@ export default function DailyFeesPage() {
       )}
 
       {tab === 'record' && (
-        <RecordTab schoolId={schoolId} term={term} students={students} configArray={config} user={user} />
+        <RecordTab schoolId={schoolId} term={term} students={students} configArray={config} user={user} school={school} />
       )}
     </div>
   )

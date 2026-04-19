@@ -50,43 +50,64 @@ Deno.serve(async (req) => {
       throw new Error("Cannot send SMS for another school");
     }
 
-    // Use Global Hubtel Credentials from Secrets
-    const hubtelClientId = Deno.env.get('HUBTEL_CLIENT_ID');
-    const hubtelClientSecret = Deno.env.get('HUBTEL_CLIENT_SECRET');
-    const hubtelSenderId = Deno.env.get('HUBTEL_SENDER_ID') || 'WULA';
+    // Use Global Africa's Talking Credentials from Secrets
+    const atUsername = Deno.env.get('AT_USERNAME');
+    const atApiKey = Deno.env.get('AT_API_KEY');
+    const atSenderId = Deno.env.get('AT_SENDER_ID');
 
-    if (!hubtelClientId || !hubtelClientSecret) {
-      throw new Error("Global Hubtel credentials not configured in Supabase Secrets");
+    if (!atUsername || !atApiKey) {
+      throw new Error("Global Africa's Talking credentials not configured in Supabase Secrets");
     }
 
-    // Normalize phone number (Ghana specific: 024 -> 23324)
+    // Normalize phone number (Ghana specific: 024 -> +23324, AT usually expects the + sign)
     let phone = recipient.replace(/\s+/g, '').replace('+', '');
     if (phone.startsWith('0')) {
-      phone = '233' + phone.substring(1);
+      phone = '+233' + phone.substring(1);
     } else if (!phone.startsWith('233')) {
-      phone = '233' + phone;
+      phone = '+233' + phone;
+    } else if (phone.startsWith('233')) {
+      phone = '+' + phone;
     }
 
-    // Hubtel API call
-    const authToken = btoa(`${hubtelClientId}:${hubtelClientSecret}`);
-    const hubtelResponse = await fetch(`https://api-v2.hubtel.com/messages/send`, {
+    // Africa's Talking API call (Dynamically switch to Sandbox if username is 'sandbox')
+    const isSandbox = atUsername.toLowerCase() === 'sandbox';
+    const apiUrl = isSandbox 
+      ? `https://api.sandbox.africastalking.com/version1/messaging`
+      : `https://api.africastalking.com/version1/messaging`;
+
+    const params = new URLSearchParams();
+    params.append('username', atUsername);
+    params.append('to', phone);
+    params.append('message', message);
+    if (atSenderId && !isSandbox) {
+      params.append('from', atSenderId);
+    }
+
+    const atResponse = await fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${authToken}`,
-        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'apiKey': atApiKey,
       },
-      body: JSON.stringify({
-        From: hubtelSenderId,
-        To: phone,
-        Content: message,
-        Type: 0 
-      })
+      body: params.toString()
     });
 
-    const result = await hubtelResponse.json();
+    // Robust parsing: AT sometimes returns plain text errors
+    const contentType = atResponse.headers.get('content-type') || '';
+    let result;
+    if (contentType.includes('application/json')) {
+      result = await atResponse.json();
+    } else {
+      const text = await atResponse.text();
+      result = { errorMessage: text || 'Unknown Error from Africa\'s Talking' };
+    }
+
+    const isSuccess = atResponse.ok;
+    const finalError = result?.errorMessage || result?.error || (isSuccess ? null : 'SMS Delivery Failed');
 
     // LOGGING: Track usage in the sms_logs table
-    if (hubtelResponse.ok) {
+    if (isSuccess) {
       const segments = Math.ceil(message.length / 160) || 1;
       await adminClient.from('sms_logs').insert({
         school_id,
@@ -98,7 +119,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ success: hubtelResponse.ok, data: result }), {
+    return new Response(JSON.stringify({ success: isSuccess, data: result, error: finalError }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });

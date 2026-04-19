@@ -270,7 +270,7 @@ export default function SMSPage() {
             {activeTab === 'fee_reminders' ? 'Fee Payment Reminders' : 'SMS Messaging Hub'}
           </h1>
           <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
-            Broadcast messages and reminders to parents and staff via Hubtel SMS.
+            Broadcast messages and reminders to parents and staff via Africa's Talking SMS.
           </p>
         </div>
 
@@ -456,7 +456,7 @@ export default function SMSPage() {
             <div style={{ display: 'flex', gap: 8, padding: '0 5px' }}>
               <AlertCircle size={14} color="#f59e0b" style={{ flexShrink: 0 }} />
               <p style={{ fontSize: 10, color: '#92400e', margin: 0 }}>
-                Approximately <strong>{selectedIds.size * smsSegments} credits</strong> will be consumed from your Hubtel account balance.
+                Approximately <strong>{selectedIds.size * smsSegments} credits</strong> will be consumed from your Africa's Talking account balance.
               </p>
             </div>
 

@@ -5,6 +5,10 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSubjects, useCreateSubject, useUpdateSubject, useDeleteSubject } from '../../hooks/useSubjects'
 import Modal from '../../components/ui/Modal'
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '../../lib/supabase'
+import { useCurrentTerm } from '../../hooks/useSettings'
+import { useAuth } from '../../hooks/useAuth'
 
 const schema = z.object({
   name: z.string().min(1, 'Subject name is required'),
@@ -80,6 +84,21 @@ function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputEle
 // ═══════════════════════════════════════════════════════════
 export default function SubjectsPage() {
   const { data: subjects = [], isLoading } = useSubjects()
+  const { data: term } = useCurrentTerm()
+  const { user } = useAuth()
+
+  const { data: assignments = [] } = useQuery({
+    queryKey: ['teacher_assignments_subjects', user?.school_id, term?.id],
+    queryFn: async () => {
+      if (!term?.id) return []
+      const { data } = await supabase.from('teacher_assignments')
+        .select('*, teacher:teachers(id, staff_id, user:users(full_name, avatar_url))')
+        .eq('term_id', term.id)
+      return data ?? []
+    },
+    enabled: !!term?.id
+  })
+
   const createSubject = useCreateSubject()
   const updateSubject = useUpdateSubject()
   const deleteSubject = useDeleteSubject()
@@ -234,6 +253,11 @@ export default function SubjectsPage() {
                   {categorySubjects.map((s, i) => {
                     const meta = getSubjectMeta(s.name)
                     const isHov = hoveredId === s.id
+                    
+                    const subjectAssignments = assignments.filter(a => a.subject_id === s.id)
+                    const uniqueTeacherIds = new Set(subjectAssignments.map(a => a.teacher_id))
+                    const teacherCount = uniqueTeacherIds.size
+
                     return (
                       <div key={s.id} className="sub-card"
                         onMouseEnter={() => setHoveredId(s.id)}
@@ -253,6 +277,13 @@ export default function SubjectsPage() {
                         {/* Info */}
                         <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: '0 0 3px', lineHeight: 1.3 }}>{s.name}</h3>
                         {s.code && <span style={{ fontSize: 11, fontWeight: 700, fontFamily: 'monospace', color: meta.color, background: meta.bg, padding: '2px 7px', borderRadius: 5 }}>{s.code}</span>}
+
+                        <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ fontSize: 12 }}>👨‍🏫</span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: teacherCount > 0 ? '#374151' : '#9ca3af' }}>
+                            {teacherCount} Teacher{teacherCount !== 1 ? 's' : ''}
+                          </span>
+                        </div>
 
                         {/* Category tag */}
                         <div style={{ marginTop: 10 }}>

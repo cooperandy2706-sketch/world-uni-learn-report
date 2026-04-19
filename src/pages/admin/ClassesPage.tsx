@@ -7,6 +7,10 @@ import { useClasses, useCreateClass, useUpdateClass, useDeleteClass } from '../.
 import { useStudents } from '../../hooks/useStudents'
 import { useSubjects } from '../../hooks/useSubjects'
 import Modal from '../../components/ui/Modal'
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '../../lib/supabase'
+import { useCurrentTerm } from '../../hooks/useSettings'
+import { useAuth } from '../../hooks/useAuth'
 
 const schema = z.object({
   name:     z.string().min(1, 'Class name is required'),
@@ -66,6 +70,20 @@ export default function ClassesPage() {
   const { data: classes = [], isLoading } = useClasses()
   const { data: students = [] } = useStudents()
   const { data: subjects = [] } = useSubjects()
+  const { data: term } = useCurrentTerm()
+  const { user } = useAuth()
+
+  const { data: assignments = [] } = useQuery({
+    queryKey: ['teacher_assignments_classes', user?.school_id, term?.id],
+    queryFn: async () => {
+      if (!term?.id) return []
+      const { data } = await supabase.from('teacher_assignments')
+        .select('*, teacher:teachers(id, staff_id, user:users(full_name, avatar_url))')
+        .eq('term_id', term.id)
+      return data ?? []
+    },
+    enabled: !!term?.id
+  })
   const createClass = useCreateClass()
   const updateClass = useUpdateClass()
   const deleteClass = useDeleteClass()
@@ -183,6 +201,8 @@ export default function ClassesPage() {
               const palette = CLASS_COLORS[i % CLASS_COLORS.length]
               const fillPct = cls.capacity ? Math.min(100, Math.round((studentCount / cls.capacity) * 100)) : null
               const isLargest = largestClass?.id === cls.id && classes.length > 1
+              const classTeacherAssignment = assignments.find(a => a.class_id === cls.id && a.is_class_teacher)
+              const classTeacherName = classTeacherAssignment?.teacher?.user?.full_name
 
               return (
                 <div key={cls.id} className="cls-card"
@@ -204,6 +224,19 @@ export default function ClassesPage() {
 
                   {/* Body */}
                   <div style={{ padding: '16px 20px' }}>
+                    {/* Class Teacher */}
+                    {classTeacherName ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f3f4f6' }}>
+                        <span style={{ fontSize: 13 }}>👨‍🏫</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#374151', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{classTeacherName}</span>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f3f4f6' }}>
+                        <span style={{ fontSize: 13, opacity: 0.5 }}>👨‍🏫</span>
+                        <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>No Class Teacher</span>
+                      </div>
+                    )}
+
                     {/* Student count */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: fillPct !== null ? 10 : 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -287,6 +320,8 @@ export default function ClassesPage() {
             const classStudents = students.filter(s => s.class_id === viewingClass.id).slice(0, 8)
             const maleCount = students.filter(s => s.class_id === viewingClass.id && s.gender === 'male').length
             const femaleCount = students.filter(s => s.class_id === viewingClass.id && s.gender === 'female').length
+            const classTeacherAssignment = assignments.find(a => a.class_id === viewingClass.id && a.is_class_teacher)
+            const classTeacherName = classTeacherAssignment?.teacher?.user?.full_name
             const palette = CLASS_COLORS[classes.findIndex(c => c.id === viewingClass.id) % CLASS_COLORS.length]
             return (
               <div>
@@ -300,6 +335,17 @@ export default function ClassesPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Class Teacher Banner */}
+                {classTeacherName && (
+                  <div style={{ background: '#f5f3ff', borderRadius: 10, padding: '12px 16px', marginBottom: 18, border: '1px solid #ede9fe', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ fontSize: 20 }}>👨‍🏫</div>
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Class Teacher</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{classTeacherName}</div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Stats */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 18 }}>
