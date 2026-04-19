@@ -935,8 +935,7 @@ export default function TeachersPage() {
       subject_id: subId, 
       term_id: (term as any).id, 
       academic_year_id: (term as any).academic_year_id, 
-      is_class_teacher: cId === classTeacherClassId,
-      school_id: user?.school_id
+      is_class_teacher: cId === classTeacherClassId
     })))
     const { error } = await supabase.from('teacher_assignments').insert(inserts)
     if (error) {
