@@ -483,15 +483,17 @@ export default function TimetablePage() {
 
             let filledGap = false
             for (const a of ranked) {
-              // For gap-fill, allow subject once more per day if truly needed
+              // For gap-fill, we relax constraints to ensure no empty slots.
               const subjectDayCount = subjectPerDay[a.subject_id]?.[day] ?? 0
               const teacherDayCnt = teacherDailyCount[a.teacher_id]?.[day] ?? 0
               if (classBusy[day][p.id]) break
               if (teacherBusy[day][p.id].has(a.teacher_id)) continue
-              if (teacherDayCnt >= (isPrimaryStyle ? teachablePeriods.length : 4)) continue // allow primary teachers to teach all day
+              
+              // Relaxed teacher limit for gap-fills: allow up to 8/day for secondary to guarantee coverage
+              if (teacherDayCnt >= (isPrimaryStyle ? teachablePeriods.length : 8)) continue 
 
-              // Allow subject twice per day ONLY for primary-style or gap fill
-              if (subjectDayCount >= (isPrimaryStyle ? 2 : 1)) continue
+              // Relaxed subject limit for gap-fills: allow 2/day for secondary, 4/day for primary
+              if (subjectDayCount >= (isPrimaryStyle ? 4 : 2)) continue
 
               // Place gap-fill
               classBusy[day][p.id] = true
