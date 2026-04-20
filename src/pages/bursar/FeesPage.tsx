@@ -276,19 +276,19 @@ export default function FeesPage() {
       : CREST_SVG
 
     const buildReceiptHTML = (type: string) => `
-      <div style="height: 148mm; padding: 15px 30px; display: flex; flex-direction: column; justify-content: flex-start; position: relative; overflow: hidden; background: #ffffff; box-sizing: border-box;">
+      <div style="height: 147mm; padding: 10px 25px; display: flex; flex-direction: column; justify-content: flex-start; position: relative; overflow: hidden; background: #ffffff; box-sizing: border-box;">
         <!-- Watermark -->
         <div style="position: absolute; top: 15%; left: 50%; transform: translate(-50%, -15%) rotate(-15deg); font-size: 80px; font-weight: 900; color: rgba(76, 29, 149, 0.03); whiteSpace: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
 
         <div style="position: relative; z-index: 1;">
-          <div style="font-size:9px; font-weight:800; color:#6d28d9; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:12px; text-align:center; background: #f5f3ff; padding: 3px 0; border-radius: 4px;">${type}</div>
+          <div style="font-size:8px; font-weight:800; color:#6d28d9; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:8px; text-align:center; background: #f5f3ff; padding: 2px 0; border-radius: 4px;">${type}</div>
           
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
             <div style="margin-right: 20px;">
               ${logoHtml}
             </div>
             <div style="flex: 1; text-align: right;">
-              <div style="font-size:22px; font-weight:900; color:#1e0646; margin-bottom:2px; font-family:'Playfair Display',serif; line-height: 1.1;">${school?.name || 'SCHOOL FEE RECEIPT'}</div>
+              <div style="font-size:20px; font-weight:900; color:#1e0646; margin-bottom:1px; font-family:'Playfair Display',serif; line-height: 1.1;">${school?.name || 'SCHOOL FEE RECEIPT'}</div>
               ${school?.motto ? `<div style="font-size:10px; color:#6d28d9; margin-bottom:6px; font-style: italic; font-weight: 500;">&ldquo;${school.motto}&rdquo;</div>` : ''}
               <div style="display: flex; flex-direction: column; gap: 2px; align-items: flex-end;">
                 ${school?.address ? `<div style="font-size:10px; color:#6b7280;">📍 ${school.address}</div>` : ''}
@@ -297,11 +297,11 @@ export default function FeesPage() {
             </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; border-bottom: 2px solid #4c1d95; padding-bottom: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; border-bottom: 1.5px solid #4c1d95; padding-bottom: 4px;">
             <div>
               <div style="font-size:9px; font-weight:800; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 2px;">Receipt For</div>
-              <div style="font-size:16px; font-weight:900; color:#111827;">${stu?.full_name ?? '—'}</div>
-              <div style="font-size:11px; color:#4c1d95; font-weight: 700;">${(stu?.class as any)?.name ?? '—'} &middot; ${stu?.student_id || 'ID NO'}</div>
+              <div style="font-size:15px; font-weight:900; color:#111827;">${stu?.full_name ?? '—'}</div>
+              <div style="font-size:10px; color:#4c1d95; font-weight: 700;">${(stu?.class as any)?.name ?? '—'} &middot; ${stu?.student_id || 'ID NO'}</div>
             </div>
             <div style="text-align: right;">
               <div style="font-size:9px; font-weight:800; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 2px;">Receipt Details</div>
@@ -313,7 +313,7 @@ export default function FeesPage() {
           <div style="background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 10px; padding: 12px 20px; color: #ffffff; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
             <div>
               <div style="font-size:10px; font-weight:700; opacity: 0.8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom: 2px;">Total Amount Paid</div>
-              <div style="font-size:24px; font-weight:900; letter-spacing: -0.01em;">${GHS(payment.amount_paid)}</div>
+              <div style="font-size:22px; font-weight:900; letter-spacing: -0.01em;">${GHS(payment.amount_paid)}</div>
             </div>
             <div style="text-align: right;">
               <div style="font-size:10px; font-weight:700; opacity: 0.8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom: 2px;">Remaining Balance</div>
@@ -322,7 +322,7 @@ export default function FeesPage() {
           </div>
 
           ${payment.notes ? `
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; margin-bottom: 10px;">
             <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Payment Notes / Coverage</div>
             <div style="font-size: 11px; color: #1e293b; font-weight: 600; line-height: 1.4;">${payment.notes}</div>
           </div>` : ''}
@@ -361,7 +361,7 @@ export default function FeesPage() {
             </tbody>
           </table>
 
-          <div style="display: flex; justify-content: space-between; margin-top: 16px; padding: 0 10px;">
+          <div style="display: flex; justify-content: space-between; margin-top: 12px; padding: 0 10px;">
             <div style="text-align: center; width: 160px;">
               <div style="font-size: 16px; color: #94a3b8; letter-spacing: 2px; margin-bottom: 2px;">...........................</div>
               <div style="font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Bursar's Signature</div>
