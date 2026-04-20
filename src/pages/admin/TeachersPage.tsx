@@ -696,30 +696,25 @@ export default function TeachersPage() {
 
   const [loadMap, setLoadMap] = useState<Record<string, { classes: number; subjects: number }>>({})
   useEffect(() => {
-    if (!user?.school_id) return
+    if (!teachers || teachers.length === 0) return
     
-    // Quick fix for existing records missing school_id
+    const teacherIds = teachers.map((t: any) => t.id)
     supabase.from('teacher_assignments')
-      .update({ school_id: user.school_id })
-      .is('school_id', null)
-      .then(() => {
-        supabase.from('teacher_assignments')
-          .select('teacher_id,class_id,subject_id')
-          .eq('school_id', user.school_id)
-          .then(({ data }) => {
-            if (!data) return
-            const m: Record<string, { classes: Set<string>; subjects: Set<string> }> = {}
-            for (const a of data) {
-              if (!m[a.teacher_id]) m[a.teacher_id] = { classes: new Set(), subjects: new Set() }
-              m[a.teacher_id].classes.add(a.class_id)
-              m[a.teacher_id].subjects.add(a.subject_id)
-            }
-            const out: Record<string, { classes: number; subjects: number }> = {}
-            for (const [k, v] of Object.entries(m)) out[k] = { classes: v.classes.size, subjects: v.subjects.size }
-            setLoadMap(out)
-          })
+      .select('teacher_id,class_id,subject_id')
+      .in('teacher_id', teacherIds)
+      .then(({ data }) => {
+        if (!data) return
+        const m: Record<string, { classes: Set<string>; subjects: Set<string> }> = {}
+        for (const a of data) {
+          if (!m[a.teacher_id]) m[a.teacher_id] = { classes: new Set(), subjects: new Set() }
+          m[a.teacher_id].classes.add(a.class_id)
+          m[a.teacher_id].subjects.add(a.subject_id)
+        }
+        const out: Record<string, { classes: number; subjects: number }> = {}
+        for (const [k, v] of Object.entries(m)) out[k] = { classes: v.classes.size, subjects: v.subjects.size }
+        setLoadMap(out)
       })
-  }, [user?.school_id, teachers])
+  }, [teachers])
 
   // ── Tabs ──
   const [activeTab, setActiveTab] = useState<'directory' | 'hr' | 'bulk'>('directory')
@@ -935,7 +930,6 @@ export default function TeachersPage() {
       subject_id: subId, 
       term_id: (term as any).id, 
       academic_year_id: (term as any).academic_year_id, 
-      school_id: user?.school_id,
       is_class_teacher: cId === classTeacherClassId
     })))
     const { error } = await supabase.from('teacher_assignments').insert(inserts)

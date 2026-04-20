@@ -456,7 +456,7 @@ export default function SMSPage() {
             <div style={{ display: 'flex', gap: 8, padding: '0 5px' }}>
               <AlertCircle size={14} color="#f59e0b" style={{ flexShrink: 0 }} />
               <p style={{ fontSize: 10, color: '#92400e', margin: 0 }}>
-                Approximately <strong>{selectedIds.size * smsSegments} credits</strong> will be consumed from your Africa's Talking account balance.
+                Approximately <strong>{selectedIds.size * smsSegments} credits</strong> will be consumed from your Textcus account balance.
               </p>
             </div>
 

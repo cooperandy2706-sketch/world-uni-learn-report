@@ -53,13 +53,12 @@ Deno.serve(async (req) => {
       throw new Error("Cannot send SMS for another school");
     }
 
-    // Use Global Africa's Talking Credentials from Secrets
-    const atUsername = Deno.env.get('AT_USERNAME');
-    const atApiKey = Deno.env.get('AT_API_KEY');
-    const atSenderId = Deno.env.get('AT_SENDER_ID');
+    // Use Global Textcus Credentials from Secrets
+    const textcusApiKey = Deno.env.get('TEXTCUS_API_KEY');
+    const textcusSenderId = Deno.env.get('TEXTCUS_SENDER_ID');
 
-    if (!atUsername || !atApiKey) {
-      throw new Error("Global Africa's Talking credentials not configured in Supabase Secrets");
+    if (!textcusApiKey) {
+      throw new Error("Global Textcus credentials not configured in Supabase Secrets");
     }
 
     // Normalize phone number (Ghana specific: 024 -> +23324, AT usually expects the + sign)
@@ -71,43 +70,39 @@ Deno.serve(async (req) => {
     } else if (phone.startsWith('233')) {
       phone = '+' + phone;
     }
+    // phone is already formatted to start with +233 or 233 etc.
+    // Textcus accepts 233 format best without the '+'
+    const cleanPhone = phone.startsWith('+') ? phone.substring(1) : phone;
 
-    // Africa's Talking API call (Dynamically switch to Sandbox if username is 'sandbox')
-    const isSandbox = atUsername.toLowerCase() === 'sandbox';
-    const apiUrl = isSandbox 
-      ? `https://api.sandbox.africastalking.com/version1/messaging`
-      : `https://api.africastalking.com/version1/messaging`;
+    const apiUrl = `https://api.textcus.com/api/v2/send`;
 
-    const params = new URLSearchParams();
-    params.append('username', atUsername);
-    params.append('to', phone);
-    params.append('message', message);
-    if (atSenderId && !isSandbox) {
-      params.append('from', atSenderId);
-    }
+    const payload = {
+      to: cleanPhone,
+      message: message,
+      ...(textcusSenderId ? { from: textcusSenderId } : {})
+    };
 
-    const atResponse = await fetch(apiUrl, {
+    const textcusResponse = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'apiKey': atApiKey,
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${textcusApiKey}`,
       },
-      body: params.toString()
+      body: JSON.stringify(payload)
     });
 
-    // Robust parsing: AT sometimes returns plain text errors
-    const contentType = atResponse.headers.get('content-type') || '';
+    const contentType = textcusResponse.headers.get('content-type') || '';
     let result;
     if (contentType.includes('application/json')) {
-      result = await atResponse.json();
+      result = await textcusResponse.json();
     } else {
-      const text = await atResponse.text();
-      result = { errorMessage: text || 'Unknown Error from Africa\'s Talking' };
+      const text = await textcusResponse.text();
+      result = { errorMessage: text || 'Unknown Error from Textcus' };
     }
 
-    const isSuccess = atResponse.ok;
-    const finalError = result?.errorMessage || result?.error || (isSuccess ? null : 'SMS Delivery Failed');
+    const isSuccess = textcusResponse.ok && (result?.status === 'success' || !result?.error);
+    const finalError = result?.errorMessage || result?.error || result?.message || (isSuccess ? null : 'SMS Delivery Failed');
 
     // LOGGING: Track usage in the sms_logs table
     if (isSuccess) {
