@@ -794,7 +794,7 @@ export default function TeachersPage() {
     email: settings?.school?.email || user?.school?.email || '',
     phone: settings?.school?.phone || user?.school?.phone || '',
     motto: settings?.school?.motto || user?.school?.motto || 'Knowledge · Integrity · Excellence',
-    headteacher: settings?.headteacher_name || 'Headteacher',
+    headteacher: settings?.school?.headteacher_name || 'Headteacher',
     logo_url: (settings as any)?.school?.logo_url || (user?.school as any)?.logo_url || '',
   }
 
