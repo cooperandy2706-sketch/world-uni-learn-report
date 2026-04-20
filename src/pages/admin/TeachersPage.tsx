@@ -789,11 +789,11 @@ export default function TeachersPage() {
 
   // ── School info for letters ──
   const school = {
-    name: settings?.school_name || user?.school?.name || 'School Name',
-    address: settings?.address || '',
-    email: settings?.email || '',
-    phone: settings?.phone || '',
-    motto: settings?.motto || 'Knowledge · Integrity · Excellence',
+    name: settings?.school?.name || user?.school?.name || 'School Name',
+    address: settings?.school?.address || user?.school?.address || '',
+    email: settings?.school?.email || user?.school?.email || '',
+    phone: settings?.school?.phone || user?.school?.phone || '',
+    motto: settings?.school?.motto || user?.school?.motto || 'Knowledge · Integrity · Excellence',
     headteacher: settings?.headteacher_name || 'Headteacher',
     logo_url: (settings as any)?.school?.logo_url || (user?.school as any)?.logo_url || '',
   }

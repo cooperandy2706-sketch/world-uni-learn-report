@@ -1347,7 +1347,9 @@ function printWelcomePack({ bills, supplies, scholarships, feeStructures = [], c
       ${logoHtml}
       <div class="cover-left">
         <div class="school">${schoolName}</div>
-        <div class="doc-title">🎓 Admissions Welcome Pack</div>
+        ${school?.motto ? `<div style="font-size:10px;color:#c4b5fd;margin-top:2px;font-style:italic;">&ldquo;${school.motto}&rdquo;</div>` : ''}
+        ${school?.address ? `<div style="font-size:10px;color:#c4b5fd;margin-top:2px;">📍 ${school.address}</div>` : ''}
+        <div class="doc-title" style="margin-top:6px;">🎓 Admissions Welcome Pack</div>
         <div class="meta">Class: <strong>${className}</strong> &nbsp;|&nbsp; Printed: ${date}</div>
       </div>
     </div>
@@ -1552,6 +1554,8 @@ function printBlankAdmissionForm(school: any) {
   <div class="header">
     ${school?.logo_url ? `<img src="${school.logo_url}" alt="Logo" style="height:72px;width:72px;object-fit:contain;border-radius:10px;margin-bottom:8px;"/>` : ''}
     <div class="school-name">${school?.name || 'School Name'}</div>
+    ${school?.motto ? `<div style="font-size:11px;color:#6b7280;font-style:italic;margin-top:2px;">&ldquo;${school.motto}&rdquo;</div>` : ''}
+    ${school?.address ? `<div style="font-size:10px;color:#6b7280;margin:2px 0 6px;">📍 ${school.address} ${school?.phone ? `&nbsp;|&nbsp; 📞 ${school.phone}` : ''}</div>` : ''}
     <div class="form-title">Admission Application Form</div>
     <div class="notice">Please complete all sections clearly in BLOCK LETTERS &nbsp;|&nbsp; Academic Year: ___________________</div>
   </div>
@@ -1681,6 +1685,8 @@ function printApplicationForm(app: any, school: any) {
   <div class="header">
     ${school?.logo_url ? `<img src="${school.logo_url}" alt="Logo" style="height:72px;width:72px;object-fit:contain;border-radius:10px;margin-bottom:8px;"/>` : ''}
     <div class="school-name">${school?.name || 'School Portal'}</div>
+    ${school?.motto ? `<div style="font-size:11px;color:#6b7280;font-style:italic;margin-top:2px;">&ldquo;${school.motto}&rdquo;</div>` : ''}
+    ${school?.address ? `<div style="font-size:10px;color:#6b7280;margin:2px 0 6px;">📍 ${school.address}</div>` : ''}
     <div class="badge">Admission Application</div>
     <div class="app-no">Ref: ${app.application_no} &nbsp;|&nbsp; ${new Date(app.created_at).toLocaleDateString('en-GH', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
   </div>
