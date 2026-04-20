@@ -135,7 +135,7 @@ export default function FeesPage() {
   }
 
   // ── Payment form ───────────────────────────────────────────────
-  const [pf, setPf] = useState({ student_id: '', fee_structure_id: '', amount_paid: '', payment_method: 'cash' as typeof METHODS[number], reference_number: '', notes: '', payment_date: new Date().toISOString().split('T')[0] })
+  const [pf, setPf] = useState({ student_id: '', fee_structure_id: '', selected_fee_ids: [] as string[], amount_paid: '', payment_method: 'cash' as typeof METHODS[number], reference_number: '', notes: '', payment_date: new Date().toISOString().split('T')[0] })
   const recordPayment = useMutation({
     mutationFn: (d: any) => feePaymentsService.createWithAllocation(d),
     onSuccess: (res) => {
@@ -163,20 +163,40 @@ export default function FeesPage() {
 
   function handleRecordPayment() {
     if (!pf.student_id || !pf.amount_paid) { toast.error('Select student and enter amount'); return }
-    const sel = structures.find((s: any) => s.id === pf.fee_structure_id) as any
+    
+    // Generate notes based on selected fees
+    let autoNotes = pf.notes;
+    if (pf.selected_fee_ids.length > 0) {
+      const selectedNames = pf.selected_fee_ids.map(id => {
+        if (id === 'arrears') return 'Arrears';
+        const s = structures.find((x: any) => x.id === id) as any;
+        return s?.fee_name || 'Unknown Fee';
+      });
+      const itemsList = selectedNames.join(', ');
+      autoNotes = pf.notes ? `${pf.notes} (Covering: ${itemsList})` : `Covering: ${itemsList}`;
+    }
+
+    // Determine the primary fee structure ID (use first one if only one, otherwise null to indicate mixed/general)
+    const primaryFeeId = pf.selected_fee_ids.length === 1 && pf.selected_fee_ids[0] !== 'arrears' 
+      ? pf.selected_fee_ids[0] 
+      : null;
+
     recordPayment.mutate({
       school_id: schoolId,
       student_id: pf.student_id,
-      fee_structure_id: (pf.fee_structure_id && pf.fee_structure_id !== 'arrears') ? pf.fee_structure_id : null,
+      fee_structure_id: primaryFeeId,
       term_id: term?.id ?? null,
       academic_year_id: (year as any)?.id ?? null,
       amount_paid: parseFloat(pf.amount_paid),
       payment_method: pf.payment_method,
       reference_number: pf.reference_number || null,
-      notes: pf.notes || null,
+      notes: autoNotes || null,
       payment_date: pf.payment_date,
       recorded_by: user?.id ?? null,
     })
+    
+    // Reset selection state after mutation (onSuccess handles the rest)
+    setPf(p => ({ ...p, selected_fee_ids: [] }))
   }
 
   async function sendReceiptSMS(payment: any) {
@@ -203,17 +223,23 @@ export default function FeesPage() {
 
   function generateTextReceipt(payment: any) {
     const stu = students.find((s: any) => s.id === payment.student_id) as any
-    const struct = structures.find((s: any) => s.id === payment.fee_structure_id) as any
     const arrPaid = Number(payment.arrears_paid || 0)
     const arrRemain = Number(payment.arrears_balance_after || 0)
     const currentPaid = Number(payment.amount_paid) - arrPaid
-    let text = `🏫 SCHOOL FEE RECEIPT\n\nStudent: ${stu?.full_name ?? 'Unknown'}\nClass: ${(stu?.class as any)?.name ?? 'Unknown'}\nFee Type: ${struct?.fee_name ?? 'General Fee'}\n\nAmount Paid: ${GHS(payment.amount_paid)}\nMethod: ${payment.payment_method.toUpperCase()}\nDate: ${new Date(payment.payment_date).toLocaleDateString('en-GB')}\nReceipt #: ${payment.id?.slice(0, 8).toUpperCase()}`
+    
+    let text = `🏫 SCHOOL FEE RECEIPT\n\nStudent: ${stu?.full_name ?? 'Unknown'}\nClass: ${(stu?.class as any)?.name ?? 'Unknown'}\n\nAmount Paid: ${GHS(payment.amount_paid)}\nMethod: ${payment.payment_method.toUpperCase()}\nDate: ${new Date(payment.payment_date).toLocaleDateString('en-GB')}`
+    
+    if (payment.notes) {
+      text += `\n\n📝 NOTES:\n${payment.notes}`
+    }
+    
     if (arrPaid > 0) {
       text += `\n\n📋 PAYMENT ALLOCATION:\n→ Applied to Arrears: ${GHS(arrPaid)}\n→ Applied to Current Term: ${GHS(currentPaid)}`
       if (arrRemain > 0) text += `\n⚠️ Remaining Arrears: ${GHS(arrRemain)}`
       else text += `\n✅ ALL ARREARS CLEARED!`
     }
-    text += `\n\nThank you for your payment.`
+    
+    text += `\n\nReceipt #: ${payment.id?.slice(0, 8).toUpperCase()}\n\nThank you for your payment.`
     return text
   }
 
@@ -284,7 +310,7 @@ export default function FeesPage() {
             </div>
           </div>
 
-          <div style="background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 10px; padding: 12px 20px; color: #ffffff; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 10px; padding: 12px 20px; color: #ffffff; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
             <div>
               <div style="font-size:10px; font-weight:700; opacity: 0.8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom: 2px;">Total Amount Paid</div>
               <div style="font-size:24px; font-weight:900; letter-spacing: -0.01em;">${GHS(payment.amount_paid)}</div>
@@ -294,6 +320,12 @@ export default function FeesPage() {
               <div style="font-size:16px; font-weight:900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'};">${finalBalance > 0 ? GHS(finalBalance) : 'CLEARED ✓'}</div>
             </div>
           </div>
+
+          ${payment.notes ? `
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px;">
+            <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Payment Notes / Coverage</div>
+            <div style="font-size: 11px; color: #1e293b; font-weight: 600; line-height: 1.4;">${payment.notes}</div>
+          </div>` : ''}
 
           <table style="width:100%; border-collapse:collapse; margin-bottom: 8px;">
             <thead>
@@ -506,45 +538,112 @@ export default function FeesPage() {
                     </select>
                   </div>
                 )},
-                { label: 'Fee Type (optional)', children: (
-                  <select 
-                    value={pf.fee_structure_id} 
-                    onChange={e => { 
-                      const val = e.target.value;
-                      const s = structures.find((x: any) => x.id === val) as any; 
-                      const selStu = (students as any[]).find((s: any) => s.id === pf.student_id);
-                      
-                      let amt = pf.amount_paid;
-                      if (val === 'arrears' && selStu) {
-                        amt = String(selStu.fees_arrears);
-                      } else if (s) {
-                        amt = String(s.amount);
-                      }
-
-                      setPf(p => ({ ...p, fee_structure_id: val, amount_paid: amt }));
-                    }} 
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}
-                  >
-                    <option value="">— General / Custom —</option>
+                { label: 'Select Fees to Pay', children: (
+                  <div style={{ background: '#f8fafc', border: '1.5px solid #e5e7eb', borderRadius: 12, padding: '12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {(() => {
                       const selStu = (students as any[]).find((s: any) => s.id === pf.student_id);
-                      const filtered = selStu 
-                        ? (structures as any[]).filter((s: any) => s.class_id === selStu.class?.id)
-                        : (structures as any[]);
+                      if (!selStu) return <p style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', margin: '4px 0' }}>Please select a student first</p>;
+                      
+                      const filtered = (structures as any[]).filter((s: any) => s.class_id === selStu.class?.id);
+                      const hasArrears = Number(selStu.fees_arrears) > 0;
+
                       return (
                         <>
-                          {selStu && Number(selStu.fees_arrears) > 0 && (
-                            <option value="arrears" style={{ fontWeight: 'bold', color: '#dc2626' }}>
-                              ⚠️ Previous Arrears — {GHS(Number(selStu.fees_arrears))}
-                            </option>
+                          {hasArrears && (
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: pf.selected_fee_ids.includes('arrears') ? '#fee2e2' : '#fff', borderRadius: 8, border: `1.5px solid ${pf.selected_fee_ids.includes('arrears') ? '#f87171' : '#e5e7eb'}`, cursor: 'pointer', transition: 'all .15s' }}>
+                              <input 
+                                type="checkbox" 
+                                checked={pf.selected_fee_ids.includes('arrears')} 
+                                onChange={e => {
+                                  let newIds = e.target.checked 
+                                    ? [...pf.selected_fee_ids, 'arrears'] 
+                                    : pf.selected_fee_ids.filter(id => id !== 'arrears');
+                                  
+                                  // Recalculate total
+                                  let total = 0;
+                                  newIds.forEach(id => {
+                                    if (id === 'arrears') total += Number(selStu.fees_arrears);
+                                    else {
+                                      const s = (structures as any[]).find(x => x.id === id);
+                                      if (s) total += Number(s.amount);
+                                    }
+                                  });
+                                  // Adjust for scholarship percentage for current term fees
+                                  const scholarshipPct = selStu.scholarship_percentage || 0;
+                                  if (scholarshipPct > 0) {
+                                    let currentFeesTotal = 0;
+                                    newIds.forEach(id => {
+                                      if (id !== 'arrears') {
+                                        const s = (structures as any[]).find(x => x.id === id);
+                                        if (s) currentFeesTotal += Number(s.amount);
+                                      }
+                                    });
+                                    const discount = currentFeesTotal * (scholarshipPct / 100);
+                                    total -= discount;
+                                  }
+
+                                  setPf(p => ({ ...p, selected_fee_ids: newIds, amount_paid: total > 0 ? total.toFixed(2) : '' }));
+                                }} 
+                                style={{ accentColor: '#dc2626' }}
+                              />
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#991b1b' }}>⚠️ Outstanding Arrears</div>
+                                <div style={{ fontSize: 11, color: '#b91c1c' }}>{GHS(Number(selStu.fees_arrears))}</div>
+                              </div>
+                            </label>
                           )}
+
                           {filtered.map((s: any) => (
-                            <option key={s.id} value={s.id}>{s.fee_name} — {GHS(s.amount)} ({s.class?.name})</option>
+                            <label key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: pf.selected_fee_ids.includes(s.id) ? '#f5f3ff' : '#fff', borderRadius: 8, border: `1.5px solid ${pf.selected_fee_ids.includes(s.id) ? '#7c3aed' : '#e5e7eb'}`, cursor: 'pointer', transition: 'all .15s' }}>
+                              <input 
+                                type="checkbox" 
+                                checked={pf.selected_fee_ids.includes(s.id)} 
+                                onChange={e => {
+                                  let newIds = e.target.checked 
+                                    ? [...pf.selected_fee_ids, s.id] 
+                                    : pf.selected_fee_ids.filter(id => id !== s.id);
+                                  
+                                  // Recalculate total
+                                  let total = 0;
+                                  newIds.forEach(id => {
+                                    if (id === 'arrears') total += Number(selStu.fees_arrears);
+                                    else {
+                                      const struct = (structures as any[]).find(x => x.id === id);
+                                      if (struct) total += Number(struct.amount);
+                                    }
+                                  });
+                                  // Adjust for scholarship
+                                  const scholarshipPct = selStu.scholarship_percentage || 0;
+                                  if (scholarshipPct > 0) {
+                                    let currentFeesTotal = 0;
+                                    newIds.forEach(id => {
+                                      if (id !== 'arrears') {
+                                        const struct = (structures as any[]).find(x => x.id === id);
+                                        if (struct) currentFeesTotal += Number(struct.amount);
+                                      }
+                                    });
+                                    const discount = currentFeesTotal * (scholarshipPct / 100);
+                                    total -= discount;
+                                  }
+
+                                  setPf(p => ({ ...p, selected_fee_ids: newIds, amount_paid: total > 0 ? total.toFixed(2) : '' }));
+                                }} 
+                                style={{ accentColor: '#6d28d9' }}
+                              />
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{s.fee_name}</div>
+                                <div style={{ fontSize: 11, color: '#6b7280' }}>{GHS(s.amount)}</div>
+                              </div>
+                            </label>
                           ))}
+                          
+                          {filtered.length === 0 && !hasArrears && (
+                            <p style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center' }}>No specific fees found for this class</p>
+                          )}
                         </>
                       );
                     })()}
-                  </select>
+                  </div>
                 )},
                 { label: 'Amount Paid (GH₵)', children: <input type="number" min="0" step="0.01" value={pf.amount_paid} onChange={e => setPf(p => ({ ...p, amount_paid: e.target.value }))} placeholder="0.00" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} /> },
               ].map(f => (
