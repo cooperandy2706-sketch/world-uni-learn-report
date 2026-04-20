@@ -154,11 +154,12 @@ export default function TakeAssignmentPage() {
   if (status === 'prep') {
     return (
       <div style={{ maxWidth: 600, margin: '60px auto', background: '#fff', borderRadius: 24, padding: 40, border: '1.5px solid #f0eefe', textAlign: 'center', boxShadow: '0 20px 50px rgba(109,40,217,0.1)' }}>
+        <style>{`@media (max-width: 640px) { .resp-grid-2 { grid-template-columns: 1fr !important; } }`}</style>
         <div style={{ fontSize: 48, marginBottom: 20 }}>🎯</div>
         <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: '#111827', marginBottom: 12 }}>{assignment.title}</h1>
         <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 32, lineHeight: 1.6 }}>{assignment.description || 'Follow instructions and complete all questions to the best of your ability.'}</p>
         
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
+        <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
           <div style={{ background: '#f5f3ff', borderRadius: 16, padding: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 4 }}>Questions</div>
             <div style={{ fontSize: 20, fontWeight: 800, color: '#7c3aed' }}>{questions.length} Items</div>
@@ -208,6 +209,7 @@ export default function TakeAssignmentPage() {
         .option-btn { transition: all 0.2s; border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; background: #fff; width: 100%; text-align: left; font-family: inherit; font-size: 14px; font-weight: 500; color: #374151; }
         .option-btn:hover { border-color: #7c3aed; background: #f5f3ff; }
         .option-btn.selected { border-color: #7c3aed; background: #f5f3ff; box-shadow: 0 0 0 3px rgba(109,40,217,0.1); color: #7c3aed; font-weight: 700; }
+        @media (max-width: 640px) { .resp-grid-2 { grid-template-columns: 1fr !important; } }
       `}</style>
 
       <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderBottom: '1.5px solid #f0eefe', padding: '12px 0' }}>
@@ -245,7 +247,7 @@ export default function TakeAssignmentPage() {
            ))}
 
            {q.type === 'tf' && (
-             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+             <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 {['True', 'False'].map(opt => (
                   <button key={opt} className={`option-btn ${userAnswers[q.id] === opt ? 'selected' : ''}`} onClick={() => handleSelect(q.id, opt)} style={{ height: 80, justifyContent: 'center', fontSize: 18 }}>
                     {opt === 'True' ? '✅' : '❌'} {opt}

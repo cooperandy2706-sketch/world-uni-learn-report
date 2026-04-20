@@ -139,6 +139,13 @@ export default function TeacherGlobalQuizDetailsPage() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
         .s-card { transition: all 0.2s; }
         .s-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        @media (max-width: 768px) {
+          .resp-header-box { flex-direction: column !important; align-items: stretch !important; gap: 16px; }
+          .resp-flex-col { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; }
+        }
+        @media (max-width: 480px) {
+          .resp-minmax-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', maxWidth: 1000, margin: '0 auto', paddingBottom: 60 }}>
@@ -151,7 +158,7 @@ export default function TeacherGlobalQuizDetailsPage() {
         </div>
 
         {/* Global Quiz Header */}
-        <div style={{ background: '#fff', borderRadius: 20, padding: 30, border: '1px solid #f0eefe', boxShadow: '0 4px 20px rgba(109,40,217,0.04)', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20 }}>
+        <div className="resp-header-box" style={{ background: '#fff', borderRadius: 20, padding: 30, border: '1px solid #f0eefe', boxShadow: '0 4px 20px rgba(109,40,217,0.04)', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
               <span style={{ fontSize: 11, fontWeight: 800, background: '#f5f3ff', color: '#7c3aed', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -174,7 +181,7 @@ export default function TeacherGlobalQuizDetailsPage() {
         </div>
 
         {/* Mini Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 30 }}>
+        <div className="resp-minmax-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 30 }}>
           <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fdf4ff', color: '#c026d3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>👩‍🎓</div>
              <div>
@@ -225,7 +232,7 @@ export default function TeacherGlobalQuizDetailsPage() {
                 </div>
 
                 {s.has_submitted ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                  <div className="resp-flex-col" style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Submitted</div>
                       <div style={{ fontSize: 12, fontWeight: 600, color: '#4b5563' }}>{formatDate(s.submitted_at)}</div>

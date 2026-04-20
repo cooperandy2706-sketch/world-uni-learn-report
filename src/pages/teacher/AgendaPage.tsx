@@ -111,6 +111,9 @@ export default function TeacherAgendaPage() {
         .timeline-item:first-child:before{top:30px}
         .timeline-item:last-child:before{bottom:calc(100% - 30px)}
         .agenda-card-teacher:hover{border-color:#7c3aed !important;box-shadow:0 10px 25px rgba(124,58,237,0.06) !important}
+        @media (max-width: 768px) {
+          .resp-grid-3 { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",sans-serif', animation: 'tap_fi .4s ease' }}>
@@ -216,7 +219,7 @@ export default function TeacherAgendaPage() {
 
                <div style={{ marginBottom: 18 }}>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>How are you doing with this plan? *</label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                  <div className="resp-grid-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
                      {[
                        { v: 'pending', label: 'Working on it', icon: <Clock size={14} />, color: '#6d28d9', bg: '#f5f3ff' },
                        { v: 'completed', label: 'Done & Success', icon: <CheckCircle size={14} />, color: '#16a34a', bg: '#f0fdf4' },

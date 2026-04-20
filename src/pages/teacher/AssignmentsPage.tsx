@@ -349,11 +349,17 @@ export default function AssignmentsPage() {
         @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         .q-card { background: #fff; border: 1.5px solid #f0eefe; border-radius: 14px; padding: 18px; margin-bottom: 16px; position: relative; }
         .q-card:hover { border-color: #7c3aed; }
+        @media (max-width: 768px) {
+          .resp-grid { grid-template-columns: 1fr !important; }
+          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
+          .resp-view-switch { flex-direction: column !important; }
+          .resp-gap-sm { gap: 8px !important; }
+        }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
         
-        <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="resp-header" style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Assignments</h1>
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage digital quizzes and tasks for your students</p>
@@ -362,7 +368,7 @@ export default function AssignmentsPage() {
         </div>
 
         {/* ── Main View Switcher ── */}
-        <div style={{ background: '#f5f3ff', padding: 8, borderRadius: 18, display: 'flex', gap: 8, marginBottom: 24, maxWidth: 500 }}>
+        <div className="resp-view-switch" style={{ background: '#f5f3ff', padding: 8, borderRadius: 18, display: 'flex', gap: 8, marginBottom: 24, maxWidth: 500 }}>
           <div onClick={() => setViewMode('class')} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'class' ? { background: '#fff', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: '#6b7280' }) }}>
             🏫 My Class Assignments
           </div>
@@ -510,7 +516,7 @@ export default function AssignmentsPage() {
             <Btn onClick={handleSubmit} loading={isSubmitting}>Publish Assignment</Btn>
           </>}
         >
-          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 24 }}>
+          <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 24 }}>
             <div>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>📋 Assignment Details</p>
               

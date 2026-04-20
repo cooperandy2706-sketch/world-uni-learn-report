@@ -14,6 +14,7 @@ const schema = z.object({
   school_name: z.string().min(1, 'School name is required'),
   school_motto: z.string().optional(),
   school_email: z.string().email('Invalid email').optional().or(z.literal('')),
+  school_phone: z.string().optional().or(z.literal('')),
   school_address: z.string().optional(),
   headteacher_name: z.string().optional(),
   next_term_date: z.string().optional(),
@@ -90,7 +91,7 @@ export default function SettingsPage() {
   const [logoUploading, setLogoUploading] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [logoHov, setLogoHov] = useState(false)
-  const [activeTab, setActiveTab] = useState<'school' | 'report' | 'account'>('school')
+  const [activeTab, setActiveTab] = useState<'school' | 'report' | 'sms' | 'account'>('school')
   const logoRef = useRef<HTMLInputElement>(null)
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty } } = useForm<FormData>({ resolver: zodResolver(schema) })

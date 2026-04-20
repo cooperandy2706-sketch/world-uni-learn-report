@@ -165,6 +165,7 @@ export default function BursarDashboard() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
         @keyframes _bd_fu { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         @keyframes _bd_fi { from{opacity:0} to{opacity:1} }
+        @keyframes _bd_spin { to{transform:rotate(360deg)} }
         .bd-card { transition: all .2s; }
         .bd-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important; }
         .bd-ql:hover { background: #f5f3ff !important; transform: translateY(-2px); }
@@ -184,7 +185,7 @@ export default function BursarDashboard() {
 
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_tp_spin .8s linear infinite' }} />
+            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_bd_spin .8s linear infinite' }} />
             <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading financial data…</p>
           </div>
         ) : (

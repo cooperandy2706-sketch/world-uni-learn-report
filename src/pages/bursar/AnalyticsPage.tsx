@@ -1,7 +1,7 @@
 // src/pages/bursar/AnalyticsPage.tsx
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { incomeService, expenseService, feePaymentsService, payrollService } from '../../services/bursar.service'
+import { incomeService, expenseService, feePaymentsService } from '../../services/bursar.service'
 import { supabase } from '../../lib/supabase'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line, AreaChart, Area } from 'recharts'
 

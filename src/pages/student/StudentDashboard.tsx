@@ -157,6 +157,7 @@ export default function StudentDashboard() {
           .sd-main-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
           .sd-kpi-grid { grid-template-columns: 1fr 1fr !important; }
           .sd-header { flex-direction: column !important; align-items: stretch !important; }
+          .resp-flex-stack { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
         }
       `}</style>
 
@@ -206,7 +207,7 @@ export default function StudentDashboard() {
         </div>
         
         {/* ── Typing Game Teaser ── */}
-        <div style={{
+        <div className="resp-flex-stack" style={{
           background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
           borderRadius: 18, padding: '20px 24px', marginBottom: 22, color: '#fff',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -233,7 +234,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* ── Global Library Teaser ── */}
-        <div style={{
+        <div className="resp-flex-stack" style={{
           background: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)',
           borderRadius: 18, padding: '20px 24px', marginBottom: 22, color: '#fff',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',

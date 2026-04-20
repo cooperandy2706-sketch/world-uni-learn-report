@@ -92,6 +92,10 @@ export default function MyClassesPage() {
         @keyframes _fi{from{opacity:0}to{opacity:1}}
         @keyframes _fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         .std-row:hover{background:#faf5ff !important}
+        @media (max-width: 768px) {
+          .resp-table-wrap { overflow-x: auto !important; padding-bottom: 12px; }
+          .resp-table-min { min-width: 700px; display: table; width: 100%; }
+        }
       `}</style>
 
       <div style={{ fontFamily:'"DM Sans",system-ui,sans-serif', animation:'_fi .4s ease' }}>
@@ -183,7 +187,8 @@ export default function MyClassesPage() {
                       <div style={{ padding:'12px 20px', background:'#fafafa', borderBottom:'1px solid #f0eefe', fontSize:11, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.06em' }}>
                         Student Rankings
                       </div>
-                      <table style={{ width:'100%', borderCollapse:'collapse' }}>
+                      <div className="resp-table-wrap">
+                      <table className="resp-table-min" style={{ borderCollapse:'collapse' }}>
                         <thead>
                           <tr style={{ background:'#f9f9ff' }}>
                             {['Rank','Student','ID','Gender','Avg Score','Grade','Progress'].map(h => (
@@ -230,6 +235,7 @@ export default function MyClassesPage() {
                           ))}
                         </tbody>
                       </table>
+                      </div>
                     </div>
                   )}
                 </div>

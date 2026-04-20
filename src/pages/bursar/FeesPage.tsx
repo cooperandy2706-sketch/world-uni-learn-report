@@ -8,7 +8,7 @@ import { feeStructuresService, feePaymentsService } from '../../services/bursar.
 import { supabase } from '../../lib/supabase'
 import Modal from '../../components/ui/Modal'
 import toast from 'react-hot-toast'
-import { Plus, Trash2, Printer, CreditCard, Settings, GraduationCap, MessageCircle, Mail, Smartphone, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Plus, Trash2, Printer, CreditCard, Settings, GraduationCap, MessageCircle, Mail, Smartphone, AlertTriangle, CheckCircle2, Send, Loader2 } from 'lucide-react'
 
 const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
 const METHODS = ['cash', 'momo', 'bank', 'cheque'] as const
@@ -51,6 +51,7 @@ export default function FeesPage() {
   const [paymentModal, setPaymentModal] = useState(false)
   const [printReceipt, setPrintReceipt] = useState<any>(null)
   const [allocationResult, setAllocationResult] = useState<any>(null)
+  const [isSendingSMS, setIsSendingSMS] = useState(false)
   const [studentSearch, setStudentSearch] = useState('')
 
   // Fee structures
@@ -78,7 +79,7 @@ export default function FeesPage() {
   // from an old-term view, so the arrears banner / allocation preview is correct.
   const { data: students = [] } = useQuery({
     queryKey: ['students-all', schoolId],
-    queryFn: async () => { const { data } = await supabase.from('students').select('id, full_name, student_id, scholarship_type, scholarship_percentage, fees_arrears, class:classes(id,name)').eq('school_id', schoolId).eq('is_active', true).order('full_name'); return data ?? [] },
+    queryFn: async () => { const { data } = await supabase.from('students').select('id, full_name, student_id, scholarship_type, scholarship_percentage, fees_arrears, guardian_phone, guardian_name, class:classes(id,name)').eq('school_id', schoolId).eq('is_active', true).order('full_name'); return data ?? [] },
     enabled: !!schoolId,
     staleTime: 0,
   })
@@ -176,6 +177,28 @@ export default function FeesPage() {
       payment_date: pf.payment_date,
       recorded_by: user?.id ?? null,
     })
+  }
+
+  async function sendReceiptSMS(payment: any) {
+    const stu = (students as any[]).find((s: any) => s.id === payment.student_id) as any
+    const phone = stu?.guardian_phone
+    if (!phone) {
+      toast.error(`No guardian phone number on file for ${stu?.full_name ?? 'this student'}`)
+      return
+    }
+    const message = generateTextReceipt(payment)
+    setIsSendingSMS(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('send-sms', {
+        body: { school_id: schoolId, recipient: phone, message }
+      })
+      if (error || data?.error) throw new Error(error?.message || data?.error)
+      toast.success(`📱 Receipt SMS sent to ${stu?.guardian_name || 'Guardian'} (${phone})`)
+    } catch (err: any) {
+      toast.error(`SMS failed: ${err.message}`)
+    } finally {
+      setIsSendingSMS(false)
+    }
   }
 
   function generateTextReceipt(payment: any) {
@@ -671,7 +694,7 @@ export default function FeesPage() {
                           <div style={{ display: 'flex', gap: 6 }}>
                             <button onClick={(e) => { e.stopPropagation(); setPrintReceipt(p) }} style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#eff6ff', color: '#2563eb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="View / Print Receipt"><Printer size={13} /></button>
                             <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(generateTextReceipt(p))}`, '_blank') }} style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#ecfdf5', color: '#059669', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Share via WhatsApp"><MessageCircle size={13} /></button>
-                            <button onClick={(e) => { e.stopPropagation(); window.open(`sms:?body=${encodeURIComponent(generateTextReceipt(p))}`, '_self') }} style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Send via SMS"><Smartphone size={13} /></button>
+                            <button onClick={(e) => { e.stopPropagation(); sendReceiptSMS(p) }} disabled={isSendingSMS} style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: isSendingSMS ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: isSendingSMS ? 0.6 : 1 }} title="Send SMS Receipt to Guardian">{isSendingSMS ? <Loader2 size={13} className="animate-spin" /> : <Smartphone size={13} />}</button>
                             <button onClick={(e) => { e.stopPropagation(); if (confirm('Delete this payment?')) delPayment.mutate(p.id) }} style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Delete"><Trash2 size={13} /></button>
                           </div>
                         </td>
@@ -809,8 +832,13 @@ export default function FeesPage() {
                 <button onClick={() => { window.open(`https://wa.me/?text=${encodeURIComponent(generateTextReceipt(printReceipt))}`, '_blank') }} style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#ecfdf5', color: '#059669', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                   <MessageCircle size={16} /> WhatsApp
                 </button>
-                <button onClick={() => { window.open(`sms:?body=${encodeURIComponent(generateTextReceipt(printReceipt))}`, '_self') }} style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#f5f3ff', color: '#6d28d9', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Smartphone size={16} /> SMS Text
+                <button
+                  onClick={() => sendReceiptSMS(printReceipt)}
+                  disabled={isSendingSMS}
+                  style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#f5f3ff', color: '#6d28d9', fontSize: 13, fontWeight: 700, cursor: isSendingSMS ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: isSendingSMS ? 0.7 : 1 }}
+                >
+                  {isSendingSMS ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                  {isSendingSMS ? 'Sending…' : 'Send SMS to Guardian'}
                 </button>
                 <button onClick={() => { window.open(`mailto:?subject=Official School Fee Receipt&body=${encodeURIComponent(generateTextReceipt(printReceipt))}`, '_self') }} style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#f8fafc', color: '#374151', borderBottom: '2px solid #e2e8f0', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, gridColumn: 'span 2' }}>
                   <Mail size={16} /> Send via Email

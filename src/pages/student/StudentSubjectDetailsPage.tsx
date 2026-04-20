@@ -122,7 +122,7 @@ export default function StudentSubjectDetailsPage() {
                     <div style={{ height: 1.5, flex: 1, background: 'linear-gradient(90deg, #ddd6fe, transparent)' }} />
                  </div>
 
-                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 }}>
+                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24 }}>
                     {items.map((res, i) => (
                       <div key={res.id} className="res-card" style={{ animation: `_fadeUp 0.4s ease ${i * 0.05}s both` }}>
                         

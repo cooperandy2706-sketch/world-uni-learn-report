@@ -25,6 +25,8 @@ export const ROUTES = {
   ADMIN_MESSAGES: '/admin/messages',
   ADMIN_AGENDA: '/admin/agenda',
   ADMIN_SMS: '/admin/sms',
+  ADMIN_ADMISSIONS: '/admin/admissions',
+  ADMIN_BURSARS: '/admin/bursars',
 
   // Teacher
   TEACHER_DASHBOARD: '/teacher/dashboard',

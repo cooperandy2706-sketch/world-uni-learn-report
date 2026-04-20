@@ -150,7 +150,7 @@ export default function TeacherTakeGlobalQuizPage() {
         <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 700, color: '#111827', marginBottom: 12 }}>{quiz.title}</h1>
         <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 32, lineHeight: 1.6 }}>{quiz.description || 'Preview this global interactive quiz.'} <br/> <strong style={{color: '#7c3aed'}}>Note:</strong> Preview submissions are not recorded to the database.</p>
         
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
+        <div className="resp-2col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
           <div style={{ background: '#f5f3ff', borderRadius: 16, padding: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 4 }}>Questions</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: '#7c3aed' }}>{questions.length} Items</div>
@@ -220,7 +220,7 @@ export default function TeacherTakeGlobalQuizPage() {
 
                 <h4 style={{ fontSize: 16, fontWeight: 600, color: '#111827', margin: '0 0 16px 0', lineHeight: 1.4 }}>{q.text}</h4>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12, background: '#f9fafb', padding: 14, borderRadius: 12 }}>
+                <div className="resp-2col-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12, background: '#f9fafb', padding: 14, borderRadius: 12 }}>
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 6 }}>Your Answer</div>
                     <div style={{ fontSize: 14, fontWeight: 600, color: isCorrect ? '#059669' : '#dc2626' }}>
@@ -253,10 +253,14 @@ export default function TeacherTakeGlobalQuizPage() {
         .option-btn { transition: all 0.2s; border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; cursor: pointer; background: #fff; width: 100%; text-align: left; font-family: inherit; font-size: 15px; font-weight: 500; color: #374151; }
         .option-btn:hover { border-color: #7c3aed; background: #faf5ff; transform: translateX(4px); }
         .option-btn.selected { border-color: #7c3aed; background: #f5f3ff; box-shadow: 0 4px 14px rgba(109,40,217,0.12); color: #6d28d9; font-weight: 700; border-width: 2px; }
+        @media (max-width: 768px) {
+          .resp-2col-grid { grid-template-columns: 1fr !important; }
+          .resp-flex-header { flex-direction: column !important; align-items: stretch !important; gap: 16px !important; }
+        }
       `}</style>
 
       <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderBottom: '1.5px solid #f0eefe', padding: '14px 0' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 20px', display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="resp-flex-header" style={{ maxWidth: 800, margin: '0 auto', padding: '0 20px', display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>🌍 Teacher Preview</div>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>{quiz.title}</h2>
@@ -301,7 +305,7 @@ export default function TeacherTakeGlobalQuizPage() {
            ))}
 
            {q.type === 'tf' && (
-             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+             <div className="resp-2col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 {['True', 'False'].map(opt => (
                   <button key={opt} className={`option-btn ${userAnswers[q.id] === opt ? 'selected' : ''}`} onClick={() => handleSelect(q.id, opt)} style={{ height: 100, flexDirection: 'column', justifyContent: 'center', gap: 10, fontSize: 20 }}>
                     <div style={{ fontSize: 32 }}>{opt === 'True' ? '✅' : '❌'}</div> 

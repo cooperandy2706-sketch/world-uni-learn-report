@@ -283,6 +283,12 @@ export default function TeacherReportsPage() {
         @keyframes _rp_fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         .rp-row:hover{background:#faf5ff !important}
         .rp-std:hover{background:#ede9fe !important}
+        @media (max-width: 768px) {
+          .resp-grid-stack { grid-template-columns: 1fr !important; }
+          .resp-main-grid { grid-template-columns: 1fr !important; }
+          .resp-table-wrap { overflow-x: auto !important; padding-bottom: 12px; }
+          .resp-table-min { min-width: 700px; display: table; width: 100%; }
+        }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_rp_fi .4s ease' }}>
@@ -330,7 +336,7 @@ export default function TeacherReportsPage() {
         </div>
 
         {/* ── Selectors ────────────────────────────────────────────────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
+        <div className="resp-grid-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
           {/* Class */}
           <div style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.05)' }}>
             <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 6 }}>
@@ -400,7 +406,7 @@ export default function TeacherReportsPage() {
 
         {/* ── Main report panel ────────────────────────────────────────── */}
         {!loadingReport && selectedStudent && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, animation: '_rp_fu .4s ease' }}>
+          <div className="resp-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, animation: '_rp_fu .4s ease' }}>
 
             {/* ── LEFT ──────────────────────────────────────────────── */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -462,7 +468,8 @@ export default function TeacherReportsPage() {
                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>Subject Scores</h3>
                     <span style={{ fontSize: 11, fontWeight: 700, background: '#f5f3ff', color: '#6d28d9', padding: '2px 8px', borderRadius: 99 }}>{scores.length} subjects</span>
                   </div>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <div className="resp-table-wrap">
+                  <table className="resp-table-min" style={{ borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)' }}>
                         {['Subject', 'Class Score', 'Exam Score', 'Total', 'Grade', 'Position', 'Remark'].map(h => (
@@ -511,6 +518,7 @@ export default function TeacherReportsPage() {
                       </tr>
                     </tfoot>
                   </table>
+                  </div>
                 </div>
               )}
 
@@ -530,7 +538,7 @@ export default function TeacherReportsPage() {
                   )}
                 </div>
 
-                <div style={{ padding: '16px 18px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div className="resp-grid-stack" style={{ padding: '16px 18px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                   <div>
                     <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>
                       Class Teacher's Remarks

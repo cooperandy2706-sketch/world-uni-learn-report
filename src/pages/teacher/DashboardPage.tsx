@@ -200,12 +200,22 @@ export default function TeacherDashboardPage() {
         .overlay2.open{display:flex;animation:_fi .15s ease}
         .att-pill{transition:all .15s}
         .att-pill:hover{transform:translateY(-1px)}
+        @media (max-width: 768px) {
+          .resp-main-grid { grid-template-columns: 1fr !important; }
+          .resp-kpi-grid { grid-template-columns: 1fr 1fr !important; }
+          .resp-header { flex-direction: column !important; align-items: stretch !important; }
+          .resp-prof-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
+        }
+        @media (max-width: 480px) {
+          .resp-kpi-grid { grid-template-columns: 1fr !important; }
+          .resp-btn-group { flex-direction: column !important; align-items: stretch !important; width: 100%; }
+        }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', opacity: mounted ? 1 : 0, transition: 'opacity .4s ease' }}>
 
         {/* ── Header ── */}
-        <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, animation: '_fu .5s ease both' }}>
+        <div className="resp-header" style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, animation: '_fu .5s ease both' }}>
           <div>
             <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
               {greeting}, {user?.full_name?.split(' ')[0]} 👋
@@ -214,7 +224,7 @@ export default function TeacherDashboardPage() {
               {DAYS[now.getDay()]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit' })} · {(year as any)?.name} · {(term as any)?.name ?? 'No active term'}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div className="resp-btn-group" style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => setMsgOpen(true)}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 14px', borderRadius: 9, fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', border: '1.5px solid #e5e7eb', cursor: 'pointer', transition: 'all .15s' }}
               onMouseEnter={e => { e.currentTarget.style.background = '#f5f3ff'; e.currentTarget.style.borderColor = '#ddd6fe' }}
@@ -242,9 +252,9 @@ export default function TeacherDashboardPage() {
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', opacity: .8, marginBottom: 4 }}>🟢 CLASS IN PROGRESS</div>
             <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, margin: '0 0 2px' }}>{activeLesson.subject?.name}</h2>
             <p style={{ fontSize: 13, opacity: .85, margin: '0 0 10px' }}>{activeLesson.class?.name} · {activeLesson.period?.name} · {activeLesson.period?.start_time?.slice(0,5)}–{activeLesson.period?.end_time?.slice(0,5)}</p>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Link to={ROUTES.TEACHER_ATTENDANCE} style={{ padding: '6px 14px', borderRadius: 8, background: 'rgba(255,255,255,.2)', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>📋 Mark Attendance</Link>
-              <Link to={ROUTES.TEACHER_LESSON_TRACKER} style={{ padding: '6px 14px', borderRadius: 8, background: 'rgba(255,255,255,.15)', color: '#fff', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>📖 Lesson Tracker</Link>
+            <div className="resp-btn-group" style={{ display: 'flex', gap: 8 }}>
+              <Link to={ROUTES.TEACHER_ATTENDANCE} style={{ flex: 1, textAlign: 'center', padding: '6px 14px', borderRadius: 8, background: 'rgba(255,255,255,.2)', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>📋 Mark Attendance</Link>
+              <Link to={ROUTES.TEACHER_LESSON_TRACKER} style={{ flex: 1, textAlign: 'center', padding: '6px 14px', borderRadius: 8, background: 'rgba(255,255,255,.15)', color: '#fff', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>📖 Lesson Tracker</Link>
             </div>
           </div>
         )}
@@ -270,7 +280,7 @@ export default function TeacherDashboardPage() {
         ) : (
           <>
             {/* ── KPIs ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 13, marginBottom: 20, animation: '_fu .5s ease .1s both' }}>
+            <div className="resp-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 13, marginBottom: 20, animation: '_fu .5s ease .1s both' }}>
               {[
                 { label: 'My Classes', value: uniqueClasses.length, icon: '🏫', color: '#6d28d9', bg: '#f5f3ff' },
                 { label: 'My Subjects', value: uniqueSubjects.length, icon: '📚', color: '#0891b2', bg: '#ecfeff' },
@@ -302,7 +312,7 @@ export default function TeacherDashboardPage() {
             </div>
 
             {/* ── Main grid ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, animation: '_fu .5s ease .2s both' }}>
+            <div className="resp-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, animation: '_fu .5s ease .2s both' }}>
 
               {/* ── LEFT ── */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -468,7 +478,7 @@ export default function TeacherDashboardPage() {
                     {teacherRecord?.qualification && (
                       <div style={{ background: 'rgba(255,255,255,.08)', borderRadius: 8, padding: '6px 11px', marginBottom: 11, fontSize: 11, color: 'rgba(255,255,255,.7)' }}>🎓 {teacherRecord.qualification}</div>
                     )}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+                    <div className="resp-prof-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
                       {[{ label: 'Classes', value: uniqueClasses.length }, { label: 'Subjects', value: uniqueSubjects.length }, { label: 'Quizzes', value: myQuizCount }].map(s => (
                         <div key={s.label} style={{ background: 'rgba(255,255,255,.08)', borderRadius: 8, padding: '8px', textAlign: 'center' }}>
                           <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#fff' }}>{s.value}</div>

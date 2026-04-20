@@ -45,6 +45,9 @@ Deno.serve(async (req) => {
 
     const { school_id, recipient, message } = await req.json();
 
+    if (!recipient) throw new Error("Missing recipient phone number");
+    if (!message || !message.trim()) throw new Error("Missing message content");
+
     // Ensure user belongs to the target school
     if (profile.role !== 'super_admin' && school_id !== profile.school_id) {
       throw new Error("Cannot send SMS for another school");

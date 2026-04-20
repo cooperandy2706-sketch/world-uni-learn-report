@@ -184,7 +184,6 @@ export default function StudentsPage() {
         clean[k] = (v === '' || v === undefined) ? null : v
       })
       const payload = { ...clean, school_id: user!.school_id, is_active: true }
-      console.log('Saving student payload:', payload)
 
       if (editingStudent) {
         const result = await supabase
@@ -193,7 +192,6 @@ export default function StudentsPage() {
           .eq('id', editingStudent.id)
           .select()
           .single()
-        console.log('Update result:', result)
         if (result.error) throw result.error
         toast.success('Student updated')
         qc.invalidateQueries({ queryKey: ['students'] })
@@ -204,7 +202,6 @@ export default function StudentsPage() {
       reset({})
 
     } catch (err: any) {
-      console.error('Save failed:', err)
       toast.error(err?.message ?? 'Failed to save student')
     }
   }
@@ -244,7 +241,6 @@ export default function StudentsPage() {
       setAccountData({ email: '', password: '' })
       qc.invalidateQueries({ queryKey: ['students'] })
     } catch (err: any) {
-      console.error('Account creation failed:', err)
       toast.error(err.message || 'Failed to create student account')
     } finally {
       setAccountLoading(false)
@@ -293,7 +289,6 @@ export default function StudentsPage() {
       }
       toast.success(`${imported} students imported successfully`)
     } catch (err: any) {
-      console.error('Import error:', err)
       toast.error(err?.message ?? 'Import failed')
     }
     finally { setImportLoading(false); if (fileRef.current) fileRef.current.value = '' }

@@ -106,6 +106,12 @@ export default function TeacherAssignmentDetailsPage() {
         @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         .sub-row:hover { background: #f8fafc; }
         .sub-row { transition: background 0.15s; cursor: pointer; }
+        @media (max-width: 768px) {
+          .resp-table-overflow { overflow-x: auto !important; padding-bottom: 12px; }
+          .resp-table-min { min-width: 700px; }
+          .resp-grid { grid-template-columns: 1fr !important; }
+          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
+        }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
@@ -116,7 +122,7 @@ export default function TeacherAssignmentDetailsPage() {
           ← Back to Assignments
         </button>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
+        <div className="resp-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
               {assignment.subject?.name} • {assignment.class?.name}
@@ -133,8 +139,9 @@ export default function TeacherAssignmentDetailsPage() {
         </div>
 
         {/* ── Submissions Table ── */}
-        <div style={{ background: '#fff', borderRadius: 20, border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 120px 140px 120px 160px', padding: '16px 24px', background: '#f8fafc', borderBottom: '1px solid #f1f5f9', fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div className="resp-table-overflow" style={{ background: '#fff', borderRadius: 20, border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
+          <div className="resp-table-min">
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 120px 140px 120px 160px', padding: '16px 24px', background: '#f8fafc', borderBottom: '1px solid #f1f5f9', fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
              <div>Student Name</div>
              <div>Score</div>
              <div>Percentage</div>
@@ -183,6 +190,7 @@ export default function TeacherAssignmentDetailsPage() {
               )
             })
           )}
+          </div>
         </div>
       </div>
 
@@ -226,7 +234,7 @@ export default function TeacherAssignmentDetailsPage() {
                         <span style={{ fontSize: 16 }}>{isCorrect ? '✅' : '❌'}</span>
                      </div>
                      
-                     <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 16, marginTop: 12 }}>
+                     <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 16, marginTop: 12 }}>
                         <div style={{ background: '#f8fafc', padding: 12, borderRadius: 12 }}>
                            <p style={{ fontSize: 10, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Student Answer</p>
                            <p style={{ fontSize: 14, fontWeight: 600, color: isCorrect ? '#059669' : '#dc2626', margin: 0, wordBreak: 'break-word' }}>

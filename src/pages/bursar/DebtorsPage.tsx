@@ -8,6 +8,7 @@ import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { supabase } from '../../lib/supabase'
 import { feeStructuresService, feePaymentsService, scholarshipService } from '../../services/bursar.service'
 import { Printer, AlertCircle, CheckCircle2, Filter, FileText, GraduationCap, Search, Award } from 'lucide-react'
+import { ROUTES } from '../../constants/routes'
 import Modal from '../../components/ui/Modal'
 import toast from 'react-hot-toast'
 
@@ -218,7 +219,7 @@ export default function DebtorsPage() {
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Consolidated debt tracking — tuition + daily fees · {term?.name ?? 'No active term'}</p>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={() => navigate('/bursar/students')} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', background: '#f5f3ff', color: '#6d28d9', fontSize: 13, fontWeight: 700, cursor: 'pointer', borderBottom: '2px solid #ddd6fe' }}>
+            <button onClick={() => navigate(ROUTES.BURSAR_STUDENTS)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', background: '#f5f3ff', color: '#6d28d9', fontSize: 13, fontWeight: 700, cursor: 'pointer', borderBottom: '2px solid #ddd6fe' }}>
               <Award size={16} /> Manage Student Financials
             </button>
             <button onClick={printDebtors} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', background: '#1e0646', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
@@ -314,7 +315,7 @@ export default function DebtorsPage() {
                           <span style={{ fontSize: 11, fontWeight: 700, background: si.bg, color: si.color, padding: '3px 10px', borderRadius: 99 }}>{si.label}</span>
                         </td>
                         <td style={{ padding: '11px 14px' }}>
-                          <button onClick={() => navigate('/bursar/bill-sheet')} title="View Bill Sheet" style={{ width: 28, height: 28, borderRadius: 7, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}>
+                          <button onClick={() => navigate(ROUTES.BURSAR_BILL_SHEET)} title="View Bill Sheet" style={{ width: 28, height: 28, borderRadius: 7, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}>
                             <FileText size={13} />
                           </button>
                         </td>

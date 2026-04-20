@@ -858,7 +858,7 @@ export default function TeachersPage() {
   // ── SMS ──
   async function sendSMS(phone: string, message: string) {
     try {
-      const { error } = await supabase.functions.invoke('send-sms', { body: { phone, message } })
+      const { error } = await supabase.functions.invoke('send-sms', { body: { recipient: phone, message } })
       if (error) throw error
       toast.success('SMS sent!')
     } catch {
@@ -935,6 +935,7 @@ export default function TeachersPage() {
       subject_id: subId, 
       term_id: (term as any).id, 
       academic_year_id: (term as any).academic_year_id, 
+      school_id: user?.school_id,
       is_class_teacher: cId === classTeacherClassId
     })))
     const { error } = await supabase.from('teacher_assignments').insert(inserts)
@@ -977,7 +978,7 @@ export default function TeachersPage() {
 
   function handleSaveLetter() {
     if (!hrLetterType) return
-    const html = getLetterHTML(hrLetterType)
+    const html = generateLetterHTML(hrLetterType, hrTeacher, hrFields, school)
     saveLetterMut.mutate(html)
   }
 

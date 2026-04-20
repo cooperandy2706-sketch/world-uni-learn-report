@@ -226,6 +226,10 @@ export default function TeacherStudentsPage() {
         @keyframes _fadeIn { from{opacity:0} to{opacity:1} }
         .std-row:hover { background:#faf5ff !important; }
         .action-btn:hover { background:#f5f3ff !important; color:#6d28d9 !important; }
+        @media (max-width: 768px) {
+          .resp-table-wrap { overflow-x: auto !important; padding-bottom: 12px; }
+          .resp-table-min { min-width: 800px; display: table; width: 100%; }
+        }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_fadeIn 0.4s ease' }}>
@@ -284,8 +288,8 @@ export default function TeacherStudentsPage() {
             <p style={{ fontSize: 13, color: '#9ca3af' }}>Ask your administrator to assign classes to you.</p>
           </div>
         ) : (
-          <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="resp-table-wrap" style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
+            <table className="resp-table-min" style={{ borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom: '1.5px solid #ede9fe' }}>
                   {['Student', 'ID', 'Class', 'Gender', 'Status', 'Actions'].map(h => (
