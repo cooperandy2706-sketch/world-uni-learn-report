@@ -780,7 +780,7 @@ export default function TeachersPage() {
   const [assignments, setAssignments] = useState<any[]>([])
   const [newClassIds, setNewClassIds] = useState<string[]>([])
   const [newSubjectIds, setNewSubjectIds] = useState<string[]>([])
-  const [classTeacherClassId, setClassTeacherClassId] = useState('')
+  const [classTeacherClassIds, setClassTeacherClassIds] = useState<string[]>([])
   const [resetModal, setResetModal] = useState(false)
   const [resetTeacher, setResetTeacher] = useState<any>(null)
   const [newPassword, setNewPassword] = useState('')
@@ -930,7 +930,7 @@ export default function TeachersPage() {
       subject_id: subId, 
       term_id: (term as any).id, 
       academic_year_id: (term as any).academic_year_id, 
-      is_class_teacher: cId === classTeacherClassId
+      is_class_teacher: classTeacherClassIds.includes(cId)
     })))
     const { error } = await supabase.from('teacher_assignments').insert(inserts)
     if (error) {
@@ -938,14 +938,33 @@ export default function TeachersPage() {
       else toast.error(error.message)
       return
     }
+
+    // Update classes table if they are class teacher
+    if (classTeacherClassIds.length > 0) {
+      const { error: clsErr } = await supabase.from('classes')
+        .update({ class_teacher_id: assigningTeacher.id })
+        .in('id', classTeacherClassIds)
+      if (clsErr) console.error('Failed to update class_teacher_id:', clsErr)
+    }
+
     toast.success(`${inserts.length} assignment(s) added`)
-    setNewClassIds([]); setNewSubjectIds([]); setClassTeacherClassId('')
+    setNewClassIds([]); setNewSubjectIds([]); setClassTeacherClassIds([])
     const { data } = await supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', assigningTeacher.id).order('class(name)')
     setAssignments(data ?? [])
   }
 
   async function removeAssignment(id: string) {
+    const toRemove = assignments.find(a => a.id === id)
     await supabase.from('teacher_assignments').delete().eq('id', id)
+    
+    if (toRemove?.is_class_teacher) {
+      // Check if any other assignments for this class still mark this teacher as CT
+      const remainingCT = assignments.filter(a => a.class_id === toRemove.class_id && a.is_class_teacher && a.id !== id)
+      if (remainingCT.length === 0) {
+        await supabase.from('classes').update({ class_teacher_id: null }).eq('id', toRemove.class_id).eq('class_teacher_id', assigningTeacher.id)
+      }
+    }
+
     setAssignments(prev => prev.filter(a => a.id !== id))
     toast.success('Removed')
   }
@@ -1603,12 +1622,19 @@ export default function TeachersPage() {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginTop: 6 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <label style={{ fontSize: 12, color: '#374151', fontWeight: 600 }}>Class Teacher for:</label>
-                  <select value={classTeacherClassId} onChange={e => setClassTeacherClassId(e.target.value)} style={{ padding: '6px 10px', borderRadius: 6, border: '1.5px solid #e5e7eb', fontSize: 12, outline: 'none', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
-                    <option value="">None</option>
-                    {(classes as any[]).filter((c: any) => newClassIds.includes(c.id)).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+                  <label style={{ fontSize: 12, color: '#374151', fontWeight: 600 }}>Assign as Class Teacher for:</label>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {(classes as any[]).filter((c: any) => newClassIds.includes(c.id)).map((c: any) => (
+                      <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer', background: classTeacherClassIds.includes(c.id) ? '#dcfce7' : '#fff', padding: '4px 10px', borderRadius: 8, border: `1.5px solid ${classTeacherClassIds.includes(c.id) ? '#16a34a' : '#e5e7eb'}`, transition: 'all .15s' }}>
+                        <input type="checkbox" checked={classTeacherClassIds.includes(c.id)} onChange={e => { if (e.target.checked) setClassTeacherClassIds(p => [...p, c.id]); else setClassTeacherClassIds(p => p.filter(id => id !== c.id)) }} style={{ display: 'none' }} />
+                        <span style={{ fontWeight: classTeacherClassIds.includes(c.id) ? 700 : 400, color: classTeacherClassIds.includes(c.id) ? '#15803d' : '#374151' }}>
+                          {classTeacherClassIds.includes(c.id) ? '✅ ' : ''}{c.name}
+                        </span>
+                      </label>
+                    ))}
+                    {newClassIds.length === 0 && <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>Select classes above first</span>}
+                  </div>
                 </div>
                 <Btn onClick={addAssignment} style={{ padding: '7px 14px', fontSize: 12 }}>➕ Add</Btn>
               </div>
