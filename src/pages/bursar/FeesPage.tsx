@@ -276,19 +276,19 @@ export default function FeesPage() {
       : CREST_SVG
 
     const buildReceiptHTML = (type: string) => `
-      <div style="height: 147mm; padding: 10px 25px; display: flex; flex-direction: column; justify-content: flex-start; position: relative; overflow: hidden; background: #ffffff; box-sizing: border-box;">
+      <div style="height: 147mm; padding: 6px 20px; display: flex; flex-direction: column; justify-content: flex-start; position: relative; overflow: hidden; background: #ffffff; box-sizing: border-box;">
         <!-- Watermark -->
         <div style="position: absolute; top: 15%; left: 50%; transform: translate(-50%, -15%) rotate(-15deg); font-size: 80px; font-weight: 900; color: rgba(76, 29, 149, 0.03); whiteSpace: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
 
         <div style="position: relative; z-index: 1;">
-          <div style="font-size:8px; font-weight:800; color:#6d28d9; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:8px; text-align:center; background: #f5f3ff; padding: 2px 0; border-radius: 4px;">${type}</div>
+          <div style="font-size:7.5px; font-weight:800; color:#6d28d9; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:5px; text-align:center; background: #f5f3ff; padding: 2px 0; border-radius: 4px;">${type}</div>
           
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
             <div style="margin-right: 20px;">
               ${logoHtml}
             </div>
             <div style="flex: 1; text-align: right;">
-              <div style="font-size:20px; font-weight:900; color:#1e0646; margin-bottom:1px; font-family:'Playfair Display',serif; line-height: 1.1;">${school?.name || 'SCHOOL FEE RECEIPT'}</div>
+              <div style="font-size:18px; font-weight:900; color:#1e0646; margin-bottom:1px; font-family:'Playfair Display',serif; line-height: 1.1;">${school?.name || 'SCHOOL FEE RECEIPT'}</div>
               ${school?.motto ? `<div style="font-size:10px; color:#6d28d9; margin-bottom:6px; font-style: italic; font-weight: 500;">&ldquo;${school.motto}&rdquo;</div>` : ''}
               <div style="display: flex; flex-direction: column; gap: 2px; align-items: flex-end;">
                 ${school?.address ? `<div style="font-size:10px; color:#6b7280;">📍 ${school.address}</div>` : ''}
@@ -297,11 +297,11 @@ export default function FeesPage() {
             </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; border-bottom: 1.5px solid #4c1d95; padding-bottom: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 6px; border-bottom: 1.2px solid #4c1d95; padding-bottom: 3px;">
             <div>
               <div style="font-size:9px; font-weight:800; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 2px;">Receipt For</div>
-              <div style="font-size:15px; font-weight:900; color:#111827;">${stu?.full_name ?? '—'}</div>
-              <div style="font-size:10px; color:#4c1d95; font-weight: 700;">${(stu?.class as any)?.name ?? '—'} &middot; ${stu?.student_id || 'ID NO'}</div>
+              <div style="font-size:14px; font-weight:900; color:#111827;">${stu?.full_name ?? '—'}</div>
+              <div style="font-size:9.5px; color:#4c1d95; font-weight: 700;">${(stu?.class as any)?.name ?? '—'} &middot; ${stu?.student_id || 'ID NO'}</div>
             </div>
             <div style="text-align: right;">
               <div style="font-size:9px; font-weight:800; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 2px;">Receipt Details</div>
@@ -310,19 +310,19 @@ export default function FeesPage() {
             </div>
           </div>
 
-          <div style="background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 10px; padding: 12px 20px; color: #ffffff; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 8px; padding: 10px 18px; color: #ffffff; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
             <div>
               <div style="font-size:10px; font-weight:700; opacity: 0.8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom: 2px;">Total Amount Paid</div>
-              <div style="font-size:22px; font-weight:900; letter-spacing: -0.01em;">${GHS(payment.amount_paid)}</div>
+              <div style="font-size:20px; font-weight:900; letter-spacing: -0.01em;">${GHS(payment.amount_paid)}</div>
             </div>
             <div style="text-align: right;">
               <div style="font-size:10px; font-weight:700; opacity: 0.8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom: 2px;">Remaining Balance</div>
-              <div style="font-size:16px; font-weight:900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'};">${finalBalance > 0 ? GHS(finalBalance) : 'CLEARED ✓'}</div>
+              <div style="font-size:15px; font-weight:900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'};">${finalBalance > 0 ? GHS(finalBalance) : 'CLEARED ✓'}</div>
             </div>
           </div>
 
           ${payment.notes ? `
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; margin-bottom: 10px;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px; padding: 6px 10px; margin-bottom: 6px;">
             <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Payment Notes / Coverage</div>
             <div style="font-size: 11px; color: #1e293b; font-weight: 600; line-height: 1.4;">${payment.notes}</div>
           </div>` : ''}
@@ -337,22 +337,22 @@ export default function FeesPage() {
             <tbody>
               ${openingArrears > 0 ? `
               <tr>
-                <td style="padding: 6px 0; font-size: 11px; color: #64748b;">Previous Arrears (B/F)</td>
-                <td style="padding: 6px 0; text-align: right; font-size: 11px; font-weight: 600; color: #64748b;">${GHS(openingArrears)}</td>
+                <td style="padding: 3px 0; font-size: 11px; color: #64748b;">Previous Arrears (B/F)</td>
+                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 600; color: #64748b;">${GHS(openingArrears)}</td>
               </tr>` : ''}
               ${classStructures.map((s: any) => `
               <tr>
-                <td style="padding: 6px 0; font-size: 11px; color: #1e293b;">${s.fee_name}</td>
-                <td style="padding: 6px 0; text-align: right; font-size: 11px; font-weight: 600; color: #1e293b;">${GHS(s.amount)}</td>
+                <td style="padding: 3px 0; font-size: 11px; color: #1e293b;">${s.fee_name}</td>
+                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 600; color: #1e293b;">${GHS(s.amount)}</td>
               </tr>`).join('')}
               ${pct > 0 ? `
               <tr>
-                <td style="padding: 6px 0; font-size: 11px; color: #16a34a; font-weight: 700;">Scholarship Discount (${pct}%)</td>
-                <td style="padding: 6px 0; text-align: right; font-size: 11px; font-weight: 700; color: #16a34a;">-${GHS(termCharges - netTermCharges)}</td>
+                <td style="padding: 3px 0; font-size: 11px; color: #16a34a; font-weight: 700;">Scholarship Discount (${pct}%)</td>
+                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 700; color: #16a34a;">-${GHS(termCharges - netTermCharges)}</td>
               </tr>` : ''}
               <tr style="border-top: 1.5px solid #e5e7eb;">
-                <td style="padding: 6px 0; font-size: 11px; font-weight: 800; color: #1e0646;">Gross Bill</td>
-                <td style="padding: 6px 0; text-align: right; font-size: 11px; font-weight: 800; color: #1e0646;">${GHS(totalBill)}</td>
+                <td style="padding: 3px 0; font-size: 11px; font-weight: 800; color: #1e0646;">Gross Bill</td>
+                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 800; color: #1e0646;">${GHS(totalBill)}</td>
               </tr>
               <tr style="border-top: 1.5px solid #4c1d95; background: #f8fafc;">
                 <td style="padding: 10px 4px; font-size: 12px; font-weight: 800; color: #1e0646; text-transform: uppercase;">Remaining Balance</td>
@@ -361,7 +361,7 @@ export default function FeesPage() {
             </tbody>
           </table>
 
-          <div style="display: flex; justify-content: space-between; margin-top: 12px; padding: 0 10px;">
+          <div style="display: flex; justify-content: space-between; margin-top: 6px; padding: 0 10px;">
             <div style="text-align: center; width: 160px;">
               <div style="font-size: 16px; color: #94a3b8; letter-spacing: 2px; margin-bottom: 2px;">...........................</div>
               <div style="font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Bursar's Signature</div>
