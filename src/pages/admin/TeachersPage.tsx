@@ -40,6 +40,16 @@ const LETTER_TYPES = [
   { id: 'salaryIncrement', label: 'Salary Increment Notice', icon: '💰' },
   { id: 'returnFromLeave', label: 'Return from Leave Notice', icon: '🔙' },
   { id: 'commendation', label: 'Commendation Letter', icon: '🏆' },
+  { id: 'termWithoutPay', label: 'Termination (No Pay)', icon: '🛑' },
+  { id: 'resignApproval', label: 'Resignation Approval', icon: '👋' },
+  { id: 'query', label: 'Query Letter', icon: '❓' },
+  { id: 'discHearing', label: 'Disciplinary Invitation', icon: '⚖️' },
+  { id: 'contractEnd', label: 'End of Contract', icon: '⌛' },
+  { id: 'maternityLeave', label: 'Maternity Leave', icon: '🤰' },
+  { id: 'recommendation', label: 'Recommendation', icon: '✨' },
+  { id: 'bonusNotice', label: 'Bonus / Incentive', icon: '💸' },
+  { id: 'salaryReview', label: 'Salary Review', icon: '📊' },
+  { id: 'otherDoc', label: 'Other Document', icon: '📄' },
   { id: 'staffId', label: 'Staff ID Card (Printable)', icon: '🪪' },
 ] as const
 type LetterTypeId = typeof LETTER_TYPES[number]['id']
@@ -59,6 +69,16 @@ const LETTER_FIELDS: Record<LetterTypeId, { key: string; label: string; type?: s
   salaryIncrement: [{ key: 'oldSalary', label: 'Previous Salary (GHS)', placeholder: 'e.g. 2,500' }, { key: 'newSalary', label: 'New Salary (GHS)', placeholder: 'e.g. 2,800' }, { key: 'effectiveDate', label: 'Effective Date', type: 'date' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
   returnFromLeave: [{ key: 'returnDate', label: 'Return Date', type: 'date' }, { key: 'leaveBalance', label: 'Remaining Leave Balance', placeholder: 'e.g. 5 days' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
   commendation: [{ key: 'achievement', label: 'Achievement / Reason', placeholder: 'Describe the achievement…' }, { key: 'award', label: 'Award or Bonus (if any)', placeholder: 'e.g. GHS 500 bonus' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
+  termWithoutPay: [{ key: 'grounds', label: 'Grounds/Reason', placeholder: 'Gross misconduct, etc…' }, { key: 'incidentDate', label: 'Date of Incident', type: 'date' }, { key: 'lastDay', label: 'Last Working Day', type: 'date' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
+  resignApproval: [{ key: 'receivedDate', label: 'Resignation Received', type: 'date' }, { key: 'effectiveDate', label: 'Effective Date', type: 'date' }, { key: 'lastDay', label: 'Last Working Day', type: 'date' }, { key: 'handover', label: 'Handover Status', placeholder: 'e.g. Pending handover of keys' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
+  query: [{ key: 'incident', label: 'Incident Description', placeholder: 'State the misconduct clearly…' }, { key: 'incidentDate', label: 'Incident Date', type: 'date' }, { key: 'deadline', label: 'Response Deadline', type: 'date' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
+  discHearing: [{ key: 'charge', label: 'Nature of Charge', placeholder: 'e.g. Continuous absenteeism' }, { key: 'hearingDate', label: 'Hearing Date', type: 'date' }, { key: 'hearingTime', label: 'Hearing Time', placeholder: 'e.g. 10:00 AM' }, { key: 'venue', label: 'Venue', placeholder: 'e.g. Principal Office' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
+  contractEnd: [{ key: 'contractEndDate', label: 'Contract End Date', type: 'date' }, { key: 'handoverReqs', label: 'Handover Requirements', placeholder: 'e.g. Return books & keys' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
+  maternityLeave: [{ key: 'fromDate', label: 'Start Date', type: 'date' }, { key: 'toDate', label: 'Return Date', type: 'date' }, { key: 'terms', label: 'Salary Terms', placeholder: 'e.g. Full pay for 3 months' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
+  recommendation: [{ key: 'duration', label: 'Employment Period', placeholder: 'e.g. 2018–2023' }, { key: 'role', label: 'Last Position held', placeholder: 'e.g. Head of Science' }, { key: 'merits', label: 'Key Merits', placeholder: 'e.g. High exam pass rate…' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
+  bonusNotice: [{ key: 'reason', label: 'Reason for Award', placeholder: 'e.g. 100% attendance' }, { key: 'amount', label: 'Award Amount (GHS)', placeholder: 'e.g. 500' }, { key: 'effectiveDate', label: 'Payment Month', placeholder: 'e.g. May 2024' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
+  salaryReview: [{ key: 'oldSalary', label: 'Previous Basic', placeholder: 'e.g. 2,000' }, { key: 'newSalary', label: 'New Basic', placeholder: 'e.g. 2,400' }, { key: 'effectiveDate', label: 'Effective Date', type: 'date' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
+  otherDoc: [{ key: 'subject', label: 'Document Subject', placeholder: 'e.g. Internal Memo' }, { key: 'content', label: 'Main Body Text', placeholder: 'Type your message here…' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
   staffId: [{ key: 'position', label: 'Position/Role', placeholder: 'e.g. Class Teacher' }, { key: 'department', label: 'Department', placeholder: 'e.g. Junior High' }, { key: 'idIssueDate', label: 'Issue Date', type: 'date' }],
 }
 
@@ -74,7 +94,10 @@ function letterRef(type: string) {
     appointment: 'APP', confirmation: 'CON', promotion: 'PRO', transfer: 'TRF',
     warning1: 'WRN', warningFinal: 'WRF', dismissal: 'DIS', suspension: 'SUS',
     reference: 'REF', leaveApproval: 'LEV', salaryIncrement: 'SAL',
-    returnFromLeave: 'RTL', commendation: 'CMD', staffId: 'SID',
+    returnFromLeave: 'RTL', commendation: 'CMD', termWithoutPay: 'TWP',
+    resignApproval: 'RSN', query: 'QRY', discHearing: 'DCH', contractEnd: 'END',
+    maternityLeave: 'MAT', recommendation: 'REC', bonusNotice: 'BNS',
+    salaryReview: 'SRV', otherDoc: 'OTH', staffId: 'SID',
   }
   const code = map[type] ?? 'HR'
   const year = new Date().getFullYear()
@@ -573,6 +596,87 @@ function generateLetterHTML(type: LetterTypeId, teacher: any, fields: Record<str
       <div class="incident-box success">${f.achievement || '___________'}</div>
       ${f.award ? `<p>In recognition of this achievement, you are hereby awarded: <strong>${f.award}</strong>.</p>` : ''}
       <p>Your dedication and excellence set a fine example for all staff and students. We encourage you to continue upholding the highest standards of professionalism.</p>
+    `))
+
+    case 'termWithoutPay': return wrapHTML(body('Termination of Employment (Without Pay)', `
+      <p>Dear ${fn},</p>
+      <p>We regret to inform you that your employment with ${sName} is hereby <strong>terminated</strong> effective <strong>${formatDate(f.lastDay)}</strong> on the grounds of:</p>
+      <div class="incident-box danger">${f.grounds || '___________'}</div>
+      <p>Specifically, our records show that on <strong>${formatDate(f.incidentDate)}</strong>, you engaged in a major breach of contract/conduct that warrants immediate dismissal without notice pay.</p>
+      <p>You are required to hand over all school property in your possession immediately. Any outstanding benefits accrued prior to this incident will be processed according to the relevant labor laws.</p>
+    `))
+
+    case 'resignApproval': return wrapHTML(body('Approval of Resignation', `
+      <p>Dear ${fn},</p>
+      <p>We acknowledge receipt of your resignation letter dated <strong>${formatDate(f.receivedDate)}</strong>. We write to formally <strong>accept and approve</strong> your resignation as <strong>${t?.position || 'staff member'}</strong>.</p>
+      <p>Your effective date of departure will be <strong>${formatDate(f.effectiveDate)}</strong>, with your last working day being <strong>${formatDate(f.lastDay)}</strong>.</p>
+      <p>Regarding your handover status: <strong>${f.handover || 'In progress'}</strong>. We appreciate your years of service and dedication to the students of ${sName} and wish you the very best in your future endeavors.</p>
+    `))
+
+    case 'query': return wrapHTML(body('Formal Query', `
+      <p>Dear ${fn},</p>
+      <p>It has been brought to the attention of management that the following incident occurred on <strong>${formatDate(f.incidentDate)}</strong>:</p>
+      <div class="incident-box">${f.incident || '___________'}</div>
+      <p>This behavior is considered a breach of the school's professional standards. You are hereby requested to provide a written explanation (query response) as to why disciplinary action should not be taken against you.</p>
+      <p>Your response must reach the office by <strong>${formatDate(f.deadline)}</strong>. Failure to respond within this timeframe will be interpreted as an admission of fault.</p>
+    `))
+
+    case 'discHearing': return wrapHTML(body('Notice of Disciplinary Hearing', `
+      <p>Dear ${fn},</p>
+      <p>Following your recent response to the query issued on the matter of <strong>${f.charge || 'conduct'}</strong>, management has decided to constitute a disciplinary committee to look into the matter.</p>
+      <p>You are therefore invited to attend a disciplinary hearing scheduled as follows:</p>
+      <div class="incident-box">
+        📅 Date: <strong>${formatDate(f.hearingDate)}</strong><br/>
+        ⏰ Time: <strong>${f.hearingTime || '___________'}</strong><br/>
+        📍 Venue: <strong>${f.venue || '___________'}</strong>
+      </div>
+      <p>You are entitled to bring a witness or representative to this hearing. Please be punctual.</p>
+    `))
+
+    case 'contractEnd': return wrapHTML(body('Notice of End of Contract', `
+      <p>Dear ${fn},</p>
+      <p>We write to remind you that your current fixed-term contract with ${sName} is scheduled to expire on <strong>${formatDate(f.contractEndDate)}</strong>.</p>
+      <p>Management has decided not to renew the contract at this time. Consequently, your employment will conclude on the aforementioned date.</p>
+      <p>You are requested to fulfill the following handover requirements: <strong>${f.handoverReqs || 'Return all property'}</strong>. We thank you for your service to the school.</p>
+    `))
+
+    case 'maternityLeave': return wrapHTML(body('Approval of Maternity Leave', `
+      <p>Dear ${fn},</p>
+      <p>We are pleased to approve your request for maternity leave. Your leave period is scheduled as follows:</p>
+      <div class="incident-box success">
+        📅 Commencement: <strong>${formatDate(f.fromDate)}</strong><br/>
+        🔙 Resumption: <strong>${formatDate(f.toDate)}</strong>
+      </div>
+      <p>The terms of your leave will be: <strong>${f.terms || 'As per policy'}</strong>. We wish you a safe delivery and a restful time with your newborn. Please keep the school informed of any changes to your expected return date.</p>
+    `))
+
+    case 'recommendation': return wrapHTML(body('Letter of Recommendation', `
+      <p>To Whom It May Concern,</p>
+      <p>It is my pleasure to recommend <strong>${fn}</strong>, who served at ${sName} from <strong>${f.duration || '___________'}</strong> as <strong>${f.role || 'a teacher'}</strong>.</p>
+      <p>${fn.split(' ')[0]} is an exceptional professional who made significant contributions to our school, particularly in the areas of: <strong>${f.merits || 'teaching and student development'}</strong>.</p>
+      <p>I have consistently been impressed by ${fn.split(' ')[0]}'s dedication, classroom management, and ability to inspire students to achieve their full potential. Any institution will be fortunate to have ${fn.split(' ')[0]} as part of their team.</p>
+    `))
+
+    case 'bonusNotice': return wrapHTML(body('Notice of Performance Bonus', `
+      <p>Dear ${fn},</p>
+      <p>We are pleased to award you a performance bonus in recognition of your exceptional work regarding: <strong>${f.reason || '___________'}</strong>.</p>
+      <p>You will receive a one-time award of <strong>GHS ${f.amount || '0.00'}</strong>, which will be included in your <strong>${f.effectiveDate || 'next'}</strong> salary payment.</p>
+      <p>We appreciate your hard work and commitment to excellence at ${sName}. Keep up the great work!</p>
+    `))
+
+    case 'salaryReview': return wrapHTML(body('Salary Review Notification', `
+      <p>Dear ${fn},</p>
+      <p>Following a recent performance review/management decision, we are pleased to inform you that your basic salary has been adjusted effective <strong>${formatDate(f.effectiveDate)}</strong>.</p>
+      <table class="salary-table">
+        <tr><th>Current Basic</th><th>New Basic</th></tr>
+        <tr><td>GHS ${f.oldSalary || '___________'}</td><td class="highlight">GHS ${f.newSalary || '___________'}</td></tr>
+      </table>
+      <p>All other terms of your employment remain unchanged. We hope this adjustment motivates you to continue delivering high-quality service.</p>
+    `))
+
+    case 'otherDoc': return wrapHTML(body(f.subject || 'Internal Document', `
+      <p>Dear ${fn},</p>
+      <div style="white-space: pre-wrap; margin-top: 15px; line-height: 1.8;">${f.content || '...'}</div>
     `))
 
     case 'staffId': return wrapHTML(`
