@@ -1036,6 +1036,14 @@ export default function TeachersPage() {
       academic_year_id: (term as any).academic_year_id, 
       is_class_teacher: classTeacherClassIds.includes(cId)
     })))
+    // Sync logic: When assigning as Class Teacher, clear any previous markers for these classes in this term
+    if (classTeacherClassIds.length > 0) {
+      await supabase.from('teacher_assignments')
+        .update({ is_class_teacher: false })
+        .in('class_id', classTeacherClassIds)
+        .eq('term_id', term.id)
+    }
+
     const { error } = await supabase.from('teacher_assignments').insert(inserts)
     if (error) {
       if (error.message.includes('unique constraint') || error.code === '23505') toast.error('One or more subjects already assigned!')
@@ -1043,7 +1051,7 @@ export default function TeachersPage() {
       return
     }
 
-    // Update classes table if they are class teacher
+    // Update classes table
     if (classTeacherClassIds.length > 0) {
       const { error: clsErr } = await supabase.from('classes')
         .update({ class_teacher_id: assigningTeacher.id })
@@ -1071,6 +1079,42 @@ export default function TeachersPage() {
 
     setAssignments(prev => prev.filter(a => a.id !== id))
     toast.success('Removed')
+  }
+
+  async function toggleCT(a: any) {
+    const newStatus = !a.is_class_teacher
+    try {
+      if (newStatus) {
+        // Clearing any other teacher as CT for this class
+        await supabase.from('teacher_assignments')
+          .update({ is_class_teacher: false })
+          .eq('class_id', a.class_id)
+          .eq('term_id', a.term_id)
+        
+        // Setting THIS teacher's records for this class as CT
+        await supabase.from('teacher_assignments')
+          .update({ is_class_teacher: true })
+          .eq('teacher_id', a.teacher_id)
+          .eq('class_id', a.class_id)
+          .eq('term_id', a.term_id)
+
+        await supabase.from('classes').update({ class_teacher_id: a.teacher_id }).eq('id', a.class_id)
+      } else {
+        await supabase.from('teacher_assignments')
+          .update({ is_class_teacher: false })
+          .eq('teacher_id', a.teacher_id)
+          .eq('class_id', a.class_id)
+          .eq('term_id', a.term_id)
+        
+        await supabase.from('classes').update({ class_teacher_id: null }).eq('id', a.class_id).eq('class_teacher_id', a.teacher_id)
+      }
+      
+      const { data } = await supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', assigningTeacher.id).order('class(name)')
+      setAssignments(data ?? [])
+      toast.success(newStatus ? 'Assigned as Class Teacher' : 'Removed Class Teacher status')
+    } catch (e: any) {
+      toast.error(e.message || 'Update failed')
+    }
   }
 
   // ── View ──
@@ -1754,7 +1798,24 @@ export default function TeachersPage() {
                       <span style={{ fontSize: 12, fontWeight: 700, color: '#5b21b6', flex: 1 }}>🏫 {a.class?.name}</span>
                       <span style={{ fontSize: 12, color: '#6d28d9', flex: 1 }}>📗 {a.subject?.name}</span>
                       <span style={{ fontSize: 10, color: '#9ca3af' }}>{a.term?.name}</span>
-                      {a.is_class_teacher && <span style={{ fontSize: 10, background: '#dcfce7', color: '#16a34a', padding: '1px 6px', borderRadius: 99, fontWeight: 600 }}>CT</span>}
+                      <button 
+                        onClick={() => toggleCT(a)} 
+                        style={{ 
+                          fontSize: 10, 
+                          background: a.is_class_teacher ? '#dcfce7' : '#fff', 
+                          color: a.is_class_teacher ? '#16a34a' : '#6b7280', 
+                          padding: '2px 8px', 
+                          borderRadius: 99, 
+                          fontWeight: 700, 
+                          border: `1px solid ${a.is_class_teacher ? '#16a34a' : '#e5e7eb'}`,
+                          cursor: 'pointer',
+                          transition: 'all .15s'
+                        }}
+                        onMouseEnter={e => { if (!a.is_class_teacher) e.currentTarget.style.borderColor = '#16a34a' }}
+                        onMouseLeave={e => { if (!a.is_class_teacher) e.currentTarget.style.borderColor = '#e5e7eb' }}
+                      >
+                        {a.is_class_teacher ? 'Class Teacher ✓' : 'Set as CT'}
+                      </button>
                       <button onClick={() => removeAssignment(a.id)} style={{ width: 24, height: 24, borderRadius: 6, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', fontSize: 12, flexShrink: 0 }}>×</button>
                     </div>
                   ))}

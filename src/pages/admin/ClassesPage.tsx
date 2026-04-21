@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useClasses, useCreateClass, useUpdateClass, useDeleteClass } from '../../hooks/useClasses'
+import { useTeachers } from '../../hooks/useTeachers'
 import { useStudents } from '../../hooks/useStudents'
 import { useSubjects } from '../../hooks/useSubjects'
 import Modal from '../../components/ui/Modal'
@@ -16,6 +17,7 @@ const schema = z.object({
   name:     z.string().min(1, 'Class name is required'),
   level:    z.string().optional(),
   capacity: z.coerce.number().optional().nullable(),
+  class_teacher_id: z.string().optional().nullable(),
 })
 type FormData = z.infer<typeof schema>
 
@@ -68,6 +70,7 @@ const CLASS_COLORS = [
 // ═══════════════════════════════════════════════════════════
 export default function ClassesPage() {
   const { data: classes = [], isLoading } = useClasses()
+  const { data: teachers = [] } = useTeachers()
   const { data: students = [] } = useStudents()
   const { data: subjects = [] } = useSubjects()
   const { data: term } = useCurrentTerm()
@@ -102,13 +105,35 @@ export default function ClassesPage() {
     [classes, search]
   )
 
-  function openCreate() { setEditingClass(null); reset({}); setModalOpen(true) }
-  function openEdit(c: any) { setEditingClass(c); reset({ name: c.name, level: c.level ?? '', capacity: c.capacity ?? undefined }); setModalOpen(true) }
+  function openCreate() { setEditingClass(null); reset({ name: '', level: '', capacity: null, class_teacher_id: null }); setModalOpen(true) }
+  function openEdit(c: any) { setEditingClass(c); reset({ name: c.name, level: c.level ?? '', capacity: c.capacity ?? undefined, class_teacher_id: c.class_teacher_id ?? null }); setModalOpen(true) }
   function openDetail(c: any) { setViewingClass(c); setDetailModal(true) }
 
   async function onSubmit(data: FormData) {
-    if (editingClass) await updateClass.mutateAsync({ id: editingClass.id, ...data })
-    else await createClass.mutateAsync(data)
+    const { class_teacher_id, ...clsData } = data as any
+    if (editingClass) {
+      await updateClass.mutateAsync({ id: editingClass.id, ...clsData, class_teacher_id })
+      
+      // SYNC: Update teacher_assignments if CT changed
+      if (class_teacher_id !== editingClass.class_teacher_id && term?.id) {
+        // Clear old CT marks for this class/term
+        await supabase.from('teacher_assignments')
+          .update({ is_class_teacher: false })
+          .eq('class_id', editingClass.id)
+          .eq('term_id', term.id)
+        
+        if (class_teacher_id) {
+          // Set new teacher marks (if they have assignments)
+          await supabase.from('teacher_assignments')
+            .update({ is_class_teacher: true })
+            .eq('class_id', editingClass.id)
+            .eq('teacher_id', class_teacher_id)
+            .eq('term_id', term.id)
+        }
+      }
+    } else {
+      await createClass.mutateAsync({ ...clsData, class_teacher_id })
+    }
     setModalOpen(false)
   }
 
@@ -304,6 +329,17 @@ export default function ClassesPage() {
                 <FieldLabel>Capacity</FieldLabel>
                 <StyledInput {...register('capacity')} type="number" placeholder="e.g. 40" />
                 <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>Maximum number of students in this class</p>
+              </div>
+              <div style={{ marginTop: 2 }}>
+                <FieldLabel>Class Teacher</FieldLabel>
+                <select {...register('class_teacher_id')} 
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid #e5e7eb`, outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', cursor: 'pointer' }}>
+                  <option value="">-- No Class Teacher --</option>
+                  {(teachers as any[]).map((t: any) => (
+                    <option key={t.id} value={t.id}>{t.user?.full_name} {t.staff_id ? `(${t.staff_id})` : ''}</option>
+                  ))}
+                </select>
+                <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>The lead teacher for this class (Syncs with portal)</p>
               </div>
             </div>
           </form>

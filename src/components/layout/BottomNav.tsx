@@ -10,8 +10,9 @@ import {
   LayoutDashboard, Users, FileSpreadsheet, ClipboardCheck, 
   Megaphone, PencilLine, Calendar, Timer, BookOpen, 
   ShieldCheck, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School,
-  CreditCard, Wallet, Gamepad2, Library
+  CreditCard, Wallet, Gamepad2, Library, Bell
 } from 'lucide-react'
+import NotificationsModal from '../ui/NotificationsModal'
 
 const adminLinks = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Home' },
@@ -62,6 +63,7 @@ export default function BottomNav() {
   const [unread, setUnread] = useState(0)
   const [visible, setVisible] = useState(false)
   const [isGameFullScreen, setIsGameFullScreen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
 
   // Check if teacher is allowed to collect daily fees
   const { data: collectorAuth, isLoading: loadingAuth } = useQuery({
@@ -148,11 +150,62 @@ export default function BottomNav() {
     <>
       <style>{`
         @keyframes _bn_in { from{opacity:0;transform:translateY(100%)} to{opacity:1;transform:translateY(0)} }
+        @keyframes _bn_pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
         .bn-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex: 1; }
         .bn-item:active { transform: scale(0.95); }
         .bn-active .bn-icon-box { background: rgba(124, 58, 237, 0.1) !important; transform: translateY(-2px); }
         .bn-active .bn-label { color: #6d28d9; font-weight: 700; transform: translateY(-1px); }
+        .bn-fab { animation: _bn_pulse 2s ease-in-out infinite; }
+        .bn-fab:hover { transform: scale(1.1) !important; animation: none; }
+        .bn-fab:active { transform: scale(0.9) !important; }
       `}</style>
+
+      {/* Floating Notification Trigger */}
+      <div style={{
+        position: 'fixed',
+        bottom: 'calc(max(12px, env(safe-area-inset-bottom)) + 74px)',
+        right: 18,
+        zIndex: 1001,
+        display: (visible && !isGameFullScreen) ? 'block' : 'none'
+      }}>
+        <button 
+          onClick={() => setModalOpen(true)}
+          className="bn-fab"
+          style={{
+            width: 54, height: 54, borderRadius: '50%',
+            background: unread > 0 ? 'linear-gradient(135deg, #7c3aed, #4c1d95)' : '#fff',
+            color: unread > 0 ? '#fff' : '#4c1d95',
+            border: unread > 0 ? 'none' : '2px solid #ede9fe',
+            boxShadow: '0 8px 24px rgba(109,40,217,0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', transition: 'all 0.2s', position: 'relative'
+          }}
+        >
+          <Bell size={24} strokeWidth={2.5} />
+          {unread > 0 && (
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              style={{
+                position: 'absolute', top: -2, right: -2,
+                minWidth: 20, height: 20, borderRadius: 10,
+                background: '#ef4444', color: '#fff',
+                fontSize: 11, fontWeight: 900,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: '2px solid #fff', boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)'
+              }}
+            >
+              {unread > 99 ? '!' : unread}
+            </motion.span>
+          )}
+        </button>
+      </div>
+
+      <NotificationsModal 
+        open={modalOpen} 
+        onClose={() => setModalOpen(false)} 
+        onRead={loadUnread}
+      />
 
       <nav style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000,
