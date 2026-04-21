@@ -1,5 +1,6 @@
 // src/pages/admin/TimetablePage.tsx
 import { useState, useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useClasses } from '../../hooks/useClasses'
@@ -184,6 +185,7 @@ const labelStyle: React.CSSProperties = {
 // ─────────────────────────────────────────────────────────────────────────────
 export default function TimetablePage() {
   const { user } = useAuth()
+  const qc = useQueryClient()
   const { data: classes = [] } = useClasses()
   const { data: term } = useCurrentTerm()
   const { data: settings } = useSettings()
@@ -368,9 +370,13 @@ export default function TimetablePage() {
   async function persistConfig(updates: Record<string, any>) {
     if (!settings?.id) return
     try {
+      // Get absolute latest from cache to avoid stale state race conditions (fix Bug: settings disappearing)
+      const latest = qc.getQueryData(['settings', user?.school_id]) as any
+      const current = latest?.settings ?? {}
+      
       await updateSettings.mutateAsync({
         id: settings.id,
-        settings: { ...(settings.settings ?? {}), ...updates },
+        settings: { ...current, ...updates },
       })
     } catch (e) {
       console.error('persistConfig failed', e)

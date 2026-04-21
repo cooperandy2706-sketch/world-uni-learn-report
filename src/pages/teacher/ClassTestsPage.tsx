@@ -132,7 +132,15 @@ export default function ClassTestsPage() {
         score_attained: parseFloat(val) || 0
       }))
       await testService.saveScores(activeTest.id, scoreData)
-      toast.success('Scores saved')
+      
+      if (selectedClass && selectedSubject && term?.id) {
+        const loadingToast = toast.loading('Submitting and syncing to system...')
+        await testService.syncToReport(selectedClass, selectedSubject, term.id)
+        toast.success('Scores submitted and synced to report!', { id: loadingToast })
+      } else {
+        toast.success('Scores saved')
+      }
+      
       setActiveTest(null)
     } catch (e: any) {
       toast.error(e.message)
@@ -336,7 +344,7 @@ export default function ClassTestsPage() {
 
           <div style={{ background: '#fff', padding: 16, borderTop: '1px solid #e2e8f0' }}>
              <button onClick={handleSaveScores} disabled={savingScores} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', height: 48 }}>
-               {savingScores ? 'Saving...' : '💾 Save All Scores'}
+               {savingScores ? 'Submitting...' : '📤 Submit Scores'}
              </button>
           </div>
         </div>
