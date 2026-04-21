@@ -29,6 +29,8 @@ const adminLinks = [
   { to: ROUTES.ADMIN_TERMS, label: 'Terms', icon: Calendar },
   { to: ROUTES.ADMIN_REPORTS, label: 'Reports', icon: FileSpreadsheet },
   { to: ROUTES.ADMIN_ANALYTICS, label: 'Analytics', icon: BarChart3 },
+  { to: '/admin/test-analytics', label: 'Test Trends', icon: TrendingUp },
+  { to: ROUTES.ADMIN_PERFORMANCE, label: 'Performance Hub', icon: TrendingUp },
   { to: ROUTES.ADMIN_SETTINGS, label: 'Settings', icon: Settings },
   { to: ROUTES.ADMIN_TIMETABLE, label: 'Timetable', icon: Calendar },
   { to: ROUTES.ADMIN_ANNOUNCEMENTS, label: 'Announcements', icon: Megaphone },
@@ -44,6 +46,7 @@ const adminLinks = [
 const teacherLinks = [
   { to: ROUTES.TEACHER_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
   { to: ROUTES.TEACHER_MY_CLASSES, label: 'My Classes', icon: School },
+  { to: '/teacher/class-tests', label: 'Class Tests', icon: ClipboardList },
   { to: ROUTES.TEACHER_STUDENTS, label: 'Students', icon: Users },
   { to: ROUTES.TEACHER_SCORE_ENTRY, label: 'Score Entry', icon: PencilLine },
   { to: ROUTES.TEACHER_REPORTS, label: 'Reports', icon: FileSpreadsheet },
@@ -200,7 +203,7 @@ export default function Sidebar() {
         background: 'linear-gradient(175deg, #1e0646 0%, #3b0764 30%, #4c1d95 70%, #5b21b6 100%)',
         borderRight: '1px solid rgba(255,255,255,0.06)',
         fontFamily: '"DM Sans", system-ui, sans-serif',
-        userSelect: 'none', position: 'relative', overflow: 'visible',
+        userSelect: 'none', position: 'relative', overflow: 'hidden',
         transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         zIndex: 150,
       }}>

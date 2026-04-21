@@ -286,3 +286,25 @@ export interface Remark {
   text: string
   created_at: string
 }
+
+export interface ClassTest {
+  id: string
+  school_id: string
+  class_id: string
+  subject_id: string
+  term_id: string
+  academic_year_id: string
+  teacher_id: string
+  title: string
+  max_score: number
+  test_date: string
+  created_at: string
+}
+
+export interface ClassTestScore {
+  id: string
+  test_id: string
+  student_id: string
+  score_attained: number
+  created_at: string
+}

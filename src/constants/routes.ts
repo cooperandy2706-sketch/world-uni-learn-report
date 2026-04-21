@@ -16,6 +16,7 @@ export const ROUTES = {
   ADMIN_TERMS: '/admin/terms',
   ADMIN_REPORTS: '/admin/reports',
   ADMIN_ANALYTICS: '/admin/analytics',
+  ADMIN_PERFORMANCE: '/admin/performance',
   ADMIN_SETTINGS: '/admin/settings',
   ADMIN_TIMETABLE: '/admin/timetable',
   ADMIN_ANNOUNCEMENTS: '/admin/announcements',
@@ -27,6 +28,7 @@ export const ROUTES = {
   ADMIN_SMS: '/admin/sms',
   ADMIN_ADMISSIONS: '/admin/admissions',
   ADMIN_BURSARS: '/admin/bursars',
+  ADMIN_TEST_ANALYTICS: '/admin/test-analytics',
 
   // Teacher
   TEACHER_DASHBOARD: '/teacher/dashboard',
@@ -44,6 +46,7 @@ export const ROUTES = {
   TEACHER_MESSAGES: '/teacher/messages',
   TEACHER_AGENDA: '/teacher/agenda',
   TEACHER_TYPING_GAME: '/teacher/typing-game',
+  TEACHER_CLASS_TESTS: '/teacher/class-tests',
 
   // Student
   STUDENT_DASHBOARD: '/student/dashboard',

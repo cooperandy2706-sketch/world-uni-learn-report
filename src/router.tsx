@@ -15,6 +15,7 @@ import AcademicYearsPage from './pages/admin/AcademicYearsPage'
 import TermsPage from './pages/admin/TermsPage'
 import AdminReportsPage from './pages/admin/ReportsPage'
 import AnalyticsPage from './pages/admin/AnalyticsPage'
+import PerformanceTrackingPage from './pages/admin/PerformanceTrackingPage'
 import SettingsPage from './pages/admin/SettingsPage'
 import TimetablePage from './pages/admin/TimetablePage'
 import AnnouncementsPage from './pages/admin/AnnouncementsPage'
@@ -64,6 +65,8 @@ import StaffDashboard from './pages/staff/DashboardPage'
 import TypingGamePage from './pages/shared/TypingGamePage'
 import AdminAdmissions from './pages/admin/AdminAdmissions'
 import SMSPage from './pages/shared/SMSPage'
+import ClassTestsPage from './pages/teacher/ClassTestsPage'
+import AdminTestAnalytics from './pages/admin/AdminTestAnalytics'
 
 // Bursar pages
 import BursarDashboard from './pages/bursar/DashboardPage'
@@ -119,6 +122,7 @@ export const router = createBrowserRouter([
           { path: 'terms', element: <TermsPage /> },
           { path: 'reports', element: <AdminReportsPage /> },
           { path: 'analytics', element: <AnalyticsPage /> },
+          { path: 'performance', element: <PerformanceTrackingPage /> },
           { path: 'settings', element: <SettingsPage /> },
           { path: 'timetable', element: <TimetablePage /> },
           { path: 'announcements', element: <AnnouncementsPage /> },
@@ -130,6 +134,7 @@ export const router = createBrowserRouter([
           { path: 'agenda', element: <AdminAgendaPage /> },
           { path: 'admissions', element: <AdminAdmissions /> },
           { path: 'sms', element: <SMSPage /> },
+          { path: 'test-analytics', element: <AdminTestAnalytics /> },
         ],
       },
       {
@@ -177,6 +182,7 @@ export const router = createBrowserRouter([
           { path: 'messages', element: <MessagingPage /> },
           { path: 'agenda', element: <TeacherAgendaPage /> },
           { path: 'typing-game', element: <TypingGamePage /> },
+          { path: 'class-tests', element: <ClassTestsPage /> },
         ],
       },
 

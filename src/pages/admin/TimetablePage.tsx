@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useClasses } from '../../hooks/useClasses'
-import { useCurrentTerm } from '../../hooks/useSettings'
+import { useCurrentTerm, useSettings, useUpdateSettings } from '../../hooks/useSettings'
 import toast from 'react-hot-toast'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
@@ -127,6 +127,8 @@ export default function TimetablePage() {
   const { user } = useAuth()
   const { data: classes = [] } = useClasses()
   const { data: term } = useCurrentTerm()
+  const { data: settings } = useSettings()
+  const updateSettings = useUpdateSettings()
 
   // ── Core state ──
   const [selectedClass, setSelectedClass] = useState('')
@@ -141,6 +143,8 @@ export default function TimetablePage() {
   const [editing, setEditing] = useState<any>(null)
   const [editForm, setEditForm] = useState({ subject_id: '', teacher_id: '' })
   const [saving, setSaving] = useState(false)
+  const [conflict, setConflict] = useState<any>(null)
+
 
   // ── Period editor ──
   const [editPeriodsOpen, setEditPeriodsOpen] = useState(false)
@@ -153,10 +157,12 @@ export default function TimetablePage() {
   const [generating, setGenerating] = useState(false)
   const [genProgress, setGenProgress] = useState('')
 
-  // ── Class merging ──
-  const [mergedClasses, setMergedClasses] = useState<string[]>([]) // class IDs that share the timetable with selectedClass
-  const [mergeOpen, setMergeOpen] = useState(false)
-  const [pendingMerged, setPendingMerged] = useState<string[]>([])
+  // ── Class combinations (Joint Timetables) ──
+  const [globalCombinations, setGlobalCombinations] = useState<Record<string, string[]>>({})
+  const [combOpen, setCombOpen] = useState(false)
+  const [pendingMirror, setPendingMirror] = useState<string[]>([])
+  const [pendingMaster, setPendingMaster] = useState('')
+
 
   // ── Subject color map ──
   const [subjectColorMap, setSubjectColorMap] = useState<Record<string, number>>({})
@@ -168,16 +174,16 @@ export default function TimetablePage() {
     setSubjectColorMap(map)
   }, [subjects])
 
-  useEffect(() => { loadPeriods(); loadSubjectsTeachers() }, [])
-  useEffect(() => { if (selectedClass && (term as any)?.id) loadSlots() }, [selectedClass, mergedClasses, (term as any)?.id])
-
-  // Clear merged classes when swapping class selector to prevent state leakage
+  // Load joint classes from settings
   useEffect(() => {
-    setMergedClasses([])
-    setPendingMerged([])
-  }, [selectedClass])
+    if (settings?.settings?.joint_classes) {
+      setGlobalCombinations(settings.settings.joint_classes)
+    }
+  }, [settings])
 
-  // ── Data loaders ──
+  useEffect(() => { loadPeriods(); loadSubjectsTeachers() }, [])
+  useEffect(() => { if (selectedClass && (term as any)?.id) loadSlots() }, [selectedClass, globalCombinations, (term as any)?.id])
+
   async function loadPeriods() {
     const { data } = await supabase.from('timetable_periods')
       .select('*').eq('school_id', user!.school_id).order('sort_order')
@@ -194,9 +200,21 @@ export default function TimetablePage() {
     setTeachers(t ?? [])
   }
 
+  // Helper: Find all classes in the same joint group as classId
+  function getJoinedClasses(cid: string) {
+    if (!cid) return []
+    // If cid is a master
+    if (globalCombinations[cid]) return [cid, ...globalCombinations[cid]]
+    // If cid is a mirror
+    for (const masterId in globalCombinations) {
+      if (globalCombinations[masterId].includes(cid)) return [masterId, ...globalCombinations[masterId]]
+    }
+    return [cid]
+  }
+
   async function loadSlots() {
     setLoading(true)
-    const targetClasses = [selectedClass, ...mergedClasses].filter(Boolean)
+    const targetClasses = getJoinedClasses(selectedClass)
     const [{ data: sl }, { data: asgn }] = await Promise.all([
       supabase.from('timetable_slots')
         .select('*,subject:subjects(id,name),teacher:teachers(id,user:users(full_name)),period:timetable_periods(id,name,start_time,end_time)')
@@ -213,6 +231,7 @@ export default function TimetablePage() {
     setLoading(false)
   }
 
+
   function getSlot(day: number, periodId: string) {
     return slots.find(s => s.day_of_week === day && s.period_id === periodId && s.class_id === selectedClass)
   }
@@ -223,16 +242,61 @@ export default function TimetablePage() {
     setEditForm({ subject_id: existing?.subject_id ?? '', teacher_id: existing?.teacher_id ?? '' })
   }
 
-  async function saveSlot() {
+  async function saveSlot(force = false) {
     if (!editing) return
     setSaving(true)
+
+    // 1. Conflict Detection (Teacher & Subject)
+    if (editForm.subject_id && !force) {
+      const targetClasses = getJoinedClasses(selectedClass)
+      
+      // A. Teacher Conflict (Other classes)
+      if (editForm.teacher_id) {
+        const { data: clash } = await supabase.from('timetable_slots')
+          .select('*, class:classes(name), subject:subjects(name)')
+          .eq('teacher_id', editForm.teacher_id)
+          .eq('day_of_week', editing.day)
+          .eq('period_id', editing.period_id)
+          .eq('term_id', (term as any).id)
+          .not('class_id', 'in', `(${targetClasses.join(',')})`)
+          .maybeSingle()
+
+        if (clash) {
+          setConflict({ ...clash, type: 'teacher' })
+          setSaving(false)
+          return
+        }
+      }
+
+      // B. Subject Repetition (Same class, same day)
+      const { data: repeat } = await supabase.from('timetable_slots')
+        .select('*, period:timetable_periods(name)')
+        .in('class_id', targetClasses)
+        .eq('subject_id', editForm.subject_id)
+        .eq('day_of_week', editing.day)
+        .eq('term_id', (term as any).id)
+        .neq('period_id', editing.period_id) // ignore current slot if updating
+        .maybeSingle()
+
+      if (repeat) {
+        setConflict({ ...repeat, type: 'subject' })
+        setSaving(false)
+        return
+      }
+    }
+
+
     const existing = getSlot(editing.day, editing.period_id)
+    const targetClasses = getJoinedClasses(selectedClass)
 
-    // Determine which class IDs to write to (selected + any merged)
-    const targetClasses = [selectedClass, ...mergedClasses]
+    // 2. Perform Swap if force
+    if (force && conflict) {
+      // Simple resolve: Delete the conflicting slot in the other class
+      await supabase.from('timetable_slots').delete().eq('id', conflict.id)
+    }
 
+    // 3. Save the new slot
     if (editForm.subject_id === '') {
-      // Clear slot in all merged classes and selected class
       const ids = slots.filter(s => s.day_of_week === editing.day && s.period_id === editing.period_id && targetClasses.includes(s.class_id)).map(s => s.id)
       if (ids.length) await supabase.from('timetable_slots').delete().in('id', ids)
     } else {
@@ -254,9 +318,12 @@ export default function TimetablePage() {
         }
       }
     }
+
     setSaving(false)
     setEditing(null)
-    toast.success('Slot saved' + (mergedClasses.length ? ` (applied to ${targetClasses.length} classes)` : ''))
+    setConflict(null)
+    const joined = getJoinedClasses(selectedClass)
+    toast.success('Slot saved' + (joined.length > 1 ? ` (applied to ${joined.length} classes)` : ''))
     await loadSlots()
 
     // Notify teacher
@@ -276,6 +343,7 @@ export default function TimetablePage() {
     }
   }
 
+
   async function savePeriods() {
     for (const p of periodForm) {
       await supabase.from('timetable_periods').update({
@@ -285,19 +353,6 @@ export default function TimetablePage() {
     toast.success('Period times saved')
     setEditPeriodsOpen(false)
     loadPeriods()
-  }
-
-  // ── Merge helpers ──
-  function openMerge() {
-    setPendingMerged([...mergedClasses])
-    setMergeOpen(true)
-  }
-  function applyMerge() {
-    setMergedClasses(pendingMerged)
-    setMergeOpen(false)
-    toast.success(pendingMerged.length
-      ? `Merged with ${pendingMerged.length} class${pendingMerged.length > 1 ? 'es' : ''} — edits apply to all`
-      : 'No classes merged — editing independently')
   }
 
   // ── Extracurricular toggle ──
@@ -335,7 +390,10 @@ export default function TimetablePage() {
   //   • Max 2 periods of same subject per teacher per day
   // ─────────────────────────────────────────────────────────────────────────────
   async function handleAutoGenerate() {
-    if (!term?.id) return
+    if (!term?.id) {
+      toast.error('❌ No active term found. Please set the current term in Settings first.')
+      return
+    }
     setGenerating(true)
     const tid = toast.loading('🧠 Analyzing school structure…')
 
@@ -362,188 +420,161 @@ export default function TimetablePage() {
       const teachablePeriods = periods.filter(p => !p.is_break)
       const totalSlots = teachablePeriods.length * 5 // per week per class
 
-      // Global teacher schedule: day → periodId → Set of teacher IDs
-      const teacherBusy: Record<number, Record<string, Set<string>>> = {}
-      DAYS.forEach((_, di) => {
-        teacherBusy[di + 1] = {}
-        teachablePeriods.forEach(p => { teacherBusy[di + 1][p.id] = new Set() })
-      })
-
-      const newSlots: any[] = []
-      let totalPlaced = 0
-
-      // Process each class
       const allClasses = classes as any[]
-      // Sort by most assignments first (harder to schedule first)
-      const sortedClasses = [...allClasses].sort((a, b) =>
-        (classByClass[b.id]?.length || 0) - (classByClass[a.id]?.length || 0)
-      )
+      const allMirrors = Object.values(globalCombinations).flat()
+      const sortedClasses = [...allClasses]
+        .filter(c => !allMirrors.includes(c.id)) // Skip child classes in a group
+        .sort((a, b) => (classByClass[b.id]?.length || 0) - (classByClass[a.id]?.length || 0))
 
-      const mergedClassIds = new Set(mergedClasses)
+      let bestSlots: any[] = []
+      let bestPlaced = -1
+      let bestMissedInfo: string[] = []
+      let bestMissedCount = 0
 
-      for (const cls of sortedClasses) {
-        if (mergedClassIds.has(cls.id) && cls.id !== selectedClass) continue // Skip classes mirroring the selected class
-
-        const clsId = cls.id
-        const assigns = classByClass[clsId]
-        if (!assigns?.length) continue
-
-        setGenProgress(`Scheduling ${cls.name}…`)
-
-        // Detect: primary (1 teacher) vs secondary (multiple teachers)
-        const uniqueTeachers = new Set(assigns.map(a => a.teacher_id))
-        const isPrimaryStyle = uniqueTeachers.size === 1
-
-        // Build "want list": for each assignment, how many periods per week?
-        const wantList: { teacher_id: string; subject_id: string; remaining: number }[] = []
-        assigns.forEach(a => {
-          const cfg = subjectConfig[a.subject_id]
-          if (cfg?.excluded) return
-          const freq = cfg?.freq ?? (isPrimaryStyle ? Math.floor(totalSlots / assigns.length) : 2)
-          wantList.push({ teacher_id: a.teacher_id, subject_id: a.subject_id, remaining: freq })
+      // Try multiple times to find the best fit
+      const ATTEMPTS = 5
+      for (let attemptNum = 1; attemptNum <= ATTEMPTS; attemptNum++) {
+        setGenProgress(`Attempt ${attemptNum}/${ATTEMPTS}: Solving teacher busy times…`)
+        
+        const currentSlots: any[] = []
+        const teacherBusy: Record<number, Record<string, Set<string>>> = {}
+        DAYS.forEach((_, di) => {
+          teacherBusy[di + 1] = {}
+          teachablePeriods.forEach(p => { teacherBusy[di + 1][p.id] = new Set() })
         })
 
-        // Track per-class scheduling state
-        const classBusy: Record<number, Record<string, boolean>> = {} // day → periodId → filled
-        const subjectPerDay: Record<string, Record<number, number>> = {} // subjectId → day → count
-        const teacherDailyCount: Record<string, Record<number, number>> = {} // teacherId → day → count
+        let currentPlaced = 0
+        const missedList: string[] = []
+        let currentMissed = 0
 
-        DAYS.forEach((_, di) => { classBusy[di + 1] = {} })
+        for (const cls of sortedClasses) {
+          if (!classByClass[cls.id]?.length) continue
+          const clsId = cls.id
+          const assigns = classByClass[clsId]
+          
+          const uniqueTeachers = new Set(assigns.map(a => a.teacher_id))
+          const isPrimaryStyle = uniqueTeachers.size === 1
 
-        function tryPlace(teacher_id: string, subject_id: string, day: number, period: any): boolean {
-          if (classBusy[day][period.id]) return false
-          if (teacherBusy[day][period.id].has(teacher_id)) return false
-          if (extracurricularSlots.find(es => es.day === day && es.periodId === period.id)) return false
-          if ((subjectPerDay[subject_id]?.[day] ?? 0) >= (isPrimaryStyle ? 2 : 1)) return false // primary style constraint
-          if ((teacherDailyCount[teacher_id]?.[day] ?? 0) >= (isPrimaryStyle ? teachablePeriods.length : 3)) return false
-
-          // Place it
-          classBusy[day][period.id] = true
-          teacherBusy[day][period.id].add(teacher_id)
-          if (!subjectPerDay[subject_id]) subjectPerDay[subject_id] = {}
-          subjectPerDay[subject_id][day] = (subjectPerDay[subject_id][day] ?? 0) + 1
-          if (!teacherDailyCount[teacher_id]) teacherDailyCount[teacher_id] = {}
-          teacherDailyCount[teacher_id][day] = (teacherDailyCount[teacher_id][day] ?? 0) + 1
-
-          newSlots.push({
-            school_id: user!.school_id, class_id: clsId,
-            subject_id, teacher_id, period_id: period.id,
-            day_of_week: day, term_id: (term as any).id,
+          const wantList: { teacher_id: string; subject_id: string; remaining: number; initial: number; name: string }[] = []
+          assigns.forEach(a => {
+            const cfg = subjectConfig[a.subject_id]
+            if (cfg?.excluded) return
+            const freq = cfg?.freq ?? (isPrimaryStyle ? Math.floor(totalSlots / assigns.length) : 2)
+            const sName = subjects.find(s => s.id === a.subject_id)?.name || 'Unknown'
+            wantList.push({ teacher_id: a.teacher_id, subject_id: a.subject_id, remaining: freq, initial: freq, name: sName })
           })
-          totalPlaced++
-          return true
-        }
 
-        // PASS 1: Place required frequencies, spread across days
-        // Sort want list by highest remaining to place hardest first
-        const shuffledWant = [...wantList].sort((a, b) => b.remaining - a.remaining)
+          const classBusy: Record<number, Record<string, boolean>> = {} 
+          const subjectPerDay: Record<string, Record<number, number>> = {}
+          const teacherDailyCount: Record<string, Record<number, number>> = {}
+          DAYS.forEach((_, di) => { classBusy[di + 1] = {} })
 
-        for (const want of shuffledWant) {
-          // Spread: prefer days where this subject hasn't appeared yet
-          const shuffledDays = [1, 2, 3, 4, 5].sort(() => Math.random() - 0.5)
-          const shuffledPeriods = [...teachablePeriods].sort(() => Math.random() - 0.5)
+          function tryPlace(teacher_id: string, subject_id: string, day: number, period: any, currentAttemptSlots: any[], currentAttemptTeacherBusy: Record<number, Record<string, Set<string>>>): boolean {
+            if (classBusy[day][period.id]) return false
+            if (currentAttemptTeacherBusy[day][period.id].has(teacher_id)) return false
+            if (extracurricularSlots.find(es => es.day === day && es.periodId === period.id)) return false
+            if ((subjectPerDay[subject_id]?.[day] ?? 0) >= 1) return false 
+            if ((teacherDailyCount[teacher_id]?.[day] ?? 0) >= (isPrimaryStyle ? teachablePeriods.length : 3)) return false
 
-          for (let attempt = 0; attempt < want.remaining; attempt++) {
-            // Days sorted by fewest appearances of this subject
-            const daysBySubjectLoad = [...shuffledDays].sort((a, b) =>
-              (subjectPerDay[want.subject_id]?.[a] ?? 0) - (subjectPerDay[want.subject_id]?.[b] ?? 0)
-            )
-            let placed = false
-            for (const day of daysBySubjectLoad) {
-              if (placed) break
-              // Periods sorted by fewest teacher clashes
+            classBusy[day][period.id] = true
+            currentAttemptTeacherBusy[day][period.id].add(teacher_id)
+            if (!subjectPerDay[subject_id]) subjectPerDay[subject_id] = {}
+            subjectPerDay[subject_id][day] = (subjectPerDay[subject_id][day] ?? 0) + 1
+            if (!teacherDailyCount[teacher_id]) teacherDailyCount[teacher_id] = {}
+            teacherDailyCount[teacher_id][day] = (teacherDailyCount[teacher_id][day] ?? 0) + 1
+
+            currentAttemptSlots.push({
+              school_id: user!.school_id, class_id: clsId,
+              subject_id, teacher_id, period_id: period.id,
+              day_of_week: day, term_id: (term as any).id,
+            })
+            currentPlaced++
+            return true
+          }
+
+          // PASS 0: Guaranteed 1st Period (Make sure all assigned subjects appear)
+          const shuffledWant = [...wantList].sort(() => Math.random() - 0.5)
+          for (const way of shuffledWant) {
+            const shuffledDays = [1, 2, 3, 4, 5].sort(() => Math.random() - 0.5)
+            const shuffledPeriods = [...teachablePeriods].sort(() => Math.random() - 0.5)
+            let placedOnce = false
+            for (const d of shuffledDays) {
+              if (placedOnce) break
               for (const p of shuffledPeriods) {
-                if (tryPlace(want.teacher_id, want.subject_id, day, p)) { placed = true; break }
+                if (tryPlace(way.teacher_id, way.subject_id, d, p, currentSlots, teacherBusy)) {
+                  placedOnce = true
+                  way.remaining--
+                  break
+                }
               }
             }
           }
-        }
 
-        // PASS 2: Fill ALL remaining empty teachable slots (no gaps allowed)
-        const shuffledDays = [1, 2, 3, 4, 5].sort(() => Math.random() - 0.5)
-        const shuffledPeriods = [...teachablePeriods].sort(() => Math.random() - 0.5)
-
-        for (const day of shuffledDays) {
-          for (const p of shuffledPeriods) {
-            if (classBusy[day][p.id]) continue
-            if (extracurricularSlots.find(es => es.day === day && es.periodId === p.id)) continue
-
-            // Pick the LEAST-used subject/teacher combo for this class today
-            // Rank assignments by: (1) not yet today, (2) least total use, (3) teacher available
-            const ranked = [...assigns]
-              .filter(a => !(subjectConfig[a.subject_id]?.excluded))
-              .sort((a, b) => {
-                const aDayCount = subjectPerDay[a.subject_id]?.[day] ?? 0
-                const bDayCount = subjectPerDay[b.subject_id]?.[day] ?? 0
-                const aTotalCount = Object.values(subjectPerDay[a.subject_id] ?? {}).reduce((s, v) => s + v, 0)
-                const bTotalCount = Object.values(subjectPerDay[b.subject_id] ?? {}).reduce((s, v) => s + v, 0)
-                if (aDayCount !== bDayCount) return aDayCount - bDayCount
-                return aTotalCount - bTotalCount
-              })
-
-            let filledGap = false
-            for (const a of ranked) {
-              // For gap-fill, we relax constraints to ensure no empty slots.
-              const subjectDayCount = subjectPerDay[a.subject_id]?.[day] ?? 0
-              const teacherDayCnt = teacherDailyCount[a.teacher_id]?.[day] ?? 0
-              if (classBusy[day][p.id]) break
-              if (teacherBusy[day][p.id].has(a.teacher_id)) continue
-              
-              // Relaxed teacher limit for gap-fills: allow up to 8/day for secondary to guarantee coverage
-              if (teacherDayCnt >= (isPrimaryStyle ? teachablePeriods.length : 8)) continue 
-
-              // Relaxed subject limit for gap-fills: allow 2/day for secondary, 4/day for primary
-              if (subjectDayCount >= (isPrimaryStyle ? 4 : 2)) continue
-
-              // Place gap-fill
-              classBusy[day][p.id] = true
-              teacherBusy[day][p.id].add(a.teacher_id)
-              if (!subjectPerDay[a.subject_id]) subjectPerDay[a.subject_id] = {}
-              subjectPerDay[a.subject_id][day] = (subjectPerDay[a.subject_id][day] ?? 0) + 1
-              if (!teacherDailyCount[a.teacher_id]) teacherDailyCount[a.teacher_id] = {}
-              teacherDailyCount[a.teacher_id][day] = (teacherDailyCount[a.teacher_id][day] ?? 0) + 1
-
-              newSlots.push({
-                school_id: user!.school_id, class_id: clsId,
-                subject_id: a.subject_id, teacher_id: a.teacher_id,
-                period_id: p.id, day_of_week: day, term_id: (term as any).id,
-              })
-              totalPlaced++
-              filledGap = true
-              break
+          // PASS 1: Fill the rest of the requested frequencies
+          for (const way of shuffledWant) {
+            const shuffledDays = [1, 2, 3, 4, 5].sort(() => Math.random() - 0.5)
+            const shuffledPeriods = [...teachablePeriods].sort(() => Math.random() - 0.5)
+            while (way.remaining > 0) {
+              let placed = false
+              const daysBySubjectLoad = [...shuffledDays].sort((a, b) => (subjectPerDay[way.subject_id]?.[a] ?? 0) - (subjectPerDay[way.subject_id]?.[b] ?? 0))
+              for (const day of daysBySubjectLoad) {
+                if (placed) break
+                if (way.initial <= 5 && (subjectPerDay[way.subject_id]?.[day] ?? 0) >= 1) continue
+                for (const p of shuffledPeriods) {
+                  if (tryPlace(way.teacher_id, way.subject_id, day, p, currentSlots, teacherBusy)) {
+                    placed = true; way.remaining--
+                    break
+                  }
+                }
+              }
+              if (!placed) break
+            }
+            if (way.remaining > 0) {
+              currentMissed += way.remaining
+              if (!missedList.includes(way.name)) missedList.push(`${way.name} (${way.remaining} periods)`)
             }
           }
         }
+
+        if (currentPlaced > bestPlaced) {
+          bestPlaced = currentPlaced
+          bestSlots = currentSlots
+          bestMissedInfo = missedList
+          bestMissedCount = currentMissed
+        }
+        if (currentMissed === 0) break // Perfect score!
       }
 
-      // 3. Wipe & insert only those actually generated to avoid wiping locked classes
+      const newSlots = bestSlots
+      const totalPlaced = bestPlaced
+      const totalMissed = bestMissedCount
+
+      // 3. Wipe 
       setGenProgress('Writing to database…')
-      const targetClassIdsForWipe = Array.from(new Set(newSlots.map(s => s.class_id).concat(mergedClasses)))
-      if (targetClassIdsForWipe.length > 0) {
-        await supabase.from('timetable_slots').delete().eq('term_id', (term as any).id).in('class_id', targetClassIdsForWipe)
+      const targetClassesForWipe = [...sortedClasses.map(c => c.id), ...allMirrors]
+      if (targetClassesForWipe.length > 0) {
+        await supabase.from('timetable_slots').delete().eq('term_id', (term as any).id).in('class_id', targetClassesForWipe)
       }
+
+      // 4. Mirroring
+      const mirroredSlots: any[] = []
+      for (const masterId in globalCombinations) {
+        const mirrors = globalCombinations[masterId]
+        const masterSlots = newSlots.filter(s => s.class_id === masterId)
+        mirrors.forEach(mid => {
+          masterSlots.forEach(s => mirroredSlots.push({ ...s, class_id: mid }))
+        })
+      }
+      const finalPayload = [...newSlots, ...mirroredSlots]
 
       const CHUNK = 400
-      for (let i = 0; i < newSlots.length; i += CHUNK) {
-        await supabase.from('timetable_slots').insert(newSlots.slice(i, i + CHUNK))
+      for (let i = 0; i < finalPayload.length; i += CHUNK) {
+        await supabase.from('timetable_slots').insert(finalPayload.slice(i, i + CHUNK))
       }
-
-      // 4. If there are merged classes, duplicate slots for them
-      if (mergedClasses.length) {
-        setGenProgress('Duplicating for merged classes…')
-        const baseSlotsForSelected = newSlots.filter(s => s.class_id === selectedClass)
-        const merged: any[] = []
-        mergedClasses.forEach(mcid => {
-          baseSlotsForSelected.forEach(s => {
-            merged.push({ ...s, class_id: mcid })
-          })
-        })
-        for (let i = 0; i < merged.length; i += CHUNK) {
-          await supabase.from('timetable_slots').insert(merged.slice(i, i + CHUNK))
-        }
-      }
-
-      toast.success(`✅ Generated ${totalPlaced} slots across ${sortedClasses.filter(c => classByClass[c.id]?.length).length} classes`, { id: tid, duration: 8000 })
+      const studyHalls = (sortedClasses.length * totalSlots) - totalPlaced
+      toast.success(`✅ Generated ${totalPlaced} slots.
+${totalMissed > 0 ? `⚠️ ${totalMissed} periods missed (${bestMissedInfo.slice(0, 3).join(', ')}${bestMissedInfo.length > 3 ? '...' : ''}). Try generating again or reduce subject frequency.` : 'Perfect: All assigned subjects placed!'}
+📖 ${studyHalls} slots filled with Study Hall.`, { id: tid, duration: 10000 })
       setAutoGenOpen(false)
       setGenProgress('')
       if (selectedClass) loadSlots()
@@ -560,7 +591,8 @@ export default function TimetablePage() {
   // ─────────────────────────────────────────────────────────────────────────────
   const teachablePeriods = periods.filter(p => !p.is_break)
   const selectedClassName = (classes as any[]).find(c => c.id === selectedClass)?.name ?? ''
-  const mergedClassNames = mergedClasses.map(id => (classes as any[]).find(c => c.id === id)?.name).filter(Boolean)
+  const joinedIds = getJoinedClasses(selectedClass)
+  const mergedClassNames = joinedIds.filter(id => id !== selectedClass).map(id => (classes as any[]).find(c => c.id === id)?.name).filter(Boolean)
 
   function slotColor(subjectId: string) {
     const idx = subjectColorMap[subjectId] ?? 0
@@ -599,7 +631,8 @@ export default function TimetablePage() {
               {(term as any)?.name ?? 'Current term'} &nbsp;·&nbsp; Smart scheduling for every class type
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Btn variant="secondary" onClick={() => setCombOpen(true)}>🔗 Joint Classes</Btn>
             <Btn variant="navy" onClick={() => setEditPeriodsOpen(true)}>⏱ Period Times</Btn>
             <Btn variant="primary" onClick={openAutoGen} style={{ background: 'linear-gradient(135deg,#0e9f84,#0a7c68)' }}>✨ Auto-Generate</Btn>
           </div>
@@ -618,16 +651,17 @@ export default function TimetablePage() {
 
           {selectedClass && (
             <>
-              <div>
-                <label style={{ display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '.07em', textTransform: 'uppercase', color: T.muted, marginBottom: 6 }}>Merged with</label>
-                <button onClick={openMerge}
-                  style={{ padding: '9px 14px', borderRadius: 9, fontSize: 12, fontWeight: 700, border: `1.5px solid ${mergedClasses.length ? T.teal : T.border}`, background: mergedClasses.length ? `${T.teal}10` : T.white, color: mergedClasses.length ? T.teal : T.muted, cursor: 'pointer', fontFamily: '"Sora",sans-serif', transition: 'all .15s' }}>
-                  {mergedClasses.length ? `🔗 ${mergedClassNames.join(', ')}` : '+ Merge classes'}
-                </button>
-              </div>
+              {getJoinedClasses(selectedClass).length > 1 && (
+                <div style={{ animation: '_tt_slide .3s ease' }}>
+                  <label style={{ display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '.07em', textTransform: 'uppercase', color: T.muted, marginBottom: 6 }}>Combined with</label>
+                  <div style={{ display: 'flex', gap: 4, alignItems: 'center', padding: '8px 12px', borderRadius: 9, background: `${T.teal}10`, border: `1.5px solid ${T.teal}40` }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: T.teal }}>🔗 {getJoinedClasses(selectedClass).filter(id => id !== selectedClass).map(id => (classes as any[]).find(cl => cl.id === id)?.name).join(', ')}</span>
+                  </div>
+                </div>
+              )}
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
                 <Tag color={T.green}>✓ Editing {selectedClassName}</Tag>
-                {mergedClasses.length > 0 && <Tag color={T.teal}>Shared timetable</Tag>}
+                {getJoinedClasses(selectedClass).length > 1 && <Tag color={T.teal}>Joint Timetable</Tag>}
               </div>
             </>
           )}
@@ -694,7 +728,9 @@ export default function TimetablePage() {
                                   <div style={{ fontSize: 11, color: T.green, fontWeight: 700 }}>⚽ Extra</div>
                                 </div>
                               ) : (
-                                <div style={{ color: '#d1d5db', fontSize: 20, lineHeight: 1 }}>+</div>
+                                <div style={{ borderRadius: 10, padding: '7px 10px', background: '#f8fafc', border: `1px dashed ${T.border}`, textAlign: 'center', transition: 'all .2s' }}>
+                                  <div style={{ fontSize: 10, color: T.muted, fontWeight: 700 }}>📖 Study Hall</div>
+                                </div>
                               )}
                             </td>
                           )
@@ -731,45 +767,85 @@ export default function TimetablePage() {
       {/* ════════════════════════════════════════════════════
           MODAL: Edit slot
       ════════════════════════════════════════════════════ */}
-      <Modal open={!!editing} onClose={() => setEditing(null)}
-        title={editing ? `${DAYS[editing.day - 1]} — ${periods.find(p => p.id === editing?.period_id)?.name}` : ''}
-        subtitle={selectedClassName + (mergedClasses.length ? ` + ${mergedClassNames.join(', ')}` : '')}
+      <Modal open={!!editing} onClose={() => { setEditing(null); setConflict(null); }}
+        title={conflict?.type === 'subject' ? '🚫 Subject Already Scheduled' : (conflict ? '⚠️ Teacher Conflict Detected' : (editing ? `${DAYS[editing.day - 1]} — ${periods.find(p => p.id === editing?.period_id)?.name}` : ''))}
+        subtitle={conflict?.type === 'subject' ? 'One subject can only appear once per day' : (conflict ? 'This teacher is already busy in another class' : (selectedClassName + (mergedClassNames.length ? ` + ${mergedClassNames.join(', ')}` : '')))}
         width={380}
         footer={
-          <>
-            <Btn variant="secondary" onClick={() => setEditing(null)}>Cancel</Btn>
-            <Btn onClick={saveSlot} loading={saving}>💾 Save Slot</Btn>
-          </>
+          conflict ? (
+            <>
+              <Btn variant="secondary" onClick={() => setConflict(null)}>Stop / Go Back</Btn>
+              <Btn variant={conflict.type === 'subject' ? 'danger' : 'amber'} onClick={() => saveSlot(true)} loading={saving}>
+                {conflict.type === 'subject' ? '⛔ Overwrite Anyway' : '🔄 Swap Teachers'}
+              </Btn>
+            </>
+          ) : (
+            <>
+              <Btn variant="secondary" onClick={() => setEditing(null)}>Cancel</Btn>
+              <Btn onClick={() => saveSlot()} loading={saving}>💾 Save Slot</Btn>
+            </>
+          )
         }>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {mergedClasses.length > 0 && (
-            <div style={{ background: '#eff6ff', borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.indigo, border: '1px solid #bfdbfe' }}>
-              🔗 This edit will apply to <strong>{1 + mergedClasses.length} classes</strong>: {selectedClassName}, {mergedClassNames.join(', ')}
+        
+        {conflict ? (
+          <div style={{ animation: '_tt_slide .3s ease' }}>
+            <div style={{ background: conflict.type === 'subject' ? '#fef2f2' : '#fffbeb', border: `1.5px solid ${conflict.type === 'subject' ? '#fecaca' : '#fde68a'}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: conflict.type === 'subject' ? '#dc2626' : '#92400e', marginBottom: 8 }}>
+                {conflict.type === 'subject' ? 'Rule Violation:' : 'Overlapping Assignment:'}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {conflict.type === 'subject' ? (
+                  <>
+                    <div style={{ fontSize: 12, color: T.navy }}>This class already has <strong>{subjects.find(s => s.id === editForm.subject_id)?.name}</strong> scheduled today.</div>
+                    <div style={{ fontSize: 12, color: T.navy }}><strong>Existing Period:</strong> {conflict.period?.name}</div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontSize: 12, color: T.navy }}><strong>Class:</strong> {conflict.class?.name}</div>
+                    <div style={{ fontSize: 12, color: T.navy }}><strong>Subject:</strong> {conflict.subject?.name}</div>
+                    <div style={{ fontSize: 12, color: T.navy }}><strong>Time:</strong> {periods.find(p => p.id === conflict.period_id)?.name}</div>
+                  </>
+                )}
+              </div>
             </div>
-          )}
-          <div>
-            <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Subject</label>
-            <select value={editForm.subject_id} onChange={e => setEditForm(f => ({ ...f, subject_id: e.target.value }))}
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: `1.5px solid ${T.border}`, outline: 'none', fontSize: 13, color: T.navy, background: '#f8faff', cursor: 'pointer' }}>
-              <option value="">— Clear slot —</option>
-              {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <p style={{ fontSize: 12, color: T.muted, lineHeight: 1.5 }}>
+              {conflict.type === 'subject' 
+                ? 'It is recommended to follow the once-per-day rule to maintain a balanced syllabus spread.' 
+                : 'Choosing Swap will remove the teacher from the other class and assign them here.'}
+            </p>
           </div>
-          <div>
-            <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Teacher</label>
-            <select value={editForm.teacher_id} onChange={e => setEditForm(f => ({ ...f, teacher_id: e.target.value }))}
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: `1.5px solid ${T.border}`, outline: 'none', fontSize: 13, color: T.navy, background: '#f8faff', cursor: 'pointer' }}>
-              <option value="">— Unassigned —</option>
-              {(classTeachers.length > 0 ? classTeachers : teachers).map(t => (
-                <option key={t.id} value={t.id}>{t.user?.full_name}</option>
-              ))}
-            </select>
-            {classTeachers.length > 0 && (
-              <p style={{ fontSize: 10, color: T.teal, marginTop: 4 }}>Showing teachers assigned to {selectedClassName}</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {mergedClassNames.length > 0 && (
+              <div style={{ background: '#eff6ff', borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.indigo, border: '1px solid #bfdbfe', marginBottom: 15 }}>
+                🔗 This edit will apply to <strong>{1 + mergedClassNames.length} classes</strong>: {selectedClassName}, {mergedClassNames.join(', ')}
+              </div>
             )}
+            <div>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Subject</label>
+              <select value={editForm.subject_id} onChange={e => setEditForm(f => ({ ...f, subject_id: e.target.value }))}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: `1.5px solid ${T.border}`, outline: 'none', fontSize: 13, color: T.navy, background: '#f8faff', cursor: 'pointer' }}>
+                <option value="">— Clear slot —</option>
+                {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>Teacher</label>
+              <select value={editForm.teacher_id} onChange={e => setEditForm(f => ({ ...f, teacher_id: e.target.value }))}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: `1.5px solid ${T.border}`, outline: 'none', fontSize: 13, color: T.navy, background: '#f8faff', cursor: 'pointer' }}>
+                <option value="">— Unassigned —</option>
+                {(classTeachers.length > 0 ? classTeachers : teachers).map(t => (
+                  <option key={t.id} value={t.id}>{t.user?.full_name}</option>
+                ))}
+              </select>
+              {classTeachers.length > 0 && (
+                <p style={{ fontSize: 10, color: T.teal, marginTop: 4 }}>Showing teachers assigned to {selectedClassName}</p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </Modal>
+
 
       {/* ════════════════════════════════════════════════════
           MODAL: Period editor
@@ -810,51 +886,90 @@ export default function TimetablePage() {
         </div>
       </Modal>
 
-      {/* ════════════════════════════════════════════════════
-          MODAL: Merge classes
-      ════════════════════════════════════════════════════ */}
-      <Modal open={mergeOpen} onClose={() => setMergeOpen(false)}
-        title="🔗 Merge Class Timetables"
-        subtitle={`Classes merged with ${selectedClassName} will share the exact same timetable`}
-        width={440}
-        footer={
-          <>
-            <Btn variant="secondary" onClick={() => setMergeOpen(false)}>Cancel</Btn>
-            <Btn onClick={applyMerge}>Apply Merge</Btn>
-          </>
-        }>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ background: '#eff6ff', borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.indigo, lineHeight: 1.5, border: '1px solid #bfdbfe' }}>
-            💡 Useful for combined classes (e.g. JHS 1A + 1B share the same teacher and room). All edits and auto-generation will be mirrored to the merged classes.
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 320, overflowY: 'auto' }}>
-            {(classes as any[]).filter(c => c.id !== selectedClass).map(c => {
-              const checked = pendingMerged.includes(c.id)
-              return (
-                <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${checked ? T.teal : T.border}`, background: checked ? `${T.teal}08` : T.white, cursor: 'pointer', transition: 'all .12s' }}>
-                  <input type="checkbox" checked={checked}
-                    onChange={e => {
-                      if (e.target.checked) setPendingMerged(p => [...p, c.id])
-                      else setPendingMerged(p => p.filter(id => id !== c.id))
-                    }} />
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: T.navy }}>{c.name}</div>
-                    {checked && <div style={{ fontSize: 10, color: T.teal, marginTop: 2 }}>Will mirror {selectedClassName}'s timetable</div>}
-                  </div>
-                  {checked && <Tag color={T.teal}>Merged</Tag>}
-                </label>
-              )
-            })}
-          </div>
-          {pendingMerged.length > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={() => setPendingMerged([])} style={{ fontSize: 11, color: T.red, background: 'none', border: 'none', cursor: 'pointer', fontFamily: '"Sora",sans-serif', fontWeight: 600 }}>
-                Clear all
-              </button>
-            </div>
-          )}
-        </div>
-      </Modal>
+       {/* ════════════════════════════════════════════════════
+           MODAL: Manage Joint Classes
+       ════════════════════════════════════════════════════ */}
+       <Modal open={combOpen} onClose={() => setCombOpen(false)}
+         title="🔗 Manage Joint Classes"
+         subtitle="Group classes that move together (share the same schedule)"
+         width={480}
+         footer={<Btn onClick={() => setCombOpen(false)}>Done</Btn>}>
+         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+           
+           {/* Add New Group Section */}
+           <div style={{ background: '#f8fafc', border: `1px solid ${T.border}`, borderRadius: 12, padding: 16 }}>
+             <p style={{ fontSize: 11, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>Create New Joint Group</p>
+             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+               <div>
+                 <label style={{ fontSize: 11, color: T.navy, fontWeight: 600, display: 'block', marginBottom: 4 }}>Master Class (The Source)</label>
+                 <select value={pendingMaster} onChange={e => { setPendingMaster(e.target.value); setPendingMirror([]) }}
+                   style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${T.border}`, fontSize: 12, outline: 'none' }}>
+                   <option value="">— Select Master Class —</option>
+                   {(classes as any[]).filter(c => !Object.values(globalCombinations).flat().includes(c.id)).map(c => (
+                     <option key={c.id} value={c.id}>{c.name}</option>
+                   ))}
+                 </select>
+               </div>
+               
+               {pendingMaster && (
+                 <div style={{ animation: '_tt_slide .2s ease' }}>
+                   <label style={{ fontSize: 11, color: T.navy, fontWeight: 600, display: 'block', marginBottom: 6 }}>Mirror Classes (The Followers)</label>
+                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, maxHeight: 120, overflowY: 'auto', padding: 2 }}>
+                     {(classes as any[]).filter(c => c.id !== pendingMaster && !Object.keys(globalCombinations).includes(c.id) && !Object.values(globalCombinations).flat().includes(c.id)).map(c => (
+                       <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', borderRadius: 8, border: `1px solid ${pendingMirror.includes(c.id) ? T.teal : T.border}`, background: pendingMirror.includes(c.id) ? `${T.teal}08` : T.white, cursor: 'pointer', transition: 'all .1s' }}>
+                         <input type="checkbox" checked={pendingMirror.includes(c.id)} onChange={e => e.target.checked ? setPendingMirror(p => [...p, c.id]) : setPendingMirror(p => p.filter(id => id !== c.id))} />
+                         <span style={{ fontSize: 12, color: T.navy }}>{c.name}</span>
+                       </label>
+                     ))}
+                   </div>
+                   <Btn variant="success" size="small" style={{ marginTop: 12, width: '100%' }} disabled={!pendingMirror.length} onClick={async () => {
+                     const next = { ...globalCombinations, [pendingMaster]: pendingMirror }
+                     if (settings?.id) {
+                       await updateSettings.mutateAsync({ id: settings.id, settings: { ...settings.settings, joint_classes: next } })
+                     }
+                     setGlobalCombinations(next)
+                     setPendingMaster('')
+                     setPendingMirror([])
+                     toast.success('Joint group linked and saved')
+                   }}>🔗 Link Classes Together</Btn>
+                 </div>
+               )}
+             </div>
+           </div>
+
+           {/* List Existing Groups */}
+           <div>
+             <p style={{ fontSize: 11, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 10 }}>Active Joint Groups</p>
+             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+               {Object.keys(globalCombinations).length === 0 ? (
+                 <div style={{ padding: '20px', textAlign: 'center', border: `1.5px dashed ${T.border}`, borderRadius: 12 }}>
+                   <p style={{ fontSize: 12, color: T.muted, margin: 0 }}>No classes combined yet</p>
+                 </div>
+               ) : (
+                 Object.keys(globalCombinations).map(mid => {
+                   const mName = (classes as any[]).find(c => c.id === mid)?.name ?? 'Unknown'
+                   const children = globalCombinations[mid]
+                   return (
+                     <div key={mid} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: 12, border: `1.5px solid ${T.teal}`, background: `${T.teal}05` }}>
+                       <div>
+                         <div style={{ fontSize: 13, fontWeight: 800, color: T.navy }}>{mName} <span style={{ color: T.muted, fontWeight: 400, margin: '0 4px' }}>→</span> {children.length} Followers</div>
+                         <div style={{ fontSize: 10, color: T.teal, marginTop: 4, fontWeight: 700 }}>Mirrored by: {children.map(cid => (classes as any[]).find(cl => cl.id === cid)?.name).join(', ')}</div>
+                       </div>
+                       <button onClick={() => {
+                         const n = { ...globalCombinations }; delete n[mid]; setGlobalCombinations(n)
+                         toast.success('Group unlinked')
+                       }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.red, padding: 8 }}>
+                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                       </button>
+                     </div>
+                   )
+                 })
+               )}
+             </div>
+           </div>
+
+         </div>
+       </Modal>
 
       {/* ════════════════════════════════════════════════════
           MODAL: Auto-generate
@@ -963,7 +1078,7 @@ export default function TimetablePage() {
         </div>
 
         {/* Merged class notice */}
-        {mergedClasses.length > 0 && (
+        {mergedClassNames.length > 0 && (
           <div style={{ background: '#eff6ff', borderRadius: 10, padding: '10px 14px', fontSize: 12, color: T.indigo, lineHeight: 1.5, marginTop: 12, border: '1px solid #bfdbfe' }}>
             🔗 <strong>{selectedClassName}'s</strong> timetable will also be duplicated to: <strong>{mergedClassNames.join(', ')}</strong>
           </div>

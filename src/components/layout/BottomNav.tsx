@@ -162,11 +162,14 @@ export default function BottomNav() {
         borderTop: '1px solid rgba(109,40,217,0.08)',
         boxShadow: '0 -8px 30px rgba(0,0,0,0.04)',
         display: 'flex', alignItems: 'center',
-        padding: '8px 12px',
+        padding: '8px 4px',
         paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
         animation: '_bn_in 0.5s ease',
         fontFamily: '"DM Sans", sans-serif',
+        overflowX: 'auto',
+        scrollbarWidth: 'none',
       }}>
+        <style>{`nav::-webkit-scrollbar { display: none; }`}</style>
         {links.map(({ to, icon: Icon, label, notify }: any) => {
           const isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to))
 

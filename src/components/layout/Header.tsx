@@ -48,6 +48,7 @@ export default function Header() {
     { icon: '📄', label: 'Reports', path: '/admin/reports' },
     { icon: '⚙️', label: 'Settings', path: '/admin/settings' },
     { icon: '📊', label: 'Analytics', path: '/admin/analytics' },
+    { icon: '📈', label: 'Test Trends', path: '/admin/test-analytics' },
     { icon: '📢', label: 'Announcements', path: '/admin/announcements' },
     { divider: true },
     { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
@@ -61,6 +62,7 @@ export default function Header() {
     { icon: '📄', label: 'Reports', path: '/teacher/reports', },
     { icon: '📅', label: 'My Timetable', path: '/teacher/timetable' },
     { icon: '👥', label: 'My Classes', path: '/teacher/my-classes' },
+    { icon: '📝', label: 'Class Tests', path: '/teacher/class-tests' },
     { icon: '⏱️', label: 'Tracker', path: '/teacher/lesson-tracker' },
     ...(!pushEnabled && VAPID_PUBLIC_KEY ? [{ icon: '🔕', label: 'Enable Push Alerts', action: enablePush, highlight: true }] : []),
     { divider: true },
@@ -215,9 +217,12 @@ export default function Header() {
                 overflow: 'hidden', zIndex: 999,
                 animation: '_hdr_in .18s ease',
                 fontFamily: '"DM Sans",sans-serif',
+                maxHeight: 'calc(100vh - 80px)',
+                display: 'flex',
+                flexDirection: 'column',
               }}>
-                {/* User info header */}
-                <div style={{ padding: '14px 16px', borderBottom: '1px solid #f5f3ff', display: 'flex', gap: 10, alignItems: 'center' }}>
+                {/* User info header - fixed */}
+                <div style={{ padding: '14px 16px', borderBottom: '1px solid #f5f3ff', display: 'flex', gap: 10, alignItems: 'center', flexShrink: 0 }}>
                   <div style={{
                     width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
                     background: isSuperAdmin
@@ -243,7 +248,7 @@ export default function Header() {
                 </div>
 
                 {/* Menu items */}
-                <div style={{ padding: '6px 0' }}>
+                <div style={{ padding: '6px 0', overflowY: 'auto', flex: 1 }}>
                   {menu.map((item: any, i) => {
                     if (item.divider) return (
                       <div key={i} style={{ height: 1, background: '#f5f3ff', margin: '4px 0' }} />

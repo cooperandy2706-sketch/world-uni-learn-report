@@ -38,11 +38,7 @@ export function useUpdateSettings() {
   const schoolId = user?.school_id ?? ''
 
   return useMutation({
-    mutationFn: (data: {
-      next_term_date?: string | null
-      school_fees_info?: string | null
-      school_news?: string | null
-    }) => settingsService.upsert(schoolId, data),
+    mutationFn: (data: any) => settingsService.upsert(schoolId, data),
 
     onSuccess: () => {
       // Invalidate the EXACT key so the refetch brings back the joined school row

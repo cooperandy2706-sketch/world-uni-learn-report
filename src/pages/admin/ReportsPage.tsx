@@ -1,5 +1,6 @@
 // src/pages/admin/ReportsPage.tsx
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useClasses } from '../../hooks/useClasses'
 import { useCurrentTerm, useCurrentAcademicYear, useSettings } from '../../hooks/useSettings'
@@ -228,6 +229,10 @@ export default function ReportsPage() {
   const { data: year }     = useCurrentAcademicYear()
   const { data: settings } = useSettings()
 
+  const [searchParams] = useSearchParams()
+  const initialStudentId = searchParams.get('student')
+  const initialTermId = searchParams.get('term')
+
   const [selectedClass, setSelectedClass]   = useState('')
   const [viewingReport, setViewingReport]   = useState<any>(null)
   const [bulkPreviewOpen, setBulkPreviewOpen] = useState(false)
@@ -264,6 +269,33 @@ export default function ReportsPage() {
     for (const r of pending) await approveReport.mutateAsync(r.id)
     toast.success(`${pending.length} reports approved`)
   }
+
+  // Handle direct links from Performance Hub
+  useEffect(() => {
+    async function resolveDeepLink() {
+      if (initialStudentId && initialTermId) {
+        // Find which class the student was in for that term
+        const { data: rc } = await supabase
+          .from('report_cards')
+          .select('class_id')
+          .eq('student_id', initialStudentId)
+          .eq('term_id', initialTermId)
+          .maybeSingle()
+        
+        if (rc?.class_id) {
+          setSelectedClass(rc.class_id)
+        }
+      }
+    }
+    resolveDeepLink()
+  }, [initialStudentId, initialTermId])
+
+  useEffect(() => {
+    if (initialStudentId && reports.length > 0) {
+      const target = reports.find((r: any) => r.student_id === initialStudentId)
+      if (target) setViewingReport(target)
+    }
+  }, [initialStudentId, reports])
 
   // ── Save attendance ───────────────────────────────────────
   async function saveAttendance() {

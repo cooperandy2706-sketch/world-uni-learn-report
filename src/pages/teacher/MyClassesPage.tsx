@@ -170,12 +170,19 @@ export default function MyClassesPage() {
                       <div style={{ fontSize:11, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.05em', marginBottom:6 }}>Assigned Subjects</div>
                       <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
                         {cls.subjects.map((s: any) => (
-                          <Link key={s.id} to={`${ROUTES.TEACHER_SCORE_ENTRY}?class=${cls.classId}&subject=${s.id}`}
-                            style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:12, fontWeight:600, background:'#f5f3ff', color:'#6d28d9', padding:'4px 10px', borderRadius:99, textDecoration:'none', border:'1px solid #ddd6fe', transition:'all .15s' }}
-                            onMouseEnter={e => { e.currentTarget.style.background='#6d28d9'; e.currentTarget.style.color='#fff' }}
-                            onMouseLeave={e => { e.currentTarget.style.background='#f5f3ff'; e.currentTarget.style.color='#6d28d9' }}>
-                            {s.name}{s.code ? ` (${s.code})` : ''}
-                          </Link>
+                          <div key={s.id} style={{ display:'flex', alignItems:'center', gap:4 }}>
+                            <Link to={`${ROUTES.TEACHER_SCORE_ENTRY}?class=${cls.classId}&subject=${s.id}`}
+                              style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:12, fontWeight:600, background:'#f5f3ff', color:'#6d28d9', padding:'4px 10px', borderRadius:99, textDecoration:'none', border:'1px solid #ddd6fe', transition:'all .15s' }}
+                              onMouseEnter={e => { e.currentTarget.style.background='#6d28d9'; e.currentTarget.style.color='#fff' }}
+                              onMouseLeave={e => { e.currentTarget.style.background='#f5f3ff'; e.currentTarget.style.color='#6d28d9' }}>
+                              {s.name}{s.code ? ` (${s.code})` : ''}
+                            </Link>
+                            <Link to={`/teacher/class-tests?class=${cls.classId}&subject=${s.id}`} 
+                              title="Manage Class Tests"
+                              style={{ textDecoration:'none', fontSize:14, padding:'4px', background:'#fff', borderRadius:6, border:'1px solid #e2e8f0', display:'flex', alignItems:'center' }}>
+                              📝
+                            </Link>
+                          </div>
                         ))}
                       </div>
                     </div>
