@@ -10,7 +10,7 @@ import { useCurrentTerm } from '../../hooks/useSettings'
 import toast from 'react-hot-toast'
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-const TODAY_KEY = (userId: string) => `wula_att_submitted_${userId}_${new Date().toISOString().slice(0, 10)}`
+const TODAY_KEY = (userId: string, classId: string) => `wula_att_submitted_${userId}_${classId}_${new Date().toISOString().slice(0, 10)}`
 
 type Mark = 'present' | 'absent' | 'late'
 
@@ -33,7 +33,11 @@ export default function TeacherAttendancePage() {
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [myClass, setMyClass] = useState<any>(null)          // teacher's home class
+  const [myClasses, setMyClasses] = useState<any[]>([])
+  const [selectedClassId, setSelectedClassId] = useState<string | null>(null)
+  
+  const myClass = useMemo(() => myClasses.find(c => c.id === selectedClassId), [myClasses, selectedClassId])
+  
   const [students, setStudents] = useState<Student[]>([])
   const [marks, setMarks] = useState<Record<string, Mark>>({})
   const [submittedToday, setSubmittedToday] = useState(false)
@@ -51,34 +55,37 @@ export default function TeacherAttendancePage() {
     const { data: t } = await supabase.from('teachers').select('id').eq('user_id', user.id).single()
     if (!t) { setLoading(false); return }
 
-    // 2. Find the class where this teacher is the class teacher
-    //    (class_teacher_id column — added by migration or already existing)
+    // 2. Find all classes where this teacher is the class teacher
     const { data: cls } = await supabase
       .from('classes')
       .select('id, name')
       .eq('class_teacher_id', t.id)
-      .maybeSingle()
 
-    if (!cls) {
-      // Fallback: try teacher_assignments to find a class they primarily teach
+    let fetchedClasses = cls || []
+
+    if (fetchedClasses.length === 0) {
+      // Fallback: try teacher_assignments to find classes they teach
       const { data: asgn } = await supabase
         .from('teacher_assignments')
         .select('class:classes(id,name)')
         .eq('teacher_id', t.id)
         .eq('term_id', (term as any).id)
-        .limit(1)
-        .maybeSingle()
 
-      const fallback = (asgn as any)?.class
-      setMyClass(fallback ?? null)
-      if (!fallback) { setLoading(false); return }
-      await loadStudents(fallback.id, (term as any).id)
-      setLoading(false)
-      return
+      if (asgn && asgn.length > 0) {
+        const unique = new Map()
+        asgn.forEach(a => {
+           const c = a.class as any
+           if (c && !unique.has(c.id)) unique.set(c.id, c)
+        })
+        fetchedClasses = Array.from(unique.values())
+      }
     }
 
-    setMyClass(cls)
-    await loadStudents(cls.id, (term as any).id)
+    setMyClasses(fetchedClasses)
+    if (fetchedClasses.length > 0) {
+      setSelectedClassId(fetchedClasses[0].id)
+      await loadStudents(fetchedClasses[0].id, (term as any).id)
+    }
     setLoading(false)
   }, [user, term])
 
@@ -86,11 +93,37 @@ export default function TeacherAttendancePage() {
 
   // Check if already submitted today
   useEffect(() => {
-    if (user) {
-      const done = !!localStorage.getItem(TODAY_KEY(user.id))
+    if (user && selectedClassId) {
+      const done = !!localStorage.getItem(TODAY_KEY(user.id, selectedClassId))
       setSubmittedToday(done)
+      checkDbSubmitted(selectedClassId)
     }
-  }, [user])
+  }, [user, selectedClassId])
+
+  async function checkDbSubmitted(classId: string) {
+    if (!term) return
+    const { data: alreadyLogged } = await supabase
+        .from('attendance_records')
+        .select('id')
+        .eq('class_id', classId)
+        .eq('date', todayDate)
+        .limit(1)
+
+    if (alreadyLogged && alreadyLogged.length > 0) {
+      localStorage.setItem(TODAY_KEY(user!.id, classId), '1')
+      setSubmittedToday(true)
+    }
+  }
+
+  async function handleClassChange(classId: string) {
+    if (classId === selectedClassId) return
+    setSelectedClassId(classId)
+    setStudents([])
+    setMarks({})
+    setLoading(true)
+    await loadStudents(classId, (term as any).id)
+    setLoading(false)
+  }
 
   async function loadStudents(classId: string, termId: string) {
     const { data: studs } = await supabase
@@ -148,7 +181,7 @@ export default function TeacherAttendancePage() {
 
       if (alreadyLogged && alreadyLogged.length > 0) {
         toast.error('Attendance has already been submitted for this class today!')
-        localStorage.setItem(TODAY_KEY(user!.id), '1')
+        localStorage.setItem(TODAY_KEY(user!.id, myClass.id), '1')
         setSubmittedToday(true)
         setSaving(false)
         return
@@ -198,7 +231,7 @@ export default function TeacherAttendancePage() {
       }
 
       // Mark as submitted today
-      localStorage.setItem(TODAY_KEY(user!.id), '1')
+      localStorage.setItem(TODAY_KEY(user!.id, myClass.id), '1')
       setSubmittedToday(true)
 
       // Refresh term totals
@@ -298,6 +331,27 @@ export default function TeacherAttendancePage() {
           <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
             <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_att_spin .8s linear infinite' }} />
           </div>
+        )}
+
+        {/* Class Selection Tabs (if multiple classes) */}
+        {!loading && myClasses.length > 1 && !isWeekend && (
+            <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+              {myClasses.map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => handleClassChange(c.id)}
+                  style={{
+                    padding: '8px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer',
+                    background: selectedClassId === c.id ? '#6d28d9' : '#fff',
+                    color: selectedClassId === c.id ? '#fff' : '#4b5563',
+                    boxShadow: selectedClassId === c.id ? '0 4px 12px rgba(109,40,217,0.2)' : '0 1px 3px rgba(0,0,0,0.05)',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
         )}
 
         {/* No home class assigned */}

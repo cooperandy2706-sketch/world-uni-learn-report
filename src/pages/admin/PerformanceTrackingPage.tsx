@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useStudents } from '../../hooks/useStudents'
 import { useClasses } from '../../hooks/useClasses'
 import { useAuth } from '../../hooks/useAuth'
+import { useAcademicChallenges, useCreateAcademicChallenge } from '../../hooks/useAcademicChallenges'
 import { getGradeInfo } from '../../utils/grading'
 import { ordinal } from '../../lib/utils'
 import Modal from '../../components/ui/Modal'
@@ -66,6 +67,10 @@ export default function PerformanceTrackingPage() {
   const [leastPerformers, setLeastPerformers] = useState<any[]>([])
   const [expandedStruggleId, setExpandedStruggleId] = useState<string | null>(null)
   const [isSupportPlanOpen, setIsSupportPlanOpen] = useState(false)
+  const [isRecordChallengeOpen, setIsRecordChallengeOpen] = useState(false)
+  const [isChallengesReportOpen, setIsChallengesReportOpen] = useState(false)
+  const [challengeStudent, setChallengeStudent] = useState<any>(null)
+  const [challengeForm, setChallengeForm] = useState({ subject_name: '', teacher_name: '', description: '' })
   
   const [loadingHistory, setLoadingHistory] = useState(false)
   
@@ -228,6 +233,25 @@ export default function PerformanceTrackingPage() {
   // ── Derived Class Data ─────────────────────────────────
   const classGrowthData = useMemo(() => classHistory.map(h => ({ name: h.name, average: h.average, passRate: h.passRate })), [classHistory])
   const latestClassStat = classHistory[classHistory.length - 1]
+
+  // ── Challenges Data ──────────────────────────────────────
+  const { data: classChallenges = [] } = useAcademicChallenges(selectedClassId, latestClassStat?.id)
+  const createChallenge = useCreateAcademicChallenge()
+
+  const handleRecordChallengeSubmit = async () => {
+    if (!challengeStudent || !challengeForm.description) return
+    await createChallenge.mutateAsync({
+      class_id: selectedClassId,
+      term_id: latestClassStat?.id,
+      student_id: challengeStudent.id,
+      subject_name: challengeForm.subject_name,
+      teacher_name: challengeForm.teacher_name,
+      description: challengeForm.description
+    })
+    setIsRecordChallengeOpen(false)
+    setChallengeForm({ subject_name: '', teacher_name: '', description: '' })
+    setChallengeStudent(null)
+  }
 
   return (
     <>
@@ -544,8 +568,15 @@ export default function PerformanceTrackingPage() {
                                 <ChevronRight size={18} color={T.muted} style={{ transform: expandedStruggleId === p.id ? 'rotate(90deg)' : 'none', transition: 'all 0.3s' }} />
                                 
                                 {expandedStruggleId === p.id && (
-                                    <div style={{ position: 'absolute', right: 60, background: T.danger, color: '#fff', padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 800, boxShadow: '0 4px 12px rgba(220,38,38,0.2)', animation: '_perfFadeIn 0.3s ease' }}>
-                                        Struggle: {p.worstSubject}
+                                    <div style={{ position: 'absolute', right: 60, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end', animation: '_perfFadeIn 0.3s ease' }}>
+                                        <div style={{ background: T.danger, color: '#fff', padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 800, boxShadow: '0 4px 12px rgba(220,38,38,0.2)' }}>
+                                            Struggle: {p.worstSubject}
+                                        </div>
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); setChallengeStudent(p.student); setChallengeForm(f => ({...f, subject_name: p.worstSubject})); setIsRecordChallengeOpen(true); }}
+                                            style={{ padding: '6px 12px', borderRadius: 8, background: '#fff', color: T.danger, border: `1.5px solid ${T.danger}`, fontSize: 11, fontWeight: 800, cursor: 'pointer' }}>
+                                            Record Challenge
+                                        </button>
                                     </div>
                                 )}
                             </div>
@@ -565,6 +596,11 @@ export default function PerformanceTrackingPage() {
                         onClick={() => setIsSupportPlanOpen(true)}
                         style={{ marginTop: 24, width: '100%', padding: '12px', borderRadius: 12, background: T.slate, color: '#fff', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                         Generate Support Plan
+                    </button>
+                    <button 
+                        onClick={() => setIsChallengesReportOpen(true)}
+                        style={{ marginTop: 12, width: '100%', padding: '12px', borderRadius: 12, background: '#fff', color: T.slate, border: `1.5px solid ${T.slate}`, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                        Class Challenges Report
                     </button>
                 </div>
             </div>
@@ -688,6 +724,123 @@ export default function PerformanceTrackingPage() {
                         </div>
                     </div>
                 </div>
+            </div>
+        </Modal>
+        {/* Record Challenge Modal */}
+        <Modal
+            open={isRecordChallengeOpen}
+            onClose={() => setIsRecordChallengeOpen(false)}
+            title="Record Academic Challenge"
+            subtitle={`Student: ${challengeStudent?.full_name || '—'} · Class: ${selectedClass?.name || '—'}`}
+        >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: T.slate, marginBottom: 6 }}>Subject Name</label>
+                    <input 
+                        type="text" 
+                        value={challengeForm.subject_name}
+                        onChange={e => setChallengeForm({...challengeForm, subject_name: e.target.value})}
+                        placeholder="e.g. Mathematics"
+                        style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: `1.5px solid ${T.border}`, outline: 'none', fontSize: 13 }}
+                    />
+                </div>
+                <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: T.slate, marginBottom: 6 }}>Teacher Consulted (Optional)</label>
+                    <input 
+                        type="text" 
+                        value={challengeForm.teacher_name}
+                        onChange={e => setChallengeForm({...challengeForm, teacher_name: e.target.value})}
+                        placeholder="e.g. Mr. Smith"
+                        style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: `1.5px solid ${T.border}`, outline: 'none', fontSize: 13 }}
+                    />
+                </div>
+                <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: T.slate, marginBottom: 6 }}>Challenge Description</label>
+                    <textarea 
+                        value={challengeForm.description}
+                        onChange={e => setChallengeForm({...challengeForm, description: e.target.value})}
+                        placeholder="Describe the academic struggle..."
+                        rows={4}
+                        style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: `1.5px solid ${T.border}`, outline: 'none', fontSize: 13, resize: 'vertical' }}
+                    />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 8 }}>
+                    <button style={{ padding: '10px 16px', borderRadius: 8, border: `1.5px solid ${T.border}`, background: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }} onClick={() => setIsRecordChallengeOpen(false)}>Cancel</button>
+                    <button 
+                        onClick={handleRecordChallengeSubmit}
+                        disabled={createChallenge.isPending || !challengeForm.description}
+                        style={{ padding: '10px 16px', borderRadius: 8, border: 'none', background: !challengeForm.description ? T.muted : T.primary, color: '#fff', fontSize: 13, fontWeight: 700, cursor: !challengeForm.description ? 'not-allowed' : 'pointer' }}>
+                        {createChallenge.isPending ? 'Saving...' : 'Save Challenge'}
+                    </button>
+                </div>
+            </div>
+        </Modal>
+
+        {/* Class Challenges Report Modal */}
+        <Modal
+            open={isChallengesReportOpen}
+            onClose={() => setIsChallengesReportOpen(false)}
+            title="Class Challenges Report"
+            subtitle={`Class: ${selectedClass?.name || '—'} · Current Term Struggles`}
+            size="lg"
+            footer={
+                <>
+                    <button style={{ padding: '8px 16px', borderRadius: 10, border: '1.5px solid #f0eefe', background: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }} onClick={() => setIsChallengesReportOpen(false)}>Close</button>
+                    <button 
+                        onClick={() => window.print()}
+                        style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: T.primary, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Printer size={16} /> Print Report
+                    </button>
+                </>
+            }
+        >
+            <div className="support-doc" style={{ padding: '10px 0' }}>
+                <div style={{ textAlign: 'center', marginBottom: 32, borderBottom: `2.5px solid ${T.slate}`, paddingBottom: 24 }}>
+                    <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 24, margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '1px' }}>Academic Challenges Report</h1>
+                    <p style={{ fontSize: 12, color: T.muted, textTransform: 'uppercase', fontWeight: 800 }}>Confidential Official Document</p>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 32 }}>
+                    <div>
+                        <div style={{ fontSize: 10, fontWeight: 800, color: T.primary, textTransform: 'uppercase', marginBottom: 4 }}>Class</div>
+                        <div style={{ fontSize: 14, fontWeight: 700 }}>{selectedClass?.name}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: 10, fontWeight: 800, color: T.primary, textTransform: 'uppercase', marginBottom: 4 }}>Total Recorded</div>
+                        <div style={{ fontSize: 14, fontWeight: 700 }}>{classChallenges.length} Struggles</div>
+                    </div>
+                </div>
+
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 40 }}>
+                    <thead>
+                        <tr style={{ borderBottom: `2px solid ${T.slate}` }}>
+                            {['Student', 'Subject', 'Teacher', 'Challenge Description', 'Date'].map(h => (
+                                <th key={h} style={{ padding: '12px 8px', textAlign: 'left', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>{h}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {classChallenges.map((c: any) => (
+                            <tr key={c.id} style={{ borderBottom: `1px solid ${T.border}` }}>
+                                <td style={{ padding: '16px 8px', fontSize: 13, fontWeight: 700 }}>
+                                    {c.student?.full_name}
+                                    <div style={{ fontSize: 10, color: T.muted, fontWeight: 500 }}>ID: {c.student?.student_id}</div>
+                                </td>
+                                <td style={{ padding: '16px 8px', fontSize: 12, fontWeight: 700 }}>{c.subject_name || '—'}</td>
+                                <td style={{ padding: '16px 8px', fontSize: 12, color: T.muted }}>{c.teacher_name || '—'}</td>
+                                <td style={{ padding: '16px 8px', fontSize: 12, lineHeight: 1.5, maxWidth: 300 }}>{c.description}</td>
+                                <td style={{ padding: '16px 8px', fontSize: 11, color: T.muted }}>{new Date(c.created_at).toLocaleDateString()}</td>
+                            </tr>
+                        ))}
+                        {classChallenges.length === 0 && (
+                            <tr>
+                                <td colSpan={5} style={{ padding: '32px 8px', textAlign: 'center', fontSize: 13, color: T.muted }}>
+                                    No challenges have been recorded for this class in the current term.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
         </Modal>
 
