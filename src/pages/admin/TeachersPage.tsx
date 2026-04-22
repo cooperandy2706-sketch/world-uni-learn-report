@@ -1158,7 +1158,7 @@ export default function TeachersPage() {
     const { data, error } = await supabase.functions.invoke('admin-ops', { body: { action: 'reset-password', payload: { target_user_id: resetTeacher.user_id, password: newPassword } } })
     setResetting(false)
     if (error) { toast.error(error.message); return }
-    if (data?.error) { toast.error(data.error); return }
+    if (data?.error) { toast.error(String(data.error)); return }
     toast.success(`Password reset for ${resetTeacher.user?.full_name}`)
     setResetModal(false); setNewPassword('')
   }

@@ -65,14 +65,14 @@ export default function BursarStaffPage() {
       })
       
       if (error) throw error
-      if (data?.error) throw new Error(data.error)
+      if (data?.error) throw new Error(String(data.error))
 
       toast.success(`Bursar created · ${form.email} · Password: ${pw}`, { duration: 8000 })
       qc.invalidateQueries({ queryKey: ['bursars'] })
       setCreateModal(false)
       setForm({ full_name: '', email: '', phone: '', password: '' })
-    } catch (e: any) {
-      toast.error(e.message ?? 'Failed to create bursar')
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? (e.message ?? 'Failed to create bursar') : 'Failed to create bursar')
     } finally {
       setSaving(false)
     }
@@ -85,11 +85,11 @@ export default function BursarStaffPage() {
         body: { action: 'delete-user', payload: { target_user_id: b.id, role: 'bursar' } }
       })
       if (error) throw error
-      if (data?.error) throw new Error(data.error)
+      if (data?.error) throw new Error(String(data.error))
       
       qc.invalidateQueries({ queryKey: ['bursars'] })
       toast.success('Bursar account removed')
-    } catch (e: any) { toast.error(e.message) }
+    } catch (e: unknown) { toast.error(e instanceof Error ? e.message : 'Failed to remove bursar') }
   }
 
   async function handleResetPassword() {
@@ -98,7 +98,7 @@ export default function BursarStaffPage() {
       body: { action: 'reset-password', payload: { target_user_id: selectedUser.id, password: newPw } }
     })
     if (error) { toast.error(error.message); return }
-    if (data?.error) { toast.error(data.error); return }
+    if (data?.error) { toast.error(String(data.error)); return }
     
     toast.success(`Password reset for ${selectedUser.full_name}`)
     setResetModal(false); setNewPw('')

@@ -66,14 +66,14 @@ export default function OtherStaffPage() {
       })
       
       if (error) throw error
-      if (data?.error) throw new Error(data.error)
+      if (data?.error) throw new Error(String(data.error))
 
       toast.success(`Staff created · ${form.email} · Password: ${pw}`, { duration: 8000 })
       qc.invalidateQueries({ queryKey: ['other-staff'] })
       setCreateModal(false)
       setForm({ full_name: '', email: '', phone: '', designation: '', password: '' })
-    } catch (e: any) {
-      toast.error(e.message ?? 'Failed to create staff')
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? (e.message ?? 'Failed to create staff') : 'Failed to create staff')
     } finally {
       setSaving(false)
     }
@@ -86,11 +86,11 @@ export default function OtherStaffPage() {
         body: { action: 'delete-user', payload: { target_user_id: s.id, role: 'staff' } }
       })
       if (error) throw error
-      if (data?.error) throw new Error(data.error)
+      if (data?.error) throw new Error(String(data.error))
       
       qc.invalidateQueries({ queryKey: ['other-staff'] })
       toast.success('Staff account removed')
-    } catch (e: any) { toast.error(e.message) }
+    } catch (e: unknown) { toast.error(e instanceof Error ? e.message : 'Failed to remove staff') }
   }
 
   async function handleResetPassword() {
@@ -99,7 +99,7 @@ export default function OtherStaffPage() {
       body: { action: 'reset-password', payload: { target_user_id: selectedUser.id, password: newPw } }
     })
     if (error) { toast.error(error.message); return }
-    if (data?.error) { toast.error(data.error); return }
+    if (data?.error) { toast.error(String(data.error)); return }
     
     toast.success(`Password reset for ${selectedUser.full_name}`)
     setResetModal(false); setNewPw('')

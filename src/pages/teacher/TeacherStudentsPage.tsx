@@ -165,8 +165,8 @@ export default function TeacherStudentsPage() {
 
       if (error) throw error
       setStudents(data ?? [])
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to load students')
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Failed to load students')
     } finally {
       setIsLoading(false)
     }
@@ -203,15 +203,15 @@ export default function TeacherStudentsPage() {
       })
 
       if (error) throw error
-      if (data?.error) throw new Error(data.error)
+      if (data?.error) throw new Error(String(data.error))
 
       toast.success('Student account created successfully!')
       setAccountModalOpen(false)
       setAccountData({ email: '', password: '' })
       loadStudents() // Refresh list
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Account creation failed:', err)
-      toast.error(err.message || 'Failed to create student account')
+      toast.error(err instanceof Error ? err.message : 'Failed to create student account')
     } finally {
       setAccountLoading(false)
     }

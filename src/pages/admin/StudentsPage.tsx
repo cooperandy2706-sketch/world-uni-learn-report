@@ -664,14 +664,14 @@ export default function StudentsPage() {
       })
 
       if (error) throw error
-      if (data?.error) throw new Error(data.error)
+      if (data?.error) throw new Error(String(data.error))
 
       toast.success('Student account created successfully!')
       setAccountModalOpen(false)
       setAccountData({ email: '', password: '' })
       qc.invalidateQueries({ queryKey: ['students'] })
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to create student account')
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? (err.message || 'Failed to create student account') : 'Failed to create student account')
     } finally {
       setAccountLoading(false)
     }

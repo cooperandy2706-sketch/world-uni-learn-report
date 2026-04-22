@@ -345,9 +345,11 @@ export default function SettingsPage() {
                     <div style={{ padding: '0 10px' }}>
                       <h4 style={{ fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 12 }}>Usage Information</h4>
                       <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#4b5563', lineHeight: 1.6 }}>
-                        <li>All messages are sent via the world-uni-learn global Textcus account.</li>
+                        <li>All messages are sent via the Arkesel SMS gateway (Sender: <strong>ESTEVROYAL</strong>).</li>
+                        <li>Each message is automatically prefixed with <strong>"ESTEV ROYAL: "</strong> for sender identification.</li>
+                        <li>Bulk sends are batched at 50 recipients per request to respect rate limits.</li>
                         <li>Each message segment (160 characters) consumes credits from the system pool.</li>
-                        <li>Your school's usage is logged for administrative and billing purposes.</li>
+                        <li>Every SMS attempt (success or failure) is logged for administrative and billing purposes.</li>
                       </ul>
                     </div>
                   </div>

@@ -212,10 +212,12 @@ export default function FeesPage() {
       const { data, error } = await supabase.functions.invoke('send-sms', {
         body: { school_id: schoolId, recipient: phone, message }
       })
-      if (error || data?.error) throw new Error(error?.message || data?.error)
+      if (error || data?.error) throw new Error(error?.message || String(data?.error))
+      if (data?.success === false) throw new Error(data?.message || 'Failed to send')
       toast.success(`📱 Receipt SMS sent to ${stu?.guardian_name || 'Guardian'} (${phone})`)
-    } catch (err: any) {
-      toast.error(`SMS failed: ${err.message}`)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      toast.error(`SMS failed: ${msg}`)
     } finally {
       setIsSendingSMS(false)
     }

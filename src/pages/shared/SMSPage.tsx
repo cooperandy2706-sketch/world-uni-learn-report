@@ -192,47 +192,95 @@ export default function SMSPage() {
   }
 
   // ── Send Logic ────────────────────────────
+  // Bulk-sends in batches of 50 (matching Arkesel edge function's batch size).
+  // For personalised messages (placeholders), we keep per-recipient calls since
+  // the resolved text differs per person. For non-personalised messages we pass
+  // all numbers in one request per batch.
+  const BATCH_SIZE = 50
+
   async function handleSend() {
     if (selectedIds.size === 0) return toast.error('Select recipients first')
     if (!message.trim()) return toast.error('Message content is empty')
-    
+
     const targets = filteredRecipients.filter(r => selectedIds.has(r.id))
     if (!confirm(`Are you sure you want to send this message to ${targets.length} recipients?`)) return
-    
+
     setIsSending(true)
     setProgress({ current: 0, total: targets.length })
-    
+
     let successCount = 0
     let failCount = 0
 
-    for (let i = 0; i < targets.length; i++) {
-      const recipient = targets[i]
-      const resolvedMsg = resolveMessage(message, recipient)
-      
-      try {
-        const { data, error } = await supabase.functions.invoke('send-sms', {
-          body: {
-            school_id: schoolId,
-            recipient: recipient.phone,
-            message: resolvedMsg
-          }
-        })
+    // Detect whether the message uses any per-recipient placeholders.
+    // Regex uses a non-capturing group so { and } wrap ALL alternatives.
+    const hasPlaceholders = /\{(?:parent_name|parent|student_name|student|amount|owed)\}/.test(message)
 
-        if (error || data?.error) throw new Error(error?.message || data?.error)
-        successCount++
-      } catch (err: any) {
-        console.error('SMS Send Error:', err)
-        failCount++
+    if (hasPlaceholders) {
+      // Personalised: one call per recipient (message body differs per person)
+      for (let i = 0; i < targets.length; i++) {
+        const recipient = targets[i]
+        const resolvedMsg = resolveMessage(message, recipient)
+        try {
+          const { data, error } = await supabase.functions.invoke('send-sms', {
+            body: { school_id: schoolId, recipient: recipient.phone, message: resolvedMsg }
+          })
+          if (error || data?.error) throw new Error(error?.message || String(data?.error))
+          if (data?.success === false) {
+            const firstBatchRes = data?.data?.[0]?.response
+            const reason = firstBatchRes 
+              ? (typeof firstBatchRes.message === 'string' ? firstBatchRes.message : JSON.stringify(firstBatchRes))
+              : data?.message
+            
+            console.error('Arkesel API Rejection JSON:', JSON.stringify(data, null, 2))
+            throw new Error(`API Rejected: ${reason}`)
+          }
+          successCount++
+        } catch (err: any) {
+          console.error('SMS Send Error:', err)
+          failCount++
+        }
+        setProgress(prev => ({ ...prev, current: i + 1 }))
       }
-      setProgress(prev => ({ ...prev, current: i + 1 }))
+    } else {
+      // Non-personalised: bulk — pass up to 50 phones per request
+      for (let i = 0; i < targets.length; i += BATCH_SIZE) {
+        const batch = targets.slice(i, i + BATCH_SIZE)
+        const phones = batch.map(r => normalizePhone(r.phone))
+        try {
+          const { data, error } = await supabase.functions.invoke('send-sms', {
+            body: { school_id: schoolId, recipients: phones, message }
+          })
+          if (error || data?.error) throw new Error(error?.message || String(data?.error))
+          
+          if (data?.success === false) {
+            const firstBatchRes = data?.data?.[0]?.response
+            const reason = firstBatchRes 
+              ? (typeof firstBatchRes.message === 'string' ? firstBatchRes.message : JSON.stringify(firstBatchRes))
+              : data?.message
+            
+            console.error('Arkesel API Rejection JSON:', JSON.stringify(data, null, 2))
+            throw new Error(`API Rejected: ${reason}`)
+          }
+          // data.data is an array of batch results; count sent ones
+          const batchSent = (data?.data ?? []).filter((b: any) => b.status === 'sent').reduce(
+            (acc: number, b: any) => acc + (b.recipients?.length ?? 0), 0
+          )
+          successCount += batchSent
+          failCount += batch.length - batchSent
+        } catch (err: any) {
+          console.error('SMS Batch Error:', err)
+          failCount += batch.length
+        }
+        setProgress(prev => ({ ...prev, current: Math.min(i + BATCH_SIZE, targets.length) }))
+      }
     }
 
     setIsSending(false)
     if (failCount === 0) {
-      toast.success(`Successfully sent ${successCount} messages!`)
+      toast.success(`Successfully sent to ${successCount} recipient${successCount !== 1 ? 's' : ''}!`)
       setSelectedIds(new Set())
     } else {
-      toast.error(`Sent ${successCount} successful, ${failCount} failed. check console for details.`)
+      toast.error(`Sent: ${successCount} ✓  Failed: ${failCount} ✗ — check console for details.`)
     }
   }
 
@@ -270,7 +318,7 @@ export default function SMSPage() {
             {activeTab === 'fee_reminders' ? 'Fee Payment Reminders' : 'SMS Messaging Hub'}
           </h1>
           <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
-            Broadcast messages and reminders to parents and staff via Africa's Talking SMS.
+            Broadcast messages and reminders to parents and staff via Arkesel SMS.
           </p>
         </div>
 
@@ -456,7 +504,7 @@ export default function SMSPage() {
             <div style={{ display: 'flex', gap: 8, padding: '0 5px' }}>
               <AlertCircle size={14} color="#f59e0b" style={{ flexShrink: 0 }} />
               <p style={{ fontSize: 10, color: '#92400e', margin: 0 }}>
-                Approximately <strong>{selectedIds.size * smsSegments} credits</strong> will be consumed from your Textcus account balance.
+                Approximately <strong>{selectedIds.size * smsSegments} credit{selectedIds.size * smsSegments !== 1 ? 's' : ''}</strong> will be consumed from your Arkesel account balance.
               </p>
             </div>
 

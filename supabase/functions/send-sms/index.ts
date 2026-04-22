@@ -5,127 +5,182 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const ARKESEL_API_URL = 'https://sms.arkesel.com/api/v2/sms/send'
+const ARKESEL_SENDER  = 'ESTEVROYAL'
+const MSG_PREFIX      = 'ESTEV ROYAL: '
+const BATCH_SIZE      = 50
+
+/** Normalise a raw phone string to 233XXXXXXXXX format */
+function normalisePhone(raw: string): string {
+  let p = raw.replace(/\s+/g, '').replace(/^\+/, '')
+  if (p.startsWith('0')) p = '233' + p.substring(1)
+  else if (!p.startsWith('233')) p = '233' + p
+  return p
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const supabaseUrl    = Deno.env.get('SUPABASE_URL') ?? ''
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 
-    if (!supabaseUrl || !serviceRoleKey) {
-      throw new Error("Missing environment variables.");
-    }
+    if (!supabaseUrl || !serviceRoleKey) throw new Error('Missing Supabase environment variables.')
 
-    // Initialize admin client to fetch school credentials
-    const adminClient = createClient(supabaseUrl, serviceRoleKey);
+    const adminClient = createClient(supabaseUrl, serviceRoleKey)
 
-    // Verify caller identity
+    // ── Auth ──────────────────────────────────────────────
     const authHeader = req.headers.get('Authorization')
-    if (!authHeader) throw new Error("Missing Authorization header");
+    if (!authHeader) throw new Error('Missing Authorization header')
 
     const callerClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
       global: { headers: { Authorization: authHeader } }
-    });
-    const { data: { user: callerToken }, error: authErr } = await callerClient.auth.getUser();
-    if (authErr || !callerToken) throw new Error("Unauthorized");
+    })
+    const { data: { user: callerToken }, error: authErr } = await callerClient.auth.getUser()
+    if (authErr || !callerToken) throw new Error('Unauthorized')
 
-    // Get caller profile
+    // ── Role check ────────────────────────────────────────
     const { data: profile } = await adminClient
       .from('users')
       .select('school_id, role, full_name')
       .eq('id', callerToken.id)
-      .single();
+      .single()
 
-    if (!profile) throw new Error("User profile not found");
+    if (!profile) throw new Error('User profile not found')
     if (!['admin', 'super_admin', 'bursar'].includes(profile.role)) {
-      throw new Error("Unauthorized role for SMS");
+      throw new Error('Unauthorized role for SMS')
     }
 
-    const { school_id, recipient, message } = await req.json();
+    // ── Payload ───────────────────────────────────────────
+    const body = await req.json()
+    const schoolId: string = body.school_id ?? profile.school_id
 
-    if (!recipient) throw new Error("Missing recipient phone number");
-    if (!message || !message.trim()) throw new Error("Missing message content");
-
-    // Ensure user belongs to the target school
-    if (profile.role !== 'super_admin' && school_id !== profile.school_id) {
-      throw new Error("Cannot send SMS for another school");
+    if (profile.role !== 'super_admin' && schoolId !== profile.school_id) {
+      throw new Error('Cannot send SMS for another school')
     }
 
-    // Use Global Textcus Credentials from Secrets
-    const textcusApiKey = Deno.env.get('TEXTCUS_API_KEY');
-    const textcusSenderId = Deno.env.get('TEXTCUS_SENDER_ID');
-
-    if (!textcusApiKey) {
-      throw new Error("Global Textcus credentials not configured in Supabase Secrets");
+    // Accept either single `recipient` (legacy) or `recipients` array
+    let recipients: string[] = []
+    if (Array.isArray(body.recipients) && body.recipients.length > 0) {
+      recipients = body.recipients.map(normalisePhone)
+    } else if (typeof body.recipient === 'string' && body.recipient.trim()) {
+      recipients = [normalisePhone(body.recipient.trim())]
     }
 
-    // Normalize phone number (Ghana specific: 024 -> +23324, AT usually expects the + sign)
-    let phone = recipient.replace(/\s+/g, '').replace('+', '');
-    if (phone.startsWith('0')) {
-      phone = '+233' + phone.substring(1);
-    } else if (!phone.startsWith('233')) {
-      phone = '+233' + phone;
-    } else if (phone.startsWith('233')) {
-      phone = '+' + phone;
+    if (recipients.length === 0) throw new Error('Missing recipient phone number(s)')
+
+    const rawMessage: string = body.message ?? ''
+    if (!rawMessage.trim()) throw new Error('Missing message content')
+
+    // Always prefix the message for sender identification
+    const message = rawMessage.startsWith(MSG_PREFIX)
+      ? rawMessage
+      : MSG_PREFIX + rawMessage
+
+    // ── Arkesel API key ───────────────────────────────────
+    const arkeselApiKey = Deno.env.get('ARKESEL_API_KEY')
+    if (!arkeselApiKey) throw new Error('ARKESEL_API_KEY not configured in Supabase Secrets')
+
+    // ── Bulk send in batches of 50 ────────────────────────
+    const batchResults: Array<{
+      batch: number
+      recipients: string[]
+      status: 'sent' | 'failed'
+      response: unknown
+    }> = []
+
+    let totalSent    = 0
+    let totalFailed  = 0
+
+    for (let i = 0; i < recipients.length; i += BATCH_SIZE) {
+      const batch      = recipients.slice(i, i + BATCH_SIZE)
+      const batchIndex = Math.floor(i / BATCH_SIZE) + 1
+
+      try {
+        const arkeselRes = await fetch(ARKESEL_API_URL, {
+          method: 'POST',
+          headers: {
+            'api-key':      arkeselApiKey,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sender:     ARKESEL_SENDER,
+            message,
+            recipients: batch,
+          }),
+        })
+
+        const contentType = arkeselRes.headers.get('content-type') ?? ''
+        let apiResponse: unknown
+        if (contentType.includes('application/json')) {
+          apiResponse = await arkeselRes.json()
+        } else {
+          const text = await arkeselRes.text()
+          apiResponse = { raw: text || 'Empty response from Arkesel' }
+        }
+
+        // Arkesel v2 returns { status: "success" } on success
+        const isSuccess = arkeselRes.ok &&
+          typeof apiResponse === 'object' &&
+          apiResponse !== null &&
+          (apiResponse as Record<string, unknown>).status === 'success'
+        const batchStatus: 'sent' | 'failed' = isSuccess ? 'sent' : 'failed'
+
+        batchResults.push({ batch: batchIndex, recipients: batch, status: batchStatus, response: apiResponse })
+
+        // Log every phone number in this batch
+        const logRows = batch.map((phone) => ({
+          school_id:   schoolId,
+          sender_id:   callerToken.id,
+          recipient:   phone,          // matches existing DB column name
+          content:     message,         // matches existing DB column name
+          status:      batchStatus,
+          response:    JSON.stringify(apiResponse),  // new column (added via migration)
+          segments:    Math.ceil(message.length / 160) || 1,
+        }))
+
+        await adminClient.from('sms_logs').insert(logRows)
+
+        if (isSuccess) totalSent  += batch.length
+        else           totalFailed += batch.length
+
+      } catch (batchErr: unknown) {
+        const errMsg = batchErr instanceof Error ? batchErr.message : String(batchErr)
+        const errPayload = { error: errMsg }
+        batchResults.push({ batch: batchIndex, recipients: batch, status: 'failed', response: errPayload })
+
+        const logRows = batch.map((phone) => ({
+          school_id:   schoolId,
+          sender_id:   callerToken.id,
+          recipient:   phone,
+          content:     message,
+          status:      'failed' as const,
+          response:    JSON.stringify(errPayload),
+          segments:    Math.ceil(message.length / 160) || 1,
+        }))
+        await adminClient.from('sms_logs').insert(logRows)
+        totalFailed += batch.length
+      }
     }
-    // phone is already formatted to start with +233 or 233 etc.
-    // Textcus accepts 233 format best without the '+'
-    const cleanPhone = phone.startsWith('+') ? phone.substring(1) : phone;
 
-    const apiUrl = `https://api.textcus.com/api/v2/send`;
+    const overallSuccess = totalFailed === 0
 
-    const payload = {
-      to: cleanPhone,
-      message: message,
-      ...(textcusSenderId ? { from: textcusSenderId } : {})
-    };
+    return new Response(
+      JSON.stringify({
+        success: overallSuccess,
+        message: `${totalSent} sent, ${totalFailed} failed out of ${recipients.length} recipient(s).`,
+        data: batchResults,
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+    )
 
-    const textcusResponse = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${textcusApiKey}`,
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const contentType = textcusResponse.headers.get('content-type') || '';
-    let result;
-    if (contentType.includes('application/json')) {
-      result = await textcusResponse.json();
-    } else {
-      const text = await textcusResponse.text();
-      result = { errorMessage: text || 'Unknown Error from Textcus' };
-    }
-
-    const isSuccess = textcusResponse.ok && (result?.status === 'success' || !result?.error);
-    const finalError = result?.errorMessage || result?.error || result?.message || (isSuccess ? null : 'SMS Delivery Failed');
-
-    // LOGGING: Track usage in the sms_logs table
-    if (isSuccess) {
-      const segments = Math.ceil(message.length / 160) || 1;
-      await adminClient.from('sms_logs').insert({
-        school_id,
-        sender_id: callerToken.id,
-        recipient: phone,
-        content: message,
-        segments,
-        status: 'sent'
-      });
-    }
-
-    return new Response(JSON.stringify({ success: isSuccess, data: result, error: finalError }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    });
-
-  } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200, // Return 200 to allow custom error handling on client
-    });
+  } catch (err: unknown) {
+    const errMsg = err instanceof Error ? err.message : String(err)
+    return new Response(
+      JSON.stringify({ success: false, error: errMsg }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+    )
   }
-});
+})

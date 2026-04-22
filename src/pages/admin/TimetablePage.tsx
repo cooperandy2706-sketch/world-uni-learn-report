@@ -740,8 +740,8 @@ export default function TimetablePage() {
       setAutoGenOpen(false)
       setGenProgress('')
       if (selectedClass) loadClassSlots()
-    } catch (e: any) {
-      toast.error(e.message || 'Generation failed', { id: tid })
+    } catch (e: unknown) {
+      toast.error((e instanceof Error ? e.message : String(e)) || 'Generation failed', { id: tid })
     } finally {
       setGenerating(false)
     }
