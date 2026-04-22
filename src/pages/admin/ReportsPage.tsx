@@ -1,5 +1,5 @@
 // src/pages/admin/ReportsPage.tsx
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useClasses } from '../../hooks/useClasses'
@@ -335,7 +335,8 @@ export default function ReportsPage() {
         .from('attendance_records')
         .select('status')
         .eq('student_id', attModal.student_id)
-        .eq('term_id', attModal.term_id)
+        .gte('date', (term as any).start_date)
+        .lte('date', (term as any).end_date)
 
       if (error) throw error
 
@@ -563,7 +564,7 @@ export default function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(reports as any[]).map((r: any, i: number) => {
+                  {useMemo(() => (reports as any[]).map((r: any, i: number) => {
                     const g = getGradeInfo(r.average_score ?? 0)
                     return (
                       <tr key={r.id} className="rpt-row" style={{ borderBottom: i < reports.length-1 ? '1px solid #faf5ff' : 'none', transition:'background .12s', animation:`_rfadeUp .3s ease ${i*.02}s both` }}>
@@ -625,7 +626,7 @@ export default function ReportsPage() {
                         </td>
                       </tr>
                     )
-                  })}
+                  }), [reports, isBW])}
                 </tbody>
               </table>
             </div>

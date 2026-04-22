@@ -81,7 +81,10 @@ export default function StudentDashboard() {
         // School announcements
         supabase.from('announcements').select('*').eq('school_id', student.school_id).order('created_at', { ascending: false }).limit(4),
         // Attendance
-        term?.id ? supabase.from('attendance_records').select('status').eq('student_id', student.id).eq('term_id', term.id) : Promise.resolve({ data: [] }),
+        term?.id ? supabase.from('attendance_records').select('status')
+          .eq('student_id', student.id)
+          .gte('date', (term as any).start_date)
+          .lte('date', (term as any).end_date) : Promise.resolve({ data: [] }),
       ])
 
       setReportCard(reportRes.data)

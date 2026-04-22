@@ -3,7 +3,7 @@
 // Uses the existing `attendance` table (term totals: total_days, days_present, days_absent)
 // Each morning submission increments the running term totals automatically.
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm } from '../../hooks/useSettings'

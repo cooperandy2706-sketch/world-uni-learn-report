@@ -6,7 +6,7 @@
 //  3. Imports consolidated: printReportCard + downloadReportPDF + buildReportHTML all from lib/pdf
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear, useSettings } from '../../hooks/useSettings'
@@ -376,13 +376,13 @@ export default function TeacherReportsPage() {
               Quick select — {selectedClassName}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {students.map((s, i) => (
+              {useMemo(() => students.map((s, i) => (
                 <button key={s.id} onClick={() => setSelectedStudent(s)} className="rp-std"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 13px', borderRadius: 99, border: '1.5px solid #ddd6fe', background: '#f5f3ff', cursor: 'pointer', transition: 'all .15s' }}>
                   <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{i + 1}</span>
                   <span style={{ fontSize: 12, fontWeight: 600, color: '#5b21b6' }}>{s.full_name}</span>
                 </button>
-              ))}
+              )), [students])}
             </div>
           </div>
         )}
@@ -655,7 +655,7 @@ export default function TeacherReportsPage() {
               <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '14px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', maxHeight: 260, overflowY: 'auto' }}>
                 <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>All Students</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {students.map((s, i) => (
+                  {useMemo(() => students.map((s, i) => (
                     <button key={s.id} onClick={() => setSelectedStudent(s)}
                       style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 9, border: 'none', background: selectedStudent?.id === s.id ? 'linear-gradient(135deg,#7c3aed,#6d28d9)' : '#faf5ff', cursor: 'pointer', transition: 'all .15s', textAlign: 'left' }}
                       onMouseEnter={e => { if (selectedStudent?.id !== s.id) e.currentTarget.style.background = '#ede9fe' }}
@@ -663,7 +663,7 @@ export default function TeacherReportsPage() {
                       <span style={{ fontSize: 10, color: selectedStudent?.id === s.id ? 'rgba(255,255,255,.5)' : '#9ca3af', width: 16, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
                       <span style={{ fontSize: 12, fontWeight: 600, color: selectedStudent?.id === s.id ? '#fff' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.full_name}</span>
                     </button>
-                  ))}
+                  )), [students, selectedStudent?.id])}
                 </div>
               </div>
             </div>
