@@ -50,6 +50,9 @@ const STUDENT_LETTER_TYPES = [
   { id: 'attendance', label: 'Perfect Attendance', icon: '⏰' },
   { id: 'improved', label: 'Most Improved Student', icon: '📈' },
   { id: 'subject', label: 'Subject Excellence', icon: '📚' },
+  { id: 'parentPermit', label: 'Parental Permission (Extra Time)', icon: '👪' },
+  { id: 'parentInvite', label: 'Parent Meeting Invitation', icon: '📅' },
+  { id: 'parentInfo', label: 'General Information Letter', icon: 'ℹ️' },
 ] as const
 type StudentLetterTypeId = typeof STUDENT_LETTER_TYPES[number]['id']
 
@@ -71,6 +74,25 @@ const STUDENT_LETTER_FIELDS: Record<StudentLetterTypeId, { key: string; label: s
   attendance: [{ key: 'academicYear', label: 'Academic Year', placeholder: 'e.g. 2023/2024' }, { key: 'term', label: 'Term', placeholder: 'e.g. Full Year' }, { key: 'awardDate', label: 'Award Date', type: 'date' }, { key: 'citation', label: 'Citation (Optional)', placeholder: 'For achieving 100% attendance…' }],
   improved: [{ key: 'academicYear', label: 'Academic Year', placeholder: 'e.g. 2023/2024' }, { key: 'term', label: 'Term', placeholder: 'e.g. Term 2' }, { key: 'awardDate', label: 'Award Date', type: 'date' }, { key: 'citation', label: 'Citation (Optional)', placeholder: 'For remarkable academic growth…' }],
   subject: [{ key: 'subject', label: 'Subject Name', placeholder: 'e.g. Mathematics' }, { key: 'academicYear', label: 'Academic Year', placeholder: 'e.g. 2023/2024' }, { key: 'term', label: 'Term', placeholder: 'e.g. Term 1' }, { key: 'awardDate', label: 'Award Date', type: 'date' }],
+  parentPermit: [
+    { key: 'eventName', label: 'Activity / Event Name', placeholder: 'e.g. Extra Mock Exam Prep' },
+    { key: 'eventDate', label: 'Event Date', type: 'date' },
+    { key: 'endTime', label: 'New Closing Time', placeholder: 'e.g. 4:30 PM' },
+    { key: 'reason', label: 'Reason for Extension', placeholder: 'e.g. To cover outstanding syllabus items...' },
+    { key: 'letterDate', label: 'Letter Date', type: 'date' }
+  ],
+  parentInvite: [
+    { key: 'purpose', label: 'Meeting Purpose', placeholder: 'e.g. Discussion of Academic Progress' },
+    { key: 'meetingDate', label: 'Meeting Date', type: 'date' },
+    { key: 'meetingTime', label: 'Meeting Time', placeholder: 'e.g. 10:00 AM' },
+    { key: 'venue', label: 'Meeting Venue', placeholder: 'e.g. Principal\'s Office' },
+    { key: 'letterDate', label: 'Letter Date', type: 'date' }
+  ],
+  parentInfo: [
+    { key: 'subject', label: 'Letter Subject', placeholder: 'e.g. End of Term Arrangements' },
+    { key: 'content', label: 'Message Content', placeholder: 'Type your message to parents here...' },
+    { key: 'letterDate', label: 'Letter Date', type: 'date' }
+  ],
 }
 
 function formatLetterDate(d: string) {
@@ -82,6 +104,7 @@ function letterRef(type: string) {
   const map: Record<string, string> = {
     admission: 'ADM', exeat: 'EXT', disciplinary: 'DIS', testimonial: 'TST',
     scholarship: 'SCH', suspension: 'SUS', medical: 'MED', studentId: 'SID',
+    parentPermit: 'PER', parentInvite: 'INV', parentInfo: 'INF',
   }
   const code = map[type] ?? 'STD'
   const year = new Date().getFullYear()
@@ -128,7 +151,7 @@ function docHeader(school: any, student: any, letterDate: string, letterType = '
       <div class="lh-date">${formatLetterDate(letterDate)}</div>
     </div>
     <div class="lh-recipient">
-      <strong>To:</strong>&nbsp; ${student?.guardian_name || 'The Parent/Guardian of'} ${student?.full_name || ''}<br/>
+      <strong>To:</strong>&nbsp; ${student?.guardian_name ? student.guardian_name : `The Parent/Guardian of ${student?.full_name || '___________'}`}<br/>
       <strong>Student Name:</strong>&nbsp; ${student?.full_name || '___________'}<br/>
       <strong>Student ID:</strong>&nbsp; ${student?.student_id || '___________'}<br/>
       <strong>Class:</strong>&nbsp; ${(student as any)?.class?.name || '___________'}
@@ -337,6 +360,29 @@ function generateStudentDocHTML(type: StudentLetterTypeId, student: any, fields:
         <strong>Reason:</strong> ${f.reason || '___________'}
       </div>
       <p>We thank you for the time your ward spent with us and wish them the very best in their future endeavors.</p>
+    `))
+    case 'parentPermit': return wrapHTML(body('Permission for Extended School Hours', `
+      <p>Dear Parents and Guardians,</p>
+      <p>We wish to inform you that the school has scheduled <strong>${f.eventName || 'an important academic session'}</strong> for students in <strong>${(s as any)?.class?.name || 'their class'}</strong> on <strong>${formatLetterDate(f.eventDate)}</strong>.</p>
+      <p>In view of this, students will be required to stay in school until <strong>${f.endTime || '___________'}</strong>. This extension is necessary to <strong>${f.reason || 'ensure all students are well-prepared for their upcoming assessments'}</strong>.</p>
+      <p>We understand the importance of student safety and transportation. Please make the necessary arrangements to pick up your ward at the new closing time. For those using the school bus, drop-off times will be adjusted accordingly.</p>
+      <p>We thank you for your continued support in providing the best educational experience for our students.</p>
+    `))
+    case 'parentInvite': return wrapHTML(body('Invitation to Parent-School Meeting', `
+      <p>Dear ${s?.guardian_name || 'Parent/Guardian'},</p>
+      <p>The management of ${school?.name || 'our school'} cordially invites you to a meeting to discuss <strong>${f.purpose || 'matters concerning your ward\'s academic progress'}</strong>.</p>
+      <div class="incident-box">
+        📅 Date: <strong>${formatLetterDate(f.meetingDate)}</strong><br/>
+        ⏰ Time: <strong>${f.meetingTime || '___________'}</strong><br/>
+        📍 Venue: <strong>${f.venue || '___________'}</strong>
+      </div>
+      <p>Your presence and input are highly valued as we work together to support <strong>${fn}</strong>'s growth and success. Please make every effort to attend punctually.</p>
+      <p>We look forward to meeting with you.</p>
+    `))
+    case 'parentInfo': return wrapHTML(body(f.subject || 'Information for Parents', `
+      <p>Dear Parents and Guardians,</p>
+      <div style="white-space: pre-wrap; margin-top: 15px; line-height: 1.8;">${f.content || '...'}</div>
+      <p>Thank you for your continued cooperation.</p>
     `))
     case 'bestBoy':
     case 'bestGirl':

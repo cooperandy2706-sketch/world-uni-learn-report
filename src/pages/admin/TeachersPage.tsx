@@ -50,6 +50,9 @@ const LETTER_TYPES = [
   { id: 'bonusNotice', label: 'Bonus / Incentive', icon: '💸' },
   { id: 'salaryReview', label: 'Salary Review', icon: '📊' },
   { id: 'otherDoc', label: 'Other Document', icon: '📄' },
+  { id: 'parentPermission', label: 'Parental Permission (Extra Time)', icon: '👪' },
+  { id: 'parentInvite', label: 'Parent Meeting Invitation', icon: '📅' },
+  { id: 'parentInfo', label: 'General Information Letter', icon: 'ℹ️' },
   { id: 'staffId', label: 'Staff ID Card (Printable)', icon: '🪪' },
 ] as const
 type LetterTypeId = typeof LETTER_TYPES[number]['id']
@@ -79,6 +82,25 @@ const LETTER_FIELDS: Record<LetterTypeId, { key: string; label: string; type?: s
   bonusNotice: [{ key: 'reason', label: 'Reason for Award', placeholder: 'e.g. 100% attendance' }, { key: 'amount', label: 'Award Amount (GHS)', placeholder: 'e.g. 500' }, { key: 'effectiveDate', label: 'Payment Month', placeholder: 'e.g. May 2024' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
   salaryReview: [{ key: 'oldSalary', label: 'Previous Basic', placeholder: 'e.g. 2,000' }, { key: 'newSalary', label: 'New Basic', placeholder: 'e.g. 2,400' }, { key: 'effectiveDate', label: 'Effective Date', type: 'date' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
   otherDoc: [{ key: 'subject', label: 'Document Subject', placeholder: 'e.g. Internal Memo' }, { key: 'content', label: 'Main Body Text', placeholder: 'Type your message here…' }, { key: 'letterDate', label: 'Letter Date', type: 'date' }],
+  parentPermission: [
+    { key: 'eventName', label: 'Event / Activity Name', placeholder: 'e.g. Extra Mock Exam Prep' },
+    { key: 'eventDate', label: 'Event Date', type: 'date' },
+    { key: 'endTime', label: 'Closing Time', placeholder: 'e.g. 4:30 PM' },
+    { key: 'reason', label: 'Reason for Extension', placeholder: 'e.g. To cover outstanding syllabus items...' },
+    { key: 'letterDate', label: 'Letter Date', type: 'date' }
+  ],
+  parentInvite: [
+    { key: 'purpose', label: 'Meeting Purpose', placeholder: 'e.g. Discussion of Academic Progress' },
+    { key: 'meetingDate', label: 'Meeting Date', type: 'date' },
+    { key: 'meetingTime', label: 'Meeting Time', placeholder: 'e.g. 10:00 AM' },
+    { key: 'venue', label: 'Meeting Venue', placeholder: 'e.g. Principal\'s Office' },
+    { key: 'letterDate', label: 'Letter Date', type: 'date' }
+  ],
+  parentInfo: [
+    { key: 'subject', label: 'Letter Subject', placeholder: 'e.g. End of Term Arrangements' },
+    { key: 'content', label: 'Message Content', placeholder: 'Type your message to parents here...' },
+    { key: 'letterDate', label: 'Letter Date', type: 'date' }
+  ],
   staffId: [{ key: 'position', label: 'Position/Role', placeholder: 'e.g. Class Teacher' }, { key: 'department', label: 'Department', placeholder: 'e.g. Junior High' }, { key: 'idIssueDate', label: 'Issue Date', type: 'date' }],
 }
 
@@ -97,7 +119,7 @@ function letterRef(type: string) {
     returnFromLeave: 'RTL', commendation: 'CMD', termWithoutPay: 'TWP',
     resignApproval: 'RSN', query: 'QRY', discHearing: 'DCH', contractEnd: 'END',
     maternityLeave: 'MAT', recommendation: 'REC', bonusNotice: 'BNS',
-    salaryReview: 'SRV', otherDoc: 'OTH', staffId: 'SID',
+    salaryReview: 'SRV', otherDoc: 'OTH', parentPermission: 'PER', parentInvite: 'INV', parentInfo: 'INF', staffId: 'SID',
   }
   const code = map[type] ?? 'HR'
   const year = new Date().getFullYear()
@@ -148,9 +170,14 @@ function letterHeader(school: any, teacher: any, letterDate: string, letterType 
 
     <!-- ═══ RECIPIENT ═══ -->
     <div class="lh-recipient">
-      <strong>To:</strong>&nbsp; ${teacher?.user?.full_name || '___________'}<br/>
-      <strong>Staff ID:</strong>&nbsp; ${teacher?.staff_id || '___________'}<br/>
-      <strong>Email:</strong>&nbsp; ${teacher?.user?.email || '___________'}
+      ${(letterType === 'parentPermission' || letterType === 'parentInvite' || letterType === 'parentInfo') ? `
+        <strong>To:</strong>&nbsp; All Parents / Guardians<br/>
+        <strong>Ref:</strong>&nbsp; Student Welfare / Official Communication
+      ` : `
+        <strong>To:</strong>&nbsp; ${teacher?.user?.full_name || '___________'}<br/>
+        <strong>Staff ID:</strong>&nbsp; ${teacher?.staff_id || '___________'}<br/>
+        <strong>Email:</strong>&nbsp; ${teacher?.user?.email || '___________'}
+      `}
     </div>
   `
 }
@@ -677,6 +704,32 @@ function generateLetterHTML(type: LetterTypeId, teacher: any, fields: Record<str
     case 'otherDoc': return wrapHTML(body(f.subject || 'Internal Document', `
       <p>Dear ${fn},</p>
       <div style="white-space: pre-wrap; margin-top: 15px; line-height: 1.8;">${f.content || '...'}</div>
+    `))
+
+    case 'parentPermission': return wrapHTML(body('Permission for Extended School Hours', `
+      <p>Dear Parents and Guardians,</p>
+      <p>We wish to inform you that the school has scheduled <strong>${f.eventName || 'an important academic session'}</strong> on <strong>${formatDate(f.eventDate)}</strong>.</p>
+      <p>In view of this, students will be required to stay in school until <strong>${f.endTime || '___________'}</strong>. This extension is necessary to <strong>${f.reason || 'ensure all students are well-prepared for their upcoming assessments'}</strong>.</p>
+      <p>We understand the importance of student safety and transportation. Please make the necessary arrangements to pick up your ward(s) at the new closing time. For those using the school bus, drop-off times will be adjusted accordingly.</p>
+      <p>We thank you for your continued support in providing the best educational experience for our students.</p>
+    `))
+
+    case 'parentInvite': return wrapHTML(body('Invitation to Parent-School Meeting', `
+      <p>Dear Parents and Guardians,</p>
+      <p>The management of ${sName} cordially invites you to a meeting to discuss <strong>${f.purpose || 'matters concerning student academic progress'}</strong>.</p>
+      <div class="incident-box">
+        📅 Date: <strong>${formatDate(f.meetingDate)}</strong><br/>
+        ⏰ Time: <strong>${f.meetingTime || '___________'}</strong><br/>
+        📍 Venue: <strong>${f.venue || '___________'}</strong>
+      </div>
+      <p>Your presence and input are highly valued as we work together to support our students' growth and success. Please make every effort to attend punctually.</p>
+      <p>We look forward to meeting with you.</p>
+    `))
+
+    case 'parentInfo': return wrapHTML(body(f.subject || 'Information for Parents', `
+      <p>Dear Parents and Guardians,</p>
+      <div style="white-space: pre-wrap; margin-top: 15px; line-height: 1.8;">${f.content || '...'}</div>
+      <p>Thank you for your continued cooperation.</p>
     `))
 
     case 'staffId': return wrapHTML(`
