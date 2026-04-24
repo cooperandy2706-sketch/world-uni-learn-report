@@ -17,7 +17,8 @@ import {
   Upload,
   Download,
   CheckCircle2,
-  FileSpreadsheet
+  FileSpreadsheet,
+  LayoutGrid
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────
@@ -289,6 +290,42 @@ export default function BECEMasterPage() {
     }
   }
 
+  const handleDownloadIndividualPDF = async (studentId: string) => {
+    const student = students.find(s => s.id === studentId)
+    if (!student) return
+    
+    const printArea = document.getElementById(`print-slip-${studentId}`)
+    if (!printArea) return
+
+    const toastId = toast.loading(`Generating PDF for ${student.full_name}…`)
+
+    try {
+      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+        import('jspdf'),
+        import('html2canvas'),
+      ])
+
+      const canvas = await html2canvas(printArea, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+      })
+      
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
+      pdf.save(`BECE_Slip_${student.full_name.replace(/\s+/g, '_')}.pdf`)
+      toast.success('Slip downloaded successfully!', { id: toastId })
+    } catch (err: any) {
+      console.error(err)
+      toast.error('Failed to generate slip', { id: toastId })
+    }
+  }
+
   // ── WAEC Portal Export (Narrow Format) ────────────────────
   const handleExportPortal = () => {
     if (students.length === 0 || subjects.length === 0) {
@@ -335,6 +372,41 @@ export default function BECEMasterPage() {
     toast.success(`✅ Exported ${rows.length} records in Narrow Format.`)
   }
 
+  // ── Master Summary Export (Wide Format) ──────────────────
+  const handleExportMasterSummary = () => {
+    if (students.length === 0 || subjects.length === 0) {
+      toast.error('No data to export.')
+      return
+    }
+
+    const rows = students.map((student, index) => {
+      const row: Record<string, any> = {
+        'S/N': index + 1,
+        'Candidate Name': student.full_name,
+        'Index No.': indexMap[student.id] || student.student_id || '',
+      }
+
+      subjects.forEach(sub => {
+        const cell = scoreGrid[student.id]?.[sub.id]
+        const sba = parseFloat(cell?.class_score || '0') || 0
+        const exam = parseFloat(cell?.exam_score || '0') || 0
+        const code = sub.code || sub.name.substring(0, 3).toUpperCase()
+        row[code] = sba + exam
+      })
+
+      return row
+    })
+
+    const ws = utils.json_to_sheet(rows)
+    const wb = utils.book_new()
+    utils.book_append_sheet(wb, ws, 'BECE Master Summary')
+
+    const className = classes.find(c => c.id === selectedClass)?.name || 'Class'
+    const fileName = `BECE_Master_Summary_${className}_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.xlsx`
+    writeFile(wb, fileName)
+    toast.success('Master Summary exported successfully.')
+  }
+
   const filteredStudents = students.filter(s => 
     s.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.student_id?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -347,29 +419,31 @@ export default function BECEMasterPage() {
         .master-grid-container { overflow-x: auto; background: #fff; border-radius: 20px; border: 1.5px solid ${T.border}; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
         .grid-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .grid-table th, .grid-table td { border-bottom: 1px solid ${T.border}; border-right: 1px solid ${T.border}; padding: 10px 12px; }
-        /* ── Frozen col 1: Student Name (left: 0, w: 200px) ── */
+        .grid-header-actions { width: 60px; text-align: center; background: ${T.bg}; position: sticky; left: 0; z-index: 5; border-right: 2px solid ${T.border}; }
+        .grid-cell-actions { width: 60px; text-align: center; position: sticky; left: 0; z-index: 3; background: #fff; border-right: 2px solid ${T.border}; }
+        /* ── Frozen col 1: Student Name (left: 60px, w: 200px) ── */
         .grid-header-student { 
           width: 200px; min-width: 200px; max-width: 200px;
-          position: sticky; left: 0; z-index: 4;
+          position: sticky; left: 60px; z-index: 4;
           background: ${T.bg}; font-size: 11px; font-weight: 800; text-transform: uppercase; color: ${T.muted};
           box-shadow: 2px 0 4px rgba(0,0,0,0.06);
         }
         .grid-cell-student { 
           width: 200px; min-width: 200px; max-width: 200px;
-          position: sticky; left: 0; z-index: 2;
+          position: sticky; left: 60px; z-index: 2;
           background: #fff;
           box-shadow: 2px 0 4px rgba(0,0,0,0.04);
         }
-        /* ── Frozen col 2: WAEC Index (left: 200px, w: 148px) ── */
+        /* ── Frozen col 2: WAEC Index (left: 260px, w: 148px) ── */
         .grid-header-index { 
           width: 148px; min-width: 148px; max-width: 148px;
-          position: sticky; left: 200px; z-index: 4;
+          position: sticky; left: 260px; z-index: 4;
           background: #d1fae5; font-size: 11px; font-weight: 800; text-transform: uppercase; color: #065f46; text-align: center;
           box-shadow: 2px 0 6px rgba(0,0,0,0.08);
         }
         .grid-cell-index { 
           width: 148px; min-width: 148px; max-width: 148px;
-          position: sticky; left: 200px; z-index: 2;
+          position: sticky; left: 260px; z-index: 2;
           background: #ecfdf5;
           box-shadow: 2px 0 6px rgba(0,0,0,0.06);
           padding: 6px !important;
@@ -395,6 +469,16 @@ export default function BECEMasterPage() {
         </div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button 
+            onClick={handleExportMasterSummary}
+            disabled={students.length === 0}
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12, 
+              background: '#fff', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: students.length === 0 ? 'not-allowed' : 'pointer',
+              opacity: students.length === 0 ? 0.5 : 1
+            }}>
+            <FileSpreadsheet size={18} /> Master Summary
+          </button>
+          <button 
             onClick={handleExportPortal}
             disabled={students.length === 0}
             style={{ 
@@ -402,7 +486,7 @@ export default function BECEMasterPage() {
               background: '#ecfdf5', border: `1.5px solid #10b981`, color: '#065f46', fontWeight: 700, cursor: students.length === 0 ? 'not-allowed' : 'pointer',
               opacity: students.length === 0 ? 0.5 : 1
             }}>
-            <FileSpreadsheet size={18} /> Export for BECE Portal
+            <LayoutGrid size={18} /> Portal Export
           </button>
           <button 
             onClick={() => setIsPrintModalOpen(true)}
@@ -474,6 +558,7 @@ export default function BECEMasterPage() {
           <table className="grid-table">
             <thead>
               <tr>
+                <th className="grid-header-actions">Slips</th>
                 <th className="grid-header-student">Student Name</th>
                 <th className="grid-header-index">WAEC Index No.</th>
                 {subjects.map(sub => (
@@ -488,6 +573,18 @@ export default function BECEMasterPage() {
             <tbody>
               {filteredStudents.map(student => (
                 <tr key={student.id}>
+                  <td className="grid-cell-actions">
+                    <button 
+                      onClick={() => handleDownloadIndividualPDF(student.id)}
+                      style={{ 
+                        padding: 6, borderRadius: 6, border: 'none', background: T.bg, 
+                        color: T.primary, cursor: 'pointer', transition: 'all 0.2s'
+                      }}
+                      title="Print Result Slip"
+                    >
+                      <Printer size={16} />
+                    </button>
+                  </td>
                   <td className="grid-cell-student">
                     <div style={{ fontWeight: 700, fontSize: 13 }}>{student.full_name}</div>
                     <div style={{ fontSize: 10, color: T.muted }}>{student.gender ? student.gender.charAt(0).toUpperCase() + student.gender.slice(1) : ''}</div>
@@ -593,23 +690,27 @@ export default function BECEMasterPage() {
         {students.map(student => {
           // Prepare scores for the report card
           const studentScores = subjects.map(sub => {
-            const gridCell = scoreGrid[student.id]?.[sub.id] || { class_score: '', exam_score: '' }
+            const cell = scoreGrid[student.id]?.[sub.id] || { class_score: '', exam_score: '' }
             return {
-              id: sub.id,
-              subject: { name: sub.name },
-              class_score: parseFloat(gridCell.class_score) || null,
-              exam_score: parseFloat(gridCell.exam_score) || null,
-              total_score: (parseFloat(gridCell.class_score) || 0) + (parseFloat(gridCell.exam_score) || 0)
+              subject_name: sub.name,
+              subject_code: sub.code,
+              class_score: parseFloat(cell.class_score) || 0,
+              exam_score: parseFloat(cell.exam_score) || 0,
+              total_score: (parseFloat(cell.class_score) || 0) + (parseFloat(cell.exam_score) || 0)
             }
           })
+
           return (
-            <div key={student.id} className="page-break">
-              <BECEReportCard 
-                student={student} 
-                school={settings?.school} 
-                term={term} 
-                year={year} 
-                scores={studentScores} 
+            <div key={student.id} id={`print-slip-${student.id}`} className="page-break">
+              <BECEReportCard
+                student={{
+                  ...student,
+                  student_id: indexMap[student.id] || student.student_id
+                }}
+                scores={studentScores}
+                termName={term?.name || ''}
+                academicYear={year?.name || ''}
+                settings={settings}
               />
             </div>
           )
