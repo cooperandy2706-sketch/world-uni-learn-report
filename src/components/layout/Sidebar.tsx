@@ -13,7 +13,7 @@ import {
   ChevronLeft, ChevronRight, Wallet, Banknote, Receipt, TrendingDown,
   TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag,
   Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap,
-  Smartphone
+  Smartphone, Calculator, Grid
 } from 'lucide-react'
 
 const adminLinks = [
@@ -40,6 +40,9 @@ const adminLinks = [
   { to: ROUTES.ADMIN_MESSAGES, label: 'Messages', icon: MessageSquare },
   { to: '/admin/agenda', label: 'Term Agenda', icon: ClipboardList },
   { to: '/admin/admissions', label: 'Admissions', icon: GraduationCap },
+  { to: '/admin/assessments', label: 'Assessment Entry', icon: ClipboardList },
+  { to: '/admin/bece-processor', label: 'BECE CA Processor', icon: Calculator },
+  { to: '/admin/bece-master', label: 'BECE Master Sheet', icon: Grid },
   { to: ROUTES.ADMIN_SMS, label: 'SMS Messaging', icon: Smartphone },
 ]
 

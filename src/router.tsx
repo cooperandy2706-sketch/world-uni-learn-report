@@ -67,6 +67,9 @@ import AdminAdmissions from './pages/admin/AdminAdmissions'
 import SMSPage from './pages/shared/SMSPage'
 import ClassTestsPage from './pages/teacher/ClassTestsPage'
 import AdminTestAnalytics from './pages/admin/AdminTestAnalytics'
+import AssessmentsPage from './pages/admin/AssessmentsPage'
+import BECEProcessorPage from './pages/admin/BECEProcessorPage'
+import BECEMasterPage from './pages/admin/BECEMasterPage'
 
 // Bursar pages
 import BursarDashboard from './pages/bursar/DashboardPage'
@@ -135,6 +138,9 @@ export const router = createBrowserRouter([
           { path: 'admissions', element: <AdminAdmissions /> },
           { path: 'sms', element: <SMSPage /> },
           { path: 'test-analytics', element: <AdminTestAnalytics /> },
+          { path: 'assessments', element: <AssessmentsPage /> },
+          { path: 'bece-processor', element: <BECEProcessorPage /> },
+          { path: 'bece-master', element: <BECEMasterPage /> },
         ],
       },
       {
