@@ -289,44 +289,50 @@ export default function BECEMasterPage() {
     }
   }
 
-  // ── WAEC Portal Export ────────────────────────────────────
+  // ── WAEC Portal Export (Narrow Format) ────────────────────
   const handleExportPortal = () => {
     if (students.length === 0 || subjects.length === 0) {
       toast.error('No data to export. Select a class and ensure scores are entered.')
       return
     }
 
-    // Wide format: one row per student with SBA, Exam AND Total per subject
-    // (WAEC portal already has candidates registered — this matches their template structure)
-    const rows = students.map(student => {
-      const row: Record<string, any> = {
-        'INDEX NUMBER': indexMap[student.id] || student.student_id || '',
-        'CANDIDATE NAME': student.full_name,
-      }
-      let grandTotal = 0
+    const rows: any[] = []
+
+    students.forEach(student => {
       subjects.forEach(sub => {
         const cell = scoreGrid[student.id]?.[sub.id]
-        const sba  = parseFloat(cell?.class_score || '0') || 0
-        const exam = parseFloat(cell?.exam_score  || '0') || 0
-        const tot  = sba + exam
-        grandTotal += tot
-        const base = sub.code ? `${sub.name}(${sub.code})` : sub.name
-        row[`${base} - SBA(30)`]   = sba
-        row[`${base} - Exam(70)`]  = exam
-        row[`${base} - Total(100)`] = tot
+        if (!cell) return
+
+        const sba = parseFloat(cell.class_score) || 0
+        const exam = parseFloat(cell.exam_score) || 0
+        const total = sba + exam
+
+        // Only export if there is some score data
+        if (cell.class_score !== '' || cell.exam_score !== '') {
+          rows.push({
+            'Index Number': indexMap[student.id] || student.student_id || '',
+            'Candidate Name': student.full_name,
+            'Sex': student.gender?.toLowerCase().startsWith('m') ? 'M' : student.gender?.toLowerCase().startsWith('f') ? 'F' : '',
+            'Subject Code': sub.code || sub.name.substring(0, 3).toUpperCase(),
+            'CA Score': Math.round(total)
+          })
+        }
       })
-      row['GRAND TOTAL'] = grandTotal
-      return row
     })
+
+    if (rows.length === 0) {
+      toast.error('No score data found to export.')
+      return
+    }
 
     const ws = utils.json_to_sheet(rows)
     const wb = utils.book_new()
-    utils.book_append_sheet(wb, ws, 'BECE SBA Scores')
+    utils.book_append_sheet(wb, ws, 'BECE Portal Upload')
 
     const className = classes.find(c => c.id === selectedClass)?.name || 'Class'
-    const fileName = `WAEC_BECE_Portal_${className}_${term?.name || 'Term'}_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.xlsx`
+    const fileName = `WAEC_BECE_Portal_${className}_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.xlsx`
     writeFile(wb, fileName)
-    toast.success(`✅ Exported: ${fileName}`)
+    toast.success(`✅ Exported ${rows.length} records in Narrow Format.`)
   }
 
   const filteredStudents = students.filter(s => 
