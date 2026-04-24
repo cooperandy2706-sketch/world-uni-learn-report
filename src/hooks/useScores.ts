@@ -58,17 +58,33 @@ export function useBulkUpsertScores() {
 
   return useMutation({
     mutationFn: async (scores: any[]) => {
-      // Calculate positions before saving
-      const withPositions = calculateClassPositions(
-        scores.map((s) => ({ ...s, total_score: s.class_score + s.exam_score }))
+      if (scores.length === 0) return { data: [] }
+      
+      // Group by subject to calculate positions correctly per subject
+      const subjectGroups: Record<string, any[]> = {}
+      scores.forEach(s => {
+        if (!subjectGroups[s.subject_id]) subjectGroups[s.subject_id] = []
+        subjectGroups[s.subject_id].push(s)
+      })
+
+      const withPositions = Object.values(subjectGroups).flatMap(group => 
+        calculateClassPositions(group.map(s => ({ ...s, total_score: (s.class_score || 0) + (s.exam_score || 0) })))
       )
-      return scoresService.bulkUpsert(withPositions)
+
+      // Remove total_score from the final objects as it is a generated column in DB
+      const dbPayload = withPositions.map(({ total_score, ...s }) => s)
+
+      const { data, error } = await scoresService.bulkUpsert(dbPayload)
+      if (error) throw error
+      return data
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['scores'] })
-      toast.success('Scores saved successfully')
     },
-    onError: () => toast.error('Failed to save scores'),
+    onError: (error: any) => {
+      console.error('Bulk Save Error:', error)
+      toast.error(`Failed to save: ${error.message || 'Unknown error'}`)
+    },
   })
 }
 

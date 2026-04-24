@@ -1,5 +1,5 @@
 // src/pages/admin/BECEMasterPage.tsx
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useClasses } from '../../hooks/useClasses'
 import { useSubjects } from '../../hooks/useSubjects'
@@ -54,8 +54,24 @@ export default function BECEMasterPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isDirty, setIsDirty] = useState(false)
 
   const bulkUpsert = useBulkUpsertScores()
+
+  // Warn on leave
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isDirty])
+
+  const allSubjectsRef = React.useRef(allSubjects)
+  useEffect(() => { allSubjectsRef.current = allSubjects }, [allSubjects])
 
   // ── Load Data ──────────────────────────────────────────────
   const loadData = useCallback(async () => {
@@ -80,11 +96,11 @@ export default function BECEMasterPage() {
         .eq('class_id', selectedClass)
         .eq('term_id', term.id)
       
-      const uniqueSubs = Array.from(new Set((classSubs || []).map(s => s.subject?.id)))
-        .map(id => allSubjects.find(s => s.id === id))
+      const uniqueSubs = Array.from(new Set((classSubs || []).map((s: any) => s.subject?.id)))
+        .map(id => allSubjectsRef.current.find(s => s.id === id))
         .filter(Boolean)
-      
-      setSubjects(uniqueSubs.length > 0 ? uniqueSubs : allSubjects.slice(0, 10)) // Fallback if no assignments
+
+      setSubjects(uniqueSubs.length > 0 ? uniqueSubs : allSubjectsRef.current.slice(0, 12))
 
       // 3. Fetch Existing Scores
       const { data: scs } = await supabase
@@ -113,12 +129,13 @@ export default function BECEMasterPage() {
       const idxMap: Record<string, string> = {}
       stds?.forEach(s => { idxMap[s.id] = s.student_id || '' })
       setIndexMap(idxMap)
+      setIsDirty(false)
     } catch (err) {
       toast.error('Failed to load master sheet')
     } finally {
       setIsLoading(false)
     }
-  }, [selectedClass, term?.id, allSubjects])
+  }, [selectedClass, term?.id])  // allSubjects intentionally excluded — uses ref to avoid wiping unsaved scores
 
   useEffect(() => {
     loadData()
@@ -126,6 +143,7 @@ export default function BECEMasterPage() {
 
   // ── Handlers ──────────────────────────────────────────────
   const handleScoreChange = (studentId: string, subjectId: string, field: keyof CellScore, value: string) => {
+    setIsDirty(true)
     setScoreGrid(prev => ({
       ...prev,
       [studentId]: {
@@ -145,7 +163,8 @@ export default function BECEMasterPage() {
     const scoresToUpsert: any[] = []
     Object.entries(scoreGrid).forEach(([studentId, subMap]) => {
       Object.entries(subMap).forEach(([subjectId, scores]) => {
-        if (scores.class_score || scores.exam_score) {
+        // Use !== '' so that score of 0 is still saved
+        if (scores.class_score !== '' || scores.exam_score !== '') {
           scoresToUpsert.push({
             student_id: studentId,
             subject_id: subjectId,
@@ -154,9 +173,7 @@ export default function BECEMasterPage() {
             academic_year_id: year.id,
             class_score: parseFloat(scores.class_score) || 0,
             exam_score: parseFloat(scores.exam_score) || 0,
-            total_score: (parseFloat(scores.class_score) || 0) + (parseFloat(scores.exam_score) || 0),
-            is_submitted: true,
-            school_id: settings?.school?.id
+            is_submitted: true
           })
         }
       })
@@ -170,15 +187,23 @@ export default function BECEMasterPage() {
       )
 
     try {
-      await Promise.all([
-        bulkUpsert.mutateAsync(scoresToUpsert),
-        ...indexUpdates
-      ])
-      // Refresh students to reflect saved index numbers
+      // 1. Save scores (throws if error)
+      await bulkUpsert.mutateAsync(scoresToUpsert)
+
+      // 2. Save index numbers (throws if error)
+      if (indexUpdates.length > 0) {
+        const results = await Promise.all(indexUpdates)
+        const firstError = results.find(r => r.error)?.error
+        if (firstError) throw firstError
+      }
+
+      // 3. Refresh and reset dirty state
       setStudents(prev => prev.map(s => ({ ...s, student_id: indexMap[s.id] || s.student_id })))
-      toast.success('Master sheet & index numbers saved')
-    } catch (err) {
-      toast.error('Failed to save — check your connection')
+      setIsDirty(false)
+      toast.success('Master sheet & index numbers saved successfully')
+    } catch (err: any) {
+      console.error('Save Action Failed:', err)
+      toast.error('Failed to save — check your data and connection')
     } finally {
       setIsSaving(false)
     }
@@ -224,7 +249,7 @@ export default function BECEMasterPage() {
     if (!printArea) return
 
     setIsPrintModalOpen(false)
-    const toastId = toast.loading('Generating PDF documents...')
+    const toastId = toast.loading(`Generating PDF for ${students.length} student(s)…`)
 
     try {
       const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
@@ -234,29 +259,33 @@ export default function BECEMasterPage() {
 
       const pdf = new jsPDF('p', 'mm', 'a4')
       const pages = printArea.querySelectorAll('.page-break')
-      
+
+      if (pages.length === 0) {
+        toast.error('No student data to export', { id: toastId })
+        return
+      }
+
       for (let i = 0; i < pages.length; i++) {
         const page = pages[i] as HTMLElement
-        // Temporarily make visible for canvas
-        page.style.display = 'block'
-        const canvas = await html2canvas(page, { scale: 2, useCORS: true })
+        const canvas = await html2canvas(page, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+        })
         const imgData = canvas.toDataURL('image/png')
-        
-        const imgProps = pdf.getImageProperties(imgData)
         const pdfWidth = pdf.internal.pageSize.getWidth()
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
-
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width
         if (i > 0) pdf.addPage()
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
-        page.style.display = 'none' // hide back
       }
 
       const className = classes.find(c => c.id === selectedClass)?.name || 'Class'
-      pdf.save(`BECE_Reports_${className}_${new Date().toLocaleDateString()}.pdf`)
+      pdf.save(`BECE_Reports_${className}_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.pdf`)
       toast.success('PDF downloaded successfully!', { id: toastId })
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
-      toast.error('Failed to generate PDF', { id: toastId })
+      toast.error('PDF failed: ' + (err.message || 'Unknown error'), { id: toastId })
     }
   }
 
@@ -267,20 +296,26 @@ export default function BECEMasterPage() {
       return
     }
 
-    // Wide format: one row per student, one column per subject SBA score
+    // Wide format: one row per student with SBA, Exam AND Total per subject
     // (WAEC portal already has candidates registered — this matches their template structure)
     const rows = students.map(student => {
       const row: Record<string, any> = {
         'INDEX NUMBER': indexMap[student.id] || student.student_id || '',
         'CANDIDATE NAME': student.full_name,
       }
+      let grandTotal = 0
       subjects.forEach(sub => {
         const cell = scoreGrid[student.id]?.[sub.id]
-        const sba = parseFloat(cell?.class_score || '0') || 0
-        // Use subject code if available, otherwise subject name
-        const colKey = sub.code ? `${sub.name} (${sub.code})` : sub.name
-        row[colKey] = sba
+        const sba  = parseFloat(cell?.class_score || '0') || 0
+        const exam = parseFloat(cell?.exam_score  || '0') || 0
+        const tot  = sba + exam
+        grandTotal += tot
+        const base = sub.code ? `${sub.name}(${sub.code})` : sub.name
+        row[`${base} - SBA(30)`]   = sba
+        row[`${base} - Exam(70)`]  = exam
+        row[`${base} - Total(100)`] = tot
       })
+      row['GRAND TOTAL'] = grandTotal
       return row
     })
 
@@ -304,18 +339,46 @@ export default function BECEMasterPage() {
       <style>{`
         @keyframes _fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .master-grid-container { overflow-x: auto; background: #fff; border-radius: 20px; border: 1.5px solid ${T.border}; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
-        .grid-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .grid-table th, .grid-table td { border: 1px solid ${T.border}; padding: 12px; }
-        .grid-header-student { min-width: 200px; position: sticky; left: 0; background: ${T.bg}; z-index: 2; border-right: 2px solid ${T.border}; }
-        .grid-header-index { min-width: 140px; position: sticky; left: 200px; background: ${T.bg}; z-index: 2; border-right: 2px solid ${T.border}; font-size: 11px; font-weight: 800; text-transform: uppercase; color: #065f46; text-align: center; }
-        .grid-cell-student { min-width: 200px; position: sticky; left: 0; background: #fff; z-index: 1; border-right: 2px solid ${T.border}; }
-        .grid-cell-index { min-width: 140px; position: sticky; left: 200px; background: #ecfdf5; z-index: 1; border-right: 2px solid ${T.border}; padding: 8px !important; }
-        .grid-header-subject { width: 160px; text-align: center; background: ${T.bg}; font-size: 11px; font-weight: 800; text-transform: uppercase; color: ${T.muted}; }
-        .grid-cell-score { width: 160px; padding: 8px !important; }
+        .grid-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .grid-table th, .grid-table td { border-bottom: 1px solid ${T.border}; border-right: 1px solid ${T.border}; padding: 10px 12px; }
+        /* ── Frozen col 1: Student Name (left: 0, w: 200px) ── */
+        .grid-header-student { 
+          width: 200px; min-width: 200px; max-width: 200px;
+          position: sticky; left: 0; z-index: 4;
+          background: ${T.bg}; font-size: 11px; font-weight: 800; text-transform: uppercase; color: ${T.muted};
+          box-shadow: 2px 0 4px rgba(0,0,0,0.06);
+        }
+        .grid-cell-student { 
+          width: 200px; min-width: 200px; max-width: 200px;
+          position: sticky; left: 0; z-index: 2;
+          background: #fff;
+          box-shadow: 2px 0 4px rgba(0,0,0,0.04);
+        }
+        /* ── Frozen col 2: WAEC Index (left: 200px, w: 148px) ── */
+        .grid-header-index { 
+          width: 148px; min-width: 148px; max-width: 148px;
+          position: sticky; left: 200px; z-index: 4;
+          background: #d1fae5; font-size: 11px; font-weight: 800; text-transform: uppercase; color: #065f46; text-align: center;
+          box-shadow: 2px 0 6px rgba(0,0,0,0.08);
+        }
+        .grid-cell-index { 
+          width: 148px; min-width: 148px; max-width: 148px;
+          position: sticky; left: 200px; z-index: 2;
+          background: #ecfdf5;
+          box-shadow: 2px 0 6px rgba(0,0,0,0.06);
+          padding: 6px !important;
+        }
+        /* ── Scrollable score columns ── */
+        .grid-header-subject { width: 150px; min-width: 150px; text-align: center; background: ${T.bg}; font-size: 11px; font-weight: 800; text-transform: uppercase; color: ${T.muted}; }
+        .grid-header-total { width: 100px; min-width: 100px; text-align: center; background: #f1f5f9; font-size: 11px; font-weight: 900; color: ${T.slate}; border-left: 2px solid ${T.border}; }
+        .grid-cell-score { width: 150px; min-width: 150px; padding: 6px !important; }
+        .grid-cell-total { width: 100px; min-width: 100px; text-align: center; background: #f8fafc; font-weight: 800; color: ${T.primary}; border-left: 2px solid ${T.border}; }
         .score-input-group { display: flex; gap: 4px; }
-        .score-input { width: 50%; padding: 8px 4px; border-radius: 6px; border: 1.5px solid ${T.border}; text-align: center; font-size: 12px; font-weight: 700; outline: none; transition: border-color 0.2s; }
-        .score-input:focus { border-color: ${T.primary}; }
+        .score-input { width: 50%; padding: 7px 4px; border-radius: 6px; border: 1.5px solid ${T.border}; text-align: center; font-size: 12px; font-weight: 700; outline: none; transition: border-color 0.2s; background: #fff; }
+        .score-input:focus { border-color: ${T.primary}; background: #faf5ff; }
         .score-input.exam { background: ${T.bg}; }
+        .score-input.exam:focus { background: #faf5ff; }
+
       `}</style>
 
       {/* Header */}
@@ -352,9 +415,17 @@ export default function BECEMasterPage() {
               display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12, 
               background: T.primary, color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer',
               boxShadow: '0 4px 12px rgba(109, 40, 217, 0.2)',
-              opacity: students.length === 0 ? 0.5 : 1
+              opacity: students.length === 0 ? 0.5 : 1,
+              position: 'relative'
             }}>
             <Save size={18} /> {isSaving ? 'Saving...' : 'Save All Scores'}
+            {isDirty && !isSaving && (
+              <span style={{ 
+                position: 'absolute', top: -4, right: -4, width: 12, height: 12, 
+                background: T.warning, borderRadius: '50%', border: '2px solid #fff',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }} title="Unsaved changes" />
+            )}
           </button>
         </div>
       </div>
@@ -402,9 +473,10 @@ export default function BECEMasterPage() {
                 {subjects.map(sub => (
                   <th key={sub.id} className="grid-header-subject">
                     {sub.name}
-                    <div style={{ fontSize: 9, opacity: 0.6, marginTop: 4 }}>SBA | EXAM</div>
+                    <div style={{ fontSize: 9, opacity: 0.6, marginTop: 4 }}>SBA(30) | EXAM(70)</div>
                   </th>
                 ))}
+                <th className="grid-header-total">Grand Total</th>
               </tr>
             </thead>
             <tbody>
@@ -419,7 +491,10 @@ export default function BECEMasterPage() {
                       type="text"
                       placeholder="e.g. 0030100001"
                       value={indexMap[student.id] ?? ''}
-                      onChange={e => setIndexMap(prev => ({ ...prev, [student.id]: e.target.value }))}
+                      onChange={e => {
+                        setIsDirty(true)
+                        setIndexMap(prev => ({ ...prev, [student.id]: e.target.value }))
+                      }}
                       style={{
                         width: '100%', padding: '7px 8px', borderRadius: 6,
                         border: `1.5px solid ${indexMap[student.id] ? '#10b981' : '#d1fae5'}`,
@@ -432,27 +507,58 @@ export default function BECEMasterPage() {
                   </td>
                   {subjects.map(sub => {
                     const cell = scoreGrid[student.id]?.[sub.id] || { class_score: '', exam_score: '' }
+                    const sba = parseFloat(cell.class_score) || 0
+                    const exam = parseFloat(cell.exam_score) || 0
+                    const total = sba + exam
+                    const hasData = cell.class_score !== '' || cell.exam_score !== ''
                     return (
                       <td key={sub.id} className="grid-cell-score">
                         <div className="score-input-group">
                           <input 
                             type="number" 
                             className="score-input"
-                            placeholder="SBA"
+                            placeholder="SBA/30"
+                            min={0} max={30}
                             value={cell.class_score}
                             onChange={e => handleScoreChange(student.id, sub.id, 'class_score', e.target.value)}
                           />
                           <input 
                             type="number" 
                             className="score-input exam"
-                            placeholder="EXAM"
+                            placeholder="EXAM/70"
+                            min={0} max={70}
                             value={cell.exam_score}
                             onChange={e => handleScoreChange(student.id, sub.id, 'exam_score', e.target.value)}
                           />
                         </div>
+                        {hasData && (
+                          <div style={{
+                            textAlign: 'center',
+                            marginTop: 4,
+                            fontSize: 11,
+                            fontWeight: 800,
+                            color: total >= 50 ? '#065f46' : '#991b1b',
+                            background: total >= 50 ? '#d1fae5' : '#fee2e2',
+                            borderRadius: 4,
+                            padding: '2px 0',
+                            letterSpacing: '0.03em'
+                          }}>
+                            Total: {total.toFixed(0)}
+                          </div>
+                        )}
                       </td>
                     )
                   })}
+                  <td className="grid-cell-total">
+                    {(() => {
+                      let grandTotal = 0
+                      subjects.forEach(sub => {
+                        const cell = scoreGrid[student.id]?.[sub.id]
+                        grandTotal += (parseFloat(cell?.class_score || '0') || 0) + (parseFloat(cell?.exam_score || '0') || 0)
+                      })
+                      return grandTotal.toFixed(0)
+                    })()}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -466,8 +572,18 @@ export default function BECEMasterPage() {
         </div>
       )}
 
-      {/* Hidden Bulk Print Area */}
-      <div id="bece-bulk-print-area" style={{ display: 'none' }}>
+      {/* Off-screen Bulk Print Area — visible to html2canvas but not to the user */}
+      <div
+        id="bece-bulk-print-area"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: '-9999px',
+          width: '800px',
+          pointerEvents: 'none',
+          zIndex: -1,
+        }}
+      >
         {students.map(student => {
           // Prepare scores for the report card
           const studentScores = subjects.map(sub => {
