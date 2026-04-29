@@ -21,6 +21,7 @@ import TimetablePage from './pages/admin/TimetablePage'
 import AnnouncementsPage from './pages/admin/AnnouncementsPage'
 import SyllabusPage from './pages/admin/SyllabusPage'
 import WeeklyGoalsPage from './pages/admin/WeeklyGoalsPage'
+import AdminPosterMakerPage from './pages/admin/PosterMakerPage'
 import TeacherDashboard from './pages/teacher/DashboardPage'
 import MyClassesPage from './pages/teacher/MyClassesPage'
 import ScoreEntryPage from './pages/teacher/ScoreEntryPage'
@@ -147,6 +148,7 @@ export const router = createBrowserRouter([
           { path: 'bece-processor', element: <BECEProcessorPage /> },
           { path: 'bece-master', element: <BECEMasterPage /> },
           { path: 'elections', element: <AdminElectionsPage /> },
+          { path: 'poster-maker', element: <AdminPosterMakerPage /> },
         ],
       },
       {

@@ -13,7 +13,7 @@ import {
   ChevronLeft, ChevronRight, Wallet, Banknote, Receipt, TrendingDown,
   TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag,
   Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap,
-  Smartphone, Calculator, Grid, Vote
+  Smartphone, Calculator, Grid, Vote, Image
 } from 'lucide-react'
 
 const adminLinks = [
@@ -44,6 +44,7 @@ const adminLinks = [
   { to: '/admin/bece-processor', label: 'BECE CA Processor', icon: Calculator },
   { to: '/admin/bece-master', label: 'BECE Master Sheet', icon: Grid },
   { to: '/admin/elections', label: 'Elections (PEC)', icon: Vote },
+  { to: '/admin/poster-maker', label: 'Poster Maker', icon: Image },
   { to: ROUTES.ADMIN_SMS, label: 'SMS Messaging', icon: Smartphone },
 ]
 
