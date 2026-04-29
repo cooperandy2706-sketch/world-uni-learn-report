@@ -334,7 +334,8 @@ export interface ElectionCandidate {
   id: string
   election_id: string
   position_id: string
-  student_id: string
+  student_id?: string
+  teacher_id?: string
   school_id: string
   manifesto?: string
   photo_url?: string
@@ -346,6 +347,7 @@ export interface ElectionCandidate {
   created_at: string
   // joined
   student?: Student
+  teacher?: User
   position?: ElectionPosition
   vetted_by_user?: User
 }
@@ -355,7 +357,8 @@ export interface ElectionVote {
   election_id: string
   position_id: string
   candidate_id: string
-  voter_student_id: string
+  voter_student_id?: string
+  voter_teacher_id?: string
   school_id: string
   created_at: string
 }

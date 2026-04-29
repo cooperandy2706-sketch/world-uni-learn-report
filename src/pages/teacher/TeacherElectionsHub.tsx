@@ -1,11 +1,11 @@
-// src/pages/student/ElectionsPage.tsx
+// src/pages/teacher/TeacherElectionsHub.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import toast from 'react-hot-toast'
 import { Election, ElectionPosition, ElectionCandidate, ElectionVote } from '../../types/database.types'
 
-export default function StudentElectionsPage() {
+export default function TeacherElectionsHub() {
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [elections, setElections] = useState<Election[]>([])
@@ -13,11 +13,9 @@ export default function StudentElectionsPage() {
   const [candidates, setCandidates] = useState<ElectionCandidate[]>([])
   const [myVotes, setMyVotes] = useState<ElectionVote[]>([])
   
-  const [tab, setTab] = useState<'nominate' | 'vote' | 'results'>('nominate')
-  const [studentId, setStudentId] = useState<string | null>(null)
+  const [tab, setTab] = useState<'nominate' | 'vote'>('nominate')
   const [ballotSelections, setBallotSelections] = useState<Record<string, string>>({})
   
-  // Nomination
   const [showNominateModal, setShowNominateModal] = useState(false)
   const [selectedPositionId, setSelectedPositionId] = useState('')
   const [manifesto, setManifesto] = useState('')
@@ -26,16 +24,11 @@ export default function StudentElectionsPage() {
     if (!user) return
     setLoading(true)
     try {
-      // Get student profile
-      const { data: stuData } = await supabase.from('students').select('id').eq('user_id', user.id).single()
-      if (!stuData) throw new Error("Student profile not found")
-      setStudentId(stuData.id)
-
       const [elRes, posRes, candRes, voteRes] = await Promise.all([
         supabase.from('elections').select('*').eq('school_id', user.school_id).eq('is_archived', false).order('created_at', { ascending: false }),
         supabase.from('election_positions').select('*').eq('school_id', user.school_id),
         supabase.from('election_candidates').select('*, student:students(full_name), teacher:teacher_id(full_name)').eq('school_id', user.school_id),
-        supabase.from('election_votes').select('*').eq('voter_student_id', stuData.id),
+        supabase.from('election_votes').select('*').eq('voter_teacher_id', user.id),
       ])
       
       setElections(elRes.data || [])
@@ -63,12 +56,12 @@ export default function StudentElectionsPage() {
         school_id: user!.school_id,
         election_id: electionId,
         position_id: selectedPositionId,
-        student_id: studentId!,
+        teacher_id: user!.id,
         manifesto,
         status: 'pending'
       })
       if (error) throw error
-      toast.success('Nomination submitted! Awaiting staff vetting.')
+      toast.success('Nomination submitted! Awaiting vetting.')
       setShowNominateModal(false)
       setManifesto('')
       setSelectedPositionId('')
@@ -79,7 +72,7 @@ export default function StudentElectionsPage() {
   }
 
   const submitBallot = async () => {
-    if (!studentId || !activeElection) return
+    if (!activeElection) return
     const selectionCount = Object.keys(ballotSelections).length
     if (selectionCount === 0) return toast.error('No candidates selected')
     
@@ -89,7 +82,7 @@ export default function StudentElectionsPage() {
         election_id: activeElection.id,
         position_id: posId,
         candidate_id: candId,
-        voter_student_id: studentId
+        voter_teacher_id: user!.id
       }))
 
       const { error } = await supabase.from('election_votes').insert(votesToInsert)
@@ -104,7 +97,7 @@ export default function StudentElectionsPage() {
   }
 
   const cancelVote = async (voteId: string) => {
-    if (!confirm('Are you sure you want to cancel your vote for this position?')) return
+    if (!confirm('Are you sure you want to cancel your vote?')) return
     try {
       const { error } = await supabase.from('election_votes').delete().eq('id', voteId)
       if (error) throw error
@@ -117,7 +110,7 @@ export default function StudentElectionsPage() {
 
   if (loading) return <div style={{ padding: 40, textAlign: 'center' }}>Loading elections...</div>
 
-  const activeElection = elections[0] // Assume latest active election
+  const activeElection = elections[0] 
 
   const styles = {
     btn: { padding: '10px 20px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(109,40,217,0.2)' },
@@ -131,14 +124,14 @@ export default function StudentElectionsPage() {
       <div style={{ padding: 60, textAlign: 'center', background: '#fff', borderRadius: 16, border: '1px solid #f3f4f6', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', animation: '_fadeIn 0.4s ease' }}>
         <style>{`@keyframes _fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: '#111827' }}>No Active Elections</h2>
-        <p style={{ color: '#6b7280', fontSize: 16 }}>There are currently no active prefectorial elections running.</p>
+        <p style={{ color: '#6b7280', fontSize: 16 }}>There are currently no active elections running.</p>
       </div>
     )
   }
 
   const elPositions = positions.filter(p => p.election_id === activeElection.id)
   const elCandidates = candidates.filter(c => c.election_id === activeElection.id)
-  const myNominations = elCandidates.filter(c => c.student_id === studentId)
+  const myNominations = elCandidates.filter(c => c.teacher_id === user!.id)
 
   return (
     <div style={{ paddingBottom: 80, animation: '_fadeIn 0.4s ease' }}>
@@ -151,13 +144,13 @@ export default function StudentElectionsPage() {
         .tab-content { animation: _slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
       `}</style>
       <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111827', margin: 0 }}>Student Elections Hub</h1>
-        <p style={{ color: '#6b7280', marginTop: 4, fontSize: 14 }}>{activeElection.title}</p>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111827', margin: 0 }}>Election Hub</h1>
+        <p style={{ color: '#6b7280', marginTop: 4, fontSize: 14 }}>{activeElection.title} — Teacher Access</p>
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 32, background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #f3f4f6', width: 'fit-content' }}>
         <button style={styles.tabBtn(tab === 'nominate')} onClick={() => setTab('nominate')}>Stand for Position</button>
-        <button style={styles.tabBtn(tab === 'vote')} onClick={() => setTab('vote')}>Vote</button>
+        <button style={styles.tabBtn(tab === 'vote')} onClick={() => setTab('vote')}>Cast Vote</button>
       </div>
 
       <div className="tab-content" key={tab}>
@@ -323,7 +316,7 @@ export default function StudentElectionsPage() {
               <textarea 
                 rows={5}
                 value={manifesto} onChange={e => setManifesto(e.target.value)}
-                placeholder="Why should students vote for you?"
+                placeholder="Why should people vote for you?"
                 style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #d1d5db', resize: 'vertical' }}
               />
             </div>

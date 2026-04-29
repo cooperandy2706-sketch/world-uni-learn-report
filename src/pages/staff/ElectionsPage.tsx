@@ -38,7 +38,7 @@ export default function StaffElectionsPage() {
 
       const [posRes, candRes] = await Promise.all([
         supabase.from('election_positions').select('*').eq('election_id', elData.id),
-        supabase.from('election_candidates').select('*, student:students(full_name)').eq('election_id', elData.id),
+        supabase.from('election_candidates').select('*, student:students(full_name), teacher:teacher_id(full_name)').eq('election_id', elData.id),
       ])
       
       setPositions(posRes.data || [])
@@ -114,7 +114,12 @@ export default function StaffElectionsPage() {
               return (
                 <div key={cand.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, border: '1px solid #e5e7eb', borderRadius: 8 }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: 15, color: '#111827' }}>{(cand.student as any)?.full_name}</div>
+                    <div style={{ fontWeight: 600, fontSize: 15, color: '#111827' }}>
+                      {cand.teacher?.full_name || cand.student?.full_name}
+                      <span style={{ fontWeight: 400, color: '#6b7280', marginLeft: 6 }}>
+                        ({cand.teacher_id ? 'Teacher' : 'Student'})
+                      </span>
+                    </div>
                     <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Position: <span style={{ fontWeight: 600 }}>{pos?.title}</span></div>
                     <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4, display: 'flex', gap: 12 }}>
                       <span>
@@ -156,12 +161,12 @@ export default function StaffElectionsPage() {
           <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Vet Candidate</h3>
             <p style={{ fontSize: 14, color: '#374151', marginBottom: 16, fontWeight: 600 }}>
-              {(vettingCandidate.student as any)?.full_name} — {positions.find(p => p.id === vettingCandidate.position_id)?.title}
+              {vettingCandidate.teacher?.full_name || vettingCandidate.student?.full_name} — {positions.find(p => p.id === vettingCandidate.position_id)?.title}
             </p>
             
             {vettingCandidate.manifesto && (
               <div style={{ background: '#f9fafb', padding: 16, borderRadius: 8, marginBottom: 16, border: '1px solid #e5e7eb' }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', marginBottom: 8 }}>Student Manifesto</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', marginBottom: 8 }}>Manifesto</div>
                 <p style={{ fontSize: 14, color: '#374151', whiteSpace: 'pre-wrap', margin: 0 }}>{vettingCandidate.manifesto}</p>
               </div>
             )}

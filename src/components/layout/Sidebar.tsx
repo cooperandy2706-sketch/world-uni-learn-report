@@ -65,6 +65,7 @@ const teacherLinks = [
   { to: '/teacher/daily-fees', label: 'Daily Collections', icon: CreditCard },
   { to: ROUTES.TEACHER_MESSAGES, label: 'Messages', icon: MessageSquare },
   { to: '/teacher/agenda', label: 'Term Agenda', icon: ClipboardList },
+  { to: '/teacher/elections-hub', label: 'Elections (PEC)', icon: Vote },
   { to: ROUTES.TEACHER_TYPING_GAME, label: 'Typing Nitro', icon: Gamepad2 },
 ]
 

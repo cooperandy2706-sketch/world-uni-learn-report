@@ -13,6 +13,8 @@ export default function AdminElectionsPage() {
   const [candidates, setCandidates] = useState<ElectionCandidate[]>([])
   const [votes, setVotes] = useState<ElectionVote[]>([])
   const [students, setStudents] = useState<any[]>([])
+  const [teachers, setTeachers] = useState<any[]>([])
+  const [voters, setVoters] = useState<any[]>([])
   
   const [tab, setTab] = useState<'overview' | 'elections' | 'candidates' | 'results' | 'proxy'>('overview')
   const [selectedElectionId, setSelectedElectionId] = useState<string>('')
@@ -26,23 +28,25 @@ export default function AdminElectionsPage() {
   const [vetForm, setVetForm] = useState({ status: 'approved' as any, vet_score: 0, vet_notes: '' })
 
   const [showAdminNominateModal, setShowAdminNominateModal] = useState(false)
-  const [adminNominateForm, setAdminNominateForm] = useState({ student_id: '', position_id: '', manifesto: '' })
+  const [adminNominateForm, setAdminNominateForm] = useState({ nominee_id: '', nominee_type: 'student' as 'student' | 'teacher', position_id: '', manifesto: '' })
   const [nominateSearch, setNominateSearch] = useState('')
   
   const [showAdminVoteModal, setShowAdminVoteModal] = useState(false)
-  const [adminVoteForm, setAdminVoteForm] = useState({ student_id: '', position_id: '', candidate_id: '' })
+  const [adminVoteForm, setAdminVoteForm] = useState({ voter_id: '', voter_type: 'student' as 'student' | 'teacher', position_id: '', candidate_id: '' })
   const [voteSearch, setVoteSearch] = useState('')
+  const [ballotSelections, setBallotSelections] = useState<Record<string, string>>({})
 
   const loadData = async () => {
     if (!user?.school_id) return
     setLoading(true)
     try {
-      const [elRes, posRes, candRes, voteRes, stuRes] = await Promise.all([
+      const [elRes, posRes, candRes, voteRes, stuRes, teaRes] = await Promise.all([
         supabase.from('elections').select('*').eq('school_id', user.school_id).order('created_at', { ascending: false }),
         supabase.from('election_positions').select('*').eq('school_id', user.school_id),
-        supabase.from('election_candidates').select('*, student:students(full_name)').eq('school_id', user.school_id),
+        supabase.from('election_candidates').select('*, student:students(full_name), teacher:teacher_id(full_name)').eq('school_id', user.school_id),
         supabase.from('election_votes').select('*').eq('school_id', user.school_id),
-        supabase.from('students').select('id, full_name, student_id').eq('school_id', user.school_id).eq('is_active', true)
+        supabase.from('students').select('id, full_name, student_id').eq('school_id', user.school_id).eq('is_active', true),
+        supabase.from('users').select('id, full_name').eq('school_id', user.school_id).eq('role', 'teacher')
       ])
       
       setElections(elRes.data || [])
@@ -50,6 +54,13 @@ export default function AdminElectionsPage() {
       setCandidates(candRes.data || [])
       setVotes(voteRes.data || [])
       setStudents(stuRes.data || [])
+      setTeachers(teaRes.data || [])
+
+      const combinedVoters = [
+        ...(stuRes.data || []).map(s => ({ ...s, type: 'student', label: `${s.full_name} (Student - ${s.student_id})` })),
+        ...(teaRes.data || []).map(t => ({ ...t, type: 'teacher', label: `${t.full_name} (Teacher)` }))
+      ]
+      setVoters(combinedVoters)
       
       if (!selectedElectionId && elRes.data?.length) {
         setSelectedElectionId(elRes.data[0].id)
@@ -148,43 +159,90 @@ export default function AdminElectionsPage() {
     }
   }
 
-  const adminNominateStudent = async () => {
-    if (!adminNominateForm.student_id || !adminNominateForm.position_id) return toast.error('Student and Position are required')
+  const adminNominateCandidate = async () => {
+    if (!adminNominateForm.nominee_id || !adminNominateForm.position_id) return toast.error('Nominee and Position are required')
     try {
       const { error } = await supabase.from('election_candidates').insert({
         school_id: user!.school_id,
         election_id: selectedElectionId,
         position_id: adminNominateForm.position_id,
-        student_id: adminNominateForm.student_id,
+        [adminNominateForm.nominee_type === 'student' ? 'student_id' : 'teacher_id']: adminNominateForm.nominee_id,
         manifesto: adminNominateForm.manifesto,
         status: 'pending'
       })
       if (error) throw error
-      toast.success('Student nominated successfully')
+      toast.success('Nomination submitted successfully')
       setShowAdminNominateModal(false)
-      setAdminNominateForm({ student_id: '', position_id: '', manifesto: '' })
+      setAdminNominateForm({ nominee_id: '', nominee_type: 'student', position_id: '', manifesto: '' })
       loadData()
     } catch (err: any) {
-      toast.error(err.message.includes('unique') ? 'Student already nominated for this position' : err.message)
+      toast.error(err.message.includes('unique') ? 'Already nominated for this position' : err.message)
     }
   }
 
-  const adminCastVote = async (voterId: string, positionId: string, candidateId: string) => {
+  const adminCastVote = async (voterId: string, voterType: 'student' | 'teacher', positionId: string, candidateId: string) => {
     if (!voterId || !positionId || !candidateId) return toast.error('All fields are required')
-    if (!confirm('Are you sure you want to cast this vote on behalf of the student?')) return
     try {
       const { error } = await supabase.from('election_votes').insert({
         school_id: user!.school_id,
         election_id: selectedElectionId,
         position_id: positionId,
         candidate_id: candidateId,
-        voter_student_id: voterId
+        [voterType === 'student' ? 'voter_student_id' : 'voter_teacher_id']: voterId
       })
       if (error) throw error
-      toast.success('Vote cast successfully on behalf of student')
+      toast.success('Vote cast successfully')
       loadData()
     } catch (err: any) {
-      toast.error(err.message.includes('unique') ? 'Student has already voted for this position' : err.message)
+      toast.error(err.message.includes('unique') ? 'Already voted for this position' : err.message)
+    }
+  }
+
+  const adminCancelVote = async (voteId: string) => {
+    if (!confirm('Are you sure you want to cancel this proxy vote?')) return
+    try {
+      const { error } = await supabase.from('election_votes').delete().eq('id', voteId)
+      if (error) throw error
+      toast.success('Proxy vote cancelled')
+      loadData()
+    } catch (err: any) {
+      toast.error(err.message)
+    }
+  }
+
+  const submitProxyBallot = async () => {
+    if (!adminVoteForm.voter_id) return
+    const selectionCount = Object.keys(ballotSelections).length
+    if (selectionCount === 0) return toast.error('No candidates selected')
+    
+    try {
+      const votesToInsert = Object.entries(ballotSelections).map(([posId, candId]) => ({
+        school_id: user!.school_id,
+        election_id: selectedElectionId,
+        position_id: posId,
+        candidate_id: candId,
+        [adminVoteForm.voter_type === 'student' ? 'voter_student_id' : 'voter_teacher_id']: adminVoteForm.voter_id
+      }))
+
+      const { error } = await supabase.from('election_votes').insert(votesToInsert)
+      if (error) throw error
+      
+      toast.success(`Cast ${selectionCount} votes successfully`)
+      setBallotSelections({})
+      
+      // Move to next voter logic
+      const currentIndex = voters.findIndex(v => v.id === adminVoteForm.voter_id && v.type === adminVoteForm.voter_type)
+      if (currentIndex !== -1 && currentIndex < voters.length - 1) {
+        const nextVoter = voters[currentIndex + 1]
+        setAdminVoteForm({ ...adminVoteForm, voter_id: nextVoter.id, voter_type: nextVoter.type })
+        setVoteSearch('')
+      } else {
+        setAdminVoteForm({ ...adminVoteForm, voter_id: '', voter_type: 'student' })
+      }
+      
+      loadData()
+    } catch (err: any) {
+      toast.error(err.message)
     }
   }
 
@@ -235,7 +293,7 @@ export default function AdminElectionsPage() {
           const percentage = posVotes.length > 0 ? Math.round((t.count / posVotes.length) * 100) : 0
           const isWinner = pos.max_winners > 0 && idx < pos.max_winners && t.count > 0
           html += `<tr class="${isWinner ? 'winner' : ''}">
-            <td>${isWinner ? '🏆 ' : ''}${(t.cand.student as any)?.full_name}</td>
+            <td>${isWinner ? '🏆 ' : ''}${t.cand.teacher?.full_name || t.cand.student?.full_name} ${t.cand.teacher_id ? '(Teacher)' : ''}</td>
             <td>${t.count}</td>
             <td>${percentage}%</td>
           </tr>`
@@ -250,6 +308,68 @@ export default function AdminElectionsPage() {
     html += `</body></html>`
 
     const win = window.open('', '_blank', 'width=800,height=900')
+    if (win) {
+      win.document.write(html)
+      win.document.close()
+      setTimeout(() => win.print(), 500)
+    }
+  }
+
+  const printCandidates = () => {
+    if (!selectedElection) return toast.error('No election selected')
+    
+    const school = user?.school as any
+    const logoHtml = school?.logo_url ? `<img src="${school.logo_url}" alt="School Logo" style="max-height: 80px; margin-bottom: 10px;" />` : ''
+    const schoolName = school?.name || 'Prefectorial Electoral Commission'
+    
+    let html = `
+      <html>
+        <head>
+          <title>${selectedElection.title} - Candidates</title>
+          <style>
+            body { font-family: sans-serif; padding: 20px; color: #111827; font-size: 12px; }
+            .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; }
+            .header h1 { margin: 0; font-size: 18px; color: #1f2937; }
+            .header h2 { margin: 5px 0 0 0; font-size: 14px; color: #4b5563; font-weight: normal; }
+            .pos-block { margin-bottom: 20px; page-break-inside: avoid; }
+            .pos-title { font-size: 14px; font-weight: bold; color: #6d28d9; border-bottom: 1px solid #ddd6fe; padding-bottom: 4px; margin-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { text-align: left; padding: 8px; border-bottom: 1px solid #f3f4f6; }
+            th { font-weight: 600; color: #4b5563; background: #f9fafb; font-size: 11px; text-transform: uppercase; }
+            .status { font-weight: bold; text-transform: uppercase; font-size: 10px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            ${logoHtml}
+            <h1>${schoolName}</h1>
+            <h2>${selectedElection.title} - Official Candidates List</h2>
+          </div>
+    `
+
+    currentPositions.forEach(pos => {
+      const posCands = currentCandidates.filter(c => c.position_id === pos.id)
+      html += `<div class="pos-block"><div class="pos-title">${pos.title}</div>`
+      if (posCands.length > 0) {
+        html += `<table><thead><tr><th>Name</th><th>Type</th><th>Status</th><th>Manifesto Summary</th></tr></thead><tbody>`
+        posCands.forEach(c => {
+          html += `<tr>
+            <td style="font-weight: 600;">${c.teacher?.full_name || c.student?.full_name}</td>
+            <td>${c.teacher_id ? 'Teacher' : 'Student'}</td>
+            <td class="status" style="color: ${c.status === 'approved' ? '#16a34a' : c.status === 'rejected' ? '#dc2626' : '#ca8a04'}">${c.status}</td>
+            <td style="font-size: 11px; color: #4b5563;">${c.manifesto ? (c.manifesto.substring(0, 150) + '...') : 'No manifesto provided.'}</td>
+          </tr>`
+        })
+        html += `</tbody></table>`
+      } else {
+        html += `<p style="color: #6b7280; font-style: italic;">No candidates for this position.</p>`
+      }
+      html += `</div>`
+    })
+
+    html += `</body></html>`
+
+    const win = window.open('', '_blank', 'width=850,height=900')
     if (win) {
       win.document.write(html)
       win.document.close()
@@ -422,7 +542,12 @@ export default function AdminElectionsPage() {
 
       {tab === 'candidates' && (
         <div style={styles.card}>
-          <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Candidate Vetting</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 600 }}>Candidate Vetting</h2>
+            <button style={{ ...styles.btnOutline, display: 'flex', alignItems: 'center', gap: 6 }} onClick={printCandidates}>
+              🖨️ Print Candidates
+            </button>
+          </div>
           {currentCandidates.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {currentCandidates.map(cand => {
@@ -430,7 +555,12 @@ export default function AdminElectionsPage() {
                 return (
                   <div key={cand.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, border: '1px solid #e5e7eb', borderRadius: 8 }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 15, color: '#111827' }}>{(cand.student as any)?.full_name}</div>
+                      <div style={{ fontWeight: 600, fontSize: 15, color: '#111827' }}>
+                        {cand.teacher?.full_name || cand.student?.full_name} 
+                        <span style={{ fontWeight: 400, color: '#6b7280', marginLeft: 6 }}>
+                          ({cand.teacher_id ? 'Teacher' : 'Student'})
+                        </span>
+                      </div>
                       <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Position: <span style={{ fontWeight: 600 }}>{pos?.title}</span></div>
                       <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>
                         Status: 
@@ -493,7 +623,7 @@ export default function AdminElectionsPage() {
                         <div key={t.cand.id}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
                             <span style={{ fontWeight: 600, color: isWinner ? '#6d28d9' : '#374151' }}>
-                              {isWinner ? '🏆 ' : ''}{(t.cand.student as any)?.full_name}
+                              {isWinner ? '🏆 ' : ''}{t.cand.teacher?.full_name || t.cand.student?.full_name}
                             </span>
                             <span style={{ fontWeight: 600 }}>{t.count} votes ({percentage}%)</span>
                           </div>
@@ -523,19 +653,19 @@ export default function AdminElectionsPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <div>
                     <h2 style={{ fontSize: 18, fontWeight: 600 }}>Proxy Nomination</h2>
-                    <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Nominate a student for a position on their behalf.</p>
+                    <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Nominate a student or teacher for a position on their behalf.</p>
                   </div>
-                  <button style={styles.btn} onClick={() => setShowAdminNominateModal(true)}>Nominate Student</button>
+                  <button style={styles.btn} onClick={() => setShowAdminNominateModal(true)}>Nominate Candidate</button>
                 </div>
               </div>
               <div style={styles.card}>
                 <div style={{ marginBottom: 16 }}>
                   <h2 style={{ fontSize: 18, fontWeight: 600 }}>Proxy Voting</h2>
-                  <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Select a student below to view their ballot and cast votes on their behalf.</p>
+                  <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Select a voter (student or teacher) below to cast votes on their behalf.</p>
                 </div>
                 
                 <div style={{ marginBottom: 24, maxWidth: 450 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Voting Student (The Voter)</label>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Voter Selection</label>
                   <input 
                     type="text" 
                     placeholder="Search voter name..." 
@@ -543,57 +673,98 @@ export default function AdminElectionsPage() {
                     style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #d1d5db', marginBottom: 8, fontSize: 13 }}
                   />
                   <select 
-                    value={adminVoteForm.student_id} onChange={e => setAdminVoteForm({...adminVoteForm, student_id: e.target.value})}
+                    value={`${adminVoteForm.voter_type}:${adminVoteForm.voter_id}`} 
+                    onChange={e => {
+                      const [type, id] = e.target.value.split(':')
+                      setAdminVoteForm({...adminVoteForm, voter_type: type as any, voter_id: id})
+                    }}
                     style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #d1d5db' }}
                   >
-                    <option value="">-- Select Student Voter --</option>
-                    {students
-                      .filter(s => s.full_name.toLowerCase().includes(voteSearch.toLowerCase()) || s.student_id?.toLowerCase().includes(voteSearch.toLowerCase()))
-                      .map(s => (
-                      <option key={s.id} value={s.id}>{s.full_name} {s.student_id ? `(${s.student_id})` : ''}</option>
+                    <option value="">-- Select Voter --</option>
+                    {voters
+                      .filter(v => v.label.toLowerCase().includes(voteSearch.toLowerCase()))
+                      .map(v => (
+                      <option key={`${v.type}:${v.id}`} value={`${v.type}:${v.id}`}>{v.label}</option>
                     ))}
                   </select>
                 </div>
 
-                {adminVoteForm.student_id && (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 24, marginTop: 24, borderTop: '1px solid #f3f4f6', paddingTop: 24 }}>
-                    {currentPositions.map(pos => {
-                      const posCands = currentCandidates.filter(c => c.position_id === pos.id && c.status === 'approved')
-                      const myVoteForPos = currentVotes.find(v => v.position_id === pos.id && v.voter_student_id === adminVoteForm.student_id)
+                {adminVoteForm.voter_id && (
+                  <div style={{ marginTop: 24, borderTop: '1px solid #f3f4f6', paddingTop: 24 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                      <div>
+                        <h3 style={{ fontSize: 16, fontWeight: 700 }}>Ballot Selections</h3>
+                        <p style={{ fontSize: 12, color: '#6b7280' }}>{Object.keys(ballotSelections).length} positions marked</p>
+                      </div>
+                      <button 
+                        style={{ ...styles.btn, background: Object.keys(ballotSelections).length > 0 ? 'linear-gradient(135deg, #059669, #10b981)' : '#9ca3af' }}
+                        disabled={Object.keys(ballotSelections).length === 0}
+                        onClick={submitProxyBallot}
+                      >
+                        Submit All & Next Voter
+                      </button>
+                    </div>
 
-                      return (
-                        <div key={pos.id} style={{ padding: 16, borderRadius: 8, border: myVoteForPos ? '2px solid #16a34a' : '1px solid #e5e7eb' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, borderBottom: '1px solid #f3f4f6', paddingBottom: 8 }}>
-                            <h3 style={{ fontSize: 16, fontWeight: 600 }}>{pos.title}</h3>
-                            {myVoteForPos && <span style={{ color: '#16a34a', fontSize: 12, fontWeight: 700 }}>✅ Voted</span>}
-                          </div>
-                          
-                          {posCands.length > 0 ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                              {posCands.map(cand => {
-                                const isVotedFor = myVoteForPos?.candidate_id === cand.id
-                                return (
-                                  <div key={cand.id} style={{ padding: 12, border: '1px solid #e5e7eb', borderRadius: 8, background: isVotedFor ? '#f0fdf4' : '#fff' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                      <div style={{ fontWeight: 600, fontSize: 14 }}>{(cand.student as any)?.full_name}</div>
-                                      {!myVoteForPos && (
-                                        <button style={{ ...styles.btnOutline, padding: '4px 12px', fontSize: 12, borderColor: '#6d28d9', color: '#6d28d9' }} 
-                                          onClick={() => adminCastVote(adminVoteForm.student_id, pos.id, cand.id)}
-                                        >
-                                          Vote
-                                        </button>
-                                      )}
-                                    </div>
-                                  </div>
-                                )
-                              })}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 24 }}>
+                      {currentPositions.map(pos => {
+                        const posCands = currentCandidates.filter(c => c.position_id === pos.id && c.status === 'approved')
+                        const myVoteForPos = currentVotes.find(v => 
+                          v.position_id === pos.id && 
+                          (adminVoteForm.voter_type === 'student' ? v.voter_student_id === adminVoteForm.voter_id : v.voter_teacher_id === adminVoteForm.voter_id)
+                        )
+                        const currentSelection = ballotSelections[pos.id]
+
+                        return (
+                          <div key={pos.id} style={{ padding: 16, borderRadius: 12, border: myVoteForPos ? '2px solid #16a34a' : (currentSelection ? '2px solid #6d28d9' : '1px solid #e5e7eb'), background: '#fff' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, borderBottom: '1px solid #f3f4f6', paddingBottom: 8, alignItems: 'center' }}>
+                              <h3 style={{ fontSize: 15, fontWeight: 600 }}>{pos.title}</h3>
+                              {myVoteForPos && (
+                                <button 
+                                  style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: 11, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
+                                  onClick={() => adminCancelVote(myVoteForPos.id)}
+                                >
+                                  Cancel Vote
+                                </button>
+                              )}
                             </div>
-                          ) : (
-                            <p style={{ fontSize: 13, color: '#6b7280' }}>No candidates available.</p>
-                          )}
-                        </div>
-                      )
-                    })}
+                            
+                            {posCands.length > 0 ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                {posCands.map(cand => {
+                                  const isVoted = myVoteForPos?.candidate_id === cand.id
+                                  const isSelected = currentSelection === cand.id
+                                  
+                                  return (
+                                    <div 
+                                      key={cand.id} 
+                                      onClick={() => {
+                                        if (myVoteForPos) return
+                                        setBallotSelections(prev => ({ ...prev, [pos.id]: cand.id }))
+                                      }}
+                                      style={{ 
+                                        padding: 12, border: '1.5px solid', 
+                                        borderColor: isVoted ? '#16a34a' : (isSelected ? '#6d28d9' : '#e5e7eb'),
+                                        borderRadius: 10, 
+                                        background: isVoted ? '#f0fdf4' : (isSelected ? '#f5f3ff' : '#fff'),
+                                        cursor: myVoteForPos ? 'default' : 'pointer',
+                                        transition: 'all 0.2s'
+                                      }}
+                                    >
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ fontWeight: 600, fontSize: 14 }}>{cand.teacher?.full_name || cand.student?.full_name}</div>
+                                        {(isVoted || isSelected) && <span style={{ color: isVoted ? '#16a34a' : '#6d28d9', fontSize: 12, fontWeight: 700 }}>{isVoted ? '✅' : '🎯'}</span>}
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            ) : (
+                              <p style={{ fontSize: 13, color: '#6b7280' }}>No candidates available.</p>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
@@ -659,7 +830,7 @@ export default function AdminElectionsPage() {
           <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Vet Candidate</h3>
             <p style={{ fontSize: 14, color: '#374151', marginBottom: 16, fontWeight: 600 }}>
-              {(vettingCandidate.student as any)?.full_name} — {currentPositions.find(p => p.id === vettingCandidate.position_id)?.title}
+              {vettingCandidate.teacher?.full_name || vettingCandidate.student?.full_name} — {currentPositions.find(p => p.id === vettingCandidate.position_id)?.title}
             </p>
             
             {vettingCandidate.manifesto && (
@@ -712,22 +883,26 @@ export default function AdminElectionsPage() {
             <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Proxy Nomination</h3>
             
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Select Student</label>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Select Nominee (Student or Teacher)</label>
               <input 
                 type="text" 
-                placeholder="Search student name..." 
+                placeholder="Search name..." 
                 value={nominateSearch} onChange={e => setNominateSearch(e.target.value)}
                 style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #d1d5db', marginBottom: 8, fontSize: 13 }}
               />
               <select 
-                value={adminNominateForm.student_id} onChange={e => setAdminNominateForm({...adminNominateForm, student_id: e.target.value})}
+                value={`${adminNominateForm.nominee_type}:${adminNominateForm.nominee_id}`} 
+                onChange={e => {
+                  const [type, id] = e.target.value.split(':')
+                  setAdminNominateForm({...adminNominateForm, nominee_type: type as any, nominee_id: id})
+                }}
                 style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #d1d5db' }}
               >
-                <option value="">-- Select Student --</option>
-                {students
-                  .filter(s => s.full_name.toLowerCase().includes(nominateSearch.toLowerCase()) || s.student_id?.toLowerCase().includes(nominateSearch.toLowerCase()))
-                  .map(s => (
-                  <option key={s.id} value={s.id}>{s.full_name} {s.student_id ? `(${s.student_id})` : ''}</option>
+                <option value="">-- Select Nominee --</option>
+                {voters
+                  .filter(v => v.label.toLowerCase().includes(nominateSearch.toLowerCase()))
+                  .map(v => (
+                  <option key={`${v.type}:${v.id}`} value={`${v.type}:${v.id}`}>{v.label}</option>
                 ))}
               </select>
             </div>
@@ -756,7 +931,7 @@ export default function AdminElectionsPage() {
             
             <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
               <button style={styles.btnOutline} onClick={() => setShowAdminNominateModal(false)}>Cancel</button>
-              <button style={styles.btn} onClick={adminNominateStudent}>Submit Nomination</button>
+              <button style={styles.btn} onClick={adminNominateCandidate}>Submit Nomination</button>
             </div>
           </div>
         </div>

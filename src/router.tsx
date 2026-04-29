@@ -71,6 +71,7 @@ import AdminTestAnalytics from './pages/admin/AdminTestAnalytics'
 import AssessmentsPage from './pages/admin/AssessmentsPage'
 import BECEProcessorPage from './pages/admin/BECEProcessorPage'
 import BECEMasterPage from './pages/admin/BECEMasterPage'
+import TeacherElectionsHubPage from './pages/teacher/TeacherElectionsHub'
 
 // Election Pages
 import AdminElectionsPage from './pages/admin/ElectionsPage'
@@ -197,6 +198,7 @@ export const router = createBrowserRouter([
           { path: 'agenda', element: <TeacherAgendaPage /> },
           { path: 'typing-game', element: <TypingGamePage /> },
           { path: 'class-tests', element: <ClassTestsPage /> },
+          { path: 'elections-hub', element: <TeacherElectionsHubPage /> },
         ],
       },
 
