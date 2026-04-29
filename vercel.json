@@ -1,11 +1,4 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "routes": [
-    { "src": "/(.*)\\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|json|txt)", "dest": "/$1.$2" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
-  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

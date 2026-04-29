@@ -100,17 +100,18 @@ export default function StudentElectionsPage() {
   const activeElection = elections[0] // Assume latest active election
 
   const styles = {
-    btn: { padding: '8px 16px', borderRadius: 8, border: 'none', background: '#6d28d9', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 13 },
-    btnOutline: { padding: '8px 16px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', color: '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13 },
-    card: { background: '#fff', borderRadius: 12, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f3f4f6' },
-    tabBtn: (active: boolean) => ({ padding: '8px 16px', borderRadius: 8, border: 'none', background: active ? '#f5f3ff' : 'transparent', color: active ? '#6d28d9' : '#6b7280', cursor: 'pointer', fontWeight: 600, fontSize: 14 })
+    btn: { padding: '10px 20px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(109,40,217,0.2)' },
+    btnOutline: { padding: '10px 20px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' },
+    card: { background: '#fff', borderRadius: 16, padding: 28, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #f3f4f6', transition: 'all 0.3s' },
+    tabBtn: (active: boolean) => ({ padding: '10px 20px', borderRadius: 12, border: 'none', background: active ? '#f5f3ff' : 'transparent', color: active ? '#6d28d9' : '#6b7280', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' })
   }
 
   if (!activeElection) {
     return (
-      <div style={{ padding: 40, textAlign: 'center', background: '#fff', borderRadius: 12, border: '1px solid #f3f4f6' }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>No Active Elections</h2>
-        <p style={{ color: '#6b7280' }}>There are currently no active prefectorial elections running.</p>
+      <div style={{ padding: 60, textAlign: 'center', background: '#fff', borderRadius: 16, border: '1px solid #f3f4f6', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', animation: '_fadeIn 0.4s ease' }}>
+        <style>{`@keyframes _fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: '#111827' }}>No Active Elections</h2>
+        <p style={{ color: '#6b7280', fontSize: 16 }}>There are currently no active prefectorial elections running.</p>
       </div>
     )
   }
@@ -120,17 +121,26 @@ export default function StudentElectionsPage() {
   const myNominations = elCandidates.filter(c => c.student_id === studentId)
 
   return (
-    <div style={{ paddingBottom: 60 }}>
-      <div style={{ marginBottom: 24 }}>
+    <div style={{ paddingBottom: 80, animation: '_fadeIn 0.4s ease' }}>
+      <style>{`
+        @keyframes _fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes _slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .hover-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important; border-color: #ddd6fe !important; }
+        .hover-cand:hover { background: #f9fafb !important; border-color: #ddd6fe !important; }
+        .hover-btn:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 16px rgba(109,40,217,0.3) !important; }
+        .tab-content { animation: _slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      `}</style>
+      <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111827', margin: 0 }}>Student Elections Hub</h1>
         <p style={{ color: '#6b7280', marginTop: 4, fontSize: 14 }}>{activeElection.title}</p>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24, background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #f3f4f6', width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 32, background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #f3f4f6', width: 'fit-content' }}>
         <button style={styles.tabBtn(tab === 'nominate')} onClick={() => setTab('nominate')}>Stand for Position</button>
         <button style={styles.tabBtn(tab === 'vote')} onClick={() => setTab('vote')}>Vote</button>
       </div>
 
+      <div className="tab-content" key={tab}>
       {tab === 'nominate' && (
         <div style={styles.card}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -199,14 +209,14 @@ export default function StudentElectionsPage() {
                       {posCands.map(cand => {
                         const isVotedFor = myVoteForPos?.candidate_id === cand.id
                         return (
-                          <div key={cand.id} style={{ padding: 12, border: '1px solid #e5e7eb', borderRadius: 8, background: isVotedFor ? '#f0fdf4' : '#fff' }}>
+                          <div key={cand.id} className="hover-cand" style={{ padding: 16, border: '1px solid #e5e7eb', borderRadius: 12, background: isVotedFor ? '#f0fdf4' : '#fff', transition: 'all 0.2s' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                               <div>
-                                <div style={{ fontWeight: 600, fontSize: 14 }}>{(cand.student as any)?.full_name}</div>
-                                {cand.manifesto && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>{cand.manifesto.substring(0, 80)}...</div>}
+                                <div style={{ fontWeight: 600, fontSize: 15 }}>{(cand.student as any)?.full_name}</div>
+                                {cand.manifesto && <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4, lineHeight: 1.5 }}>{cand.manifesto.substring(0, 120)}...</div>}
                               </div>
                               {activeElection.voting_open && !myVoteForPos && (
-                                <button style={{ ...styles.btnOutline, padding: '4px 12px', fontSize: 12, borderColor: '#6d28d9', color: '#6d28d9' }} onClick={() => castVote(activeElection.id, pos.id, cand.id)}>Vote</button>
+                                <button className="hover-btn" style={{ ...styles.btnOutline, padding: '6px 16px', fontSize: 13, borderColor: '#6d28d9', color: '#6d28d9' }} onClick={() => castVote(activeElection.id, pos.id, cand.id)}>Vote</button>
                               )}
                             </div>
                           </div>
@@ -214,7 +224,7 @@ export default function StudentElectionsPage() {
                       })}
                     </div>
                   ) : (
-                    <p style={{ fontSize: 13, color: '#6b7280' }}>No candidates available.</p>
+                    <p style={{ fontSize: 14, color: '#6b7280' }}>No candidates available.</p>
                   )}
                 </div>
               )
@@ -222,6 +232,7 @@ export default function StudentElectionsPage() {
           </div>
         </div>
       )}
+      </div>
 
       {/* Nominate Modal */}
       {showNominateModal && (

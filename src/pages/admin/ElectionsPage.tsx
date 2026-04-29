@@ -188,6 +188,75 @@ export default function AdminElectionsPage() {
     }
   }
 
+  const printResults = () => {
+    if (!selectedElection) return toast.error('No election selected')
+    
+    const school = user?.school as any
+    const logoHtml = school?.logo_url ? `<img src="${school.logo_url}" alt="School Logo" style="max-height: 80px; margin-bottom: 10px;" />` : ''
+    const schoolName = school?.name || 'Prefectorial Electoral Commission'
+    
+    let html = `
+      <html>
+        <head>
+          <title>${selectedElection.title} - Results</title>
+          <style>
+            body { font-family: sans-serif; padding: 20px; color: #111827; font-size: 12px; }
+            .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; }
+            .header h1 { margin: 0; font-size: 18px; color: #1f2937; }
+            .header h2 { margin: 5px 0 0 0; font-size: 14px; color: #4b5563; font-weight: normal; }
+            .pos-block { margin-bottom: 15px; page-break-inside: avoid; }
+            .pos-title { font-size: 13px; font-weight: bold; background: #f3f4f6; padding: 6px 10px; border-radius: 4px; border: 1px solid #e5e7eb; }
+            table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+            th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid #e5e7eb; }
+            th { font-weight: 600; color: #4b5563; background: #f9fafb; }
+            .winner { background: #f0fdfa; font-weight: bold; color: #0f766e; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            ${logoHtml}
+            <h1>${schoolName}</h1>
+            <h2>${selectedElection.title} - Official Results</h2>
+          </div>
+    `
+
+    currentPositions.forEach(pos => {
+      const posCands = currentCandidates.filter(c => c.position_id === pos.id && c.status === 'approved')
+      const posVotes = currentVotes.filter(v => v.position_id === pos.id)
+      const tallies = posCands.map(c => {
+        const count = posVotes.filter(v => v.candidate_id === c.id).length
+        return { cand: c, count }
+      }).sort((a, b) => b.count - a.count)
+
+      html += `<div class="pos-block"><div class="pos-title">${pos.title} (Max Winners: ${pos.max_winners})</div>`
+      if (tallies.length > 0) {
+        html += `<table><thead><tr><th>Candidate</th><th>Votes</th><th>Percentage</th></tr></thead><tbody>`
+        tallies.forEach((t, idx) => {
+          const percentage = posVotes.length > 0 ? Math.round((t.count / posVotes.length) * 100) : 0
+          const isWinner = pos.max_winners > 0 && idx < pos.max_winners && t.count > 0
+          html += `<tr class="${isWinner ? 'winner' : ''}">
+            <td>${isWinner ? '🏆 ' : ''}${(t.cand.student as any)?.full_name}</td>
+            <td>${t.count}</td>
+            <td>${percentage}%</td>
+          </tr>`
+        })
+        html += `</tbody></table>`
+      } else {
+        html += `<p style="padding: 6px 10px; margin: 0; color: #6b7280;">No candidates or votes.</p>`
+      }
+      html += `</div>`
+    })
+
+    html += `</body></html>`
+
+    const win = window.open('', '_blank', 'width=800,height=900')
+    if (win) {
+      win.document.write(html)
+      win.document.close()
+      setTimeout(() => win.print(), 500)
+    }
+  }
+
   if (loading) return <div style={{ padding: 40, textAlign: 'center' }}>Loading elections...</div>
 
   const selectedElection = elections.find(e => e.id === selectedElectionId)
@@ -196,15 +265,23 @@ export default function AdminElectionsPage() {
   const currentVotes = votes.filter(v => v.election_id === selectedElectionId)
 
   const styles = {
-    btn: { padding: '8px 16px', borderRadius: 8, border: 'none', background: '#6d28d9', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 13 },
-    btnOutline: { padding: '8px 16px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', color: '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13 },
-    card: { background: '#fff', borderRadius: 12, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f3f4f6' },
-    tabBtn: (active: boolean) => ({ padding: '8px 16px', borderRadius: 8, border: 'none', background: active ? '#f5f3ff' : 'transparent', color: active ? '#6d28d9' : '#6b7280', cursor: 'pointer', fontWeight: 600, fontSize: 14 })
+    btn: { padding: '10px 20px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(109,40,217,0.2)' },
+    btnOutline: { padding: '10px 20px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' },
+    card: { background: '#fff', borderRadius: 16, padding: 28, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #f3f4f6', transition: 'all 0.3s' },
+    tabBtn: (active: boolean) => ({ padding: '10px 20px', borderRadius: 12, border: 'none', background: active ? '#f5f3ff' : 'transparent', color: active ? '#6d28d9' : '#6b7280', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' })
   }
 
   return (
-    <div style={{ paddingBottom: 60 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+    <div style={{ paddingBottom: 80, animation: '_fadeIn 0.4s ease' }}>
+      <style>{`
+        @keyframes _fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes _slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .hover-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important; border-color: #ddd6fe !important; }
+        .hover-btn:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 16px rgba(109,40,217,0.3) !important; }
+        .hover-btn-outline:hover { background: #f9fafb !important; border-color: #d1d5db !important; }
+        .tab-content { animation: _slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      `}</style>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111827', margin: 0 }}>Prefectorial Electoral Commission</h1>
           <p style={{ color: '#6b7280', marginTop: 4, fontSize: 14 }}>Manage student elections, positions, and vetting</p>
@@ -226,9 +303,10 @@ export default function AdminElectionsPage() {
         <button style={styles.tabBtn(tab === 'elections')} onClick={() => setTab('elections')}>Manage Elections</button>
         <button style={styles.tabBtn(tab === 'candidates')} onClick={() => setTab('candidates')}>Candidates & Vetting</button>
         <button style={styles.tabBtn(tab === 'results')} onClick={() => setTab('results')}>Live Results</button>
-        <button style={styles.tabBtn(tab === 'proxy')} onClick={() => setTab('proxy')}>Proxy Actions</button>
+        <button className="hover-btn-outline" style={styles.tabBtn(tab === 'proxy')} onClick={() => setTab('proxy')}>Proxy Actions</button>
       </div>
 
+      <div className="tab-content" key={tab}>
       {tab === 'overview' && (
         <div>
           {selectedElection ? (
@@ -385,8 +463,15 @@ export default function AdminElectionsPage() {
       )}
 
       {tab === 'results' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 24 }}>
-          {currentPositions.map(pos => {
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 600 }}>Live Results Overview</h2>
+            <button style={{ ...styles.btnOutline, display: 'flex', alignItems: 'center', gap: 6 }} onClick={printResults}>
+              🖨️ Print Results
+            </button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 24 }}>
+            {currentPositions.map(pos => {
             const posCands = currentCandidates.filter(c => c.position_id === pos.id && c.status === 'approved')
             const posVotes = currentVotes.filter(v => v.position_id === pos.id)
             
@@ -426,6 +511,7 @@ export default function AdminElectionsPage() {
             )
           })}
           {currentPositions.length === 0 && <p style={{ fontSize: 14, color: '#6b7280', padding: 20 }}>No positions created yet.</p>}
+          </div>
         </div>
       )}
 
@@ -517,6 +603,7 @@ export default function AdminElectionsPage() {
           )}
         </div>
       )}
+      </div>
 
       {/* Modals */}
       {showElectionModal && (
