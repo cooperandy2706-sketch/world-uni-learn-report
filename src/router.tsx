@@ -71,6 +71,11 @@ import AssessmentsPage from './pages/admin/AssessmentsPage'
 import BECEProcessorPage from './pages/admin/BECEProcessorPage'
 import BECEMasterPage from './pages/admin/BECEMasterPage'
 
+// Election Pages
+import AdminElectionsPage from './pages/admin/ElectionsPage'
+import StudentElectionsPage from './pages/student/ElectionsPage'
+import StaffElectionsPage from './pages/staff/ElectionsPage'
+
 // Bursar pages
 import BursarDashboard from './pages/bursar/DashboardPage'
 import BursarFeesPage from './pages/bursar/FeesPage'
@@ -141,6 +146,7 @@ export const router = createBrowserRouter([
           { path: 'assessments', element: <AssessmentsPage /> },
           { path: 'bece-processor', element: <BECEProcessorPage /> },
           { path: 'bece-master', element: <BECEMasterPage /> },
+          { path: 'elections', element: <AdminElectionsPage /> },
         ],
       },
       {
@@ -221,6 +227,7 @@ export const router = createBrowserRouter([
           { path: 'subjects/:id', element: <StudentSubjectDetailsPage /> },
           { path: 'typing-game', element: <TypingGamePage /> },
           { path: 'library', element: <StudentLibraryPage /> },
+          { path: 'elections', element: <StudentElectionsPage /> },
         ],
       },
       {
@@ -229,6 +236,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="/staff/dashboard" replace /> },
           { path: 'dashboard', element: <StaffDashboard /> },
+          { path: 'elections', element: <StaffElectionsPage /> },
         ],
       },
       { path: '*', element: <NotFoundPage /> },

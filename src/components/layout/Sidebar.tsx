@@ -13,7 +13,7 @@ import {
   ChevronLeft, ChevronRight, Wallet, Banknote, Receipt, TrendingDown,
   TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag,
   Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap,
-  Smartphone, Calculator, Grid
+  Smartphone, Calculator, Grid, Vote
 } from 'lucide-react'
 
 const adminLinks = [
@@ -43,6 +43,7 @@ const adminLinks = [
   { to: '/admin/assessments', label: 'Assessment Entry', icon: ClipboardList },
   { to: '/admin/bece-processor', label: 'BECE CA Processor', icon: Calculator },
   { to: '/admin/bece-master', label: 'BECE Master Sheet', icon: Grid },
+  { to: '/admin/elections', label: 'Elections (PEC)', icon: Vote },
   { to: ROUTES.ADMIN_SMS, label: 'SMS Messaging', icon: Smartphone },
 ]
 
@@ -81,6 +82,7 @@ const studentLinks = [
   { to: ROUTES.STUDENT_ASSIGNMENTS, label: 'Assignments', icon: ClipboardList },
   { to: ROUTES.STUDENT_LIBRARY, label: 'Global Library', icon: Library },
   { to: ROUTES.STUDENT_RESULTS, label: 'Academic Results', icon: BarChart3 },
+  { to: '/student/elections', label: 'Elections', icon: Vote },
   { to: ROUTES.STUDENT_SCHEDULE, label: 'My Schedule', icon: Calendar },
   { to: ROUTES.STUDENT_TYPING_GAME, label: 'Typing Nitro', icon: Gamepad2 },
 ]
@@ -99,6 +101,11 @@ const bursarLinks = [
   { to: ROUTES.BURSAR_REPORTS, label: 'Financial Reports', icon: FileSpreadsheet },
   { to: ROUTES.BURSAR_ANALYTICS, label: 'Analytics', icon: BarChart3 },
   { to: ROUTES.BURSAR_SMS, label: 'SMS Reminders', icon: Smartphone },
+]
+
+const staffLinks = [
+  { to: '/staff/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/staff/elections', label: 'Elections (PEC)', icon: Vote },
 ]
 
 // ── Logo Mark ────────────────────────────
@@ -123,6 +130,7 @@ function LogoMark() {
 
 export default function Sidebar() {
   const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
+  const isStaff = user?.role === 'staff'
 
   // Check if teacher is allowed to collect daily fees
   const { data: collectorAuth, isLoading: loadingAuth } = useQuery({
@@ -161,7 +169,7 @@ export default function Sidebar() {
     return () => clearInterval(interval)
   }, [user?.id, isStudent, isBursar])
 
-  let links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : teacherLinks
+  let links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : isStaff ? staffLinks : teacherLinks
 
   // Hide daily collections from unauthorized teachers
   if (isTeacher && !loadingAuth && !collectorAuth) {

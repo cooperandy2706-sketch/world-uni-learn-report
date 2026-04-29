@@ -308,3 +308,54 @@ export interface ClassTestScore {
   score_attained: number
   created_at: string
 }
+
+export interface Election {
+  id: string
+  school_id: string
+  title: string
+  academic_year_id?: string
+  nomination_open: boolean
+  voting_open: boolean
+  is_archived: boolean
+  created_by?: string
+  created_at: string
+}
+
+export interface ElectionPosition {
+  id: string
+  election_id: string
+  school_id: string
+  title: string
+  max_winners: number
+  created_at: string
+}
+
+export interface ElectionCandidate {
+  id: string
+  election_id: string
+  position_id: string
+  student_id: string
+  school_id: string
+  manifesto?: string
+  photo_url?: string
+  status: 'pending' | 'approved' | 'rejected'
+  vet_score?: number
+  vet_notes?: string
+  vetted_by?: string
+  vetted_at?: string
+  created_at: string
+  // joined
+  student?: Student
+  position?: ElectionPosition
+  vetted_by_user?: User
+}
+
+export interface ElectionVote {
+  id: string
+  election_id: string
+  position_id: string
+  candidate_id: string
+  voter_student_id: string
+  school_id: string
+  created_at: string
+}
