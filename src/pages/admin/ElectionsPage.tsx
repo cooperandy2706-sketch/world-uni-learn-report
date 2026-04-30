@@ -16,7 +16,7 @@ export default function AdminElectionsPage() {
   const [teachers, setTeachers] = useState<any[]>([])
   const [voters, setVoters] = useState<any[]>([])
   
-  const [tab, setTab] = useState<'overview' | 'elections' | 'candidates' | 'results' | 'proxy'>('overview')
+  const [tab, setTab] = useState<'overview' | 'elections' | 'candidates' | 'results' | 'proxy' | 'appointments'>('overview')
   const [selectedElectionId, setSelectedElectionId] = useState<string>('')
   
   // Modals
@@ -210,6 +210,20 @@ export default function AdminElectionsPage() {
     }
   }
 
+  const toggleAppointment = async (candidateId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase.from('election_candidates').update({ 
+        is_appointed: !currentStatus,
+        appointed_at: !currentStatus ? new Date().toISOString() : null
+      }).eq('id', candidateId)
+      if (error) throw error
+      toast.success(currentStatus ? 'Appointment retracted' : 'Candidate appointed successfully')
+      loadData()
+    } catch (err: any) {
+      toast.error(err.message)
+    }
+  }
+
   const submitProxyBallot = async () => {
     if (!adminVoteForm.voter_id) return
     const selectionCount = Object.keys(ballotSelections).length
@@ -377,6 +391,103 @@ export default function AdminElectionsPage() {
     }
   }
 
+  const printAppointments = () => {
+    if (!selectedElection) return toast.error('No election selected')
+    
+    const school = user?.school as any
+    const logoHtml = school?.logo_url ? `<img src="${school.logo_url}" alt="School Logo" style="max-height: 80px; margin-bottom: 10px;" />` : ''
+    const schoolName = school?.name || 'Prefectorial Electoral Commission'
+    
+    let html = `
+      <html>
+        <head>
+          <title>${selectedElection.title} - Appointments</title>
+          <style>
+            body { font-family: sans-serif; padding: 40px; color: #111827; font-size: 14px; line-height: 1.6; }
+            .header { text-align: center; margin-bottom: 40px; border-bottom: 3px double #e5e7eb; padding-bottom: 20px; }
+            .header h1 { margin: 0; font-size: 24px; color: #1f2937; text-transform: uppercase; letter-spacing: 1px; }
+            .header h2 { margin: 10px 0 0 0; font-size: 18px; color: #4b5563; font-weight: 600; }
+            .intro { margin-bottom: 30px; text-align: justify; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { text-align: left; padding: 12px 15px; border: 1px solid #e5e7eb; }
+            th { background: #f9fafb; font-weight: 700; color: #374151; text-transform: uppercase; font-size: 12px; }
+            .pos-col { font-weight: 700; color: #6d28d9; width: 40%; }
+            .name-col { font-weight: 700; font-size: 16px; }
+            .footer { margin-top: 60px; display: flex; justify-content: space-between; }
+            .sign-box { border-top: 1px solid #000; width: 200px; text-align: center; padding-top: 8px; font-weight: 600; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            ${logoHtml}
+            <h1>${schoolName}</h1>
+            <h2>OFFICIAL APPOINTMENTS REPORT</h2>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">Election: ${selectedElection.title} | Academic Year: ${school.current_academic_year || 'N/A'}</div>
+          </div>
+
+          <div class="intro">
+            The Prefectorial Electoral Commission (PEC), following the conclusion of the electoral process and vetting procedures, 
+            hereby formally announces the following appointments for the upcoming leadership term. These appointments are official 
+            and binding as per the school's electoral guidelines.
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Position / Portfolio</th>
+                <th>Appointee Name</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+    `
+
+    currentPositions.forEach(pos => {
+      const appointees = currentCandidates.filter(c => c.position_id === pos.id && c.is_appointed)
+      if (appointees.length > 0) {
+        appointees.forEach(a => {
+          html += `
+            <tr>
+              <td class="pos-col">${pos.title}</td>
+              <td class="name-col">${a.teacher?.full_name || a.student?.full_name}</td>
+              <td>${a.teacher_id ? 'Teacher' : 'Student'}</td>
+            </tr>
+          `
+        })
+      } else {
+        html += `
+          <tr>
+            <td class="pos-col">${pos.title}</td>
+            <td colspan="2" style="color: #9ca3af; font-style: italic;">No appointment made for this position.</td>
+          </tr>
+        `
+      }
+    })
+
+    html += `
+            </tbody>
+          </table>
+
+          <div class="footer">
+            <div class="sign-box">Election Commissioner</div>
+            <div class="sign-box">Head of Institution</div>
+          </div>
+          
+          <div style="text-align: center; margin-top: 40px; font-size: 10px; color: #9ca3af;">
+            Generated on ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
+          </div>
+        </body>
+      </html>
+    `
+
+    const win = window.open('', '_blank', 'width=900,height=1000')
+    if (win) {
+      win.document.write(html)
+      win.document.close()
+      setTimeout(() => win.print(), 500)
+    }
+  }
+
   if (loading) return <div style={{ padding: 40, textAlign: 'center' }}>Loading elections...</div>
 
   const selectedElection = elections.find(e => e.id === selectedElectionId)
@@ -423,6 +534,7 @@ export default function AdminElectionsPage() {
         <button style={styles.tabBtn(tab === 'elections')} onClick={() => setTab('elections')}>Manage Elections</button>
         <button style={styles.tabBtn(tab === 'candidates')} onClick={() => setTab('candidates')}>Candidates & Vetting</button>
         <button style={styles.tabBtn(tab === 'results')} onClick={() => setTab('results')}>Live Results</button>
+        <button style={styles.tabBtn(tab === 'appointments')} onClick={() => setTab('appointments')}>Appointments</button>
         <button className="hover-btn-outline" style={styles.tabBtn(tab === 'proxy')} onClick={() => setTab('proxy')}>Proxy Actions</button>
       </div>
 
@@ -641,6 +753,75 @@ export default function AdminElectionsPage() {
             )
           })}
           {currentPositions.length === 0 && <p style={{ fontSize: 14, color: '#6b7280', padding: 20 }}>No positions created yet.</p>}
+          </div>
+        </div>
+      )}
+
+      {tab === 'appointments' && (
+        <div style={{ animation: '_slideUp 0.4s ease' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div>
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: '#111827' }}>Official Appointments</h2>
+              <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>Manually appoint candidates to positions regardless of vote counts.</p>
+            </div>
+            <button onClick={printAppointments} style={{ ...styles.btn, background: 'linear-gradient(135deg, #059669, #10b981)' }}>
+              🖨️ Print Appointment List
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: 24 }}>
+            {currentPositions.map(pos => {
+              const posCands = currentCandidates.filter(c => c.position_id === pos.id && c.status === 'approved')
+              const posVotes = currentVotes.filter(v => v.position_id === pos.id)
+              const appointees = posCands.filter(c => c.is_appointed)
+              
+              return (
+                <div key={pos.id} style={{ ...styles.card, border: appointees.length > 0 ? '2px solid #10b981' : '1px solid #f3f4f6' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid #f3f4f6', paddingBottom: 12 }}>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>{pos.title}</h3>
+                    <span style={{ fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 99, background: '#f0fdf4', color: '#16a34a' }}>
+                      {appointees.length} / {pos.max_winners} Appointed
+                    </span>
+                  </div>
+
+                  {posCands.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {posCands.map(cand => {
+                        const voteCount = posVotes.filter(v => v.candidate_id === cand.id).length
+                        return (
+                          <div key={cand.id} style={{ 
+                            padding: 14, borderRadius: 12, border: '1px solid', 
+                            borderColor: cand.is_appointed ? '#10b981' : '#f3f4f6',
+                            background: cand.is_appointed ? '#f0fdf4' : '#fff'
+                          }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <div>
+                                <div style={{ fontWeight: 700, fontSize: 15 }}>{cand.teacher?.full_name || cand.student?.full_name}</div>
+                                <div style={{ fontSize: 12, color: '#6b7280' }}>
+                                  {voteCount} votes · {cand.teacher_id ? 'Teacher' : 'Student'}
+                                </div>
+                              </div>
+                              <button 
+                                onClick={() => toggleAppointment(cand.id, cand.is_appointed || false)}
+                                style={{ 
+                                  padding: '6px 14px', borderRadius: 8, border: 'none',
+                                  background: cand.is_appointed ? '#dc2626' : '#10b981',
+                                  color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer'
+                                }}
+                              >
+                                {cand.is_appointed ? 'Retract' : 'Appoint'}
+                              </button>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ) : (
+                    <p style={{ color: '#9ca3af', fontSize: 14, textAlign: 'center', padding: '20px 0' }}>No approved candidates.</p>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
