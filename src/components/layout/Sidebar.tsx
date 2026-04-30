@@ -11,13 +11,20 @@ import {
   Target, ClipboardCheck, PencilLine, Bell, Timer, ClipboardList,
   MessageSquare, Trophy, ShieldCheck, LogOut, Book,
   ChevronLeft, ChevronRight, Wallet, Banknote, Receipt, TrendingDown,
-  TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag,
+  TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag, ChevronDown,
   Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap,
-  Smartphone, Calculator, Grid, Vote, Image, UserPlus
+  Smartphone, Calculator, Grid, Vote, Image, UserPlus, Heart, Search, ArrowUpRight
 } from 'lucide-react'
 
 const adminLinks = [
+  { header: 'General' },
   { to: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
+  { to: ROUTES.ADMIN_MESSAGES, label: 'Messages', icon: MessageSquare },
+  { to: ROUTES.ADMIN_ANALYTICS, label: 'Analytics', icon: BarChart3 },
+  { to: ROUTES.ADMIN_PERFORMANCE, label: 'Performance Hub', icon: TrendingUp },
+  { to: '/admin/test-analytics', label: 'Test Trends', icon: TrendingUp },
+
+  { header: 'Management' },
   { to: ROUTES.ADMIN_STUDENTS, label: 'Students', icon: Users },
   { to: ROUTES.ADMIN_TEACHERS, label: 'Teachers', icon: UserCheck },
   { to: ROUTES.ADMIN_OTHER_STAFF, label: 'Other Staff', icon: Users },
@@ -25,46 +32,54 @@ const adminLinks = [
   { to: ROUTES.ADMIN_CLASSES, label: 'Classes', icon: School },
   { to: ROUTES.ADMIN_SUBJECTS, label: 'Subjects', icon: BookOpen },
   { to: ROUTES.ADMIN_DEPARTMENTS, label: 'Departments', icon: Building2 },
-  { to: ROUTES.ADMIN_ACADEMIC_YEARS, label: 'Academic Years', icon: Calendar },
-  { to: ROUTES.ADMIN_TERMS, label: 'Terms', icon: Calendar },
+  { to: '/admin/admissions', label: 'Admissions', icon: GraduationCap },
+
+  { header: 'Academics' },
   { to: ROUTES.ADMIN_REPORTS, label: 'Reports', icon: FileSpreadsheet },
-  { to: ROUTES.ADMIN_ANALYTICS, label: 'Analytics', icon: BarChart3 },
-  { to: '/admin/test-analytics', label: 'Test Trends', icon: TrendingUp },
-  { to: ROUTES.ADMIN_PERFORMANCE, label: 'Performance Hub', icon: TrendingUp },
-  { to: ROUTES.ADMIN_SETTINGS, label: 'Settings', icon: Settings },
+  { to: ROUTES.ADMIN_ATTENDANCE, label: 'Attendance', icon: ClipboardCheck },
   { to: ROUTES.ADMIN_TIMETABLE, label: 'Timetable', icon: Calendar },
-  { to: ROUTES.ADMIN_ANNOUNCEMENTS, label: 'Announcements', icon: Megaphone },
   { to: ROUTES.ADMIN_SYLLABUS, label: 'Syllabus', icon: Book },
   { to: ROUTES.ADMIN_WEEKLY_GOALS, label: 'Weekly Goals', icon: Target },
-  { to: ROUTES.ADMIN_ATTENDANCE, label: 'Attendance', icon: ClipboardCheck },
-  { to: ROUTES.ADMIN_MESSAGES, label: 'Messages', icon: MessageSquare },
   { to: '/admin/agenda', label: 'Term Agenda', icon: ClipboardList },
-  { to: '/admin/admissions', label: 'Admissions', icon: GraduationCap },
-  { to: '/admin/assessments', label: 'Assessment Entry', icon: ClipboardList },
+
+  { header: 'Tools' },
+  { to: ROUTES.ADMIN_VISITORS, label: 'Visitors Record', icon: UserPlus },
+  { to: ROUTES.ADMIN_ALUMNI, label: 'Alumni & Fundraising', icon: Heart },
+  { to: ROUTES.ADMIN_PROMOTION, label: 'Promotion & Graduation', icon: ArrowUpRight },
   { to: '/admin/bece-processor', label: 'BECE CA Processor', icon: Calculator },
   { to: '/admin/bece-master', label: 'BECE Master Sheet', icon: Grid },
+  { to: '/admin/assessments', label: 'Assessment Entry', icon: ClipboardList },
   { to: '/admin/elections', label: 'Elections (PEC)', icon: Vote },
   { to: '/admin/poster-maker', label: 'Poster Maker', icon: Image },
   { to: ROUTES.ADMIN_SMS, label: 'SMS Messaging', icon: Smartphone },
-  { to: ROUTES.ADMIN_VISITORS, label: 'Visitors Record', icon: UserPlus },
+
+  { header: 'Settings' },
+  { to: ROUTES.ADMIN_ACADEMIC_YEARS, label: 'Academic Years', icon: Calendar },
+  { to: ROUTES.ADMIN_TERMS, label: 'Terms', icon: Calendar },
+  { to: ROUTES.ADMIN_SETTINGS, label: 'Settings', icon: Settings },
 ]
 
 const teacherLinks = [
+  { header: 'General' },
   { to: ROUTES.TEACHER_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
+  { to: ROUTES.TEACHER_MESSAGES, label: 'Messages', icon: MessageSquare },
+  { to: ROUTES.TEACHER_NOTIFICATIONS, label: 'Notifications', icon: Bell },
+
+  { header: 'Instructional' },
   { to: ROUTES.TEACHER_MY_CLASSES, label: 'My Classes', icon: School },
-  { to: '/teacher/class-tests', label: 'Class Tests', icon: ClipboardList },
   { to: ROUTES.TEACHER_STUDENTS, label: 'Students', icon: Users },
+  { to: '/teacher/class-tests', label: 'Class Tests', icon: ClipboardList },
   { to: ROUTES.TEACHER_SCORE_ENTRY, label: 'Score Entry', icon: PencilLine },
   { to: ROUTES.TEACHER_REPORTS, label: 'Reports', icon: FileSpreadsheet },
   { to: ROUTES.TEACHER_TIMETABLE, label: 'Timetable', icon: Calendar },
-  { to: ROUTES.TEACHER_NOTIFICATIONS, label: 'Notifications', icon: Bell },
+  { to: ROUTES.TEACHER_ATTENDANCE, label: 'Attendance', icon: ClipboardCheck },
   { to: ROUTES.TEACHER_SYLLABUS, label: 'Syllabus', icon: Book },
   { to: ROUTES.TEACHER_LESSON_TRACKER, label: 'Lesson Tracker', icon: Timer },
   { to: ROUTES.TEACHER_ASSIGNMENTS, label: 'Assignments', icon: ClipboardList },
   { to: ROUTES.TEACHER_SUBJECTS, label: 'Library', icon: BookOpen },
-  { to: ROUTES.TEACHER_ATTENDANCE, label: 'Attendance', icon: ClipboardCheck },
   { to: '/teacher/daily-fees', label: 'Daily Collections', icon: CreditCard },
-  { to: ROUTES.TEACHER_MESSAGES, label: 'Messages', icon: MessageSquare },
+
+  { header: 'Extras' },
   { to: '/teacher/agenda', label: 'Term Agenda', icon: ClipboardList },
   { to: '/teacher/elections-hub', label: 'Elections (PEC)', icon: Vote },
   { to: ROUTES.TEACHER_TYPING_GAME, label: 'Typing Nitro', icon: Gamepad2 },
@@ -91,18 +106,25 @@ const studentLinks = [
 ]
 
 const bursarLinks = [
+  { header: 'Overview' },
   { to: ROUTES.BURSAR_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
+  { to: ROUTES.BURSAR_ANALYTICS, label: 'Analytics', icon: BarChart3 },
+
+  { header: 'Operations' },
   { to: ROUTES.BURSAR_STUDENTS, label: 'Students', icon: Users },
   { to: ROUTES.BURSAR_FEES, label: 'School Fees', icon: CreditCard },
   { to: '/bursar/daily-fees', label: 'Daily Fees', icon: Wallet },
   { to: ROUTES.BURSAR_INVENTORY, label: 'School Store', icon: ShoppingBag },
+
+  { header: 'Financials' },
   { to: ROUTES.BURSAR_DEBTORS, label: 'Debtors List', icon: AlertCircle },
   { to: ROUTES.BURSAR_BILL_SHEET, label: 'Bill Sheet', icon: FileText },
   { to: ROUTES.BURSAR_PAYROLL, label: 'Payroll', icon: Wallet },
   { to: ROUTES.BURSAR_INCOME, label: 'Income', icon: TrendingUp },
   { to: ROUTES.BURSAR_EXPENSES, label: 'Expenses', icon: TrendingDown },
   { to: ROUTES.BURSAR_REPORTS, label: 'Financial Reports', icon: FileSpreadsheet },
-  { to: ROUTES.BURSAR_ANALYTICS, label: 'Analytics', icon: BarChart3 },
+
+  { header: 'Tools' },
   { to: ROUTES.BURSAR_SMS, label: 'SMS Reminders', icon: Smartphone },
 ]
 
@@ -176,7 +198,7 @@ export default function Sidebar() {
 
   // Hide daily collections from unauthorized teachers
   if (isTeacher && !loadingAuth && !collectorAuth) {
-    links = links.filter(l => l.label !== 'Daily Collections')
+    links = links.filter(l => !('label' in l) || (l as any).label !== 'Daily Collections')
   }
 
   const [hovered, setHovered] = useState<string | null>(null)
@@ -190,6 +212,21 @@ export default function Sidebar() {
   useEffect(() => {
     localStorage.setItem('sidebar_collapsed', String(collapsed))
   }, [collapsed])
+
+  const [searchQuery, setSearchQuery] = useState('')
+  const [expandedSections, setExpandedSections] = useState<string[]>(['General', 'Management', 'Academics', 'Tools', 'Operations', 'Financials', 'Instructional'])
+
+  const toggleSection = (header: string) => {
+    setExpandedSections(prev => 
+      prev.includes(header) ? prev.filter(h => h !== header) : [...prev, header]
+    )
+  }
+
+  const filteredLinks = links.filter(l => {
+    if ('header' in l) return true // Keep headers
+    const label = (l as any).label || ''
+    return label.toLowerCase().includes(searchQuery.toLowerCase())
+  })
 
   return (
     <>
@@ -255,71 +292,120 @@ export default function Sidebar() {
           </div>
         </div>
 
+        {/* ── Search Bar ── */}
+        {!collapsed && (
+          <div style={{ padding: '16px 20px 8px', position: 'relative', zIndex: 1 }}>
+            <div style={{ position: 'relative' }}>
+              <Search size={14} color="rgba(255,255,255,0.4)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+              <input 
+                type="text" 
+                placeholder="Find a page..." 
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                style={{ 
+                  width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', 
+                  borderRadius: 10, padding: '10px 12px 10px 34px', fontSize: 13, color: '#fff', outline: 'none',
+                  transition: 'all 0.2s', boxSizing: 'border-box'
+                }}
+                onFocus={e => e.target.style.background = 'rgba(255,255,255,0.08)'}
+                onBlur={e => e.target.style.background = 'rgba(255,255,255,0.05)'}
+              />
+            </div>
+          </div>
+        )}
+
         {/* ── Nav links ── */}
         <nav style={{ flex: 1, overflowY: 'auto', padding: collapsed ? '16px 12px' : '16px 14px', position: 'relative', zIndex: 1 }}>
-          {links.map(({ to, label, icon: Icon }, i) => (
-            <NavLink key={to} to={to} style={{ textDecoration: 'none', display: 'block', marginBottom: 6 }} aria-label={label}>
-              {({ isActive }) => (
-                <div
-                  className="sidebar-link"
-                  onMouseEnter={() => setHovered(to)}
-                  onMouseLeave={() => setHovered(null)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: collapsed ? 0 : 12,
-                    padding: '10px 14px', borderRadius: 14,
-                    background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
-                    borderLeft: !collapsed && isActive ? '4px solid #fbbf24' : '4px solid transparent',
-                    justifyContent: collapsed ? 'center' : 'flex-start',
-                    animation: `_sideIn 0.4s ease ${i * 0.05}s both`,
-                    boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
-                    height: 44,
-                  }}>
-                  {/* Icon with optional unread dot */}
-                  <div style={{ position: 'relative', flexShrink: 0 }}>
-                    <Icon
-                      size={20}
-                      strokeWidth={isActive ? 2.5 : 2}
-                      color={isActive ? '#fbbf24' : hovered === to ? '#fff' : 'rgba(255,255,255,0.5)'}
-                      style={{ transition: 'all 0.2s', display: 'block' }}
-                    />
-                    {label === 'Messages' && unreadMsgs > 0 && collapsed && (
-                      <span style={{
-                        position: 'absolute', top: -5, right: -6,
-                        background: '#ef4444', color: '#fff',
-                        fontSize: 9, fontWeight: 800, borderRadius: 99,
-                        padding: '0 3px', minWidth: 14, textAlign: 'center', lineHeight: '14px',
-                        border: '1.5px solid #1e0646',
-                      }}>{unreadMsgs > 99 ? '99+' : unreadMsgs}</span>
+          <div style={{ display: 'grid', gap: 4 }}>
+            {(() => {
+              let currentSectionVisible = true
+              return filteredLinks.map((item: any, i) => {
+                if (item.header) {
+                  const isExpanded = expandedSections.includes(item.header)
+                  currentSectionVisible = isExpanded || !!searchQuery
+                  
+                  if (collapsed || searchQuery) {
+                    currentSectionVisible = true // Always show links when searching or collapsed (flat list)
+                    return null
+                  }
+
+                  return (
+                    <div 
+                      key={`header-${item.header}`} 
+                      onClick={() => toggleSection(item.header)}
+                      style={{ 
+                        padding: '20px 12px 8px', fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.4)', 
+                        textTransform: 'uppercase', letterSpacing: '0.12em', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        transition: 'color 0.2s', userSelect: 'none'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.4)'}
+                    >
+                      {item.header}
+                      <ChevronDown size={12} style={{ 
+                        transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)', 
+                        transition: 'transform 0.2s', opacity: 0.5 
+                      }} />
+                    </div>
+                  )
+                }
+
+                if (!currentSectionVisible && !searchQuery && !collapsed) return null
+
+                const { to, label, icon: Icon } = item
+                return (
+                  <NavLink key={to} to={to} style={{ textDecoration: 'none', display: 'block' }} aria-label={label}>
+                    {({ isActive }) => (
+                      <div
+                        className="sidebar-link"
+                        onMouseEnter={() => setHovered(to)}
+                        onMouseLeave={() => setHovered(null)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: collapsed ? 0 : 12,
+                          padding: '10px 14px', borderRadius: 14,
+                          background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
+                          borderLeft: !collapsed && isActive ? '4px solid #fbbf24' : '4px solid transparent',
+                          justifyContent: collapsed ? 'center' : 'flex-start',
+                          animation: searchQuery ? 'none' : `_sideIn 0.3s ease ${i * 0.02}s both`,
+                          boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
+                          height: 44,
+                        }}>
+                        <div style={{ position: 'relative', flexShrink: 0 }}>
+                          <Icon
+                            size={18}
+                            strokeWidth={isActive ? 2.5 : 2}
+                            color={isActive ? '#fbbf24' : hovered === to ? '#fff' : 'rgba(255,255,255,0.5)'}
+                            style={{ transition: 'all 0.2s', display: 'block' }}
+                          />
+                          {label === 'Messages' && unreadMsgs > 0 && (
+                            <span style={{
+                              position: 'absolute', top: -5, right: -6,
+                              background: '#ef4444', color: '#fff',
+                              fontSize: 9, fontWeight: 800, borderRadius: 99,
+                              padding: '0 3px', minWidth: 14, textAlign: 'center', lineHeight: '14px',
+                              border: '1.5px solid #1e0646',
+                            }}>{unreadMsgs > 99 ? '99+' : unreadMsgs}</span>
+                          )}
+                        </div>
+                        {!collapsed && (
+                          <span style={{
+                            fontSize: 13,
+                            fontWeight: isActive ? 700 : 500,
+                            color: isActive ? '#fff' : hovered === to ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.6)',
+                            whiteSpace: 'nowrap',
+                            transition: 'all 0.2s'
+                          }}>
+                            {label}
+                          </span>
+                        )}
+                      </div>
                     )}
-                  </div>
-                  {!collapsed && (
-                    <span style={{
-                      fontSize: 13.5,
-                      fontWeight: isActive ? 700 : 500,
-                      color: isActive ? '#fff' : hovered === to ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.6)',
-                      transition: 'all 0.22s',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      flex: 1,
-                    }}>
-                      {label}
-                    </span>
-                  )}
-                  {/* Expanded unread pill */}
-                  {!collapsed && label === 'Messages' && unreadMsgs > 0 && (
-                    <span style={{
-                      background: '#ef4444', color: '#fff', fontSize: 10, fontWeight: 800,
-                      borderRadius: 99, padding: '1px 6px', marginLeft: 'auto', flexShrink: 0,
-                    }}>{unreadMsgs > 99 ? '99+' : unreadMsgs}</span>
-                  )}
-                  {!collapsed && isActive && label !== 'Messages' && (
-                    <div style={{ marginLeft: 'auto', width: 4, height: 4, borderRadius: '50%', background: '#fbbf24', boxShadow: '0 0 8px #fbbf24' }} />
-                  )}
-                </div>
-              )}
-            </NavLink>
-          ))}
+                  </NavLink>
+                )
+              })
+            })()}
+          </div>
         </nav>
 
         {/* ── User footer ── */}

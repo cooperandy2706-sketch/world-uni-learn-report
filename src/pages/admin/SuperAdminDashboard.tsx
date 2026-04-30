@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'react-hot-toast'
 import { Link } from 'react-router-dom'
+import Modal from '../../components/ui/Modal'
+import Button from '../../components/ui/Button'
 
 // ─── types ────────────────────────────────────────────────
 interface PlatformStats {
@@ -78,6 +80,12 @@ export default function SuperAdminDashboard() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | SchoolStatus>('all')
   const [mounted, setMounted] = useState(false)
+  const [createModal, setCreateModal] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({
+    name: '', email: '', phone: '', address: '', motto: '',
+    adminName: '', adminEmail: '', adminPassword: ''
+  })
 
   useEffect(() => {
     setMounted(true)
@@ -148,6 +156,58 @@ export default function SuperAdminDashboard() {
     }
   }
 
+  async function handleCreateSchool() {
+    if (!form.name || !form.adminEmail || !form.adminPassword) {
+      toast.error('School name, admin email and password are required')
+      return
+    }
+
+    setSaving(true)
+    try {
+      // 1. Create school
+      const schoolId = Math.random().toString(36).substring(2, 8).toUpperCase()
+      const { error: sErr } = await supabase.from('schools').insert({
+        id: schoolId,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        address: form.address,
+        motto: form.motto,
+        status: 'active'
+      })
+      if (sErr) throw sErr
+
+      // 2. Create Admin Auth Account
+      const { data: authData, error: authErr } = await supabase.auth.signUp({
+        email: form.adminEmail,
+        password: form.adminPassword,
+        options: { data: { full_name: form.adminName } }
+      })
+      if (authErr) throw authErr
+      if (!authData.user) throw new Error('Failed to create auth account')
+
+      // 3. Create Admin Profile
+      const { error: pErr } = await supabase.from('users').insert({
+        id: authData.user.id,
+        school_id: schoolId,
+        full_name: form.adminName,
+        email: form.adminEmail,
+        role: 'admin',
+        is_active: true
+      })
+      if (pErr) throw pErr
+
+      toast.success('School and Admin created successfully!')
+      setCreateModal(false)
+      setForm({ name: '', email: '', phone: '', address: '', motto: '', adminName: '', adminEmail: '', adminPassword: '' })
+      loadPlatformData()
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to create school')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const filteredSchools = schools.filter(s => {
     const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase())
     const matchesFilter = filter === 'all' || s.status === filter
@@ -192,6 +252,9 @@ export default function SuperAdminDashboard() {
           >
             <span>🔄</span> Force Sync
           </button>
+          <Button onClick={() => setCreateModal(true)}>
+            <span>➕</span> Register New School
+          </Button>
         </div>
       </header>
 
@@ -333,6 +396,63 @@ export default function SuperAdminDashboard() {
       <p style={{ textAlign: 'center', marginTop: 40, fontSize: 13, color: '#94a3b8' }}>
         World Uni-Learn Platform Management Dashboard v1.0
       </p>
+
+      <Modal
+        open={createModal}
+        onClose={() => setCreateModal(false)}
+        title="Register New School"
+        subtitle="Create a new school and its administrator"
+        size="lg"
+        footer={(
+          <>
+            <Button variant="secondary" onClick={() => setCreateModal(false)}>Cancel</Button>
+            <Button onClick={handleCreateSchool} loading={saving}>Create School</Button>
+          </>
+        )}
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+          <section>
+            <h4 style={{ fontSize: 13, color: '#6d28d9', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em' }}>School Details</h4>
+            <div style={{ display: 'grid', gap: 14 }}>
+              <Input label="School Name" value={form.name} onChange={v => setForm(f => ({...f, name:v}))} />
+              <Input label="School Email" value={form.email} onChange={v => setForm(f => ({...f, email:v}))} />
+              <Input label="School Phone" value={form.phone} onChange={v => setForm(f => ({...f, phone:v}))} />
+              <Input label="Address" value={form.address} onChange={v => setForm(f => ({...f, address:v}))} />
+              <Input label="Motto" value={form.motto} onChange={v => setForm(f => ({...f, motto:v}))} />
+            </div>
+          </section>
+          <section style={{ borderLeft: '1px solid #f1f5f9', paddingLeft: 24 }}>
+            <h4 style={{ fontSize: 13, color: '#6d28d9', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Administrator Details</h4>
+            <div style={{ display: 'grid', gap: 14 }}>
+              <Input label="Admin Full Name" value={form.adminName} onChange={v => setForm(f => ({...f, adminName:v}))} />
+              <Input label="Admin Email" type="email" value={form.adminEmail} onChange={v => setForm(f => ({...f, adminEmail:v}))} />
+              <Input label="Admin Password" type="password" value={form.adminPassword} onChange={v => setForm(f => ({...f, adminPassword:v}))} />
+              <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 10, fontStyle: 'italic' }}>
+                Note: This will create an active school and an active administrator account immediately.
+              </p>
+            </div>
+          </section>
+        </div>
+      </Modal>
+    </div>
+  )
+}
+
+function Input({ label, value, onChange, type = 'text' }: any) {
+  return (
+    <div>
+      <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6 }}>{label}</label>
+      <input
+        type={type}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        style={{
+          width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #f1f5f9',
+          fontSize: 14, outline: 'none', transition: 'all 0.2s', fontFamily: 'inherit'
+        }}
+        onFocus={e => { e.target.style.borderColor = '#6d28d9'; e.target.style.boxShadow = '0 0 0 4px rgba(109,40,217,0.1)' }}
+        onBlur={e => { e.target.style.borderColor = '#f1f5f9'; e.target.style.boxShadow = 'none' }}
+      />
     </div>
   )
 }
