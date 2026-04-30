@@ -29,6 +29,7 @@ export const ROUTES = {
   ADMIN_ADMISSIONS: '/admin/admissions',
   ADMIN_BURSARS: '/admin/bursars',
   ADMIN_TEST_ANALYTICS: '/admin/test-analytics',
+  ADMIN_VISITORS: '/admin/visitors',
 
   // Teacher
   TEACHER_DASHBOARD: '/teacher/dashboard',

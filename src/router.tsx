@@ -72,6 +72,7 @@ import AssessmentsPage from './pages/admin/AssessmentsPage'
 import BECEProcessorPage from './pages/admin/BECEProcessorPage'
 import BECEMasterPage from './pages/admin/BECEMasterPage'
 import TeacherElectionsHubPage from './pages/teacher/TeacherElectionsHub'
+import VisitorsPage from './pages/admin/VisitorsPage'
 
 // Election Pages
 import AdminElectionsPage from './pages/admin/ElectionsPage'
@@ -150,6 +151,7 @@ export const router = createBrowserRouter([
           { path: 'bece-master', element: <BECEMasterPage /> },
           { path: 'elections', element: <AdminElectionsPage /> },
           { path: 'poster-maker', element: <AdminPosterMakerPage /> },
+          { path: 'visitors', element: <VisitorsPage /> },
         ],
       },
       {
