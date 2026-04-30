@@ -66,6 +66,7 @@ import TeacherAgendaPage from './pages/teacher/AgendaPage'
 import OtherStaffPage from './pages/admin/OtherStaffPage'
 import StaffDashboard from './pages/staff/DashboardPage'
 import TypingGamePage from './pages/shared/TypingGamePage'
+import BillingPage from './pages/admin/BillingPage'
 import AdminAdmissions from './pages/admin/AdminAdmissions'
 import SMSPage from './pages/shared/SMSPage'
 import ClassTestsPage from './pages/teacher/ClassTestsPage'
@@ -128,6 +129,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="/admin/dashboard" replace /> },
           { path: 'dashboard', element: <AdminDashboard /> },
+          { path: 'billing', element: <BillingPage /> },
           { path: 'students', element: <StudentsPage /> },
           { path: 'teachers', element: <TeachersPage /> },
           { path: 'other-staff', element: <OtherStaffPage /> },

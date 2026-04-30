@@ -130,12 +130,11 @@ export default function SettingsPage() {
         .eq('id', user!.school_id)
       if (schoolError) throw schoolError
 
-      // 2. Upsert report-card settings via RPC
-      const { error: settingsError } = await supabase.rpc('upsert_school_settings', {
-        p_school_id: user!.school_id,
-        p_next_term_date: data.next_term_date || null,
-        p_school_fees_info: data.school_fees_info || null,
-        p_school_news: data.school_news || null,
+      // 2. Upsert report-card settings via service
+      const { error: settingsError } = await settingsService.upsert(user!.school_id, {
+        next_term_date: data.next_term_date || null,
+        school_fees_info: data.school_fees_info || null,
+        school_news: data.school_news || null,
       })
       if (settingsError) throw settingsError
 
@@ -345,8 +344,8 @@ export default function SettingsPage() {
                     <div style={{ padding: '0 10px' }}>
                       <h4 style={{ fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 12 }}>Usage Information</h4>
                       <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#4b5563', lineHeight: 1.6 }}>
-                        <li>All messages are sent via the Arkesel SMS gateway (Sender: <strong>ESTEVROYAL</strong>).</li>
-                        <li>Each message is automatically prefixed with <strong>"ESTEV ROYAL: "</strong> for sender identification.</li>
+                        <li>All messages are sent via the Arkesel SMS gateway. The Sender ID is dynamically generated from your <strong>School Name</strong> (up to 11 characters).</li>
+                        <li>Each message is automatically prefixed with your <strong>School Name</strong> for sender identification.</li>
                         <li>Bulk sends are batched at 50 recipients per request to respect rate limits.</li>
                         <li>Each message segment (160 characters) consumes credits from the system pool.</li>
                         <li>Every SMS attempt (success or failure) is logged for administrative and billing purposes.</li>

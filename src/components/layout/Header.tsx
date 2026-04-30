@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
+import { useSchoolInvoices } from '../../hooks/useBilling'
 import NotificationBell from './NotificationBell'
 import { requestAndSubscribe, isPushSubscribed, VAPID_PUBLIC_KEY } from '../../utils/pushNotifications'
 
@@ -14,6 +15,22 @@ export default function Header() {
   const [open, setOpen] = useState(false)
   const [signing, setSigning] = useState(false)
   const [pushEnabled, setPushEnabled] = useState<boolean | null>(null)
+
+  const userSchool = user?.school as any
+  const { data: invoices = [] } = useSchoolInvoices(userSchool?.id)
+
+  const now = new Date()
+  let daysLeft = 0
+  if (userSchool?.status === 'pending') {
+    const trialEnd = new Date(new Date(userSchool.created_at).getTime() + 30 * 24 * 60 * 60 * 1000)
+    daysLeft = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  }
+
+  const unpaidInvoice = invoices.find(inv => inv.status === 'pending' || inv.status === 'requested_approval')
+  let invoiceDaysLeft = 0
+  if (unpaidInvoice) {
+    invoiceDaysLeft = Math.ceil((new Date(unpaidInvoice.due_date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  }
 
   useEffect(() => {
     if (!isAdmin) isPushSubscribed().then(s => setPushEnabled(s))
@@ -45,6 +62,7 @@ export default function Header() {
   const adminMenu = [
     { icon: '⊞', label: 'Dashboard', path: '/admin/dashboard' },
     { icon: '👥', label: 'Students', path: '/admin/students' },
+    { icon: '💳', label: 'Billing', path: '/admin/billing' },
     { icon: '📄', label: 'Reports', path: '/admin/reports' },
     { icon: '⚙️', label: 'Settings', path: '/admin/settings' },
     { icon: '📊', label: 'Analytics', path: '/admin/analytics' },
@@ -151,6 +169,34 @@ export default function Header() {
           ) : (
             <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 99, padding: '5px 14px', fontSize: 12, fontWeight: 600, color: '#92400e' }}>
               ⚠ No active term
+            </div>
+          )}
+
+          {/* Billing Alerts */}
+          {!isSuperAdmin && userSchool?.status === 'pending' && daysLeft > 0 && (
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: '#fffbeb', border: '1px solid #f59e0b40', borderRadius: 99, padding: '6px 14px',
+              cursor: 'pointer'
+            }} onClick={() => navigate('/admin/billing')}>
+              <span style={{ fontSize: 12 }}>⏳</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#b45309', letterSpacing: '0.03em' }}>
+                FREE TIER: {daysLeft} DAYS LEFT
+              </span>
+            </div>
+          )}
+
+          {!isSuperAdmin && unpaidInvoice && invoiceDaysLeft >= 0 && (
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: invoiceDaysLeft < 5 ? '#fef2f2' : '#fffbeb', 
+              border: `1px solid ${invoiceDaysLeft < 5 ? '#ef444440' : '#f59e0b40'}`, 
+              borderRadius: 99, padding: '6px 14px', cursor: 'pointer'
+            }} onClick={() => navigate('/admin/billing')}>
+              <span style={{ fontSize: 12 }}>💳</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: invoiceDaysLeft < 5 ? '#dc2626' : '#b45309', letterSpacing: '0.03em' }}>
+                INVOICE DUE IN {invoiceDaysLeft} DAYS
+              </span>
             </div>
           )}
         </div>

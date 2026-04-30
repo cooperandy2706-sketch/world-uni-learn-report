@@ -106,6 +106,16 @@ export interface SchoolSettings {
   updated_at: string
 }
 
+export interface SchoolInvoice {
+  id: string
+  school_id: string
+  term_id?: string
+  amount: number
+  status: 'pending' | 'requested_approval' | 'paid'
+  due_date: string
+  created_at: string
+}
+
 export interface AcademicYear {
   id: string
   school_id: string

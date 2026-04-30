@@ -140,7 +140,31 @@ export const termsService = {
       .single()
   },
   async create(data: any) {
-    return supabase.from('terms').insert(data).select().single()
+    const { data: term, error: termErr } = await supabase.from('terms').insert(data).select().single()
+    if (termErr) throw termErr
+
+    // Automatically generate a subscription invoice when a term is created
+    const { count } = await supabase
+      .from('terms')
+      .select('*', { count: 'exact', head: true })
+      .eq('school_id', data.school_id)
+
+    // 600 for the first term, 300 for subsequent terms
+    const amount = (count === 1) ? 600 : 300
+    
+    // Due date is 30 days from now
+    const dueDate = new Date()
+    dueDate.setDate(dueDate.getDate() + 30)
+
+    await supabase.from('school_invoices').insert({
+      school_id: data.school_id,
+      term_id: term.id,
+      amount: amount,
+      status: 'pending',
+      due_date: dueDate.toISOString()
+    })
+
+    return term
   },
   async lock(id: string) {
     return supabase.from('terms').update({ is_locked: true }).eq('id', id).select().single()

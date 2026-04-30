@@ -36,13 +36,24 @@ export function useCreateStudent() {
   const { user } = useAuth()
 
   return useMutation({
-    mutationFn: (student: any) =>
-      studentsService.create({ ...student, school_id: user?.school_id }),
+    mutationFn: async (student: any) => {
+      const { data, error } = await studentsService.create({ ...student, school_id: user?.school_id })
+      if (error) throw error
+      return data
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['students'] })
       toast.success('Student added successfully')
     },
-    onError: () => toast.error('Failed to add student'),
+    onError: (err: any) => {
+      if (err.code === '23505' && err.message?.includes('students_student_id_key')) {
+        toast.error('This Student ID is already in use. Try a format like: ' + 
+          (user?.school?.name?.substring(0, 3).toUpperCase() || 'STU') + '-' + 
+          Math.floor(1000 + Math.random() * 9000));
+      } else {
+        toast.error(err.message || 'Failed to add student');
+      }
+    },
   })
 }
 
@@ -50,12 +61,16 @@ export function useUpdateStudent() {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, ...data }: any) => studentsService.update(id, data),
+    mutationFn: async ({ id, ...data }: any) => {
+      const { data: res, error } = await studentsService.update(id, data)
+      if (error) throw error
+      return res
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['students'] })
       toast.success('Student updated successfully')
     },
-    onError: () => toast.error('Failed to update student'),
+    onError: (err: any) => toast.error(err.message || 'Failed to update student'),
   })
 }
 
@@ -63,11 +78,15 @@ export function useDeleteStudent() {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => studentsService.delete(id),
+    mutationFn: async (id: string) => {
+      const { data, error } = await studentsService.delete(id)
+      if (error) throw error
+      return data
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['students'] })
       toast.success('Student removed')
     },
-    onError: () => toast.error('Failed to remove student'),
+    onError: (err: any) => toast.error(err.message || 'Failed to remove student'),
   })
 }

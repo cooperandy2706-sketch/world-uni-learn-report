@@ -80,6 +80,7 @@ export default function SuperAdminDashboard() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | SchoolStatus>('all')
   const [mounted, setMounted] = useState(false)
+  const [pendingInvoices, setPendingInvoices] = useState<any[]>([])
   const [createModal, setCreateModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
@@ -116,7 +117,8 @@ export default function SuperAdminDashboard() {
       ] = await Promise.all([
         supabase.from('schools').select('*').order('created_at', { ascending: false }),
         supabase.from('teachers').select('*', { count: 'exact', head: true }),
-        supabase.from('students').select('*', { count: 'exact', head: true })
+        supabase.from('students').select('*', { count: 'exact', head: true }),
+        supabase.from('school_invoices').select('*, school:schools(id, name)').eq('status', 'requested_approval').order('created_at', { ascending: false })
       ])
 
       if (sErr) throw sErr
@@ -129,6 +131,7 @@ export default function SuperAdminDashboard() {
         totalTeachers: tCount || 0,
         totalStudents: stCount || 0
       })
+      setPendingInvoices((arguments[0][3] as any)?.data || [])
     } catch (err: any) {
       toast.error('Failed to sync platform data')
     } finally {
@@ -156,6 +159,27 @@ export default function SuperAdminDashboard() {
     }
   }
 
+  async function approveInvoice(invoiceId: string, schoolId: string) {
+    if (!confirm('Have you confirmed receipt of this Mobile Money payment?')) return
+    
+    try {
+      const { error } = await supabase.from('school_invoices').update({ status: 'paid' }).eq('id', invoiceId)
+      if (error) throw error
+      
+      // Also set the school to active if it was pending
+      const { data: school } = await supabase.from('schools').select('status').eq('id', schoolId).single()
+      if (school && school.status === 'pending') {
+        await supabase.from('schools').update({ status: 'active' }).eq('id', schoolId)
+        await supabase.from('users').update({ is_active: true }).eq('school_id', schoolId).eq('role', 'admin')
+      }
+
+      toast.success('Payment approved and school activated!')
+      loadPlatformData()
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to approve payment')
+    }
+  }
+
   async function handleCreateSchool() {
     if (!form.name || !form.adminEmail || !form.adminPassword) {
       toast.error('School name, admin email and password are required')
@@ -164,38 +188,31 @@ export default function SuperAdminDashboard() {
 
     setSaving(true)
     try {
-      // 1. Create school
-      const schoolId = Math.random().toString(36).substring(2, 8).toUpperCase()
-      const { error: sErr } = await supabase.from('schools').insert({
-        id: schoolId,
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        address: form.address,
-        motto: form.motto,
-        status: 'active'
+      // Create School and Admin via Edge Function (avoids changing current session and bypasses RLS)
+      const { data: opData, error: opErr } = await supabase.functions.invoke('admin-ops', {
+        body: {
+          action: 'create-school-with-admin',
+          payload: {
+            school: {
+              name: form.name,
+              email: form.email,
+              phone: form.phone,
+              address: form.address,
+              motto: form.motto,
+              status: 'active'
+            },
+            admin: {
+              email: form.adminEmail,
+              password: form.adminPassword,
+              full_name: form.adminName
+            }
+          }
+        }
       })
-      if (sErr) throw sErr
 
-      // 2. Create Admin Auth Account
-      const { data: authData, error: authErr } = await supabase.auth.signUp({
-        email: form.adminEmail,
-        password: form.adminPassword,
-        options: { data: { full_name: form.adminName } }
-      })
-      if (authErr) throw authErr
-      if (!authData.user) throw new Error('Failed to create auth account')
-
-      // 3. Create Admin Profile
-      const { error: pErr } = await supabase.from('users').insert({
-        id: authData.user.id,
-        school_id: schoolId,
-        full_name: form.adminName,
-        email: form.adminEmail,
-        role: 'admin',
-        is_active: true
-      })
-      if (pErr) throw pErr
+      if (opErr || opData?.error) {
+        throw new Error(opData?.error || opErr?.message || 'Failed to create school and admin user')
+      }
 
       toast.success('School and Admin created successfully!')
       setCreateModal(false)
@@ -265,6 +282,41 @@ export default function SuperAdminDashboard() {
         <StatCard icon="👨‍🏫" label="Total Teachers" value={stats?.totalTeachers || 0} color="#0891b2" bg="#ecfeff" />
         <StatCard icon="🎓" label="Total Students" value={stats?.totalStudents || 0} color="#059669" bg="#f0fdf4" />
       </div>
+
+      {/* Pending Billing Approvals */}
+      {pendingInvoices.length > 0 && (
+        <div style={{ background: '#fff', borderRadius: 24, border: '1px solid #fde68a', boxShadow: '0 4px 24px rgba(245,158,11,0.05)', overflow: 'hidden', marginBottom: 48 }}>
+          <div style={{ padding: '24px 32px', borderBottom: '1.5px solid #fef3c7', background: '#fffbeb', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 24 }}>💳</span>
+            <div>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#92400e', margin: 0 }}>Pending Billing Approvals</h2>
+              <p style={{ fontSize: 13, color: '#b45309', margin: '4px 0 0' }}>These schools have reported sending Mobile Money payments.</p>
+            </div>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 120px', padding: '16px 32px', background: '#fcfcfd', borderBottom: '1px solid #f1f5f9', fontSize: 13, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <div>School</div>
+            <div>Invoice Date</div>
+            <div>Amount</div>
+            <div style={{ textAlign: 'right' }}>Action</div>
+          </div>
+          
+          <div>
+            {pendingInvoices.map((inv, i) => (
+              <div key={inv.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 120px', padding: '20px 32px', borderBottom: i < pendingInvoices.length - 1 ? '1px solid #f1f5f9' : 'none', alignItems: 'center' }}>
+                <div style={{ fontWeight: 700, color: '#1e0646' }}>{inv.school?.name || 'Unknown School'}</div>
+                <div style={{ color: '#64748b', fontSize: 14 }}>{new Date(inv.created_at).toLocaleDateString()}</div>
+                <div style={{ fontWeight: 800, color: '#1e0646', fontSize: 15 }}>GHS {inv.amount}</div>
+                <div style={{ textAlign: 'right' }}>
+                  <button onClick={() => approveInvoice(inv.id, inv.school_id)} style={{ background: '#10b981', color: '#fff', padding: '8px 16px', borderRadius: 8, border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>
+                    Approve
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Management Area */}
       <div style={{ background: '#fff', borderRadius: 24, border: '1px solid #f1f5f9', boxShadow: '0 4px 24px rgba(0,0,0,0.02)', overflow: 'hidden' }}>

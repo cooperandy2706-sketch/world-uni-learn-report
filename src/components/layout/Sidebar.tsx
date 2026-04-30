@@ -19,6 +19,7 @@ import {
 const adminLinks = [
   { header: 'General' },
   { to: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/admin/billing', label: 'Billing & Subscriptions', icon: CreditCard },
   { to: ROUTES.ADMIN_CALENDAR, label: 'School Calendar', icon: Calendar },
   { to: ROUTES.ADMIN_MESSAGES, label: 'Messages', icon: MessageSquare },
   { to: ROUTES.ADMIN_ANALYTICS, label: 'Analytics', icon: BarChart3 },

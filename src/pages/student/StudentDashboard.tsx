@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { getGradeInfo } from '../../utils/grading'
 import { ROUTES } from '../../constants/routes'
+import { Wallet, Clock } from 'lucide-react'
 import { 
   LineChart, 
   Line, 
