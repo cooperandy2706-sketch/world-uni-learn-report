@@ -48,6 +48,8 @@ import TakeGlobalQuizPage from './pages/student/TakeGlobalQuizPage'
 import StudentSubjectsPage from './pages/student/StudentSubjectsPage'
 import StudentSubjectDetailsPage from './pages/student/StudentSubjectDetailsPage'
 import StudentLibraryPage from './pages/student/StudentLibraryPage'
+import StudentBillingPage from './pages/student/StudentBilling'
+import StudentResourcesPage from './pages/student/StudentResources'
 import TeacherSubjectsPage from './pages/teacher/TeacherSubjectsPage'
 import TeacherSubjectDetailsPage from './pages/teacher/TeacherSubjectDetailsPage'
 import TeacherDailyFeesPage from './pages/teacher/TeacherDailyFeesPage'
@@ -75,6 +77,7 @@ import TeacherElectionsHubPage from './pages/teacher/TeacherElectionsHub'
 import VisitorsPage from './pages/admin/VisitorsPage'
 import AlumniPage from './pages/admin/AlumniPage'
 import PromotionPage from './pages/admin/PromotionPage'
+import CalendarPage from './pages/admin/CalendarPage'
 
 // Election Pages
 import AdminElectionsPage from './pages/admin/ElectionsPage'
@@ -156,6 +159,7 @@ export const router = createBrowserRouter([
           { path: 'visitors', element: <VisitorsPage /> },
           { path: 'alumni', element: <AlumniPage /> },
           { path: 'promotion', element: <PromotionPage /> },
+          { path: 'calendar', element: <CalendarPage /> },
         ],
       },
       {
@@ -237,6 +241,8 @@ export const router = createBrowserRouter([
           { path: 'subjects/:id', element: <StudentSubjectDetailsPage /> },
           { path: 'typing-game', element: <TypingGamePage /> },
           { path: 'library', element: <StudentLibraryPage /> },
+          { path: 'billing', element: <StudentBillingPage /> },
+          { path: 'resources', element: <StudentResourcesPage /> },
           { path: 'elections', element: <StudentElectionsPage /> },
         ],
       },

@@ -32,6 +32,7 @@ export const ROUTES = {
   ADMIN_VISITORS: '/admin/visitors',
   ADMIN_PROMOTION: '/admin/promotion',
   ADMIN_ALUMNI: '/admin/alumni',
+  ADMIN_CALENDAR: '/admin/calendar',
 
   // Teacher
   TEACHER_DASHBOARD: '/teacher/dashboard',
@@ -58,6 +59,8 @@ export const ROUTES = {
   STUDENT_SCHEDULE: '/student/schedule',
   STUDENT_TYPING_GAME: '/student/typing-game',
   STUDENT_LIBRARY: '/student/library',
+  STUDENT_BILLING: '/student/billing',
+  STUDENT_RESOURCES: '/student/resources',
 
   // Bursar
   BURSAR_DASHBOARD:  '/bursar/dashboard',

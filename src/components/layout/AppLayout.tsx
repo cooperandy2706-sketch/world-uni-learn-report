@@ -9,6 +9,7 @@ import SplashScreen from './SplashScreen'
 import EnablePushButton from '../ui/EnablePushButton'
 import WhatsNewModal from '../ui/WhatsNewModal'
 import AnnouncementPopup from '../ui/AnnouncementPopup'
+import FloatingClock from '../shared/FloatingClock'
 import { ROUTES } from '../../constants/routes'
 
 interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 'student' | 'bursar' | 'staff' }
@@ -77,6 +78,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
       <BottomNav />
       <WhatsNewModal />
       <AnnouncementPopup />
+      <FloatingClock />
     </>
   )
 }

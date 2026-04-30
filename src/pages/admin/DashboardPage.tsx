@@ -14,6 +14,7 @@ interface Stats {
   pendingScores: number; unreadMessages: number; totalAssignments: number
   totalSubmissions: number; totalAnnouncements: number
   presentToday: number; absentToday: number; attendanceClasses: number
+  totalDebt: number; pendingApproval: number
 }
 interface TopStudent { student_id: string; full_name: string; class_name: string; average_score: number; overall_position: number; total_students: number }
 interface Message { id: string; subject: string; body: string; priority: string; created_at: string; is_read: boolean; from_user?: { full_name: string } }
@@ -69,6 +70,12 @@ function StatCard({ icon, label, value, color, bg, link, pulse, sub }: {
       </div>
     </Link>
   )
+}
+
+function DashboardClock() {
+  const [t, setT] = useState(new Date())
+  useEffect(() => { const i = setInterval(() => setT(new Date()), 1000); return () => clearInterval(i) }, [])
+  return <>{t.toLocaleTimeString('en-GH', { hour12: false })}</>
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -130,13 +137,16 @@ export default function DashboardPage() {
       supabase.from('announcements').select('*', { count: 'exact', head: true }).eq('school_id', sid),
     ])
 
-    let reports = 0, totalForReports = students ?? 0, pendingScores = 0
+    let reports = 0, totalForReports = students ?? 0, pendingScores = 0, totalDebt = 0, pendingApproval = 0
     if (term?.id) {
-      const [{ count: r }, { count: p }] = await Promise.all([
+      const [{ count: r }, { count: p }, { data: arrearsData }, { count: pa }] = await Promise.all([
         supabase.from('report_cards').select('*', { count: 'exact', head: true }).eq('term_id', term.id),
         supabase.from('scores').select('*', { count: 'exact', head: true }).eq('term_id', term.id).eq('is_submitted', false),
+        supabase.from('students').select('fees_arrears').eq('school_id', sid).eq('is_active', true),
+        supabase.from('report_cards').select('*', { count: 'exact', head: true }).eq('term_id', term.id).eq('status', 'pending_approval'),
       ])
-      reports = r ?? 0; pendingScores = p ?? 0
+      reports = r ?? 0; pendingScores = p ?? 0; pendingApproval = pa ?? 0
+      totalDebt = arrearsData?.reduce((acc, s) => acc + (s.fees_arrears || 0), 0) || 0
     }
 
     // Today's attendance
@@ -149,7 +159,25 @@ export default function DashboardPage() {
     const { data: attClasses } = await supabase.from('attendance_records').select('class_id').eq('school_id', sid).eq('date', today)
     const attendanceClasses = new Set(attClasses?.map((a: any) => a.class_id)).size
 
-    setStats({ students: students ?? 0, teachers: teachers ?? 0, classes: classes ?? 0, subjects: subjects ?? 0, departments: departments ?? 0, reportsGenerated: reports, totalStudentsForReports: totalForReports, pendingScores, unreadMessages: msgs ?? 0, totalAssignments: assigns ?? 0, totalSubmissions: subs ?? 0, totalAnnouncements: announceCount ?? 0, presentToday, absentToday, attendanceClasses })
+    setStats({ 
+      students: students ?? 0, 
+      teachers: teachers ?? 0, 
+      classes: classes ?? 0, 
+      subjects: subjects ?? 0, 
+      departments: departments ?? 0, 
+      reportsGenerated: reports, 
+      totalStudentsForReports: totalForReports, 
+      pendingScores, 
+      unreadMessages: msgs ?? 0, 
+      totalAssignments: assigns ?? 0, 
+      totalSubmissions: subs ?? 0, 
+      totalAnnouncements: announceCount ?? 0, 
+      presentToday, 
+      absentToday, 
+      attendanceClasses,
+      totalDebt,
+      pendingApproval
+    })
   }
 
   async function loadRecentActivity() {
@@ -243,8 +271,11 @@ export default function DashboardPage() {
             <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>
               {greeting}, {user?.full_name?.split(' ')[0]} 👋
             </h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
-              {year?.name} · {term?.name ?? 'No active term'} · {new Date().toLocaleDateString('en-GH', { weekday: 'long', day: 'numeric', month: 'long' })}
+            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>{year?.name}</span> · 
+              <span>{term?.name ?? 'No active term'}</span> · 
+              <span>{new Date().toLocaleDateString('en-GH', { weekday: 'long', day: 'numeric', month: 'long' })}</span> ·
+              <span style={{ fontWeight: 700, color: '#7c3aed', fontFamily: 'monospace' }}><DashboardClock /></span>
             </p>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -264,7 +295,65 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* ── Alerts ── */}
+        {/* ── Priority Feed ── */}
+        {stats && (
+          <div className="da" style={{ animationDelay: '.08s', marginBottom: 28 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 800, color: '#1e1b4b', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
+              Priority Action Feed
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+              {/* Attendance Alert */}
+              {stats.classes > stats.attendanceClasses && (
+                <Link to={ROUTES.ADMIN_ATTENDANCE} style={{ textDecoration: 'none' }}>
+                  <div className="qb" style={{ background: '#fef2f2', border: '1.5px solid #fee2e2', borderRadius: 16, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14, transition: 'all 0.2s', cursor: 'pointer' }}>
+                    <div style={{ fontSize: 22, width: 44, height: 44, borderRadius: 12, background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📋</div>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#991b1b' }}>{stats.classes - stats.attendanceClasses} Classes missing attendance</div>
+                      <div style={{ fontSize: 11, color: '#b91c1c', opacity: 0.8 }}>Required for today's records. Tap to view.</div>
+                    </div>
+                  </div>
+                </Link>
+              )}
+
+              {/* Debt Alert */}
+              {stats.totalDebt > 0 && (
+                <Link to="/bursar/debtors" style={{ textDecoration: 'none' }}>
+                  <div className="qb" style={{ background: '#fff7ed', border: '1.5px solid #ffedd5', borderRadius: 16, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14, transition: 'all 0.2s', cursor: 'pointer' }}>
+                    <div style={{ fontSize: 22, width: 44, height: 44, borderRadius: 12, background: '#ffedd5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>💰</div>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#9a3412' }}>Debt Arrears: GH₵ {stats.totalDebt.toLocaleString()}</div>
+                      <div style={{ fontSize: 11, color: '#c2410c', opacity: 0.8 }}>Action required on outstanding fees.</div>
+                    </div>
+                  </div>
+                </Link>
+              )}
+
+              {/* Reports Alert */}
+              {stats.pendingApproval > 0 && (
+                <Link to={ROUTES.ADMIN_REPORTS} style={{ textDecoration: 'none' }}>
+                  <div className="qb" style={{ background: '#f5f3ff', border: '1.5px solid #ede9fe', borderRadius: 16, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14, transition: 'all 0.2s', cursor: 'pointer' }}>
+                    <div style={{ fontSize: 22, width: 44, height: 44, borderRadius: 12, background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✍️</div>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#5b21b6' }}>{stats.pendingApproval} Reports awaiting signature</div>
+                      <div style={{ fontSize: 11, color: '#6d28d9', opacity: 0.8 }}>Term completion depends on these approvals.</div>
+                    </div>
+                  </div>
+                </Link>
+              )}
+
+              {stats.classes === stats.attendanceClasses && stats.totalDebt === 0 && stats.pendingApproval === 0 && (
+                <div style={{ background: '#f0fdf4', border: '1.5px solid #dcfce7', borderRadius: 16, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14, gridColumn: '1 / -1' }}>
+                  <div style={{ fontSize: 22, width: 44, height: 44, borderRadius: 12, background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✅</div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#166534' }}>All systems healthy</div>
+                    <div style={{ fontSize: 11, color: '#15803d', opacity: 0.8 }}>No priority actions required at this moment.</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           {(stats?.unreadMessages ?? 0) > 0 && (
             <div className="da" style={{ animationDelay: '.08s', background: 'linear-gradient(135deg,#fdf4ff,#f5f3ff)', border: '1.5px solid #ddd6fe', borderRadius: 12, padding: '11px 18px', display: 'flex', alignItems: 'center', gap: 12, animation: '_glow 2.5s infinite' }}>

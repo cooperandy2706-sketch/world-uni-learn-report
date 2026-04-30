@@ -6,6 +6,17 @@ import { supabase } from '../../lib/supabase'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { getGradeInfo } from '../../utils/grading'
 import { ROUTES } from '../../constants/routes'
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  AreaChart,
+  Area
+} from 'recharts'
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -24,6 +35,7 @@ export default function StudentDashboard() {
   const [todayLessons, setTodayLessons] = useState<any[]>([])
   const [announcements, setAnnouncements] = useState<any[]>([])
   const [attendanceSummary, setAttendanceSummary] = useState({ total: 0, present: 0 })
+  const [historicalScores, setHistoricalScores] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
   const [now] = useState(new Date())
@@ -85,10 +97,22 @@ export default function StudentDashboard() {
           .eq('student_id', student.id)
           .gte('date', (term as any).start_date)
           .lte('date', (term as any).end_date) : Promise.resolve({ data: [] }),
+        // Historical Trends
+        year?.id ? supabase.from('report_cards')
+          .select('average_score, term:terms(name, sort_order)')
+          .eq('student_id', student.id)
+          .eq('academic_year_id', year.id)
+          .order('terms(sort_order)', { ascending: true }) : Promise.resolve({ data: [] }),
       ])
 
       setReportCard(reportRes.data)
       setSubjectScores((scoresRes.data ?? []).sort((a: any, b: any) => (b.total_score ?? 0) - (a.total_score ?? 0)))
+      setHistoricalScores(
+        (trendRes.data ?? []).map((r: any) => ({
+          term: r.term?.name || 'Unknown',
+          score: r.average_score || 0
+        }))
+      )
       setAnnouncements(announceRes.data ?? [])
 
       // Filter assignments not yet submitted
@@ -207,6 +231,74 @@ export default function StudentDashboard() {
               <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 2 }}>{s.sub}</div>
             </div>
           ))}
+        </div>
+
+        <div className="sd-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24, marginBottom: 24 }}>
+          {/* Progress Visualization */}
+          <div className="sd-card" style={{ background: '#fff', borderRadius: 20, padding: '24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .1s both' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div>
+                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#1e1b4b', margin: 0 }}>Learning Journey</h3>
+                <p style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>Track your performance trend across terms.</p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#7c3aed' }} />
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#6b7280' }}>Score %</span>
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ height: 200, width: '100%' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={historicalScores.length > 0 ? historicalScores : [{term: 'No Data', score: 0}]}>
+                  <defs>
+                    <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="#7c3aed" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="term" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} dy={10} />
+                  <YAxis hide domain={[0, 100]} />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontSize: 12, fontWeight: 700 }}
+                    cursor={{ stroke: '#7c3aed', strokeWidth: 2, strokeDasharray: '5 5' }}
+                  />
+                  <Area type="monotone" dataKey="score" stroke="#7c3aed" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Fee Quick Status */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81)', borderRadius: 20, padding: '20px', color: '#fff', animation: '_sfu .5s ease .15s both' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, opacity: 0.7 }}>
+                <Wallet size={16} />
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.05em' }}>OUTSTANDING BALANCE</span>
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 800, fontFamily: 'monospace' }}>GH₵ {(studentData?.fees_arrears || 0).toLocaleString()}</div>
+              <Link to={ROUTES.STUDENT_BILLING} style={{ display: 'block', marginTop: 16, textAlign: 'center', background: 'rgba(255,255,255,0.1)', color: '#fff', textDecoration: 'none', padding: '8px', borderRadius: 10, fontSize: 12, fontWeight: 700 }}>View Billing Tab →</Link>
+            </div>
+            
+            <div style={{ background: '#fff', borderRadius: 20, padding: '16px', border: '1.5px solid #f0eefe', animation: '_sfu .5s ease .2s both' }}>
+               <h4 style={{ fontSize: 12, fontWeight: 800, color: '#1e1b4b', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                 <Clock size={14} color="#7c3aed" /> DUE TOMORROW
+               </h4>
+               {pendingAssignments.filter(a => a.due_date === now.toISOString().slice(0, 10)).length > 0 ? (
+                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                   {pendingAssignments.filter(a => a.due_date === now.toISOString().slice(0, 10)).map(a => (
+                     <div key={a.id} style={{ fontSize: 11, background: '#fef2f2', color: '#991b1b', padding: '8px 10px', borderRadius: 8, fontWeight: 700 }}>
+                       {a.title} ({a.subject?.name})
+                     </div>
+                   ))}
+                 </div>
+               ) : (
+                 <p style={{ fontSize: 11, color: '#6b7280', margin: 0 }}>No deadlines for today! 🎉</p>
+               )}
+            </div>
+          </div>
         </div>
         
         {/* ── Typing Game Teaser ── */}

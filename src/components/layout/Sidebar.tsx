@@ -19,44 +19,43 @@ import {
 const adminLinks = [
   { header: 'General' },
   { to: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
+  { to: ROUTES.ADMIN_CALENDAR, label: 'School Calendar', icon: Calendar },
   { to: ROUTES.ADMIN_MESSAGES, label: 'Messages', icon: MessageSquare },
   { to: ROUTES.ADMIN_ANALYTICS, label: 'Analytics', icon: BarChart3 },
   { to: ROUTES.ADMIN_PERFORMANCE, label: 'Performance Hub', icon: TrendingUp },
   { to: '/admin/test-analytics', label: 'Test Trends', icon: TrendingUp },
 
-  { header: 'Management' },
-  { to: ROUTES.ADMIN_STUDENTS, label: 'Students', icon: Users },
-  { to: ROUTES.ADMIN_TEACHERS, label: 'Teachers', icon: UserCheck },
-  { to: ROUTES.ADMIN_OTHER_STAFF, label: 'Other Staff', icon: Users },
-  { to: '/admin/bursars', label: 'Bursar Staff', icon: Wallet },
+  { header: 'Core Academics' },
   { to: ROUTES.ADMIN_CLASSES, label: 'Classes', icon: School },
   { to: ROUTES.ADMIN_SUBJECTS, label: 'Subjects', icon: BookOpen },
-  { to: ROUTES.ADMIN_DEPARTMENTS, label: 'Departments', icon: Building2 },
-  { to: '/admin/admissions', label: 'Admissions', icon: GraduationCap },
-
-  { header: 'Academics' },
-  { to: ROUTES.ADMIN_REPORTS, label: 'Reports', icon: FileSpreadsheet },
   { to: ROUTES.ADMIN_ATTENDANCE, label: 'Attendance', icon: ClipboardCheck },
   { to: ROUTES.ADMIN_TIMETABLE, label: 'Timetable', icon: Calendar },
   { to: ROUTES.ADMIN_SYLLABUS, label: 'Syllabus', icon: Book },
   { to: ROUTES.ADMIN_WEEKLY_GOALS, label: 'Weekly Goals', icon: Target },
-  { to: '/admin/agenda', label: 'Term Agenda', icon: ClipboardList },
+  { to: ROUTES.ADMIN_REPORTS, label: 'Report Cards', icon: FileSpreadsheet },
 
-  { header: 'Tools' },
-  { to: ROUTES.ADMIN_VISITORS, label: 'Visitors Record', icon: UserPlus },
+  { header: 'Financial Hub' },
+  { to: '/admin/admissions', label: 'Admissions', icon: GraduationCap },
+  { to: '/admin/bursars', label: 'Bursar Staff', icon: Wallet },
+  { to: ROUTES.ADMIN_SMS, label: 'SMS Messaging', icon: Smartphone },
+  { to: ROUTES.ADMIN_STUDENTS, label: 'Students Directory', icon: Users },
+  { to: ROUTES.ADMIN_TEACHERS, label: 'Staff Directory', icon: UserCheck },
+  { to: ROUTES.ADMIN_OTHER_STAFF, label: 'Other Staff', icon: Users },
+
+  { header: 'Community & Tools' },
   { to: ROUTES.ADMIN_ALUMNI, label: 'Alumni & Fundraising', icon: Heart },
-  { to: ROUTES.ADMIN_PROMOTION, label: 'Promotion & Graduation', icon: ArrowUpRight },
+  { to: ROUTES.ADMIN_VISITORS, label: 'Visitors Record', icon: UserPlus },
+  { to: '/admin/poster-maker', label: 'Poster Maker', icon: Image },
+  { to: '/admin/elections', label: 'Elections (PEC)', icon: Vote },
   { to: '/admin/bece-processor', label: 'BECE CA Processor', icon: Calculator },
   { to: '/admin/bece-master', label: 'BECE Master Sheet', icon: Grid },
   { to: '/admin/assessments', label: 'Assessment Entry', icon: ClipboardList },
-  { to: '/admin/elections', label: 'Elections (PEC)', icon: Vote },
-  { to: '/admin/poster-maker', label: 'Poster Maker', icon: Image },
-  { to: ROUTES.ADMIN_SMS, label: 'SMS Messaging', icon: Smartphone },
-
+  { to: '/admin/agenda', label: 'Term Agenda', icon: ClipboardList },
+  { to: ROUTES.ADMIN_PROMOTION, label: 'Promotion & Graduation', icon: ArrowUpRight },
   { header: 'Settings' },
   { to: ROUTES.ADMIN_ACADEMIC_YEARS, label: 'Academic Years', icon: Calendar },
-  { to: ROUTES.ADMIN_TERMS, label: 'Terms', icon: Calendar },
-  { to: ROUTES.ADMIN_SETTINGS, label: 'Settings', icon: Settings },
+  { to: ROUTES.ADMIN_TERMS, label: 'Terms Management', icon: Calendar },
+  { to: ROUTES.ADMIN_SETTINGS, label: 'System Settings', icon: Settings },
 ]
 
 const teacherLinks = [
@@ -98,8 +97,10 @@ const superAdminLinks = [
 const studentLinks = [
   { to: ROUTES.STUDENT_DASHBOARD, label: 'My Portal', icon: LayoutDashboard },
   { to: ROUTES.STUDENT_ASSIGNMENTS, label: 'Assignments', icon: ClipboardList },
+  { to: ROUTES.STUDENT_RESOURCES, label: 'Resources Hub', icon: BookOpen },
   { to: ROUTES.STUDENT_LIBRARY, label: 'Global Library', icon: Library },
   { to: ROUTES.STUDENT_RESULTS, label: 'Academic Results', icon: BarChart3 },
+  { to: ROUTES.STUDENT_BILLING, label: 'Fees & Billing', icon: Wallet },
   { to: '/student/elections', label: 'Elections', icon: Vote },
   { to: ROUTES.STUDENT_SCHEDULE, label: 'My Schedule', icon: Calendar },
   { to: ROUTES.STUDENT_TYPING_GAME, label: 'Typing Nitro', icon: Gamepad2 },
@@ -214,7 +215,7 @@ export default function Sidebar() {
   }, [collapsed])
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [expandedSections, setExpandedSections] = useState<string[]>(['General', 'Management', 'Academics', 'Tools', 'Operations', 'Financials', 'Instructional'])
+  const [expandedSections, setExpandedSections] = useState<string[]>(['General', 'Core Academics', 'Financial Hub', 'Community & Tools', 'Settings', 'Operations', 'Financials', 'Instructional'])
 
   const toggleSection = (header: string) => {
     setExpandedSections(prev => 
