@@ -92,6 +92,9 @@ export interface School {
   headteacher_name?: string
   headteacher_signature_url?: string
   created_at: string
+  // Storage allocation
+  storage_limit_gb: number     // Quota in GB (default: 5)
+  storage_used_bytes: number   // Real-time total footprint in bytes
 }
 
 export interface SchoolSettings {
@@ -266,6 +269,7 @@ export interface Score {
 
 export interface ReportCard {
   id: string
+  school_id: string
   student_id: string
   class_id: string
   term_id: string

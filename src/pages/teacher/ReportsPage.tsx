@@ -284,17 +284,22 @@ export default function TeacherReportsPage() {
         .rp-row:hover{background:#faf5ff !important}
         .rp-std:hover{background:#ede9fe !important}
         @media (max-width: 768px) {
-          .resp-grid-stack { grid-template-columns: 1fr !important; }
-          .resp-main-grid { grid-template-columns: 1fr !important; }
-          .resp-table-wrap { overflow-x: auto !important; padding-bottom: 12px; }
+          .resp-grid-stack { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .resp-main-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .resp-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
           .resp-table-min { min-width: 700px; display: table; width: 100%; }
+          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 16px !important; }
+          .resp-btn-group { flex-direction: column !important; align-items: stretch !important; width: 100% !important; }
+          .resp-pills { flex-wrap: nowrap !important; overflow-x: auto !important; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
+          .rp-std { flex-shrink: 0 !important; }
+          .resp-remarks-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
         }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_rp_fi .4s ease' }}>
 
         {/* ── Header ───────────────────────────────────────────────────── */}
-        <div style={{ marginBottom: 22, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        <div className="resp-header" style={{ marginBottom: 22, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
             <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Report Cards</h1>
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
@@ -303,7 +308,7 @@ export default function TeacherReportsPage() {
           </div>
 
           {fakeReport && (
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div className="resp-btn-group" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {remarksDirty && (
                 <Btn variant="success" onClick={saveRemarks} loading={savingRemarks}>
                   💾 Save Remarks
@@ -375,12 +380,12 @@ export default function TeacherReportsPage() {
             <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>
               Quick select — {selectedClassName}
             </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <div className="resp-pills" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {useMemo(() => students.map((s, i) => (
                 <button key={s.id} onClick={() => setSelectedStudent(s)} className="rp-std"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 13px', borderRadius: 99, border: '1.5px solid #ddd6fe', background: '#f5f3ff', cursor: 'pointer', transition: 'all .15s' }}>
                   <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{i + 1}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#5b21b6' }}>{s.full_name}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#5b21b6', whiteSpace: 'nowrap' }}>{s.full_name}</span>
                 </button>
               )), [students])}
             </div>
@@ -538,7 +543,7 @@ export default function TeacherReportsPage() {
                   )}
                 </div>
 
-                <div className="resp-grid-stack" style={{ padding: '16px 18px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div className="resp-remarks-grid" style={{ padding: '16px 18px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                   <div>
                     <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>
                       Class Teacher's Remarks

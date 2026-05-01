@@ -60,7 +60,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
         marginBottom: 40,
       }}>
         {/* Hero */}
-        <div style={{ position: 'relative', minHeight: resource.cover_image_url ? 240 : 120, background: 'linear-gradient(135deg,#1e0646,#4c1d95)' }}>
+        <div className="lib-reader-hero" style={{ position: 'relative', minHeight: resource.cover_image_url ? 240 : 120, background: 'linear-gradient(135deg,#1e0646,#4c1d95)' }}>
           {resource.cover_image_url && (
             <img src={resource.cover_image_url} alt=""
               style={{ width: '100%', height: 240, objectFit: 'cover', display: 'block', opacity: 0.6 }} />
@@ -70,18 +70,15 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
             position: 'absolute', top: 16, right: 16, width: 36, height: 36, borderRadius: '50%',
             background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)',
             border: '1px solid rgba(255,255,255,0.2)', color: '#fff', fontSize: 18, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1,
+            zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1,
           }}>×</button>
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px 32px' }}>
+          <div className="lib-reader-hero-body" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px 32px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
               <TypeBadge type={resource.content_type} />
               {resource.subject?.name && (
                 <span style={{ fontSize: 10, fontWeight: 800, color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   {resource.subject.name}
                 </span>
-              )}
-              {resource.topic && (
-                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>• {resource.topic}</span>
               )}
             </div>
             <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.3 }}>
@@ -91,7 +88,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
         </div>
 
         {/* Body */}
-        <div style={{ padding: '28px 32px' }}>
+        <div className="lib-reader-content" style={{ padding: '28px 32px' }}>
           {resource.description && (
             <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, marginBottom: 24, borderBottom: '1px solid #f5f3ff', paddingBottom: 20 }}>
               {resource.description}
@@ -100,15 +97,16 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
 
           {/* Video */}
           {resource.content_type === 'video' && (
-            <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+            <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', background: '#000' }}>
               {ytId ? (
-                <iframe
-                  width="100%" height="400"
-                  src={`https://www.youtube.com/embed/${ytId}?autoplay=0&rel=0`}
-                  frameBorder="0" allowFullScreen
-                  style={{ display: 'block' }}
-                  title={resource.title}
-                />
+                <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
+                  <iframe
+                    src={`https://www.youtube.com/embed/${ytId}?autoplay=0&rel=0`}
+                    frameBorder="0" allowFullScreen
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                    title={resource.title}
+                  />
+                </div>
               ) : (
                 <a href={resource.content} target="_blank" rel="noopener noreferrer"
                   style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '20px', background: '#fff7ed', borderRadius: 16, textDecoration: 'none', color: '#ea580c', fontWeight: 700, fontSize: 14, border: '1.5px solid #fed7aa' }}>
@@ -155,8 +153,8 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
           {/* Reading Passage */}
           {resource.content_type === 'passage' && (
             <div style={{
-              background: '#fafaf9', borderRadius: 16, padding: '32px',
-              border: '1.5px solid #f0eefe', lineHeight: 1.9,
+              background: '#fafaf9', borderRadius: 16, padding: '24px',
+              border: '1.5px solid #f0eefe', lineHeight: 1.8,
               fontFamily: 'Georgia, "Times New Roman", serif',
             }}>
               <div className="lib-markdown" style={{ fontSize: 16, color: '#1f2937' }}>
@@ -242,6 +240,13 @@ export default function StudentLibraryPage() {
         .lib-markdown code{background:#f3f4f6;border-radius:6px;padding:2px 6px;font-size:0.9em;}
         @media(max-width:768px){.lib-grid{grid-template-columns:1fr 1fr!important;}.lib-controls{flex-direction:column!important;}}
         @media(max-width:480px){.lib-grid{grid-template-columns:1fr!important;}}
+        @media(max-width:640px){
+          .lib-reader-content{padding:20px!important;}
+          .lib-reader-hero{min-height:160px!important;}
+          .lib-reader-hero img{height:160px!important;}
+          .lib-reader-hero h1{font-size:20px!important;}
+          .lib-reader-hero-body{padding:16px 20px!important;}
+        }
       `}</style>
 
       {selectedResource && (

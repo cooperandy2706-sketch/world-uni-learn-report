@@ -61,6 +61,12 @@ export const ROUTES = {
   STUDENT_LIBRARY: '/student/library',
   STUDENT_BILLING: '/student/billing',
   STUDENT_RESOURCES: '/student/resources',
+  STUDENT_PROFILE: '/student/profile',
+  STUDENT_ATTENDANCE: '/student/attendance',
+  STUDENT_ANNOUNCEMENTS: '/student/announcements',
+  STUDENT_CALENDAR: '/student/calendar',
+  STUDENT_SUBJECTS: '/student/subjects',
+  STUDENT_ELECTIONS: '/student/elections',
 
   // Bursar
   BURSAR_DASHBOARD:  '/bursar/dashboard',

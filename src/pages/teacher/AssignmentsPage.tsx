@@ -350,10 +350,14 @@ export default function AssignmentsPage() {
         .q-card { background: #fff; border: 1.5px solid #f0eefe; border-radius: 14px; padding: 18px; margin-bottom: 16px; position: relative; }
         .q-card:hover { border-color: #7c3aed; }
         @media (max-width: 768px) {
-          .resp-grid { grid-template-columns: 1fr !important; }
-          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
-          .resp-view-switch { flex-direction: column !important; }
+          .resp-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 16px !important; }
+          .resp-view-switch { flex-direction: column !important; width: 100% !important; max-width: none !important; }
           .resp-gap-sm { gap: 8px !important; }
+          .assign-card { padding: 16px !important; }
+          .q-card { padding: 14px !important; }
+          .modal-content-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+          .modal-sidebar { border-left: none !important; padding-left: 0 !important; border-top: 1.5px solid #f5f3ff !important; padding-top: 20px !important; }
         }
       `}</style>
 
@@ -364,7 +368,7 @@ export default function AssignmentsPage() {
             <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Assignments</h1>
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage digital quizzes and tasks for your students</p>
           </div>
-          <Btn onClick={() => setModalOpen(true)}>➕ Create New Assignment</Btn>
+          <Btn onClick={() => setModalOpen(true)} style={{ whiteSpace: 'nowrap' }}>➕ Create Assignment</Btn>
         </div>
 
         {/* ── Main View Switcher ── */}
@@ -516,7 +520,7 @@ export default function AssignmentsPage() {
             <Btn onClick={handleSubmit} loading={isSubmitting}>Publish Assignment</Btn>
           </>}
         >
-          <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 24 }}>
+          <div className="modal-content-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 24 }}>
             <div>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>📋 Assignment Details</p>
               
@@ -563,7 +567,7 @@ export default function AssignmentsPage() {
               </div>
             </div>
 
-            <div style={{ borderLeft: '1.5px solid #f5f3ff', paddingLeft: 24, maxHeight: '600px', overflowY: 'auto' }}>
+            <div className="modal-sidebar" style={{ borderLeft: '1.5px solid #f5f3ff', paddingLeft: 24, maxHeight: '600px', overflowY: 'auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <p style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>❓ Questions ({form.content.questions.length})</p>
                 <button onClick={addQuestion} style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: '#7c3aed', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer' }}>+ Add</button>

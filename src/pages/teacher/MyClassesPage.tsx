@@ -93,8 +93,11 @@ export default function MyClassesPage() {
         @keyframes _fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         .std-row:hover{background:#faf5ff !important}
         @media (max-width: 768px) {
-          .resp-table-wrap { overflow-x: auto !important; padding-bottom: 12px; }
-          .resp-table-min { min-width: 700px; display: table; width: 100%; }
+          .resp-grid { grid-template-columns: 1fr !important; }
+          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
+          .resp-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
+          .resp-table-min { min-width: 700px; }
+          .resp-stat-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
         }
       `}</style>
 
@@ -121,11 +124,11 @@ export default function MyClassesPage() {
                 <div key={cls.classId} style={{ background:'#fff', borderRadius:18, border:'1.5px solid #f0eefe', overflow:'hidden', boxShadow:'0 1px 4px rgba(109,40,217,.07)', animation:`_fu .4s ease ${i*.08}s both` }}>
 
                   {/* Class header */}
-                  <div style={{ background:'linear-gradient(135deg,#faf5ff,#f5f3ff)', padding:'20px', borderBottom:'1px solid #ede9fe', display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
+                  <div className="resp-header" style={{ background:'linear-gradient(135deg,#faf5ff,#f5f3ff)', padding:'20px', borderBottom:'1px solid #ede9fe', display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
                     <div style={{ display:'flex', alignItems:'flex-start', gap:14 }}>
                       <div style={{ width:52, height:52, borderRadius:14, background:'linear-gradient(135deg,#7c3aed,#6d28d9)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, flexShrink:0 }}>🏫</div>
                       <div>
-                        <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
+                        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gap: 10, animation: '_fu .5s ease both', alignItems: 'center' }}>
                           <h2 style={{ fontFamily:'"Playfair Display",serif', fontSize:20, fontWeight:700, color:'#111827', margin:0 }}>{cls.className}</h2>
                           {cls.level && <span style={{ fontSize:11, color:'#6b7280', background:'#fff', padding:'2px 8px', borderRadius:99, border:'1px solid #e5e7eb' }}>{cls.level}</span>}
                           {cls.isClassTeacher && <span style={{ fontSize:11, fontWeight:700, background:'#f0fdf4', color:'#16a34a', padding:'2px 8px', borderRadius:99 }}>👨‍🏫 Class Teacher</span>}
@@ -155,9 +158,9 @@ export default function MyClassesPage() {
                   <div style={{ padding:'16px 20px', display:'flex', flexWrap:'wrap', gap:16, alignItems:'center', borderBottom: isExpanded ? '1px solid #faf5ff' : 'none' }}>
                     {/* Completion */}
                     <div style={{ flex:'1 1 200px', minWidth:0 }}>
-                      <div style={{ display:'flex', justifyContent:'space-between', fontSize:12, marginBottom:5 }}>
-                        <span style={{ color:'#6b7280' }}>Score Completion</span>
-                        <span style={{ fontWeight:700, color: completionPct === 100 ? '#16a34a' : '#6d28d9' }}>{completionPct}%</span>
+                      <div className="resp-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 8 }}>
+                        <span style={{ fontSize: 12, color:'#6b7280' }}>Score Completion</span>
+                        <span style={{ fontSize: 12, textAlign: 'right', fontWeight:700, color: completionPct === 100 ? '#16a34a' : '#6d28d9' }}>{completionPct}%</span>
                       </div>
                       <div style={{ height:7, background:'#f0eefe', borderRadius:99, overflow:'hidden' }}>
                         <div style={{ height:'100%', width:completionPct+'%', background: completionPct === 100 ? 'linear-gradient(90deg,#16a34a,#22c55e)' : 'linear-gradient(90deg,#7c3aed,#a78bfa)', borderRadius:99, transition:'width 1s ease' }} />
@@ -195,7 +198,7 @@ export default function MyClassesPage() {
                         Student Rankings
                       </div>
                       <div className="resp-table-wrap">
-                      <table className="resp-table-min" style={{ borderCollapse:'collapse' }}>
+                      <table className="resp-table-min" style={{ borderCollapse:'collapse', width: '100%' }}>
                         <thead>
                           <tr style={{ background:'#f9f9ff' }}>
                             {['Rank','Student','ID','Gender','Avg Score','Grade','Progress'].map(h => (

@@ -77,10 +77,16 @@ export default function StudentSubjectsPage() {
         .sub-card { background: #fff; border-radius: 20px; padding: 24px; border: 1.5px solid #f0eefe; transition: all 0.3s cubic-bezier(.4, 0, .2, 1); cursor: pointer; position: relative; overflow: hidden; }
         .sub-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(109,40,217,0.12); border-color: #ddd6fe; }
         .sub-card:hover .icon-bounce { transform: scale(1.1) rotate(-5deg); }
+
+        @media (max-width: 640px) {
+          .subjects-header h1 { font-size: 24px !important; }
+          .subjects-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .sub-card { padding: 20px !important; }
+        }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
-        <div style={{ marginBottom: 32 }}>
+        <div className="subjects-header" style={{ marginBottom: 32 }}>
           <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>Discover Library 📚</h1>
           <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>Explore study materials, global challenges, and interactive resources by subject.</p>
         </div>
@@ -104,7 +110,7 @@ export default function StudentSubjectsPage() {
                    <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, #ede9fe, transparent)' }} />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
+                <div className="subjects-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
                   {catSubjects.map((s, i) => {
                     const meta = getSubjectMeta(s.name)
                     return (

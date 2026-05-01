@@ -70,21 +70,43 @@ export default function StudentResourcesPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        
+        .resources-grid {
+          display: grid;
+          grid-template-columns: 1fr 340px;
+          gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+          .resources-grid {
+            grid-template-columns: 1fr;
+          }
+          .resources-sidebar {
+            order: -1;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .resources-header h1 { font-size: 24px !important; }
+          .resources-card-padding { padding: 16px !important; }
+          .due-hero { padding: 24px !important; }
+          .material-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
-      <div style={{ marginBottom: 28 }}>
+      <div className="resources-header" style={{ marginBottom: 28 }}>
         <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>Homework & Resources</h1>
         <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Access your study materials and track upcoming deadlines.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 24 }}>
+      <div className="resources-grid">
         
         {/* Left Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           
           {/* Due Tomorrow Hero */}
           {dueTomorrow.length > 0 && (
-            <div style={{ 
+            <div className="due-hero" style={{ 
               background: 'linear-gradient(135deg, #7c3aed, #4c1d95)', 
               borderRadius: 24, 
               padding: 32, 
@@ -114,7 +136,7 @@ export default function StudentResourcesPage() {
 
           {/* Resources List */}
           <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div className="resources-card-padding" style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 10 }}>
               <FileText size={20} color="#059669" />
               <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>Study Materials & Resources</h3>
             </div>
@@ -125,9 +147,9 @@ export default function StudentResourcesPage() {
                 <p style={{ fontSize: 14, color: '#9ca3af', margin: 0 }}>No reading materials uploaded yet.</p>
               </div>
             ) : (
-              <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+              <div className="resources-card-padding material-grid" style={{ padding: 24, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
                 {resources.map(r => (
-                  <div key={r.id} style={{ border: '1px solid #f1f5f9', borderRadius: 16, padding: 16, transition: 'all 0.2s' }}>
+                  <div key={r.id} style={{ border: '1px solid #f1f5f9', borderRadius: 16, padding: 16, transition: 'all 0.2s', background: '#fff' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                       <div style={{ width: 40, height: 40, borderRadius: 10, background: '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📚</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -154,7 +176,7 @@ export default function StudentResourcesPage() {
         </div>
 
         {/* Right Column: Deadlines */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div className="resources-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div style={{ background: '#fff', borderRadius: 24, padding: 24, border: '1.5px solid #f1f5f9' }}>
             <h4 style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Clock size={16} color="#7c3aed" /> Upcoming Deadlines

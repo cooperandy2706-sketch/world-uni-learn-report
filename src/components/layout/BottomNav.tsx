@@ -20,6 +20,10 @@ const adminLinks = [
   { to: '/admin/attendance', icon: ClipboardCheck, label: 'Register' },
   { to: '/admin/announcements', icon: Megaphone, label: 'Posts' },
   { to: '/admin/messages', icon: MessageSquare, label: 'Messages', notify: true },
+  { to: '/admin/billing', icon: CreditCard, label: 'Billing' },
+  { to: '/admin/reports', icon: FileSpreadsheet, label: 'Reports' },
+  { to: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
+  { to: '/admin/settings', icon: ShieldCheck, label: 'Settings' },
 ]
 
 const teacherLinks = [
@@ -28,7 +32,12 @@ const teacherLinks = [
   { to: '/teacher/attendance', icon: ClipboardCheck, label: 'Register' },
   { to: '/teacher/daily-fees', icon: CreditCard, label: 'Fees' },
   { to: '/teacher/messages', icon: MessageSquare, label: 'Messages', notify: true },
+  { to: '/teacher/assignments', icon: ClipboardList, label: 'Tasks' },
+  { to: '/teacher/behavior', icon: ShieldCheck, label: 'Behavior' },
   { to: '/teacher/syllabus', icon: BookOpen, label: 'Syllabus' },
+  { to: '/teacher/timetable', icon: Calendar, label: 'Schedule' },
+  { to: '/teacher/reports', icon: FileSpreadsheet, label: 'Reports' },
+  { to: '/teacher/self-service', icon: UserCheck, label: 'Service' },
   { to: '/teacher/typing-game', icon: Gamepad2, label: 'Nitro' },
 ]
 
@@ -45,16 +54,22 @@ const studentLinks = [
   { to: '/student/library', icon: Library, label: 'Library' },
   { to: '/student/results', icon: BarChart3, label: 'Results' },
   { to: '/student/schedule', icon: Calendar, label: 'Schedule' },
+  { to: '/student/billing', icon: CreditCard, label: 'Billing' },
+  { to: '/student/profile', icon: Users, label: 'Profile' },
+  { to: '/student/announcements', icon: Megaphone, label: 'Notices' },
   { to: '/student/typing-game', icon: Gamepad2, label: 'Nitro' },
 ]
 
 const bursarLinks = [
   { to: '/bursar/dashboard', icon: LayoutDashboard, label: 'Home' },
   { to: '/bursar/fees', icon: CreditCard, label: 'Fees' },
-  { to: '/bursar/daily-fees', icon: Wallet, label: 'Daily Fees' },
+  { to: '/bursar/daily-fees', icon: Wallet, label: 'Daily' },
   { to: '/bursar/debtors', icon: School, label: 'Classes' },
   { to: '/bursar/payroll', icon: Wallet, label: 'Payroll' },
+  { to: '/bursar/inventory', icon: Library, label: 'Inventory' },
   { to: '/bursar/analytics', icon: BarChart3, label: 'Stats' },
+  { to: '/bursar/reports', icon: FileSpreadsheet, label: 'Reports' },
+  { to: '/bursar/sms', icon: MessageSquare, label: 'SMS' },
 ]
 
 export default function BottomNav() {
@@ -151,7 +166,7 @@ export default function BottomNav() {
       <style>{`
         @keyframes _bn_in { from{opacity:0;transform:translateY(100%)} to{opacity:1;transform:translateY(0)} }
         @keyframes _bn_pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
-        .bn-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex: 1; }
+        .bn-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; min-width: 76px; }
         .bn-item:active { transform: scale(0.95); }
         .bn-active .bn-icon-box { background: rgba(124, 58, 237, 0.1) !important; transform: translateY(-2px); }
         .bn-active .bn-label { color: #6d28d9; font-weight: 700; transform: translateY(-1px); }
@@ -215,7 +230,8 @@ export default function BottomNav() {
         borderTop: '1px solid rgba(109,40,217,0.08)',
         boxShadow: '0 -8px 30px rgba(0,0,0,0.04)',
         display: 'flex', alignItems: 'center',
-        padding: '8px 4px',
+        padding: '8px 12px',
+        gap: 4,
         paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
         animation: '_bn_in 0.5s ease',
         fontFamily: '"DM Sans", sans-serif',

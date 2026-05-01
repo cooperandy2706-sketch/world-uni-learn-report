@@ -1,21 +1,239 @@
 // src/components/layout/Header.tsx
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { useSchoolInvoices } from '../../hooks/useBilling'
+import { supabase } from '../../lib/supabase'
 import NotificationBell from './NotificationBell'
-import { requestAndSubscribe, isPushSubscribed, VAPID_PUBLIC_KEY } from '../../utils/pushNotifications'
+import {
+  Search, Settings, ChevronDown, ChevronLeft, ChevronRight,
+  LogOut, User, Shield, Calendar, AlertTriangle, CreditCard,
+  FileText, BarChart3, MessageSquare, Command, BookOpen, Users,
+  GraduationCap, LayoutDashboard, Zap
+} from 'lucide-react'
+import { ROUTES } from '../../constants/routes'
+import { resolveIntents, extractClassHint, extractPersonIntent, intentToPath } from '../../lib/commandSearch'
 
+// ─── Navigation groups per role ───────────────────────────────────────────────
+const ADMIN_NAV = [
+  {
+    label: 'Dashboard', to: ROUTES.ADMIN_DASHBOARD, single: true,
+  },
+  {
+    label: 'Academics', items: [
+      { label: 'Classes', to: ROUTES.ADMIN_CLASSES },
+      { label: 'Subjects', to: ROUTES.ADMIN_SUBJECTS },
+      { label: 'Attendance', to: ROUTES.ADMIN_ATTENDANCE },
+      { label: 'Timetable', to: ROUTES.ADMIN_TIMETABLE },
+      { label: 'Syllabus', to: ROUTES.ADMIN_SYLLABUS },
+      { label: 'Report Cards', to: ROUTES.ADMIN_REPORTS },
+      { label: 'Score Entry', to: '/admin/score-entry' },
+      { label: 'Batch Promotion', to: '/admin/batch-promotion' },
+    ]
+  },
+  {
+    label: 'People', items: [
+      { label: 'Students', to: ROUTES.ADMIN_STUDENTS },
+      { label: 'Student Vault', to: '/admin/student-vault' },
+      { label: 'Staff', to: ROUTES.ADMIN_TEACHERS },
+      { label: 'Admissions', to: '/admin/admissions' },
+      { label: 'SMS Messaging', to: ROUTES.ADMIN_SMS },
+    ]
+  },
+  {
+    label: 'Operations', items: [
+      { label: 'Admin Tasks', to: '/admin/tasks' },
+      { label: 'Calendar', to: ROUTES.ADMIN_CALENDAR },
+      { label: 'Messages', to: ROUTES.ADMIN_MESSAGES },
+      { label: 'Asset Register', to: '/admin/assets' },
+      { label: 'Billing', to: '/admin/billing' },
+      { label: 'Elections (PEC)', to: '/admin/elections' },
+      { label: 'Alumni', to: ROUTES.ADMIN_ALUMNI },
+    ]
+  },
+  {
+    label: 'Insights', items: [
+      { label: 'Analytics', to: ROUTES.ADMIN_ANALYTICS },
+      { label: 'Academic Years', to: ROUTES.ADMIN_ACADEMIC_YEARS },
+      { label: 'Terms', to: ROUTES.ADMIN_TERMS },
+      { label: 'Settings', to: ROUTES.ADMIN_SETTINGS },
+    ]
+  },
+]
+
+const TEACHER_NAV = [
+  { label: 'Dashboard', to: ROUTES.TEACHER_DASHBOARD, single: true },
+  {
+    label: 'Instruction', items: [
+      { label: 'My Classes', to: ROUTES.TEACHER_MY_CLASSES },
+      { label: 'Students', to: ROUTES.TEACHER_STUDENTS },
+      { label: 'Score Entry', to: ROUTES.TEACHER_SCORE_ENTRY },
+      { label: 'Attendance', to: ROUTES.TEACHER_ATTENDANCE },
+      { label: 'Reports', to: ROUTES.TEACHER_REPORTS },
+      { label: 'Timetable', to: ROUTES.TEACHER_TIMETABLE },
+      { label: 'Assignments', to: ROUTES.TEACHER_ASSIGNMENTS },
+    ]
+  },
+  {
+    label: 'More', items: [
+      { label: 'Behavior Log', to: '/teacher/behavior' },
+      { label: 'Lesson Tracker', to: ROUTES.TEACHER_LESSON_TRACKER },
+      { label: 'Syllabus', to: ROUTES.TEACHER_SYLLABUS },
+      { label: 'Self Service', to: '/teacher/self-service' },
+      { label: 'Messages', to: ROUTES.TEACHER_MESSAGES },
+    ]
+  },
+]
+
+const STUDENT_NAV = [
+  { label: 'Portal', to: ROUTES.STUDENT_DASHBOARD, single: true },
+  { label: 'Results', to: ROUTES.STUDENT_RESULTS, single: true },
+  { label: 'Assignments', to: ROUTES.STUDENT_ASSIGNMENTS, single: true },
+  { label: 'Attendance', to: ROUTES.STUDENT_ATTENDANCE, single: true },
+  { label: 'Timetable', to: ROUTES.STUDENT_SCHEDULE, single: true },
+  { label: 'Library', to: ROUTES.STUDENT_LIBRARY, single: true },
+  { label: 'Fees', to: ROUTES.STUDENT_BILLING, single: true },
+]
+
+const BURSAR_NAV = [
+  { label: 'Dashboard', to: ROUTES.BURSAR_DASHBOARD, single: true },
+  {
+    label: 'Financials', items: [
+      { label: 'School Fees', to: ROUTES.BURSAR_FEES },
+      { label: 'Daily Fees', to: '/bursar/daily-fees' },
+      { label: 'Debtors', to: ROUTES.BURSAR_DEBTORS },
+      { label: 'Bill Sheet', to: ROUTES.BURSAR_BILL_SHEET },
+      { label: 'Payroll', to: ROUTES.BURSAR_PAYROLL },
+      { label: 'Income', to: ROUTES.BURSAR_INCOME },
+      { label: 'Expenses', to: ROUTES.BURSAR_EXPENSES },
+    ]
+  },
+  {
+    label: 'Tools', items: [
+      { label: 'Students', to: ROUTES.BURSAR_STUDENTS },
+      { label: 'School Store', to: ROUTES.BURSAR_INVENTORY },
+      { label: 'Analytics', to: ROUTES.BURSAR_ANALYTICS },
+      { label: 'SMS Reminders', to: ROUTES.BURSAR_SMS },
+      { label: 'Reports', to: ROUTES.BURSAR_REPORTS },
+    ]
+  },
+]
+
+const SUPER_ADMIN_NAV = [
+  { label: 'Platform Hub', to: ROUTES.SUPER_ADMIN_DASHBOARD, single: true },
+  { label: 'Schools', to: ROUTES.SUPER_ADMIN_SCHOOLS, single: true },
+  { label: 'Quizzes', to: ROUTES.SUPER_ADMIN_QUIZZES, single: true },
+  { label: 'Messaging', to: ROUTES.SUPER_ADMIN_MESSAGING, single: true },
+  { label: 'Leaderboards', to: ROUTES.SUPER_ADMIN_ANALYTICS, single: true },
+  { label: 'Resources', to: ROUTES.SUPER_ADMIN_RESOURCES, single: true },
+]
+
+// ─── NavItem component ─────────────────────────────────────────────────────────
+function NavItem({ group }: { group: any }) {
+  const [open, setOpen] = useState(false)
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0 })
+  const ref = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  function openDropdown() {
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect()
+      setDropPos({ top: rect.bottom + 6, left: rect.left })
+    }
+    setOpen(o => !o)
+  }
+
+  if (group.single) {
+    return (
+      <NavLink
+        to={group.to}
+        style={({ isActive }) => ({
+          padding: '7px 14px', borderRadius: 99, fontSize: 13, fontWeight: 600,
+          textDecoration: 'none', whiteSpace: 'nowrap', transition: 'all 0.15s',
+          background: isActive ? '#1a56db' : 'transparent',
+          color: isActive ? '#fff' : '#374151',
+        })}
+      >
+        {group.label}
+      </NavLink>
+    )
+  }
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button
+        onClick={openDropdown}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 4,
+          padding: '7px 14px', borderRadius: 99, fontSize: 13, fontWeight: 600,
+          border: 'none', background: open ? '#eff6ff' : 'transparent',
+          color: open ? '#1a56db' : '#374151', cursor: 'pointer', transition: 'all 0.15s',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {group.label}
+        <ChevronDown size={13} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+      </button>
+
+      {open && (
+        <div style={{
+          position: 'fixed', top: dropPos.top, left: dropPos.left,
+          minWidth: 200,
+          background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.12)', zIndex: 9999,
+          padding: '6px', animation: 'fadeDown 0.15s ease',
+        }}>
+          {group.items.map((item: any) => (
+            <div
+              key={item.to}
+              onClick={() => { navigate(item.to); setOpen(false) }}
+              style={{
+                padding: '9px 14px', borderRadius: 10, fontSize: 13, fontWeight: 500,
+                color: '#374151', cursor: 'pointer', transition: 'all 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.color = '#1a56db' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#374151' }}
+            >
+              {item.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Main Header ───────────────────────────────────────────────────────────────
 export default function Header() {
-  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar } = useAuth()
+  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
   const navigate = useNavigate()
-  const [open, setOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [signing, setSigning] = useState(false)
-  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [searching, setSearching] = useState(false)
+  const [showResults, setShowResults] = useState(false)
+  const [pushEnabled, setPushEnabled] = useState(false)
+  const [selectedPerson, setSelectedPerson] = useState<{ label: string, subtitle: string, type: string, name: string } | null>(null)
+  const [highlightedIdx, setHighlightedIdx] = useState(-1)
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('wul_recent_searches') || '[]') } catch { return [] }
+  })
 
+  const profileRef = useRef<HTMLDivElement>(null)
+  const searchRef = useRef<HTMLDivElement>(null)
   const userSchool = user?.school as any
   const { data: invoices = [] } = useSchoolInvoices(userSchool?.id)
 
@@ -26,32 +244,73 @@ export default function Header() {
     daysLeft = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
   }
 
-  const unpaidInvoice = invoices.find(inv => inv.status === 'pending' || inv.status === 'requested_approval')
-  let invoiceDaysLeft = 0
-  if (unpaidInvoice) {
-    invoiceDaysLeft = Math.ceil((new Date(unpaidInvoice.due_date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  }
+  const navGroups = isSuperAdmin ? SUPER_ADMIN_NAV
+    : isAdmin ? ADMIN_NAV
+    : isTeacher ? TEACHER_NAV
+    : isBursar ? BURSAR_NAV
+    : STUDENT_NAV
 
   useEffect(() => {
-    if (!isAdmin) isPushSubscribed().then(s => setPushEnabled(s))
-  }, [isAdmin])
-
-  async function enablePush() {
-    setOpen(false)
-    const result = await requestAndSubscribe(user!.id)
-    if (result === 'granted') { setPushEnabled(true); alert('🔔 Notifications enabled!') }
-    else if (result === 'denied') alert('Notifications blocked. Go to browser Settings → Allow notifications for this site.')
-  }
-  const ref = useRef<HTMLDivElement>(null)
-
-  // Close on outside click
-  useEffect(() => {
-    function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    const handler = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false)
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setShowResults(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
+
+  useEffect(() => {
+    const allResults = searchResults
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        const input = searchRef.current?.querySelector('input') as HTMLInputElement | null
+        input?.focus()
+        setShowResults(true)
+      }
+      if (e.key === 'Escape') {
+        setShowResults(false)
+        setSelectedPerson(null)
+        setHighlightedIdx(-1)
+        const input = searchRef.current?.querySelector('input') as HTMLInputElement | null
+        input?.blur()
+      }
+      if (!showResults) return
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setHighlightedIdx(i => Math.min(i + 1, allResults.length - 1))
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setHighlightedIdx(i => Math.max(i - 1, -1))
+      }
+      if (e.key === 'Enter' && highlightedIdx >= 0 && allResults[highlightedIdx]) {
+        e.preventDefault()
+        const r = allResults[highlightedIdx]
+        if (r.resultKind === 'person') {
+          setSelectedPerson({ label: r.label, subtitle: r.subtitle, type: r.type, name: r.label })
+        } else {
+          saveRecent(searchQuery)
+          navigate(r.path)
+          setShowResults(false)
+          setSearchQuery('')
+          setHighlightedIdx(-1)
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [searchQuery, showResults, highlightedIdx, searchResults])
+
+  function saveRecent(q: string) {
+    const trimmed = q.trim()
+    if (!trimmed || trimmed.length < 2) return
+    setRecentSearches(prev => {
+      const next = [trimmed, ...prev.filter(r => r !== trimmed)].slice(0, 6)
+      try { localStorage.setItem('wul_recent_searches', JSON.stringify(next)) } catch {}
+      return next
+    })
+  }
 
   async function handleSignOut() {
     setSigning(true)
@@ -59,289 +318,577 @@ export default function Header() {
     navigate('/login')
   }
 
-  const adminMenu = [
-    { icon: '⊞', label: 'Dashboard', path: '/admin/dashboard' },
-    { icon: '👥', label: 'Students', path: '/admin/students' },
-    { icon: '💳', label: 'Billing', path: '/admin/billing' },
-    { icon: '📄', label: 'Reports', path: '/admin/reports' },
-    { icon: '⚙️', label: 'Settings', path: '/admin/settings' },
-    { icon: '📊', label: 'Analytics', path: '/admin/analytics' },
-    { icon: '📈', label: 'Test Trends', path: '/admin/test-analytics' },
-    { icon: '📢', label: 'Announcements', path: '/admin/announcements' },
-    { divider: true },
-    { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
-  ]
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const q = searchQuery.trim()
+      if (q.length < 2) { setSearchResults([]); setShowResults(false); setSelectedPerson(null); return }
+      setSearching(true)
+      try {
+        const results: any[] = []
+        const sid = user?.school_id
 
-  const teacherMenu = [
-    { icon: '⊞', label: 'Dashboard', path: '/teacher/dashboard' },
-    { icon: '🔔', label: 'Notifications', path: '/teacher/notifications' },
-    { icon: '✏️', label: 'Score Entry', path: '/teacher/score-entry' },
-    { icon: '📚', label: 'Library', path: '/teacher/subjects' },
-    { icon: '📄', label: 'Reports', path: '/teacher/reports', },
-    { icon: '📅', label: 'My Timetable', path: '/teacher/timetable' },
-    { icon: '👥', label: 'My Classes', path: '/teacher/my-classes' },
-    { icon: '📝', label: 'Class Tests', path: '/teacher/class-tests' },
-    { icon: '⏱️', label: 'Tracker', path: '/teacher/lesson-tracker' },
-    ...(!pushEnabled && VAPID_PUBLIC_KEY ? [{ icon: '🔕', label: 'Enable Push Alerts', action: enablePush, highlight: true }] : []),
-    { divider: true },
-    { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
-  ]
+        // 1. Keyword intent navigation (instant)
+        const intents = resolveIntents(q, { isAdmin, isTeacher, isBursar, isStudent })
+        intents.forEach(r => results.push({ ...r, resultKind: 'intent' }))
 
-  const superAdminMenu = [
-    { icon: '🏰', label: 'Platform Hub', path: '/super-admin/dashboard' },
-    { icon: '🏫', label: 'School Registry', path: '/super-admin/schools' },
-    { icon: '📝', label: 'Global Quizzes', path: '/super-admin/quizzes' },
-    { icon: '💬', label: 'Global Messaging', path: '/super-admin/messaging' },
-    { icon: '🏅', label: 'Leaderboards', path: '/super-admin/analytics' },
-    { divider: true },
-    { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
-  ]
+        // 2. Person-context intent: "desmond's results", "sir andy timetable", etc.
+        const personIntent = extractPersonIntent(q)
+        if (personIntent && (isAdmin || isTeacher || isBursar)) {
+          const { name, rawName, intent } = personIntent
 
-  const studentMenu = [
-    { icon: '🏠', label: 'My Portal', path: '/student/dashboard' },
-    { icon: '📝', label: 'Assignments', path: '/student/assignments' },
-    { icon: '📚', label: 'Library', path: '/student/subjects' },
-    { icon: '📊', label: 'Academic Results', path: '/student/results' },
-    { icon: '📅', label: 'My Schedule', path: '/student/schedule' },
-    { divider: true },
-    { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
-  ]
+          // Decide: is this likely a teacher query?
+          const teacherIntents = ['timetable', 'classes', 'schedule']
+          const hasTitle = /^(sir|mr|mrs|ms|dr|prof)/i.test(name)
+          const isTeacherIntent = teacherIntents.includes(intent) || hasTitle
 
-  const bursarMenu = [
-    { icon: '⊞', label: 'Dashboard', path: '/bursar/dashboard' },
-    { icon: '💵', label: 'School Fees', path: '/bursar/fees' },
-    { icon: '🏫', label: 'Class Tracking', path: '/bursar/debtors' },
-    { icon: '💼', label: 'Payroll', path: '/bursar/payroll' },
-    { icon: '📈', label: 'Analytics', path: '/bursar/analytics' },
-    { divider: true },
-    { icon: '🔒', label: 'Sign Out', action: handleSignOut, danger: true },
-  ]
+          if (isTeacherIntent) {
+            // Query teachers/staff
+            const { data: teachers } = await supabase
+              .from('users')
+              .select('id, full_name, role')
+              .eq('school_id', sid)
+              .in('role', ['teacher', 'bursar', 'staff'])
+              .ilike('full_name', `%${rawName}%`)
+              .limit(4)
 
-  const menu = isSuperAdmin ? superAdminMenu : isStudent ? studentMenu : isAdmin ? adminMenu : isBursar ? bursarMenu : teacherMenu
+            teachers?.forEach(t => {
+              const dest = intentToPath(intent, 'teacher', isAdmin, isBursar, isTeacher)
+              results.unshift({
+                resultKind: 'intent',
+                label: `${dest.verb} — ${t.full_name}`,
+                subtitle: `Staff · ${t.role}`,
+                icon: dest.icon,
+                color: dest.color,
+                path: `${dest.path}?teacher=${encodeURIComponent(t.full_name)}`,
+              })
+            })
+          } else {
+            // Query students
+            const { data: students } = await supabase
+              .from('students')
+              .select('id, full_name, fees_arrears, class:classes(name)')
+              .eq('school_id', sid)
+              .eq('is_active', true)
+              .ilike('full_name', `%${rawName}%`)
+              .limit(4)
+
+            students?.forEach(s => {
+              const dest = intentToPath(intent, 'student', isAdmin, isBursar, isTeacher)
+              const cls = (s as any).class?.name ?? 'No Class'
+              const arrears = intent === 'fees' ? ` · GH₵${Number((s as any).fees_arrears || 0).toLocaleString()} arrears` : ''
+              results.unshift({
+                resultKind: 'intent',
+                label: `${dest.verb} — ${s.full_name}`,
+                subtitle: `${cls}${arrears}`,
+                icon: dest.icon,
+                color: dest.color,
+                path: `${dest.path}?student=${encodeURIComponent(s.full_name)}`,
+              })
+            })
+          }
+        }
+
+        // 3. Plain student name lookup (fallback when no intent matched)
+        if (!personIntent && (isAdmin || isTeacher || isBursar)) {
+          const { data: st } = await supabase
+            .from('students')
+            .select('id, full_name, class:classes(name)')
+            .eq('school_id', sid)
+            .ilike('full_name', `%${q}%`)
+            .limit(4)
+          st?.forEach(s => results.push({
+            resultKind: 'person', type: 'Student',
+            label: s.full_name,
+            subtitle: `Student · ${(s as any).class?.name ?? 'No Class'}`,
+            icon: '👨‍🎓', color: '#1a56db',
+            path: isAdmin ? `/admin/students` : `/teacher/students`,
+          }))
+        }
+
+        // 4. Plain staff name lookup (fallback)
+        if (!personIntent && isAdmin) {
+          const { data: tr } = await supabase
+            .from('users')
+            .select('id, full_name, role')
+            .eq('school_id', sid)
+            .in('role', ['teacher', 'bursar', 'staff'])
+            .ilike('full_name', `%${q}%`)
+            .limit(3)
+          tr?.forEach(t => results.push({
+            resultKind: 'person', type: 'Staff',
+            label: t.full_name,
+            subtitle: `Staff · ${t.role}`,
+            icon: '👩‍🏫', color: '#7c3aed',
+            path: `/admin/teachers`,
+          }))
+        }
+
+        setSearchResults(results)
+        setShowResults(results.length > 0)
+      } catch { } finally { setSearching(false) }
+    }, 280)
+    return () => clearTimeout(timer)
+  }, [searchQuery, isAdmin, isBursar, isTeacher, isStudent])
+
+  const rolePath = isSuperAdmin ? 'super-admin' : isStudent ? 'student' : isAdmin ? 'admin' : isBursar ? 'bursar' : 'teacher'
 
   return (
     <>
       <style>{`
-        @keyframes _hdr_pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-        @keyframes _hdr_in { from{opacity:0;transform:translateY(-8px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
-        .hdr-menu-item:hover { background: #f5f3ff !important; }
-        .hdr-menu-item { transition: background .12s; }
-        .hdr-avatar:hover { transform: scale(1.06); box-shadow: 0 0 0 3px rgba(124,58,237,.25) !important; }
-        .hdr-avatar { transition: all .2s; cursor: pointer; }
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: translateY(0) } }
+        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes slideInRight { from { transform: translateX(100%) } to { transform: translateX(0) } }
+        @keyframes spin { to { transform: rotate(360deg) } }
+        .top-nav-pill { display: flex; align-items: center; gap: 2px; overflow: visible; }
+        .mobile-menu-btn { display: none; }
+        @media (max-width: 1024px) {
+          .top-nav-pill { display: none !important; }
+          .mobile-menu-btn { display: flex !important; }
+          .header-pill-container { padding: 6px !important; }
+          .school-branding-text { display: none !important; }
+        }
+        @media (max-width: 600px) {
+          .search-input-pill { width: 40px !important; padding: 0 !important; display: flex; justify-content: center; }
+          .search-input-pill input { display: none; }
+          .search-input-pill svg { position: static !important; }
+        }
       `}</style>
 
-      <header className="app-header" style={{
-        height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 32px', background: '#fff', flexShrink: 0,
-        borderBottom: '1px solid #f0eefe',
-        boxShadow: '0 1px 8px rgba(109,40,217,.06)',
-        fontFamily: '"DM Sans",system-ui,sans-serif',
-        position: 'relative', zIndex: 100,
+      <header style={{
+        height: 76, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 28px', background: '#f8f7ff', flexShrink: 0,
+        borderBottom: '1px solid #e8e8f0',
+        fontFamily: '"DM Sans", system-ui, sans-serif',
+        position: 'sticky', top: 0, zIndex: 200,
+        gap: 16,
       }}>
 
-        {/* ── Left: term badge ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {isSuperAdmin ? (
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 7,
-              background: 'linear-gradient(135deg, #ecfdf5, #dcfce7)',
-              border: '1px solid #10b98140', borderRadius: 99, padding: '6px 14px',
-            }}>
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#10b981', animation: '_hdr_pulse 2s infinite' }} />
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#065f46', letterSpacing: '0.05em' }}>
-                GLOBAL SYSTEM CORE &nbsp;·&nbsp; ONLINE
-              </span>
+        {/* ── LEFT: Standalone School Branding ── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+          <button 
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenuOpen(true)}
+            style={{ border: 'none', background: '#fff', width: 42, height: 42, borderRadius: 12, display: 'none', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', cursor: 'pointer', color: '#1a56db' }}
+          >
+            <Command size={20} />
+          </button>
+
+          {userSchool?.logo_url ? (
+            <img
+              src={userSchool.logo_url} alt="School"
+              style={{ width: 42, height: 42, borderRadius: 12, objectFit: 'contain', background: '#fff', padding: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+            />
+          ) : (
+            <div style={{ width: 42, height: 42, borderRadius: 12, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+              <GraduationCap size={22} color="#1a56db" />
             </div>
-          ) : year && term ? (
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 7,
-              background: 'linear-gradient(135deg,#f5f3ff,#ede9fe)',
-              border: '1px solid #ddd6fe', borderRadius: 99, padding: '6px 14px',
-            }}>
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#f59e0b', animation: '_hdr_pulse 2s infinite' }} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#5b21b6' }}>
-                {(year as any).name} &nbsp;·&nbsp; {(term as any).name}
-              </span>
-              {(term as any).is_locked && (
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#dc2626', background: '#fef2f2', borderRadius: 99, padding: '1px 7px' }}>LOCKED</span>
+          )}
+          <div className="school-branding-text" style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <span style={{ fontSize: 15, fontWeight: 800, color: '#111827', whiteSpace: 'nowrap', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em' }}>
+              {userSchool?.name || 'World Uni-Learn'}
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              {year && term ? (
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', whiteSpace: 'nowrap' }}>
+                  {year.name} · {term.name}
+                </span>
+              ) : (
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#ef4444' }}>No Active Term</span>
               )}
             </div>
-          ) : (
-            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 99, padding: '5px 14px', fontSize: 12, fontWeight: 600, color: '#92400e' }}>
-              ⚠ No active term
-            </div>
-          )}
-
-          {/* Billing Alerts */}
-          {!isSuperAdmin && userSchool?.status === 'pending' && daysLeft > 0 && (
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              background: '#fffbeb', border: '1px solid #f59e0b40', borderRadius: 99, padding: '6px 14px',
-              cursor: 'pointer'
-            }} onClick={() => navigate('/admin/billing')}>
-              <span style={{ fontSize: 12 }}>⏳</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#b45309', letterSpacing: '0.03em' }}>
-                FREE TIER: {daysLeft} DAYS LEFT
-              </span>
-            </div>
-          )}
-
-          {!isSuperAdmin && unpaidInvoice && invoiceDaysLeft >= 0 && (
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              background: invoiceDaysLeft < 5 ? '#fef2f2' : '#fffbeb', 
-              border: `1px solid ${invoiceDaysLeft < 5 ? '#ef444440' : '#f59e0b40'}`, 
-              borderRadius: 99, padding: '6px 14px', cursor: 'pointer'
-            }} onClick={() => navigate('/admin/billing')}>
-              <span style={{ fontSize: 12 }}>💳</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: invoiceDaysLeft < 5 ? '#dc2626' : '#b45309', letterSpacing: '0.03em' }}>
-                INVOICE DUE IN {invoiceDaysLeft} DAYS
-              </span>
-            </div>
-          )}
+          </div>
         </div>
 
-        {/* ── Right: bell + avatar ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* ── RIGHT PILL: Nav + Bell + Profile ── */}
+        <div className="header-pill-container" style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          background: '#fff',
+          borderRadius: 99,
+          border: '1px solid #e5e7eb',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+          padding: '6px 6px 6px 16px',
+          maxWidth: '75%',   /* shifted left so search & bell are fully visible */
+        }}>
 
-          {/* Notification bell — teachers only */}
-          {!isAdmin && <NotificationBell />}
+          {/* Nav Groups */}
+          <nav className="top-nav-pill">
+            {navGroups.map((group: any, i: number) => (
+              <NavItem key={i} group={group} />
+            ))}
+          </nav>
 
-          <div style={{ width: 1, height: 24, background: '#f0eefe' }} />
+          {/* Separator */}
+          <div style={{ width: 1, height: 24, background: '#e5e7eb', flexShrink: 0, margin: '0 4px' }} />
 
-          {/* Avatar dropdown trigger */}
-          <div ref={ref} style={{ position: 'relative' }}>
-            <div className="hdr-avatar"
-              onClick={() => setOpen(o => !o)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '5px 10px 5px 5px',
-                borderRadius: 99, border: `1.5px solid ${open ? '#ddd6fe' : 'transparent'}`,
-                background: open ? '#f5f3ff' : 'transparent',
-              }}>
-              {/* Avatar circle */}
-              <div style={{
-                width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                background: (user?.school as any)?.logo_url ? '#fff' : (isSuperAdmin
-                  ? 'linear-gradient(135deg, #059669, #10b981)'
-                  : isStudent ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' : 'linear-gradient(135deg,#7c3aed,#6d28d9)'),
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 13, fontWeight: 800, color: '#fff',
-                boxShadow: (user?.school as any)?.logo_url ? '0 1px 4px rgba(0,0,0,0.1)' : (isSuperAdmin
-                  ? '0 2px 8px rgba(16,185,129,.4)'
-                  : '0 2px 8px rgba(109,40,217,.3)'),
-                overflow: 'hidden',
-                border: '1px solid rgba(0,0,0,0.05)',
-              }}>
-                {(user?.school as any)?.logo_url ? (
-                  <img src={(user.school as any).logo_url} alt="School" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                ) : (
-                  user?.full_name?.charAt(0).toUpperCase()
-                )}
-              </div>
-              {/* Name — hidden on mobile */}
-              <div style={{ display: 'flex', flexDirection: 'column' }}
-                className="hdr-name">
-                <style>{`@media(max-width:767px){.hdr-name{display:none!important}}`}</style>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#111827', lineHeight: 1.2, whiteSpace: 'nowrap' }}>{user?.full_name}</span>
-                <span style={{ fontSize: 10, color: '#a78bfa', textTransform: 'capitalize' }}>{user?.role}</span>
-              </div>
-              {/* Chevron */}
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
-                style={{ transition: 'transform .2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0 }}>
-                <path d="M2 4l4 4 4-4" stroke="#a78bfa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+          {/* Search */}
+          <div ref={searchRef} className="search-input-pill" style={{ position: 'relative', flexShrink: 0 }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Search size={14} color="#9ca3af" style={{ position: 'absolute', left: 10, zIndex: 1, pointerEvents: 'none' }} />
+              <input
+                id="header-search"
+                type="text"
+                value={searchQuery}
+                onChange={e => { setSearchQuery(e.target.value); setHighlightedIdx(-1) }}
+                onFocus={() => setShowResults(true)}
+                placeholder="Search or type a command…"
+                style={{
+                  width: 160, background: '#f3f4f6', border: '1.5px solid transparent',
+                  borderRadius: 99, padding: '7px 36px 7px 30px', fontSize: 13, color: '#111827',
+                  outline: 'none', transition: 'all 0.25s',
+                }}
+                onFocusCapture={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.borderColor = '#1a56db'; e.currentTarget.style.width = '240px' }}
+                onBlurCapture={e => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.width = '160px' }}
+              />
+              {/* ⌘K badge */}
+              {!searching && !searchQuery && (
+                <kbd style={{ position: 'absolute', right: 8, fontSize: 10, background: '#e5e7eb', color: '#9ca3af', padding: '2px 5px', borderRadius: 4, border: '1px solid #d1d5db', pointerEvents: 'none', whiteSpace: 'nowrap' }}>⌘K</kbd>
+              )}
             </div>
 
-            {/* Dropdown menu */}
-            {open && (
+            {showResults && (
               <div style={{
-                position: 'absolute', top: 50, right: 0,
-                width: 230, background: '#fff',
-                borderRadius: 16, border: '1.5px solid #f0eefe',
-                boxShadow: '0 8px 40px rgba(109,40,217,.14)',
-                overflow: 'hidden', zIndex: 999,
-                animation: '_hdr_in .18s ease',
-                fontFamily: '"DM Sans",sans-serif',
-                maxHeight: 'calc(100vh - 80px)',
-                display: 'flex',
-                flexDirection: 'column',
+                position: 'absolute', top: 48, right: 0, width: 340, background: '#fff',
+                borderRadius: 20, border: '1px solid #e5e7eb',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06)',
+                padding: '8px', zIndex: 9999, animation: 'fadeDown 0.15s ease',
+                overflow: 'hidden',
               }}>
-                {/* User info header - fixed */}
-                <div style={{ padding: '14px 16px', borderBottom: '1px solid #f5f3ff', display: 'flex', gap: 10, alignItems: 'center', flexShrink: 0 }}>
-                  <div style={{
-                    width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-                    background: isSuperAdmin
-                      ? 'linear-gradient(135deg, #059669, #10b981)'
-                      : isStudent ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' : 'linear-gradient(135deg,#7c3aed,#6d28d9)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, fontWeight: 800, color: '#fff',
-                  }}>
-                    {user?.full_name?.charAt(0).toUpperCase()}
+
+                {/* Recent searches — shown when query is empty */}
+                {!searchQuery && !selectedPerson && recentSearches.length > 0 && (
+                  <div style={{ marginBottom: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 12px 6px' }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Recent</span>
+                      <button onClick={() => { setRecentSearches([]); localStorage.removeItem('wul_recent_searches') }} style={{ border: 'none', background: 'none', fontSize: 10, color: '#d1d5db', cursor: 'pointer', padding: 0 }}>Clear</button>
+                    </div>
+                    {recentSearches.map((r, i) => (
+                      <div key={i} onClick={() => { setSearchQuery(r); setHighlightedIdx(-1) }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 10, cursor: 'pointer', transition: 'background 0.12s' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+                      >
+                        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, flexShrink: 0 }}>🕐</div>
+                        <span style={{ fontSize: 13, color: '#374151', fontWeight: 500, flex: 1 }}>{r}</span>
+                        <span style={{ fontSize: 11, color: '#d1d5db' }}>↵</span>
+                      </div>
+                    ))}
+                    <div style={{ height: 1, background: '#f3f4f6', margin: '6px 0' }} />
                   </div>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.full_name}</div>
-                    <div style={{ fontSize: 11, color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
-                    <span style={{
-                      fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 99,
-                      background: isSuperAdmin ? '#ecfdf5' : '#f5f3ff',
-                      color: isSuperAdmin ? '#059669' : '#6d28d9',
-                      textTransform: 'capitalize', display: 'inline-block', marginTop: 2
-                    }}>
-                      {user?.role?.replace('_', ' ')}
+                )}
+
+                {/* Empty state: only when actively searching */}
+                {searchQuery && searchResults.length === 0 && !searching && (
+                  <div style={{ padding: '24px 16px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 24, marginBottom: 8 }}>🔍</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>No results found</div>
+                    <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>Try: "pay fees", "attendance", "grade 5"</div>
+                  </div>
+                )}
+
+                {/* Class context hint */}
+                {extractClassHint(searchQuery) && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', marginBottom: 4, background: '#eff6ff', borderRadius: 12 }}>
+                    <Zap size={13} color="#1a56db" />
+                    <span style={{ fontSize: 12, color: '#1a56db', fontWeight: 700 }}>
+                      Context: <strong>{extractClassHint(searchQuery)}</strong> detected — filtering to that class
                     </span>
                   </div>
-                </div>
+                )}
 
-                {/* Menu items */}
-                <div style={{ padding: '6px 0', overflowY: 'auto', flex: 1 }}>
-                  {menu.map((item: any, i) => {
-                    if (item.divider) return (
-                      <div key={i} style={{ height: 1, background: '#f5f3ff', margin: '4px 0' }} />
-                    )
-                    return (
-                      <button key={i} className="hdr-menu-item"
-                        onClick={() => {
-                          setOpen(false)
-                          if (item.action) item.action()
-                          else if (item.path) navigate(item.path)
-                        }}
-                        style={{
-                          width: '100%', display: 'flex', alignItems: 'center', gap: 10,
-                          padding: '10px 16px', border: 'none', background: 'transparent',
-                          cursor: 'pointer', textAlign: 'left', fontFamily: '"DM Sans",sans-serif',
-                        }}>
-                        <span style={{
-                          width: 32, height: 32, borderRadius: 9, flexShrink: 0,
-                          background: item.danger ? '#fef2f2' : '#f5f3ff',
+                {/* Navigation / Action results */}
+                {searchResults.filter((r: any) => r.resultKind === 'intent').length > 0 && (
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '6px 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Zap size={10} /> Quick Actions
+                    </div>
+                    {searchResults.filter((r: any) => r.resultKind === 'intent').map((r: any, i: number) => (
+                      <div
+                        key={`intent-${i}`}
+                        onClick={() => { saveRecent(searchQuery); navigate(r.path); setShowResults(false); setSearchQuery(''); setHighlightedIdx(-1) }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s', background: highlightedIdx === i ? '#f0f4ff' : 'transparent' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = highlightedIdx === i ? '#f0f4ff' : 'transparent' }}
+                      >
+                        <div style={{
+                          width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                          background: `${r.color}15`,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 15,
+                          fontSize: 18, border: `1px solid ${r.color}25`
                         }}>
-                          {item.icon}
-                        </span>
-                        <span style={{
-                          fontSize: 13, fontWeight: 500,
-                          color: item.danger ? '#dc2626' : item.highlight ? '#d97706' : '#374151',
-                        }}>
-                          {item.label}
-                          {item.label === 'Sign Out' && signing && '…'}
-                        </span>
-                      </button>
-                    )
-                  })}
+                          {r.icon}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.label}</div>
+                          <div style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500 }}>{r.subtitle}</div>
+                        </div>
+                        <div style={{ fontSize: 11, color: r.color, fontWeight: 700, background: `${r.color}12`, padding: '2px 8px', borderRadius: 99, whiteSpace: 'nowrap' }}>Go →</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* People results — click to show actions sub-panel */}
+                {!selectedPerson && searchResults.filter((r: any) => r.resultKind === 'person').length > 0 && (
+                  <div style={{ marginTop: searchResults.some((r: any) => r.resultKind === 'intent') ? 8 : 0 }}>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '6px 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <User size={10} /> People
+                    </div>
+                    {searchResults.filter((r: any) => r.resultKind === 'person').map((r: any, i: number) => (
+                      <div
+                        key={`person-${i}`}
+                        onClick={() => setSelectedPerson({ label: r.label, subtitle: r.subtitle, type: r.type, name: r.label })}
+                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+                      >
+                        <div style={{ width: 34, height: 34, borderRadius: '50%', background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>
+                          {r.icon}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</div>
+                          <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.subtitle}</div>
+                        </div>
+                        <div style={{ fontSize: 11, color: '#6b7280', background: '#f3f4f6', padding: '3px 10px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 4 }}>
+                          {r.type} <ChevronRight size={10} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* ── Person Action Sub-Panel ── */}
+                {selectedPerson && (() => {
+                  const enc = encodeURIComponent(selectedPerson.label)
+                  const isStud = selectedPerson.type === 'Student'
+
+                  const adminStudentActions = [
+                    { icon: '👤', label: 'View Profile', subtitle: 'Student directory', color: '#1a56db', path: `/admin/students?student=${enc}` },
+                    { icon: '📊', label: 'View Results / Scores', subtitle: 'Score entry', color: '#0891b2', path: `/admin/score-entry?student=${enc}` },
+                    { icon: '✅', label: 'Attendance Record', subtitle: 'Attendance page', color: '#16a34a', path: `/admin/attendance?student=${enc}` },
+                    { icon: '📄', label: 'Report Card', subtitle: 'Report cards', color: '#7c3aed', path: `/admin/reports?student=${enc}` },
+                    { icon: '💳', label: 'Pay Fees', subtitle: 'Fees & billing', color: '#16a34a', path: `/bursar/fees?student=${enc}` },
+                    { icon: '📋', label: 'Bill Sheet', subtitle: 'Full bill breakdown', color: '#b45309', path: `/bursar/bill-sheet?student=${enc}` },
+                  ]
+                  const bursarStudentActions = [
+                    { icon: '💳', label: 'Pay Fees', subtitle: 'Record a payment', color: '#16a34a', path: `/bursar/fees?student=${enc}` },
+                    { icon: '📋', label: 'Get Bill Sheet', subtitle: 'Full fee breakdown', color: '#b45309', path: `/bursar/bill-sheet?student=${enc}` },
+                    { icon: '📊', label: 'Check Balance', subtitle: 'Debtors overview', color: '#ef4444', path: `/bursar/debtors?student=${enc}` },
+                    { icon: '🧾', label: 'Payment History', subtitle: 'Past payments', color: '#6d28d9', path: `/bursar/fees?student=${enc}&tab=history` },
+                  ]
+                  const teacherStudentActions = [
+                    { icon: '📊', label: 'View Scores', subtitle: 'Score entry', color: '#0891b2', path: `/teacher/score-entry?student=${enc}` },
+                    { icon: '✅', label: 'Attendance', subtitle: 'Attendance record', color: '#16a34a', path: `/teacher/attendance?student=${enc}` },
+                    { icon: '👤', label: 'Student Profile', subtitle: 'Student info', color: '#1a56db', path: `/teacher/students?student=${enc}` },
+                  ]
+                  const adminStaffActions = [
+                    { icon: '👤', label: 'View Profile', subtitle: 'Staff directory', color: '#7c3aed', path: `/admin/teachers?teacher=${enc}` },
+                    { icon: '🕐', label: 'View Timetable', subtitle: 'Timetable', color: '#6d28d9', path: `/admin/timetable?teacher=${enc}` },
+                    { icon: '💼', label: 'Payroll Record', subtitle: 'Staff payroll', color: '#0891b2', path: `/bursar/payroll?teacher=${enc}` },
+                    { icon: '📱', label: 'Send SMS', subtitle: 'Message staff', color: '#16a34a', path: `/admin/sms?to=${enc}` },
+                  ]
+
+                  const actions = isStud
+                    ? (isBursar ? bursarStudentActions : isTeacher ? teacherStudentActions : adminStudentActions)
+                    : adminStaffActions
+
+                  return (
+                    <div style={{ animation: 'fadeDown 0.15s ease' }}>
+                      {/* Header */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px 12px', borderBottom: '1px solid #f3f4f6' }}>
+                        <button
+                          onClick={() => setSelectedPerson(null)}
+                          style={{ border: 'none', background: '#f3f4f6', width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                        >
+                          <ChevronLeft size={14} color="#6b7280" />
+                        </button>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedPerson.label}</div>
+                          <div style={{ fontSize: 11, color: '#9ca3af' }}>{selectedPerson.subtitle}</div>
+                        </div>
+                      </div>
+                      <div style={{ padding: '6px 4px 4px', fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', paddingLeft: 12, paddingTop: 10 }}>
+                        What do you want to do?
+                      </div>
+                      {/* Action list */}
+                      {actions.map((a, i) => (
+                        <div
+                          key={i}
+                          onClick={() => { navigate(a.path); setShowResults(false); setSearchQuery(''); setSelectedPerson(null) }}
+                          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s' }}
+                          onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+                        >
+                          <div style={{ width: 34, height: 34, borderRadius: 10, background: `${a.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>
+                            {a.icon}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{a.label}</div>
+                            <div style={{ fontSize: 11, color: '#9ca3af' }}>{a.subtitle}</div>
+                          </div>
+                          <ChevronRight size={13} color="#d1d5db" />
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
+
+                {/* Footer hint */}
+                <div style={{ marginTop: 8, padding: '8px 12px', borderTop: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 11, color: '#d1d5db' }}>Try: "pay fees" • "top students" • "grade 5 attendance"</span>
+                  <kbd style={{ fontSize: 10, background: '#f3f4f6', color: '#9ca3af', padding: '2px 6px', borderRadius: 4, border: '1px solid #e5e7eb' }}>Esc</kbd>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Notifications */}
+          <div style={{ flexShrink: 0 }}>
+            <NotificationBell />
+          </div>
+
+          {/* Profile Avatar */}
+          <div ref={profileRef} style={{ position: 'relative', flexShrink: 0 }}>
+            <div
+              onClick={() => setProfileOpen(!profileOpen)}
+              style={{
+                width: 36, height: 36, borderRadius: '50%', background: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+                fontSize: 14, fontWeight: 700, color: '#1a56db', cursor: 'pointer',
+                border: '2px solid #e5e7eb', transition: 'box-shadow 0.2s',
+                boxShadow: profileOpen ? '0 0 0 3px #bfdbfe' : 'none',
+              }}
+            >
+              {userSchool?.logo_url
+                ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
+                : user?.full_name?.charAt(0).toUpperCase()
+              }
+            </div>
+
+            {profileOpen && (
+              <div style={{
+                position: 'fixed',
+                top: 82, right: 24,
+                width: 260, background: '#fff',
+                borderRadius: 18, border: '1px solid #e5e7eb',
+                boxShadow: '0 12px 28px rgba(0,0,0,0.12)',
+                padding: 16, zIndex: 9999, animation: 'fadeDown 0.15s ease',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid #f3f4f6' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', fontSize: 18, fontWeight: 700, color: '#1a56db', flexShrink: 0, border: '1px solid #e5e7eb' }}>
+                    {userSchool?.logo_url
+                      ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
+                      : user?.full_name?.charAt(0).toUpperCase()
+                    }
+                  </div>
+                  <div style={{ overflow: 'hidden' }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.full_name}</div>
+                    <div style={{ fontSize: 11, color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: '#1a56db', textTransform: 'uppercase', marginTop: 2 }}>{user?.role}</div>
+                  </div>
                 </div>
 
-                {/* Footer */}
-                <div style={{ padding: '8px 16px 12px', borderTop: '1px solid #f5f3ff' }}>
-                  <p style={{ fontSize: 10, color: '#9ca3af', margin: 0, textAlign: 'center' }}>
-                    WULA Reports · World Uni-Learn Academy
-                  </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <button
+                    onClick={() => { navigate(isAdmin ? '/admin/settings' : '/teacher/self-service'); setProfileOpen(false) }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', background: '#f3f4f6', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#e5e7eb'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#f3f4f6'}
+                  >
+                    <Settings size={15} /> Manage Account
+                  </button>
+                  <button
+                    onClick={handleSignOut}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', background: '#fff5f5', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600, color: '#ef4444', cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#fee2e2'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#fff5f5'}
+                  >
+                    <LogOut size={15} /> {signing ? 'Signing out…' : 'Sign Out'}
+                  </button>
                 </div>
               </div>
             )}
           </div>
         </div>
       </header>
+
+      {/* ── MOBILE MENU OVERLAY ── */}
+      {mobileMenuOpen && (
+        <>
+          <div 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 1000, animation: 'fadeIn 0.3s ease' }} 
+          />
+          <div style={{
+            position: 'fixed', top: 0, right: 0, bottom: 0, width: '85%', maxWidth: 360,
+            background: '#fff', zIndex: 1001, boxShadow: '-10px 0 30px rgba(0,0,0,0.1)',
+            padding: '24px', display: 'flex', flexDirection: 'column', gap: 24,
+            animation: 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 36, height: 36, background: '#eff6ff', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Command size={18} color="#1a56db" />
+                </div>
+                <span style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>Navigation</span>
+              </div>
+              <button onClick={() => setMobileMenuOpen(false)} style={{ border: 'none', background: '#f3f4f6', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <ChevronRight size={18} />
+              </button>
+            </div>
+
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', paddingRight: 4 }}>
+              {navGroups.map((group: any, i: number) => (
+                <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 12px 4px' }}>
+                    {group.label}
+                  </div>
+                  {group.single ? (
+                    <NavLink
+                      to={group.to}
+                      onClick={() => setMobileMenuOpen(false)}
+                      style={({ isActive }) => ({
+                        display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12,
+                        textDecoration: 'none', fontSize: 14, fontWeight: 600, transition: 'all 0.2s',
+                        background: isActive ? '#eff6ff' : 'transparent',
+                        color: isActive ? '#1a56db' : '#374151',
+                      })}
+                    >
+                      <LayoutDashboard size={16} /> Dashboard
+                    </NavLink>
+                  ) : (
+                    group.items.map((item: any) => (
+                      <NavLink
+                        key={item.to}
+                        to={item.to}
+                        onClick={() => setMobileMenuOpen(false)}
+                        style={({ isActive }) => ({
+                          display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 12,
+                          textDecoration: 'none', fontSize: 14, fontWeight: 600, transition: 'all 0.2s',
+                          background: isActive ? '#eff6ff' : 'transparent',
+                          color: isActive ? '#1a56db' : '#374151',
+                        })}
+                      >
+                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor', opacity: 0.4 }} />
+                        {item.label}
+                      </NavLink>
+                    ))
+                  )}
+                </div>
+              ))}
+            </nav>
+
+            <div style={{ marginTop: 'auto', paddingTop: 20, borderTop: '1px solid #f3f4f6' }}>
+              <button 
+                onClick={handleSignOut}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px', borderRadius: 14, background: '#fff5f5', border: 'none', color: '#ef4444', fontWeight: 700, cursor: 'pointer' }}
+              >
+                <LogOut size={18} /> Sign Out
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </>
   )
 }

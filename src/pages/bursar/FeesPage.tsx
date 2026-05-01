@@ -1,5 +1,6 @@
 // src/pages/bursar/FeesPage.tsx
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
@@ -53,6 +54,16 @@ export default function FeesPage() {
   const [allocationResult, setAllocationResult] = useState<any>(null)
   const [isSendingSMS, setIsSendingSMS] = useState(false)
   const [studentSearch, setStudentSearch] = useState('')
+  const [searchParams] = useSearchParams()
+
+  // ── Deep-link: ?student=desmond pre-populates search & auto-selects ──────────
+  useEffect(() => {
+    const hint = searchParams.get('student')
+    if (hint) {
+      setStudentSearch(hint)
+      setTab('record')
+    }
+  }, [searchParams])
 
   // Fee structures
   const { data: structures = [], isLoading: loadingStructures } = useQuery({
@@ -90,6 +101,15 @@ export default function FeesPage() {
       (s.student_id && s.student_id.toLowerCase().includes(studentSearch.toLowerCase()))
     )
   }, [students, studentSearch])
+
+  // Auto-select student if deep-link produced a single match
+  useEffect(() => {
+    const hint = searchParams.get('student')
+    if (hint && filteredStudents.length === 1) {
+      setPf(prev => ({ ...prev, student_id: filteredStudents[0].id }))
+      setPaymentModal(true)
+    }
+  }, [filteredStudents])
 
   // ── Structure form ─────────────────────────────────────────────
   const [sf, setSf] = useState({ class_id: '', fee_name: '', amount: '', description: '' })

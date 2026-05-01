@@ -93,27 +93,69 @@ export default function StudentBillingPage() {
     toast.success('Receipt downloaded')
   }
 
-  if (loading) return null
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
+      <div style={{ width: 24, height: 24, borderRadius: '50%', border: '2.5px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_ssp 0.8s linear infinite' }} />
+      <style>{`@keyframes _ssp { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  )
 
   return (
-    <div style={{ fontFamily: '"DM Sans", sans-serif' }}>
+    <div style={{ fontFamily: '"DM Sans", sans-serif', paddingBottom: 40 }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+        
+        .billing-grid {
+          display: grid;
+          grid-template-columns: 1fr 360px;
+          gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+          .billing-grid {
+            grid-template-columns: 1fr;
+          }
+          .billing-sidebar {
+            order: -1;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .billing-header h1 { font-size: 24px !important; }
+          .billing-card-padding { padding: 16px !important; }
+          .billing-table th, .billing-table td { padding: 12px 0 !important; }
+          .balance-amount { font-size: 36px !important; }
+          .balance-card { padding: 24px !important; }
+        }
+
+        .billing-card {
+          background: #fff;
+          border-radius: 24px;
+          border: 1.5px solid #f1f5f9;
+          overflow: hidden;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+          transition: transform 0.2s;
+        }
+        
+        .billing-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
       `}</style>
 
-      <div style={{ marginBottom: 28 }}>
+      <div className="billing-header" style={{ marginBottom: 28 }}>
         <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>Fees & Billing</h1>
         <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>View your payment history and manage school fees.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 24 }}>
+      <div className="billing-grid">
         
         {/* Left Column: Detailed Statement */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           
           {/* Fee Statement Card */}
-          <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-            <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fafbff' }}>
+          <div className="billing-card">
+            <div className="billing-card-padding" style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fafbff' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <FileText size={20} color="#7c3aed" />
@@ -130,65 +172,67 @@ export default function StudentBillingPage() {
               </div>
             </div>
 
-            <div style={{ padding: '0 24px' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ textAlign: 'left' }}>
-                    <th style={{ padding: '16px 0', fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Description</th>
-                    <th style={{ padding: '16px 0', fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Previous Arrears */}
-                  {billData?.arrears > 0 && (
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '14px 0' }}>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: '#ef4444' }}>Previous Balance (Arrears)</div>
-                        <div style={{ fontSize: 11, color: '#94a3b8' }}>Brought forward from previous terms</div>
-                      </td>
-                      <td style={{ padding: '14px 0', textAlign: 'right', fontSize: 14, fontWeight: 700, color: '#ef4444' }}>
-                        GH₵ {billData.arrears.toLocaleString()}
-                      </td>
+            <div className="billing-card-padding" style={{ padding: '0 24px' }}>
+              <div style={{ overflowX: 'auto' }}>
+                <table className="billing-table">
+                  <thead>
+                    <tr style={{ textAlign: 'left' }}>
+                      <th style={{ padding: '16px 0', fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Description</th>
+                      <th style={{ padding: '16px 0', fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Amount</th>
                     </tr>
-                  )}
+                  </thead>
+                  <tbody>
+                    {/* Previous Arrears */}
+                    {billData?.arrears > 0 && (
+                      <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '14px 0' }}>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: '#ef4444' }}>Previous Balance (Arrears)</div>
+                          <div style={{ fontSize: 11, color: '#94a3b8' }}>Brought forward from previous terms</div>
+                        </td>
+                        <td style={{ padding: '14px 0', textAlign: 'right', fontSize: 14, fontWeight: 700, color: '#ef4444' }}>
+                          GH₵ {billData.arrears.toLocaleString()}
+                        </td>
+                      </tr>
+                    )}
 
-                  {/* Fee Structures */}
-                  {billData?.structures.map((f: any) => (
-                    <tr key={f.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '14px 0' }}>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: '#334155' }}>{f.fee_name}</div>
-                      </td>
-                      <td style={{ padding: '14px 0', textAlign: 'right', fontSize: 14, fontWeight: 700, color: '#334155' }}>
-                        GH₵ {f.amount.toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
+                    {/* Fee Structures */}
+                    {billData?.structures.map((f: any) => (
+                      <tr key={f.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '14px 0' }}>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: '#334155' }}>{f.fee_name}</div>
+                        </td>
+                        <td style={{ padding: '14px 0', textAlign: 'right', fontSize: 14, fontWeight: 700, color: '#334155' }}>
+                          GH₵ {f.amount.toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
 
-                  {/* Scholarship */}
-                  {billData?.scholarship.discount > 0 && (
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '14px 0' }}>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: '#059669', display: 'flex', alignItems: 'center', gap: 6 }}>
-                          Scholarship Discount ({billData.scholarship.percentage}%)
-                        </div>
-                      </td>
-                      <td style={{ padding: '14px 0', textAlign: 'right', fontSize: 14, fontWeight: 700, color: '#059669' }}>
-                        - GH₵ {billData.scholarship.discount.toLocaleString()}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    {/* Scholarship */}
+                    {billData?.scholarship.discount > 0 && (
+                      <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '14px 0' }}>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: '#059669', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            Scholarship Discount ({billData.scholarship.percentage}%)
+                          </div>
+                        </td>
+                        <td style={{ padding: '14px 0', textAlign: 'right', fontSize: 14, fontWeight: 700, color: '#059669' }}>
+                          - GH₵ {billData.scholarship.discount.toLocaleString()}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* Subtotal of Charges */}
-            <div style={{ padding: '20px 24px', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="billing-card-padding" style={{ padding: '20px 24px', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: '#64748b' }}>Total Term Charges</span>
               <span style={{ fontSize: 16, fontWeight: 800, color: '#1e293b' }}>GH₵ {billData?.summary.totalCharges.toLocaleString()}</span>
             </div>
 
             {/* Payment Summary */}
-            <div style={{ padding: '24px' }}>
+            <div className="billing-card-padding" style={{ padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <h4 style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: 0 }}>Payments Applied</h4>
                 <button onClick={() => setShowHistory(!showHistory)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -202,14 +246,14 @@ export default function StudentBillingPage() {
                     <div style={{ padding: '12px', textAlign: 'center', border: '1px dashed #e2e8f0', borderRadius: 12, fontSize: 12, color: '#94a3b8' }}>No payments recorded this term</div>
                   ) : billData?.payments.map((p: any) => (
                     <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#f0fdf4', border: '1px solid #dcfce7', borderRadius: 12 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
-                        <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
+                        <div style={{ minWidth: 0 }}>
                           <div style={{ fontSize: 12, fontWeight: 700, color: '#065f46' }}>Payment received</div>
-                          <div style={{ fontSize: 10, color: '#059669' }}>{new Date(p.payment_date).toLocaleDateString()} · {p.payment_method}</div>
+                          <div style={{ fontSize: 10, color: '#059669', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{new Date(p.payment_date).toLocaleDateString()} · {p.payment_method}</div>
                         </div>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
+                      <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
                         <div style={{ fontSize: 12, fontWeight: 800, color: '#065f46' }}>GH₵ {p.amount_paid.toLocaleString()}</div>
                         <button onClick={() => downloadReceipt(p)} style={{ fontSize: 9, fontWeight: 800, color: '#059669', background: 'none', border: 'none', padding: 0, textDecoration: 'underline', cursor: 'pointer' }}>Receipt →</button>
                       </div>
@@ -227,9 +271,9 @@ export default function StudentBillingPage() {
         </div>
 
         {/* Right Column: Balance Summary Card */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div className="billing-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           
-          <div style={{ 
+          <div className="balance-card" style={{ 
             background: 'linear-gradient(135deg, #1e1b4b, #312e81)', 
             borderRadius: 24, 
             padding: 32, 
@@ -245,7 +289,7 @@ export default function StudentBillingPage() {
               <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Current Balance</span>
             </div>
 
-            <div style={{ fontSize: 44, fontWeight: 900, fontFamily: 'monospace', marginBottom: 12, lineHeight: 1 }}>
+            <div className="balance-amount" style={{ fontSize: 44, fontWeight: 900, fontFamily: 'monospace', marginBottom: 12, lineHeight: 1 }}>
               GH₵ {billData?.summary.balance.toLocaleString()}
             </div>
 
@@ -268,15 +312,15 @@ export default function StudentBillingPage() {
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', margin: '0 0 12px' }}>Student Identification</p>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>👤</div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700 }}>{student?.full_name}</div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{student?.full_name}</div>
                   <div style={{ fontSize: 11, opacity: 0.7 }}>ID: {student?.student_id}</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div style={{ background: '#fff', borderRadius: 20, padding: 24, border: '1.5px solid #f1f5f9' }}>
+          <div className="billing-card" style={{ padding: 24 }}>
             <h4 style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Info size={16} color="#7c3aed" /> Payment Methods
             </h4>
@@ -295,3 +339,4 @@ export default function StudentBillingPage() {
     </div>
   )
 }
+

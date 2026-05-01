@@ -3,10 +3,8 @@ import { useState, useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useSchoolInvoices } from '../../hooks/useBilling'
-import Sidebar from './Sidebar'
 import Header from './Header'
 import BottomNav from './BottomNav'
-import SplashScreen from './SplashScreen'
 import EnablePushButton from '../ui/EnablePushButton'
 import WhatsNewModal from '../ui/WhatsNewModal'
 import AnnouncementPopup from '../ui/AnnouncementPopup'
@@ -17,8 +15,17 @@ interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 
 
 export default function AppLayout({ requiredRole }: AppLayoutProps) {
   const { user, loading, initialized } = useAuth()
+  const userSchool = user?.school as any
+  const { data: invoices = [], isLoading: invoicesLoading } = useSchoolInvoices(userSchool?.id)
 
-
+  if (!initialized || loading) {
+    return (
+      <div style={{ display:'flex', height:'100vh', alignItems:'center', justifyContent:'center', background:'#f8f7ff' }}>
+        <style>{`@keyframes _spin { to { transform:rotate(360deg) } }`}</style>
+        <div style={{ width:24, height:24, borderRadius:'50%', border:'2.5px solid #ede9fe', borderTopColor:'#6d28d9', animation:'_spin 0.8s linear infinite' }} />
+      </div>
+    )
+  }
 
   if (!user) return <Navigate to={ROUTES.LOGIN} replace />
   
@@ -30,10 +37,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
     return <Navigate to={user.role === 'admin' ? ROUTES.ADMIN_DASHBOARD : ROUTES.TEACHER_DASHBOARD} replace />
   }
 
-  const userSchool = user.school as any
-  const { data: invoices = [], isLoading: invoicesLoading } = useSchoolInvoices(userSchool?.id)
-
-  if (!initialized || loading || (user.role !== 'super_admin' && invoicesLoading)) {
+  if (user.role !== 'super_admin' && invoicesLoading) {
     return (
       <div style={{ display:'flex', height:'100vh', alignItems:'center', justifyContent:'center', background:'#f8f7ff' }}>
         <style>{`@keyframes _spin { to { transform:rotate(360deg) } }`}</style>
@@ -41,6 +45,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
       </div>
     )
   }
+
 
   // Pending School Guard & Billing Guard (Non-super-admins)
   if (user.role !== 'super_admin' && userSchool) {
@@ -93,20 +98,21 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
 
   return (
     <>
-      <style>{`
-        @media (max-width: 767px) {
-          .app-sidebar { display: none !important; }
-          .app-main { padding: 16px 14px 80px !important; }
-          .app-header { padding: 0 14px !important; }
-        }
-      `}</style>
-      <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:'#f8f7ff', fontFamily:'"DM Sans",system-ui,sans-serif' }}>
-        <div className="app-sidebar">
-          <Sidebar />
-        </div>
-        <div style={{ display:'flex', flex:1, flexDirection:'column', overflow:'hidden', minWidth:0 }}>
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: '#f8f7ff', fontFamily: '"DM Sans",system-ui,sans-serif' }}>
+        
+        {/* Subtle Watermark Background */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
+          backgroundImage: 'url(/wula-logo.png)',
+          backgroundSize: 'cover', /* Stretches to fill the entire screen */
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.03
+        }} />
+
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
           <Header />
-          <main className="app-main" style={{ flex:1, overflowY:'auto', padding:'28px 32px 48px' }}>
+          <main style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '28px 32px 80px' }}>
             <EnablePushButton />
             <Outlet />
           </main>

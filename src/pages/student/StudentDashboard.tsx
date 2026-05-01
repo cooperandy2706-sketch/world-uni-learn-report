@@ -8,15 +8,13 @@ import { getGradeInfo } from '../../utils/grading'
 import { ROUTES } from '../../constants/routes'
 import { Wallet, Clock } from 'lucide-react'
 import { 
-  LineChart, 
-  Line, 
+  AreaChart,
+  Area,
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer,
-  AreaChart,
-  Area
+  ResponsiveContainer
 } from 'recharts'
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -37,6 +35,7 @@ export default function StudentDashboard() {
   const [announcements, setAnnouncements] = useState<any[]>([])
   const [attendanceSummary, setAttendanceSummary] = useState({ total: 0, present: 0 })
   const [historicalScores, setHistoricalScores] = useState<any[]>([])
+  const [academicChallenges, setAcademicChallenges] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
   const [now] = useState(new Date())
@@ -61,7 +60,6 @@ export default function StudentDashboard() {
       setStudentData(student)
 
       // Load all data in parallel
-      const today = now.toISOString().slice(0, 10)
       const todayDay = now.getDay()
 
       const [
@@ -71,6 +69,8 @@ export default function StudentDashboard() {
         timetableRes,
         announceRes,
         attRes,
+        trendRes,
+        challengesRes,
       ] = await Promise.all([
         // Latest report card
         term?.id ? supabase.from('report_cards').select('*, scores:scores(total_score,grade,subject:subjects(name))').eq('student_id', student.id).eq('term_id', term.id).maybeSingle() : Promise.resolve({ data: null }),
@@ -104,6 +104,12 @@ export default function StudentDashboard() {
           .eq('student_id', student.id)
           .eq('academic_year_id', year.id)
           .order('terms(sort_order)', { ascending: true }) : Promise.resolve({ data: [] }),
+        // Academic Challenges
+        term?.id ? supabase.from('academic_challenges')
+          .select('*')
+          .eq('student_id', student.id)
+          .eq('term_id', term.id)
+          .order('created_at', { ascending: false }) : Promise.resolve({ data: [] }),
       ])
 
       setReportCard(reportRes.data)
@@ -115,6 +121,7 @@ export default function StudentDashboard() {
         }))
       )
       setAnnouncements(announceRes.data ?? [])
+      setAcademicChallenges(challengesRes.data ?? [])
 
       // Filter assignments not yet submitted
       if (assignRes.data) {
@@ -151,7 +158,6 @@ export default function StudentDashboard() {
     const s = timeToMins(l.period?.start_time?.slice(0, 5)); const e = timeToMins(l.period?.end_time?.slice(0, 5))
     return currentMins >= s && currentMins < e
   })
-  const nextLesson = todayLessons.find((l: any) => timeToMins(l.period?.start_time?.slice(0, 5)) > currentMins)
 
   const attPct = attendanceSummary.total > 0 ? Math.round((attendanceSummary.present / attendanceSummary.total) * 100) : 0
   const avgScore = reportCard?.average_score ?? (subjectScores.length ? subjectScores.reduce((s: number, x: any) => s + (x.total_score ?? 0), 0) / subjectScores.length : null)
@@ -174,7 +180,6 @@ export default function StudentDashboard() {
         @keyframes _ssp{to{transform:rotate(360deg)}}
         @keyframes _sfu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
         @keyframes _sfi{from{opacity:0}to{opacity:1}}
-        @keyframes _spulse{0%,100%{box-shadow:0 0 0 0 rgba(109,40,217,.2)}50%{box-shadow:0 0 0 8px rgba(109,40,217,0)}}
         @keyframes _sglive{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,.25)}50%{box-shadow:0 0 0 6px rgba(22,163,74,0)}}
         .sd-card:hover{box-shadow:0 8px 28px rgba(109,40,217,.1)!important;transform:translateY(-2px)!important}
         .sd-card{transition:all .2s}
@@ -212,7 +217,7 @@ export default function StudentDashboard() {
             </p>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <Link to={ROUTES.STUDENT_ASSIGNMENTS} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', textDecoration: 'none', border: '1.5px solid #e5e7eb' }}>📝 Assignments</Link>
+            <Link to={ROUTES.STUDENT_PROFILE} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', textDecoration: 'none', border: '1.5px solid #e5e7eb' }}>👤 My Profile</Link>
             <Link to={ROUTES.STUDENT_RESULTS} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', textDecoration: 'none', boxShadow: '0 2px 8px rgba(109,40,217,.25)' }}>📊 My Results</Link>
           </div>
         </div>
@@ -285,11 +290,11 @@ export default function StudentDashboard() {
             
             <div style={{ background: '#fff', borderRadius: 20, padding: '16px', border: '1.5px solid #f0eefe', animation: '_sfu .5s ease .2s both' }}>
                <h4 style={{ fontSize: 12, fontWeight: 800, color: '#1e1b4b', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-                 <Clock size={14} color="#7c3aed" /> DUE TOMORROW
+                 <Clock size={14} color="#7c3aed" /> DUE SOON
                </h4>
-               {pendingAssignments.filter(a => a.due_date === now.toISOString().slice(0, 10)).length > 0 ? (
+               {pendingAssignments.length > 0 ? (
                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                   {pendingAssignments.filter(a => a.due_date === now.toISOString().slice(0, 10)).map(a => (
+                   {pendingAssignments.slice(0, 2).map(a => (
                      <div key={a.id} style={{ fontSize: 11, background: '#fef2f2', color: '#991b1b', padding: '8px 10px', borderRadius: 8, fontWeight: 700 }}>
                        {a.title} ({a.subject?.name})
                      </div>
@@ -298,11 +303,39 @@ export default function StudentDashboard() {
                ) : (
                  <p style={{ fontSize: 11, color: '#6b7280', margin: 0 }}>No deadlines for today! 🎉</p>
                )}
-            </div>
+             </div>
           </div>
         </div>
+
+        {/* ── Academic Challenges (Parent Focus) ── */}
+        {academicChallenges.length > 0 && (
+          <div className="sd-card" style={{ background: '#fff', borderRadius: 20, padding: '24px', border: '1.5px solid #fecaca', boxShadow: '0 8px 20px rgba(220,38,38,0.05)', marginBottom: 24, animation: '_sfu .5s ease both' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fef2f2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🎯</div>
+              <div>
+                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#991b1b', margin: 0 }}>Growth Opportunities</h3>
+                <p style={{ fontSize: 12, color: '#ef4444', marginTop: 2 }}>Areas identified by teachers for personalized improvement.</p>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+              {academicChallenges.map((c, i) => (
+                <div key={i} style={{ background: '#fff', padding: 16, borderRadius: 16, border: '1px solid #fee2e2' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>{c.subject_name || 'General'}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: '#991b1b', background: '#fef2f2', padding: '2px 8px', borderRadius: 99 }}>{new Date(c.created_at).toLocaleDateString()}</div>
+                  </div>
+                  <p style={{ fontSize: 13, color: '#475569', margin: '0 0 12px', lineHeight: 1.5 }}>{c.description}</p>
+                  <div style={{ fontSize: 11, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#fef2f2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800 }}>{c.teacher_name?.charAt(0)}</div>
+                    Recommended by {c.teacher_name || 'Class Teacher'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         
-        {/* ── Typing Game Teaser ── */}
+        {/* ── Turbo Typing Challenge ── */}
         <div className="resp-flex-stack" style={{
           background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
           borderRadius: 18, padding: '20px 24px', marginBottom: 22, color: '#fff',
@@ -439,18 +472,6 @@ export default function StudentDashboard() {
                 </div>
               </div>
             )}
-
-            {subjectScores.length === 0 && (
-              <div style={{ background: 'linear-gradient(135deg,#2e1065,#4c1d95,#5b21b6)', borderRadius: 18, padding: '32px 28px', color: '#fff', position: 'relative', overflow: 'hidden', animation: '_sfu .5s ease .28s both' }}>
-                <div style={{ position: 'absolute', right: -20, bottom: -20, fontSize: 120, opacity: .08, transform: 'rotate(-10deg)' }}>🎓</div>
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', opacity: .7, marginBottom: 8 }}>📊 YOUR RESULTS</div>
-                  <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 22, fontWeight: 700, margin: '0 0 10px' }}>Results are being finalized</h2>
-                  <p style={{ fontSize: 13, opacity: .8, lineHeight: 1.6, maxWidth: 380 }}>Your teachers are currently entering scores for this term. Check back soon to see your full performance report.</p>
-                  <Link to={ROUTES.STUDENT_RESULTS} style={{ display: 'inline-flex', marginTop: 18, padding: '10px 20px', borderRadius: 10, background: 'rgba(255,255,255,.15)', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none', backdropFilter: 'blur(10px)' }}>View Results Page →</Link>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* ── RIGHT ── */}
@@ -481,20 +502,6 @@ export default function StudentDashboard() {
                     </div>
                   ))}
                 </div>
-                {reportCard && (
-                  <div style={{ marginTop: 12, background: 'rgba(255,255,255,.1)', borderRadius: 10, padding: '10px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,.5)', fontWeight: 700 }}>TERM RANK</div>
-                      <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: '#fbbf24' }}>
-                        {reportCard.overall_position ?? '—'}{reportCard.overall_position ? <span style={{ fontSize: 11 }}> / {reportCard.total_students}</span> : ''}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,.5)', fontWeight: 700 }}>AVERAGE</div>
-                      <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: '#fff' }}>{(reportCard.average_score ?? 0).toFixed(1)}%</div>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -554,6 +561,7 @@ export default function StudentDashboard() {
                     <span style={{ fontSize: 10, color: '#9ca3af' }}>{new Date(a.created_at).toLocaleDateString('en-GH', { day: 'numeric', month: 'short' })}</span>
                   </div>
                 ))}
+                <Link to={ROUTES.STUDENT_ANNOUNCEMENTS} style={{ display: 'block', textAlign: 'center', padding: '8px', borderRadius: 9, background: '#f5f3ff', color: '#6d28d9', fontSize: 12, fontWeight: 600, textDecoration: 'none', marginTop: 8 }}>View notice board →</Link>
               </div>
             )}
 
@@ -565,10 +573,12 @@ export default function StudentDashboard() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 {[
-                   { icon: '📚', label: 'Global Library', to: ROUTES.STUDENT_LIBRARY },
-                   { icon: '📊', label: 'My Results', to: ROUTES.STUDENT_RESULTS },
-                   { icon: '📅', label: 'Class Schedule', to: ROUTES.STUDENT_SCHEDULE },
-                   { icon: '📝', label: 'Assignments & Quizzes', to: ROUTES.STUDENT_ASSIGNMENTS },
+                  { icon: '📚', label: 'Global Library', to: ROUTES.STUDENT_LIBRARY },
+                  { icon: '📊', label: 'My Results', to: ROUTES.STUDENT_RESULTS },
+                  { icon: '📅', label: 'Class Schedule', to: ROUTES.STUDENT_SCHEDULE },
+                  { icon: '📝', label: 'Assignments', to: ROUTES.STUDENT_ASSIGNMENTS },
+                  { icon: '✅', label: 'Attendance', to: ROUTES.STUDENT_ATTENDANCE },
+                  { icon: '🗓️', label: 'School Calendar', to: ROUTES.STUDENT_CALENDAR },
                 ].map(({ icon, label, to }) => (
                   <Link key={label} to={to} className="sd-link"
                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 10, background: '#faf5ff', textDecoration: 'none' }}>

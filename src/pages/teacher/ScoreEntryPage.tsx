@@ -372,7 +372,7 @@ export default function ScoreEntryPage() {
       <div style={{ fontFamily:'"DM Sans",system-ui,sans-serif', animation:'_fi .4s ease' }}>
 
         {/* ── Header ── */}
-        <div style={{ marginBottom:20, display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
+        <div className="resp-header" style={{ marginBottom:20, display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
           <div>
             <h1 style={{ fontFamily:'"Playfair Display",serif', fontSize:24, fontWeight:700, color:'#111827', margin:0 }}>
               GES Score Entry
@@ -385,14 +385,14 @@ export default function ScoreEntryPage() {
             </p>
           </div>
           {selectedClass && students.length > 0 && !isLocked && (
-            <div style={{ display:'flex', gap:8 }}>
+            <div style={{ display:'flex', gap:8, width: '100%', justifyContent: 'flex-end' }} className="resp-btn-group">
               <button onClick={() => handleSave(true)} disabled={saving || !dirty}
-                style={{ display:'inline-flex', alignItems:'center', gap:7, padding:'8px 16px', borderRadius:9, fontSize:13, fontWeight:600, background:'#fff', color:'#374151', border:'1.5px solid #e5e7eb', cursor: dirty ? 'pointer' : 'not-allowed', opacity: dirty ? 1 : 0.5, transition:'all .15s' }}>
+                style={{ flex: 1, maxWidth: 120, display:'inline-flex', alignItems:'center', justifyContent: 'center', gap:7, padding:'10px 16px', borderRadius:9, fontSize:13, fontWeight:600, background:'#fff', color:'#374151', border:'1.5px solid #e5e7eb', cursor: dirty ? 'pointer' : 'not-allowed', opacity: dirty ? 1 : 0.5, transition:'all .15s' }}>
                 {saving ? <span style={{ width:12,height:12,borderRadius:'50%',border:'2px solid #e5e7eb',borderTopColor:'#6d28d9',animation:'_spin .7s linear infinite' }} /> : '💾'}
                 Save
               </button>
               <button onClick={handleSubmit} disabled={submitting || enteredCount === 0}
-                style={{ display:'inline-flex', alignItems:'center', gap:7, padding:'8px 16px', borderRadius:9, fontSize:13, fontWeight:600, background:'linear-gradient(135deg,#7c3aed,#6d28d9)', color:'#fff', border:'none', cursor:'pointer', boxShadow:'0 2px 8px rgba(109,40,217,.28)', opacity: enteredCount === 0 ? 0.5 : 1 }}>
+                style={{ flex: 2, maxWidth: 220, display:'inline-flex', alignItems:'center', justifyContent: 'center', gap:7, padding:'10px 16px', borderRadius:9, fontSize:13, fontWeight:600, background:'linear-gradient(135deg,#7c3aed,#6d28d9)', color:'#fff', border:'none', cursor:'pointer', boxShadow:'0 2px 8px rgba(109,40,217,.28)', opacity: enteredCount === 0 ? 0.5 : 1 }}>
                 {submitting ? <span style={{ width:12,height:12,borderRadius:'50%',border:'2px solid rgba(255,255,255,.3)',borderTopColor:'#fff',animation:'_spin .7s linear infinite' }} /> : '📤'}
                 Submit to Admin
               </button>
@@ -401,7 +401,7 @@ export default function ScoreEntryPage() {
         </div>
 
         {/* ── Controls ── */}
-        <div style={{ background:'#fff', borderRadius:14, padding:'16px 20px', border:'1.5px solid #f0eefe', marginBottom:18, display:'flex', flexWrap:'wrap', gap:16, alignItems:'flex-end' }}>
+        <div className="resp-controls" style={{ background:'#fff', borderRadius:14, padding:'16px 20px', border:'1.5px solid #f0eefe', marginBottom:18, display:'flex', flexWrap:'wrap', gap:16, alignItems:'flex-end' }}>
 
           {/* Class selector */}
           <div style={{ flex:'1 1 200px' }}>
@@ -414,7 +414,7 @@ export default function ScoreEntryPage() {
           </div>
 
           {/* Weights */}
-          <div>
+          <div className="resp-weights">
             <label style={{ display:'block', fontSize:11, fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', color:'#6b7280', marginBottom:5 }}>
               Score Weights &nbsp;
               <span style={{ fontSize:10, fontWeight:600, color: classWeight + examWeight === 100 ? '#16a34a' : '#dc2626' }}>
@@ -442,7 +442,7 @@ export default function ScoreEntryPage() {
 
           {/* Stats */}
           {students.length > 0 && subjects.length > 0 && (
-            <div style={{ display:'flex', gap:20, marginLeft:'auto', flexWrap:'wrap' }}>
+            <div className="resp-stats" style={{ display:'flex', gap:20, marginLeft:'auto', flexWrap:'wrap' }}>
               {[
                 { l:'Students', v: students.length },
                 { l:'Entered',  v: enteredCount, color:'#16a34a' },
@@ -500,7 +500,7 @@ export default function ScoreEntryPage() {
               <span style={{ fontSize:10, color:'#9ca3af', marginLeft:'auto' }}>Click any cell to edit · Tab to move right · Enter to move down</span>
             </div>
 
-            <div style={{ overflowX:'auto', overflowY:'auto', maxHeight:'70vh' }}>
+            <div className="sba-table-wrap">
               <table className="sba-table" style={{ minWidth: COL_STUDENT + subjects.length * COL_SUBJECT + 160 }}>
 
                 {/* ── THEAD ── */}

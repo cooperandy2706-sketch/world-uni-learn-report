@@ -22,3 +22,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# API keys and credentials
+credentials.json
+client_secret.json
+
+# Supabase secrets
+supabase/.env
+supabase/.temp/
+supabase/functions/**/.env

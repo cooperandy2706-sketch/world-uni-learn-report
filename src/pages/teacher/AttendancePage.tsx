@@ -265,30 +265,31 @@ export default function TeacherAttendancePage() {
         .att-btn:hover { filter: brightness(1.08); transform: scale(1.04); }
         .att-btn:active { transform: scale(0.96); }
 
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
           .att-grid-header { display: none !important; }
           .att-list { 
             display: grid !important; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
-            gap: 16px !important;
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
           }
           .att-row { 
             flex-direction: column !important; 
             align-items: stretch !important; 
             gap: 16px !important; 
-            padding: 20px !important; 
+            padding: 16px !important; 
             border-radius: 16px !important;
             border: 1.5px solid #f0eefe !important;
-            box-shadow: 0 4px 12px rgba(109,40,217,.04) !important;
+            box-shadow: 0 2px 8px rgba(109,40,217,.04) !important;
+            background: #fff !important;
           }
           .att-row-mark { 
             width: 100% !important; 
             justify-content: space-between !important; 
-            gap: 10px !important;
+            gap: 8px !important;
           }
           .att-btn {
             flex: 1 !important;
-            padding: 12px 8px !important;
+            padding: 10px 4px !important;
             height: auto !important;
           }
           .att-row-stats { 
@@ -304,13 +305,20 @@ export default function TeacherAttendancePage() {
             bottom: 20px;
             z-index: 50;
             background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
             padding: 16px;
             border-radius: 20px;
             border: 1.5px solid #ede9fe;
             box-shadow: 0 10px 30px rgba(109,40,217,0.15);
-            margin-bottom: 20px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
           }
+          .att-submit-btn { width: 100% !important; justify-content: center !important; }
+        }
+        @media (min-width: 769px) {
+          .show-on-mobile { display: none !important; }
         }
       `}</style>
 
@@ -552,19 +560,21 @@ export default function TeacherAttendancePage() {
 
             {/* Submit button */}
             {!submittedToday && students.length > 0 && (
-              <div className="att-submit-bar" style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
-                <div style={{ fontSize: 13, color: '#6b7280', alignSelf: 'center', fontWeight: 600 }}>
+              <div className="att-submit-bar">
+                <div style={{ fontSize: 13, color: '#6b7280', textAlign: 'center', fontWeight: 600 }}>
                   Today: {presentCount} Present · {absentCount} Absent
                 </div>
                 <button
                   onClick={submit}
                   disabled={saving}
+                  className="att-submit-btn"
                   style={{
                     padding: '12px 28px', borderRadius: 12, border: 'none',
                     background: saving ? '#a78bfa' : 'linear-gradient(135deg,#7c3aed,#4f46e5)',
                     color: '#fff', fontSize: 14, fontWeight: 700, cursor: saving ? 'default' : 'pointer',
                     fontFamily: '"DM Sans",sans-serif', display: 'flex', alignItems: 'center', gap: 8,
                     boxShadow: '0 4px 14px rgba(109,40,217,.35)', transition: 'all .2s',
+                    marginLeft: 'auto'
                   }}
                 >
                   {saving ? (

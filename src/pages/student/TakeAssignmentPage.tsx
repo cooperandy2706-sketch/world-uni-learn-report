@@ -160,13 +160,13 @@ export default function TakeAssignmentPage() {
         <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 32, lineHeight: 1.6 }}>{assignment.description || 'Follow instructions and complete all questions to the best of your ability.'}</p>
         
         <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
-          <div style={{ background: '#f5f3ff', borderRadius: 16, padding: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 4 }}>Questions</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: '#7c3aed' }}>{questions.length} Items</div>
+          <div style={{ background: '#f5f3ff', borderRadius: 16, padding: '20px 16px' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 4, letterSpacing: '0.05em' }}>Questions</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: '#7c3aed' }}>{questions.length} Items</div>
           </div>
-          <div style={{ background: '#f5f3ff', borderRadius: 16, padding: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 4 }}>Time Limit</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: '#f59e0b' }}>{assignment.duration_minutes > 0 ? `${assignment.duration_minutes} Minutes` : 'Unlimited'}</div>
+          <div style={{ background: '#fffbeb', borderRadius: 16, padding: '20px 16px' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 4, letterSpacing: '0.05em' }}>Time Limit</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: '#d97706' }}>{assignment.duration_minutes > 0 ? `${assignment.duration_minutes} Mins` : 'Unlimited'}</div>
           </div>
         </div>
 
@@ -212,21 +212,20 @@ export default function TakeAssignmentPage() {
         @media (max-width: 640px) { .resp-grid-2 { grid-template-columns: 1fr !important; } }
       `}</style>
 
-      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderBottom: '1.5px solid #f0eefe', padding: '12px 0' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 20px', display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase' }}>{assignment.subject?.name}</div>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>{assignment.title}</h2>
+      <div style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(12px)', borderBottom: '1.5px solid #f0eefe', padding: '10px 0' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 16px', display: 'flex', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 10, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{assignment.subject?.name}</div>
+            <h2 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{assignment.title}</h2>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
             {timeLeft !== null && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: timeLeft < 60 ? '#fef2f2' : '#fff', borderRadius: 99, border: `1.5px solid ${timeLeft < 60 ? '#f87171' : '#e5e7eb'}` }}>
-                <span style={{ fontSize: 14 }}>⏱️</span>
-                <span style={{ fontSize: 16, fontWeight: 800, color: timeLeft < 60 ? '#dc2626' : '#374151', fontFamily: 'monospace' }}>{formatTime(timeLeft)}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: timeLeft < 60 ? '#fef2f2' : '#f8fafc', borderRadius: 99, border: `1.5px solid ${timeLeft < 60 ? '#f87171' : '#e2e8f0'}` }}>
+                <span style={{ fontSize: 12, fontWeight: 800, color: timeLeft < 60 ? '#dc2626' : '#475569', fontFamily: 'monospace' }}>{formatTime(timeLeft)}</span>
               </div>
             )}
-            <button onClick={() => handleFinish()} disabled={isSubmitting} style={{ background: '#111827', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Finish Quiz</button>
+            <button onClick={() => handleFinish()} disabled={isSubmitting} style={{ background: '#111827', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Finish</button>
           </div>
         </div>
         <div style={{ height: 4, background: '#ede9fe', width: '100%', marginTop: 12 }}>

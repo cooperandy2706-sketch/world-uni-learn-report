@@ -19,17 +19,12 @@ function LogoMark() {
   return (
     <div style={{
       width: 64, height: 64, borderRadius: 18, flexShrink: 0,
-      background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
-      boxShadow: '0 12px 28px rgba(245,158,11,0.35)',
+      background: '#fff', padding: 6,
+      boxShadow: '0 12px 28px rgba(0,0,0,0.2)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       position: 'relative', overflow: 'hidden', margin: '0 auto 24px'
     }}>
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L2 7l10 5 10-5-10-5z" fill="white" opacity="0.95" />
-        <path d="M2 17c0 0 3.5 3 10 3s10-3 10-3" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.7" />
-        <path d="M2 7v10" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.6" />
-        <path d="M12 12v8" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.8" />
-      </svg>
+      <img src="/wula.png" alt="WULA" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     </div>
   )
 }

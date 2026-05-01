@@ -85,6 +85,14 @@ export default function StudentSubjectDetailsPage() {
         .markdown-content ul, .markdown-content ol { margin-bottom: 1.2em; padding-left: 20px; }
         .markdown-content li { margin-bottom: 0.5em; }
         .markdown-content hr { border: none; border-top: 1.5px solid #e2e8f0; margin: 32px 0; }
+
+        @media (max-width: 640px) {
+          .subject-header h1 { font-size: 28px !important; }
+          .subject-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .res-card-img { height: 140px !important; }
+          .res-card-body { padding: 16px !important; }
+          .passage-modal-body { padding: 16px !important; }
+        }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', maxWidth: 1200, margin: '0 auto' }}>
@@ -93,7 +101,7 @@ export default function StudentSubjectDetailsPage() {
           ← Back to Library
         </button>
 
-        <div style={{ marginBottom: 40 }}>
+        <div className="subject-header" style={{ marginBottom: 40 }}>
           <div style={{ fontSize: 13, fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Global Curriculum</div>
           <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 36, fontWeight: 700, color: '#111827', margin: 0 }}>
             {subject ? subject.name : 'Loading Subject...'}
@@ -122,12 +130,12 @@ export default function StudentSubjectDetailsPage() {
                     <div style={{ height: 1.5, flex: 1, background: 'linear-gradient(90deg, #ddd6fe, transparent)' }} />
                  </div>
 
-                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24 }}>
+                 <div className="subject-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24 }}>
                     {items.map((res, i) => (
                       <div key={res.id} className="res-card" style={{ animation: `_fadeUp 0.4s ease ${i * 0.05}s both` }}>
                         
                         {/* Visual Header based on Content Type or Cover Image */}
-                        <div style={{ 
+                        <div className="res-card-img" style={{ 
                           height: 180, width: '100%', position: 'relative', overflow: 'hidden',
                           background: res.cover_image_url ? '#000' : (
                                       res.content_type === 'video' ? '#0f172a' : 
@@ -167,7 +175,7 @@ export default function StudentSubjectDetailsPage() {
                            </div>
                         </div>
 
-                        <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <div className="res-card-body" style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                           <h3 style={{ fontSize: 19, fontWeight: 700, color: '#1e293b', margin: '0 0 8px 0', lineHeight: 1.3 }}>{res.title}</h3>
                           <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 24px 0', flex: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{res.description}</p>
                           
@@ -199,7 +207,7 @@ export default function StudentSubjectDetailsPage() {
         {/* ── PASSAGE READING MODAL ── */}
         <Modal open={!!activePassage} onClose={() => setActivePassage(null)} title={activePassage?.title} size="lg">
           {activePassage && (
-            <div style={{ background: '#f8fafc', padding: '24px 32px', borderRadius: 16, border: '1px solid #e2e8f0', minHeight: '300px', maxHeight: '65vh', overflowY: 'auto' }}>
+            <div className="passage-modal-body" style={{ background: '#f8fafc', padding: '24px 32px', borderRadius: 16, border: '1px solid #e2e8f0', minHeight: '300px', maxHeight: '65vh', overflowY: 'auto' }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 12 }}>Platform Study Guide</div>
               
               <div className="markdown-content" style={{ fontFamily: 'Georgia, serif', fontSize: 17, lineHeight: 1.8, color: '#334155' }}>

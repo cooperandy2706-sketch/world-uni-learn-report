@@ -15,7 +15,7 @@ type SchoolStatus = 'pending' | 'active' | 'suspended'
 interface School {
   id: string; name: string; email: string; phone: string
   address: string; motto: string; status: SchoolStatus; created_at: string
-  logo_url?: string
+  logo_url?: string; storage_limit_gb: number; storage_used_bytes: number
 }
 
 // ─── animated counter ─────────────────────────────────────
@@ -177,6 +177,20 @@ export default function SuperAdminDashboard() {
       loadPlatformData()
     } catch (err: any) {
       toast.error(err.message || 'Failed to approve payment')
+    }
+  }
+
+  async function handleUpdateStorage(schoolId: string, newLimit: string) {
+    const limit = parseFloat(newLimit)
+    if (isNaN(limit) || limit < 0) return
+
+    try {
+      const { error } = await supabase.from('schools').update({ storage_limit_gb: limit }).eq('id', schoolId)
+      if (error) throw error
+      toast.success('Storage limit updated!')
+      loadPlatformData()
+    } catch (err: any) {
+      toast.error('Update failed')
     }
   }
 
@@ -355,11 +369,12 @@ export default function SuperAdminDashboard() {
         </div>
 
         {/* Table Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 160px', padding: '16px 32px', background: '#fcfcfd', borderBottom: '1px solid #f1f5f9', fontSize: 13, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 120px 160px', padding: '16px 32px', background: '#fcfcfd', borderBottom: '1px solid #f1f5f9', fontSize: 13, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           <div>School Identity</div>
           <div>Contact Info</div>
           <div>Status</div>
-          <div>Registration Date</div>
+          <div>Data Storage</div>
+          <div>Registration</div>
           <div style={{ textAlign: 'right' }}>Actions</div>
         </div>
 
@@ -378,7 +393,7 @@ export default function SuperAdminDashboard() {
                 key={school.id}
                 className="school-row row-animate"
                 style={{
-                  display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 160px', padding: '24px 32px',
+                  display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 120px 160px', padding: '24px 32px',
                   borderBottom: i < filteredSchools.length - 1 ? '1.5px solid #f8fafc' : 'none',
                   alignItems: 'center', transition: 'background 0.2s', animationDelay: `${i * 0.05}s`
                 }}
@@ -415,6 +430,21 @@ export default function SuperAdminDashboard() {
                    }}>
                      {school.status}
                    </span>
+                </div>
+
+                <div>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <input 
+                        type="number"
+                        defaultValue={school.storage_limit_gb}
+                        onBlur={(e) => handleUpdateStorage(school.id, e.target.value)}
+                        style={{ width: 60, padding: '4px 8px', borderRadius: 6, border: '1px solid #e2e8f0', fontSize: 13, fontWeight: 700 }}
+                      />
+                      <span style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>GB</span>
+                   </div>
+                   <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 4 }}>
+                      Used: {((school.storage_used_bytes || 0) / (1024**3)).toFixed(3)} GB
+                   </div>
                 </div>
 
                 <div style={{ fontSize: 13, color: '#64748b' }}>

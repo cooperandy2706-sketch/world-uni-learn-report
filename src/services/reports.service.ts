@@ -6,7 +6,7 @@ export const reportsService = {
     // Fetch all students in the class
     const { data: students } = await supabase
       .from('students')
-      .select('id')
+      .select('id, school_id')
       .eq('class_id', classId)
       .eq('is_active', true)
 
@@ -40,6 +40,7 @@ export const reportsService = {
 
       return {
         student_id: student.id,
+        school_id: student.school_id,
         class_id: classId,
         term_id: termId,
         academic_year_id: academicYearId,

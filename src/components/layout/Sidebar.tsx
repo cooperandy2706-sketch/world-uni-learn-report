@@ -1,7 +1,9 @@
+// src/components/layout/Sidebar.tsx
 import { useState, useEffect } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '../../hooks/useAuth'
+import { useSchoolStorage } from '../../hooks/useSchoolStorage'
 import { dailyFeesService } from '../../services/bursar.service'
 import { supabase } from '../../lib/supabase'
 import { ROUTES } from '../../constants/routes'
@@ -13,47 +15,46 @@ import {
   ChevronLeft, ChevronRight, Wallet, Banknote, Receipt, TrendingDown,
   TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag, ChevronDown,
   Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap,
-  Smartphone, Calculator, Grid, Vote, Image, UserPlus, Heart, Search, ArrowUpRight
+  Smartphone, Calculator, Grid, Vote, Image, UserPlus, Heart, Search, ArrowUpRight,
+  Plus, Monitor, Truck, Armchair, Box
 } from 'lucide-react'
 
 const adminLinks = [
   { header: 'General' },
   { to: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/admin/billing', label: 'Billing & Subscriptions', icon: CreditCard },
+  { to: '/admin/tasks', label: 'Admin Tasks', icon: ClipboardCheck },
   { to: ROUTES.ADMIN_CALENDAR, label: 'School Calendar', icon: Calendar },
   { to: ROUTES.ADMIN_MESSAGES, label: 'Messages', icon: MessageSquare },
-  { to: ROUTES.ADMIN_ANALYTICS, label: 'Analytics', icon: BarChart3 },
-  { to: ROUTES.ADMIN_PERFORMANCE, label: 'Performance Hub', icon: TrendingUp },
-  { to: '/admin/test-analytics', label: 'Test Trends', icon: TrendingUp },
 
-  { header: 'Core Academics' },
+  { header: 'Academics' },
   { to: ROUTES.ADMIN_CLASSES, label: 'Classes', icon: School },
   { to: ROUTES.ADMIN_SUBJECTS, label: 'Subjects', icon: BookOpen },
   { to: ROUTES.ADMIN_ATTENDANCE, label: 'Attendance', icon: ClipboardCheck },
-  { to: ROUTES.ADMIN_TIMETABLE, label: 'Timetable', icon: Calendar },
+  { to: ROUTES.ADMIN_TIMETABLE, label: 'Timetable', icon: Timer },
   { to: ROUTES.ADMIN_SYLLABUS, label: 'Syllabus', icon: Book },
   { to: ROUTES.ADMIN_WEEKLY_GOALS, label: 'Weekly Goals', icon: Target },
   { to: ROUTES.ADMIN_REPORTS, label: 'Report Cards', icon: FileSpreadsheet },
+  { to: '/admin/batch-promotion', label: 'Batch Promotion', icon: ArrowUpRight },
+  { to: '/admin/bece-processor', label: 'BECE CA Processor', icon: Calculator },
 
-  { header: 'Financial Hub' },
-  { to: '/admin/admissions', label: 'Admissions', icon: GraduationCap },
-  { to: '/admin/bursars', label: 'Bursar Staff', icon: Wallet },
-  { to: ROUTES.ADMIN_SMS, label: 'SMS Messaging', icon: Smartphone },
-  { to: ROUTES.ADMIN_STUDENTS, label: 'Students Directory', icon: Users },
+  { header: 'People' },
+  { to: ROUTES.ADMIN_STUDENTS, label: 'Student Directory', icon: Users },
+  { to: '/admin/student-vault', label: 'Student Vault', icon: ShieldCheck },
   { to: ROUTES.ADMIN_TEACHERS, label: 'Staff Directory', icon: UserCheck },
-  { to: ROUTES.ADMIN_OTHER_STAFF, label: 'Other Staff', icon: Users },
+  { to: '/admin/admissions', label: 'Admissions', icon: GraduationCap },
+  { to: ROUTES.ADMIN_SMS, label: 'SMS Messaging', icon: Smartphone },
 
-  { header: 'Community & Tools' },
-  { to: ROUTES.ADMIN_ALUMNI, label: 'Alumni & Fundraising', icon: Heart },
-  { to: ROUTES.ADMIN_VISITORS, label: 'Visitors Record', icon: UserPlus },
+  { header: 'HR & Operations' },
+  { to: '/admin/staff-requests', label: 'Staff Requests', icon: MessageSquare },
+  { to: '/admin/assets', label: 'Asset Register', icon: Package },
+  { to: '/admin/billing', label: 'Billing & Subscription', icon: CreditCard },
+  { to: '/admin/bursars', label: 'Bursar Staff', icon: Wallet },
   { to: '/admin/poster-maker', label: 'Poster Maker', icon: Image },
   { to: '/admin/elections', label: 'Elections (PEC)', icon: Vote },
-  { to: '/admin/bece-processor', label: 'BECE CA Processor', icon: Calculator },
-  { to: '/admin/bece-master', label: 'BECE Master Sheet', icon: Grid },
-  { to: '/admin/assessments', label: 'Assessment Entry', icon: ClipboardList },
-  { to: '/admin/agenda', label: 'Term Agenda', icon: ClipboardList },
-  { to: ROUTES.ADMIN_PROMOTION, label: 'Promotion & Graduation', icon: ArrowUpRight },
-  { header: 'Settings' },
+  { to: ROUTES.ADMIN_ALUMNI, label: 'Alumni & Fundraising', icon: Heart },
+
+  { header: 'Insights & Setup' },
+  { to: ROUTES.ADMIN_ANALYTICS, label: 'School Analytics', icon: BarChart3 },
   { to: ROUTES.ADMIN_ACADEMIC_YEARS, label: 'Academic Years', icon: Calendar },
   { to: ROUTES.ADMIN_TERMS, label: 'Terms Management', icon: Calendar },
   { to: ROUTES.ADMIN_SETTINGS, label: 'System Settings', icon: Settings },
@@ -62,12 +63,14 @@ const adminLinks = [
 const teacherLinks = [
   { header: 'General' },
   { to: ROUTES.TEACHER_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/teacher/self-service', label: 'Self Service', icon: UserCheck },
   { to: ROUTES.TEACHER_MESSAGES, label: 'Messages', icon: MessageSquare },
   { to: ROUTES.TEACHER_NOTIFICATIONS, label: 'Notifications', icon: Bell },
 
   { header: 'Instructional' },
   { to: ROUTES.TEACHER_MY_CLASSES, label: 'My Classes', icon: School },
   { to: ROUTES.TEACHER_STUDENTS, label: 'Students', icon: Users },
+  { to: '/teacher/behavior', label: 'Behavior Log', icon: ShieldCheck },
   { to: '/teacher/class-tests', label: 'Class Tests', icon: ClipboardList },
   { to: ROUTES.TEACHER_SCORE_ENTRY, label: 'Score Entry', icon: PencilLine },
   { to: ROUTES.TEACHER_REPORTS, label: 'Reports', icon: FileSpreadsheet },
@@ -96,14 +99,23 @@ const superAdminLinks = [
 ]
 
 const studentLinks = [
+  { header: 'General' },
   { to: ROUTES.STUDENT_DASHBOARD, label: 'My Portal', icon: LayoutDashboard },
-  { to: ROUTES.STUDENT_ASSIGNMENTS, label: 'Assignments', icon: ClipboardList },
+  { to: ROUTES.STUDENT_PROFILE, label: 'My Profile', icon: UserCheck },
+  { to: ROUTES.STUDENT_ANNOUNCEMENTS, label: 'Notice Board', icon: Megaphone },
+  { to: ROUTES.STUDENT_CALENDAR, label: 'School Calendar', icon: Calendar },
+
+  { header: 'Academic Hub' },
+  { to: ROUTES.STUDENT_RESULTS, label: 'Academic Results', icon: BarChart3 },
+  { to: ROUTES.STUDENT_ASSIGNMENTS, label: 'Assignments & Quizzes', icon: ClipboardList },
+  { to: ROUTES.STUDENT_ATTENDANCE, label: 'Attendance History', icon: UserCheck },
+  { to: ROUTES.STUDENT_SCHEDULE, label: 'My Timetable', icon: Timer },
+
+  { header: 'Resources & Billing' },
   { to: ROUTES.STUDENT_RESOURCES, label: 'Resources Hub', icon: BookOpen },
   { to: ROUTES.STUDENT_LIBRARY, label: 'Global Library', icon: Library },
-  { to: ROUTES.STUDENT_RESULTS, label: 'Academic Results', icon: BarChart3 },
   { to: ROUTES.STUDENT_BILLING, label: 'Fees & Billing', icon: Wallet },
-  { to: '/student/elections', label: 'Elections', icon: Vote },
-  { to: ROUTES.STUDENT_SCHEDULE, label: 'My Schedule', icon: Calendar },
+  { to: ROUTES.STUDENT_ELECTIONS, label: 'PEC Elections', icon: Vote },
   { to: ROUTES.STUDENT_TYPING_GAME, label: 'Typing Nitro', icon: Gamepad2 },
 ]
 
@@ -135,29 +147,15 @@ const staffLinks = [
   { to: '/staff/elections', label: 'Elections (PEC)', icon: Vote },
 ]
 
-// ── Logo Mark ────────────────────────────
-function LogoMark() {
-  return (
-    <div style={{
-      width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-      background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
-      boxShadow: '0 4px 14px rgba(245,158,11,0.45)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      position: 'relative', overflow: 'hidden',
-    }}>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L2 7l10 5 10-5-10-5z" fill="white" opacity="0.95" />
-        <path d="M2 17c0 0 3.5 3 10 3s10-3 10-3" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.7" />
-        <path d="M2 7v10" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.6" />
-        <path d="M12 12v8" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.8" />
-      </svg>
-    </div>
-  )
-}
-
 export default function Sidebar() {
   const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
+  const navigate = useNavigate()
   const isStaff = user?.role === 'staff'
+  const school = user?.school as any
+
+  // Only calculate storage for Admins — avoids unnecessary DB queries for other roles
+  const schoolId = isAdmin ? (user?.school_id ?? undefined) : undefined
+  const storage  = useSchoolStorage(schoolId)
 
   // Check if teacher is allowed to collect daily fees
   const { data: collectorAuth, isLoading: loadingAuth } = useQuery({
@@ -216,13 +214,6 @@ export default function Sidebar() {
   }, [collapsed])
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [expandedSections, setExpandedSections] = useState<string[]>(['General', 'Core Academics', 'Financial Hub', 'Community & Tools', 'Settings', 'Operations', 'Financials', 'Instructional'])
-
-  const toggleSection = (header: string) => {
-    setExpandedSections(prev => 
-      prev.includes(header) ? prev.filter(h => h !== header) : [...prev, header]
-    )
-  }
 
   const filteredLinks = links.filter(l => {
     if ('header' in l) return true // Keep headers
@@ -233,151 +224,143 @@ export default function Sidebar() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
         @keyframes _sideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
-        .sidebar-link { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
-        .sidebar-link:hover { background: rgba(255,255,255,0.08) !important; transform: translateX( ${collapsed ? '0' : '4px'} ); }
-        .sidebar-signout:hover { background: rgba(239,68,68,0.12) !important; }
+        .sidebar-link { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; color: rgba(255,255,255,0.7); }
+        .sidebar-link:hover { background: rgba(255,255,255,0.15) !important; color: #fff; }
         ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 99px; }
         .collapse-btn { 
-          position: absolute; right: -16px; top: 40px; z-index: 200;
-          background: #fbbf24; color: #1e0646; border: 2px solid #3b0764; 
-          width: 32px; height: 32px; border-radius: 50%; cursor: pointer; 
+          position: absolute; right: -14px; top: 32px; z-index: 200;
+          background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.2); 
+          width: 28px; height: 28px; border-radius: 50%; cursor: pointer; backdrop-filter: blur(8px);
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-        .collapse-btn:hover { transform: scale(1.15); background: #f59e0b; box-shadow: 0 0 15px rgba(245,158,11,0.5); }
+        .collapse-btn:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
+        .active-link { background: rgba(255,255,255,0.2) !important; color: #fff !important; border-left: 3px solid #fff; box-shadow: inset 0 0 20px rgba(255,255,255,0.05); }
       `}</style>
 
       <aside style={{
         width: collapsed ? 80 : 260, minWidth: collapsed ? 80 : 260, height: '100vh',
         display: 'flex', flexDirection: 'column',
-        background: 'linear-gradient(175deg, #1e0646 0%, #3b0764 30%, #4c1d95 70%, #5b21b6 100%)',
-        borderRight: '1px solid rgba(255,255,255,0.06)',
+        background: '#1a56db', // Vibrant Royal Blue
+        borderRight: '1px solid rgba(255,255,255,0.05)',
         fontFamily: '"DM Sans", system-ui, sans-serif',
         userSelect: 'none', position: 'relative', overflow: 'hidden',
         transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         zIndex: 150,
+        boxShadow: '10px 0 30px rgba(0,0,0,0.15)',
       }}>
+
+        {/* Background Watermark */}
+        {school?.logo_url && (
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundImage: `url(${school.logo_url})`,
+            backgroundPosition: 'center', backgroundSize: '80%', backgroundRepeat: 'no-repeat',
+            opacity: 0.05, zIndex: 0, pointerEvents: 'none'
+          }} />
+        )}
 
         {/* Toggle Button */}
         <button className="collapse-btn" onClick={() => setCollapsed(!collapsed)}>
           {collapsed ? <ChevronRight size={14} strokeWidth={3} /> : <ChevronLeft size={14} strokeWidth={3} />}
         </button>
 
-        <div style={{ position: 'absolute', top: -60, right: -60, width: 180, height: 180, borderRadius: '50%', background: 'rgba(245,158,11,0.06)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: 80, left: -40, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.03)', pointerEvents: 'none' }} />
-
-        {/* ── Logo ── */}
-        <div style={{ padding: collapsed ? '24px 20px 18px' : '24px 20px 18px', borderBottom: '1px solid rgba(255,255,255,0.07)', position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: collapsed ? 'center' : 'flex-start' }}>
-            <LogoMark />
-            <div style={{ minWidth: 0, opacity: collapsed ? 0 : 1, width: collapsed ? 0 : 'auto', transition: 'all 0.2s', overflow: 'hidden' }}>
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>World</div>
-              <div style={{ fontFamily: '"Playfair Display", serif', fontSize: 15, fontWeight: 700, color: '#fff', lineHeight: 1.2, marginTop: 2 }}>
-                Uni-Learn<br />
-                <span style={{ fontSize: 11, fontWeight: 400, color: 'rgba(255,255,255,0.6)', fontFamily: '"DM Sans",sans-serif' }}>Platform</span>
+        {/* ── Header Area ── */}
+        <div style={{ padding: '32px 20px 24px', position: 'relative', zIndex: 1, overflow: 'visible' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: collapsed ? 'center' : 'flex-start', marginBottom: collapsed ? 0 : 24 }}>
+             {school?.logo_url ? (
+                <img src={school.logo_url} alt="School" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: '#fff', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
+             ) : (
+                <img src="/wula.png" alt="WULA" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: '#fff', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
+             )}
+            {!collapsed && (
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {school?.name || 'World Uni-Learn'}
               </div>
-            </div>
+            )}
           </div>
 
-          <div style={{
-            marginTop: 14, display: collapsed ? 'none' : 'inline-flex', alignItems: 'center', gap: 6,
-            background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 99, padding: '4px 12px',
-            opacity: collapsed ? 0 : 1, transition: 'all 0.2s'
-          }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: isSuperAdmin ? '#10b981' : isStudent ? '#a78bfa' : '#fbbf24' }} />
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>
-              {isSuperAdmin ? 'Master Portal' : isStudent ? 'Student Access' : isAdmin ? 'Admin Console' : 'Teacher View'}
-            </span>
-          </div>
+          {!collapsed && (
+            <button 
+                onClick={() => isAdmin ? navigate('/admin/tasks') : navigate('/teacher/behavior')}
+                style={{ 
+                    width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.2)', 
+                    background: 'rgba(255,255,255,0.15)', color: '#fff', fontWeight: 700, fontSize: 13,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    transition: 'all 0.2s', backdropFilter: 'blur(10px)'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.25)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; }}
+            >
+                <Plus size={16} strokeWidth={3} /> {isAdmin ? 'Add New Task' : 'Log Behavior'}
+            </button>
+          )}
         </div>
 
         {/* ── Search Bar ── */}
         {!collapsed && (
-          <div style={{ padding: '16px 20px 8px', position: 'relative', zIndex: 1 }}>
+          <div style={{ padding: '0 20px 16px', position: 'relative', zIndex: 1 }}>
             <div style={{ position: 'relative' }}>
-              <Search size={14} color="rgba(255,255,255,0.4)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+              <Search size={14} color="rgba(255,255,255,0.6)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
               <input 
                 type="text" 
-                placeholder="Find a page..." 
+                placeholder="Search menu..." 
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 style={{ 
-                  width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', 
+                  width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', 
                   borderRadius: 10, padding: '10px 12px 10px 34px', fontSize: 13, color: '#fff', outline: 'none',
-                  transition: 'all 0.2s', boxSizing: 'border-box'
+                  transition: 'all 0.2s', boxSizing: 'border-box', backdropFilter: 'blur(5px)'
                 }}
-                onFocus={e => e.target.style.background = 'rgba(255,255,255,0.08)'}
-                onBlur={e => e.target.style.background = 'rgba(255,255,255,0.05)'}
+                onFocus={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; }}
+                onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
               />
             </div>
           </div>
         )}
 
         {/* ── Nav links ── */}
-        <nav style={{ flex: 1, overflowY: 'auto', padding: collapsed ? '16px 12px' : '16px 14px', position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'grid', gap: 4 }}>
+        <nav style={{ flex: 1, overflowY: 'auto', padding: collapsed ? '16px 12px' : '0 14px 16px', position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'grid', gap: 2 }}>
             {(() => {
-              let currentSectionVisible = true
               return filteredLinks.map((item: any, i) => {
                 if (item.header) {
-                  const isExpanded = expandedSections.includes(item.header)
-                  currentSectionVisible = isExpanded || !!searchQuery
-                  
-                  if (collapsed || searchQuery) {
-                    currentSectionVisible = true // Always show links when searching or collapsed (flat list)
-                    return null
-                  }
-
+                  if (collapsed || searchQuery) return null
                   return (
                     <div 
                       key={`header-${item.header}`} 
-                      onClick={() => toggleSection(item.header)}
                       style={{ 
-                        padding: '20px 12px 8px', fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.4)', 
-                        textTransform: 'uppercase', letterSpacing: '0.12em', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                        transition: 'color 0.2s', userSelect: 'none'
+                        padding: '24px 12px 8px', fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.5)', 
+                        textTransform: 'uppercase', letterSpacing: '0.05em'
                       }}
-                      onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
-                      onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.4)'}
                     >
                       {item.header}
-                      <ChevronDown size={12} style={{ 
-                        transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)', 
-                        transition: 'transform 0.2s', opacity: 0.5 
-                      }} />
                     </div>
                   )
                 }
-
-                if (!currentSectionVisible && !searchQuery && !collapsed) return null
 
                 const { to, label, icon: Icon } = item
                 return (
                   <NavLink key={to} to={to} style={{ textDecoration: 'none', display: 'block' }} aria-label={label}>
                     {({ isActive }) => (
                       <div
-                        className="sidebar-link"
+                        className={`sidebar-link ${isActive ? 'active-link' : ''}`}
                         onMouseEnter={() => setHovered(to)}
                         onMouseLeave={() => setHovered(null)}
                         style={{
                           display: 'flex', alignItems: 'center', gap: collapsed ? 0 : 12,
-                          padding: '10px 14px', borderRadius: 14,
-                          background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
-                          borderLeft: !collapsed && isActive ? '4px solid #fbbf24' : '4px solid transparent',
+                          padding: '10px 14px', borderRadius: 12,
                           justifyContent: collapsed ? 'center' : 'flex-start',
                           animation: searchQuery ? 'none' : `_sideIn 0.3s ease ${i * 0.02}s both`,
-                          boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
-                          height: 44,
+                          height: 40,
                         }}>
                         <div style={{ position: 'relative', flexShrink: 0 }}>
                           <Icon
-                            size={18}
-                            strokeWidth={isActive ? 2.5 : 2}
-                            color={isActive ? '#fbbf24' : hovered === to ? '#fff' : 'rgba(255,255,255,0.5)'}
+                            size={20}
+                            color={isActive ? '#fff' : 'rgba(255,255,255,0.7)'}
                             style={{ transition: 'all 0.2s', display: 'block' }}
                           />
                           {label === 'Messages' && unreadMsgs > 0 && (
@@ -386,15 +369,15 @@ export default function Sidebar() {
                               background: '#ef4444', color: '#fff',
                               fontSize: 9, fontWeight: 800, borderRadius: 99,
                               padding: '0 3px', minWidth: 14, textAlign: 'center', lineHeight: '14px',
-                              border: '1.5px solid #1e0646',
+                              border: '2px solid rgba(255,255,255,0.2)',
                             }}>{unreadMsgs > 99 ? '99+' : unreadMsgs}</span>
                           )}
                         </div>
                         {!collapsed && (
                           <span style={{
                             fontSize: 13,
-                            fontWeight: isActive ? 700 : 500,
-                            color: isActive ? '#fff' : hovered === to ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.6)',
+                            fontWeight: isActive ? 700 : 600,
+                            color: isActive ? '#fff' : 'rgba(255,255,255,0.85)',
                             whiteSpace: 'nowrap',
                             transition: 'all 0.2s'
                           }}>
@@ -410,58 +393,78 @@ export default function Sidebar() {
           </div>
         </nav>
 
-        {/* ── User footer ── */}
-        <div style={{ padding: '16px 14px', borderTop: '1px solid rgba(255,255,255,0.07)', position: 'relative', zIndex: 1 }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 12,
-            padding: '12px 14px', borderRadius: 16,
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            marginBottom: 10,
-            justifyContent: collapsed ? 'center' : 'flex-start',
-          }}>
-            <div style={{
-              width: 36, height: 36, borderRadius: 12, flexShrink: 0,
-              background: (user?.school as any)?.logo_url ? '#fff' : 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 15, fontWeight: 900, color: '#fff',
-              boxShadow: (user?.school as any)?.logo_url ? '0 1px 4px rgba(0,0,0,0.1)' : '0 4px 12px rgba(245,158,11,0.3)',
-              overflow: 'hidden',
-              border: (user?.school as any)?.logo_url ? '1px solid rgba(255,255,255,0.1)' : 'none',
-            }}>
-              {(user?.school as any)?.logo_url ? (
-                <img src={(user.school as any).logo_url} alt="School" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-              ) : (
-                user?.full_name?.charAt(0).toUpperCase()
-              )}
-            </div>
-            {!collapsed && (
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {user?.full_name}
-                </div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {user?.email}
-                </div>
-              </div>
-            )}
-          </div>
+        {/* ── Storage Widget — Admin Only ── */}
+        {!collapsed && isAdmin && (
+            <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.15)', position: 'relative', zIndex: 1 }}>
 
-          <button
-            className="sidebar-signout"
-            onClick={signOut}
-            aria-label="Sign out"
-            style={{
-              width: '100%', display: 'flex', alignItems: 'center', gap: 10,
-              padding: '10px 14px', borderRadius: 12,
-              border: 'none', background: 'transparent',
-              cursor: 'pointer', transition: 'all 0.2s',
-              justifyContent: collapsed ? 'center' : 'flex-start',
-            }}>
-            <LogOut size={18} color="rgba(252,165,165,0.7)" />
-            {!collapsed && <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(252,165,165,0.7)' }}>End Session</span>}
-          </button>
-        </div>
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                    <Monitor size={15} color="rgba(255,255,255,0.7)" />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Storage Usage</span>
+                    {storage.loading && <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)' }}>Calculating…</span>}
+                </div>
+
+                <div style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: 14, padding: '14px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+
+                    {/* Progress bar */}
+                    <div style={{ height: 6, background: 'rgba(0,0,0,0.2)', borderRadius: 3, marginBottom: 8, overflow: 'hidden' }}>
+                        <div style={{
+                            width: `${storage.percentUsed}%`,
+                            height: '100%',
+                            borderRadius: 3,
+                            background: storage.percentUsed >= 90 ? '#ef4444'
+                                      : storage.percentUsed >= 75 ? '#f59e0b'
+                                      : '#fff',
+                            transition: 'width 1.2s cubic-bezier(0.4,0,0.2,1)'
+                        }} />
+                    </div>
+
+                    {/* Primary label */}
+                    <div style={{ fontSize: 12, fontWeight: 800, color: '#fff', marginBottom: 8 }}>
+                        {storage.totalBytes < 1024 ** 3
+                            ? `${(storage.totalBytes / 1024 ** 2).toFixed(1)} MB`
+                            : `${(storage.totalBytes / 1024 ** 3).toFixed(2)} GB`
+                        }
+                        <span style={{ fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}> of {storage.limitGB} GB used</span>
+                    </div>
+
+                    {/* Breakdown rows */}
+                    {[
+                        { label: 'Student Vault', bytes: storage.vaultBytes },
+                        { label: 'Assets & Media', bytes: storage.assetBytes },
+                        { label: 'Logos & Branding', bytes: storage.logoBytes },
+                        { label: 'Database Records', bytes: storage.dbFootprintBytes },
+                    ].map(({ label, bytes }) => bytes > 0 && (
+                        <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>
+                            <span>{label}</span>
+                            <span style={{ fontWeight: 600 }}>{bytes < 1024 ** 2 ? `${(bytes / 1024).toFixed(0)} KB` : bytes < 1024 ** 3 ? `${(bytes / 1024 ** 2).toFixed(1)} MB` : `${(bytes / 1024 ** 3).toFixed(2)} GB`}</span>
+                        </div>
+                    ))}
+
+                    {/* CTA */}
+                    <button
+                        onClick={() => navigate('/admin/billing')}
+                        style={{
+                            marginTop: 14, width: '100%', padding: '8px', borderRadius: 8, border: 'none',
+                            background: 'rgba(255,255,255,0.2)', color: '#fff', fontSize: 11, fontWeight: 700,
+                            cursor: 'pointer', transition: 'all 0.2s', backdropFilter: 'blur(4px)'
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.3)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; }}
+                    >
+                        Get more storage
+                    </button>
+                </div>
+
+                <div onClick={signOut} style={{ marginTop: 20, display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: '8px 12px', borderRadius: 10, transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.15)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <div style={{ width: 28, height: 28, borderRadius: '8px', background: 'rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <LogOut size={14} color="#fca5a5" />
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#fca5a5' }}>Sign Out</span>
+                </div>
+            </div>
+        )}
+
       </aside>
     </>
   )

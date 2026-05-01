@@ -149,22 +149,36 @@ export default function StudentElectionsPage() {
         .hover-cand:hover { background: #f9fafb !important; border-color: #ddd6fe !important; }
         .hover-btn:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 16px rgba(109,40,217,0.3) !important; }
         .tab-content { animation: _slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        .elections-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+          gap: 24px;
+        }
+
+        @media (max-width: 640px) {
+          .elections-header h1 { font-size: 22px !important; }
+          .elections-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .elections-card { padding: 20px !important; }
+          .nominate-header { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
+          .vote-header { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
+        }
       `}</style>
-      <div style={{ marginBottom: 32 }}>
+      <div className="elections-header" style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111827', margin: 0 }}>Student Elections Hub</h1>
         <p style={{ color: '#6b7280', marginTop: 4, fontSize: 14 }}>{activeElection.title}</p>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 32, background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #f3f4f6', width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 32, background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #f3f4f6', width: 'fit-content', maxWidth: '100%', overflowX: 'auto' }}>
         <button style={styles.tabBtn(tab === 'nominate')} onClick={() => setTab('nominate')}>Stand for Position</button>
         <button style={styles.tabBtn(tab === 'vote')} onClick={() => setTab('vote')}>Vote</button>
       </div>
 
       <div className="tab-content" key={tab}>
       {tab === 'nominate' && (
-        <div style={styles.card}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <h2 style={{ fontSize: 18, fontWeight: 600 }}>My Nominations</h2>
+        <div className="elections-card" style={styles.card}>
+          <div className="nominate-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>My Nominations</h2>
             {activeElection.nomination_open ? (
                <button style={styles.btn} onClick={() => setShowNominateModal(true)}>Nominate Yourself</button>
             ) : (
@@ -212,10 +226,10 @@ export default function StudentElectionsPage() {
              </div>
           )}
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <div className="vote-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
             <div>
-              <h2 style={{ fontSize: 18, fontWeight: 600 }}>Cast Your Vote</h2>
-              <p style={{ fontSize: 13, color: '#6b7280' }}>Mark your preferred candidates and click Submit Ballot.</p>
+              <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Cast Your Vote</h2>
+              <p style={{ fontSize: 13, color: '#6b7280', margin: '4px 0 0' }}>Mark your preferred candidates and click Submit Ballot.</p>
             </div>
             {activeElection.voting_open && (
               <button 
@@ -228,14 +242,14 @@ export default function StudentElectionsPage() {
             )}
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 24 }}>
+          <div className="elections-grid">
             {elPositions.map(pos => {
               const posCands = elCandidates.filter(c => c.position_id === pos.id && c.status === 'approved')
               const myVoteForPos = myVotes.find(v => v.position_id === pos.id)
               const currentSelection = ballotSelections[pos.id]
 
               return (
-                <div key={pos.id} style={{ ...styles.card, border: myVoteForPos ? '2px solid #16a34a' : (currentSelection ? '2px solid #6d28d9' : '1px solid #f3f4f6') }}>
+                <div key={pos.id} className="elections-card" style={{ ...styles.card, border: myVoteForPos ? '2px solid #16a34a' : (currentSelection ? '2px solid #6d28d9' : '1px solid #f3f4f6') }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, borderBottom: '1px solid #f3f4f6', paddingBottom: 8, alignItems: 'center' }}>
                     <h3 style={{ fontSize: 16, fontWeight: 600 }}>{pos.title}</h3>
                     {myVoteForPos && (

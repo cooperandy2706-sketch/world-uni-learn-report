@@ -201,14 +201,16 @@ export default function TeacherDashboardPage() {
         .att-pill{transition:all .15s}
         .att-pill:hover{transform:translateY(-1px)}
         @media (max-width: 768px) {
-          .resp-main-grid { grid-template-columns: 1fr !important; }
-          .resp-kpi-grid { grid-template-columns: 1fr 1fr !important; }
-          .resp-header { flex-direction: column !important; align-items: stretch !important; }
-          .resp-prof-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
+          .resp-main-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .resp-kpi-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important; gap: 10px !important; }
+          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 16px !important; }
+          .resp-prof-grid { grid-template-columns: 1fr 1fr 1fr !important; gap: 6px !important; }
+          .resp-btn-group { flex-direction: column !important; align-items: stretch !important; width: 100%; }
         }
         @media (max-width: 480px) {
-          .resp-kpi-grid { grid-template-columns: 1fr !important; }
-          .resp-btn-group { flex-direction: column !important; align-items: stretch !important; width: 100%; }
+          .resp-kpi-grid { grid-template-columns: 1fr 1fr !important; }
+          .resp-prof-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
+          .td-header-title { fontSize: 22px !important; }
         }
       `}</style>
 
@@ -217,7 +219,7 @@ export default function TeacherDashboardPage() {
         {/* ── Header ── */}
         <div className="resp-header" style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, animation: '_fu .5s ease both' }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
+            <h1 className="td-header-title" style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
               {greeting}, {user?.full_name?.split(' ')[0]} 👋
             </h1>
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>

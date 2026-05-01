@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm } from '../../hooks/useSettings'
-import { generateLessonPlan, type GeneratedLessonPlan } from '../../lib/gemini'
+import { generateLessonPlan, type GeneratedLessonPlan } from '../../lib/huggingface'
 import toast from 'react-hot-toast'
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -70,6 +70,27 @@ function AILessonModal({
     const [plan, setPlan] = useState<GeneratedLessonPlan | null>(stored.plan ?? null)
     const [generating, setGenerating] = useState(false)
     const [error, setError] = useState('')
+    const [usageCount, setUsageCount] = useState(0)
+    const DAILY_LIMIT = 5
+
+    // Check usage on load
+    useEffect(() => {
+        checkUsage()
+    }, [lesson.id])
+
+    async function checkUsage() {
+        const today = new Date().toISOString().split('T')[0]
+        const { count, error } = await supabase
+            .from('ai_usage_logs')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', (await supabase.auth.getUser()).data.user?.id ?? '') 
+            .eq('feature', 'lesson_plan')
+            .gte('created_at', today)
+
+        if (!error && count !== null) {
+            setUsageCount(count)
+        }
+    }
 
     function addBullet() { setBullets(b => [...b, '']) }
     function updateBullet(i: number, val: string) { setBullets(b => b.map((x, idx) => idx === i ? val : x)) }
@@ -77,6 +98,13 @@ function AILessonModal({
 
     async function handleGenerate() {
         if (!topic.trim()) { setError('Please enter a topic.'); return }
+        
+        // Final usage check before start
+        if (usageCount >= DAILY_LIMIT) {
+            setError(`You have used your ${DAILY_LIMIT} free AI plans for today. Please try again tomorrow.`);
+            return
+        }
+
         setError('')
         setGenerating(true)
         try {
@@ -86,12 +114,25 @@ function AILessonModal({
                 subject: lesson.subject,
                 className: lesson.class,
             })
+            
+            // Log successful usage
+            const { data: userData } = await supabase.auth.getUser()
+            if (userData.user) {
+                await supabase.from('ai_usage_logs').insert({
+                    user_id: userData.user.id,
+                    school_id: (userData.user as any).user_metadata?.school_id || lesson.id, // Fallback placeholder
+                    feature: 'lesson_plan',
+                    model_used: 'huggingface_chain'
+                })
+                setUsageCount(prev => prev + 1)
+            }
+
             setPlan(result)
             setStep('plan')
             // auto-save immediately
             onSave(lesson.id, { notes, topic, bullets, plan: result })
         } catch (err: any) {
-            setError(err.message ?? 'Failed to generate lesson plan. Check your API key.')
+            setError(err.message ?? 'Failed to generate lesson plan. Check your Hugging Face API key.')
         } finally {
             setGenerating(false)
         }
@@ -163,9 +204,14 @@ function AILessonModal({
                     {step === 'input' ? (
                         // ── Input Step ────────────────────────────────────────
                         <div>
-                            <div style={{ background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 10, padding: '10px 14px', marginBottom: 20, fontSize: 12, color: '#5b21b6', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                                <span>✨</span>
-                                <span>Enter your lesson topic and the key points you want to cover. The AI will build a full, detailed lesson plan with learning objectives, activities, and visual aids.</span>
+                            <div style={{ background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 12, padding: '14px', marginBottom: 20, fontSize: 12, color: '#5b21b6', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                                <span style={{ fontSize: 20 }}>💡</span>
+                                <div>
+                                    <div style={{ fontWeight: 700, marginBottom: 4 }}>How to get the best results:</div>
+                                    <span style={{ lineHeight: 1.5 }}>
+                                        Enter a specific topic (e.g., "Introduction to Photosynthesis") and add 2-3 key objectives. The more specific you are, the better the AI can tailor the activities for your class.
+                                    </span>
+                                </div>
                             </div>
 
                             {/* Topic */}
@@ -223,24 +269,31 @@ function AILessonModal({
 
                             {error && <p style={{ fontSize: 12, color: '#dc2626', marginTop: 8 }}>⚠️ {error}</p>}
 
-                            <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'flex-end' }}>
-                                <button onClick={handleSaveNotes}
-                                    style={{ padding: '9px 18px', borderRadius: 9, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
-                                    💾 Save Notes Only
-                                </button>
-                                <button
-                                    onClick={handleGenerate}
-                                    disabled={generating}
-                                    style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: generating ? '#a78bfa' : 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: generating ? 'default' : 'pointer', fontFamily: '"DM Sans",sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    {generating ? (
-                                        <>
-                                            <span style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid rgba(255,255,255,.4)', borderTopColor: '#fff', borderRadius: '50%', animation: '_lt_spin .8s linear infinite' }} />
-                                            Generating Plan…
-                                        </>
-                                    ) : (
-                                        <>✨ Generate Lesson Plan</>
-                                    )}
-                                </button>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 20 }}>
+                                <div style={{ fontSize: 11, fontWeight: 700, color: usageCount >= DAILY_LIMIT ? '#dc2626' : '#6b7280' }}>
+                                    Quota: {usageCount} / {DAILY_LIMIT} today
+                                </div>
+                                <div style={{ display: 'flex', gap: 10 }}>
+                                    <button onClick={handleSaveNotes}
+                                        style={{ padding: '9px 18px', borderRadius: 9, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
+                                        💾 Save Notes Only
+                                    </button>
+                                    <button
+                                        onClick={handleGenerate}
+                                        disabled={generating || usageCount >= DAILY_LIMIT}
+                                        style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: (generating || usageCount >= DAILY_LIMIT) ? '#d1d5db' : 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: (generating || usageCount >= DAILY_LIMIT) ? 'default' : 'pointer', fontFamily: '"DM Sans",sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        {generating ? (
+                                            <>
+                                                <span style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid rgba(255,255,255,.4)', borderTopColor: '#fff', borderRadius: '50%', animation: '_lt_spin .8s linear infinite' }} />
+                                                Generating…
+                                            </>
+                                        ) : usageCount >= DAILY_LIMIT ? (
+                                            <>Limit Reached</>
+                                        ) : (
+                                            <>✨ Generate Plan</>
+                                        )}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ) : (
@@ -469,18 +522,25 @@ export default function LessonTrackerPage() {
         @keyframes _lt_pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(.98)}}
         @keyframes _lt_spin{to{transform:rotate(360deg)}}
         .lt-card:hover{box-shadow:0 6px 20px rgba(109,40,217,.1)!important;transform:translateY(-1px)}
-        .lt-card{transition:all .2s}
-        .lt-tab{transition:all .15s}
-        .lt-ai-btn:hover{background:linear-gradient(135deg,#4c1d95,#6d28d9)!important}
+        @media (max-width: 768px) {
+          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 16px !important; }
+          .resp-tabs { width: 100% !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch; padding: 4px !important; }
+          .lt-card { padding: 14px !important; }
+          .modal-container { padding: 8px !important; }
+          .modal-content { border-radius: 12px !important; margin-top: 0 !important; }
+          .modal-header { padding: 16px !important; }
+          .modal-body { padding: 16px !important; }
+          .resp-btn-group { flex-direction: column !important; width: 100% !important; }
+        }
       `}</style>
             <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_lt_fi .4s ease' }}>
 
                 {/* Header */}
-                <div style={{ marginBottom: 20 }}>
-                    <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Lesson Tracker</h1>
-                    <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
-                        {DAYS[todayDay]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                    </p>
+                <div className="resp-header" style={{ marginBottom: 20 }}>
+                  <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Lesson Tracker</h1>
+                  <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
+                    {DAYS[todayDay]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  </p>
                 </div>
 
                 {/* Active lesson banner */}
@@ -518,17 +578,17 @@ export default function LessonTrackerPage() {
                 )}
 
                 {/* Tabs */}
-                <div style={{ display: 'flex', gap: 4, marginBottom: 18, background: '#f5f3ff', borderRadius: 12, padding: 4, width: 'fit-content' }}>
-                    {[
-                        { k: 'today', label: `Today (${todayItems.length})` },
-                        { k: 'week', label: 'Full Week' },
-                        { k: 'tracker', label: '✨ AI Plans' },
-                    ].map(t => (
-                        <button key={t.k} className="lt-tab" onClick={() => setTab(t.k as any)}
-                            style={{ padding: '7px 14px', borderRadius: 9, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif', background: tab === t.k ? '#fff' : 'transparent', color: tab === t.k ? '#6d28d9' : '#6b7280', boxShadow: tab === t.k ? '0 1px 4px rgba(0,0,0,.08)' : 'none' }}>
-                            {t.label}
-                        </button>
-                    ))}
+                <div className="resp-tabs" style={{ display: 'flex', gap: 4, marginBottom: 18, background: '#f5f3ff', borderRadius: 12, padding: 4, width: 'fit-content' }}>
+                  {[
+                    { k: 'today', label: `Today (${todayItems.length})` },
+                    { k: 'week', label: 'Full Week' },
+                    { k: 'tracker', label: '✨ AI Plans' },
+                  ].map(t => (
+                    <button key={t.k} className="lt-tab" onClick={() => setTab(t.k as any)}
+                      style={{ padding: '7px 14px', borderRadius: 9, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif', background: tab === t.k ? '#fff' : 'transparent', color: tab === t.k ? '#6d28d9' : '#6b7280', boxShadow: tab === t.k ? '0 1px 4px rgba(0,0,0,.08)' : 'none', whiteSpace: 'nowrap' }}>
+                      {t.label}
+                    </button>
+                  ))}
                 </div>
 
                 {loading ? (
