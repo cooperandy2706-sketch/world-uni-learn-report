@@ -38,34 +38,34 @@ function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
 // ── Feature card data ─────────────────────────────────────
 const features = [
   {
-    icon: '💻',
-    title: 'Interactive e-Learning',
-    desc: 'Students can securely access digital lesson materials, complete assignments, and learn from anywhere.',
+    icon: '⌨️',
+    title: 'Command Palette (⌘K)',
+    desc: 'Navigate at lightning speed with our intent-based natural language search. Just type "pay fees for Desmond" to jump straight into action.',
   },
   {
-    icon: '📅',
-    title: 'Daily Lesson Tracking',
-    desc: 'Staff easily manage their daily timetables, log subjects, and track curriculum completion efficiently.',
+    icon: '💰',
+    title: 'Dynamic Billing Engine',
+    desc: 'A robust Bursar portal that seamlessly manages term fees, calculates automated scholarship discounts, and tracks daily feeding collections in real-time.',
+  },
+  {
+    icon: '📱',
+    title: 'Smart SMS Hub',
+    desc: 'Blast automated SMS report cards, fee payment reminders, and urgent announcements directly to parents’ phones instantly.',
   },
   {
     icon: '⚡',
-    title: 'Instant Scoring & Reports',
-    desc: 'Automatically calculate grades and instantly generate print-ready GES-standard report cards.',
+    title: 'Automated Grading & BECE',
+    desc: 'Breeze through the academic term with instant grade calculations, automated batch promotions, and a dedicated BECE CA Processor.',
   },
   {
-    icon: '🏫',
-    title: 'Comprehensive Admin',
-    desc: 'Manage unlimited classes, departments, subjects, students, and teachers from a single dashboard.',
+    icon: '🛡️',
+    title: 'Isolated Role Portals',
+    desc: 'Dedicated, secure dashboards crafted specifically for Super Admins, School Heads, Teachers, Bursars, and Students.',
   },
   {
-    icon: '📈',
-    title: 'Rich Analytics',
-    desc: 'Visual insights into class averages, attendance, subject performance, and overall school health.',
-  },
-  {
-    icon: '💬',
-    title: 'Real-time Communication',
-    desc: 'Centralized announcements and notifications to bridge the gap between administrators, teachers, and students.',
+    icon: '🎮',
+    title: 'Interactive Student Hub',
+    desc: 'Keep students engaged with built-in Typing Nitro games, a global digital library, and a live PEC student election voting system.',
   },
 ]
 
@@ -371,25 +371,28 @@ function FeatureCard({ feature, index, parentInView }: any) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: '#fff', borderRadius: 20, padding: '36px',
-        border: '1px solid', borderColor: hovered ? '#f59e0b50' : '#f1f5f9',
-        boxShadow: hovered ? '0 20px 40px rgba(91,33,182,0.08)' : '0 4px 12px rgba(0,0,0,0.02)',
-        transition: 'all 0.4s cubic-bezier(.4,0,.2,1)',
-        transform: parentInView ? (hovered ? 'translateY(-6px)' : 'translateY(0)') : 'translateY(30px)',
+        background: '#fff', borderRadius: 24, padding: '36px',
+        border: '1px solid', borderColor: hovered ? 'rgba(91,33,182,0.1)' : '#f1f5f9',
+        boxShadow: hovered ? '0 24px 48px rgba(91,33,182,0.08)' : '0 4px 12px rgba(0,0,0,0.02)',
+        transition: 'all 0.5s cubic-bezier(.4,0,.2,1)',
+        transform: parentInView ? (hovered ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)') : 'translateY(40px)',
         opacity: parentInView ? 1 : 0,
         transitionDelay: `${index * 0.1}s`,
+        position: 'relative', overflow: 'hidden'
       }}
     >
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 4, background: hovered ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' : 'transparent', transition: 'background 0.3s' }} />
       <div style={{
-        width: 56, height: 56, borderRadius: 16, fontSize: 26,
+        width: 64, height: 64, borderRadius: 20, fontSize: 32,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: hovered ? '#f59e0b' : '#ede9fe',
+        background: hovered ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' : '#f8fafc',
         color: hovered ? '#fff' : '#1e0646',
-        marginBottom: 20, transition: 'all 0.4s',
-        transform: hovered ? 'scale(1.1) rotate(-5deg)' : 'scale(1)',
+        marginBottom: 24, transition: 'all 0.5s cubic-bezier(.4,0,.2,1)',
+        transform: hovered ? 'rotate(-10deg) scale(1.1)' : 'rotate(0deg) scale(1)',
+        boxShadow: hovered ? '0 12px 24px rgba(245,158,11,0.3)' : 'inset 0 2px 4px rgba(0,0,0,0.02)'
       }}>{feature.icon}</div>
-      <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e0646', marginBottom: 12 }}>{feature.title}</h3>
-      <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }}>{feature.desc}</p>
+      <h3 style={{ fontSize: 20, fontWeight: 800, color: '#1e0646', marginBottom: 14, letterSpacing: '-0.02em' }}>{feature.title}</h3>
+      <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.7 }}>{feature.desc}</p>
     </div>
   )
 }
@@ -505,51 +508,103 @@ function CTA() {
 // ── Footer ────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer style={{ background: '#0f0322', paddingTop: 80, paddingBottom: 40, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+    <footer style={{ background: '#0a0118', paddingTop: 100, paddingBottom: 40, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 48, marginBottom: 64 }}>
-          <div style={{ gridColumn: '1 / -1', maxWidth: 400 }}>
-             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#f59e0b,#fbbf24)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📘</div>
-              <div style={{ fontFamily: '"Playfair Display",serif', fontWeight: 700, fontSize: 18, color: '#fff' }}>World Uni-Learn</div>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '48px 32px', marginBottom: 80 }}>
+          
+          {/* Brand Column */}
+          <div style={{ gridColumn: '1 / -1', maxWidth: 340, marginBottom: 20, '@media(minWidth: 1024px)': { gridColumn: 'span 2' } } as any}>
+             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fff', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+                <img src="/wula.png" alt="WULA" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              </div>
+              <div>
+                 <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: '#fcd34d', textTransform: 'uppercase', lineHeight: 1, marginBottom: 4 }}>World</div>
+                 <div style={{ fontFamily: '"Playfair Display",serif', fontWeight: 700, fontSize: 20, color: '#fff', lineHeight: 1 }}>Uni-Learn</div>
+              </div>
             </div>
-            <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
-              The complete electronic learning and school management platform tailored for Ghanaian schools. 
+            <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.8, marginBottom: 32 }}>
+              The enterprise-grade school management and digital learning ecosystem tailored specifically for modern Ghanaian education.
             </p>
+            {/* Social Icons Placeholder */}
+            <div style={{ display: 'flex', gap: 16 }}>
+               {[1,2,3,4].map(i => (
+                 <a key={i} href="#" style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', transition: 'all 0.2s', border: '1px solid rgba(255,255,255,0.1)' }}
+                   onMouseEnter={e => { e.currentTarget.style.background = '#f59e0b'; e.currentTarget.style.color = '#1e0646'; e.currentTarget.style.borderColor = '#f59e0b' }}
+                   onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
+                 >
+                   <div style={{ width: 14, height: 14, background: 'currentColor', borderRadius: 2 }} /> {/* Placeholder for SVGs */}
+                 </a>
+               ))}
+            </div>
           </div>
           
+          {/* Product Column */}
           <div>
-            <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: 24 }}>Platform</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {['Features', 'Pillars', 'Login to Portal'].map((l, i) => (
-                <a key={i} href={l === 'Login to Portal' ? ROUTES.LOGIN : `#${l.toLowerCase()}`} style={{ fontSize: 14, color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }}
-                  onMouseEnter={e => e.currentTarget.style.color = '#f59e0b'}
-                  onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}
+            <h4 style={{ color: '#fff', fontSize: 16, fontWeight: 700, marginBottom: 28, letterSpacing: '0.02em' }}>Platform Features</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {['Dynamic Billing Engine', 'Automated Grade Processing', 'Smart SMS Notifications', 'Intelligent Command Center', 'Interactive Student Portal', 'Real-time Analytics'].map((l) => (
+                <a key={l} href="#features" style={{ fontSize: 14, color: '#94a3b8', textDecoration: 'none', transition: 'all 0.2s', fontWeight: 500 }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#f59e0b'; e.currentTarget.style.transform = 'translateX(4px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.transform = 'translateX(0)' }}
                 >{l}</a>
               ))}
             </div>
           </div>
           
+          {/* Solutions Column */}
           <div>
-            <h4 style={{ color: '#fff', fontWeight: 700, marginBottom: 24 }}>Company</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-               {['About Us', 'Contact', 'Privacy Policy'].map(l => (
-                <a key={l} href="#" style={{ fontSize: 14, color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }}
-                  onMouseEnter={e => e.currentTarget.style.color = '#f59e0b'}
-                  onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}
+            <h4 style={{ color: '#fff', fontSize: 16, fontWeight: 700, marginBottom: 28, letterSpacing: '0.02em' }}>Target Roles</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+               {['For School Administrators', 'For Bursars & Finance', 'For Educators', 'For Students & Parents', 'Super Admin Network'].map(l => (
+                <a key={l} href="#" style={{ fontSize: 14, color: '#94a3b8', textDecoration: 'none', transition: 'all 0.2s', fontWeight: 500 }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#f59e0b'; e.currentTarget.style.transform = 'translateX(4px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.transform = 'translateX(0)' }}
                 >{l}</a>
               ))}
             </div>
           </div>
+
+          {/* Company Column */}
+          <div>
+            <h4 style={{ color: '#fff', fontSize: 16, fontWeight: 700, marginBottom: 28, letterSpacing: '0.02em' }}>Company</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+               {['About WULA', 'Register Your School', 'Contact Support', 'Privacy Policy', 'Terms of Service'].map(l => (
+                <a key={l} href={l === 'Register Your School' ? '/register-school' : '#'} style={{ fontSize: 14, color: '#94a3b8', textDecoration: 'none', transition: 'all 0.2s', fontWeight: 500 }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#f59e0b'; e.currentTarget.style.transform = 'translateX(4px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.transform = 'translateX(0)' }}
+                >{l}</a>
+              ))}
+            </div>
+          </div>
+
         </div>
         
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
-          <p style={{ fontSize: 13, color: '#64748b' }}>© {new Date().getFullYear()} World Uni-Learn Platform. Built for Ghana.</p>
-          <div style={{ display: 'flex', gap: 24, fontSize: 13, color: '#64748b' }}>
-            <span>✓ GES Compliant</span>
-            <span>✓ Secure</span>
+        {/* Bottom Bar */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 24 }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+             {/* System Status Indicator */}
+             <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', transition: 'background 0.2s' }}
+               onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+               onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+             >
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 12px #10b981', animation: 'pulse-slow 2s infinite' }} />
+                <span style={{ fontSize: 12, color: '#e2e8f0', fontWeight: 600 }}>All systems operational</span>
+             </div>
+          </div>
+
+          <p style={{ fontSize: 14, color: '#64748b', fontWeight: 500 }}>
+            © {new Date().getFullYear()} World Uni-Learn Platform. <span style={{ color: '#94a3b8' }}>Built for Ghana.</span>
+          </p>
+
+          <div style={{ display: 'flex', gap: 24, fontSize: 13, color: '#64748b', fontWeight: 600 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ color: '#10b981' }}>✓</span> GES Compliant</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ color: '#3b82f6' }}>🔒</span> 256-bit Secure</span>
           </div>
         </div>
+
       </div>
     </footer>
   )
