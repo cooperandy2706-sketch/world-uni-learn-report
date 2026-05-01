@@ -11,7 +11,7 @@ import AnnouncementPopup from '../ui/AnnouncementPopup'
 import FloatingClock from '../shared/FloatingClock'
 import { ROUTES } from '../../constants/routes'
 
-interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 'student' | 'bursar' | 'staff' }
+interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 'student' | 'bursar' | 'staff' | 'parent' }
 
 export default function AppLayout({ requiredRole }: AppLayoutProps) {
   const { user, loading, initialized } = useAuth()
@@ -34,6 +34,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
     if (user.role === 'student')    return <Navigate to="/student/dashboard" replace />
     if (user.role === 'bursar')     return <Navigate to={ROUTES.BURSAR_DASHBOARD} replace />
     if (user.role === 'staff')      return <Navigate to={ROUTES.STAFF_DASHBOARD}  replace />
+    if (user.role === 'parent')     return <Navigate to="/parent/dashboard" replace />
     return <Navigate to={user.role === 'admin' ? ROUTES.ADMIN_DASHBOARD : ROUTES.TEACHER_DASHBOARD} replace />
   }
 
@@ -104,7 +105,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
           backgroundImage: 'url(/wula-logo.png)',
-          backgroundSize: 'cover', /* Stretches to fill the entire screen */
+          backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           opacity: 0.03
@@ -112,7 +113,11 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
 
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
           <Header />
-          <main style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '28px 32px 80px' }}>
+          <style>{`
+            .app-main { padding: 28px 32px 80px; }
+            @media (max-width: 600px) { .app-main { padding: 20px 16px 100px; } }
+          `}</style>
+          <main className="app-main" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
             <EnablePushButton />
             <Outlet />
           </main>

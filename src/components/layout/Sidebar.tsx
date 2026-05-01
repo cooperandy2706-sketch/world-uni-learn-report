@@ -36,11 +36,13 @@ const adminLinks = [
   { to: ROUTES.ADMIN_REPORTS, label: 'Report Cards', icon: FileSpreadsheet },
   { to: '/admin/batch-promotion', label: 'Batch Promotion', icon: ArrowUpRight },
   { to: '/admin/bece-processor', label: 'BECE CA Processor', icon: Calculator },
+  { to: '/admin/lesson-plans', label: 'Lesson Plans', icon: BookOpen },
 
   { header: 'People' },
   { to: ROUTES.ADMIN_STUDENTS, label: 'Student Directory', icon: Users },
   { to: '/admin/student-vault', label: 'Student Vault', icon: ShieldCheck },
   { to: ROUTES.ADMIN_TEACHERS, label: 'Staff Directory', icon: UserCheck },
+  { to: '/admin/parents', label: 'Parent Logins', icon: UserPlus },
   { to: '/admin/admissions', label: 'Admissions', icon: GraduationCap },
   { to: ROUTES.ADMIN_SMS, label: 'SMS Messaging', icon: Smartphone },
 
@@ -147,6 +149,19 @@ const staffLinks = [
   { to: '/staff/elections', label: 'Elections (PEC)', icon: Vote },
 ]
 
+const parentLinks = [
+  { header: 'Overview' },
+  { to: '/parent/dashboard', label: 'My Wards', icon: Users },
+  { to: '/parent/calendar', label: 'Calendar', icon: Calendar },
+  
+  { header: 'Academics & Billing' },
+  { to: '/parent/academics', label: 'Academics', icon: FileSpreadsheet },
+  { to: '/parent/billing', label: 'Billing & Fees', icon: Wallet },
+  
+  { header: 'Communication' },
+  { to: '/parent/messages', label: 'Messages', icon: MessageSquare },
+]
+
 export default function Sidebar() {
   const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
   const navigate = useNavigate()
@@ -194,7 +209,8 @@ export default function Sidebar() {
     return () => clearInterval(interval)
   }, [user?.id, isStudent, isBursar])
 
-  let links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : isStaff ? staffLinks : teacherLinks
+  const isParent = user?.role === 'parent'
+  let links = isSuperAdmin ? superAdminLinks : isParent ? parentLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : isStaff ? staffLinks : teacherLinks
 
   // Hide daily collections from unauthorized teachers
   if (isTeacher && !loadingAuth && !collectorAuth) {

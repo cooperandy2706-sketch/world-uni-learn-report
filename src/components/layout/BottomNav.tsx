@@ -72,6 +72,14 @@ const bursarLinks = [
   { to: '/bursar/sms', icon: MessageSquare, label: 'SMS' },
 ]
 
+const parentLinks = [
+  { to: '/parent/dashboard', icon: Home, label: 'Wards' },
+  { to: '/parent/academics', icon: FileSpreadsheet, label: 'Results' },
+  { to: '/parent/billing', icon: Wallet, label: 'Billing' },
+  { to: '/parent/messages', icon: MessageSquare, label: 'Messages', notify: true },
+  { to: '/parent/calendar', icon: Calendar, label: 'Calendar' },
+]
+
 export default function BottomNav() {
   const { user, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
   const location = useLocation()
@@ -90,7 +98,8 @@ export default function BottomNav() {
     enabled: isTeacher && !!user?.id
   })
 
-  let links = isSuperAdmin ? superAdminLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : teacherLinks
+  const isParent = user?.role === 'parent'
+  let links = isSuperAdmin ? superAdminLinks : isParent ? parentLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : teacherLinks
 
   // Hide daily collections from unauthorized teachers
   if (isTeacher && !loadingAuth && !collectorAuth) {

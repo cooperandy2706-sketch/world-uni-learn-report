@@ -31,7 +31,9 @@ type LessonStatus = 'upcoming' | 'soon' | 'now' | 'done' | 'next'
 interface Lesson {
     id: string
     subject: string
+    subjectId: string
     class: string
+    classId: string
     period: string
     startTime: string
     endTime: string
@@ -61,6 +63,7 @@ function AILessonModal({
     lesson: Lesson
     stored: StoredLessonData
     onSave: (id: string, data: StoredLessonData) => void
+    onSubmit: (topic: string, content: string) => Promise<void>
     onClose: () => void
 }) {
     const [step, setStep] = useState<'input' | 'plan'>(stored.plan ? 'plan' : 'input')
@@ -69,6 +72,7 @@ function AILessonModal({
     const [notes, setNotes] = useState(stored.notes ?? '')
     const [plan, setPlan] = useState<GeneratedLessonPlan | null>(stored.plan ?? null)
     const [generating, setGenerating] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState('')
     const [usageCount, setUsageCount] = useState(0)
     const DAILY_LIMIT = 5
@@ -140,8 +144,22 @@ function AILessonModal({
 
     function handleSaveNotes() {
         onSave(lesson.id, { notes, topic, bullets, plan: plan ?? undefined })
-        toast.success('Saved!')
+        toast.success('Saved locally!')
         onClose()
+    }
+
+    async function handleFormalSubmit() {
+        if (!plan) return
+        setSubmitting(true)
+        try {
+            await onSubmit(topic, plan.markdown)
+            toast.success('Submitted to Headmaster!')
+            onClose()
+        } catch (err: any) {
+            toast.error(err.message || 'Failed to submit')
+        } finally {
+            setSubmitting(false)
+        }
     }
 
     function handlePrint() {
@@ -343,14 +361,18 @@ function AILessonModal({
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'flex-end' }}>
+                                <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                                     <button onClick={onClose}
                                         style={{ padding: '9px 18px', borderRadius: 9, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
                                         Close
                                     </button>
                                     <button onClick={handleSaveNotes}
-                                        style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
-                                        💾 Save Plan
+                                        style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: '#f3f4f6', color: '#111827', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
+                                        💾 Save Locally
+                                    </button>
+                                    <button onClick={handleFormalSubmit} disabled={submitting}
+                                        style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: submitting ? 'default' : 'pointer', fontFamily: '"DM Sans",sans-serif', opacity: submitting ? 0.7 : 1 }}>
+                                        {submitting ? 'Submitting…' : '📨 Submit to Headmaster'}
                                     </button>
                                 </div>
                             </div>
@@ -371,6 +393,7 @@ export default function LessonTrackerPage() {
     const [now, setNow] = useState(new Date())
     const [tab, setTab] = useState<'today' | 'week' | 'tracker'>('today')
     const [activeModal, setActiveModal] = useState<Lesson | null>(null)
+    const [teacherInfo, setTeacherInfo] = useState<{ id: string, schoolId: string } | null>(null)
     const [storedData, setStoredData] = useState<Record<string, StoredLessonData>>({})
     const [alerted, setAlerted] = useState<Set<string>>(new Set())
     const tickRef = useRef<any>(null)
@@ -392,8 +415,9 @@ export default function LessonTrackerPage() {
 
     async function load() {
         setLoading(true)
-        const { data: t } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
+        const { data: t } = await supabase.from('teachers').select('id, school_id').eq('user_id', user!.id).single()
         if (!t) { setLoading(false); return }
+        setTeacherInfo({ id: t.id, schoolId: t.school_id })
 
         const [{ data: slots }] = await Promise.all([
             supabase.from('timetable_slots')
@@ -407,7 +431,9 @@ export default function LessonTrackerPage() {
             .map((s: any) => ({
                 id: s.id,
                 subject: s.subject?.name ?? '—',
+                subjectId: s.subject?.id ?? '',
                 class: s.class?.name ?? '—',
+                classId: s.class?.id ?? '',
                 period: s.period?.name ?? '—',
                 startTime: s.period?.start_time?.slice(0, 5) ?? '00:00',
                 endTime: s.period?.end_time?.slice(0, 5) ?? '00:00',
@@ -487,6 +513,21 @@ export default function LessonTrackerPage() {
         const updated = { ...storedData, [lessonId]: data }
         setStoredData(updated)
         try { localStorage.setItem(`wula_lessondata_${user?.id}`, JSON.stringify(updated)) } catch { }
+    }
+
+    async function submitFormalPlan(lesson: Lesson, topic: string, content: string) {
+        if (!teacherInfo || !term) throw new Error('Missing teacher or term data')
+        const { error } = await supabase.from('lesson_plans').insert({
+            school_id: teacherInfo.schoolId,
+            teacher_id: teacherInfo.id,
+            term_id: (term as any).id,
+            class_id: lesson.classId,
+            subject_id: lesson.subjectId,
+            topic,
+            content,
+            status: 'pending'
+        })
+        if (error) throw error
     }
 
     const computed = computedLessons()
@@ -778,6 +819,7 @@ export default function LessonTrackerPage() {
                     lesson={activeModal}
                     stored={storedData[activeModal.id] ?? { notes: '' }}
                     onSave={(id, data) => { saveData(id, data) }}
+                    onSubmit={async (topic, content) => { await submitFormalPlan(activeModal, topic, content) }}
                     onClose={() => setActiveModal(null)}
                 />
             )}

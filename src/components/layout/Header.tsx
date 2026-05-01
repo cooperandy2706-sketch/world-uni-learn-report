@@ -30,6 +30,7 @@ const ADMIN_NAV = [
       { label: 'Report Cards', to: ROUTES.ADMIN_REPORTS },
       { label: 'Score Entry', to: '/admin/score-entry' },
       { label: 'Batch Promotion', to: '/admin/batch-promotion' },
+      { label: 'Lesson Plans', to: '/admin/lesson-plans' },
     ]
   },
   {
@@ -37,6 +38,7 @@ const ADMIN_NAV = [
       { label: 'Students', to: ROUTES.ADMIN_STUDENTS },
       { label: 'Student Vault', to: '/admin/student-vault' },
       { label: 'Staff', to: ROUTES.ADMIN_TEACHERS },
+      { label: 'Parent Logins', to: '/admin/parents' },
       { label: 'Admissions', to: '/admin/admissions' },
       { label: 'SMS Messaging', to: ROUTES.ADMIN_SMS },
     ]
@@ -127,6 +129,14 @@ const SUPER_ADMIN_NAV = [
   { label: 'Messaging', to: ROUTES.SUPER_ADMIN_MESSAGING, single: true },
   { label: 'Leaderboards', to: ROUTES.SUPER_ADMIN_ANALYTICS, single: true },
   { label: 'Resources', to: ROUTES.SUPER_ADMIN_RESOURCES, single: true },
+]
+
+const PARENT_NAV = [
+  { label: 'Wards', to: '/parent/dashboard', single: true },
+  { label: 'Academics', to: '/parent/academics', single: true },
+  { label: 'Billing', to: '/parent/billing', single: true },
+  { label: 'Messaging', to: '/parent/messages', single: true },
+  { label: 'Calendar', to: '/parent/calendar', single: true },
 ]
 
 // ─── NavItem component ─────────────────────────────────────────────────────────
@@ -248,6 +258,7 @@ export default function Header() {
     : isAdmin ? ADMIN_NAV
     : isTeacher ? TEACHER_NAV
     : isBursar ? BURSAR_NAV
+    : user?.role === 'parent' ? PARENT_NAV
     : STUDENT_NAV
 
   useEffect(() => {
@@ -799,11 +810,12 @@ export default function Header() {
                   </button>
                   <button
                     onClick={handleSignOut}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', background: '#fff5f5', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600, color: '#ef4444', cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left' }}
+                    disabled={signing}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', background: '#fff5f5', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 700, color: '#ef4444', cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left' }}
                     onMouseEnter={e => e.currentTarget.style.background = '#fee2e2'}
                     onMouseLeave={e => e.currentTarget.style.background = '#fff5f5'}
                   >
-                    <LogOut size={15} /> {signing ? 'Signing out…' : 'Sign Out'}
+                    <LogOut size={15} /> {signing ? 'Signing out...' : 'Sign Out'}
                   </button>
                 </div>
               </div>
@@ -854,7 +866,7 @@ export default function Header() {
                         color: isActive ? '#1a56db' : '#374151',
                       })}
                     >
-                      <LayoutDashboard size={16} /> Dashboard
+                      <LayoutDashboard size={16} /> {group.label}
                     </NavLink>
                   ) : (
                     group.items.map((item: any) => (

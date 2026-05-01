@@ -20,6 +20,7 @@ const schema = z.object({
   next_term_date: z.string().optional(),
   school_fees_info: z.string().optional(),
   school_news: z.string().optional(),
+  paystack_public_key: z.string().optional().or(z.literal('')),
 })
 type FormData = z.infer<typeof schema>
 
@@ -87,7 +88,6 @@ export default function SettingsPage() {
   const { user } = useAuth()
   const qc = useQueryClient()
   const { data: settings, isLoading } = useSettings()
-  const updateSettings = useUpdateSettings()
   const [logoUploading, setLogoUploading] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [logoHov, setLogoHov] = useState(false)
@@ -109,6 +109,7 @@ export default function SettingsPage() {
         next_term_date: settings.next_term_date ?? '',
         school_fees_info: settings.school_fees_info ?? '',
         school_news: settings.school_news ?? '',
+        paystack_public_key: school?.paystack_public_key ?? '',
       })
       setLogoUrl(school?.logo_url ?? null)
     }
@@ -126,6 +127,7 @@ export default function SettingsPage() {
           phone: data.school_phone,
           address: data.school_address,
           headteacher_name: data.headteacher_name,
+          paystack_public_key: data.paystack_public_key,
         })
         .eq('id', user!.school_id)
       if (schoolError) throw schoolError
@@ -138,7 +140,7 @@ export default function SettingsPage() {
       })
       if (settingsError) throw settingsError
 
-      // 3. Invalidate cache so useSettings refetches fresh data (no page reload needed)
+      // 3. Invalidate cache so useSettings refetches fresh data
       await qc.invalidateQueries({ queryKey: ['settings', user!.school_id] })
 
       toast.success('Settings saved successfully')
@@ -291,6 +293,11 @@ export default function SettingsPage() {
                     <div style={{ gridColumn: '1 / -1' }}>
                       <Field label="School Address / P.O. Box">
                         <StyledInput {...register('school_address')} placeholder="e.g. P.O. Box 000, Accra, Ghana" />
+                      </Field>
+                    </div>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <Field label="Paystack Public Key" hint="Used for secure online fee payments. Starts with 'pk_test_' or 'pk_live_'">
+                        <StyledInput {...register('paystack_public_key')} placeholder="pk_test_..." />
                       </Field>
                     </div>
                   </div>

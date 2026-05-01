@@ -22,6 +22,8 @@ import AnnouncementsPage from './pages/admin/AnnouncementsPage'
 import SyllabusPage from './pages/admin/SyllabusPage'
 import WeeklyGoalsPage from './pages/admin/WeeklyGoalsPage'
 import AdminPosterMakerPage from './pages/admin/PosterMakerPage'
+import LessonPlansPage from './pages/admin/LessonPlansPage'
+import ParentsPage from './pages/admin/ParentsPage'
 import TeacherDashboard from './pages/teacher/DashboardPage'
 import MyClassesPage from './pages/teacher/MyClassesPage'
 import ScoreEntryPage from './pages/teacher/ScoreEntryPage'
@@ -96,6 +98,13 @@ import AdminElectionsPage from './pages/admin/ElectionsPage'
 import StudentElectionsPage from './pages/student/ElectionsPage'
 import StaffElectionsPage from './pages/staff/ElectionsPage'
 
+// Parent Pages
+import ParentDashboard from './pages/parent/ParentDashboard'
+import ParentBillingPage from './pages/parent/ParentBillingPage'
+import ParentAcademicsPage from './pages/parent/ParentAcademicsPage'
+import ParentCalendarPage from './pages/parent/ParentCalendarPage'
+import ParentMessagingPage from './pages/parent/ParentMessagingPage'
+
 // Bursar pages
 import BursarDashboard from './pages/bursar/DashboardPage'
 import BursarFeesPage from './pages/bursar/FeesPage'
@@ -142,6 +151,7 @@ export const router = createBrowserRouter([
           { path: 'dashboard', element: <AdminDashboard /> },
           { path: 'billing', element: <BillingPage /> },
           { path: 'students', element: <StudentsPage /> },
+          { path: 'parents', element: <ParentsPage /> },
           { path: 'teachers', element: <TeachersPage /> },
           { path: 'other-staff', element: <OtherStaffPage /> },
           { path: 'classes', element: <ClassesPage /> },
@@ -156,6 +166,7 @@ export const router = createBrowserRouter([
           { path: 'timetable', element: <TimetablePage /> },
           { path: 'announcements', element: <AnnouncementsPage /> },
           { path: 'syllabus', element: <SyllabusPage /> },
+          { path: 'lesson-plans', element: <LessonPlansPage /> },
           { path: 'weekly-goals', element: <WeeklyGoalsPage /> },
           { path: 'attendance', element: <AdminAttendancePage /> },
           { path: 'bursars', element: <BursarStaffPage /> },
@@ -279,6 +290,19 @@ export const router = createBrowserRouter([
           { index: true, element: <Navigate to="/staff/dashboard" replace /> },
           { path: 'dashboard', element: <StaffDashboard /> },
           { path: 'elections', element: <StaffElectionsPage /> },
+        ],
+      },
+      {
+        path: 'parent',
+        element: <AppLayout requiredRole="parent" />,
+        children: [
+          { index: true, element: <Navigate to="/parent/dashboard" replace /> },
+          { path: 'dashboard', element: <ParentDashboard /> },
+          { path: 'billing', element: <ParentBillingPage /> },
+          { path: 'academics', element: <ParentAcademicsPage /> },
+          { path: 'messages', element: <ParentMessagingPage /> },
+          { path: 'calendar', element: <ParentCalendarPage /> },
+          { path: 'ward/:id', element: <ParentDashboard /> }, // Placeholder for now
         ],
       },
       { path: '*', element: <NotFoundPage /> },

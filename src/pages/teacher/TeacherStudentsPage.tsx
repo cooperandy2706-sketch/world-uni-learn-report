@@ -128,6 +128,8 @@ export default function TeacherStudentsPage() {
   const [accountStudent, setAccountStudent] = useState<any>(null)
   const [accountLoading, setAccountLoading] = useState(false)
   const [accountData, setAccountData] = useState({ email: '', password: '' })
+  const [parentModalOpen, setParentModalOpen] = useState(false)
+  const [parentData, setParentData] = useState({ email: '', password: '' })
 
   useEffect(() => {
     if (user?.id) loadStudents()
@@ -212,6 +214,41 @@ export default function TeacherStudentsPage() {
     } catch (err: unknown) {
       console.error('Account creation failed:', err)
       toast.error(err instanceof Error ? err.message : 'Failed to create student account')
+    } finally {
+      setAccountLoading(false)
+    }
+  }
+
+  async function handleCreateParentAccount() {
+    if (!parentData.email || !parentData.password) {
+      toast.error('Please enter both email and password')
+      return
+    }
+    
+    setAccountLoading(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-ops', {
+        body: {
+          action: 'create-user',
+          payload: {
+            email: parentData.email,
+            password: parentData.password,
+            full_name: accountStudent.guardian_name || 'Parent/Guardian',
+            role: 'parent',
+            target_school_id: user!.school_id,
+            metadata: { link_id: accountStudent.id }
+          }
+        }
+      })
+
+      if (error) throw error
+      if (data?.error) throw new Error(String(data.error))
+
+      toast.success('Parent account linked successfully!')
+      setParentModalOpen(false)
+      setParentData({ email: '', password: '' })
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? (err.message || 'Failed to create parent account') : 'Failed to create parent account')
     } finally {
       setAccountLoading(false)
     }
@@ -334,6 +371,8 @@ export default function TeacherStudentsPage() {
                           <button className="action-btn" onClick={() => { setAccountStudent(s); setAccountData(prev => ({ ...prev, email: s.guardian_email || '' })); setAccountModalOpen(true) }}
                             style={{ padding: '6px 12px', borderRadius: 8, border: 'none', background: '#ecfdf5', color: '#059669', cursor: 'pointer', fontSize: 12, fontWeight: 600, transition: 'all 0.15s' }}>🗝️ Create Login</button>
                         )}
+                        <button className="action-btn" onClick={() => { setAccountStudent(s); setParentData(prev => ({ ...prev, email: s.guardian_email || '' })); setParentModalOpen(true) }}
+                          style={{ padding: '6px 12px', borderRadius: 8, border: 'none', background: '#e0f2fe', color: '#0284c7', cursor: 'pointer', fontSize: 12, fontWeight: 600, transition: 'all 0.15s' }}>👨‍👩‍👦 Parent Portal</button>
                       </div>
                     </td>
                   </tr>
@@ -407,6 +446,47 @@ export default function TeacherStudentsPage() {
                   type="button"
                   onClick={() => setAccountData(prev => ({ ...prev, password: Math.random().toString(36).slice(-8) }))}
                   style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: '#ede9fe', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#6d28d9', cursor: 'pointer' }}
+                >Generate</button>
+              </div>
+            </Field>
+          </div>
+        </Modal>
+
+        {/* ── CREATE PARENT ACCOUNT MODAL ── */}
+        <Modal open={parentModalOpen} onClose={() => setParentModalOpen(false)} 
+          title="Generate Parent Login" 
+          subtitle={`Set up parent access for ${accountStudent?.full_name}`}
+          footer={<>
+            <Btn variant="secondary" onClick={() => setParentModalOpen(false)}>Cancel</Btn>
+            <Btn onClick={handleCreateParentAccount} loading={accountLoading}>Link Parent Account</Btn>
+          </>}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ padding: '12px 16px', background: '#eff6ff', borderRadius: 10, border: '1px solid #bfdbfe', color: '#1e40af', fontSize: 13 }}>
+              <strong>Tip:</strong> If the parent already has an account for another child, use the same email address. The system will automatically link this student to their existing dashboard!
+            </div>
+            
+            <Field label="Parent Email Address">
+              <StyledInput 
+                type="email" 
+                placeholder="parent@example.com" 
+                value={parentData.email}
+                onChange={e => setParentData(prev => ({ ...prev, email: e.target.value }))}
+              />
+            </Field>
+            
+            <Field label="Initial Password (Required for new parents)">
+              <div style={{ position: 'relative' }}>
+                <StyledInput 
+                  type="text" 
+                  placeholder="Choose a password" 
+                  value={parentData.password}
+                  onChange={e => setParentData(prev => ({ ...prev, password: e.target.value }))}
+                />
+                <button 
+                  type="button"
+                  onClick={() => setParentData(prev => ({ ...prev, password: Math.random().toString(36).slice(-8) }))}
+                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: '#e0f2fe', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0284c7', cursor: 'pointer' }}
                 >Generate</button>
               </div>
             </Field>
