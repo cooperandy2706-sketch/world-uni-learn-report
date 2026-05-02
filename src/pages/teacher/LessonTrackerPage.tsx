@@ -58,6 +58,7 @@ function AILessonModal({
     lesson,
     stored,
     onSave,
+    onSubmit,
     onClose,
 }: {
     lesson: Lesson
