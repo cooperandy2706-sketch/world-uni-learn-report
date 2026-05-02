@@ -51,23 +51,39 @@ Deno.serve(async (req) => {
       const { email, password, full_name, role, phone, metadata, target_school_id } = payload;
       const schoolId = callerProfile.role === 'super_admin' ? target_school_id : callerProfile.school_id;
 
-      if (!isAdmin && !(isTeacher && role === 'student')) {
+      if (!isAdmin && !(isTeacher && (role === 'student' || role === 'parent'))) {
         throw new Error("Not authorized to create this user.");
       }
 
-      const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
-        email, password, email_confirm: true, user_metadata: { full_name }
-      });
-      if (authError) throw authError;
+      let newUserId: string;
 
-      const newUserId = authData.user.id;
+      try {
+        const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+          email, password, email_confirm: true, user_metadata: { full_name }
+        });
+        if (authError) throw authError;
 
-      const { error: profError } = await adminClient.from('users').upsert({
-        id: newUserId, school_id: schoolId, full_name, email, phone: phone || null, role, is_active: true
-      });
-      if (profError) {
-        await adminClient.auth.admin.deleteUser(newUserId)
-        throw profError;
+        newUserId = authData.user.id;
+
+        const { error: profError } = await adminClient.from('users').upsert({
+          id: newUserId, school_id: schoolId, full_name, email, phone: phone || null, role, is_active: true
+        });
+        if (profError) {
+          await adminClient.auth.admin.deleteUser(newUserId)
+          throw profError;
+        }
+      } catch (err: any) {
+        if (role === 'parent' && (err.message?.toLowerCase().includes('already exists') || err.message?.toLowerCase().includes('registered'))) {
+          // If parent already exists, fetch their user ID to link the new student
+          const { data: extUser } = await adminClient.from('users').select('id, role, school_id').eq('email', email).single();
+          if (extUser && extUser.role === 'parent' && extUser.school_id === schoolId) {
+             newUserId = extUser.id;
+          } else {
+             throw new Error("Email exists but is not a parent account for this school.");
+          }
+        } else {
+          throw err;
+        }
       }
 
       if (role === 'teacher') {
@@ -81,6 +97,19 @@ Deno.serve(async (req) => {
            await adminClient.from('students').update({ user_id: newUserId }).eq('id', metadata.link_id);
          } else {
            await adminClient.from('students').insert({ user_id: newUserId, school_id: schoolId, class_id: metadata?.class_id, student_id: metadata?.student_id, full_name, is_active: true });
+         }
+      } else if (role === 'parent') {
+         if (metadata?.link_id) {
+           // Ensure it doesn't fail if they link the same student twice (handled by ON CONFLICT if we use upsert, but we'll try to insert and ignore error)
+           const { error: linkErr } = await adminClient.from('parent_wards').insert({
+              school_id: schoolId,
+              parent_user_id: newUserId,
+              student_id: metadata.link_id
+           });
+           // We can ignore unique violation if they try to link the same child twice
+           if (linkErr && !linkErr.message.includes('unique constraint')) {
+              throw linkErr;
+           }
          }
       }
 
@@ -110,6 +139,59 @@ Deno.serve(async (req) => {
       if (error) throw error;
 
       return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+    }
+
+    if (action === 'create-school-with-admin') {
+      if (callerProfile.role !== 'super_admin') {
+        throw new Error("Only super admins can create new schools directly.");
+      }
+
+      const { school, admin } = payload;
+
+      // 1. Create the school
+      const { data: newSchool, error: sErr } = await adminClient.from('schools').insert({
+        name: school.name,
+        email: school.email,
+        phone: school.phone,
+        address: school.address,
+        motto: school.motto,
+        status: school.status || 'active'
+      }).select('id').single();
+
+      if (sErr) throw sErr;
+      const schoolId = newSchool.id;
+
+      // 2. Create the admin user
+      const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+        email: admin.email,
+        password: admin.password,
+        email_confirm: true,
+        user_metadata: { full_name: admin.full_name }
+      });
+
+      if (authError) {
+        await adminClient.from('schools').delete().eq('id', schoolId);
+        throw authError;
+      }
+
+      const newUserId = authData.user.id;
+
+      const { error: profError } = await adminClient.from('users').upsert({
+        id: newUserId,
+        school_id: schoolId,
+        full_name: admin.full_name,
+        email: admin.email,
+        role: 'admin',
+        is_active: true
+      });
+
+      if (profError) {
+        await adminClient.auth.admin.deleteUser(newUserId);
+        await adminClient.from('schools').delete().eq('id', schoolId);
+        throw profError;
+      }
+
+      return new Response(JSON.stringify({ success: true, school_id: schoolId, admin_id: newUserId }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
     }
 
     if (action === 'reset-password') {

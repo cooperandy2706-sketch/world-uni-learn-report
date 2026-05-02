@@ -9,6 +9,7 @@ import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { getGradeInfo, calculateAverage, calculatePassRate } from '../../utils/grading'
 import { formatDate } from '../../lib/utils'
 import { ROUTES } from '../../constants/routes'
+import FlaskLoader from '../../components/ui/FlaskLoader'
 
 function AnimNum({ to }: { to: number }) {
   const [val, setVal] = useState(0); const ref = useRef(false)
@@ -177,13 +178,7 @@ export default function TeacherDashboardPage() {
   const activeLesson = todayLessons.find((l: any) => { const s = timeToMins(l.period?.start_time?.slice(0, 5)); const e = timeToMins(l.period?.end_time?.slice(0, 5)); return currentMins >= s && currentMins < e })
   const nextLesson = todayLessons.find((l: any) => timeToMins(l.period?.start_time?.slice(0, 5)) > currentMins)
 
-  if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', flexDirection: 'column', gap: 16, fontFamily: '"DM Sans",sans-serif' }}>
-      <style>{`@keyframes _sp{to{transform:rotate(360deg)}}`}</style>
-      <div style={{ width: 40, height: 40, borderRadius: '50%', border: '4px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_sp .8s linear infinite' }} />
-      <p style={{ fontSize: 13, color: '#6b7280' }}>Loading your dashboard…</p>
-    </div>
-  )
+  if (loading) return <FlaskLoader fullScreen={false} label="Loading your dashboard…" />
 
   return (
     <>

@@ -8,6 +8,7 @@ import { getGradeInfo } from '../../utils/grading'
 import { formatDate, ordinal } from '../../lib/utils'
 import { ROUTES } from '../../constants/routes'
 import { feeStructuresService, feePaymentsService } from '../../services/bursar.service'
+import FlaskLoader from '../../components/ui/FlaskLoader'
 
 interface Stats {
   students: number; teachers: number; classes: number; subjects: number
@@ -393,13 +394,7 @@ export default function DashboardPage() {
     setStats(prev => prev ? { ...prev, unreadMessages: Math.max(0, prev.unreadMessages - 1) } : prev)
   }
 
-  if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', flexDirection: 'column', gap: 16 }}>
-      <style>{`@keyframes _spin { to{transform:rotate(360deg)} }`}</style>
-      <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
-      <p style={{ fontSize: 13, color: '#6b7280', fontFamily: '"DM Sans",sans-serif' }}>Loading dashboard…</p>
-    </div>
-  )
+  if (loading) return <FlaskLoader fullScreen={false} label="Loading dashboard…" />
 
   const reportsRemaining = (stats?.totalStudentsForReports ?? 0) - (stats?.reportsGenerated ?? 0)
   const reportPct = stats?.totalStudentsForReports ? Math.round((stats.reportsGenerated / stats.totalStudentsForReports) * 100) : 0

@@ -16,6 +16,7 @@ interface School {
   id: string; name: string; email: string; phone: string
   address: string; motto: string; status: SchoolStatus; created_at: string
   logo_url?: string; storage_limit_gb: number; storage_used_bytes: number
+  paystack_public_key?: string;
 }
 
 // ─── animated counter ─────────────────────────────────────
@@ -110,16 +111,14 @@ export default function SuperAdminDashboard() {
 
   async function loadPlatformData() {
     try {
-      const [
-        { data: sData, error: sErr },
-        { count: tCount },
-        { count: stCount }
-      ] = await Promise.all([
+      const results = await Promise.all([
         supabase.from('schools').select('*').order('created_at', { ascending: false }),
         supabase.from('teachers').select('*', { count: 'exact', head: true }),
         supabase.from('students').select('*', { count: 'exact', head: true }),
         supabase.from('school_invoices').select('*, school:schools(id, name)').eq('status', 'requested_approval').order('created_at', { ascending: false })
       ])
+
+      const [{ data: sData, error: sErr }, { count: tCount }, { count: stCount }, { data: invData }] = results
 
       if (sErr) throw sErr
       
@@ -131,8 +130,9 @@ export default function SuperAdminDashboard() {
         totalTeachers: tCount || 0,
         totalStudents: stCount || 0
       })
-      setPendingInvoices((arguments[0][3] as any)?.data || [])
+      setPendingInvoices(invData || [])
     } catch (err: any) {
+      console.error(err)
       toast.error('Failed to sync platform data')
     } finally {
       setLoading(false)
@@ -191,6 +191,17 @@ export default function SuperAdminDashboard() {
       loadPlatformData()
     } catch (err: any) {
       toast.error('Update failed')
+    }
+  }
+
+  async function handleUpdateSubaccount(schoolId: string, subaccountCode: string) {
+    try {
+      const { error } = await supabase.from('schools').update({ paystack_public_key: subaccountCode || null }).eq('id', schoolId)
+      if (error) throw error
+      toast.success('Paystack Subaccount updated!')
+      loadPlatformData()
+    } catch (err: any) {
+      toast.error('Failed to update subaccount')
     }
   }
 
@@ -368,18 +379,8 @@ export default function SuperAdminDashboard() {
           </div>
         </div>
 
-        {/* Table Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 120px 160px', padding: '16px 32px', background: '#fcfcfd', borderBottom: '1px solid #f1f5f9', fontSize: 13, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-          <div>School Identity</div>
-          <div>Contact Info</div>
-          <div>Status</div>
-          <div>Data Storage</div>
-          <div>Registration</div>
-          <div style={{ textAlign: 'right' }}>Actions</div>
-        </div>
-
-        {/* School List */}
-        <div style={{ minHeight: 400 }}>
+        {/* School Cards Grid */}
+        <div style={{ minHeight: 400, padding: '32px', background: '#f8fafc' }}>
           {loading ? (
             <div style={{ textAlign: 'center', padding: '100px 0', color: '#94a3b8' }}>Syncing platform...</div>
           ) : filteredSchools.length === 0 ? (
@@ -388,89 +389,124 @@ export default function SuperAdminDashboard() {
               <p style={{ color: '#94a3b8', fontSize: 15 }}>No schools found matching your current filters.</p>
             </div>
           ) : (
-            filteredSchools.map((school, i) => (
-              <div
-                key={school.id}
-                className="school-row row-animate"
-                style={{
-                  display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 120px 160px', padding: '24px 32px',
-                  borderBottom: i < filteredSchools.length - 1 ? '1.5px solid #f8fafc' : 'none',
-                  alignItems: 'center', transition: 'background 0.2s', animationDelay: `${i * 0.05}s`
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                  {school.logo_url ? (
-                    <img
-                      src={school.logo_url}
-                      alt={school.name}
-                      style={{ width: 44, height: 44, borderRadius: 12, objectFit: 'cover', border: '1.5px solid #f1f5f9' }}
-                    />
-                  ) : (
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg, #1e0646, #5b21b6)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>
-                      {school.name.charAt(0)}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 24 }}>
+              {filteredSchools.map((school, i) => (
+                <div
+                  key={school.id}
+                  className="row-animate"
+                  style={{
+                    background: '#fff', borderRadius: 20, border: '1px solid #e2e8f0', overflow: 'hidden',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.02)', transition: 'all 0.3s cubic-bezier(.4,0,.2,1)',
+                    animationDelay: `${i * 0.05}s`
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.06)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.02)' }}
+                >
+                  {/* Card Header */}
+                  <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', gap: 14 }}>
+                      {school.logo_url ? (
+                        <img src={school.logo_url} alt={school.name} style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'cover', border: '1.5px solid #f1f5f9', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }} />
+                      ) : (
+                        <div style={{ width: 48, height: 48, borderRadius: 12, background: 'linear-gradient(135deg, #1e0646, #5b21b6)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, boxShadow: '0 2px 8px rgba(91,33,182,0.2)' }}>
+                          {school.name.charAt(0)}
+                        </div>
+                      )}
+                      <div>
+                        <h3 style={{ fontSize: 16, fontWeight: 800, color: '#1e0646', margin: '0 0 4px' }}>{school.name}</h3>
+                        <span style={{ fontSize: 11, color: '#64748b', background: '#f1f5f9', padding: '3px 8px', borderRadius: 6, fontWeight: 700, letterSpacing: '0.02em' }}>
+                          ID: {school.id.split('-')[0]}
+                        </span>
+                      </div>
                     </div>
-                  )}
-                  <div>
-                    <h3 style={{ fontSize: 15, fontWeight: 700, color: '#1e0646', marginBottom: 4 }}>{school.name}</h3>
-                    <p style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500 }}>ID: {school.id}</p>
+                    <span style={{
+                      padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em',
+                      background: school.status === 'active' ? '#f0fdf4' : school.status === 'pending' ? '#fffbeb' : '#fef2f2',
+                      color: school.status === 'active' ? '#16a34a' : school.status === 'pending' ? '#d97706' : '#dc2626',
+                      border: `1px solid ${school.status === 'active' ? '#bcf0da' : school.status === 'pending' ? '#fde68a' : '#fecaca'}`
+                    }}>
+                      {school.status}
+                    </span>
+                  </div>
+
+                  {/* Card Body */}
+                  <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#64748b', fontWeight: 500 }}>
+                          <span style={{ color: '#94a3b8' }}>📧</span> <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{school.email || 'N/A'}</span>
+                       </div>
+                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#64748b', fontWeight: 500 }}>
+                          <span style={{ color: '#94a3b8' }}>📞</span> <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{school.phone || 'N/A'}</span>
+                       </div>
+                    </div>
+                    
+                    <div style={{ background: '#f8fafc', borderRadius: 14, padding: '16px', border: '1px solid #e2e8f0' }}>
+                       <h4 style={{ fontSize: 11, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ width: 4, height: 12, background: '#6d28d9', borderRadius: 2 }} />
+                          System Config
+                       </h4>
+                       
+                       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                             <span style={{ fontSize: 13, fontWeight: 600, color: '#475569' }}>Data Storage Limit</span>
+                             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                <input 
+                                  type="number" 
+                                  defaultValue={school.storage_limit_gb} 
+                                  onBlur={(e) => handleUpdateStorage(school.id, e.target.value)} 
+                                  style={{ width: 60, padding: '6px 8px', borderRadius: 8, border: '1.5px solid #cbd5e1', fontSize: 13, fontWeight: 700, textAlign: 'center', outline: 'none', transition: 'border-color 0.2s' }} 
+                                  onFocus={e => e.target.style.borderColor = '#6d28d9'}
+                                />
+                                <span style={{ fontSize: 12, color: '#64748b', fontWeight: 800 }}>GB</span>
+                             </div>
+                          </div>
+                          
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                             <span style={{ fontSize: 13, fontWeight: 600, color: '#475569' }}>Paystack SubAcct</span>
+                             <input 
+                               type="text" 
+                               placeholder="ACCT_..." 
+                               defaultValue={school.paystack_public_key || ''} 
+                               onBlur={(e) => handleUpdateSubaccount(school.id, e.target.value)} 
+                               style={{ width: 140, padding: '6px 10px', borderRadius: 8, border: '1.5px solid #cbd5e1', fontSize: 13, fontWeight: 700, outline: 'none', transition: 'border-color 0.2s', fontFamily: 'monospace' }} 
+                               onFocus={e => e.target.style.borderColor = '#6d28d9'} 
+                             />
+                          </div>
+                       </div>
+                    </div>
+                  </div>
+
+                  {/* Card Footer */}
+                  <div style={{ padding: '16px 24px', background: '#fcfcfd', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                     <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>
+                        Joined: {new Date(school.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                     </div>
+                     <div style={{ display: 'flex', gap: 8 }}>
+                       {school.status === 'pending' ? (
+                         <button
+                           onClick={() => updateStatus(school.id, 'active')}
+                           style={{ padding: '8px 16px', borderRadius: 10, border: 'none', background: '#22c55e', color: '#fff', fontWeight: 800, fontSize: 12, cursor: 'pointer', boxShadow: '0 4px 12px rgba(34,197,94,0.25)', transition: 'transform 0.1s' }}
+                           onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
+                           onMouseUp={e => e.currentTarget.style.transform = 'none'}
+                         >Approve</button>
+                       ) : school.status === 'active' ? (
+                         <button
+                           onClick={() => updateStatus(school.id, 'suspended')}
+                           style={{ padding: '8px 16px', borderRadius: 10, border: '1.5px solid #fee2e2', background: '#fff', color: '#dc2626', fontWeight: 800, fontSize: 12, cursor: 'pointer', transition: 'background 0.2s' }}
+                           onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
+                           onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+                         >Suspend</button>
+                       ) : (
+                         <button
+                           onClick={() => updateStatus(school.id, 'active')}
+                           style={{ padding: '8px 16px', borderRadius: 10, border: 'none', background: '#6d28d9', color: '#fff', fontWeight: 800, fontSize: 12, cursor: 'pointer', boxShadow: '0 4px 12px rgba(109,40,217,0.25)' }}
+                         >Activate</button>
+                       )}
+                     </div>
                   </div>
                 </div>
-
-                <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.5 }}>
-                  <p>📧 {school.email || 'N/A'}</p>
-                  <p>📞 {school.phone || 'N/A'}</p>
-                </div>
-
-                <div>
-                   <span style={{
-                     padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em',
-                     background: school.status === 'active' ? '#f0fdf4' : school.status === 'pending' ? '#fffbeb' : '#fef2f2',
-                     color: school.status === 'active' ? '#16a34a' : school.status === 'pending' ? '#d97706' : '#dc2626',
-                     border: `1px solid ${school.status === 'active' ? '#bcf0da' : school.status === 'pending' ? '#fef3c7' : '#fecaca'}`
-                   }}>
-                     {school.status}
-                   </span>
-                </div>
-
-                <div>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <input 
-                        type="number"
-                        defaultValue={school.storage_limit_gb}
-                        onBlur={(e) => handleUpdateStorage(school.id, e.target.value)}
-                        style={{ width: 60, padding: '4px 8px', borderRadius: 6, border: '1px solid #e2e8f0', fontSize: 13, fontWeight: 700 }}
-                      />
-                      <span style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>GB</span>
-                   </div>
-                   <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 4 }}>
-                      Used: {((school.storage_used_bytes || 0) / (1024**3)).toFixed(3)} GB
-                   </div>
-                </div>
-
-                <div style={{ fontSize: 13, color: '#64748b' }}>
-                  {new Date(school.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </div>
-
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                  {school.status === 'pending' ? (
-                    <button
-                      onClick={() => updateStatus(school.id, 'active')}
-                      style={{ padding: '8px 16px', borderRadius: 9, border: 'none', background: '#22c55e', color: '#fff', fontWeight: 700, fontSize: 12, cursor: 'pointer', boxShadow: '0 4px 12px rgba(34,197,94,0.2)' }}
-                    >Approve</button>
-                  ) : school.status === 'active' ? (
-                    <button
-                      onClick={() => updateStatus(school.id, 'suspended')}
-                      style={{ padding: '8px 16px', borderRadius: 9, border: '1.5px solid #fee2e2', background: '#fff', color: '#dc2626', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
-                    >Suspend</button>
-                  ) : (
-                    <button
-                      onClick={() => updateStatus(school.id, 'active')}
-                      style={{ padding: '8px 16px', borderRadius: 9, border: 'none', background: '#6d28d9', color: '#fff', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
-                    >Activate</button>
-                  )}
-                </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </div>

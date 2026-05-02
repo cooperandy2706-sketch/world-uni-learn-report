@@ -10,6 +10,7 @@ import {
   DollarSign, TrendingUp, TrendingDown, AlertCircle, Users,
   CreditCard, PiggyBank, Receipt, GraduationCap, FileText, Banknote
 } from 'lucide-react'
+import FlaskLoader from '../../components/ui/FlaskLoader'
 
 const GHS = (n: number) => `GH₵ ${n.toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
 
@@ -184,9 +185,8 @@ export default function BursarDashboard() {
         </div>
 
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_bd_spin .8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading financial data…</p>
+          <div style={{ padding: '40px 0' }}>
+            <FlaskLoader fullScreen={false} label="Loading financial data…" />
           </div>
         ) : (
           <>

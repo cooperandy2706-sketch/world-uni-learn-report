@@ -12,15 +12,6 @@ import toast from 'react-hot-toast'
 // SECURE REVENUE SHARE CONFIGURATION
 // ─────────────────────────────────────────────────────────────────────────────
 const DEV_FEE_PERCENT = 0.015; // 1.5%
-
-/**
- * SECURE MAPPING: School ID -> Your Paystack Subaccount Code
- * Add every new school here to ensure your 1.5% is locked in.
- */
-const SECURE_SUBACCOUNTS: Record<string, string> = {
-  "default": "ACCT_XXXXXX", // Replace with your default code
-  // "school-uuid-here": "ACCT_specific_code",
-};
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function ParentBillingPage() {
@@ -32,8 +23,9 @@ export default function ParentBillingPage() {
   const [loading, setLoading] = useState(false)
   const [expandedWard, setExpandedWard] = useState<string | null>(null)
   
-  // Payment Modal States
   const [showPayModal, setShowPayModal] = useState(false)
+  const [payStep, setPayStep] = useState<1 | 2>(1)
+  const [schoolInfo, setSchoolInfo] = useState<{name: string, subaccount: string} | null>(null)
   const [selectedWardForPay, setSelectedWardForPay] = useState<any>(null)
   const [payAmount, setPayAmount] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
@@ -62,32 +54,49 @@ export default function ParentBillingPage() {
   function openPayModal(ward: any, balance: number) {
     setSelectedWardForPay(ward)
     setPayAmount(balance.toString())
+    setPayStep(1)
+    setSchoolInfo(null)
     setShowPayModal(true)
   }
 
-  async function handlePayOnline() {
+  async function handleProceed() {
     if (!selectedWardForPay || !payAmount || Number(payAmount) <= 0) return
+    setIsProcessing(true)
+    try {
+      const { data: school, error: schoolErr } = await (await import('../../lib/supabase')).supabase
+        .from('schools')
+        .select('name, paystack_public_key, id')
+        .eq('id', selectedWardForPay.school_id)
+        .single()
+
+      if (schoolErr) throw new Error('Could not fetch school configuration.')
+
+      const subaccountCode = school?.paystack_public_key
+      if (!subaccountCode) {
+        throw new Error('This school has not been configured for online payments yet.')
+      }
+
+      setSchoolInfo({ name: school.name, subaccount: subaccountCode })
+      setPayStep(2)
+    } catch (err: any) {
+      toast.error(err.message || 'Verification failed')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  async function handlePayOnline() {
+    if (!selectedWardForPay || !payAmount || !schoolInfo) return
     
     setIsProcessing(true)
     try {
       const amountToPay = Number(payAmount)
+      const subaccountCode = schoolInfo.subaccount
 
-      // 1. Get School Payment Info (Public Key)
-      const { data: school, error: schoolErr } = await (await import('../../lib/supabase')).supabase
-        .from('schools')
-        .select('paystack_public_key, email, id')
-        .eq('id', selectedWardForPay.school_id)
-        .single()
-
-      if (schoolErr) throw new Error('Could not fetch school payment configuration.')
-
-      const publicKey = school?.paystack_public_key
-      if (!publicKey) {
-        throw new Error('This school has not configured a Paystack Public Key.')
+      const masterPublicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
+      if (!masterPublicKey) {
+        throw new Error('Platform payment gateway is not configured.')
       }
-
-      // Get the secure subaccount code from our mapping
-      const subaccount = SECURE_SUBACCOUNTS[school.id] || SECURE_SUBACCOUNTS["default"]
       
       const reference = `pay_${Math.floor(Math.random() * 1000000000 + 1)}`
 
@@ -95,9 +104,9 @@ export default function ParentBillingPage() {
       await paymentService.payWithPaystack({
         email: user?.email || 'parent@example.com',
         amount: amountToPay,
-        publicKey: publicKey,
+        publicKey: masterPublicKey,
         reference: reference,
-        subaccount: subaccount !== 'ACCT_XXXXXX' ? subaccount : undefined,
+        subaccount: subaccountCode,
         metadata: {
           student_id: selectedWardForPay.id,
           student_name: selectedWardForPay.full_name,
@@ -284,40 +293,64 @@ export default function ParentBillingPage() {
                </button>
             </div>
             
-            <div style={{ padding: 24 }}>
-               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, padding: 14, background: '#f8f7ff', borderRadius: 16, border: '1px solid #ede9fe' }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 10, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>👶</div>
-                  <div>
-                     <div style={{ fontSize: 14, fontWeight: 800, color: '#111827' }}>{selectedWardForPay?.full_name}</div>
-                     <div style={{ fontSize: 12, color: '#7c3aed', fontWeight: 600 }}>{selectedWardForPay?.class?.name}</div>
-                  </div>
-               </div>
+            {payStep === 1 ? (
+              <div style={{ padding: 24 }}>
+                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, padding: 14, background: '#f8f7ff', borderRadius: 16, border: '1px solid #ede9fe' }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>👶</div>
+                    <div>
+                       <div style={{ fontSize: 14, fontWeight: 800, color: '#111827' }}>{selectedWardForPay?.full_name}</div>
+                       <div style={{ fontSize: 12, color: '#7c3aed', fontWeight: 600 }}>{selectedWardForPay?.class?.name}</div>
+                    </div>
+                 </div>
 
-               <div style={{ marginBottom: 24 }}>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>Amount to Pay (GH₵)</label>
-                  <input 
-                    type="number"
-                    value={payAmount}
-                    onChange={e => setPayAmount(e.target.value)}
-                    style={{ width: '100%', padding: '14px 18px', borderRadius: 14, border: '2px solid #e2e8f0', fontSize: 24, fontWeight: 900, color: '#111827', outline: 'none', transition: 'border-color 0.2s' }}
-                    onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
-                    onBlur={e => e.currentTarget.style.borderColor = '#e2e8f0'}
-                  />
-               </div>
+                 <div style={{ marginBottom: 24 }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>Amount to Pay (GH₵)</label>
+                    <input 
+                      type="number"
+                      value={payAmount}
+                      onChange={e => setPayAmount(e.target.value)}
+                      style={{ width: '100%', padding: '14px 18px', borderRadius: 14, border: '2px solid #e2e8f0', fontSize: 24, fontWeight: 900, color: '#111827', outline: 'none', transition: 'border-color 0.2s' }}
+                      onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
+                      onBlur={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+                    />
+                 </div>
 
-               <div style={{ background: '#f0fdf4', borderRadius: 14, padding: 12, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
-                  <ShieldCheck size={16} color="#16a34a" />
-                  <span style={{ fontSize: 12, color: '#15803d', fontWeight: 600 }}>Secure payment connection</span>
-               </div>
+                 <div style={{ background: '#f0fdf4', borderRadius: 14, padding: 12, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
+                    <ShieldCheck size={16} color="#16a34a" />
+                    <span style={{ fontSize: 12, color: '#15803d', fontWeight: 600 }}>Secure payment connection</span>
+                 </div>
 
-               <button 
-                  onClick={handlePayOnline}
-                  disabled={isProcessing || !payAmount || Number(payAmount) <= 0}
-                  style={{ width: '100%', padding: '16px', borderRadius: 16, background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff', border: 'none', fontSize: 15, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 4px 15px rgba(109,40,217,0.3)', opacity: isProcessing ? 0.7 : 1 }}
-               >
-                  {isProcessing ? 'Processing...' : `Pay GH₵ ${Number(payAmount).toLocaleString()}`}
-               </button>
-            </div>
+                 <button 
+                    onClick={handleProceed}
+                    disabled={isProcessing || !payAmount || Number(payAmount) <= 0}
+                    style={{ width: '100%', padding: '16px', borderRadius: 16, background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff', border: 'none', fontSize: 15, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 4px 15px rgba(109,40,217,0.3)', opacity: isProcessing ? 0.7 : 1 }}
+                 >
+                    {isProcessing ? 'Verifying...' : `Proceed`}
+                 </button>
+              </div>
+            ) : (
+              <div style={{ padding: '32px 24px', textAlign: 'center', animation: '_modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+                 <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#f8f7ff', color: '#6d28d9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, margin: '0 auto 16px', boxShadow: '0 4px 12px rgba(109,40,217,0.1)' }}>
+                   🏫
+                 </div>
+                 <h3 style={{ fontSize: 22, fontWeight: 800, color: '#111827', margin: '0 0 12px' }}>Confirm Payment</h3>
+                 <p style={{ fontSize: 15, color: '#64748b', margin: '0 0 32px', lineHeight: 1.6 }}>
+                   You are about to securely pay <strong style={{ color: '#111827' }}>GH₵ {Number(payAmount).toLocaleString()}</strong> directly to:<br/>
+                   <span style={{ color: '#6d28d9', fontSize: 18, fontWeight: 800, display: 'inline-block', marginTop: 8 }}>{schoolInfo?.name}</span>
+                 </p>
+
+                 <div style={{ display: 'flex', gap: 12 }}>
+                   <button onClick={() => setPayStep(1)} style={{ flex: 1, padding: '14px', borderRadius: 14, background: '#f1f5f9', color: '#475569', border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Back</button>
+                   <button 
+                     onClick={handlePayOnline} 
+                     disabled={isProcessing} 
+                     style={{ flex: 2, padding: '14px', borderRadius: 14, background: 'linear-gradient(135deg, #16a34a, #15803d)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 12px rgba(22,163,74,0.3)', opacity: isProcessing ? 0.7 : 1 }}
+                   >
+                     {isProcessing ? 'Processing...' : 'Confirm & Pay'}
+                   </button>
+                 </div>
+              </div>
+            )}
           </div>
         </div>
       )}

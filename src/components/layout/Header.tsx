@@ -451,7 +451,8 @@ export default function Header() {
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
         @keyframes slideInRight { from { transform: translateX(100%) } to { transform: translateX(0) } }
         @keyframes spin { to { transform: rotate(360deg) } }
-        .top-nav-pill { display: flex; align-items: center; gap: 2px; overflow: visible; }
+        .top-nav-pill { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; flex-shrink: 1; min-width: 0; }
+        .top-nav-pill::-webkit-scrollbar { display: none; }
         .mobile-menu-btn { display: none; }
         @media (max-width: 1024px) {
           .top-nav-pill { display: none !important; }
@@ -519,7 +520,9 @@ export default function Header() {
           border: '1px solid #e5e7eb',
           boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
           padding: '6px 6px 6px 16px',
-          maxWidth: '75%',   /* shifted left so search & bell are fully visible */
+          flex: 1,
+          justifyContent: 'flex-end',
+          maxWidth: 'fit-content'
         }}>
 
           {/* Nav Groups */}
@@ -770,9 +773,11 @@ export default function Header() {
                 boxShadow: profileOpen ? '0 0 0 3px #bfdbfe' : 'none',
               }}
             >
-              {userSchool?.logo_url
-                ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
-                : user?.full_name?.charAt(0).toUpperCase()
+              {user?.avatar_url
+                ? <img src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', background: '#fff' }} />
+                : userSchool?.logo_url
+                  ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
+                  : (user?.full_name?.charAt(0).toUpperCase() || <Shield size={16} />)
               }
             </div>
 
@@ -787,13 +792,15 @@ export default function Header() {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid #f3f4f6' }}>
                   <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', fontSize: 18, fontWeight: 700, color: '#1a56db', flexShrink: 0, border: '1px solid #e5e7eb' }}>
-                    {userSchool?.logo_url
-                      ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
-                      : user?.full_name?.charAt(0).toUpperCase()
+                    {user?.avatar_url
+                      ? <img src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', background: '#fff' }} />
+                      : userSchool?.logo_url
+                        ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
+                        : (user?.full_name?.charAt(0).toUpperCase() || <Shield size={20} />)
                     }
                   </div>
                   <div style={{ overflow: 'hidden' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.full_name}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.full_name || 'System Admin'}</div>
                     <div style={{ fontSize: 11, color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
                     <div style={{ fontSize: 10, fontWeight: 700, color: '#1a56db', textTransform: 'uppercase', marginTop: 2 }}>{user?.role}</div>
                   </div>
@@ -801,7 +808,12 @@ export default function Header() {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <button
-                    onClick={() => { navigate(isAdmin ? '/admin/settings' : '/teacher/self-service'); setProfileOpen(false) }}
+                    onClick={() => { 
+                      if (user?.role) {
+                        navigate(`/${user.role.replace('_', '-')}/account`)
+                      }
+                      setProfileOpen(false) 
+                    }}
                     style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', background: '#f3f4f6', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left' }}
                     onMouseEnter={e => e.currentTarget.style.background = '#e5e7eb'}
                     onMouseLeave={e => e.currentTarget.style.background = '#f3f4f6'}

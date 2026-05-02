@@ -33,7 +33,7 @@ export const ROUTES = {
   ADMIN_PROMOTION: '/admin/promotion',
   ADMIN_ALUMNI: '/admin/alumni',
   ADMIN_CALENDAR: '/admin/calendar',
-
+  ADMIN_ACCOUNT: '/admin/account',
   // Teacher
   TEACHER_DASHBOARD: '/teacher/dashboard',
   TEACHER_MY_CLASSES: '/teacher/my-classes',
@@ -51,7 +51,7 @@ export const ROUTES = {
   TEACHER_AGENDA: '/teacher/agenda',
   TEACHER_TYPING_GAME: '/teacher/typing-game',
   TEACHER_CLASS_TESTS: '/teacher/class-tests',
-
+  TEACHER_ACCOUNT: '/teacher/account',
   // Student
   STUDENT_DASHBOARD: '/student/dashboard',
   STUDENT_ASSIGNMENTS: '/student/assignments',
@@ -67,7 +67,7 @@ export const ROUTES = {
   STUDENT_CALENDAR: '/student/calendar',
   STUDENT_SUBJECTS: '/student/subjects',
   STUDENT_ELECTIONS: '/student/elections',
-
+  STUDENT_ACCOUNT: '/student/account',
   // Bursar
   BURSAR_DASHBOARD:  '/bursar/dashboard',
   BURSAR_FEES:       '/bursar/fees',
@@ -81,9 +81,10 @@ export const ROUTES = {
   BURSAR_INVENTORY:  '/bursar/inventory',
   BURSAR_STUDENTS:   '/bursar/students',
   BURSAR_SMS:        '/bursar/sms',
-
+  BURSAR_ACCOUNT:    '/bursar/account',
   // Other Staff
   STAFF_DASHBOARD: '/staff/dashboard',
+  STAFF_ACCOUNT: '/staff/account',
 
   // Super Admin
   SUPER_ADMIN_DASHBOARD: '/super-admin/dashboard',
@@ -94,4 +95,10 @@ export const ROUTES = {
   SUPER_ADMIN_RESOURCES: '/super-admin/resources',
   SUPER_ADMIN_SUBJECTS: '/super-admin/subjects',
   SUPER_ADMIN_MESSAGES: '/super-admin/messaging',
+  SUPER_ADMIN_ACCOUNT: '/super-admin/account',
+
+  // Parent
+  PARENT_DASHBOARD: '/parent/dashboard',
+  PARENT_BILLING: '/parent/billing',
+  PARENT_ACCOUNT: '/parent/account',
 } as const

@@ -600,6 +600,37 @@ export default function StudentsPage() {
   const [searchFocused, setSearchFocused] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   
+  const [photoUploading, setPhotoUploading] = useState(false)
+  const photoInputRef = useRef<HTMLInputElement>(null)
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>, student: any) {
+    const file = e.target.files?.[0]
+    if (!file || !student) return
+    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5MB'); return }
+
+    setPhotoUploading(true)
+    try {
+      const ext = file.name.split('.').pop()
+      const path = `student_photos/${student.id}_${Date.now()}.${ext}`
+      
+      const { error: uploadError } = await supabase.storage.from('school-assets').upload(path, file)
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage.from('school-assets').getPublicUrl(path)
+      
+      const { error: updateError } = await supabase.from('students').update({ photo_url: urlData.publicUrl }).eq('id', student.id)
+      if (updateError) throw updateError
+
+      qc.invalidateQueries({ queryKey: ['students'] })
+      setViewingStudent({ ...student, photo_url: urlData.publicUrl })
+      toast.success('Student photo updated!')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to upload photo')
+    } finally {
+      setPhotoUploading(false)
+    }
+  }
+  
   // New: Account Creation State
   const [accountModalOpen, setAccountModalOpen] = useState(false)
   const [parentModalOpen, setParentModalOpen] = useState(false)
@@ -607,6 +638,9 @@ export default function StudentsPage() {
   const [accountLoading, setAccountLoading] = useState(false)
   const [accountData, setAccountData] = useState({ email: '', password: '' })
   const [parentData, setParentData] = useState({ email: '', password: '' })
+  
+  // New: Form Photo Upload State
+  const [formPhotoFile, setFormPhotoFile] = useState<File | null>(null)
 
   // New: Document Centre State
   const [activeTab, setActiveTab] = useState<'directory' | 'documents'>('directory')
@@ -625,10 +659,11 @@ export default function StudentsPage() {
     return matchSearch && matchClass && matchGender
   }), [students, search, filterClass, filterGender])
 
-  function openCreate() { setEditingStudent(null); reset({}); setModalOpen(true) }
+  function openCreate() { setEditingStudent(null); reset({}); setFormPhotoFile(null); setModalOpen(true) }
   function openEdit(s: any) {
     setEditingStudent(s)
     reset({ full_name: s.full_name, student_id: s.student_id ?? '', class_id: s.class_id ?? '', gender: s.gender ?? undefined, date_of_birth: s.date_of_birth ?? '', house: s.house ?? '', guardian_name: s.guardian_name ?? '', guardian_phone: s.guardian_phone ?? '', guardian_email: s.guardian_email ?? '', address: s.address ?? '' })
+    setFormPhotoFile(null)
     setModalOpen(true)
   }
 
@@ -648,6 +683,7 @@ export default function StudentsPage() {
         clean[k] = (v === '' || v === undefined) ? null : v
       })
       const payload = { ...clean, school_id: user!.school_id, is_active: true }
+      let studentId = editingStudent?.id
 
       if (editingStudent) {
         const result = await supabase
@@ -658,12 +694,31 @@ export default function StudentsPage() {
           .single()
         if (result.error) throw result.error
         toast.success('Student updated')
-        qc.invalidateQueries({ queryKey: ['students'] })
       } else {
-        await createStudent.mutateAsync(payload)
+        const result = await supabase
+          .from('students')
+          .insert(payload)
+          .select()
+          .single()
+        if (result.error) throw result.error
+        studentId = result.data.id
+        toast.success('Student added')
       }
+
+      if (formPhotoFile && studentId) {
+        const ext = formPhotoFile.name.split('.').pop()
+        const path = `student_photos/${studentId}_${Date.now()}.${ext}`
+        const { error: uploadError } = await supabase.storage.from('school-assets').upload(path, formPhotoFile)
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from('school-assets').getPublicUrl(path)
+          await supabase.from('students').update({ photo_url: urlData.publicUrl }).eq('id', studentId)
+        }
+      }
+
+      qc.invalidateQueries({ queryKey: ['students'] })
       setModalOpen(false)
       reset({})
+      setFormPhotoFile(null)
 
     } catch (err: any) {
       toast.error(err?.message ?? 'Failed to save student')
@@ -957,7 +1012,11 @@ export default function StudentsPage() {
                         style={{ borderBottom: i < filtered.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background 0.12s', animation: `_fadeUp 0.3s ease ${i * 0.03}s both` }}>
                         <td style={{ padding: '12px 16px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <Avatar name={s.full_name} size={34} />
+                            {s.photo_url ? (
+                              <img src={s.photo_url} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
+                            ) : (
+                              <Avatar name={s.full_name} size={34} />
+                            )}
                             <div>
                               <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{s.full_name}</div>
                               {s.date_of_birth && <div style={{ fontSize: 11, color: '#9ca3af' }}>{formatDate(s.date_of_birth)}</div>}
@@ -1017,7 +1076,11 @@ export default function StudentsPage() {
                   <div key={s.id} className="std-card"
                     style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px', boxShadow: '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.2s', animation: `_fadeUp 0.35s ease ${i * 0.04}s both` }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
-                      <Avatar name={s.full_name} size={44} />
+                      {s.photo_url ? (
+                        <img src={s.photo_url} alt="" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }} />
+                      ) : (
+                        <Avatar name={s.full_name} size={44} />
+                      )}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.full_name}</div>
                         <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>{s.student_id ?? 'No ID'}</div>
@@ -1175,6 +1238,25 @@ export default function StudentsPage() {
           </>}
         >
           <form id="student-form" onSubmit={handleSubmit(onSubmit)}>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20, padding: '16px', background: '#faf5ff', borderRadius: 12, border: '1px dashed #c4b5fd' }}>
+              <div style={{ position: 'relative', width: 64, height: 64 }}>
+                <Avatar name={editingStudent?.full_name || 'Student'} size={64} />
+                {formPhotoFile ? (
+                  <img src={URL.createObjectURL(formPhotoFile)} alt="Preview" style={{ position: 'absolute', inset: 0, width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
+                ) : editingStudent?.photo_url ? (
+                  <img src={editingStudent.photo_url} alt="Current" style={{ position: 'absolute', inset: 0, width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
+                ) : null}
+              </div>
+              <div>
+                <label style={{ display: 'inline-block', padding: '8px 14px', background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'all 0.15s' }}>
+                  📷 Choose Picture
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => setFormPhotoFile(e.target.files?.[0] || null)} />
+                </label>
+                <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>Max size 5MB (Optional)</div>
+              </div>
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               <div style={{ gridColumn: '1 / -1' }}>
                 <Field label="Full Name *">
@@ -1220,7 +1302,22 @@ export default function StudentsPage() {
           {viewingStudent && (
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderRadius: 12, marginBottom: 18 }}>
-                <Avatar name={viewingStudent.full_name} size={52} />
+                <div style={{ position: 'relative' }}>
+                  {viewingStudent.photo_url ? (
+                    <img src={viewingStudent.photo_url} alt="Profile" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
+                  ) : (
+                    <Avatar name={viewingStudent.full_name} size={56} />
+                  )}
+                  <button 
+                    onClick={() => photoInputRef.current?.click()}
+                    disabled={photoUploading}
+                    style={{ position: 'absolute', bottom: -4, right: -4, width: 24, height: 24, borderRadius: '50%', background: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 12 }}
+                    title="Upload Photo"
+                  >
+                    {photoUploading ? '⏳' : '📷'}
+                  </button>
+                  <input ref={photoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e, viewingStudent)} />
+                </div>
                 <div>
                   <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 }}>{viewingStudent.full_name}</h3>
                   <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{(viewingStudent as any).class?.name ?? 'No class assigned'}</div>

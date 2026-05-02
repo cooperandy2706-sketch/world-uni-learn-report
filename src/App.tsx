@@ -9,33 +9,21 @@ import { useAuthStore } from './store/authStore'
 
 export default function App() {
   const [minTimeElapsed, setMinTimeElapsed] = useState(false)
-  const { initialized, initialize, user, firstLoadComplete, setFirstLoadComplete } = useAuthStore()
-  const [timedOut, setTimedOut] = useState(false)
+  const { initialized, initialize } = useAuthStore()
 
   useEffect(() => {
     if (!initialized) initialize()
   }, [initialized, initialize])
 
   useEffect(() => {
-    // Show splash for minimum 2s on every fresh load/refresh
-    const timer = setTimeout(() => setMinTimeElapsed(true), 2000)
-    
-    // Safety fallback: if firstLoadComplete doesn't trigger, let them through anyway
-    // 6 seconds is long enough for slow connections but prevents being "stuck"
-    const safetyTimer = setTimeout(() => setTimedOut(true), 6000)
-
-    return () => {
-      clearTimeout(timer)
-      clearTimeout(safetyTimer)
-    }
+    // Show splash for minimum 1.5s for branding, then let the app through
+    const timer = setTimeout(() => setMinTimeElapsed(true), 1500)
+    return () => clearTimeout(timer)
   }, [])
 
-  // Exit condition: 
-  // 1. Min time (2s) must pass.
-  // 2. Auth must be initialized.
-  // 3. If logged in, the first page must be ready (data fetched).
-  // 4. Fallback to timedOut (6s) if data is really slow or a bug occurs.
-  const isReady = minTimeElapsed && initialized && (!user || firstLoadComplete || timedOut)
+  // Exit splash once auth is initialized and minimum branding time has elapsed.
+  // Individual pages handle their own data-loading spinners.
+  const isReady = minTimeElapsed && initialized
 
   if (!isReady) {
     return <SplashScreen />

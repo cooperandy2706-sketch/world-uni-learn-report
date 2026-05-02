@@ -6,8 +6,6 @@ const corsHeaders = {
 }
 
 const ARKESEL_API_URL = 'https://sms.arkesel.com/api/v2/sms/send'
-const ARKESEL_SENDER  = 'ESTEVROYAL'
-const MSG_PREFIX      = 'ESTEV ROYAL: '
 const BATCH_SIZE      = 50
 
 /** Normalise a raw phone string to 233XXXXXXXXX format */
@@ -74,6 +72,19 @@ Deno.serve(async (req) => {
     const rawMessage: string = body.message ?? ''
     if (!rawMessage.trim()) throw new Error('Missing message content')
 
+    // Fetch school name for message prefix and sender ID
+    const { data: schoolData } = await adminClient
+      .from('schools')
+      .select('name')
+      .eq('id', schoolId)
+      .single()
+    
+    const schoolName = schoolData?.name || 'School'
+    const MSG_PREFIX = `${schoolName}: `
+    
+    // Sender ID typically limited to 11 chars alphanumeric
+    const arkeselSender = schoolName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 11).toUpperCase() || 'SCHOOLSMS'
+
     // Always prefix the message for sender identification
     const message = rawMessage.startsWith(MSG_PREFIX)
       ? rawMessage
@@ -106,7 +117,7 @@ Deno.serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            sender:     ARKESEL_SENDER,
+            sender:     arkeselSender,
             message,
             recipients: batch,
           }),

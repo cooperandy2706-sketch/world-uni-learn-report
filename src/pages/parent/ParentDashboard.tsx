@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useParentWards } from '../../hooks/useParents'
 import { useNavigate } from 'react-router-dom'
 import { useMemo } from 'react'
+import FlaskLoader from '../../components/ui/FlaskLoader'
 
 function Avatar({ name, size = 48 }: { name: string; size?: number }) {
   const colors = ['#6d28d9','#0891b2','#16a34a','#d97706','#dc2626','#7c3aed','#0284c7']
@@ -27,14 +28,7 @@ export default function ParentDashboard() {
 
   const firstName = user?.full_name?.split(' ')[0] || 'Parent'
 
-  if (isLoading) {
-    return (
-      <div style={{ padding: 20, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-        <style>{`@keyframes _spin { to { transform:rotate(360deg) } }`}</style>
-        <div style={{ width: 30, height: 30, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
-      </div>
-    )
-  }
+  if (isLoading) return <FlaskLoader fullScreen={false} label="Loading children…" />
 
   return (
     <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', paddingBottom: 40, animation: '_fadeIn .4s ease', maxWidth: 600, margin: '0 auto' }}>

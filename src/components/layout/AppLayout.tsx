@@ -9,6 +9,7 @@ import EnablePushButton from '../ui/EnablePushButton'
 import WhatsNewModal from '../ui/WhatsNewModal'
 import AnnouncementPopup from '../ui/AnnouncementPopup'
 import FloatingClock from '../shared/FloatingClock'
+import FlaskLoader from '../ui/FlaskLoader'
 import { ROUTES } from '../../constants/routes'
 
 interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 'student' | 'bursar' | 'staff' | 'parent' }
@@ -19,12 +20,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
   const { data: invoices = [], isLoading: invoicesLoading } = useSchoolInvoices(userSchool?.id)
 
   if (!initialized || loading) {
-    return (
-      <div style={{ display:'flex', height:'100vh', alignItems:'center', justifyContent:'center', background:'#f8f7ff' }}>
-        <style>{`@keyframes _spin { to { transform:rotate(360deg) } }`}</style>
-        <div style={{ width:24, height:24, borderRadius:'50%', border:'2.5px solid #ede9fe', borderTopColor:'#6d28d9', animation:'_spin 0.8s linear infinite' }} />
-      </div>
-    )
+    return <FlaskLoader label="Authenticating..." />
   }
 
   if (!user) return <Navigate to={ROUTES.LOGIN} replace />
@@ -38,18 +34,9 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
     return <Navigate to={user.role === 'admin' ? ROUTES.ADMIN_DASHBOARD : ROUTES.TEACHER_DASHBOARD} replace />
   }
 
-  if (user.role !== 'super_admin' && invoicesLoading) {
-    return (
-      <div style={{ display:'flex', height:'100vh', alignItems:'center', justifyContent:'center', background:'#f8f7ff' }}>
-        <style>{`@keyframes _spin { to { transform:rotate(360deg) } }`}</style>
-        <div style={{ width:24, height:24, borderRadius:'50%', border:'2.5px solid #ede9fe', borderTopColor:'#6d28d9', animation:'_spin 0.8s linear infinite' }} />
-      </div>
-    )
-  }
-
-
   // Pending School Guard & Billing Guard (Non-super-admins)
-  if (user.role !== 'super_admin' && userSchool) {
+  // Only enforce billing guard when invoice data has loaded (don't block on loading)
+  if (user.role !== 'super_admin' && userSchool && !invoicesLoading) {
     const createdAt = new Date(userSchool.created_at)
     const trialEnd = new Date(createdAt.getTime() + 30 * 24 * 60 * 60 * 1000)
     const now = new Date()

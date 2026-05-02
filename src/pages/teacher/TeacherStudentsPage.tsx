@@ -1,5 +1,5 @@
 // src/pages/teacher/TeacherStudentsPage.tsx
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../hooks/useAuth'
@@ -130,6 +130,38 @@ export default function TeacherStudentsPage() {
   const [accountData, setAccountData] = useState({ email: '', password: '' })
   const [parentModalOpen, setParentModalOpen] = useState(false)
   const [parentData, setParentData] = useState({ email: '', password: '' })
+  
+  // Photo Upload
+  const [photoUploading, setPhotoUploading] = useState(false)
+  const photoInputRef = useRef<HTMLInputElement>(null)
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>, student: any) {
+    const file = e.target.files?.[0]
+    if (!file || !student) return
+    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5MB'); return }
+
+    setPhotoUploading(true)
+    try {
+      const ext = file.name.split('.').pop()
+      const path = `student_photos/${student.id}_${Date.now()}.${ext}`
+      
+      const { error: uploadError } = await supabase.storage.from('school-assets').upload(path, file)
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage.from('school-assets').getPublicUrl(path)
+      
+      const { error: updateError } = await supabase.from('students').update({ photo_url: urlData.publicUrl }).eq('id', student.id)
+      if (updateError) throw updateError
+
+      loadStudents() // Refresh list
+      setViewingStudent({ ...student, photo_url: urlData.publicUrl })
+      toast.success('Student photo updated!')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to upload photo')
+    } finally {
+      setPhotoUploading(false)
+    }
+  }
 
   useEffect(() => {
     if (user?.id) loadStudents()
@@ -340,7 +372,11 @@ export default function TeacherStudentsPage() {
                     style={{ borderBottom: i < filtered.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background 0.12s', animation: `_fadeUp 0.3s ease ${i * 0.03}s both` }}>
                     <td style={{ padding: '12px 16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <Avatar name={s.full_name} size={34} />
+                        {s.photo_url ? (
+                          <img src={s.photo_url} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
+                        ) : (
+                          <Avatar name={s.full_name} size={34} />
+                        )}
                         <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{s.full_name}</div>
                       </div>
                     </td>
@@ -387,7 +423,22 @@ export default function TeacherStudentsPage() {
           {viewingStudent && (
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderRadius: 12, marginBottom: 18 }}>
-                <Avatar name={viewingStudent.full_name} size={52} />
+                <div style={{ position: 'relative' }}>
+                  {viewingStudent.photo_url ? (
+                    <img src={viewingStudent.photo_url} alt="Profile" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
+                  ) : (
+                    <Avatar name={viewingStudent.full_name} size={56} />
+                  )}
+                  <button 
+                    onClick={() => photoInputRef.current?.click()}
+                    disabled={photoUploading}
+                    style={{ position: 'absolute', bottom: -4, right: -4, width: 24, height: 24, borderRadius: '50%', background: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 12 }}
+                    title="Upload Photo"
+                  >
+                    {photoUploading ? '⏳' : '📷'}
+                  </button>
+                  <input ref={photoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e, viewingStudent)} />
+                </div>
                 <div>
                   <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 }}>{viewingStudent.full_name}</h3>
                   <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{viewingStudent.class?.name ?? 'No class assigned'}</div>
