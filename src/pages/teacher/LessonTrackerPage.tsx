@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm } from '../../hooks/useSettings'
-import { generateLessonPlan, type GeneratedLessonPlan } from '../../lib/huggingface'
+import { generateLessonPlan, type GeneratedLessonPlan } from '../../lib/groq'
 import toast from 'react-hot-toast'
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -136,7 +136,7 @@ function AILessonModal({
             // auto-save immediately
             onSave(lesson.id, { notes, topic, bullets, plan: result })
         } catch (err: any) {
-            setError(err.message ?? 'Failed to generate lesson plan. Check your Hugging Face API key.')
+            setError(err.message ?? 'Failed to generate lesson plan. Please check your AI API key status.')
         } finally {
             setGenerating(false)
         }
