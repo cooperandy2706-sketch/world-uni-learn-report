@@ -211,7 +211,6 @@ export default function TeacherAttendancePage() {
           await supabase.from('attendance').insert({
             student_id: student.id,
             term_id: (term as any).id,
-            school_id: user!.school_id,
             total_days: 1,
             days_present: isPresent ? 1 : 0,
             days_absent: isPresent ? 0 : 1,

@@ -71,8 +71,8 @@ export default function StudentResultsPage() {
     setLoading(true)
     try {
       const [reportRes, scoresRes, submissionsRes, classCountRes] = await Promise.all([
-        supabase.from('report_cards').select('*').eq('student_id', studentData.id).eq('term_id', termId).maybeSingle(),
-        supabase.from('scores').select('total_score,grade,class_score,exam_score,subject:subjects(id,name)').eq('student_id', studentData.id).eq('term_id', termId),
+        supabase.from('report_cards').select('*').eq('student_id', studentData.id).eq('term_id', termId).eq('is_approved', true).maybeSingle(),
+        supabase.from('scores').select('total_score,grade,class_score,exam_score,subject:subjects(id,name)').eq('student_id', studentData.id).eq('term_id', termId).eq('is_submitted', true),
         supabase
           .from('assignment_submissions')
           .select('*, assignment:assignments!inner(title, subject_id, term_id)')

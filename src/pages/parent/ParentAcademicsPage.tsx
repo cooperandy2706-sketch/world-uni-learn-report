@@ -54,8 +54,8 @@ export default function ParentAcademicsPage() {
     for (const ward of wards) {
       try {
         const [reportRes, scoresRes] = await Promise.all([
-          supabase.from('report_cards').select('*').eq('student_id', ward.id).eq('term_id', selectedTermId).maybeSingle(),
-          supabase.from('scores').select('total_score,grade,subject:subjects(name)').eq('student_id', ward.id).eq('term_id', selectedTermId)
+          supabase.from('report_cards').select('*').eq('student_id', ward.id).eq('term_id', selectedTermId).eq('is_approved', true).maybeSingle(),
+          supabase.from('scores').select('total_score,grade,subject:subjects(name)').eq('student_id', ward.id).eq('term_id', selectedTermId).eq('is_submitted', true)
         ])
         
         newAcademicData[ward.id] = {

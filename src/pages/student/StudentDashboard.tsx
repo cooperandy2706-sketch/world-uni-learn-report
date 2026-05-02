@@ -73,9 +73,9 @@ export default function StudentDashboard() {
         challengesRes,
       ] = await Promise.all([
         // Latest report card
-        term?.id ? supabase.from('report_cards').select('*, scores:scores(total_score,grade,subject:subjects(name))').eq('student_id', student.id).eq('term_id', term.id).maybeSingle() : Promise.resolve({ data: null }),
+        term?.id ? supabase.from('report_cards').select('*, scores:scores(total_score,grade,subject:subjects(name))').eq('student_id', student.id).eq('term_id', term.id).eq('is_approved', true).maybeSingle() : Promise.resolve({ data: null }),
         // Subject scores this term
-        term?.id ? supabase.from('scores').select('total_score,grade,subject:subjects(name)').eq('student_id', student.id).eq('term_id', term.id) : Promise.resolve({ data: [] }),
+        term?.id ? supabase.from('scores').select('total_score,grade,subject:subjects(name)').eq('student_id', student.id).eq('term_id', term.id).eq('is_submitted', true) : Promise.resolve({ data: [] }),
         // Pending assignments
         supabase.from('assignments')
           .select('id,title,due_date,subject:subjects(name)')
@@ -103,6 +103,7 @@ export default function StudentDashboard() {
           .select('average_score, term:terms(name, sort_order)')
           .eq('student_id', student.id)
           .eq('academic_year_id', year.id)
+          .eq('is_approved', true)
           .order('terms(sort_order)', { ascending: true }) : Promise.resolve({ data: [] }),
         // Academic Challenges
         term?.id ? supabase.from('academic_challenges')

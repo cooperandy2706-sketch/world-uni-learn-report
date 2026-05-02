@@ -47,7 +47,7 @@ export default function BursarDashboard() {
         supabase.from('daily_fees_collected').select('student_id, amount, fee_type').eq('school_id', schoolId).eq('term_id', term?.id),
         supabase.from('fee_payments').select('amount_paid, student_id').eq('school_id', schoolId).eq('term_id', term?.id),
         supabase.from('daily_fees_collected').select('amount, date').eq('school_id', schoolId).gte('date', `${currentYear}-01-01`),
-        supabase.from('attendance').select('student_id, days_present').eq('school_id', schoolId).eq('term_id', term?.id)
+        supabase.from('attendance').select('student_id, days_present').eq('term_id', term?.id)
       ])
 
       const [paymentsRes, incomeRes, expensesRes, payrollRes, recentRes, studentsRes, structRes, dailyConfRes, dailyCollRes, termPaymentsRes, dailyCollFullYearRes, attendanceRes] = resData as any

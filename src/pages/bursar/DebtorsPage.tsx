@@ -70,7 +70,7 @@ export default function DebtorsPage() {
   // Attendance for dynamic billing
   const { data: attendance = [] } = useQuery({
     queryKey: ['attendance-debt', schoolId, term?.id],
-    queryFn: async () => { const { data } = await supabase.from('attendance').select('student_id, days_present').eq('school_id', schoolId).eq('term_id', term!.id); return data ?? [] },
+    queryFn: async () => { const { data } = await supabase.from('attendance').select('student_id, days_present').eq('term_id', term!.id); return data ?? [] },
     enabled: !!schoolId && !!term?.id,
   })
 

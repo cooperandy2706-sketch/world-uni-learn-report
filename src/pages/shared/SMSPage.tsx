@@ -43,6 +43,13 @@ export default function SMSPage() {
   const [isSending, setIsSending] = useState(false)
   const [progress, setProgress] = useState({ current: 0, total: 0 })
 
+  // Auto-fill template when tab changes
+  useEffect(() => {
+    if (activeTab === 'fee_reminders' && !message.trim()) {
+      setMessage("Dear {parent}, an amount of {owed} is outstanding for {student}. Please settle at your earliest convenience. Thank you. - {school}")
+    }
+  }, [activeTab])
+
   const { data: classes = [] } = useClasses()
 
   // 1. Fetch Recipients (Parents & Students)
@@ -51,7 +58,7 @@ export default function SMSPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from('students')
-        .select('id, full_name, guardian_phone, guardian_name, fees_arrears, daily_fee_mode, class_id, class:classes(name)')
+        .select('id, full_name, guardian_phone, guardian_name, fees_arrears, scholarship_percentage, daily_fee_mode, class_id, class:classes(name)')
         .eq('school_id', schoolId)
         .eq('is_active', true)
         .order('full_name')
@@ -88,7 +95,7 @@ export default function SMSPage() {
   const { data: structures = [] } = useQuery({
     queryKey: ['sms-fee-structures', schoolId],
     queryFn: async () => {
-      const { data } = await supabase.from('fee_structures').select('class_id, amount').eq('school_id', schoolId)
+      const { data } = await supabase.from('fee_structures').select('class_id, amount, is_discountable').eq('school_id', schoolId)
       return data ?? []
     },
     enabled: !!schoolId && activeTab === 'fee_reminders'
@@ -112,7 +119,7 @@ export default function SMSPage() {
           })
         }
       })
-      // Add staff (only if no class filter is active or role is admin)
+      // Add staff
       if (!selectedClass) {
         staff.forEach((u: any) => {
           if (u.phone) {
@@ -127,28 +134,21 @@ export default function SMSPage() {
         })
       }
     } else {
-      // Fee Reminders Tab (Bursar)
-      // Map class -> total tuition
-      const classTotals: Record<string, number> = {}
-      structures.forEach((st: any) => {
-        classTotals[st.class_id] = (classTotals[st.class_id] || 0) + (st.amount || 0)
-      })
-      
-      // Map student -> total paid
-      const studentPaid: Record<string, number> = {}
-      feePayments.forEach((p: any) => {
-        studentPaid[p.student_id] = (studentPaid[p.student_id] || 0) + (p.amount_paid || 0)
-      })
-
+      // Fee Reminders Tab (Bursar) - Corrected logic to match scholarship policy
       students.forEach((s: any) => {
-        const tuition = classTotals[s.class_id] || 0
-        const disc = tuition * ((s.scholarship_percentage || 0) / 100)
-        const netTuition = tuition - disc
-        const paid = studentPaid[s.id] || 0
-        const arrears = Number(s.fees_arrears || 0)
-        const totalOwed = arrears + Math.max(0, netTuition - paid)
+        const classStrs = structures.filter((st: any) => st.class_id === s.class_id);
+        const netTermCharges = classStrs.reduce((acc, st: any) => {
+          const discount = st.is_discountable !== false ? (s.scholarship_percentage || 0) / 100 : 0;
+          return acc + (st.amount || 0) * (1 - discount);
+        }, 0);
 
-        if (totalOwed > 0 && s.guardian_phone) {
+        const paid = (feePayments as any[])
+          .filter(p => p.student_id === s.id)
+          .reduce((acc, p) => acc + (p.amount_paid || 0), 0);
+          
+        const totalOwed = Number(s.fees_arrears || 0) + netTermCharges - paid;
+
+        if (totalOwed > 1 && s.guardian_phone) { // 1 GHS threshold
           list.push({
             id: s.id,
             name: s.guardian_name || s.full_name + "'s Parent",

@@ -216,7 +216,7 @@ export default function DashboardPage() {
       const [{ count: r }, { count: p }, { count: pa }] = await Promise.all([
         supabase.from('report_cards').select('*', { count: 'exact', head: true }).eq('term_id', term.id),
         supabase.from('scores').select('*', { count: 'exact', head: true }).eq('term_id', term.id).eq('is_submitted', false),
-        supabase.from('report_cards').select('*', { count: 'exact', head: true }).eq('term_id', term.id).eq('status', 'pending_approval'),
+        supabase.from('report_cards').select('*', { count: 'exact', head: true }).eq('term_id', term.id).eq('is_approved', false),
       ])
       reports = r ?? 0; pendingScores = p ?? 0; pendingApproval = pa ?? 0
 
@@ -234,7 +234,7 @@ export default function DashboardPage() {
         feePaymentsService.getAll(sid, term.id),
         supabase.from('daily_fee_class_rates').select('*').eq('school_id', sid).eq('term_id', term.id),
         supabase.from('daily_fees_collected').select('student_id, amount, fee_type').eq('school_id', sid).eq('term_id', term.id),
-        supabase.from('attendance').select('student_id, days_present').eq('school_id', sid).eq('term_id', term.id),
+        supabase.from('attendance').select('student_id, days_present').eq('term_id', term.id),
       ])
 
       const structuresByClass: Record<string, number> = {}

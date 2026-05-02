@@ -928,6 +928,9 @@ function SectionHeader({ children }: any) {
 // ═══════════════════════════════════════════════════════════════
 
 function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange, classes, academicYears, onShowToast, onSwitchToBills, school, feeStructures = [] }: any) {
+  const { user } = useAuth()
+  const isBursar = user?.role === 'bursar'
+  const canManage = isBursar // Only bursar can add/edit/delete
   const qc = useQueryClient()
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<any>(null)
@@ -1030,12 +1033,14 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
         onYearChange={onYearChange}
         rightSlot={
           <>
-            <button
-              onClick={() => { setEditing(null); setForm({ category: 'textbook', quantity: 1, unit: 'copy', is_required: true }); setShowForm(true) }}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 18px', background: '#1e0646', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}
-            >
-              <Plus size={16} /> Add Item
-            </button>
+            {canManage && (
+              <button
+                onClick={() => { setEditing(null); setForm({ category: 'textbook', quantity: 1, unit: 'copy', is_required: true }); setShowForm(true) }}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 18px', background: '#1e0646', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}
+              >
+                <Plus size={16} /> Add Item
+              </button>
+            )}
             <button
               onClick={() => {
                 const className = selClass ? classes.find((c: any) => c.id === selClass)?.name : undefined
@@ -1144,10 +1149,12 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
                         : <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 700, background: '#fef3c7', padding: '2px 8px', borderRadius: 99 }}>Optional</span>}
                     </td>
                     <td style={{ padding: '12px 14px' }}>
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        <button onClick={() => openEdit(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3b82f6' }}><Edit3 size={15} /></button>
-                        <button onClick={() => deleteMutation.mutate(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444' }}><Trash2 size={15} /></button>
-                      </div>
+                      {canManage && (
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button onClick={() => openEdit(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3b82f6' }}><Edit3 size={15} /></button>
+                          <button onClick={() => deleteMutation.mutate(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444' }}><Trash2 size={15} /></button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}

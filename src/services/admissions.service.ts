@@ -283,6 +283,7 @@ export interface SchoolSupply {
     unit_price?: number | null // optional estimated price
     is_required: boolean
     supplier_note?: string | null  // e.g. "Available at school store"
+    inventory_item_id?: string | null // Link to inventory
     created_at?: string
     updated_at?: string
     // joined

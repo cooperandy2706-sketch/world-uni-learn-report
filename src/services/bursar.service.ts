@@ -68,7 +68,7 @@ export const feePaymentsService = {
     const previousArrears = Number(student?.fees_arrears || 0)
 
     // Step 2: Calculate allocation — arrears are paid FIRST
-    const arrearsPaid = Math.min(amountPaid, previousArrears)
+    const arrearsPaid = Math.min(amountPaid, Math.max(0, previousArrears))
     const currentTermPaid = amountPaid - arrearsPaid
     const remainingArrears = Math.max(0, previousArrears - arrearsPaid)
     const arrearsCleared = previousArrears > 0 && remainingArrears === 0
@@ -115,26 +115,40 @@ export const feePaymentsService = {
   },
 
   async delete(id: string) {
-    // When deleting a payment, we need to restore the arrears
+    // When deleting a payment, we need to restore the balance
     const { data: payment } = await supabase
       .from('fee_payments')
-      .select('student_id, arrears_paid')
+      .select('student_id, term_id, amount_paid, arrears_paid, school_id')
       .eq('id', id)
       .single()
 
-    if (payment && Number(payment.arrears_paid) > 0) {
-      // Restore the arrears amount that was deducted
-      const { data: student } = await supabase
-        .from('students')
-        .select('fees_arrears')
-        .eq('id', payment.student_id)
-        .single()
+    if (payment) {
+      // Get the current term for this school
+      const { data: currentTerm } = await supabase
+        .from('terms')
+        .select('id')
+        .eq('school_id', payment.school_id)
+        .eq('is_current', true)
+        .maybeSingle()
 
-      const currentArrears = Number(student?.fees_arrears || 0)
-      await supabase
-        .from('students')
-        .update({ fees_arrears: currentArrears + Number(payment.arrears_paid) })
-        .eq('id', payment.student_id)
+      // If the payment belongs to a past term, its FULL amount was rolled over into the current arrears.
+      // If it belongs to the current term, only the portion marked as 'arrears_paid' affected the student.fees_arrears field.
+      const isPastTerm = currentTerm && payment.term_id !== currentTerm.id
+      const amountToRestore = isPastTerm ? Number(payment.amount_paid) : Number(payment.arrears_paid)
+
+      if (amountToRestore !== 0) {
+        const { data: student } = await supabase
+          .from('students')
+          .select('fees_arrears')
+          .eq('id', payment.student_id)
+          .single()
+
+        const currentArrears = Number(student?.fees_arrears || 0)
+        await supabase
+          .from('students')
+          .update({ fees_arrears: currentArrears + amountToRestore })
+          .eq('id', payment.student_id)
+      }
     }
 
     return supabase.from('fee_payments').delete().eq('id', id)
@@ -411,10 +425,18 @@ export const billSheetService = {
     const dailyCollections = dailyCollectionsRes.data ?? []
     const attendanceRecord = attendanceRes?.data
 
-    // Tuition fees
-    const totalTuition = structures.reduce((s: number, f: any) => s + (f.amount || 0), 0)
+    // Tuition fees - split by discountable status
+    const discountableTuition = structures
+      .filter((f: any) => f.is_discountable !== false)
+      .reduce((s: number, f: any) => s + (f.amount || 0), 0)
+    
+    const nonDiscountableTuition = structures
+      .filter((f: any) => f.is_discountable === false)
+      .reduce((s: number, f: any) => s + (f.amount || 0), 0)
+
+    const totalTuition = discountableTuition + nonDiscountableTuition
     const scholarshipPct = student?.scholarship_percentage || 0
-    const scholarshipDiscount = totalTuition * (scholarshipPct / 100)
+    const scholarshipDiscount = discountableTuition * (scholarshipPct / 100)
     const netTuition = totalTuition - scholarshipDiscount
 
     // Daily fees expected
@@ -483,7 +505,7 @@ export const billSheetService = {
         feeding: { rate: feedingRate, days: daysPresent, expected: expectedFeeding, paid: feedingPaid, owed: Math.max(0, expectedFeeding - feedingPaid) },
         studies: { rate: studiesRate, days: daysPresent, expected: expectedStudies, paid: studiesPaid, owed: Math.max(0, expectedStudies - studiesPaid) },
       },
-      summary: { totalCharges, totalPaid, balance: Math.max(0, balance), status: balance <= 0 ? 'paid' : tuitionPaid + feedingPaid + studiesPaid > 0 ? 'partial' : 'unpaid' },
+      summary: { totalCharges, totalPaid, balance: balance, status: balance <= 0 ? 'paid' : tuitionPaid + feedingPaid + studiesPaid > 0 ? 'partial' : 'unpaid' },
     }
   },
 }

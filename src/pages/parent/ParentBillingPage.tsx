@@ -189,9 +189,9 @@ export default function ParentBillingPage() {
 
                 <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: 16 }}>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Balance</div>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{bill?.summary?.balance < 0 ? 'Credit Balance' : 'Balance'}</div>
                     <div style={{ fontSize: 18, fontWeight: 900, color: bill?.summary?.balance > 0 ? '#ef4444' : '#10b981' }}>
-                      GH₵ {bill?.summary?.balance?.toLocaleString() || '0'}
+                      {bill?.summary?.balance < 0 ? `(Credit) GH₵ ${Math.abs(bill.summary.balance).toLocaleString()}` : `GH₵ ${bill?.summary?.balance?.toLocaleString() || '0'}`}
                     </div>
                   </div>
                   <div style={{ color: '#d1d5db', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: '#f8fafc' }}>
@@ -239,7 +239,10 @@ export default function ParentBillingPage() {
                         )}
                         {bill.structures.map((f: any) => (
                           <tr key={f.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                            <td style={{ padding: '12px 16px', fontSize: 13, color: '#334155', fontWeight: 500 }}>{f.fee_name}</td>
+                            <td style={{ padding: '12px 16px', fontSize: 13, color: '#334155', fontWeight: 500 }}>
+                              {f.fee_name}
+                              {f.is_discountable === false && <span style={{ fontSize: 10, color: '#ef4444', marginLeft: 6, fontWeight: 700 }}>[NO SCHOLARSHIP DISCOUNT]</span>}
+                            </td>
                             <td style={{ padding: '12px 16px', fontSize: 13, color: '#334155', fontWeight: 800, textAlign: 'right' }}>GH₵ {f.amount.toLocaleString()}</td>
                           </tr>
                         ))}
@@ -257,8 +260,8 @@ export default function ParentBillingPage() {
                       {bill.payments.map((p: any) => (
                         <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: '#fff', borderRadius: 14, border: '1px solid #e2e8f0' }}>
                           <div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>{p.payment_method} Payment</div>
-                            <div style={{ fontSize: 11, color: '#64748b' }}>{new Date(p.payment_date).toLocaleDateString()} {p.reference ? `· Ref: ${p.reference.slice(-8)}` : ''}</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', textTransform: 'capitalize' }}>{p.payment_method === 'online' ? '🌐 Online' : p.payment_method} Payment</div>
+                            <div style={{ fontSize: 11, color: '#64748b' }}>{new Date(p.payment_date).toLocaleDateString()} {p.reference ? `· Ref: ${p.reference.slice(-8)}` : ''} · <span style={{ color: '#7c3aed', fontWeight: 600 }}>Official Receipt available at Office</span></div>
                           </div>
                           <div style={{ fontSize: 15, fontWeight: 800, color: '#16a34a' }}>
                             GH₵ {p.amount_paid.toLocaleString()}

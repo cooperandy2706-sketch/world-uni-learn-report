@@ -93,8 +93,9 @@ export default function BillSheetPage() {
       partial: { bg: '#fffbeb', color: '#d97706', label: 'PARTIALLY PAID' },
       unpaid: { bg: '#fef2f2', color: '#dc2626', label: 'OUTSTANDING' },
     }
-    const grandStatus = grandBalance <= 0 ? 'paid' : (d.summary.totalPaid > 0 ? 'partial' : 'unpaid')
+    const grandStatus = grandBalance < 0 ? 'paid' : (grandBalance === 0 ? 'paid' : (d.summary.totalPaid > 0 ? 'partial' : 'unpaid'))
     const st = statusColors[grandStatus] || statusColors.unpaid
+    const isCredit = grandBalance < 0
 
     const scholarshipRow = d.scholarship.type !== 'none'
       ? '<tr style="color:#16a34a"><td style="padding:10px 14px;font-size:13px">\u{1F393} Scholarship Discount (' + d.scholarship.percentage + '%)</td><td style="padding:10px 14px;text-align:right;font-weight:700;font-size:13px">\u2212 ' + GHS(d.scholarship.discount) + '</td></tr>' : ''
@@ -217,8 +218,8 @@ export default function BillSheetPage() {
       '<div class="section"><div class="section-title">Payments & Credits</div>',
       '<table class="fee-table"><thead><tr><th>Date</th><th>Item</th><th>Method</th><th style="text-align:right">Paid</th></tr></thead>',
       '<tbody>' + paymentRows + '</tbody>' + paymentsFooter + '</table></div>',
-      '<div class="grand-total-box"><div><div class="grand-label">Current Balance Outstanding</div><div class="grand-val">' + GHS(grandBalance) + '</div></div>',
-      '<div><div class="status-badge" style="background:' + st.bg + ';color:' + st.color + '">' + st.label + '</div></div></div>',
+      '<div class="grand-total-box" style="background: ' + (isCredit ? 'linear-gradient(135deg, #059669, #065f46)' : 'linear-gradient(135deg, #4c1d95, #2e1065)') + '"><div><div class="grand-label">' + (isCredit ? 'Credit Balance (Prepaid)' : 'Current Balance Outstanding') + '</div><div class="grand-val">' + GHS(Math.abs(grandBalance)) + '</div></div>',
+      '<div><div class="status-badge" style="background:' + (isCredit ? '#ecfdf5' : st.bg) + ';color:' + (isCredit ? '#059669' : st.color) + '">' + (isCredit ? 'CREDIT / PREPAID' : st.label) + '</div></div></div>',
       '<div class="signature-row"><div><div style="height:40px"></div><div class="sig-line">Bursar\'s Approval / Stamp</div></div><div><div style="height:40px"></div><div class="sig-line">Parent / Guardian Signature</div></div></div>',
       '<div class="footer"><p>This is an electronically generated official document. <br/> For clarifications, please visit the bursary office or call ' + (school?.phone || 'the school') + '.</p>',
       '<p style="margin-top:8px">&copy; ' + new Date().getFullYear() + ' ' + (school?.name || 'School System') + '. All Rights Reserved.</p></div>',
@@ -342,12 +343,13 @@ export default function BillSheetPage() {
                         </div>
                       </div>
                       {(() => {
-                        const bStat = grandBalance <= 0 ? 'paid' : (billData.summary.totalPaid > 0 ? 'partial' : 'unpaid')
+                        const bStat = grandBalance < 0 ? 'paid' : (grandBalance === 0 ? 'paid' : (billData.summary.totalPaid > 0 ? 'partial' : 'unpaid'))
                         const si = statusInfo[bStat]
+                        const isCredit = grandBalance < 0
                         return (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 16px', borderRadius: 99, background: si.bg }}>
-                            <si.icon size={14} color={si.color} />
-                            <span style={{ fontSize: 12, fontWeight: 800, color: si.color, letterSpacing: '.04em' }}>{si.label}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 16px', borderRadius: 99, background: isCredit ? '#ecfdf5' : si.bg }}>
+                            <si.icon size={14} color={isCredit ? '#059669' : si.color} />
+                            <span style={{ fontSize: 12, fontWeight: 800, color: isCredit ? '#059669' : si.color, letterSpacing: '.04em' }}>{isCredit ? 'Credit / Prepaid' : si.label}</span>
                           </div>
                         )
                       })()}
@@ -360,7 +362,7 @@ export default function BillSheetPage() {
                       { label: 'Total Charges', value: GHS(grandTotalCharges), color: '#374151', bg: '#f8fafc' },
                       { label: 'Scholarship Discount', value: billData.scholarship.discount > 0 ? `− ${GHS(billData.scholarship.discount)}` : '—', color: '#16a34a', bg: '#f0fdf4' },
                       { label: 'Total Paid', value: GHS(billData.summary.totalPaid), color: '#16a34a', bg: '#f0fdf4' },
-                      { label: 'Balance Due', value: GHS(grandBalance), color: grandBalance > 0 ? '#dc2626' : '#16a34a', bg: grandBalance > 0 ? '#fef2f2' : '#f0fdf4' },
+                      { label: grandBalance < 0 ? 'Credit Balance' : 'Balance Due', value: GHS(Math.abs(grandBalance)), color: grandBalance > 0 ? '#dc2626' : '#16a34a', bg: grandBalance > 0 ? '#fef2f2' : '#f0fdf4' },
                     ].map((c, i) => (
                       <div key={c.label} className="bs-card" style={{ background: '#fff', borderRadius: 14, padding: '14px 16px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', animation: `_bs_fu .3s ease ${i * 0.05}s both` }}>
                         <div style={{ fontSize: 18, fontWeight: 900, color: c.color, fontFamily: '"Playfair Display",serif' }}>{c.value}</div>
@@ -385,17 +387,24 @@ export default function BillSheetPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {billData.arrears > 0 && (
-                          <tr style={{ background: '#fef2f2', borderBottom: '1px solid #faf5ff' }}>
-                            <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 700, color: '#dc2626' }}>Previous Arrears (Brought Forward)</td>
-                            <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 800, color: '#dc2626', textAlign: 'right' }}>{GHS(billData.arrears)}</td>
+                        {billData.arrears !== 0 && (
+                          <tr style={{ background: billData.arrears > 0 ? '#fef2f2' : '#f0fdf4', borderBottom: '1px solid #faf5ff' }}>
+                            <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 700, color: billData.arrears > 0 ? '#dc2626' : '#16a34a' }}>
+                              {billData.arrears > 0 ? 'Previous Arrears (Brought Forward)' : 'Credit / Prepayment (Brought Forward)'}
+                            </td>
+                            <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 800, color: billData.arrears > 0 ? '#dc2626' : '#16a34a', textAlign: 'right' }}>
+                              {billData.arrears > 0 ? GHS(billData.arrears) : `− ${GHS(Math.abs(billData.arrears))}`}
+                            </td>
                           </tr>
                         )}
                         {billData.structures.length === 0 ? (
                           <tr><td colSpan={2} style={{ padding: '24px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No fee structures for this class/term</td></tr>
                         ) : billData.structures.map((f: any) => (
                           <tr key={f.id} style={{ borderBottom: '1px solid #faf5ff' }}>
-                            <td style={{ padding: '10px 20px', fontSize: 13, color: '#374151' }}>{f.fee_name}</td>
+                            <td style={{ padding: '10px 20px', fontSize: 13, color: '#374151' }}>
+                              {f.fee_name}
+                              {f.is_discountable === false && <span style={{ fontSize: 10, color: '#dc2626', fontWeight: 800, marginLeft: 8 }}>[EXEMPT FROM DISCOUNT]</span>}
+                            </td>
                             <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 700, color: '#374151', textAlign: 'right' }}>{GHS(f.amount)}</td>
                           </tr>
                         ))}
