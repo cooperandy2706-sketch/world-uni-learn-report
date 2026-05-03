@@ -12,7 +12,40 @@ export const reportsService = {
 
     if (!students?.length) return { data: null, error: 'No students found' }
 
-    // Fetch all scores for the class/term
+    // Fetch all scores for the class/term to calculate subject positions
+    const { data: allScores } = await supabase
+      .from('scores')
+      .select('*')
+      .eq('class_id', classId)
+      .eq('term_id', termId)
+
+    if (allScores && allScores.length > 0) {
+      // Group by subject
+      const subjectGroups: Record<string, any[]> = {}
+      allScores.forEach(s => {
+        if (!subjectGroups[s.subject_id]) subjectGroups[s.subject_id] = []
+        subjectGroups[s.subject_id].push(s)
+      })
+
+      // Calculate positions for each subject
+      const scoreUpdates: any[] = []
+      Object.keys(subjectGroups).forEach(subId => {
+        const sorted = [...subjectGroups[subId]].sort((a, b) => (b.total_score ?? 0) - (a.total_score ?? 0))
+        sorted.forEach((s, index) => {
+          scoreUpdates.push({
+            id: s.id,
+            position: index + 1
+          })
+        })
+      })
+
+      // Batch update scores with positions
+      if (scoreUpdates.length > 0) {
+        await supabase.from('scores').upsert(scoreUpdates, { onConflict: 'id' })
+      }
+    }
+
+    // Refresh scores after position update
     const { data: scores } = await supabase
       .from('scores')
       .select('*')
@@ -33,11 +66,6 @@ export const reportsService = {
         ? Number((totalMarks / studentScores.length).toFixed(2))
         : 0
 
-      const att = attRows?.find(a => a.student_id === student.id)
-      const attendancePercent = att && att.total_days > 0 
-        ? Math.round((att.days_present / att.total_days) * 100) 
-        : null
-
       return {
         student_id: student.id,
         school_id: student.school_id,
@@ -47,7 +75,6 @@ export const reportsService = {
         total_marks: totalMarks,
         average_score: averageScore,
         total_students: students.length,
-        attendance_percent: attendancePercent,
       }
     })
 
@@ -65,7 +92,7 @@ export const reportsService = {
   async getByClassAndTerm(classId: string, termId: string) {
     return supabase
       .from('report_cards')
-      .select('*, student:students(*, class:classes(id, name))')
+      .select('*, student:students(*, class:classes(id, name, department_id))')
       .eq('class_id', classId)
       .eq('term_id', termId)
       .order('overall_position')

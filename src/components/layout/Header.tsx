@@ -22,14 +22,17 @@ const ADMIN_NAV = [
   },
   {
     label: 'Academics', items: [
+      { label: 'Departments', to: ROUTES.ADMIN_DEPARTMENTS },
       { label: 'Classes', to: ROUTES.ADMIN_CLASSES },
       { label: 'Subjects', to: ROUTES.ADMIN_SUBJECTS },
       { label: 'Attendance', to: ROUTES.ADMIN_ATTENDANCE },
       { label: 'Timetable', to: ROUTES.ADMIN_TIMETABLE },
       { label: 'Syllabus', to: ROUTES.ADMIN_SYLLABUS },
+      { label: 'Weekly Goals', to: ROUTES.ADMIN_WEEKLY_GOALS },
       { label: 'Report Cards', to: ROUTES.ADMIN_REPORTS },
       { label: 'Score Entry', to: '/admin/score-entry' },
       { label: 'Batch Promotion', to: '/admin/batch-promotion' },
+      { label: 'BECE CA Processor', to: '/admin/bece-processor' },
       { label: 'Lesson Plans', to: '/admin/lesson-plans' },
     ]
   },
@@ -48,8 +51,11 @@ const ADMIN_NAV = [
       { label: 'Admin Tasks', to: '/admin/tasks' },
       { label: 'Calendar', to: ROUTES.ADMIN_CALENDAR },
       { label: 'Messages', to: ROUTES.ADMIN_MESSAGES },
+      { label: 'Staff Requests', to: '/admin/staff-requests' },
       { label: 'Asset Register', to: '/admin/assets' },
       { label: 'Billing', to: '/admin/billing' },
+      { label: 'Bursar Staff', to: '/admin/bursars' },
+      { label: 'Poster Maker', to: '/admin/poster-maker' },
       { label: 'Elections (PEC)', to: '/admin/elections' },
       { label: 'Alumni', to: ROUTES.ADMIN_ALUMNI },
     ]
@@ -72,9 +78,11 @@ const TEACHER_NAV = [
       { label: 'Students', to: ROUTES.TEACHER_STUDENTS },
       { label: 'Score Entry', to: ROUTES.TEACHER_SCORE_ENTRY },
       { label: 'Attendance', to: ROUTES.TEACHER_ATTENDANCE },
+      { label: 'Class Tests', to: '/teacher/class-tests' },
       { label: 'Reports', to: ROUTES.TEACHER_REPORTS },
       { label: 'Timetable', to: ROUTES.TEACHER_TIMETABLE },
       { label: 'Assignments', to: ROUTES.TEACHER_ASSIGNMENTS },
+      { label: 'Library', to: ROUTES.TEACHER_SUBJECTS },
     ]
   },
   {
@@ -84,18 +92,41 @@ const TEACHER_NAV = [
       { label: 'Syllabus', to: ROUTES.TEACHER_SYLLABUS },
       { label: 'Self Service', to: '/teacher/self-service' },
       { label: 'Messages', to: ROUTES.TEACHER_MESSAGES },
+      { label: 'Notifications', to: ROUTES.TEACHER_NOTIFICATIONS },
+      { label: 'Daily Collections', to: '/teacher/daily-fees' },
+      { label: 'Term Agenda', to: '/teacher/agenda' },
+      { label: 'Elections (PEC)', to: '/teacher/elections-hub' },
+      { label: 'Typing Nitro', to: ROUTES.TEACHER_TYPING_GAME },
     ]
   },
 ]
 
 const STUDENT_NAV = [
   { label: 'Portal', to: ROUTES.STUDENT_DASHBOARD, single: true },
-  { label: 'Results', to: ROUTES.STUDENT_RESULTS, single: true },
-  { label: 'Assignments', to: ROUTES.STUDENT_ASSIGNMENTS, single: true },
-  { label: 'Attendance', to: ROUTES.STUDENT_ATTENDANCE, single: true },
-  { label: 'Timetable', to: ROUTES.STUDENT_SCHEDULE, single: true },
-  { label: 'Library', to: ROUTES.STUDENT_LIBRARY, single: true },
-  { label: 'Fees', to: ROUTES.STUDENT_BILLING, single: true },
+  {
+    label: 'Academics', items: [
+      { label: 'Results', to: ROUTES.STUDENT_RESULTS },
+      { label: 'Assignments', to: ROUTES.STUDENT_ASSIGNMENTS },
+      { label: 'Attendance', to: ROUTES.STUDENT_ATTENDANCE },
+      { label: 'Timetable', to: ROUTES.STUDENT_SCHEDULE },
+    ]
+  },
+  {
+    label: 'Explore', items: [
+      { label: 'Global Library', to: ROUTES.STUDENT_LIBRARY },
+      { label: 'Resources', to: ROUTES.STUDENT_RESOURCES },
+      { label: 'Typing Nitro', to: ROUTES.STUDENT_TYPING_GAME },
+      { label: 'PEC Elections', to: ROUTES.STUDENT_ELECTIONS },
+      { label: 'Notice Board', to: ROUTES.STUDENT_ANNOUNCEMENTS },
+      { label: 'Calendar', to: ROUTES.STUDENT_CALENDAR },
+    ]
+  },
+  {
+    label: 'Account', items: [
+      { label: 'Fees & Billing', to: ROUTES.STUDENT_BILLING },
+      { label: 'My Profile', to: ROUTES.STUDENT_PROFILE },
+    ]
+  }
 ]
 
 const BURSAR_NAV = [
@@ -128,6 +159,7 @@ const SUPER_ADMIN_NAV = [
   { label: 'Quizzes', to: ROUTES.SUPER_ADMIN_QUIZZES, single: true },
   { label: 'Messaging', to: ROUTES.SUPER_ADMIN_MESSAGING, single: true },
   { label: 'Leaderboards', to: ROUTES.SUPER_ADMIN_ANALYTICS, single: true },
+  { label: 'Subjects', to: ROUTES.SUPER_ADMIN_SUBJECTS, single: true },
   { label: 'Resources', to: ROUTES.SUPER_ADMIN_RESOURCES, single: true },
 ]
 
@@ -137,6 +169,11 @@ const PARENT_NAV = [
   { label: 'Billing', to: '/parent/billing', single: true },
   { label: 'Messaging', to: '/parent/messages', single: true },
   { label: 'Calendar', to: '/parent/calendar', single: true },
+]
+
+const STAFF_NAV = [
+  { label: 'Dashboard', to: '/staff/dashboard', single: true },
+  { label: 'Elections (PEC)', to: '/staff/elections', single: true },
 ]
 
 // ─── NavItem component ─────────────────────────────────────────────────────────
@@ -225,6 +262,7 @@ function NavItem({ group }: { group: any }) {
 // ─── Main Header ───────────────────────────────────────────────────────────────
 export default function Header() {
   const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
+  const isStaff = user?.role === 'staff'
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
   const navigate = useNavigate()
@@ -258,6 +296,7 @@ export default function Header() {
     : isAdmin ? ADMIN_NAV
     : isTeacher ? TEACHER_NAV
     : isBursar ? BURSAR_NAV
+    : isStaff ? STAFF_NAV
     : user?.role === 'parent' ? PARENT_NAV
     : STUDENT_NAV
 

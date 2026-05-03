@@ -1,5 +1,5 @@
 // src/pages/admin/ReportsPage.tsx
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useClasses } from '../../hooks/useClasses'
@@ -249,6 +249,27 @@ export default function ReportsPage() {
   const [showOverallPosition, setShowOverallPosition] = useState(true)
 
   const { data: reports = [], isLoading } = useReportsByClassTerm(selectedClass, (term as any)?.id ?? '')
+  const [gradingCategories, setGradingCategories] = useState<any[]>([])
+
+  useEffect(() => {
+    async function loadCategories() {
+      if (!selectedClass) return
+      const cls = (classes as any[]).find(c => c.id === selectedClass)
+      if (cls?.department_id) {
+        const { data } = await supabase.from('department_grading_categories').select('*').eq('department_id', cls.department_id).order('created_at')
+        if (data && data.length > 0) {
+          setGradingCategories(data)
+          return
+        }
+      }
+      setGradingCategories([
+        { id: 'cs', name: 'Class Score', weight_percentage: 30, max_score: 30 },
+        { id: 'es', name: 'Exam Score', weight_percentage: 70, max_score: 70 }
+      ])
+    }
+    loadCategories()
+  }, [selectedClass, classes])
+
   const generateReports = useGenerateReports()
   const approveReport   = useApproveReport()
   const updateRemarks   = useUpdateReportRemarks()
@@ -415,7 +436,15 @@ export default function ReportsPage() {
           return { ...r, _scores: sc ?? [], _attendance: att }
         }))
 
-        const html = buildClassHTML(enriched, cls.name, school, term, year, settings, isBW, showOverallPosition)
+        const clsDeptId = cls.department_id
+        let cats = []
+        if (clsDeptId) {
+          const { data } = await supabase.from('department_grading_categories').select('*').eq('department_id', clsDeptId).order('created_at')
+          if (data && data.length > 0) cats = data
+        }
+        if (cats.length === 0) cats = [{ id: 'cs', name: 'Class Score', weight_percentage: 50, max_score: 100 }, { id: 'es', name: 'Exam Score', weight_percentage: 50, max_score: 100 }]
+
+        const html = buildClassHTML(enriched, cls.name, school, term, year, settings, isBW, showOverallPosition, cats)
         const win = window.open('', '_blank', 'width=900,height=700')
         if (win) {
           win.document.write(html)
@@ -564,7 +593,7 @@ export default function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {useMemo(() => (reports as any[]).map((r: any, i: number) => {
+                  {(reports as any[]).map((r: any, i: number) => {
                     const g = getGradeInfo(r.average_score ?? 0)
                     return (
                       <tr key={r.id} className="rpt-row" style={{ borderBottom: i < reports.length-1 ? '1px solid #faf5ff' : 'none', transition:'background .12s', animation:`_rfadeUp .3s ease ${i*.02}s both` }}>
@@ -626,7 +655,7 @@ export default function ReportsPage() {
                         </td>
                       </tr>
                     )
-                  }), [reports, isBW])}
+                  })}
                 </tbody>
               </table>
             </div>
@@ -641,6 +670,7 @@ export default function ReportsPage() {
             isBW={isBW} setIsBW={setIsBW}
             showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
             hideSettings={true}
+            categories={gradingCategories}
             readonly />
         )}
       </div>
@@ -651,6 +681,7 @@ export default function ReportsPage() {
               isBW={isBW} setIsBW={setIsBW}
               showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
               hideSettings={true}
+              categories={gradingCategories}
               readonly />
           </div>
         ))}
@@ -794,6 +825,7 @@ export default function ReportsPage() {
           <ReportCard report={viewingReport} school={school} term={term} year={year} settings={settings}
             isBW={isBW} setIsBW={setIsBW}
             showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
+            categories={gradingCategories}
             onRemarksUpdate={remarks => updateRemarks.mutate({ reportId: viewingReport.id, remarks })} />
         )}
       </Modal>
@@ -849,7 +881,7 @@ export default function ReportsPage() {
 }
 
 // ── Build HTML for export-all ─────────────────────────────
-function buildClassHTML(reports: any[], className: string, school: any, term: any, year: any, settings: any, isBW: boolean = false, showOverallPosition: boolean = true): string {
+function buildClassHTML(reports: any[], className: string, school: any, term: any, year: any, settings: any, isBW: boolean = false, showOverallPosition: boolean = true, cats: any[] = []): string {
   const GS = [{g:'A',min:80,c:'#16a34a'},{g:'B',min:70,c:'#2563eb'},{g:'C',min:60,c:'#7c3aed'},{g:'D',min:50,c:'#d97706'},{g:'E',min:40,c:'#ea580c'},{g:'F',min:0,c:'#dc2626'}]
   const getG = (n: number) => GS.find(g => n >= g.min) ?? GS[5]
   const ord = (n: number) => { const s=['th','st','nd','rd'],v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]) }
@@ -880,14 +912,25 @@ function buildClassHTML(reports: any[], className: string, school: any, term: an
       </div>`:''}
       <table style="width:100%;border-collapse:collapse;margin-bottom:10px;border:${isBW?'1px solid #000':'none'}">
         <thead><tr style="background:${isBW?'#f1f5f9':'#1e3a8a'}">
-          ${['Subject', 'Class', 'Exam', 'Total', 'Grade', ...(showOverallPosition ? ['Pos.'] : []), 'Remarks'].map(h=>`<th style="padding:4px 7px;color:${isBW?'#000':'#fff'};font-size:9.5px;font-weight:700;text-align:left;text-transform:uppercase;border:${isBW?'1px solid #000':'none'}">${h}</th>`).join('')}
+          ${['Subject', ...cats.map((c: any) => c.name), 'Total', 'Grade', ...(showOverallPosition ? ['Pos.'] : []), 'Remarks'].map(h=>`<th style="padding:4px 7px;color:${isBW?'#000':'#fff'};font-size:9.5px;font-weight:700;text-align:left;text-transform:uppercase;border:${isBW?'1px solid #000':'none'}">${h}</th>`).join('')}
         </tr></thead>
         <tbody>${scores.map((s:any, si:number)=>{
           const g = getG(s.total_score??0)
+          const catScoresHTML = cats.map((c: any) => {
+            let val = '—'
+            if (s.category_scores && s.category_scores[c.id] !== undefined && s.category_scores[c.id] !== '') {
+              val = s.category_scores[c.id]
+            } else {
+              // Backward compatibility
+              if (c.id === 'cs') val = s.class_score ?? '—'
+              if (c.id === 'es') val = s.exam_score ?? '—'
+            }
+            return `<td style="padding:4px 7px;font-size:11px;text-align:center;border-right:${isBW?'1px solid #000':'none'}">${val}</td>`
+          }).join('')
+
           return `<tr style="background:${(isBW? 'none' : (si%2===0?'#fff':'#f8fafc'))};border-bottom:${isBW?'1px solid #000':'.5px solid #e2e8f0'}">
             <td style="padding:4px 7px;font-size:12px;font-weight:700;color:#000;border-right:${isBW?'1px solid #000':'none'}">${s.subject?.name??'—'}</td>
-            <td style="padding:4px 7px;font-size:11px;text-align:center;border-right:${isBW?'1px solid #000':'none'}">${s.class_score??'—'}</td>
-            <td style="padding:4px 7px;font-size:11px;text-align:center;border-right:${isBW?'1px solid #000':'none'}">${s.exam_score??'—'}</td>
+            ${catScoresHTML}
             <td style="padding:4px 7px;font-size:12px;text-align:center;font-weight:800;color:${isBW?'#000':((s.total_score??0)>=50?'#15803d':'#dc2626')};border-right:${isBW?'1px solid #000':'none'}">${s.total_score?.toFixed(1)??'—'}</td>
             <td style="padding:4px 7px;font-size:11px;text-align:center;font-weight:800;color:${isBW?'#000':g.c};border-right:${isBW?'1px solid #000':'none'}">${g.g}</td>
             ${showOverallPosition ? `<td style="padding:4px 7px;font-size:11px;text-align:center;border-right:${isBW?'1px solid #000':'none'}">${s.position?ord(s.position):'—'}</td>` : ''}

@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase'
 import { useSettings, useUpdateSettings } from '../../hooks/useSettings'
 import { useAuth } from '../../hooks/useAuth'
 import { settingsService } from '../../services/index'
+import GradingSetupTab from '../../components/admin/GradingSetupTab'
 import { useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
@@ -91,7 +92,7 @@ export default function SettingsPage() {
   const [logoUploading, setLogoUploading] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [logoHov, setLogoHov] = useState(false)
-  const [activeTab, setActiveTab] = useState<'school' | 'report' | 'sms' | 'account'>('school')
+  const [activeTab, setActiveTab] = useState<'school' | 'report' | 'sms' | 'grading' | 'account'>('school')
   const logoRef = useRef<HTMLInputElement>(null)
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty } } = useForm<FormData>({ resolver: zodResolver(schema) })
@@ -255,6 +256,7 @@ export default function SettingsPage() {
           {([
             { id: 'school', label: '🏫 School Info' },
             { id: 'report', label: '📄 Report Card' },
+            { id: 'grading', label: '📊 Grading Setup' },
             { id: 'sms', label: '📱 SMS Integration' },
             { id: 'account', label: '👤 Account' },
           ] as const).map(tab => (
@@ -371,6 +373,11 @@ export default function SettingsPage() {
               </>
             )}
 
+            {/* ── GRADING SETUP TAB ── */}
+            {activeTab === 'grading' && (
+              <GradingSetupTab />
+            )}
+
             {/* ── ACCOUNT TAB ── */}
             {activeTab === 'account' && (
               <FieldGroup title="Admin Account" icon="👤">
@@ -395,7 +402,7 @@ export default function SettingsPage() {
             )}
 
             {/* Save button */}
-            {activeTab !== 'account' && (
+            {(activeTab !== 'account' && activeTab !== 'grading') && (
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                 <Btn variant="secondary" type="button" onClick={() => reset()}>↩ Reset</Btn>
                 <Btn type="submit" loading={isSubmitting} disabled={!isDirty && !isSubmitting}>

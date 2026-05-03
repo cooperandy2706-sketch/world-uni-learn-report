@@ -27,6 +27,7 @@ const adminLinks = [
   { to: ROUTES.ADMIN_MESSAGES, label: 'Messages', icon: MessageSquare },
 
   { header: 'Academics' },
+  { to: ROUTES.ADMIN_DEPARTMENTS, label: 'Departments', icon: Box },
   { to: ROUTES.ADMIN_CLASSES, label: 'Classes', icon: School },
   { to: ROUTES.ADMIN_SUBJECTS, label: 'Subjects', icon: BookOpen },
   { to: ROUTES.ADMIN_ATTENDANCE, label: 'Attendance', icon: ClipboardCheck },

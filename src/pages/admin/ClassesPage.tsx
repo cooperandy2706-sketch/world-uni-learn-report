@@ -18,6 +18,7 @@ const schema = z.object({
   level:    z.string().optional(),
   capacity: z.coerce.number().optional().nullable(),
   class_teacher_id: z.string().optional().nullable(),
+  department_id: z.string().optional().nullable(),
 })
 type FormData = z.infer<typeof schema>
 
@@ -76,6 +77,15 @@ export default function ClassesPage() {
   const { data: term } = useCurrentTerm()
   const { user } = useAuth()
 
+  const { data: departments = [] } = useQuery({
+    queryKey: ['departments', user?.school_id],
+    queryFn: async () => {
+      const { data } = await supabase.from('departments').select('id, name').eq('school_id', user!.school_id).order('name')
+      return data ?? []
+    },
+    enabled: !!user?.school_id,
+  })
+
   const { data: assignments = [] } = useQuery({
     queryKey: ['teacher_assignments_classes', user?.school_id, term?.id],
     queryFn: async () => {
@@ -105,8 +115,8 @@ export default function ClassesPage() {
     [classes, search]
   )
 
-  function openCreate() { setEditingClass(null); reset({ name: '', level: '', capacity: null, class_teacher_id: null }); setModalOpen(true) }
-  function openEdit(c: any) { setEditingClass(c); reset({ name: c.name, level: c.level ?? '', capacity: c.capacity ?? undefined, class_teacher_id: c.class_teacher_id ?? null }); setModalOpen(true) }
+  function openCreate() { setEditingClass(null); reset({ name: '', level: '', capacity: null, class_teacher_id: null, department_id: null }); setModalOpen(true) }
+  function openEdit(c: any) { setEditingClass(c); reset({ name: c.name, level: c.level ?? '', capacity: c.capacity ?? undefined, class_teacher_id: c.class_teacher_id ?? null, department_id: c.department_id ?? null }); setModalOpen(true) }
   function openDetail(c: any) { setViewingClass(c); setDetailModal(true) }
 
   async function onSubmit(data: FormData) {
@@ -244,7 +254,10 @@ export default function ClassesPage() {
                       )}
                     </div>
                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: palette.accent, margin: '12px 0 2px' }}>{cls.name}</h3>
-                    {cls.level && <p style={{ fontSize: 12, color: palette.accent + 'aa', margin: 0 }}>{cls.level}</p>}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      {cls.level && <p style={{ fontSize: 12, color: palette.accent + 'aa', margin: 0 }}>{cls.level}</p>}
+                      {cls.department && <span style={{ fontSize: 10, fontWeight: 700, color: palette.accent, background: palette.bg, padding: '2px 6px', borderRadius: 4, border: `1px solid ${palette.border}` }}>{cls.department.name}</span>}
+                    </div>
                   </div>
 
                   {/* Body */}
@@ -326,6 +339,17 @@ export default function ClassesPage() {
                 <StyledInput {...register('level')} placeholder="e.g. Primary 6, JHS 2" />
               </div>
               <div>
+                <FieldLabel>Department</FieldLabel>
+                <select {...register('department_id')} 
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid #e5e7eb`, outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', cursor: 'pointer' }}>
+                  <option value="">-- No Department --</option>
+                  {(departments as any[]).map((d: any) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                </select>
+                <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>Group classes by department for curriculum and grading</p>
+              </div>
+              <div>
                 <FieldLabel>Capacity</FieldLabel>
                 <StyledInput {...register('capacity')} type="number" placeholder="e.g. 40" />
                 <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>Maximum number of students in this class</p>
@@ -367,7 +391,10 @@ export default function ClassesPage() {
                     <div style={{ width: 52, height: 52, borderRadius: 14, background: palette.accent + '20', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>🏫</div>
                     <div>
                       <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: palette.accent, margin: 0 }}>{viewingClass.name}</h3>
-                      {viewingClass.level && <p style={{ fontSize: 13, color: palette.accent + 'aa', margin: '2px 0 0' }}>{viewingClass.level}</p>}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                        {viewingClass.level && <p style={{ fontSize: 13, color: palette.accent + 'aa', margin: 0 }}>{viewingClass.level}</p>}
+                        {viewingClass.department && <span style={{ fontSize: 11, fontWeight: 700, color: palette.accent, background: palette.bg, padding: '2px 8px', borderRadius: 4, border: `1px solid ${palette.border}` }}>{viewingClass.department.name}</span>}
+                      </div>
                     </div>
                   </div>
                 </div>

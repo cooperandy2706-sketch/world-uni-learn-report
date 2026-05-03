@@ -170,6 +170,7 @@ interface BuildHTMLOptions {
   teacherRemark: string
   htRemark: string
   className: string
+  categories?: any[]
 }
 
 export function buildReportHTML({
@@ -184,6 +185,7 @@ export function buildReportHTML({
   teacherRemark,
   htRemark,
   className,
+  categories = [],
 }: BuildHTMLOptions): string {
   const GRADES = [
     { g: 'A', label: 'Excellent', min: 80, c: '#16a34a' },
@@ -207,14 +209,33 @@ export function buildReportHTML({
       : 0
   const og = getG(avg)
 
+  // Use dynamic categories or fallback to CS/ES
+  const activeCats = categories.length > 0 
+    ? categories 
+    : [
+        { id: 'cs', name: 'Class Score' },
+        { id: 'es', name: 'Exam Score' }
+      ]
+
   const rows = scores
     .map((sc, i) => {
       const g = getG(sc.total_score ?? 0)
+      
+      const catCols = activeCats.map(cat => {
+        let val = '—'
+        if (sc.category_scores && sc.category_scores[cat.id] !== undefined && sc.category_scores[cat.id] !== '') {
+          val = sc.category_scores[cat.id]
+        } else {
+          if (cat.id === 'cs') val = sc.class_score ?? '—'
+          if (cat.id === 'es') val = sc.exam_score ?? '—'
+        }
+        return `<td style="padding:5px 9px;font-size:12px;text-align:center">${val}</td>`
+      }).join('')
+
       return `
       <tr style="background:${i % 2 === 0 ? '#fff' : '#f8fafc'}">
         <td style="padding:5px 9px;font-size:12px">${esc(sc.subject?.name ?? '—')}</td>
-        <td style="padding:5px 9px;font-size:12px;text-align:center">${sc.class_score ?? '—'}</td>
-        <td style="padding:5px 9px;font-size:12px;text-align:center">${sc.exam_score ?? '—'}</td>
+        ${catCols}
         <td style="padding:5px 9px;font-size:12px;text-align:center;font-weight:700">${sc.total_score?.toFixed(1) ?? '—'}</td>
         <td style="padding:5px 9px;font-size:12px;text-align:center;font-weight:800;color:${g.c}">${g.g}</td>
         <td style="padding:5px 9px;font-size:12px;text-align:center">${sc.position ? ord(sc.position) : '—'}</td>
@@ -264,6 +285,10 @@ export function buildReportHTML({
     </p>
   </div>`
 
+  const tableHeaders = ['Subject', ...activeCats.map(c => c.name), 'Total', 'Grade', 'Position', 'Remarks']
+    .map(h => `<th style="padding:6px 9px;color:#fff;font-size:10px;font-weight:700;text-align:left;text-transform:uppercase;letter-spacing:.05em">${h}</th>`)
+    .join('')
+
   return `
 <div style="font-family:'DM Sans',system-ui,sans-serif;padding:20px;max-width:760px;margin:0 auto;background:#fff;color:#1e293b">
 
@@ -300,9 +325,7 @@ export function buildReportHTML({
       ? `<table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px">
     <thead>
       <tr style="background:#1e3a8a">
-        ${['Subject', 'Class Score', 'Exam Score', 'Total', 'Grade', 'Position', 'Remarks']
-          .map(h => `<th style="padding:6px 9px;color:#fff;font-size:10px;font-weight:700;text-align:left;text-transform:uppercase;letter-spacing:.05em">${h}</th>`)
-          .join('')}
+        ${tableHeaders}
       </tr>
     </thead>
     <tbody>${rows}</tbody>

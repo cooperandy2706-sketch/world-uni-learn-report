@@ -23,6 +23,7 @@ interface ReportCardProps {
   // Pre-loaded data — when provided the component uses these directly instead of fetching
   scores?: any[]
   attendance?: any
+  categories?: any[]
 }
 
 export default function ReportCard({
@@ -33,6 +34,7 @@ export default function ReportCard({
   onRemarksUpdate,
   scores: scoresProp,
   attendance: attendanceProp,
+  categories,
 }: ReportCardProps) {
   // Use pre-loaded props as initial state when provided (e.g. from ReportsPage)
   const [scores, setScores] = useState<any[]>(scoresProp ?? [])
@@ -254,8 +256,14 @@ export default function ReportCard({
             <thead>
               <tr>
                 <th>Subject</th>
-                <th style={{ textAlign: 'center', width: 70 }}>Class Score<br /><span style={{ fontSize: 9, opacity: .9 }}>(50%)</span></th>
-                <th style={{ textAlign: 'center', width: 70 }}>Exam Score<br /><span style={{ fontSize: 9, opacity: .9 }}>(50%)</span></th>
+                {(categories && categories.length > 0 ? categories : [
+                  { id: 'cs', name: 'Class Score', weight_percentage: 30, max_score: 30 },
+                  { id: 'es', name: 'Exam Score', weight_percentage: 70, max_score: 70 }
+                ]).map((c: any) => (
+                  <th key={c.id} style={{ textAlign: 'center', width: 70 }}>
+                    {c.name}<br /><span style={{ fontSize: 9, opacity: .9 }}>({c.weight_percentage}%)</span>
+                  </th>
+                ))}
                 <th style={{ textAlign: 'center', width: 60 }}>Total</th>
                 <th style={{ textAlign: 'center', width: 50 }}>Grade</th>
                 {showOverallPosition && <th style={{ textAlign: 'center', width: 65 }}>Position</th>}
@@ -270,8 +278,21 @@ export default function ReportCard({
                 return (
                   <tr key={s.id}>
                     <td style={{ fontWeight: 700 }}>{s.subject?.name}</td>
-                    <td style={{ textAlign: 'center' }}>{s.class_score ?? '—'}</td>
-                    <td style={{ textAlign: 'center' }}>{s.exam_score ?? '—'}</td>
+                    {(categories && categories.length > 0 ? categories : [
+                      { id: 'cs', name: 'Class Score' },
+                      { id: 'es', name: 'Exam Score' }
+                    ]).map((c: any) => {
+                      let val = '—'
+                      if (s.category_scores && s.category_scores[c.id] !== undefined && s.category_scores[c.id] !== '') {
+                        val = s.category_scores[c.id]
+                      } else {
+                        if (c.id === 'cs') val = s.class_score ?? '—'
+                        if (c.id === 'es') val = s.exam_score ?? '—'
+                      }
+                      return (
+                        <td key={c.id} style={{ textAlign: 'center' }}>{val}</td>
+                      )
+                    })}
                     <td style={{ textAlign: 'center', fontWeight: 800, color: (isBW) ? '#000' : ((s.total_score ?? 0) >= 50 ? '#15803d' : '#dc2626') }}>
                       {s.total_score?.toFixed(1) ?? '—'}
                     </td>

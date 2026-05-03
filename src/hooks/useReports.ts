@@ -32,16 +32,20 @@ export function useGenerateReports() {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ classId, termId, academicYearId }: {
+    mutationFn: async ({ classId, termId, academicYearId }: {
       classId: string
       termId: string
       academicYearId: string
-    }) => reportsService.generateForClass(classId, termId, academicYearId),
+    }) => {
+      const res = await reportsService.generateForClass(classId, termId, academicYearId)
+      if (res.error) throw new Error(res.error.message || res.error)
+      return res.data
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['reports'] })
       toast.success('Reports generated successfully')
     },
-    onError: () => toast.error('Failed to generate reports'),
+    onError: (err: any) => toast.error(err.message || 'Failed to generate reports'),
   })
 }
 
