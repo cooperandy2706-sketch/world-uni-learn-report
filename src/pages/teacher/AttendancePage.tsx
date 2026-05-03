@@ -218,15 +218,18 @@ export default function TeacherAttendancePage() {
         }
 
         // ── RECORD DAILY LOG ──
-        await supabase.from('attendance_records').insert({
-          student_id: student.id,
-          class_id: myClass.id,
-          teacher_id: (await supabase.from('teachers').select('id').eq('user_id', user!.id).single()).data?.id,
-          term_id: (term as any).id,
-          school_id: user!.school_id, // Added school_id
-          date: todayDate,
-          status: mark,
-        })
+        const { data: tRecord } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single();
+        if (tRecord?.id) {
+          await supabase.from('attendance_records').insert({
+            student_id: student.id,
+            class_id: myClass.id,
+            teacher_id: tRecord.id,
+            term_id: (term as any).id,
+            school_id: user!.school_id, 
+            date: todayDate,
+            status: mark,
+          })
+        }
       }
 
       // Mark as submitted today

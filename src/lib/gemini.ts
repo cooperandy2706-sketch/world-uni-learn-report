@@ -22,9 +22,9 @@ export interface GeneratedLessonPlan {
 
 // Model fallback chain — tries each in order until one succeeds
 const MODEL_CHAIN = [
-  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash',
   'gemini-1.5-flash-latest',
-  'gemini-2.0-flash',
+  'gemini-pro',
 ]
 
 /**
@@ -119,10 +119,12 @@ IMPORTANT RULES:
 - Do NOT add any text before or after the Markdown — return ONLY the Markdown.
 `.trim()
 
-  let lastError: Error | null = null
+  let lastError: any = null
+  let firstError: any = null
 
   for (const modelName of MODEL_CHAIN) {
     try {
+      // Let library handle API version
       const model = genAI.getGenerativeModel({ model: modelName })
       const result = await model.generateContent(prompt)
       const markdown = result.response.text()
@@ -133,23 +135,26 @@ IMPORTANT RULES:
         subject: input.subject,
       }
     } catch (err: any) {
+      if (!firstError) firstError = err
+      lastError = err
       const is429 = err?.message?.includes('429') || err?.message?.includes('quota')
       const is404 = err?.message?.includes('404') || err?.message?.includes('not found')
       if (is429 || is404) {
-        lastError = err
         continue // try next model
       }
-      // For other errors (auth, network) fail immediately
       throw new Error(`AI Error: ${err.message ?? String(err)}`)
     }
   }
 
   // All models exhausted
-  throw new Error(
-    '⚠️ Your Gemini API key has exceeded its free quota for today. ' +
-    'This resets every 24 hours — please try again tomorrow, or visit ' +
-    'https://aistudio.google.com to check your usage. ' +
-    `(Last error: ${lastError?.message?.slice(0, 120)})`
-  )
+  const finalErr = firstError || lastError
+  if (finalErr?.message?.includes('429') || finalErr?.message?.includes('quota')) {
+    throw new Error(
+      '⚠️ Your Gemini API key has exceeded its free quota for today. ' +
+      'This resets every 24 hours — please try again tomorrow.'
+    )
+  }
+
+  throw new Error(`AI Error: ${finalErr?.message ?? 'Connection failed. Please check your API key.'}`)
 }
 

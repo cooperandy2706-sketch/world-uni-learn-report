@@ -117,11 +117,12 @@ export default function BursarDashboard() {
       const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
       const monthly = months.map((m, i) => {
         const idx = String(i + 1).padStart(2, '0')
-        const inc = (incomeRes?.data ?? []).filter((r: any) => r.date?.startsWith(`${currentYear}-${idx}`)).reduce((s: number, r: any) => s + r.amount, 0)
-        const exp = (expensesRes?.data ?? []).filter((r: any) => r.date?.startsWith(`${currentYear}-${idx}`)).reduce((s: number, r: any) => s + r.amount, 0)
-        const fees = (paymentsRes?.data ?? []).filter((r: any) => r.created_at?.startsWith(`${currentYear}-${idx}`)).reduce((s: number, r: any) => s + r.amount_paid, 0)
-        const dailyFeesMonth = (dailyCollFullYearRes?.data ?? []).filter((r: any) => r.date?.startsWith(`${currentYear}-${idx}`)).reduce((s: number, r: any) => s + Number(r.amount), 0)
-        const payrollMonth = (payrollRes?.data ?? []).filter((r: any) => r.is_paid && r.created_at?.startsWith(`${currentYear}-${idx}`)).reduce((s: number, r: any) => s + Number(r.net_salary), 0)
+        const prefix = `${currentYear}-${idx}`
+        const inc = (incomeRes?.data ?? []).filter((r: any) => (r.date ?? '').startsWith(prefix)).reduce((s: number, r: any) => s + r.amount, 0)
+        const exp = (expensesRes?.data ?? []).filter((r: any) => (r.date ?? '').startsWith(prefix)).reduce((s: number, r: any) => s + r.amount, 0)
+        const fees = (paymentsRes?.data ?? []).filter((r: any) => (r.created_at ?? '').startsWith(prefix)).reduce((s: number, r: any) => s + r.amount_paid, 0)
+        const dailyFeesMonth = (dailyCollFullYearRes?.data ?? []).filter((r: any) => (r.date ?? '').startsWith(prefix)).reduce((s: number, r: any) => s + Number(r.amount), 0)
+        const payrollMonth = (payrollRes?.data ?? []).filter((r: any) => r.is_paid && (r.created_at ?? '').startsWith(prefix)).reduce((s: number, r: any) => s + Number(r.net_salary), 0)
         return { month: m, income: inc + fees + dailyFeesMonth, expenses: exp + payrollMonth }
       })
       setMonthlyData(monthly)

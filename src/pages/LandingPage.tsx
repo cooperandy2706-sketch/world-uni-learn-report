@@ -202,8 +202,8 @@ function Hero() {
     }}>
       {/* Background Setup */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        <img src="/kids2.JPG" alt="Background" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.25 }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom right, rgba(2,6,23,0.95), rgba(15,23,42,0.8), rgba(30,27,75,0.95))' }} />
+        <img src="/kids2.JPG" alt="Background" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.65 }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom right, rgba(2,6,23,0.65), rgba(15,23,42,0.4), rgba(30,27,75,0.65))' }} />
       </div>
 
       {/* Abstract Blobs */}

@@ -174,9 +174,23 @@ export default function TeacherDashboardPage() {
 
   // Determine current/next lesson
   const currentMins = hour * 60 + now.getMinutes()
-  function timeToMins(t: string) { const [h, m] = (t ?? '00:00').split(':').map(Number); return h * 60 + m }
-  const activeLesson = todayLessons.find((l: any) => { const s = timeToMins(l.period?.start_time?.slice(0, 5)); const e = timeToMins(l.period?.end_time?.slice(0, 5)); return currentMins >= s && currentMins < e })
-  const nextLesson = todayLessons.find((l: any) => timeToMins(l.period?.start_time?.slice(0, 5)) > currentMins)
+  function timeToMins(t: string) { 
+    if (!t) return 0;
+    const [h, m] = t.split(':').map(Number); 
+    return (isNaN(h) ? 0 : h * 60) + (isNaN(m) ? 0 : m);
+  }
+  const activeLesson = todayLessons.find((l: any) => { 
+    const start = l.period?.start_time?.slice(0, 5);
+    const end = l.period?.end_time?.slice(0, 5);
+    if (!start || !end) return false;
+    const s = timeToMins(start); 
+    const e = timeToMins(end); 
+    return currentMins >= s && currentMins < e 
+  })
+  const nextLesson = todayLessons.find((l: any) => {
+    const start = l.period?.start_time?.slice(0, 5);
+    return start && timeToMins(start) > currentMins;
+  })
 
   if (loading) return <FlaskLoader fullScreen={false} label="Loading your dashboard…" />
 
