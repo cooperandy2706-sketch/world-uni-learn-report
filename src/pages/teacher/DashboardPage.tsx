@@ -7,7 +7,7 @@ import { useAuthStore } from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { getGradeInfo, calculateAverage, calculatePassRate } from '../../utils/grading'
-import { formatDate } from '../../lib/utils'
+import { formatDate, getEngagingGreeting } from '../../lib/utils'
 import { ROUTES } from '../../constants/routes'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 
@@ -169,8 +169,8 @@ export default function TeacherDashboardPage() {
   const uniqueSubjects = [...new Map(assignments.map((a: any) => [a.subject?.id, a.subject])).values()].filter(Boolean)
   const isClassTeacher = assignments.some((a: any) => a.is_class_teacher)
   const classesWithoutAttendance = uniqueClasses.filter((c: any) => !attendanceStatus[c.id])
+  const { timeGreeting, roleMessage } = getEngagingGreeting(user?.role)
   const hour = now.getHours()
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
 
   // Determine current/next lesson
   const currentMins = hour * 60 + now.getMinutes()
@@ -229,8 +229,9 @@ export default function TeacherDashboardPage() {
         <div className="resp-header" style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, animation: '_fu .5s ease both' }}>
           <div>
             <h1 className="td-header-title" style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
-              {greeting}, {user?.full_name?.split(' ')[0]} 👋
+              {timeGreeting}, {user?.full_name?.split(' ')[0]} 👋
             </h1>
+            <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4, fontWeight: 500 }}>{roleMessage}</p>
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
               {DAYS[now.getDay()]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit' })} · {(year as any)?.name} · {(term as any)?.name ?? 'No active term'}
             </p>

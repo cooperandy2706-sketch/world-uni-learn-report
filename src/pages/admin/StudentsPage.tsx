@@ -862,6 +862,21 @@ export default function StudentsPage() {
     finally { setImportLoading(false); if (fileRef.current) fileRef.current.value = '' }
   }
 
+  function downloadTemplate() {
+    const ws = XLSX.utils.json_to_sheet([{
+      'Full Name': 'John Doe',
+      'Student ID': 'STU-001',
+      'Gender': 'male',
+      'House': 'Blue House',
+      'Guardian Name': 'Jane Doe',
+      'Guardian Phone': '0240000000',
+      'Guardian Email': 'jane@example.com'
+    }])
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Template')
+    XLSX.writeFile(wb, 'student_import_template.xlsx')
+  }
+
   const totalMale = students.filter(s => s.gender === 'male').length
   const totalFemale = students.filter(s => s.gender === 'female').length
 
@@ -889,6 +904,9 @@ export default function StudentsPage() {
           {activeTab === 'directory' && (
             <div style={{ display: 'flex', gap: 10 }}>
               <input ref={fileRef} type="file" accept=".xlsx,.csv" style={{ display: 'none' }} onChange={handleImport} />
+              <Btn variant="ghost" onClick={downloadTemplate} title="Download Excel format template">
+                📄 Format Template
+              </Btn>
               <Btn variant="secondary" onClick={() => fileRef.current?.click()} loading={importLoading}>
                 📥 Import Excel
               </Btn>

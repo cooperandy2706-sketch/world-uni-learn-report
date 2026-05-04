@@ -8,6 +8,8 @@ import BottomNav from './BottomNav'
 import EnablePushButton from '../ui/EnablePushButton'
 import WhatsNewModal from '../ui/WhatsNewModal'
 import AnnouncementPopup from '../ui/AnnouncementPopup'
+import { DailyInsightNotification } from '../ui/DailyInsightNotification'
+import { NewsTicker } from '../ui/NewsTicker'
 import FloatingClock from '../shared/FloatingClock'
 import FlaskLoader from '../ui/FlaskLoader'
 import { ROUTES } from '../../constants/routes'
@@ -99,6 +101,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
         }} />
 
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <NewsTicker />
           <Header />
           <style>{`
             .app-main { padding: 28px 32px 80px; }
@@ -113,6 +116,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
       <BottomNav />
       <WhatsNewModal />
       <AnnouncementPopup />
+      <DailyInsightNotification />
       <FloatingClock />
     </>
   )

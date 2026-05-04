@@ -5,10 +5,11 @@ import { useAuthStore } from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { getGradeInfo } from '../../utils/grading'
-import { formatDate, ordinal } from '../../lib/utils'
+import { formatDate, ordinal, getEngagingGreeting } from '../../lib/utils'
 import { ROUTES } from '../../constants/routes'
 import { feeStructuresService, feePaymentsService } from '../../services/bursar.service'
 import FlaskLoader from '../../components/ui/FlaskLoader'
+import WelcomeOnboarding from '../../components/ui/WelcomeOnboarding'
 
 interface Stats {
   students: number; teachers: number; classes: number; subjects: number
@@ -106,6 +107,19 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false)
   const [financeData, setFinanceData] = useState<{ month: string, amount: number }[]>([])
   const [activeMsg, setActiveMsg] = useState<Message | null>(null)
+  const [showOnboarding, setShowOnboarding] = useState(false)
+
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem(`onboarding_seen_${user?.id}`)
+    if (!hasSeenOnboarding && user) {
+      setShowOnboarding(true)
+    }
+  }, [user?.id])
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem(`onboarding_seen_${user?.id}`, 'true')
+    setShowOnboarding(false)
+  }
 
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
 
@@ -398,14 +412,58 @@ export default function DashboardPage() {
 
   const reportsRemaining = (stats?.totalStudentsForReports ?? 0) - (stats?.reportsGenerated ?? 0)
   const reportPct = stats?.totalStudentsForReports ? Math.round((stats.reportsGenerated / stats.totalStudentsForReports) * 100) : 0
-  const hour = new Date().getHours()
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+  const { timeGreeting, roleMessage } = getEngagingGreeting(user?.role)
 
   return (
     <>
+      {showOnboarding && <WelcomeOnboarding userName={user?.full_name?.split(' ')[0] || 'Admin'} onComplete={handleOnboardingComplete} />}
+      
+      {/* Floating Tour Bubble */}
+      {!showOnboarding && (
+        <button 
+          onClick={() => setShowOnboarding(true)}
+          title="Watch Feature Tour"
+          style={{
+            position: 'fixed',
+            bottom: '30px',
+            right: '30px',
+            zIndex: 999,
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+            color: 'white',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '24px',
+            boxShadow: '0 10px 25px rgba(99, 102, 241, 0.4)',
+            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            animation: 'floatBubble 3s infinite ease-in-out'
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.transform = 'scale(1.1) translateY(-5px)'
+            e.currentTarget.style.boxShadow = '0 15px 30px rgba(99, 102, 241, 0.6)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.transform = 'scale(1) translateY(0)'
+            e.currentTarget.style.boxShadow = '0 10px 25px rgba(99, 102, 241, 0.4)'
+          }}
+        >
+          🎓
+        </button>
+      )}
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
+        @keyframes floatBubble {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+
         .dashboard-container {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           opacity: ${mounted ? 1 : 0};
@@ -512,9 +570,10 @@ export default function DashboardPage() {
         {/* ── HEADER SECTION ── */}
         <div className="anim-fade-up" style={{ marginBottom: 40, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
           <div>
-            <h1 style={{ fontSize: 36, fontWeight: 800, color: '#0f172a', margin: '0 0 8px', letterSpacing: '-0.03em' }}>
-              {greeting}, <span style={{ background: 'linear-gradient(135deg, #4f46e5, #9333ea)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{user?.full_name?.split(' ')[0]}</span> 👋
-            </h1>
+            <h2 style={{ fontSize: 32, fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.04em' }}>
+              {timeGreeting}, <span style={{ background: 'linear-gradient(135deg, #4f46e5, #9333ea)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{user?.full_name?.split(' ')[0]}</span> 👋
+            </h2>
+            <p style={{ fontSize: 15, color: '#6b7280', marginTop: 6, fontWeight: 500 }}>{roleMessage}</p>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 14, fontWeight: 600, color: '#64748b' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#f1f5f9', padding: '4px 10px', borderRadius: 8 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#3b82f6' }} />

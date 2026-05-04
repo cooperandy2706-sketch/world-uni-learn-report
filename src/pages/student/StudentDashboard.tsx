@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { getGradeInfo } from '../../utils/grading'
 import { ROUTES } from '../../constants/routes'
+import { getEngagingGreeting } from '../../lib/utils'
 import { Wallet, Clock } from 'lucide-react'
 import { 
   AreaChart,
@@ -163,8 +164,7 @@ export default function StudentDashboard() {
   const attPct = attendanceSummary.total > 0 ? Math.round((attendanceSummary.present / attendanceSummary.total) * 100) : 0
   const avgScore = reportCard?.average_score ?? (subjectScores.length ? subjectScores.reduce((s: number, x: any) => s + (x.total_score ?? 0), 0) / subjectScores.length : null)
   const gradeInfo = avgScore != null ? getGradeInfo(avgScore) : null
-  const hour = now.getHours()
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+  const { timeGreeting, roleMessage } = getEngagingGreeting(user?.role)
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '70vh', flexDirection: 'column', gap: 16 }}>
@@ -211,8 +211,9 @@ export default function StudentDashboard() {
         <div className="sd-header" style={{ marginBottom: 22, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, animation: '_sfu .5s ease both' }}>
           <div>
             <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
-              {greeting}, {user?.full_name?.split(' ')[0]} 👋
+              {timeGreeting}, {user?.full_name?.split(' ')[0]} 👋
             </h1>
+            <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4, fontWeight: 500 }}>{roleMessage}</p>
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
               {studentData?.class?.name ?? 'No class assigned'} · {(year as any)?.name} · {(term as any)?.name ?? 'No active term'} · {DAYS[now.getDay()]}
             </p>

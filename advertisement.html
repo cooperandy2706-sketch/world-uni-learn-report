@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Uni Learn Report</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@600;700&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --lime: #c8f135;
+            --coral: #ff5c3a;
+            --sky: #2af4ff;
+            --violet: #7b2fff;
+            --amber: #ffb800;
+            --pink: #ff3cac;
+            --mint: #00e5a0;
+            --navy: #0a0618;
+            --cream: #faf7f0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--navy)
+        }
+
+        body {
+            font-family: 'Cabinet Grotesk', sans-serif
+        }
+
+        /* BG CANVAS */
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none
+        }
+
+        /* NAV DOTS */
+        #dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s
+        }
+
+        .dot.on {
+            background: #fff;
+            transform: scale(1.4)
+        }
+
+        /* TIMER BAR */
+        #tbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--lime);
+            z-index: 300;
+            width: 0;
+            transition: width linear
+        }
+
+        /* SCENE SYSTEM */
+        .sc {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.7s ease
+        }
+
+        .sc.on {
+            opacity: 1;
+            pointer-events: all
+        }
+
+        /* SCENE 1 — PROBLEM */
+        #s1 {
+            flex-direction: column;
+            text-align: center
+        }
+
+        .s1-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 92, 58, 0.15);
+            border: 1.5px solid rgba(255, 92, 58, 0.5);
+            color: #ff8a72;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.5rem 1.2rem;
+            border-radius: 100px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 2rem
+        }
+
+        .blink-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--coral);
+            animation: bld 1.2s infinite
+        }
+
+        @keyframes bld {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0
+            }
+        }
+
+        .s1-h {
+            font-family: 'Clash Display', sans-serif;
+            font-size: clamp(3.5rem, 8vw, 7rem);
+            font-weight: 700;
+            line-height: 0.95;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em
+        }
+
+        .s1-h em {
+            font-style: normal;
+            color: var(--coral);
+            display: block
+        }
+
+        .s1-sub {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.45);
+            max-width: 560px;
+            margin: 0 auto 3rem;
+            line-height: 1.6
+        }
+
+        .pain-pills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.8rem;
+            max-width: 700px
+        }
+
+        .pp {
+            padding: 0.6rem 1.4rem;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            animation: ppbob ease-in-out infinite alternate
+        }
+
+        @keyframes ppbob {
+            0% {
+                transform: translateY(0)
+            }
+
+            100% {
+                transform: translateY(-10px)
+            }
+        }
+
+        /* SCENE 2 — HERO */
+        #s2 {
+            gap: 4rem
+        }
+
+        .s2-left {
+            flex: 1;
+            max-width: 500px
+        }
+
+        .brand-lock {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem
+        }
+
+        .brand-ico {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--violet), var(--sky));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem
+        }
+
+        .brand-name {
+            font-family: 'Clash Display', sans-serif;
+            font-size: 1.4rem;
+            color: #fff;
+            font-weight: 600
+        }
+
+        .brand-name span {
+            color: var(--lime)
+        }
+
+        .s2-h {
+            font-family: 'Clash Display', sans-serif;
+            font-size: clamp(2.2rem, 4vw, 3.8rem);
+            font-weight: 700;
+            line-height: 1.05;
+            color: #fff;
+            margin-bottom: 1.2rem;
+            letter-spacing: -0.02em
+        }
+
+        .s2-h mark {
+            background: none;
+            color: var(--lime)
+        }
+
+        .s2-p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.7;
+            margin-bottom: 2rem
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 2rem
+        }
+
+        .role-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            transition: all 0.3s
+        }
+
+        .role-chip:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px)
+        }
+
+        .role-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+
+        .s2-right {
+            flex: 1;
+            max-width: 520px
+        }
+
+        .dash-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden
+        }
+
+        .dash-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(123, 47, 255, 0.08), rgba(42, 244, 255, 0.04));
+            pointer-events: none
+        }
+
+        .dash-top {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem
+        }
+
+        .dt-ico {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%
+        }
+
+        .dash-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem
+        }
+
+        .ds {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 1.2rem
+        }
+
+        .ds-n {
+            font-family: 'Clash Display', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem
+        }
+
+        .ds-l {
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.06em
+        }
+
+        .dash-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.4rem;
+            height: 70px
+        }
+
+        .db {
+            border-radius: 4px 4px 0 0;
+            flex: 1;
+            position: relative;
+            overflow: hidden
+        }
+
+        .db::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.1), transparent)
+        }
+
+        /* SCENE 3 — ACADEMICS */
+        #s3 {
+            gap: 4rem
+        }
+
+        .report-big {
+            flex: 1;
+            max-width: 480px
+        }
+
+        .rb-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden
+        }
+
+        .rb-card::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(0, 229, 160, 0.08)
+        }
+
+        .stud-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem
+        }
+
+        .stud-av {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            flex-shrink: 0
+        }
+
+        .stud-info-name {
+            font-weight: 700;
+            color: #fff;
+            font-size: 1rem
+        }
+
+        .stud-info-meta {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 2px
+        }
+
+        .subj-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem
+        }
+
+        .sj {
+            display: flex;
+            align-items: center;
+            gap: 1rem
+        }
+
+        .sj-nm {
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.5);
+            width: 105px;
+            flex-shrink: 0
+        }
+
+        .sj-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            overflow: hidden
+        }
+
+        .sj-fill {
+            height: 100%;
+            border-radius: 4px;
+            animation: grow 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards
+        }
+
+        @keyframes grow {
+            from {
+                width: 0 !important
+            }
+        }
+
+        .sj-sc {
+            font-size: 0.82rem;
+            font-weight: 700;
+            width: 32px;
+            text-align: right
+        }
+
+        .rb-gpa {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .rb-gpa-lbl {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.06em
+        }
+
+        .rb-gpa-val {
+            font-family: 'Clash Display', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700
+        }
+
+        .s3-right {
+            flex: 1;
+            max-width: 480px
+        }
+
+        /* SCENE 4 — FINANCE */
+        #s4 {
+            flex-direction: column;
+            align-items: center;
+            text-align: center
+        }
+
+        .fin-top {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem
+        }
+
+        .fin-big {
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s
+        }
+
+        .fin-big:hover {
+            transform: translateY(-6px)
+        }
+
+        .fin-big-lbl {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            opacity: 0.7
+        }
+
+        .fin-big-val {
+            font-family: 'Clash Display', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem
+        }
+
+        .fin-big-sub {
+            font-size: 0.8rem;
+            opacity: 0.6
+        }
+
+        .fin-list {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem
+        }
+
+        .fl-row {
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all 0.5s
+        }
+
+        .fl-row.in {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .fl-av {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            flex-shrink: 0
+        }
+
+        .fl-info {
+            flex: 1
+        }
+
+        .fl-nm {
+            font-size: 0.85rem;
+            color: #fff;
+            font-weight: 600
+        }
+
+        .fl-dt {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 1px
+        }
+
+        .fl-right {
+            text-align: right
+        }
+
+        .fl-amt {
+            font-family: 'Clash Display', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700
+        }
+
+        .fl-st {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 100px;
+            margin-top: 3px;
+            display: inline-block;
+            font-weight: 700
+        }
+
+        /* SCENE 5 — TEACHER */
+        #s5 {
+            gap: 4rem
+        }
+
+        .teach-left {
+            flex: 1;
+            max-width: 480px
+        }
+
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 1.8rem
+        }
+
+        .qz-hd {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem
+        }
+
+        .qz-title {
+            font-weight: 700;
+            color: #fff;
+            font-size: 0.95rem
+        }
+
+        .qz-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 100px;
+            background: rgba(123, 47, 255, 0.2);
+            color: #b08aff;
+            border: 1px solid rgba(123, 47, 255, 0.4)
+        }
+
+        .qz-q {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.5;
+            margin-bottom: 1.2rem
+        }
+
+        .qz-opts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem
+        }
+
+        .qo {
+            border-radius: 10px;
+            padding: 0.7rem 1rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.45);
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: all 0.2s
+        }
+
+        .qo.ok {
+            background: rgba(0, 229, 160, 0.12);
+            border-color: rgba(0, 229, 160, 0.4);
+            color: var(--mint)
+        }
+
+        .qo.no {
+            background: rgba(255, 92, 58, 0.08);
+            border-color: rgba(255, 92, 58, 0.3);
+            color: #ff8a72
+        }
+
+        .attend-title {
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+            font-weight: 700
+        }
+
+        .at-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.55rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04)
+        }
+
+        .at-row:last-child {
+            border-bottom: none
+        }
+
+        .at-av {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0
+        }
+
+        .at-nm {
+            flex: 1;
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.6)
+        }
+
+        .at-tag {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 100px
+        }
+
+        .teach-right {
+            flex: 1;
+            max-width: 480px
+        }
+
+        /* SCENE 6 — PARENT */
+        #s6 {
+            gap: 4rem
+        }
+
+        .msg-panel {
+            flex: 1;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.94);
+            transition: all 1s ease-out 0.3s
+        }
+
+        .sc.on #s6 .msg-panel {
+            opacity: 1;
+            transform: scale(1)
+        }
+
+        .msg-hd {
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem
+        }
+
+        .msg-av {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--sky), var(--violet));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #fff
+        }
+
+        .msg-cn {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fff
+        }
+
+        .msg-cs {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.35)
+        }
+
+        .msg-online {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--mint);
+            margin-left: auto;
+            animation: pls 2s infinite
+        }
+
+        @keyframes pls {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 229, 160, 0.5)
+            }
+
+            60% {
+                box-shadow: 0 0 0 6px rgba(0, 229, 160, 0)
+            }
+        }
+
+        .msg-thread {
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            min-height: 220px
+        }
+
+        .mb {
+            max-width: 82%;
+            padding: 0.7rem 1rem;
+            border-radius: 14px;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            opacity: 0;
+            animation: mpop 0.4s ease-out forwards
+        }
+
+        @keyframes mpop {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .mi {
+            background: rgba(255, 255, 255, 0.07);
+            color: rgba(255, 255, 255, 0.75);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px
+        }
+
+        .mo {
+            background: linear-gradient(135deg, var(--violet), #5b1fd1);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px
+        }
+
+        .mt {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 3px
+        }
+
+        .mi+.mt,
+        .mo+.mt {
+            display: block
+        }
+
+        .msg-inp-row {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center
+        }
+
+        .msg-inp {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+            padding: 0.5rem 1rem;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.78rem;
+            outline: none;
+            font-family: 'Cabinet Grotesk', sans-serif
+        }
+
+        .msg-snd {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--violet), var(--sky));
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            flex-shrink: 0
+        }
+
+        .par-right {
+            flex: 1;
+            max-width: 480px
+        }
+
+        /* SCENE 7 — INFRA */
+        #s7 {
+            flex-direction: column;
+            align-items: center
+        }
+
+        .infra-wrap {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+            margin-top: 2rem
+        }
+
+        .ic {
+            border-radius: 18px;
+            padding: 1.5rem;
+            border: 1.5px solid transparent;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.5s;
+            cursor: default
+        }
+
+        .ic.in {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .ic-top {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem
+        }
+
+        .ic-ico {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0
+        }
+
+        .ic-ttl {
+            font-weight: 700;
+            color: #fff;
+            font-size: 0.95rem
+        }
+
+        .ic-desc {
+            font-size: 0.8rem;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.4)
+        }
+
+        .sec-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            margin-top: 0.75rem;
+            padding: 0.25rem 0.7rem;
+            border-radius: 100px
+        }
+
+        /* SCENE 8 — CTA */
+        #s8 {
+            flex-direction: column;
+            align-items: center;
+            text-align: center
+        }
+
+        .cta-kicker {
+            font-size: 0.82rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 1.5rem
+        }
+
+        .cta-h {
+            font-family: 'Clash Display', sans-serif;
+            font-size: clamp(3rem, 7vw, 6rem);
+            font-weight: 700;
+            line-height: 0.95;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em
+        }
+
+        .cta-h .punch {
+            display: block;
+            background: linear-gradient(90deg, var(--lime), var(--sky));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .cta-p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.45);
+            max-width: 500px;
+            margin: 0 auto 3rem;
+            line-height: 1.7
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2.5rem
+        }
+
+        .btn-lime {
+            background: var(--lime);
+            color: #0a0618;
+            padding: 1.1rem 2.8rem;
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.01em;
+            font-family: 'Cabinet Grotesk', sans-serif;
+            transition: all 0.3s;
+            box-shadow: 0 0 40px rgba(200, 241, 53, 0.25)
+        }
+
+        .btn-lime:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 0 60px rgba(200, 241, 53, 0.4)
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #fff;
+            padding: 1.1rem 2.8rem;
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            font-family: 'Cabinet Grotesk', sans-serif;
+            transition: all 0.3s
+        }
+
+        .btn-ghost:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.05)
+        }
+
+        .trust-strip {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem
+        }
+
+        .ti {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem
+        }
+
+        .ti-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(0, 229, 160, 0.2);
+            border: 1px solid rgba(0, 229, 160, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            color: var(--mint)
+        }
+
+        .domain {
+            font-family: 'Clash Display', sans-serif;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.12);
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            margin-top: 1rem
+        }
+
+        /* SHARED */
+        .sc-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 1rem
+        }
+
+        .sc-h {
+            font-family: 'Clash Display', sans-serif;
+            font-size: clamp(2rem, 3.5vw, 3.2rem);
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em
+        }
+
+        .sc-p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.7;
+            margin-bottom: 1.8rem
+        }
+
+        .feat-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem
+        }
+
+        .fi {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            opacity: 0;
+            transform: translateX(-15px);
+            transition: all 0.5s
+        }
+
+        .fi.in {
+            opacity: 1;
+            transform: translateX(0)
+        }
+
+        .fi:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(4px) !important
+        }
+
+        .fi-ico {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0
+        }
+
+        .fi-ttl {
+            font-weight: 700;
+            color: #fff;
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem
+        }
+
+        .fi-sub {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.35);
+            line-height: 1.4
+        }
+
+        /* ANIM UTILS */
+        .pop {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.7s cubic-bezier(0.34, 1.3, 0.64, 1)
+        }
+
+        .sc.on .pop {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .sc.on .pop:nth-child(1) {
+            transition-delay: 0.05s
+        }
+
+        .sc.on .pop:nth-child(2) {
+            transition-delay: 0.18s
+        }
+
+        .sc.on .pop:nth-child(3) {
+            transition-delay: 0.3s
+        }
+
+        .sc.on .pop:nth-child(4) {
+            transition-delay: 0.42s
+        }
+
+        .sc.on .pop:nth-child(5) {
+            transition-delay: 0.54s
+        }
+
+        .sc.on .pop:nth-child(6) {
+            transition-delay: 0.65s
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div id="dots"></div>
+    <div id="tbar"></div>
+
+    <!-- S1: THE PROBLEM -->
+    <section class="sc on" id="s1">
+        <div class="s1-badge pop"><span class="blink-dot"></span>The Reality</div>
+        <h1 class="s1-h pop">Managing a school<em>is chaos.</em></h1>
+        <p class="s1-sub pop">Endless paperwork. Missed fees. Angry parents. Chaotic timetables. There has to be a
+            better way.</p>
+        <div class="pain-pills pop">
+            <span class="pp" style="background:#ff5c3a;color:#fff;animation-duration:3s">Lost Records</span>
+            <span class="pp"
+                style="background:#ffb800;color:#0a0618;animation-duration:2.5s;animation-delay:0.3s">Manual
+                Invoices</span>
+            <span class="pp" style="background:#ff3cac;color:#fff;animation-duration:3.5s;animation-delay:0.6s">Missed
+                Fees</span>
+            <span class="pp" style="background:#7b2fff;color:#fff;animation-duration:2.8s;animation-delay:0.1s">Angry
+                Parents</span>
+            <span class="pp"
+                style="background:#2af4ff;color:#0a0618;animation-duration:3.2s;animation-delay:0.5s">Chaotic
+                Schedules</span>
+            <span class="pp" style="background:#c8f135;color:#0a0618;animation-duration:2.6s;animation-delay:0.8s">Data
+                Silos</span>
+            <span class="pp" style="background:#ff5c3a;color:#fff;animation-duration:3.8s;animation-delay:0.2s">Poor
+                Communication</span>
+            <span class="pp" style="background:#00e5a0;color:#0a0618;animation-duration:3s;animation-delay:0.9s">Slow
+                Reports</span>
+        </div>
+    </section>
+
+    <!-- S2: HERO -->
+    <section class="sc" id="s2">
+        <div class="s2-left">
+            <div class="brand-lock pop">
+                <div class="brand-ico">🎓</div>
+                <div class="brand-name">World Uni <span>Learn Report</span></div>
+            </div>
+            <h1 class="s2-h pop">One platform.<br><mark>Every role.</mark><br>Zero chaos.</h1>
+            <p class="s2-p pop">The complete school management system built for administrators, teachers, bursars,
+                parents and students.</p>
+            <div class="role-grid pop">
+                <div class="role-chip"><span class="role-dot" style="background:var(--sky)"></span>Administrators</div>
+                <div class="role-chip"><span class="role-dot" style="background:var(--amber)"></span>Bursars</div>
+                <div class="role-chip"><span class="role-dot" style="background:var(--violet)"></span>Teachers</div>
+                <div class="role-chip"><span class="role-dot" style="background:var(--mint)"></span>Parents</div>
+                <div class="role-chip"><span class="role-dot" style="background:var(--pink)"></span>Students</div>
+                <div class="role-chip"><span class="role-dot" style="background:var(--coral)"></span>Staff</div>
+            </div>
+        </div>
+        <div class="s2-right pop">
+            <div class="dash-card">
+                <div class="dash-top">
+                    <div class="dt-ico" style="background:#ff5c3a"></div>
+                    <div class="dt-ico" style="background:#ffb800"></div>
+                    <div class="dt-ico" style="background:#00e5a0"></div>
+                    <span
+                        style="flex:1;height:8px;background:rgba(255,255,255,0.04);border-radius:4px;margin:0 1rem"></span>
+                    <span style="font-size:0.7rem;color:rgba(255,255,255,0.2)">Admin Dashboard</span>
+                </div>
+                <div class="dash-stats">
+                    <div class="ds">
+                        <div class="ds-n" style="color:var(--sky)">1,247</div>
+                        <div class="ds-l">Students</div>
+                    </div>
+                    <div class="ds">
+                        <div class="ds-n" style="color:var(--mint)">94.2%</div>
+                        <div class="ds-l">Attendance</div>
+                    </div>
+                    <div class="ds">
+                        <div class="ds-n" style="color:var(--amber)">GH₵64k</div>
+                        <div class="ds-l">Fees Collected</div>
+                    </div>
+                    <div class="ds">
+                        <div class="ds-n" style="color:var(--violet)">B+</div>
+                        <div class="ds-l">Avg Grade</div>
+                    </div>
+                </div>
+                <div class="dash-bars">
+                    <div class="db" style="height:42%;background:rgba(123,47,255,0.5)"></div>
+                    <div class="db" style="height:60%;background:rgba(123,47,255,0.6)"></div>
+                    <div class="db" style="height:52%;background:rgba(123,47,255,0.5)"></div>
+                    <div class="db" style="height:78%;background:rgba(42,244,255,0.5)"></div>
+                    <div class="db" style="height:68%;background:rgba(42,244,255,0.4)"></div>
+                    <div class="db" style="height:91%;background:linear-gradient(to top,var(--violet),var(--sky))">
+                    </div>
+                    <div class="db" style="height:74%;background:rgba(42,244,255,0.5)"></div>
+                    <div class="db" style="height:85%;background:rgba(200,241,53,0.5)"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- S3: ACADEMICS -->
+    <section class="sc" id="s3">
+        <div class="report-big">
+            <div class="rb-card">
+                <div class="stud-row">
+                    <div class="stud-av" style="background:linear-gradient(135deg,var(--mint),#0891b2)">AM</div>
+                    <div>
+                        <div class="stud-info-name">Ama Mensah</div>
+                        <div class="stud-info-meta">JSS 2A · Term 1 · 2024/25</div>
+                    </div>
+                </div>
+                <div class="subj-list">
+                    <div class="sj"><span class="sj-nm">Mathematics</span>
+                        <div class="sj-track">
+                            <div class="sj-fill"
+                                style="width:88%;background:linear-gradient(90deg,var(--sky),var(--violet))"></div>
+                        </div><span class="sj-sc" style="color:var(--sky)">88</span>
+                    </div>
+                    <div class="sj"><span class="sj-nm">English</span>
+                        <div class="sj-track">
+                            <div class="sj-fill"
+                                style="width:92%;background:linear-gradient(90deg,var(--mint),var(--sky))"></div>
+                        </div><span class="sj-sc" style="color:var(--mint)">92</span>
+                    </div>
+                    <div class="sj"><span class="sj-nm">Science</span>
+                        <div class="sj-track">
+                            <div class="sj-fill"
+                                style="width:78%;background:linear-gradient(90deg,var(--violet),var(--pink))"></div>
+                        </div><span class="sj-sc" style="color:var(--violet)">78</span>
+                    </div>
+                    <div class="sj"><span class="sj-nm">Social Studies</span>
+                        <div class="sj-track">
+                            <div class="sj-fill"
+                                style="width:85%;background:linear-gradient(90deg,var(--amber),var(--coral))"></div>
+                        </div><span class="sj-sc" style="color:var(--amber)">85</span>
+                    </div>
+                    <div class="sj"><span class="sj-nm">ICT</span>
+                        <div class="sj-track">
+                            <div class="sj-fill"
+                                style="width:96%;background:linear-gradient(90deg,var(--lime),var(--mint))"></div>
+                        </div><span class="sj-sc" style="color:var(--lime)">96</span>
+                    </div>
+                </div>
+                <div class="rb-gpa"><span class="rb-gpa-lbl">Cumulative Average</span><span class="rb-gpa-val"
+                        style="color:var(--mint)">87.8</span></div>
+            </div>
+        </div>
+        <div class="s3-right">
+            <div class="sc-label pop" style="color:var(--mint)">Academic Module</div>
+            <h2 class="sc-h pop">Precision<br>academic<br>reporting.</h2>
+            <p class="sc-p pop">Automate grading, generate beautiful report cards instantly, and track every student's
+                growth over time.</p>
+            <div class="feat-stack">
+                <div class="fi" style="transition-delay:0.5s">
+                    <div class="fi-ico" style="background:rgba(0,229,160,0.15)">📊</div>
+                    <div>
+                        <div class="fi-ttl">Smart Grading Engine</div>
+                        <div class="fi-sub">Flexible 30% CA / 70% Exam splits with auto-calculation</div>
+                    </div>
+                </div>
+                <div class="fi" style="transition-delay:0.65s">
+                    <div class="fi-ico" style="background:rgba(0,229,160,0.15)">📋</div>
+                    <div>
+                        <div class="fi-ttl">Instant Report Cards</div>
+                        <div class="fi-sub">One-click professional, printable reports for every student</div>
+                    </div>
+                </div>
+                <div class="fi" style="transition-delay:0.8s">
+                    <div class="fi-ico" style="background:rgba(0,229,160,0.15)">📈</div>
+                    <div>
+                        <div class="fi-ttl">Growth Analytics</div>
+                        <div class="fi-sub">Individual performance history and visual trend tracking</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- S4: FINANCE -->
+    <section class="sc" id="s4">
+        <div style="width:100%;max-width:1000px">
+            <div class="sc-label pop" style="color:var(--amber)">Bursar Portal</div>
+            <h2 class="sc-h pop">Total financial <span style="color:var(--amber)">clarity.</span></h2>
+        </div>
+        <div class="fin-top pop">
+            <div class="fin-big" style="background:rgba(255,184,0,0.1);border:1.5px solid rgba(255,184,0,0.25)">
+                <div class="fin-big-lbl" style="color:rgba(255,184,0,0.7)">Total Billed</div>
+                <div class="fin-big-val" style="color:var(--amber)">GH₵82,400</div>
+                <div class="fin-big-sub" style="color:rgba(255,184,0,0.5)">Term 1 · 2024/25</div>
+            </div>
+            <div class="fin-big" style="background:rgba(0,229,160,0.1);border:1.5px solid rgba(0,229,160,0.3)">
+                <div class="fin-big-lbl" style="color:rgba(0,229,160,0.7)">Collected</div>
+                <div class="fin-big-val" style="color:var(--mint)">GH₵64,200</div>
+                <div class="fin-big-sub" style="color:rgba(0,229,160,0.5)">78% of target ↑</div>
+            </div>
+            <div class="fin-big" style="background:rgba(255,92,58,0.08);border:1.5px solid rgba(255,92,58,0.25)">
+                <div class="fin-big-lbl" style="color:rgba(255,92,58,0.7)">Outstanding</div>
+                <div class="fin-big-val" style="color:var(--coral)">GH₵18,200</div>
+                <div class="fin-big-sub" style="color:rgba(255,92,58,0.5)">24 debtors</div>
+            </div>
+        </div>
+        <div class="fin-list pop">
+            <div class="fl-row">
+                <div class="fl-av" style="background:rgba(0,229,160,0.15);color:var(--mint)">KO</div>
+                <div class="fl-info">
+                    <div class="fl-nm">Kofi Owusu</div>
+                    <div class="fl-dt">Today 9:14 AM</div>
+                </div>
+                <div class="fl-right">
+                    <div class="fl-amt" style="color:var(--mint)">GH₵850</div>
+                    <div class="fl-st" style="background:rgba(0,229,160,0.12);color:var(--mint)">Paid</div>
+                </div>
+            </div>
+            <div class="fl-row">
+                <div class="fl-av" style="background:rgba(255,184,0,0.15);color:var(--amber)">AB</div>
+                <div class="fl-info">
+                    <div class="fl-nm">Abena Boateng</div>
+                    <div class="fl-dt">Yesterday 2:30 PM</div>
+                </div>
+                <div class="fl-right">
+                    <div class="fl-amt" style="color:var(--amber)">GH₵850</div>
+                    <div class="fl-st" style="background:rgba(255,184,0,0.12);color:var(--amber)">Pending</div>
+                </div>
+            </div>
+            <div class="fl-row">
+                <div class="fl-av" style="background:rgba(255,92,58,0.15);color:var(--coral)">YA</div>
+                <div class="fl-info">
+                    <div class="fl-nm">Yaw Asante</div>
+                    <div class="fl-dt">3 days ago</div>
+                </div>
+                <div class="fl-right">
+                    <div class="fl-amt" style="color:var(--coral)">GH₵850</div>
+                    <div class="fl-st" style="background:rgba(255,92,58,0.12);color:var(--coral)">Overdue</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- S5: TEACHER -->
+    <section class="sc" id="s5">
+        <div class="teach-left">
+            <div class="quiz-card">
+                <div class="qz-hd">
+                    <div class="qz-title">Week 5 Quiz — Algebra</div><span class="qz-pill">Live · JSS 2A</span>
+                </div>
+                <div class="qz-q">If 3x + 7 = 22, what is the value of x?</div>
+                <div class="qz-opts">
+                    <div class="qo">A. x = 3</div>
+                    <div class="qo ok">B. x = 5 ✓</div>
+                    <div class="qo no">C. x = 7</div>
+                    <div class="qo">D. x = 4</div>
+                </div>
+                <div class="attend-title">Attendance Register · Today</div>
+                <div class="at-row">
+                    <div class="at-av" style="background:rgba(0,229,160,0.2);color:var(--mint)">AB</div><span
+                        class="at-nm">Ama Boateng</span><span class="at-tag"
+                        style="background:rgba(0,229,160,0.12);color:var(--mint)">Present</span>
+                </div>
+                <div class="at-row">
+                    <div class="at-av" style="background:rgba(255,92,58,0.15);color:var(--coral)">KO</div><span
+                        class="at-nm">Kweku Ofori</span><span class="at-tag"
+                        style="background:rgba(255,92,58,0.1);color:var(--coral)">Absent</span>
+                </div>
+                <div class="at-row">
+                    <div class="at-av" style="background:rgba(255,184,0,0.15);color:var(--amber)">SA</div><span
+                        class="at-nm">Sika Asante</span><span class="at-tag"
+                        style="background:rgba(255,184,0,0.1);color:var(--amber)">Late</span>
+                </div>
+                <div class="at-row">
+                    <div class="at-av" style="background:rgba(0,229,160,0.2);color:var(--mint)">PA</div><span
+                        class="at-nm">Paapa Aidoo</span><span class="at-tag"
+                        style="background:rgba(0,229,160,0.12);color:var(--mint)">Present</span>
+                </div>
+            </div>
+        </div>
+        <div class="teach-right">
+            <div class="sc-label pop" style="color:var(--violet)">Teacher Portal</div>
+            <h2 class="sc-h pop">Teach smarter,<br><span style="color:var(--violet)">not harder.</span></h2>
+            <p class="sc-p pop">Quizzes, digital attendance, lesson plans — all connected. Parents get notified the
+                moment their child is marked absent.</p>
+            <div class="feat-stack">
+                <div class="fi" style="transition-delay:0.5s">
+                    <div class="fi-ico" style="background:rgba(123,47,255,0.15)">📝</div>
+                    <div>
+                        <div class="fi-ttl">Quiz & Assignment Engine</div>
+                        <div class="fi-sub">Live and scheduled, per-class or school-wide</div>
+                    </div>
+                </div>
+                <div class="fi" style="transition-delay:0.65s">
+                    <div class="fi-ico" style="background:rgba(123,47,255,0.15)">✅</div>
+                    <div>
+                        <div class="fi-ttl">Digital Attendance Register</div>
+                        <div class="fi-sub">One tap — parent notified instantly via push alert</div>
+                    </div>
+                </div>
+                <div class="fi" style="transition-delay:0.8s">
+                    <div class="fi-ico" style="background:rgba(123,47,255,0.15)">📚</div>
+                    <div>
+                        <div class="fi-ttl">Lesson Planning Tools</div>
+                        <div class="fi-sub">Organise, share, and schedule academic content</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- S6: PARENT PORTAL -->
+    <section class="sc" id="s6">
+        <div class="par-right">
+            <div class="sc-label pop" style="color:var(--sky)">Parent & Student Portal</div>
+            <h2 class="sc-h pop">Always<br><span style="color:var(--sky)">in the loop.</span></h2>
+            <p class="sc-p pop">Every parent deserves to know how their child is doing — in real time. Grades,
+                attendance, fees, messages. All in one place.</p>
+            <div class="feat-stack">
+                <div class="fi" style="transition-delay:0.5s">
+                    <div class="fi-ico" style="background:rgba(42,244,255,0.12)">🏠</div>
+                    <div>
+                        <div class="fi-ttl">Parent Dashboard</div>
+                        <div class="fi-sub">Grades, attendance, and billing at a glance</div>
+                    </div>
+                </div>
+                <div class="fi" style="transition-delay:0.65s">
+                    <div class="fi-ico" style="background:rgba(42,244,255,0.12)">💬</div>
+                    <div>
+                        <div class="fi-ttl">Secure Messaging</div>
+                        <div class="fi-sub">Direct channel: parents ↔ teachers ↔ admins</div>
+                    </div>
+                </div>
+                <div class="fi" style="transition-delay:0.8s">
+                    <div class="fi-ico" style="background:rgba(42,244,255,0.12)">🔔</div>
+                    <div>
+                        <div class="fi-ttl">Smart Notifications</div>
+                        <div class="fi-sub">Fee reminders, event alerts, and announcements</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="msg-panel">
+            <div class="msg-hd">
+                <div class="msg-av">KA</div>
+                <div>
+                    <div class="msg-cn">Mrs. Adjei</div>
+                    <div class="msg-cs">JSS 2A Class Teacher</div>
+                </div>
+                <div class="msg-online"></div>
+            </div>
+            <div class="msg-thread">
+                <div>
+                    <div class="mb mi" style="animation-delay:0.6s">Good morning! Kofi was marked absent today. Is
+                        everything okay?</div>
+                    <div class="mt" style="text-align:left;padding-left:4px">9:04 AM</div>
+                </div>
+                <div>
+                    <div class="mb mo" style="animation-delay:1.1s">He has a slight fever. He'll be in tomorrow. Thank
+                        you for the alert!</div>
+                    <div class="mt" style="text-align:right;padding-right:4px">9:07 AM</div>
+                </div>
+                <div>
+                    <div class="mb mi" style="animation-delay:1.7s">Understood! I'll send his assignments shortly. Get
+                        well soon Kofi 😊</div>
+                    <div class="mt" style="text-align:left;padding-left:4px">9:09 AM</div>
+                </div>
+            </div>
+            <div class="msg-inp-row"><input class="msg-inp" placeholder="Type a message…" readonly>
+                <div class="msg-snd">➤</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- S7: INFRASTRUCTURE -->
+    <section class="sc" id="s7">
+        <div style="width:100%;max-width:1000px;text-align:center">
+            <div class="sc-label pop" style="color:var(--sky)">Infrastructure & Security</div>
+            <h2 class="sc-h pop" style="text-align:center">Built for the <span style="color:var(--sky)">whole
+                    school.</span></h2>
+        </div>
+        <div class="infra-wrap">
+            <div class="ic"
+                style="background:rgba(123,47,255,0.08);border-color:rgba(123,47,255,0.2);transition-delay:0.1s">
+                <div class="ic-top">
+                    <div class="ic-ico" style="background:rgba(123,47,255,0.15)">🗓️</div>
+                    <div class="ic-ttl">Master Scheduling</div>
+                </div>
+                <div class="ic-desc">Constraint-aware engine for timetables, exams, and room allocation — zero conflicts
+                    guaranteed.</div>
+            </div>
+            <div class="ic"
+                style="background:rgba(42,244,255,0.06);border-color:rgba(42,244,255,0.15);transition-delay:0.2s">
+                <div class="ic-top">
+                    <div class="ic-ico" style="background:rgba(42,244,255,0.12)">📦</div>
+                    <div class="ic-ttl">Inventory Control</div>
+                </div>
+                <div class="ic-desc">Track library books, lab equipment, and school assets with live status updates.
+                </div>
+            </div>
+            <div class="ic"
+                style="background:rgba(255,184,0,0.06);border-color:rgba(255,184,0,0.15);transition-delay:0.3s">
+                <div class="ic-top">
+                    <div class="ic-ico" style="background:rgba(255,184,0,0.12)">👥</div>
+                    <div class="ic-ttl">Staff Management</div>
+                </div>
+                <div class="ic-desc">Full HR suite: payroll, schedules, performance reviews, and leave management.</div>
+            </div>
+            <div class="ic"
+                style="background:rgba(0,229,160,0.06);border-color:rgba(0,229,160,0.15);transition-delay:0.4s">
+                <div class="ic-top">
+                    <div class="ic-ico" style="background:rgba(0,229,160,0.12)">🔒</div>
+                    <div class="ic-ttl">Data Isolation</div>
+                </div>
+                <div class="ic-desc">Role-based permissions — parents see only their children, staff see only relevant
+                    records.</div>
+                <div class="sec-badge"
+                    style="background:rgba(0,229,160,0.1);color:var(--mint);border:1px solid rgba(0,229,160,0.2)">✓
+                    SOC-compliant</div>
+            </div>
+            <div class="ic"
+                style="background:rgba(200,241,53,0.05);border-color:rgba(200,241,53,0.15);transition-delay:0.5s">
+                <div class="ic-top">
+                    <div class="ic-ico" style="background:rgba(200,241,53,0.1)">☁️</div>
+                    <div class="ic-ttl">Cloud Persistence</div>
+                </div>
+                <div class="ic-desc">Powered by Supabase with automated backups. Your data is always safe and always
+                    available.</div>
+                <div class="sec-badge"
+                    style="background:rgba(200,241,53,0.08);color:var(--lime);border:1px solid rgba(200,241,53,0.2)">✓
+                    Auto Backups</div>
+            </div>
+            <div class="ic"
+                style="background:rgba(255,60,172,0.06);border-color:rgba(255,60,172,0.15);transition-delay:0.6s">
+                <div class="ic-top">
+                    <div class="ic-ico" style="background:rgba(255,60,172,0.12)">📱</div>
+                    <div class="ic-ttl">Mobile-Ready</div>
+                </div>
+                <div class="ic-desc">Fully responsive across all devices — manage your entire school from any phone or
+                    tablet.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- S8: CTA -->
+    <section class="sc" id="s8">
+        <div class="cta-kicker pop" style="color:var(--lime)">Ready to transform your school?</div>
+        <h1 class="cta-h pop">One platform.<br><span class="punch">Every stakeholder.<br>Zero chaos.</span></h1>
+        <p class="cta-p pop">Join hundreds of schools running smarter with World Uni Learn Report.</p>
+        <div class="cta-row pop">
+            <button class="btn-lime">Get Started Free</button>
+            <button class="btn-ghost">Watch Demo</button>
+        </div>
+        <div class="trust-strip pop">
+            <span class="ti"><span class="ti-check">✓</span>No setup fees</span>
+            <span class="ti"><span class="ti-check">✓</span>Free onboarding</span>
+            <span class="ti"><span class="ti-check">✓</span>Cancel anytime</span>
+            <span class="ti"><span class="ti-check">✓</span>Secure cloud data</span>
+        </div>
+        <div class="domain pop">worldunilearn.com</div>
+    </section>
+
+    <script>
+        const TOTAL = 8;
+        const TIMINGS = [5500, 9000, 9000, 9000, 9000, 9000, 9000, 12000];
+        let cur = 1, tmr = null;
+
+        // Dots
+        const dotWrap = document.getElementById('dots');
+        for (let i = 1; i <= TOTAL; i++) {
+            const d = document.createElement('button');
+            d.className = 'dot' + (i === 1 ? ' on' : '');
+            d.onclick = () => go(i);
+            dotWrap.appendChild(d);
+        }
+
+        function updDots() { document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i + 1 === cur)) }
+
+        const tbar = document.getElementById('tbar');
+        let tbarStart, tbarDur;
+
+        function startTBar(dur) {
+            tbarDur = dur; tbarStart = performance.now();
+            tbar.style.transition = 'none'; tbar.style.width = '0';
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                tbar.style.transition = `width ${dur}ms linear`; tbar.style.width = '100%';
+            }));
+        }
+
+        function go(n) {
+            document.getElementById('s' + cur).classList.remove('on');
+            cur = n;
+            const sc = document.getElementById('s' + cur);
+            sc.classList.add('on');
+            updDots();
+            triggerIn(cur);
+            clearTimeout(tmr);
+            startTBar(TIMINGS[cur - 1]);
+            tmr = setTimeout(() => go(cur < TOTAL ? cur + 1 : 1), TIMINGS[cur - 1]);
+        }
+
+        function triggerIn(n) {
+            if (n === 3 || n === 5 || n === 6 || n === 7) {
+                setTimeout(() => {
+                    document.querySelectorAll('#s' + n + ' .fi, #s' + n + ' .fl-row, #s' + n + ' .ic').forEach((el, i) => {
+                        setTimeout(() => el.classList.add('in'), i * 120);
+                    });
+                }, 500);
+            }
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') go(cur < TOTAL ? cur + 1 : 1);
+            if (e.key === 'ArrowLeft') go(cur > 1 ? cur - 1 : TOTAL);
+        });
+
+        // BG Canvas — animated colour blobs
+        const cv = document.getElementById('bg-canvas');
+        const ctx = cv.getContext('2d');
+        let W, H;
+
+        function resize() { W = cv.width = innerWidth; H = cv.height = innerHeight }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const PALETTE = ['#7b2fff', '#2af4ff', '#ff5c3a', '#c8f135', '#ff3cac', '#00e5a0', '#ffb800'];
+        const blobs = PALETTE.map((c, i) => ({
+            x: W * (0.1 + 0.8 * (i / PALETTE.length)), y: H * 0.3 + Math.random() * H * 0.4,
+            r: 180 + Math.random() * 180, vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
+            col: c, a: 0.06 + Math.random() * 0.06
+        }));
+
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
+            blobs.forEach(b => {
+                b.x += b.vx; b.y += b.vy;
+                if (b.x < -b.r || b.x > W + b.r) b.vx *= -1;
+                if (b.y < -b.r || b.y > H + b.r) b.vy *= -1;
+                const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+                g.addColorStop(0, b.col + '28'); g.addColorStop(1, 'transparent');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
+
+        triggerIn(1);
+        startTBar(TIMINGS[0]);
+        tmr = setTimeout(() => go(2), TIMINGS[0]);
+    </script>
+</body>
+
+</html>

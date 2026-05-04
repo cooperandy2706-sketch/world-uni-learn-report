@@ -125,18 +125,18 @@ const CSS = `
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --ink: #0d0d0d;
-    --ink-2: #1c1c1c;
-    --ink-3: #2e2e2e;
-    --muted: #6b6b6b;
-    --muted-2: #9a9a9a;
-    --cream: #f9f6f1;
-    --cream-2: #f3ede4;
-    --cream-3: #ece4d8;
+    --ink: #0a0a0f;
+    --ink-2: #0f172a;
+    --ink-3: #1e293b;
+    --muted: #64748b;
+    --muted-2: #94a3b8;
+    --cream: #f8fafc;
+    --cream-2: #f1f5f9;
+    --cream-3: #e2e8f0;
     --white: #ffffff;
     --gold: #b8924a;
-    --gold-light: #d4aa6a;
-    --rule: rgba(13,13,13,0.10);
+    --gold-light: #e2b86e;
+    --rule: rgba(15,23,42,0.08);
     --serif: 'Cormorant Garamond', Georgia, serif;
     --sans: 'Outfit', system-ui, sans-serif;
   }
@@ -641,6 +641,12 @@ function Hero() {
           <a href="/register-school" className="hero-btn-main">
             Register School <span className="arrow">→</span>
           </a>
+          <a href="https://jltlnzjqhzsqpmhcpczl.supabase.co/storage/v1/object/public/downloads/WorldUniLearn.dmg" className="hero-btn-outline" style={{ border: '1.5px solid var(--gold)', color: 'var(--gold-light)' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px' }}>
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.1 2.48-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .76-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.24-1.99 1.1-3.15-1.01.04-2.24.67-2.96 1.49-.64.73-1.21 1.91-1.05 3.08 1.12.08 2.21-.59 2.91-1.42z" />
+            </svg>
+            Download for Mac
+          </a>
           <a href="/login" className="hero-btn-outline">
             Sign In to Portal
           </a>
@@ -844,6 +850,12 @@ function CTA() {
             <div className="cta-actions">
               <a href="/register-school" className="cta-btn-main">
                 Register School for Free →
+              </a>
+              <a href="https://jltlnzjqhzsqpmhcpczl.supabase.co/storage/v1/object/public/downloads/WorldUniLearn.dmg" className="hero-btn-outline" style={{ border: '1px solid var(--gold)', color: 'var(--gold-light)' }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '8px' }}>
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.1 2.48-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .76-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.24-1.99 1.1-3.15-1.01.04-2.24.67-2.96 1.49-.64.73-1.21 1.91-1.05 3.08 1.12.08 2.21-.59 2.91-1.42z" />
+                </svg>
+                Download for Mac
               </a>
               <a href="/login" className="cta-btn-outline">
                 Sign In to Portal

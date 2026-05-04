@@ -11,6 +11,7 @@ import {
   CreditCard, PiggyBank, Receipt, GraduationCap, FileText, Banknote
 } from 'lucide-react'
 import FlaskLoader from '../../components/ui/FlaskLoader'
+import { getEngagingGreeting } from '../../lib/utils'
 
 const GHS = (n: number) => `GH₵ ${n.toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
 
@@ -20,6 +21,7 @@ export default function BursarDashboard() {
   const { data: term } = useCurrentTerm()
   const schoolId = user?.school_id ?? ''
   const currentYear = new Date().getFullYear()
+  const { timeGreeting, roleMessage } = getEngagingGreeting(user?.role)
 
   const [stats, setStats] = useState({ totalCollected: 0, tuitionCollected: 0, dailyCollected: 0, totalExpenses: 0, totalIncome: 0, payrollPaid: 0, outstandingStudents: 0, scholarshipCount: 0, lastTermArrears: 0, currentTermArrears: 0, overallDebt: 0 })
   const [monthlyData, setMonthlyData] = useState<any[]>([])
@@ -178,8 +180,9 @@ export default function BursarDashboard() {
         {/* Header */}
         <div style={{ marginBottom: 24 }}>
           <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
-            Bursary Dashboard
+            {timeGreeting}, {user?.full_name?.split(' ')[0]} 👋
           </h1>
+          <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4, fontWeight: 500 }}>{roleMessage}</p>
           <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
             Financial overview for {currentYear} · {term ? `Current term: ${term.name}` : 'No active term'}
           </p>

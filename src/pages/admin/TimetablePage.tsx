@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useClasses } from '../../hooks/useClasses'
 import { useCurrentTerm, useSettings, useUpdateSettings } from '../../hooks/useSettings'
+import { TimetableService } from '../../services/timetable.service'
 import toast from 'react-hot-toast'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
@@ -222,8 +223,9 @@ export default function TimetablePage() {
   // ── Generator Config (all persisted to settings JSONB) ──
   // Bug 4 fix: subjectConfig is loaded from DB on mount, never reset on modal open
   // Bug 5 fix: extracurricularSlots is loaded from DB on mount, persisted on change
-  const [subjectConfig, setSubjectConfig] = useState<Record<string, { freq: number; excluded: boolean }>>({})
+  const [subjectConfig, setSubjectConfig] = useState<Record<string, { freq: number; excluded: boolean; double_period?: boolean; preferred_time?: 'morning' | 'afternoon' }>>({})
   const [extracurricularSlots, setExtracurricularSlots] = useState<{ day: number; periodId: string }[]>([])
+  const [morningCutoff, setMorningCutoff] = useState<number>(-1)
   const [globalCombinations, setGlobalCombinations] = useState<Record<string, string[]>>({})
   const [generating, setGenerating] = useState(false)
   const [genProgress, setGenProgress] = useState('')
@@ -246,6 +248,7 @@ export default function TimetablePage() {
     if (s.joint_classes) setGlobalCombinations(s.joint_classes)
     if (s.extracurricular_slots) setExtracurricularSlots(s.extracurricular_slots)
     if (s.subject_config) setSubjectConfig(s.subject_config)
+    if (s.morning_cutoff !== undefined) setMorningCutoff(s.morning_cutoff)
   }, [settings])
 
   // Reload timetable when selection changes
@@ -284,11 +287,11 @@ export default function TimetablePage() {
     // Initialise subject config only if not yet persisted (Bug 4: never overwrite)
     setSubjectConfig(prev => {
       if (Object.keys(prev).length > 0) return prev
-      const cfg: Record<string, { freq: number; excluded: boolean }> = {}
+      const cfg: Record<string, { freq: number; excluded: boolean; double_period?: boolean; preferred_time?: 'morning' | 'afternoon' }> = {}
         ; (s ?? []).forEach(sub => {
           const isCore = ['math', 'english', 'science', 'literacy', 'numeracy']
             .some(k => sub.name.toLowerCase().includes(k))
-          cfg[sub.id] = { freq: isCore ? 4 : 2, excluded: false }
+          cfg[sub.id] = { freq: isCore ? 4 : 2, excluded: false, double_period: false, preferred_time: undefined }
         })
       return cfg
     })
@@ -540,7 +543,7 @@ export default function TimetablePage() {
     if (singleClass && !selectedClass) { toast.error('Select a class first'); return }
 
     setGenerating(true)
-    const tid = toast.loading('🧠 Building schedule...')
+    const tid = toast.loading('🧠 Building master schedule...')
 
     try {
       const { data: assignments, error: ae } = await supabase
@@ -552,151 +555,31 @@ export default function TimetablePage() {
         throw new Error('No teacher assignments found.\nGo to Admin → Teachers → Assign to set them up.')
       }
 
-      const tpList = periods.filter(p => !p.is_break)
-      const allClasses = classes as any[]
-
-      // Mirror IDs are all classes that appear as a follower in globalCombinations.
-      // They are driven by their master — we never schedule them independently.
-      const mirrorIds = new Set(Object.values(globalCombinations).flat())
-
-      // All master classes (including classes with no combination at all)
-      const masterClasses = allClasses.filter(c => !mirrorIds.has(c.id))
-
-      // For single-class re-gen, find the master of the selected class
-      const classesToProcess = singleClass
-        ? masterClasses.filter(c => {
-          if (c.id === selectedClass) return true
-          // If selected is a mirror, its master is in globalCombinations
-          for (const [mid, followers] of Object.entries(globalCombinations)) {
-            if (followers.includes(selectedClass) && c.id === mid) return true
-          }
-          return false
-        })
-        : masterClasses
-
-      let best: { slots: any[]; missed: number; details: string[] } = {
-        slots: [], missed: Infinity, details: [],
-      }
-
-      for (let attempt = 1; attempt <= 5; attempt++) {
-        setGenProgress(`Attempt ${attempt} of 5...`)
-
-        const currentSlots: any[] = []
-        // Global teacher busy map — shared across ALL classes in this attempt
-        // key: "day:periodId" → Set of teacherIds
-        const teacherBusy = new Map<string, Set<string>>()
-
-        let attemptMissed = 0
-        const details: string[] = []
-
-        for (const cls of classesToProcess) {
-          const assigns = assignments.filter(a => a.class_id === cls.id)
-          if (!assigns.length) continue
-
-          // Build want-list respecting subject config (excluded subjects are skipped)
-          const wantList = assigns
-            .map(a => ({
-              teacher_id: a.teacher_id,
-              subject_id: a.subject_id,
-              name: subjects.find(s => s.id === a.subject_id)?.name ?? '?',
-              freq: subjectConfig[a.subject_id]?.excluded
-                ? 0
-                : (subjectConfig[a.subject_id]?.freq ?? 2),
-              placed: 0,
-            }))
-            .filter(w => w.freq > 0)
-
-          // Per-class state (reset for each class)
-          const classBusy = new Set<string>()        // slots occupied within this class
-          const subjectDays = new Map<string, Set<number>>() // which days each subject has been placed
-
-          // Bug 6: hoisted helpers — receive state by reference, always fresh
-          const canPlace = makeCanPlace(classBusy, teacherBusy, subjectDays, extracurricularSlots)
-          const place = makePlace(classBusy, teacherBusy, subjectDays, currentSlots, user!.school_id, cls.id, (term as any).id)
-
-          const shuffledWant = [...wantList].sort(() => Math.random() - 0.5)
-
-          // ── Pass 0: guarantee at least 1 slot for every subject ──
-          for (const w of shuffledWant) {
-            const days = [1, 2, 3, 4, 5].sort(() => Math.random() - 0.5)
-            const pds = tpList.map(p => p.id).sort(() => Math.random() - 0.5)
-            let placed = false
-            outer: for (const d of days) {
-              for (const p of pds) {
-                if (canPlace(w.teacher_id, w.subject_id, d, p)) {
-                  place(w.teacher_id, w.subject_id, d, p)
-                  w.placed++
-                  placed = true
-                  break outer
-                }
-              }
-            }
-            if (!placed) {
-              // Subject couldn't get even one slot — count as missed
-              attemptMissed += w.freq
-              details.push(`${cls.name}: ${w.name} (no slot available)`)
-            }
-          }
-
-          // ── Pass 1: fill remaining frequency ──
-          for (const w of shuffledWant) {
-            while (w.placed < w.freq) {
-              // Prefer days where this subject hasn't been placed yet
-              const days = [1, 2, 3, 4, 5].sort((a, b) => {
-                const aHas = subjectDays.get(w.subject_id)?.has(a) ? 1 : 0
-                const bHas = subjectDays.get(w.subject_id)?.has(b) ? 1 : 0
-                return aHas - bHas + (Math.random() - 0.5) * 0.1
-              })
-              const pds = tpList.map(p => p.id).sort(() => Math.random() - 0.5)
-              let placed = false
-              outer: for (const d of days) {
-                for (const p of pds) {
-                  if (canPlace(w.teacher_id, w.subject_id, d, p)) {
-                    place(w.teacher_id, w.subject_id, d, p)
-                    w.placed++
-                    placed = true
-                    break outer
-                  }
-                }
-              }
-              if (!placed) break
-            }
-            const missing = w.freq - w.placed
-            if (missing > 0) {
-              attemptMissed += missing
-              details.push(`${cls.name}: ${w.name} (need ${w.freq}, placed ${w.placed})`)
-            }
-          }
-
-          // ── Bug 3 fix: propagate master's teacher-busy into mirror slots ──
-          // After scheduling master class `cls`, mark the same teacher as busy
-          // at each slot for all its mirror classes. This prevents any subsequent
-          // master class that shares a teacher with a mirror from being double-booked.
-          const followers = globalCombinations[cls.id] ?? []
-          if (followers.length > 0) {
-            const masterNewSlots = currentSlots.filter(s => s.class_id === cls.id)
-            for (const slot of masterNewSlots) {
-              const key = `${slot.day_of_week}:${slot.period_id}`
-              if (!teacherBusy.has(key)) teacherBusy.set(key, new Set())
-              // Mark the teacher busy for all mirror class contexts
-              teacherBusy.get(key)!.add(slot.teacher_id)
-            }
-          }
-        }
-
-        if (attemptMissed < best.missed) {
-          best = { slots: currentSlots, missed: attemptMissed, details }
-        }
-        if (best.missed === 0) break
-      }
+      setGenProgress('Running Advanced Scheduling Engine...')
+      
+      const { finalSlots, missed, details, mirroredCount } = await TimetableService.generate({
+        schoolId: user!.school_id,
+        termId: (term as any).id,
+        classes: classes as any[],
+        subjects,
+        teachers,
+        assignments,
+        periods,
+        config: {
+          subject_config: subjectConfig,
+          extracurricular_slots: extracurricularSlots,
+          joint_classes: globalCombinations,
+          morning_cutoff_index: morningCutoff >= 0 ? morningCutoff : undefined
+        },
+        singleClassId: singleClass ? selectedClass : undefined
+      })
 
       // ── Write to DB ──
-      setGenProgress('Writing to database...')
+      setGenProgress('Saving schedule to database...')
 
-      // Determine which class IDs to wipe before inserting
       const targetCids = singleClass
         ? getJoinedClasses(selectedClass)
-        : allClasses.map(c => c.id)
+        : (classes as any[]).map(c => c.id)
 
       await supabase
         .from('timetable_slots')
@@ -704,36 +587,22 @@ export default function TimetablePage() {
         .eq('term_id', (term as any).id)
         .in('class_id', targetCids)
 
-      // ── Mirror master slots to all follower classes ──
-      // This is the definitive mirror step. Each follower gets an exact copy
-      // of its master's scheduled slots (same subject, same teacher, same period).
-      const mirrored: any[] = []
-      for (const [masterId, followers] of Object.entries(globalCombinations)) {
-        // Skip if this master wasn't included in this run
-        if (!classesToProcess.some(c => c.id === masterId)) continue
-        const masterSlots = best.slots.filter(s => s.class_id === masterId)
-        if (!masterSlots.length) continue
-        followers.forEach(fid =>
-          masterSlots.forEach(s => mirrored.push({ ...s, class_id: fid }))
-        )
-      }
-
-      const finalPayload = [...best.slots, ...mirrored]
-
       // Insert in chunks to avoid request size limits
       const CHUNK = 300
-      for (let i = 0; i < finalPayload.length; i += CHUNK) {
+      for (let i = 0; i < finalSlots.length; i += CHUNK) {
         const { error: ie } = await supabase
           .from('timetable_slots')
-          .insert(finalPayload.slice(i, i + CHUNK))
+          .insert(finalSlots.slice(i, i + CHUNK))
         if (ie) throw ie
       }
 
-      const studyHallGaps = (classesToProcess.length * teachablePeriods.length * 5) - best.slots.length
+      const tpList = periods.filter(p => !p.is_break)
+      const studyHallGaps = (targetCids.length * tpList.length) - finalSlots.length
+      
       toast.success(
-        best.missed === 0
-          ? `✅ Perfect! ${finalPayload.length} slots placed (${mirrored.length} mirrored). ${studyHallGaps} Study Hall gaps.`
-          : `⚠️ ${finalPayload.length} slots placed. ${best.missed} couldn't fit: ${best.details.slice(0, 2).join('; ')}`,
+        missed === 0
+          ? `✅ Perfect! ${finalSlots.length} slots placed (${mirroredCount} mirrored). ${studyHallGaps} Study Hall gaps.`
+          : `⚠️ ${finalSlots.length} slots placed. ${missed} couldn't fit: ${details.slice(0, 2).join('; ')}`,
         { id: tid, duration: 8000 }
       )
 
@@ -1322,44 +1191,114 @@ export default function TimetablePage() {
                 ))}
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               {subjects.map(s => {
-                const cfg = subjectConfig[s.id] ?? { freq: 2, excluded: false }
+                const cfg = subjectConfig[s.id] ?? { freq: 2, excluded: false, double_period: false, preferred_time: undefined }
                 const c = slotColor(s.id)
                 return (
-                  <div key={s.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: cfg.excluded ? '#f1f5f9' : c.bg, padding: '8px 12px', borderRadius: 10, border: `1.5px solid ${cfg.excluded ? T.border : c.border}`, opacity: cfg.excluded ? 0.5 : 1 }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', minWidth: 0 }}>
-                      <input
-                        type="checkbox"
-                        checked={!cfg.excluded}
-                        onChange={e => {
-                          const next = { ...subjectConfig, [s.id]: { ...cfg, excluded: !e.target.checked } }
-                          setSubjectConfig(next)
-                          persistConfig({ subject_config: next })
-                        }}
-                      />
-                      <span style={{ fontSize: 11, fontWeight: 700, color: cfg.excluded ? T.muted : c.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={s.name}>
-                        {s.name}
-                      </span>
-                    </label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                      {([-1, 0, 1] as const).map(delta =>
-                        delta === 0 ? (
-                          <span key={0} style={{ fontSize: 14, fontWeight: 900, color: c.text, minWidth: 22, textAlign: 'center' }}>{cfg.freq}</span>
-                        ) : (
-                          <button key={delta} onClick={() => {
-                            const next = { ...subjectConfig, [s.id]: { ...cfg, freq: Math.max(1, Math.min(10, cfg.freq + delta)) } }
+                  <div key={s.id} style={{ display: 'flex', flexDirection: 'column', background: cfg.excluded ? '#f1f5f9' : c.bg, padding: '10px 14px', borderRadius: 14, border: `1.5px solid ${cfg.excluded ? T.border : c.border}`, opacity: cfg.excluded ? 0.6 : 1, transition: 'all .2s' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', minWidth: 0 }}>
+                        <input
+                          type="checkbox"
+                          checked={!cfg.excluded}
+                          onChange={e => {
+                            const next = { ...subjectConfig, [s.id]: { ...cfg, excluded: !e.target.checked } }
                             setSubjectConfig(next)
                             persistConfig({ subject_config: next })
-                          }} disabled={cfg.excluded} style={{ width: 22, height: 22, borderRadius: 6, border: `1px solid ${c.border}`, background: T.white, color: c.text, fontSize: 14, fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            {delta < 0 ? '−' : '+'}
-                          </button>
-                        )
-                      )}
+                          }}
+                        />
+                        <span style={{ fontSize: 12, fontWeight: 800, color: cfg.excluded ? T.muted : c.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={s.name}>
+                          {s.name}
+                        </span>
+                      </label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                        {([-1, 0, 1] as const).map(delta =>
+                          delta === 0 ? (
+                            <span key={0} style={{ fontSize: 15, fontWeight: 900, color: c.text, minWidth: 24, textAlign: 'center' }}>{cfg.freq}</span>
+                          ) : (
+                            <button key={delta} onClick={() => {
+                              const next = { ...subjectConfig, [s.id]: { ...cfg, freq: Math.max(1, Math.min(10, cfg.freq + delta)) } }
+                              setSubjectConfig(next)
+                              persistConfig({ subject_config: next })
+                            }} disabled={cfg.excluded} style={{ width: 24, height: 24, borderRadius: 8, border: `1px solid ${c.border}`, background: T.white, color: c.text, fontSize: 15, fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              {delta < 0 ? '−' : '+'}
+                            </button>
+                          )
+                        )}
+                      </div>
                     </div>
+
+                    {!cfg.excluded && (
+                      <div style={{ display: 'flex', gap: 8, borderTop: `1px solid ${c.border}60`, paddingTop: 8 }}>
+                        <button
+                          onClick={() => {
+                            const next = { ...subjectConfig, [s.id]: { ...cfg, double_period: !cfg.double_period } }
+                            setSubjectConfig(next)
+                            persistConfig({ subject_config: next })
+                          }}
+                          style={{
+                            flex: 1, fontSize: 10, fontWeight: 800, padding: '4px 0', borderRadius: 6,
+                            background: cfg.double_period ? c.text : T.white,
+                            color: cfg.double_period ? '#fff' : c.text,
+                            border: `1px solid ${c.border}`, cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4
+                          }}
+                        >
+                          {cfg.double_period ? '✅ 2x Block' : '🔗 Double'}
+                        </button>
+                        <select
+                          value={cfg.preferred_time || ''}
+                          onChange={e => {
+                            const val = e.target.value as any || undefined
+                            const next = { ...subjectConfig, [s.id]: { ...cfg, preferred_time: val } }
+                            setSubjectConfig(next)
+                            persistConfig({ subject_config: next })
+                          }}
+                          style={{
+                            flex: 1.5, fontSize: 10, fontWeight: 800, padding: '3px 6px', borderRadius: 6,
+                            background: cfg.preferred_time ? c.text : T.white,
+                            color: cfg.preferred_time ? '#fff' : c.text,
+                            border: `1px solid ${c.border}`, outline: 'none'
+                          }}
+                        >
+                          <option value="">Any Time</option>
+                          <option value="morning">Morning Only</option>
+                          <option value="afternoon">Afternoon Only</option>
+                        </select>
+                      </div>
+                    )}
                   </div>
                 )
               })}
+            </div>
+          </div>
+
+          {/* Morning Cutoff Configuration */}
+          <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 14, padding: 16 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#0369a1', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10, margin: '0 0 10px' }}>
+              Morning vs Afternoon Cutoff
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <select
+                value={morningCutoff}
+                onChange={async e => {
+                  const val = parseInt(e.target.value)
+                  setMorningCutoff(val)
+                  await persistConfig({ morning_cutoff: val })
+                }}
+                style={{ ...fieldStyle, flex: 1, background: '#fff' }}
+              >
+                <option value={-1}>No cutoff (treat all slots same)</option>
+                {teachablePeriods.map((p, i) => (
+                  <option key={p.id} value={i}>
+                    Morning ends after {p.name}
+                  </option>
+                ))}
+              </select>
+              <div style={{ fontSize: 11, color: '#0369a1', fontWeight: 600, flex: 1 }}>
+                Used for subjects marked "Morning Only" or "Afternoon Only".
+              </div>
             </div>
           </div>
 

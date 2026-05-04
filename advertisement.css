@@ -1,0 +1,336 @@
+:root {
+    --bg-dark: #0a0a0c;
+    --primary: #6366f1;
+    --secondary: #a855f7;
+    --accent: #22d3ee;
+    --text-main: #f8fafc;
+    --text-dim: #94a3b8;
+    --glass: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Outfit', sans-serif;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.scene {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.5s;
+    padding: 4rem;
+}
+
+/* Visibility Control */
+body[data-scene="1"] #scene-1,
+body[data-scene="2"] #scene-2,
+body[data-scene="3"] #scene-3,
+body[data-scene="4"] #scene-4,
+body[data-scene="5"] #scene-5,
+body[data-scene="6"] #scene-6 {
+    opacity: 1;
+    visibility: visible;
+}
+
+.content {
+    max-width: 1200px;
+    width: 100%;
+    z-index: 10;
+}
+
+.flex-row {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+}
+
+.flex-row-reverse {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 4rem;
+}
+
+/* Typography */
+h1 {
+    font-size: 5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+}
+
+h2 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(to right, var(--text-main), var(--text-dim));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+p {
+    font-size: 1.5rem;
+    color: var(--text-dim);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+/* Scene 1: Chaos */
+#scene-1 {
+    background: radial-gradient(circle at center, #1e1b4b 0%, #0a0a0c 100%);
+}
+
+.glitch {
+    position: relative;
+    color: #fff;
+    mix-blend-mode: hard-light;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-dark);
+}
+
+.glitch::before {
+    left: 2px;
+    text-shadow: -2px 0 #ff00c1;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+    left: -2px;
+    text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+    animation: glitch-anim2 1s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+    0% { clip: rect(31px, 9999px, 94px, 0); }
+    20% { clip: rect(62px, 9999px, 42px, 0); }
+    40% { clip: rect(10px, 9999px, 86px, 0); }
+    60% { clip: rect(54px, 9999px, 47px, 0); }
+    80% { clip: rect(78px, 9999px, 12px, 0); }
+    100% { clip: rect(23px, 9999px, 63px, 0); }
+}
+
+.paperwork-chaos .paper {
+    position: absolute;
+    width: 80px;
+    height: 110px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: float 10s infinite ease-in-out;
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(100px, -50px) rotate(15deg); }
+    50% { transform: translate(50px, -150px) rotate(-10deg); }
+    75% { transform: translate(-50px, -50px) rotate(5deg); }
+}
+
+/* Scene 2: Hero */
+#scene-2 {
+    background: radial-gradient(circle at top right, #312e81 0%, #0a0a0c 70%);
+}
+
+.logo-animation {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    animation: fadeInUp 1s ease-out forwards;
+}
+
+.logo-icon { font-size: 4rem; }
+.logo-text { font-size: 3rem; margin: 0; color: var(--accent); }
+
+.floating-mockup {
+    width: 100%;
+    max-width: 900px;
+    border-radius: 20px;
+    box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5), 0 0 50px rgba(99, 102, 241, 0.2);
+    transform: perspective(1000px) rotateX(10deg);
+    animation: mockupFloat 6s infinite ease-in-out;
+}
+
+@keyframes mockupFloat {
+    0%, 100% { transform: perspective(1000px) rotateX(10deg) translateY(0); }
+    50% { transform: perspective(1000px) rotateX(5deg) translateY(-20px); }
+}
+
+/* Scene 3: Reports */
+.slide-in-mockup {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 12px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    transform: translateX(100px);
+    opacity: 0;
+    transition: all 1.2s ease-out 0.5s;
+}
+
+body[data-scene="3"] .slide-in-mockup {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.feature-list {
+    list-style: none;
+    margin-top: 2rem;
+}
+
+.feature-list li {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+body[data-scene="3"] .feature-list li {
+    animation: slideIn 0.5s forwards;
+}
+
+body[data-scene="3"] .feature-list li:nth-child(1) { animation-delay: 0.8s; }
+body[data-scene="3"] .feature-list li:nth-child(2) { animation-delay: 1s; }
+body[data-scene="3"] .feature-list li:nth-child(3) { animation-delay: 1.2s; }
+
+.feature-list li::before {
+    content: "✓";
+    color: var(--accent);
+    font-weight: 800;
+}
+
+@keyframes slideIn {
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Scene 4: Finance */
+.finance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    padding: 3rem;
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+    text-align: center;
+    transition: transform 0.5s ease;
+}
+
+.card.highlight {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+    border-color: var(--primary);
+    transform: scale(1.1);
+}
+
+.centered-title { text-align: center; width: 100%; }
+
+/* Scene 5: Connection */
+.phone-mockup {
+    width: 320px;
+    border-radius: 40px;
+    box-shadow: 0 50px 100px rgba(0, 0, 0, 0.4);
+    animation: rotateIn 1.5s ease-out forwards;
+}
+
+@keyframes rotateIn {
+    from { transform: rotateY(90deg) scale(0.8); opacity: 0; }
+    to { transform: rotateY(0) scale(1); opacity: 1; }
+}
+
+/* Scene 6: CTA */
+.content.final { text-align: center; }
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.btn-primary {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+    padding: 1.5rem 3rem;
+    border-radius: 100px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: white;
+    padding: 1.5rem 3rem;
+    border-radius: 100px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border: 2px solid var(--glass-border);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-primary:hover { transform: translateY(-5px); }
+.btn-secondary:hover { background: var(--glass); }
+
+.footer-logo {
+    margin-top: 4rem;
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Global Animations */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+body[data-scene] h1, 
+body[data-scene] h2, 
+body[data-scene] p {
+    animation: fadeInUp 1s ease-out forwards;
+}
