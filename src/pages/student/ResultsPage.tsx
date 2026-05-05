@@ -104,6 +104,9 @@ export default function StudentResultsPage() {
   const gradeInfo = avg != null ? getGradeInfo(avg) : null
   const selectedTerm = allTerms.find((t: any) => t.id === selectedTermId)
 
+  const totalOutstanding = (Number(studentData?.fees_arrears ?? 0) + (studentData?.other_fees ?? []).reduce((s: number, f: any) => s + Math.max(0, Number(f.amount) - Number(f.paid ?? 0)), 0))
+  const isFinancialHold = totalOutstanding > 0
+
   const isProvisional = !reportCard && scores.length > 0
   const displayPosition = reportCard?.overall_position ? ordinal(reportCard.overall_position) : '—'
   const displayTotal = reportCard?.total_students ?? classSize ?? '—'
@@ -213,7 +216,7 @@ export default function StudentResultsPage() {
         ) : (
           <>
             {/* Summary Analytics */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 24, filter: isFinancialHold ? 'blur(10px)' : 'none', pointerEvents: isFinancialHold ? 'none' : 'auto', transition: 'all 0.3s' }}>
               {[
                 { 
                   label: 'Average Score', 
@@ -279,7 +282,7 @@ export default function StudentResultsPage() {
                       <p style={{ fontSize: 13, color: '#9ca3af' }}>Scores for this term haven't been synchronized yet.</p>
                     </div>
                   ) : (
-                    <div style={{ padding: '12px' }}>
+                  <div style={{ padding: '12px', filter: isFinancialHold ? 'blur(15px)' : 'none', pointerEvents: isFinancialHold ? 'none' : 'auto', transition: 'all 0.3s' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
                         {scores.map((s: any, i: number) => {
                           const g = getGradeInfo(s.total_score ?? 0)
@@ -383,27 +386,17 @@ export default function StudentResultsPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 {/* Official Results Snapshot */}
                 {reportCard ? (
-                  <div style={{ background: 'linear-gradient(145deg, #1e1b4b, #312e81)', borderRadius: 24, padding: 24, color: '#fff' }}>
-                    <div style={{ fontSize: 10, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 8 }}>Verified Report Card</div>
-                    <div style={{ fontSize: 32, fontWeight: 800, color: '#fff', marginBottom: 4 }}>{reportCard.average_score?.toFixed(1)}%</div>
-                    <div style={{ fontSize: 13, opacity: 0.8, marginBottom: 16 }}>{gradeInfo?.label} Status</div>
-                    
-                    {[
-                      { label: 'Position', value: reportCard.overall_position ? ordinal(reportCard.overall_position) + ` of ${reportCard.total_students}` : '—' },
-                      { label: 'Attendance', value: reportCard.attendance_percent ? `${reportCard.attendance_percent}%` : '—' },
-                    ].map(st => (
-                      <div key={st.label} style={{ marginBottom: 12 }}>
-                        <div style={{ fontSize: 9, fontWeight: 700, opacity: 0.6, textTransform: 'uppercase' }}>{st.label}</div>
-                        <div style={{ fontSize: 13, fontWeight: 700 }}>{st.value}</div>
-                      </div>
-                    ))}
-
-                    {(reportCard.class_teacher_remarks || reportCard.head_teacher_remarks) && (
-                      <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                        <div style={{ fontSize: 12, fontStyle: 'italic', opacity: 0.9 }}>"{reportCard.class_teacher_remarks || reportCard.head_teacher_remarks}"</div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: '#a5b4fc', marginTop: 8 }}>— SCHOOL REMARK</div>
-                      </div>
-                    )}
+                  <div style={{ position: 'relative' }}>
+                    <ReportCard 
+                      report={reportCard}
+                      school={studentData.school}
+                      term={selectedTerm}
+                      year={selectedTerm?.academic_year}
+                      settings={{}}
+                      readonly={true}
+                      hideSettings={true}
+                      isFinancialHold={isFinancialHold}
+                    />
                   </div>
                 ) : (
                   <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, textAlign: 'center' }}>

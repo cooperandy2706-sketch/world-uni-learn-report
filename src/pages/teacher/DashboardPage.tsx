@@ -67,10 +67,10 @@ export default function TeacherDashboardPage() {
     setLoading(true)
     try {
       const { data: teacher } = await supabase.from('teachers').select('*').eq('user_id', user!.id).single()
-      if (!teacher) { 
+      if (!teacher) {
         setLoading(false)
         setFirstLoadComplete(true)
-        return 
+        return
       }
       setTeacherRecord(teacher)
 
@@ -108,7 +108,7 @@ export default function TeacherDashboardPage() {
           .eq('teacher_id', teacher.id)
           .eq('term_id', term.id)
           .eq('day_of_week', todayDay)
-          // Sort happens on client after fetch because Supabase can struggle to order by related columns depending on schema
+        // Sort happens on client after fetch because Supabase can struggle to order by related columns depending on schema
         const lessons = (slots ?? []).filter((s: any) => !s.period?.is_break)
           .sort((a: any, b: any) => {
             const aSort = a.period?.sort_order ?? 999;
@@ -147,9 +147,9 @@ export default function TeacherDashboardPage() {
       setPendingCount(classStatsData.reduce((s: number, c: any) => s + c.pendingEntries, 0))
       setSubmittedCount(classStatsData.reduce((s: number, c: any) => s + c.submitted, 0))
 
-    } catch (e) { 
-      console.error(e) 
-    } finally { 
+    } catch (e) {
+      console.error(e)
+    } finally {
       setLoading(false)
       setFirstLoadComplete(true)
     }
@@ -174,18 +174,18 @@ export default function TeacherDashboardPage() {
 
   // Determine current/next lesson
   const currentMins = hour * 60 + now.getMinutes()
-  function timeToMins(t: string) { 
+  function timeToMins(t: string) {
     if (!t) return 0;
-    const [h, m] = t.split(':').map(Number); 
+    const [h, m] = t.split(':').map(Number);
     return (isNaN(h) ? 0 : h * 60) + (isNaN(m) ? 0 : m);
   }
-  const activeLesson = todayLessons.find((l: any) => { 
+  const activeLesson = todayLessons.find((l: any) => {
     const start = l.period?.start_time?.slice(0, 5);
     const end = l.period?.end_time?.slice(0, 5);
     if (!start || !end) return false;
-    const s = timeToMins(start); 
-    const e = timeToMins(end); 
-    return currentMins >= s && currentMins < e 
+    const s = timeToMins(start);
+    const e = timeToMins(end);
+    return currentMins >= s && currentMins < e
   })
   const nextLesson = todayLessons.find((l: any) => {
     const start = l.period?.start_time?.slice(0, 5);
@@ -263,7 +263,7 @@ export default function TeacherDashboardPage() {
             <div style={{ position: 'absolute', top: -20, right: -20, width: 90, height: 90, borderRadius: '50%', background: 'rgba(255,255,255,.06)' }} />
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', opacity: .8, marginBottom: 4 }}>🟢 CLASS IN PROGRESS</div>
             <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, margin: '0 0 2px' }}>{activeLesson.subject?.name}</h2>
-            <p style={{ fontSize: 13, opacity: .85, margin: '0 0 10px' }}>{activeLesson.class?.name} · {activeLesson.period?.name} · {activeLesson.period?.start_time?.slice(0,5)}–{activeLesson.period?.end_time?.slice(0,5)}</p>
+            <p style={{ fontSize: 13, opacity: .85, margin: '0 0 10px' }}>{activeLesson.class?.name} · {activeLesson.period?.name} · {activeLesson.period?.start_time?.slice(0, 5)}–{activeLesson.period?.end_time?.slice(0, 5)}</p>
             <div className="resp-btn-group" style={{ display: 'flex', gap: 8 }}>
               <Link to={ROUTES.TEACHER_ATTENDANCE} style={{ flex: 1, textAlign: 'center', padding: '6px 14px', borderRadius: 8, background: 'rgba(255,255,255,.2)', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>📋 Mark Attendance</Link>
               <Link to={ROUTES.TEACHER_LESSON_TRACKER} style={{ flex: 1, textAlign: 'center', padding: '6px 14px', borderRadius: 8, background: 'rgba(255,255,255,.15)', color: '#fff', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>📖 Lesson Tracker</Link>

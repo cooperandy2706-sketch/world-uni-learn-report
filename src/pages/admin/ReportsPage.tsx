@@ -9,6 +9,7 @@ import { getGradeInfo } from '../../utils/grading'
 import { ordinal } from '../../lib/utils'
 import Modal from '../../components/ui/Modal'
 import ReportCard from '../../components/reports/ReportCard'
+import { getSmartHeadteacherRemark } from '../../constants/remarks'
 import toast from 'react-hot-toast'
 
 function Btn({ children, onClick, variant = 'primary', disabled, loading, style }: any) {
@@ -244,28 +245,40 @@ export default function ReportsPage() {
   const [fetchingAtt, setFetchingAtt]       = useState(false)
   const [feesModal, setFeesModal]           = useState<any>(null)
   const [feesData, setFeesData]             = useState({ fees_amount:'', fees_paid:'', fees_arrears:'', other_fees:[] as any[] })
-  const [savingFees, setSavingFees]         = useState(false)
+  const [savingFees, setSavingFees] = useState(false)
   const [isBW, setIsBW]                     = useState(false)
   const [showOverallPosition, setShowOverallPosition] = useState(true)
+  const [generatingRemarks, setGeneratingRemarks] = useState(false)
 
   const { data: reports = [], isLoading } = useReportsByClassTerm(selectedClass, (term as any)?.id ?? '')
   const [gradingCategories, setGradingCategories] = useState<any[]>([])
+  const [gradingScale, setGradingScale] = useState<any[]>([])
 
   useEffect(() => {
     async function loadCategories() {
       if (!selectedClass) return
       const cls = (classes as any[]).find(c => c.id === selectedClass)
       if (cls?.department_id) {
-        const { data } = await supabase.from('department_grading_categories').select('*').eq('department_id', cls.department_id).order('created_at')
-        if (data && data.length > 0) {
-          setGradingCategories(data)
-          return
+        const [catsRes, scaleRes] = await Promise.all([
+          supabase.from('department_grading_categories').select('*').eq('department_id', cls.department_id).order('created_at'),
+          supabase.from('grading_scales').select('*, levels:grading_scale_levels(*)').eq('department_id', cls.department_id).single()
+        ])
+
+        if (catsRes.data && catsRes.data.length > 0) {
+          setGradingCategories(catsRes.data)
+        } else {
+          setGradingCategories([
+            { id: 'cs', name: 'Class Score', weight_percentage: 30, max_score: 30 },
+            { id: 'es', name: 'Exam Score', weight_percentage: 70, max_score: 70 }
+          ])
+        }
+
+        if (scaleRes.data?.levels) {
+          setGradingScale(scaleRes.data.levels.sort((a: any, b: any) => b.min_score - a.min_score))
+        } else {
+          setGradingScale([])
         }
       }
-      setGradingCategories([
-        { id: 'cs', name: 'Class Score', weight_percentage: 30, max_score: 30 },
-        { id: 'es', name: 'Exam Score', weight_percentage: 70, max_score: 70 }
-      ])
     }
     loadCategories()
   }, [selectedClass, classes])
@@ -276,8 +289,8 @@ export default function ReportsPage() {
 
   const school = (settings as any)?.school
   const selectedClassName = (classes as any[]).find(c => c.id === selectedClass)?.name ?? ''
-  const approvedCount = (reports as any[]).filter((r: any) => r.is_approved).length
-  const approvalPct   = reports.length > 0 ? Math.round((approvedCount / reports.length) * 100) : 0
+  const approvedCount = (reports as any[] || []).filter((r: any) => r.is_approved).length
+  const approvalPct   = reports?.length > 0 ? Math.round((approvedCount / reports.length) * 100) : 0
 
   async function handleGenerate() {
     if (!selectedClass || !(term as any)?.id || !(year as any)?.id) { toast.error('Select a class first'); return }
@@ -289,6 +302,27 @@ export default function ReportsPage() {
     const pending = (reports as any[]).filter((r: any) => !r.is_approved)
     for (const r of pending) await approveReport.mutateAsync(r.id)
     toast.success(`${pending.length} reports approved`)
+  }
+  
+  async function handleAutoGenerateRemarks() {
+    if (!reports?.length) return
+    if (!confirm(`Auto-generate smart Headteacher's remarks for all ${reports.length} students in this class?`)) return
+    
+    setGeneratingRemarks(true)
+    try {
+      const updates = (reports as any[]).map(r => ({
+        id: r.id,
+        headteacher_remarks: getSmartHeadteacherRemark(r.average_score ?? 0)
+      }))
+      
+      const { error } = await supabase.from('report_cards').upsert(updates, { onConflict: 'id' })
+      if (error) throw error
+      toast.success('Smart remarks generated for the whole class! ✨')
+    } catch (e: any) {
+      toast.error(e.message)
+    } finally {
+      setGeneratingRemarks(false)
+    }
   }
 
   // Handle direct links from Performance Hub
@@ -349,15 +383,15 @@ export default function ReportsPage() {
 
   // ── Sync attendance from daily records ────────────────────
   async function syncFromRegister() {
-    if (!attModal) return
+    if (!attModal || !term) return
     setFetchingAtt(true)
     try {
       const { data, error } = await supabase
         .from('attendance_records')
         .select('status')
         .eq('student_id', attModal.student_id)
-        .gte('date', (term as any).start_date)
-        .lte('date', (term as any).end_date)
+        .gte('date', (term as any).start_date || '1970-01-01')
+        .lte('date', (term as any).end_date || '2099-12-31')
 
       if (error) throw error
 
@@ -438,13 +472,18 @@ export default function ReportsPage() {
 
         const clsDeptId = cls.department_id
         let cats = []
+        let scale = []
         if (clsDeptId) {
-          const { data } = await supabase.from('department_grading_categories').select('*').eq('department_id', clsDeptId).order('created_at')
-          if (data && data.length > 0) cats = data
+          const [catsRes, scaleRes] = await Promise.all([
+            supabase.from('department_grading_categories').select('*').eq('department_id', clsDeptId).order('created_at'),
+            supabase.from('grading_scales').select('*, levels:grading_scale_levels(*)').eq('department_id', clsDeptId).single()
+          ])
+          if (catsRes.data && catsRes.data.length > 0) cats = catsRes.data
+          if (scaleRes.data?.levels) scale = scaleRes.data.levels.sort((a: any, b: any) => b.min_score - a.min_score)
         }
         if (cats.length === 0) cats = [{ id: 'cs', name: 'Class Score', weight_percentage: 50, max_score: 100 }, { id: 'es', name: 'Exam Score', weight_percentage: 50, max_score: 100 }]
 
-        const html = buildClassHTML(enriched, cls.name, school, term, year, settings, isBW, showOverallPosition, cats)
+        const html = buildClassHTML(enriched, cls.name, school, term, year, settings, isBW, showOverallPosition, cats, scale)
         const win = window.open('', '_blank', 'width=900,height=700')
         if (win) {
           win.document.write(html)
@@ -515,6 +554,7 @@ export default function ReportsPage() {
                 {(reports as any[]).length > 0 ? '🔄 Regenerate' : '⚡ Generate'}
               </Btn>
               {(reports as any[]).length > 0 && <>
+                <Btn variant="secondary" onClick={handleAutoGenerateRemarks} loading={generatingRemarks}>🤖 Auto-Gen Remarks</Btn>
                 {approvedCount < reports.length && <Btn variant="success" onClick={approveAll}>✅ Approve All</Btn>}
                 <Btn variant="info" onClick={() => setBulkPreviewOpen(true)}>👁️ Preview All</Btn>
                 <Btn variant="secondary" onClick={() => printBulk(selectedClassName, isBW)}>🖨️ Print Class</Btn>
@@ -603,10 +643,10 @@ export default function ReportsPage() {
                         <td style={{ padding:'11px 14px' }}>
                           <div style={{ display:'flex', alignItems:'center', gap:9 }}>
                             <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,#7c3aed,#6d28d9)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:800, color:'#fff', flexShrink:0 }}>
-                              {r.student?.full_name?.charAt(0)}
+                              {r.student?.full_name?.charAt(0) || '?'}
                             </div>
                             <div>
-                              <div style={{ fontSize:13, fontWeight:700, color:'#111827' }}>{r.student?.full_name}</div>
+                              <div style={{ fontSize:13, fontWeight:700, color:'#111827' }}>{r.student?.full_name || 'Unknown Student'}</div>
                               <div style={{ fontSize:11, color:'#9ca3af' }}>{r.student?.student_id ?? '—'}</div>
                             </div>
                           </div>
@@ -671,6 +711,7 @@ export default function ReportsPage() {
             showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
             hideSettings={true}
             categories={gradingCategories}
+            scale={gradingScale}
             readonly />
         )}
       </div>
@@ -682,6 +723,7 @@ export default function ReportsPage() {
               showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
               hideSettings={true}
               categories={gradingCategories}
+              scale={gradingScale}
               readonly />
           </div>
         ))}
@@ -826,6 +868,7 @@ export default function ReportsPage() {
             isBW={isBW} setIsBW={setIsBW}
             showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
             categories={gradingCategories}
+            scale={gradingScale}
             onRemarksUpdate={remarks => updateRemarks.mutate({ reportId: viewingReport.id, remarks })} />
         )}
       </Modal>
@@ -871,6 +914,8 @@ export default function ReportsPage() {
                 isBW={isBW} setIsBW={setIsBW}
                 showOverallPosition={showOverallPosition} onToggleOverallPosition={setShowOverallPosition}
                 hideSettings={true}
+                categories={gradingCategories}
+                scale={gradingScale}
                 readonly />
             </div>
           ))}
@@ -881,9 +926,12 @@ export default function ReportsPage() {
 }
 
 // ── Build HTML for export-all ─────────────────────────────
-function buildClassHTML(reports: any[], className: string, school: any, term: any, year: any, settings: any, isBW: boolean = false, showOverallPosition: boolean = true, cats: any[] = []): string {
-  const GS = [{g:'A',min:80,c:'#16a34a'},{g:'B',min:70,c:'#2563eb'},{g:'C',min:60,c:'#7c3aed'},{g:'D',min:50,c:'#d97706'},{g:'E',min:40,c:'#ea580c'},{g:'F',min:0,c:'#dc2626'}]
-  const getG = (n: number) => GS.find(g => n >= g.min) ?? GS[5]
+function buildClassHTML(reports: any[], className: string, school: any, term: any, year: any, settings: any, isBW: boolean = false, showOverallPosition: boolean = true, cats: any[] = [], scale: any[] = []): string {
+  const GS = (scale && scale.length > 0) 
+    ? scale.map(l => ({ g: l.label, min: l.min_score, c: l.color_code }))
+    : [{g:'A',min:80,c:'#16a34a'},{g:'B',min:70,c:'#2563eb'},{g:'C',min:60,c:'#7c3aed'},{g:'D',min:50,c:'#d97706'},{g:'E',min:40,c:'#ea580c'},{g:'F',min:0,c:'#dc2626'}]
+  
+  const getG = (n: number) => GS.find(g => n >= g.min) ?? GS[GS.length - 1]
   const ord = (n: number) => { const s=['th','st','nd','rd'],v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]) }
 
   const cards = reports.map((r, idx) => {

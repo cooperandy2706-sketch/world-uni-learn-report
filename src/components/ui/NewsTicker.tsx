@@ -1,9 +1,10 @@
 // src/components/ui/NewsTicker.tsx
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
-import { Cloud, Sun, CloudRain, Wind, Zap, AlertCircle } from 'lucide-react'
+import { Cloud, Sun, CloudRain, Wind, Tv, AlertCircle } from 'lucide-react'
 
 export const NewsTicker: React.FC = () => {
   const { user } = useAuth()
@@ -50,10 +51,11 @@ export const NewsTicker: React.FC = () => {
 
   async function fetchNews() {
     try {
-      // 1. Fetch GES News (Ghana)
-      const gesRss = encodeURIComponent('https://news.google.com/rss/search?q=Ghana+Education+Service+news&hl=en-GH&gl=GH&ceid=GH:en')
+      const timestamp = new Date().getTime()
+      // 1. Fetch GES News (Ghana) - add timestamp for cache busting
+      const gesRss = encodeURIComponent(`https://news.google.com/rss/search?q=Ghana+Education+Service+news&hl=en-GH&gl=GH&ceid=GH:en&t=${timestamp}`)
       // 2. Fetch Global News (World)
-      const globalRss = encodeURIComponent('https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en')
+      const globalRss = encodeURIComponent(`https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en&t=${timestamp}`)
       
       const [gesRes, globalRes] = await Promise.all([
         fetch(`https://api.rss2json.com/v1/api.json?rss_url=${gesRss}`),
@@ -75,7 +77,7 @@ export const NewsTicker: React.FC = () => {
 
   async function fetchWeather() {
     try {
-      const res = await fetch('https://wttr.in/Accra?format=j1')
+      const res = await fetch(`https://wttr.in/Accra?format=j1&t=${new Date().getTime()}`)
       const data = await res.json()
       const current = data.current_condition[0]
       setWeather({
@@ -103,12 +105,21 @@ export const NewsTicker: React.FC = () => {
     } catch { }
   }
 
+  const tips = [
+    "🚀 TIP: Punctuality is key for the BECE examinations.",
+    "💡 TIP: Use the Lesson Tracker to keep your classes on schedule.",
+    "📊 TIP: Admins can monitor school-wide performance in Global Analytics.",
+    "📱 TIP: Enable push notifications for instant school alerts.",
+    "✨ TIP: Use AI to generate professional lesson plans in seconds."
+  ]
+  const randomTip = tips[Math.floor((new Date().getMinutes() / 10) % tips.length)]
+
   const tickerItems = [
     `<span style="color: #fbbf24">🌡️ ACCRA WEATHER: ${weather.temp}°C · ${weather.condition}</span>`,
     ...gesNews.map(n => `<span style="color: #fff">🇬🇭 GES NEWS: ${n}</span>`),
     ...globalNews.map(n => `<span style="color: #a5b4fc">🌍 WORLD: ${n}</span>`),
     ...announcements.map(a => `<span style="color: #60a5fa">📢 SCHOOL: ${a}</span>`),
-    `<span style="color: #4ade80">🚀 TIP: Punctuality is key for the BECE examinations.</span>`
+    `<span style="color: #4ade80">${randomTip}</span>`
   ]
 
   const fullTickerText = tickerItems.join('        |        ')
@@ -128,23 +139,32 @@ export const NewsTicker: React.FC = () => {
       fontFamily: '"DM Sans", sans-serif',
     }}>
       {/* "Breaking" Label */}
-      <div style={{
-        background: '#ef4444',
-        padding: '0 12px',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        fontWeight: 800,
-        fontSize: '11px',
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        zIndex: 10,
-        boxShadow: '4px 0 10px rgba(0,0,0,0.3)',
-        whiteSpace: 'nowrap'
-      }}>
-        <Zap size={12} fill="white" style={{ marginRight: '6px' }} />
-        Live Feed
-      </div>
+      <Link 
+        to={`/${user?.role || 'admin'}/news`}
+        style={{
+          background: '#ef4444',
+          padding: '0 12px',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          fontWeight: 800,
+          fontSize: '11px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          zIndex: 10,
+          boxShadow: '4px 0 10px rgba(0,0,0,0.3)',
+          whiteSpace: 'nowrap',
+          color: '#fff',
+          textDecoration: 'none',
+          cursor: 'pointer',
+          transition: 'all 0.2s'
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = '#dc2626'}
+        onMouseLeave={e => e.currentTarget.style.background = '#ef4444'}
+      >
+        <Tv size={12} fill="white" style={{ marginRight: '6px' }} />
+        Live News
+      </Link>
 
       {/* Scrolling Container */}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center' }}>

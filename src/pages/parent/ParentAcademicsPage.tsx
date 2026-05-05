@@ -124,6 +124,9 @@ export default function ParentAcademicsPage() {
           const isExpanded = expandedWard === ward.id
           const avg = data?.report?.average_score ?? (data?.scores.length ? data.scores.reduce((s: any, x: any) => s + (x.total_score ?? 0), 0) / data.scores.length : null)
           const gradeInfo = avg != null ? getGradeInfo(avg) : null
+          
+          const totalOutstanding = (Number(ward.fees_arrears ?? 0) + (ward.other_fees ?? []).reduce((s: number, f: any) => s + Math.max(0, Number(f.amount) - Number(f.paid ?? 0)), 0))
+          const isFinancialHold = totalOutstanding > 0
 
           return (
             <div key={ward.id} style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 16px rgba(109,40,217,0.03)' }}>
@@ -176,35 +179,54 @@ export default function ParentAcademicsPage() {
                     </div>
                   </div>
 
-                  <h4 style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', margin: '0 0 12px' }}>Subject Breakdown</h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {data.scores.length === 0 ? (
-                      <div style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', padding: '10px 0' }}>No results recorded for this term.</div>
-                    ) : (
-                      data.scores.map((s: any, idx: number) => {
-                        const g = getGradeInfo(s.total_score || 0)
-                        return (
-                           <div key={idx} style={{ background: '#fff', padding: '12px 16px', borderRadius: 12, border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <div style={{ fontSize: 14, fontWeight: 600, color: '#334155' }}>{s.subject?.name}</div>
-                              <div style={{ fontSize: 11, color: '#94a3b8' }}>{g.label}</div>
+                  <div style={{ filter: isFinancialHold ? 'blur(12px)' : 'none', pointerEvents: isFinancialHold ? 'none' : 'auto', transition: 'all 0.3s' }}>
+                    <h4 style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', margin: '0 0 12px' }}>Subject Breakdown</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {data.scores.length === 0 ? (
+                        <div style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', padding: '10px 0' }}>No results recorded for this term.</div>
+                      ) : (
+                        data.scores.map((s: any, idx: number) => {
+                          const g = getGradeInfo(s.total_score || 0)
+                          return (
+                             <div key={idx} style={{ background: '#fff', padding: '12px 16px', borderRadius: 12, border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <div>
+                                <div style={{ fontSize: 14, fontWeight: 600, color: '#334155' }}>{s.subject?.name}</div>
+                                <div style={{ fontSize: 11, color: '#94a3b8' }}>{g.label}</div>
+                              </div>
+                              <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: g.color }}>{(s.total_score || 0).toFixed(1)}%</div>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: g.color, opacity: 0.8 }}>Grade {g.grade}</div>
+                              </div>
                             </div>
-                            <div style={{ textAlign: 'right' }}>
-                              <div style={{ fontSize: 14, fontWeight: 800, color: g.color }}>{(s.total_score || 0).toFixed(1)}%</div>
-                              <div style={{ fontSize: 10, fontWeight: 700, color: g.color, opacity: 0.8 }}>Grade {g.grade}</div>
-                            </div>
-                          </div>
-                        )
-                      })
+                          )
+                        })
+                      )}
+                    </div>
+
+                    {data.report?.head_teacher_remarks && (
+                      <div style={{ marginTop: 24, padding: 16, background: '#f5f3ff', borderRadius: 12, border: '1px solid #ddd6fe' }}>
+                        <div style={{ fontSize: 11, color: '#6d28d9', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Teacher Remarks</div>
+                        <div style={{ fontSize: 13, color: '#4c1d95', fontStyle: 'italic', marginTop: 4 }}>
+                          "{data.report.head_teacher_remarks}"
+                        </div>
+                      </div>
                     )}
                   </div>
 
-                  {data.report?.head_teacher_remarks && (
-                    <div style={{ marginTop: 24, padding: 16, background: '#f5f3ff', borderRadius: 12, border: '1px solid #ddd6fe' }}>
-                      <div style={{ fontSize: 11, color: '#6d28d9', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Teacher Remarks</div>
-                      <div style={{ fontSize: 13, color: '#4c1d95', fontStyle: 'italic', marginTop: 4 }}>
-                        "{data.report.head_teacher_remarks}"
-                      </div>
+                  {isFinancialHold && (
+                    <div style={{ marginTop: 20, padding: 24, background: '#fff1f2', borderRadius: 16, border: '1.5px solid #fecaca', textAlign: 'center' }}>
+                      <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
+                      <h4 style={{ fontSize: 18, fontWeight: 800, color: '#991b1b', margin: '0 0 8px' }}>Financial Hold</h4>
+                      <p style={{ fontSize: 13, color: '#b91c1c', lineHeight: 1.5, margin: 0 }}>
+                        {ward.full_name}'s results are locked due to an outstanding balance of GH₵ {totalOutstanding.toFixed(2)}. 
+                        Please settle all fees to view the report card.
+                      </p>
+                      <button 
+                        onClick={() => window.location.href = '/parent/billing'}
+                        style={{ marginTop: 16, background: '#991b1b', color: '#fff', padding: '10px 20px', borderRadius: 10, border: 'none', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
+                      >
+                        Go to Billing
+                      </button>
                     </div>
                   )}
 

@@ -12,7 +12,6 @@ export const DailyInsightNotification: React.FC = () => {
   useEffect(() => {
     // Show after a short delay on mount
     const timer = setTimeout(() => {
-      // Check if already shown today in session storage
       const today = new Date().toDateString()
       const lastShown = localStorage.getItem('daily_insight_shown')
       
@@ -24,8 +23,9 @@ export const DailyInsightNotification: React.FC = () => {
     return () => clearTimeout(timer)
   }, [])
 
-  const handleClose = () => {
+  const handleClose = (isSnooze: boolean = false) => {
     setIsVisible(false)
+    // Always dismiss for the day as requested
     localStorage.setItem('daily_insight_shown', new Date().toDateString())
   }
 
@@ -74,7 +74,7 @@ export const DailyInsightNotification: React.FC = () => {
                 {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
               </button>
               <button 
-                onClick={(e) => { e.stopPropagation(); handleClose() }}
+                onClick={(e) => { e.stopPropagation(); handleClose(true) }}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}
               >
                 <X size={18} />
@@ -125,7 +125,7 @@ export const DailyInsightNotification: React.FC = () => {
               </div>
 
               <button 
-                onClick={handleClose}
+                onClick={(e) => { e.stopPropagation(); handleClose(false) }}
                 style={{ 
                   width: '100%', 
                   marginTop: '16px', 

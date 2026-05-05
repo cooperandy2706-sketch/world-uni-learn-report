@@ -99,5 +99,6 @@ export function getDailyInsight(): DailyInsight {
   const date = new Date();
   // Create a seed based on day, month, and year to ensure variety
   const seed = date.getDate() + date.getMonth() + date.getFullYear();
+  
   return insights[seed % insights.length];
 }

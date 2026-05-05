@@ -6,13 +6,14 @@ export function calculateTotal(classScore: number, examScore: number): number {
   return Number((classScore + examScore).toFixed(2))
 }
 
-export function getGradeInfo(total: number): GradeInfo {
-  // Use only g.min for matching (descending order) — no upper-bound check.
-  // The old `total <= g.max` guard created gaps for decimal averages:
-  // e.g. 69.5 failed C (max 69) and every grade above, defaulting to F.
+export function getGradeInfo(total: number, customScale?: any[]): GradeInfo {
+  const scale = customScale && customScale.length > 0 ? customScale : GRADE_SCALE
+  // Ensure scale is sorted descending by min score
+  const sortedScale = [...scale].sort((a, b) => (b.min ?? b.min_score) - (a.min ?? a.min_score))
+  
   return (
-    GRADE_SCALE.find((g) => total >= g.min) ??
-    GRADE_SCALE[GRADE_SCALE.length - 1]
+    sortedScale.find((g) => total >= (g.min ?? g.min_score)) ??
+    sortedScale[sortedScale.length - 1]
   )
 }
 
@@ -28,7 +29,18 @@ export function calculateClassPositions<T extends { student_id: string; total_sc
   scores: T[]
 ): (T & { position: number })[] {
   const sorted = [...scores].sort((a, b) => b.total_score - a.total_score)
-  return sorted.map((score, index) => ({ ...score, position: index + 1 }))
+  
+  let currentRank = 0
+  let lastScore = null
+  
+  return sorted.map((score, index) => {
+    const s = score.total_score
+    if (s !== lastScore) {
+      currentRank = index + 1
+      lastScore = s
+    }
+    return { ...score, position: currentRank }
+  })
 }
 
 export function calculateAverage(scores: number[]): number {

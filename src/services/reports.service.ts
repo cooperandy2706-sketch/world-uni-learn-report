@@ -27,14 +27,23 @@ export const reportsService = {
         subjectGroups[s.subject_id].push(s)
       })
 
-      // Calculate positions for each subject
+      // Calculate positions for each subject using Competition Ranking (handles ties)
       const scoreUpdates: any[] = []
       Object.keys(subjectGroups).forEach(subId => {
         const sorted = [...subjectGroups[subId]].sort((a, b) => (b.total_score ?? 0) - (a.total_score ?? 0))
+        
+        let currentRank = 0
+        let lastScore = null
+        
         sorted.forEach((s, index) => {
+          const score = s.total_score ?? 0
+          if (score !== lastScore) {
+            currentRank = index + 1
+            lastScore = score
+          }
           scoreUpdates.push({
             id: s.id,
-            position: index + 1
+            position: currentRank
           })
         })
       })
@@ -50,12 +59,6 @@ export const reportsService = {
       .from('scores')
       .select('*')
       .eq('class_id', classId)
-      .eq('term_id', termId)
-
-    // Fetch all attendance totals for the term
-    const { data: attRows } = await supabase
-      .from('attendance')
-      .select('student_id, total_days, days_present')
       .eq('term_id', termId)
 
     // Calculate report for each student
@@ -78,9 +81,20 @@ export const reportsService = {
       }
     })
 
-    // Sort by average to get positions
+    // Sort by average and calculate overall positions using Competition Ranking
     const sorted = [...reports].sort((a, b) => (b.average_score ?? 0) - (a.average_score ?? 0))
-    const withPositions = sorted.map((r, i) => ({ ...r, overall_position: i + 1 }))
+    
+    let currentOverallRank = 0
+    let lastAvg = null
+    
+    const withPositions = sorted.map((r, i) => {
+      const avg = r.average_score ?? 0
+      if (avg !== lastAvg) {
+        currentOverallRank = i + 1
+        lastAvg = avg
+      }
+      return { ...r, overall_position: currentOverallRank }
+    })
 
     // Upsert all reports
     return supabase

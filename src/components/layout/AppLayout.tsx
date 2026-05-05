@@ -26,13 +26,13 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
   }
 
   if (!user) return <Navigate to={ROUTES.LOGIN} replace />
-  
+
   if (requiredRole && user.role !== requiredRole) {
     if (user.role === 'super_admin') return <Navigate to="/super-admin/dashboard" replace />
-    if (user.role === 'student')    return <Navigate to="/student/dashboard" replace />
-    if (user.role === 'bursar')     return <Navigate to={ROUTES.BURSAR_DASHBOARD} replace />
-    if (user.role === 'staff')      return <Navigate to={ROUTES.STAFF_DASHBOARD}  replace />
-    if (user.role === 'parent')     return <Navigate to="/parent/dashboard" replace />
+    if (user.role === 'student') return <Navigate to="/student/dashboard" replace />
+    if (user.role === 'bursar') return <Navigate to={ROUTES.BURSAR_DASHBOARD} replace />
+    if (user.role === 'staff') return <Navigate to={ROUTES.STAFF_DASHBOARD} replace />
+    if (user.role === 'parent') return <Navigate to="/parent/dashboard" replace />
     return <Navigate to={user.role === 'admin' ? ROUTES.ADMIN_DASHBOARD : ROUTES.TEACHER_DASHBOARD} replace />
   }
 
@@ -42,12 +42,12 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
     const createdAt = new Date(userSchool.created_at)
     const trialEnd = new Date(createdAt.getTime() + 30 * 24 * 60 * 60 * 1000)
     const now = new Date()
-    
+
     // 1. Check if trial expired for unapproved schools
     const isTrialExpired = userSchool.status === 'pending' && now > trialEnd
 
     // 2. Check for overdue invoices
-    const overdueInvoice = invoices.find(inv => 
+    const overdueInvoice = invoices.find(inv =>
       (inv.status === 'pending' || inv.status === 'requested_approval') && new Date(inv.due_date) < now
     )
 
@@ -59,7 +59,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
             {isTrialExpired ? 'Free Trial Expired' : 'Payment Overdue'}
           </h2>
           <p style={{ maxWidth: 460, color: '#64748b', lineHeight: 1.6, marginBottom: 32 }}>
-            {isTrialExpired 
+            {isTrialExpired
               ? 'Your 30-day free trial has expired. To continue using the platform and unlock full access, please make your subscription payment.'
               : 'You have an unpaid invoice that is past its due date. Please settle the outstanding balance to restore access to your dashboard.'
             }
@@ -73,9 +73,9 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
             </p>
           </div>
           {user.role === 'admin' ? (
-             <button onClick={() => window.location.href = '/admin/billing'} style={{ padding: '14px 28px', borderRadius: 12, background: '#1e0646', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: 15, transition: 'all 0.2s' }}>
-               Go to Billing Page
-             </button>
+            <button onClick={() => window.location.href = '/admin/billing'} style={{ padding: '14px 28px', borderRadius: 12, background: '#1e0646', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: 15, transition: 'all 0.2s' }}>
+              Go to Billing Page
+            </button>
           ) : (
             <button onClick={() => window.location.reload()} style={{ padding: '12px 24px', borderRadius: 10, background: '#f59e0b', color: '#1e0646', border: 'none', fontWeight: 700, cursor: 'pointer' }}>
               Check Status Again
@@ -89,7 +89,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
   return (
     <>
       <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: '#f8f7ff', fontFamily: '"DM Sans",system-ui,sans-serif' }}>
-        
+
         {/* Subtle Watermark Background */}
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,

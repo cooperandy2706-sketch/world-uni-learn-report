@@ -66,6 +66,7 @@ export default function ScoreEntryPage() {
   const [dirty, setDirty]                   = useState(false)
   const [activeCell, setActiveCell]         = useState<{sid:string;subId:string;field:string}|null>(null)
   const [loading, setLoading]               = useState(true)
+  const [syncingTests, setSyncingTests]     = useState(false)
   const autoSaveRef = useRef<any>(null)
 
   const [gradingCategories, setGradingCategories] = useState<GradingCategory[]>([])
@@ -265,8 +266,18 @@ export default function ScoreEntryPage() {
       .map(s => ({ id: s.id, avg: getStudentAvg(s.id) }))
       .filter(s => s.avg > 0)
       .sort((a,b) => b.avg - a.avg)
+      
     const pos: Record<string,number> = {}
-    sorted.forEach((s,i) => { pos[s.id] = i+1 })
+    let currentRank = 0
+    let lastAvg = null
+    
+    sorted.forEach((s, index) => {
+      if (s.avg !== lastAvg) {
+        currentRank = index + 1
+        lastAvg = s.avg
+      }
+      pos[s.id] = currentRank
+    })
     return pos
   }
 
@@ -326,6 +337,164 @@ export default function ScoreEntryPage() {
       setSubmitting(false)
     }
   }
+  
+  async function handleSyncAssignments() {
+    if (!selectedClass || selectedSubjectId === 'all' || !term?.id) {
+      toast.error('Select a specific subject to sync assignments')
+      return
+    }
+    
+    // Find the target category (usually "Class Score" or the first non-exam category)
+    const targetCat = gradingCategories.find(c => c.name.toLowerCase().includes('class') || c.id === 'cs') || gradingCategories[0]
+    if (!targetCat) {
+      toast.error('No grading categories found to sync into')
+      return
+    }
+    
+    if (!confirm(`Sync all digital assignment scores for this subject into "${targetCat.name}"? This will overwrite existing values in that column.`)) return
+    
+    setSyncingTests(true)
+    try {
+      // 1. Fetch assignments for this subject/class/term
+      const { data: ass, error: aErr } = await supabase
+        .from('assignments')
+        .select('id')
+        .eq('class_id', selectedClass)
+        .eq('subject_id', selectedSubjectId)
+        .eq('term_id', term.id)
+        
+      if (aErr) throw aErr
+      if (!ass || ass.length === 0) {
+        toast.error('No digital assignments found for this subject/term')
+        return
+      }
+      
+      const assIds = ass.map(a => a.id)
+      
+      // 2. Fetch submissions
+      const { data: subs, error: sErr } = await supabase
+        .from('assignment_submissions')
+        .select('student_id, score, total_possible')
+        .in('assignment_id', assIds)
+        
+      if (sErr) throw sErr
+      if (!subs || subs.length === 0) {
+        toast.error('No submissions found for the existing assignments')
+        return
+      }
+      
+      // 3. Group and calculate
+      const studentAverages: Record<string, { total: number, max: number }> = {}
+      subs.forEach(s => {
+        if (!studentAverages[s.student_id]) studentAverages[s.student_id] = { total: 0, max: 0 }
+        studentAverages[s.student_id].total += (s.score || 0)
+        studentAverages[s.student_id].max += (s.total_possible || 100)
+      })
+      
+      // 4. Update scoreMap
+      setScoreMap(prev => {
+        const next = { ...prev }
+        Object.keys(studentAverages).forEach(sid => {
+          if (!next[sid]) return
+          const avgPercent = studentAverages[sid].total / studentAverages[sid].max
+          const scaledScore = (avgPercent * targetCat.max_score).toFixed(1)
+          
+          if (next[sid][selectedSubjectId]) {
+            next[sid][selectedSubjectId] = {
+              ...next[sid][selectedSubjectId],
+              scores: {
+                ...next[sid][selectedSubjectId].scores,
+                [targetCat.id]: scaledScore
+              }
+            }
+          }
+        })
+        return next
+      })
+      
+      setDirty(true)
+      toast.success(`Successfully synced ${Object.keys(studentAverages).length} digital assignment scores! ✨`)
+    } catch (e: any) {
+      toast.error(e.message)
+    } finally {
+      setSyncingTests(false)
+    }
+  }
+
+  async function handleSyncClassTests() {
+    if (!selectedClass || selectedSubjectId === 'all' || !term?.id) {
+      toast.error('Select a specific subject to sync class tests')
+      return
+    }
+    
+    const targetCat = gradingCategories.find(c => c.name.toLowerCase().includes('class') || c.id === 'cs') || gradingCategories[0]
+    if (!targetCat) {
+      toast.error('No grading categories found')
+      return
+    }
+    
+    if (!confirm(`Sync all teacher-entered class tests into "${targetCat.name}"?`)) return
+    
+    setSyncingTests(true)
+    try {
+      const { data: tests, error: tErr } = await supabase
+        .from('class_tests')
+        .select('id, max_score')
+        .eq('class_id', selectedClass)
+        .eq('subject_id', selectedSubjectId)
+        .eq('term_id', term.id)
+        
+      if (tErr) throw tErr
+      if (!tests || tests.length === 0) {
+        toast.error('No class tests found for this subject/term')
+        return
+      }
+      
+      const testIds = tests.map(t => t.id)
+      const { data: scores, error: sErr } = await supabase
+        .from('class_test_scores')
+        .select('student_id, score_attained, test_id')
+        .in('test_id', testIds)
+        
+      if (sErr) throw sErr
+      if (!scores || scores.length === 0) {
+        toast.error('No scores found for the existing tests')
+        return
+      }
+      
+      const studentAggregates: Record<string, { total: number, max: number }> = {}
+      scores.forEach(s => {
+        const testMax = tests.find(t => t.id === s.test_id)?.max_score || 0
+        if (!studentAggregates[s.student_id]) studentAggregates[s.student_id] = { total: 0, max: 0 }
+        studentAggregates[s.student_id].total += (s.score_attained || 0)
+        studentAggregates[s.student_id].max += testMax
+      })
+      
+      setScoreMap(prev => {
+        const next = { ...prev }
+        Object.keys(studentAggregates).forEach(sid => {
+          if (!next[sid]) return
+          const avgPercent = studentAggregates[sid].total / (studentAggregates[sid].max || 1)
+          const scaledScore = (avgPercent * targetCat.max_score).toFixed(1)
+          
+          if (next[sid][selectedSubjectId]) {
+            next[sid][selectedSubjectId] = {
+              ...next[sid][selectedSubjectId],
+              scores: { ...next[sid][selectedSubjectId].scores, [targetCat.id]: scaledScore }
+            }
+          }
+        })
+        return next
+      })
+      
+      setDirty(true)
+      toast.success(`Successfully synced class tests for ${Object.keys(studentAggregates).length} students! ✨`)
+    } catch (e: any) {
+      toast.error(e.message)
+    } finally {
+      setSyncingTests(false)
+    }
+  }
 
   const overallPos = getOverallPositions()
   const enteredCount = students.filter(s => subjects.some(sub => gradingCategories.some(c => scoreMap[s.id]?.[sub.id]?.scores[c.id] !== ''))).length
@@ -357,6 +526,16 @@ export default function ScoreEntryPage() {
         </div>
         {selectedClass && students.length > 0 && !isLocked && (
           <div style={{ display:'flex', gap:8 }}>
+            {selectedSubjectId !== 'all' && (
+              <>
+                <button onClick={handleSyncClassTests} disabled={syncingTests} style={{ padding:'10px 16px', borderRadius:9, background:'#fdf2f2', color:'#dc2626', border:'1.5px solid #fecaca', cursor:'pointer', fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
+                  {syncingTests ? '⌛' : '📝 Sync Tests'}
+                </button>
+                <button onClick={handleSyncAssignments} disabled={syncingTests} style={{ padding:'10px 16px', borderRadius:9, background:'#f5f3ff', color:'#6d28d9', border:'1.5px solid #ddd6fe', cursor:'pointer', fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
+                  {syncingTests ? '⌛' : '🤖 Sync Assignments'}
+                </button>
+              </>
+            )}
             <button onClick={() => handleSave(true)} disabled={saving || !dirty} style={{ padding:'10px 16px', borderRadius:9, background:'#fff', border:'1px solid #e5e7eb', cursor:'pointer' }}>💾 Save</button>
             <button onClick={handleSubmit} disabled={submitting || enteredCount === 0} style={{ padding:'10px 16px', borderRadius:9, background:'#6d28d9', color:'#fff', border:'none', cursor:'pointer' }}>📤 Submit</button>
           </div>

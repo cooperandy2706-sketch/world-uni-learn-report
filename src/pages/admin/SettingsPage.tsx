@@ -10,6 +10,8 @@ import { settingsService } from '../../services/index'
 import GradingSetupTab from '../../components/admin/GradingSetupTab'
 import { useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
+import ReportCard from '../../components/reports/ReportCard'
+import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 
 const schema = z.object({
   school_name: z.string().min(1, 'School name is required'),
@@ -22,6 +24,8 @@ const schema = z.object({
   school_fees_info: z.string().optional(),
   school_news: z.string().optional(),
   paystack_public_key: z.string().optional().or(z.literal('')),
+  report_theme: z.enum(['modern', 'classic', 'professional']).default('modern'),
+  primary_color: z.string().default('#1e3a8a'),
 })
 type FormData = z.infer<typeof schema>
 
@@ -84,18 +88,44 @@ function StyledTextarea({ ...props }: React.TextareaHTMLAttributes<HTMLTextAreaE
   )
 }
 
+const MOCK_REPORT = {
+  id: 'mock-1',
+  student: {
+    full_name: 'Kwame Mensah',
+    student_id: 'WUA-2026-001',
+    gender: 'Male',
+    class: { name: 'JHS 2 Blue' }
+  },
+  class_teacher_remarks: 'Kwame is a dedicated student who consistently demonstrates strong analytical skills. His participation in class discussions is commendable.',
+  headteacher_remarks: 'An outstanding performance this term. Maintain this momentum.',
+  average_score: 88.6,
+  overall_position: 2
+}
+
+const MOCK_SCORES = [
+  { id: 's1', subject: { name: 'Mathematics' }, total_score: 94, category_scores: { cs: 29, es: 65 } },
+  { id: 's2', subject: { name: 'English Language' }, total_score: 82, category_scores: { cs: 25, es: 57 } },
+  { id: 's3', subject: { name: 'Integrated Science' }, total_score: 89, category_scores: { cs: 27, es: 62 } },
+]
+
 // ═══════════════════════════════════════════════════════════
 export default function SettingsPage() {
   const { user } = useAuth()
   const qc = useQueryClient()
   const { data: settings, isLoading } = useSettings()
+  const { data: currentTerm } = useCurrentTerm()
+  const { data: currentYear } = useCurrentAcademicYear()
   const [logoUploading, setLogoUploading] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
+  const [watermarkUploading, setWatermarkUploading] = useState(false)
+  const [watermarkUrl, setWatermarkUrl] = useState<string | null>(null)
   const [logoHov, setLogoHov] = useState(false)
   const [activeTab, setActiveTab] = useState<'school' | 'report' | 'sms' | 'grading' | 'account'>('school')
   const logoRef = useRef<HTMLInputElement>(null)
+  const watermarkRef = useRef<HTMLInputElement>(null)
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty } } = useForm<FormData>({ resolver: zodResolver(schema) })
+  const { register, handleSubmit, reset, watch, formState: { errors, isSubmitting, isDirty } } = useForm<FormData>({ resolver: zodResolver(schema) })
+  const selectedTheme = watch('report_theme')
 
   useEffect(() => {
     if (settings) {
@@ -111,8 +141,11 @@ export default function SettingsPage() {
         school_fees_info: settings.school_fees_info ?? '',
         school_news: settings.school_news ?? '',
         paystack_public_key: school?.paystack_public_key ?? '',
+        report_theme: settings.report_theme ?? 'modern',
+        primary_color: settings.primary_color ?? '#1e3a8a',
       })
       setLogoUrl(school?.logo_url ?? null)
+      setWatermarkUrl(settings.report_watermark_url ?? null)
     }
   }, [settings, reset])
 
@@ -138,6 +171,8 @@ export default function SettingsPage() {
         next_term_date: data.next_term_date || null,
         school_fees_info: data.school_fees_info || null,
         school_news: data.school_news || null,
+        report_theme: data.report_theme,
+        primary_color: data.primary_color,
       })
       if (settingsError) throw settingsError
 
@@ -168,6 +203,25 @@ export default function SettingsPage() {
       toast.error('Logo upload failed. Check your Supabase storage bucket.')
     } finally {
       setLogoUploading(false)
+    }
+  }
+
+  async function handleWatermarkUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]; if (!file) return
+    setWatermarkUploading(true)
+    try {
+      const ext = file.name.split('.').pop()
+      const path = `watermarks/${user!.school_id}.${ext}`
+      const { error } = await supabase.storage.from('school-assets').upload(path, file, { upsert: true })
+      if (error) throw error
+      const { data: urlData } = supabase.storage.from('school-assets').getPublicUrl(path)
+      await settingsService.upsert(user!.school_id, { report_watermark_url: urlData.publicUrl })
+      setWatermarkUrl(urlData.publicUrl)
+      toast.success('Watermark uploaded successfully')
+    } catch {
+      toast.error('Watermark upload failed')
+    } finally {
+      setWatermarkUploading(false)
     }
   }
 
@@ -324,6 +378,100 @@ export default function SettingsPage() {
                     </Field>
                   </div>
                 </FieldGroup>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                    <FieldGroup title="Visual Branding" icon="🎨">
+                       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                          <Field label="Report Card Theme" hint="Choose the visual layout for your report cards">
+                             <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                                {([
+                                   { id: 'modern', name: 'Modern', desc: 'Sleek & Colorful', icon: '✨' },
+                                   { id: 'classic', name: 'Classic', desc: 'Serif & Traditional', icon: '🏛️' },
+                                   { id: 'professional', name: 'Professional', desc: 'Minimal & Clean', icon: '💼' },
+                                ] as const).map(t => (
+                                   <label key={t.id} style={{ flex: 1, cursor: 'pointer', position: 'relative' }}>
+                                      <input type="radio" {...register('report_theme')} value={t.id} style={{ position: 'absolute', opacity: 0 }} />
+                                      <div style={{ padding: '12px', borderRadius: 12, border: `2px solid ${errors.report_theme ? '#f87171' : (selectedTheme === t.id ? '#7c3aed' : '#e5e7eb')}`, background: selectedTheme === t.id ? '#f5f3ff' : '#fff', textAlign: 'center', transition: 'all 0.2s' }}
+                                        onMouseEnter={e => { if (selectedTheme !== t.id) e.currentTarget.style.borderColor = '#7c3aed' }}
+                                        onMouseLeave={e => { if (selectedTheme !== t.id) e.currentTarget.style.borderColor = '#e5e7eb' }}>
+                                         <div style={{ fontSize: 24, marginBottom: 4 }}>{t.icon}</div>
+                                         <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{t.name}</div>
+                                         <div style={{ fontSize: 10, color: '#9ca3af' }}>{t.desc}</div>
+                                      </div>
+                                   </label>
+                                ))}
+                             </div>
+                          </Field>
+
+                          <Field label="Background Watermark" hint="Faint image shown behind the report content (e.g. school crest)">
+                             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+                                <div style={{ width: 60, height: 60, borderRadius: 10, border: '1.5px solid #e5e7eb', background: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                   {watermarkUrl ? <img src={watermarkUrl} style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: 0.5 }} /> : <span style={{ fontSize: 20 }}>📜</span>}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                   <Btn variant="secondary" style={{ padding: '6px 12px', fontSize: 11 }} onClick={() => watermarkRef.current?.click()} loading={watermarkUploading}>
+                                      {watermarkUrl ? 'Change Watermark' : 'Upload Watermark'}
+                                    </Btn>
+                                    {watermarkUrl && <p style={{ fontSize: 10, color: '#16a34a', marginTop: 4 }}>✓ Watermark active</p>}
+                                </div>
+                                <input ref={watermarkRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleWatermarkUpload} />
+                             </div>
+                          </Field>
+
+                          <Field label="Brand Primary Color" hint="Sets the main theme color for reports and accents">
+                             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+                                <input type="color" {...register('primary_color')} style={{ width: 44, height: 44, padding: 0, border: 'none', borderRadius: 8, cursor: 'pointer', background: 'none' }} />
+                                <StyledInput {...register('primary_color')} placeholder="#1e3a8a" style={{ flex: 1, fontFamily: 'monospace' }} />
+                             </div>
+                          </Field>
+                       </div>
+                    </FieldGroup>
+                  </div>
+
+                  {/* LIVE PREVIEW PANEL */}
+                  <div style={{ position: 'sticky', top: 20, height: 'fit-content' }}>
+                    <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(109,40,217,0.1)' }}>
+                      <div style={{ padding: '12px 20px', borderBottom: '1px solid #faf5ff', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontSize: 16 }}>👁️</span>
+                          <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>Live Preview</h3>
+                        </div>
+                        <span style={{ fontSize: 10, fontWeight: 800, color: '#7c3aed', background: '#ede9fe', padding: '2px 8px', borderRadius: 99 }}>REAL-TIME</span>
+                      </div>
+                      <div style={{ padding: '0', height: 500, overflowY: 'auto', background: '#f1f5f9', position: 'relative' }}>
+                        {/* Scaled Preview Wrapper */}
+                        <div style={{ 
+                          transform: 'scale(0.65)', 
+                          transformOrigin: 'top center',
+                          width: '153.8%', // To offset the scale(0.65) so it fills width
+                          marginLeft: '-26.9%', // Center the scaled content
+                          padding: '20px 0'
+                        }}>
+                          <ReportCard 
+                            report={MOCK_REPORT} 
+                            scores={MOCK_SCORES}
+                            school={school}
+                            term={currentTerm}
+                            year={currentYear}
+                            settings={{
+                              report_theme: watch('report_theme'),
+                              primary_color: watch('primary_color'),
+                              report_watermark_url: watermarkUrl,
+                              school_fees_info: watch('school_fees_info'),
+                              school_news: watch('school_news'),
+                            }}
+                            readonly={true}
+                            hideSettings={true}
+                          />
+                        </div>
+                      </div>
+                      <div style={{ padding: '10px 20px', background: '#fff', borderTop: '1px solid #f0eefe', textAlign: 'center' }}>
+                        <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>Showing a simulated JHS 2 student report</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Report card preview hint */}
                 <div style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 14, padding: '14px 18px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>

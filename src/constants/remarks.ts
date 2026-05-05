@@ -60,13 +60,61 @@ export function getRandomRemark(grade: string): string {
 // Flat list for dropdowns if needed
 export const TEACHER_REMARKS = Object.values(GRADE_REMARKS).flat()
 
-export const HEADTEACHER_REMARKS = [
-  'Outstanding student, well done!',
-  'A commendable performance this term.',
-  'Keep up the good work.',
-  'Put in more effort next term.',
-  'Great improvement shown this term.',
-  'A brilliant student, well done!',
-  'Promoted to the next class.',
-  'Work harder to improve your grades.',
-]
+export const SMART_HEADTEACHER_REMARKS: Record<string, string[]> = {
+  'A': [
+    'Outstanding student, well done!',
+    'A brilliant student, very commendable performance.',
+    'Consistently high standards, keep it up!',
+    'An exemplary student with excellent results.',
+    'Magnificent performance, a pride to the school.',
+  ],
+  'B': [
+    'A very good performance this term.',
+    'Commendable effort, keep striving for the top.',
+    'A strong set of results, well done.',
+    'Shows great promise and academic strength.',
+    'Very good work, aim for even higher next term.',
+  ],
+  'C': [
+    'Good effort, keep up the hard work.',
+    'Satisfactory results, but has potential for more.',
+    'Steady progress shown this term.',
+    'A solid average, focus more to reach the top.',
+    'Well done, continue to work hard.',
+  ],
+  'D': [
+    'Fair performance, but needs more concentration.',
+    'Work harder to improve your grades next term.',
+    'Satisfactory, but much more effort is required.',
+    'You have potential, put in more study time.',
+    'A pass, but strive for excellence next term.',
+  ],
+  'E': [
+    'Weak performance, strive for significant improvement.',
+    'Needs much more focus and dedication to studies.',
+    'Double your efforts next term to pass comfortably.',
+    'Improve your study habits for better results.',
+    'More hard work is required to overcome weaknesses.',
+  ],
+  'F': [
+    'Fail. Extensive study and help are required.',
+    'Poor results, seek help in difficult areas.',
+    'Work much harder next term to avoid failure.',
+    'Needs to be more serious with academic work.',
+    'Significant improvement is needed in all areas.',
+  ]
+}
+
+export function getSmartHeadteacherRemark(avg: number): string {
+  let grade = 'F'
+  if (avg >= 80) grade = 'A'
+  else if (avg >= 70) grade = 'B'
+  else if (avg >= 60) grade = 'C'
+  else if (avg >= 50) grade = 'D'
+  else if (avg >= 40) grade = 'E'
+
+  const remarks = SMART_HEADTEACHER_REMARKS[grade] || []
+  return remarks[Math.floor(Math.random() * remarks.length)] || 'Good work.'
+}
+
+export const HEADTEACHER_REMARKS = Object.values(SMART_HEADTEACHER_REMARKS).flat()

@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Users, FileSpreadsheet, ClipboardCheck, 
   Megaphone, PencilLine, Calendar, Timer, BookOpen, 
   ShieldCheck, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School,
-  CreditCard, Wallet, Gamepad2, Library, Bell
+  CreditCard, Wallet, Gamepad2, Library, Bell, Tv
 } from 'lucide-react'
 import NotificationsModal from '../ui/NotificationsModal'
 
@@ -23,7 +23,8 @@ const adminLinks = [
   { to: '/admin/billing', icon: CreditCard, label: 'Billing' },
   { to: '/admin/reports', icon: FileSpreadsheet, label: 'Reports' },
   { to: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
-  { to: '/admin/settings', icon: ShieldCheck, label: 'Settings' },
+   { to: '/admin/settings', icon: ShieldCheck, label: 'Settings' },
+  { to: '/admin/news', icon: Tv, label: 'News' },
 ]
 
 const teacherLinks = [
@@ -38,14 +39,16 @@ const teacherLinks = [
   { to: '/teacher/timetable', icon: Calendar, label: 'Schedule' },
   { to: '/teacher/reports', icon: FileSpreadsheet, label: 'Reports' },
   { to: '/teacher/self-service', icon: UserCheck, label: 'Service' },
-  { to: '/teacher/typing-game', icon: Gamepad2, label: 'Nitro' },
+   { to: '/teacher/typing-game', icon: Gamepad2, label: 'Nitro' },
+  { to: '/teacher/news', icon: Tv, label: 'News' },
 ]
 
 const superAdminLinks = [
   { to: '/super-admin/dashboard', icon: ShieldCheck, label: 'Hub' },
   { to: '/super-admin/schools', icon: School, label: 'Schools' },
   { to: '/super-admin/quizzes', icon: ClipboardList, label: 'Quizzes' },
-  { to: '/super-admin/messaging', icon: MessageSquare, label: 'News' },
+   { to: '/super-admin/messaging', icon: MessageSquare, label: 'News' },
+  { to: '/super-admin/news', icon: Tv, label: 'News' },
 ]
 
 const studentLinks = [
@@ -57,7 +60,8 @@ const studentLinks = [
   { to: '/student/billing', icon: CreditCard, label: 'Billing' },
   { to: '/student/profile', icon: Users, label: 'Profile' },
   { to: '/student/announcements', icon: Megaphone, label: 'Notices' },
-  { to: '/student/typing-game', icon: Gamepad2, label: 'Nitro' },
+   { to: '/student/typing-game', icon: Gamepad2, label: 'Nitro' },
+  { to: '/student/news', icon: Tv, label: 'News' },
 ]
 
 const bursarLinks = [
@@ -69,7 +73,8 @@ const bursarLinks = [
   { to: '/bursar/inventory', icon: Library, label: 'Inventory' },
   { to: '/bursar/analytics', icon: BarChart3, label: 'Stats' },
   { to: '/bursar/reports', icon: FileSpreadsheet, label: 'Reports' },
-  { to: '/bursar/sms', icon: MessageSquare, label: 'SMS' },
+   { to: '/bursar/sms', icon: MessageSquare, label: 'SMS' },
+  { to: '/bursar/news', icon: Tv, label: 'News' },
 ]
 
 const parentLinks = [
@@ -77,7 +82,8 @@ const parentLinks = [
   { to: '/parent/academics', icon: FileSpreadsheet, label: 'Results' },
   { to: '/parent/billing', icon: Wallet, label: 'Billing' },
   { to: '/parent/messages', icon: MessageSquare, label: 'Messages', notify: true },
-  { to: '/parent/calendar', icon: Calendar, label: 'Calendar' },
+   { to: '/parent/calendar', icon: Calendar, label: 'Calendar' },
+  { to: '/parent/news', icon: Tv, label: 'News' },
 ]
 
 export default function BottomNav() {

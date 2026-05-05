@@ -10,7 +10,7 @@ import {
   Search, Settings, ChevronDown, ChevronLeft, ChevronRight,
   LogOut, User, Shield, Calendar, AlertTriangle, CreditCard,
   FileText, BarChart3, MessageSquare, Command, BookOpen, Users,
-  GraduationCap, LayoutDashboard, Zap
+  GraduationCap, LayoutDashboard, Zap, Tv
 } from 'lucide-react'
 import { ROUTES } from '../../constants/routes'
 import { resolveIntents, extractClassHint, extractPersonIntent, intentToPath } from '../../lib/commandSearch'

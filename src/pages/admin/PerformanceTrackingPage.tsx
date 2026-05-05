@@ -186,16 +186,16 @@ export default function PerformanceTrackingPage() {
 
       const history = Object.values(termMap).map((t: any) => ({
         ...t,
-        average: Number((t.totalScores / t.count).toFixed(2)),
-        passRate: Number(((t.passed / t.count) * 100).toFixed(1))
+        average: t.count > 0 ? Number((t.totalScores / t.count).toFixed(2)) : 0,
+        passRate: t.count > 0 ? Number(((t.passed / t.count) * 100).toFixed(1)) : 0
       }))
 
       // 3. Get top and bottom performers of the LATEST term
-      const latestTerm = history[history.length - 1]
+      const latestTerm = history.length > 0 ? history[history.length - 1] : null
       let top: any[] = []
       let bottom: any[] = []
       
-      if (latestTerm) {
+      if (latestTerm && latestTerm.students) {
         top = [...latestTerm.students].sort((a, b) => (b.average_score || 0) - (a.average_score || 0)).slice(0, 5)
         bottom = [...latestTerm.students].sort((a, b) => (a.average_score || 0) - (b.average_score || 0)).slice(0, 5)
 

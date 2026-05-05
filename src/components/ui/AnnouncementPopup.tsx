@@ -66,6 +66,10 @@ export default function AnnouncementPopup() {
   useEffect(() => {
     if (!user) return
     loadAnnouncements()
+
+    // Refresh announcements every 30 minutes to check for new updates
+    const interval = setInterval(loadAnnouncements, 30 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [user?.id])
 
   async function loadAnnouncements() {
