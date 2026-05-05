@@ -536,7 +536,7 @@ export default function Header() {
             </div>
           )}
           <div className="school-branding-text" style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <span style={{ fontSize: 15, fontWeight: 800, color: '#111827', whiteSpace: 'nowrap', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em' }}>
+            <span style={{ fontSize: 15, fontWeight: 800, color: '#111827', whiteSpace: 'nowrap', maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em' }}>
               {userSchool?.name || 'World Uni-Learn'}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
