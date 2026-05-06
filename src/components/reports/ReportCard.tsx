@@ -129,11 +129,13 @@ export default function ReportCard({
 
   const student = report?.student
   const classInfo = student?.class
-  const validScores = scores.filter(r => (r.total_score ?? 0) > 0 || r.class_score != null)
-  const totalMarks = scores.reduce((s, r) => s + (r.total_score ?? 0), 0)
+  // Only count subjects where scores were actually entered (matches reports.service.ts)
+  const validScores = scores.filter(r => (r.total_score ?? 0) > 0)
+  const totalMarks = validScores.reduce((s, r) => s + (r.total_score ?? 0), 0)
+  const maxPossibleMarks = validScores.length * 100
   // Compute avg from live scores — fall back to report?.average_score if scores not yet loaded
   const avg = validScores.length > 0
-    ? parseFloat((validScores.reduce((s, r) => s + (r.total_score ?? 0), 0) / validScores.length).toFixed(2))
+    ? parseFloat((totalMarks / validScores.length).toFixed(2))
     : (report?.average_score ?? 0)
   const overallGrade = getGradeInfo(avg, scale)
 
@@ -327,18 +329,23 @@ export default function ReportCard({
                     <tr key={s.id}>
                       <td style={{ fontWeight: 700 }}>{s.subject?.name}</td>
                       {(categories && categories.length > 0 ? categories : [
-                        { id: 'cs', name: 'Class Score' },
-                        { id: 'es', name: 'Exam Score' }
+                        { id: 'cs', name: 'Class Score', max_score: 30 },
+                        { id: 'es', name: 'Exam Score', max_score: 70 }
                       ]).map((c: any) => {
-                        let val = '—'
+                        let val: any = '—'
+                        let fromFlexible = false
                         if (s.category_scores && s.category_scores[c.id] !== undefined && s.category_scores[c.id] !== '') {
                           val = s.category_scores[c.id]
+                          fromFlexible = true
                         } else {
                           if (c.id === 'cs') val = s.class_score ?? '—'
                           if (c.id === 'es') val = s.exam_score ?? '—'
                         }
+                        const display = (val !== '—' && fromFlexible && c.max_score)
+                          ? `${val}/${c.max_score}`
+                          : val
                         return (
-                          <td key={c.id} style={{ textAlign: 'center' }}>{val}</td>
+                          <td key={c.id} style={{ textAlign: 'center' }}>{display}</td>
                         )
                       })}
                       <td style={{ textAlign: 'center', fontWeight: 800, color: (isBW) ? '#000' : ((s.total_score ?? 0) >= 50 ? '#15803d' : '#dc2626') }}>
@@ -359,7 +366,7 @@ export default function ReportCard({
           {/* ── SUMMARY TILES ── */}
           <div className="rc-section-gap" style={{ display: 'grid', gridTemplateColumns: `repeat(${showOverallPosition ? 4 : 3}, 1fr)`, gap: 8, marginBottom: 8 }}>
             {[
-              { label: 'Total Marks', value: totalMarks.toFixed(1) },
+              { label: 'Total Marks', value: maxPossibleMarks > 0 ? `${totalMarks.toFixed(1)} / ${maxPossibleMarks}` : totalMarks.toFixed(1) },
               { label: 'Average Score', value: `${avg.toFixed(1)}%` },
               ...(showOverallPosition ? [{ label: 'Overall Position', value: report?.overall_position ? `${ordinal(report.overall_position)} / ${report.total_students}` : '—' }] : []),
               { label: 'Overall Grade', value: `${overallGrade.grade} — ${overallGrade.label}` },

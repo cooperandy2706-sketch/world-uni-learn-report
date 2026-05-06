@@ -64,8 +64,8 @@ export default function SplashScreen() {
           }
         }
 
-        /* PWA Standalone Mode: Maximum Minimalism */
-        @media (display-mode: standalone) {
+        /* PWA Mode: Maximum Minimalism */
+        @media (display-mode: standalone), (display-mode: fullscreen) {
           .sp-container {
             background: #ffffff !important;
           }

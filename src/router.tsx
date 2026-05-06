@@ -83,6 +83,7 @@ export const router = createBrowserRouter([
            { path: 'batch-promotion', element: lazyPage(() => import('./pages/admin/BatchPromotionPage')) },
           { path: 'fees', element: lazyPage(() => import('./pages/bursar/FeesPage')) },
           { path: 'news', element: lazyPage(() => import('./pages/shared/NewsPortalPage')) },
+          { path: 'account', element: lazyPage(() => import('./pages/shared/ManageAccountPage')) },
         ],
       },
       {

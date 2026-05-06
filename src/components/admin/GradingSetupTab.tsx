@@ -110,6 +110,14 @@ export default function GradingSetupTab() {
   const applyTemplate = async (departmentId: string, templateKey: keyof typeof GRADING_TEMPLATES) => {
     if (!user?.school_id) return
     const tpl = GRADING_TEMPLATES[templateKey]
+
+    // Validate that category weights sum to 100%
+    const totalWeight = tpl.categories.reduce((sum, c) => sum + c.weight_percentage, 0)
+    if (totalWeight !== 100) {
+      toast.error(`Template weights sum to ${totalWeight}%, not 100%. Contact support.`)
+      return
+    }
+
     if (!window.confirm(`Apply ${tpl.name} to this department? This will override its current grading setup.`)) return
 
     setApplying(departmentId)

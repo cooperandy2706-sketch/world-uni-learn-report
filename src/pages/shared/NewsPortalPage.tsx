@@ -68,31 +68,7 @@ interface Channel {
 // ═══════════════════════════════════════════════════════════════
 
 const CATEGORIES: Category[] = [
-  {
-    id: 'top',
-    label: 'Top Stories',
-    icon: Newspaper,
-    feeds: [
-      'https://feeds.bbci.co.uk/news/rss.xml',
-      'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
-      'https://www.aljazeera.com/xml/rss/all.xml',
-    ],
-    sourceName: 'BBC News',
-  },
-  {
-    id: 'ghana',
-    label: 'Ghana',
-    icon: Globe,
-    feeds: [
-      'https://www.ghanaweb.com/GhanaHomePage/NewsArchive/rss.xml',
-      'https://www.modernghana.com/rss/news.xml',
-      'https://citinewsroom.com/feed/',
-      'https://www.myjoyonline.com/feed/',
-      'https://pulse.com.gh/rss/news',
-      'https://www.graphic.com.gh/feed/',
-    ],
-    sourceName: 'GhanaWeb',
-  },
+  // ── GES / Education FIRST (Ghana Education Service priority) ──
   {
     id: 'ges',
     label: 'GES / Education',
@@ -107,6 +83,22 @@ const CATEGORIES: Category[] = [
     ],
     sourceName: 'Ghana Education',
   },
+  // ── Ghana National News SECOND ──
+  {
+    id: 'ghana',
+    label: 'Ghana',
+    icon: Globe,
+    feeds: [
+      'https://www.ghanaweb.com/GhanaHomePage/NewsArchive/rss.xml',
+      'https://www.modernghana.com/rss/news.xml',
+      'https://citinewsroom.com/feed/',
+      'https://www.myjoyonline.com/feed/',
+      'https://pulse.com.gh/rss/news',
+      'https://www.graphic.com.gh/feed/',
+    ],
+    sourceName: 'GhanaWeb',
+  },
+  // ── Global THIRD ──
   {
     id: 'global',
     label: 'Global',
@@ -120,6 +112,18 @@ const CATEGORIES: Category[] = [
       'https://feeds.skynews.com/feeds/rss/world.xml',
     ],
     sourceName: 'Al Jazeera',
+  },
+  // ── Then the rest ──
+  {
+    id: 'top',
+    label: 'Top Stories',
+    icon: Newspaper,
+    feeds: [
+      'https://feeds.bbci.co.uk/news/rss.xml',
+      'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
+      'https://www.aljazeera.com/xml/rss/all.xml',
+    ],
+    sourceName: 'BBC News',
   },
   {
     id: 'tech',
@@ -177,30 +181,32 @@ const CATEGORIES: Category[] = [
 //  CHANNELS — verified free-embed YouTube 24/7 live streams
 //
 //  HOW TO REFRESH A `vid`:
-//    1. Open youtube.com/@{handle}/live
-//    2. Copy the ?v= param from the URL bar
-//
-//  CONFIRMED FREELY EMBEDDABLE (iframe, no geo-lock):
-//    Al Jazeera, DW, France 24, WION, TRT World, CGTN,
-//    Euronews, Sky News Australia, NHK World, Reuters, AP, i24 News
+//    If using a channel ID (starts with UC), it will automatically play their live stream.
+//    If a channel ID doesn't work, you can use a direct video ID (starts with a random string).
 //
 //  EXCLUDED (embed disabled / geo-restricted / paywalled):
 //    BBC News Live, CNN International, NBC News, Bloomberg TV
 // ═══════════════════════════════════════════════════════════════
 
 const CHANNELS: Channel[] = [
-  { id: 'alj', name: 'Al Jazeera English', short: 'AJE', bgColor: '#9e6d14', vid: 'h3MuIUNCCzI' },
-  { id: 'dw', name: 'DW News', short: 'DW', bgColor: '#a02820', vid: 'BGET3MkmLCg' },
-  { id: 'f24', name: 'France 24 English', short: 'F24', bgColor: '#003d80', vid: 'l8PMl7tUDIE' },
-  { id: 'wion', name: 'WION', short: 'WION', bgColor: '#141438', vid: 'tdNwbBd4dI0' },
-  { id: 'trt', name: 'TRT World', short: 'TRT', bgColor: '#8c2218', vid: 'S6sFSEMn02Q' },
-  { id: 'cgtn', name: 'CGTN', short: 'CGTN', bgColor: '#125030', vid: 'mMYDobFVEYU' },
-  { id: 'euro', name: 'Euronews', short: 'EURO', bgColor: '#002b80', vid: 'uKWB4Fpgbnc' },
-  { id: 'sky', name: 'Sky News Australia', short: 'SKY', bgColor: '#003399', vid: '_1pKKEU7M6Q' },
-  { id: 'nhk', name: 'NHK World Japan', short: 'NHK', bgColor: '#1a5276', vid: '4ToUAkEF_d4' },
-  { id: 'reuters', name: 'Reuters TV', short: 'REU', bgColor: '#b34700', vid: 'DFsHQSFmpao' },
-  { id: 'ap', name: 'AP News', short: 'AP', bgColor: '#222222', vid: 'dCXazbNhlFg' },
-  { id: 'i24', name: 'i24 News English', short: 'i24', bgColor: '#004f77', vid: 'uGJiyQI1eMU' },
+  // ── 🇬🇭 Ghana Channels (first) ──
+  { id: 'gtv',     name: 'GTV Ghana',          short: 'GTV',  bgColor: '#006b3c', vid: 'UCv9H3dC62m0oT8J5R9oG_5A' },
+  { id: 'joy',     name: 'JoyNews Ghana',       short: 'JOY',  bgColor: '#c0392b', vid: 'UChd1DEecCRlxaa0-hvPACCw' },
+  // ── 🌍 Africa / International ──
+  { id: 'alj',     name: 'Al Jazeera English',  short: 'AJE',  bgColor: '#9e6d14', vid: 'UCNye-wNBqNL5ZzHSJj3l8Bg' },
+  { id: 'dw',      name: 'DW News',             short: 'DW',   bgColor: '#a02820', vid: 'UCknLrEdhRCp3d-Vp4_H5sIQ' },
+  { id: 'f24',     name: 'France 24 English',   short: 'F24',  bgColor: '#003d80', vid: 'UCCCPCcN9EjyEiS3g4M63tDA' },
+  { id: 'wion',    name: 'WION',                short: 'WION', bgColor: '#141438', vid: 'UC_gUM8rL-Lrg6O3adPW9K1g' },
+  { id: 'trt',     name: 'TRT World',           short: 'TRT',  bgColor: '#8c2218', vid: 'UC7fWeaHhqgM4Ry-RMpM2YYw' },
+  { id: 'cgtn',    name: 'CGTN',                short: 'CGTN', bgColor: '#125030', vid: 'UCp1Fp-sV9tYJ7yX4u_m23zQ' },
+  { id: 'euro',    name: 'Euronews',            short: 'EURO', bgColor: '#002b80', vid: 'UCSrZ3UV4jOidv8ppoVuvW9Q' },
+  { id: 'sky',     name: 'Sky News Australia',  short: 'SKY',  bgColor: '#003399', vid: 'UC384K0xP82J1W0S6O7gL8Lw' },
+  { id: 'nhk',     name: 'NHK World Japan',     short: 'NHK',  bgColor: '#1a5276', vid: 'UC1b-b46h175dDk9e3_A9_4Q' },
+  { id: 'arirang', name: 'Arirang TV',           short: 'ARG',  bgColor: '#1a3a8a', vid: 'UC1H9-mN_5qfQ5cQ4yq8k9nQ' },
+  { id: 'cna',     name: 'CNA International',   short: 'CNA',  bgColor: '#c00000', vid: 'UC9Kq9DMTD7aV_K6G3u6H9Yw' },
+  { id: 'reuters', name: 'Reuters TV',           short: 'REU',  bgColor: '#b34700', vid: 'UChTnXJhiPjYJ6Y5l92qO_0A' },
+  { id: 'ap',      name: 'AP News',              short: 'AP',   bgColor: '#222222', vid: 'UC52X5xPrR_QZtPZzF211_0g' },
+  { id: 'i24',     name: 'i24 News English',     short: 'i24',  bgColor: '#004f77', vid: 'UC1c6p3Vn39TjP9zX04xN9Jg' },
 ]
 
 // ═══════════════════════════════════════════════════════════════
@@ -375,7 +381,11 @@ function BreakingTicker({ headlines }: { headlines: string[] }) {
 function LivePlayer({ channel, theaterMode, onEnterTheater, onExitTheater }: {
   channel: Channel; theaterMode: boolean; onEnterTheater: () => void; onExitTheater: () => void
 }) {
-  const src = `https://www.youtube.com/embed/${channel.vid}?autoplay=1&mute=${theaterMode ? 0 : 1}&rel=0&modestbranding=1&playsinline=1`
+  const isChannel = channel.vid.startsWith('UC')
+  const src = isChannel
+    ? `https://www.youtube.com/embed/live_stream?channel=${channel.vid}&autoplay=1&mute=${theaterMode ? 0 : 1}&rel=0&modestbranding=1&playsinline=1`
+    : `https://www.youtube.com/embed/${channel.vid}?autoplay=1&mute=${theaterMode ? 0 : 1}&rel=0&modestbranding=1&playsinline=1`
+
   return (
     <div style={{ background: '#1e1e5c', borderRadius: theaterMode ? 12 : 20, overflow: 'hidden', boxShadow: '0 16px 48px rgba(16,16,58,0.3)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
@@ -414,7 +424,7 @@ function ChannelGrid({ channels, activeChannel, onSelect }: {
   channels: Channel[]; activeChannel: Channel; onSelect: (ch: Channel) => void
 }) {
   return (
-    <div style={{ background: '#1e1e5c', borderRadius: 16, padding: 10, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 6 }}>
+    <div style={{ background: '#1e1e5c', borderRadius: 16, padding: 10, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 5 }}>
       {channels.map(ch => (
         <button
           key={ch.id} onClick={() => onSelect(ch)} title={ch.name}
@@ -451,7 +461,7 @@ function LiveClock() {
 // ═══════════════════════════════════════════════════════════════
 
 export default function NewsPortalPage() {
-  const [activeTab, setActiveTab] = useState('top')
+  const [activeTab, setActiveTab] = useState('ges') // GES / Education is default first tab
   const [news, setNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -658,9 +668,9 @@ export default function NewsPortalPage() {
                 <div style={{ fontSize: 20, marginBottom: 10, opacity: 0.6 }}>📡</div>
                 <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 14, fontWeight: 700, marginBottom: 7 }}>Live Briefing</div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.75 }}>
-                  RSS from BBC, GhanaWeb, Citi FM, Joy FM, Al Jazeera, Reuters &amp; more.
-                  GES &amp; education news included. 12 freely embeddable live channels.
-                  Auto-refreshes every 30 min.
+                  RSS from GhanaWeb, Citi FM, Joy FM, Graphic, BBC, Al Jazeera &amp; more.
+                  GES &amp; Education news leads. 16 freely embeddable live channels including
+                  GTV Ghana, JoyNews, Arirang TV &amp; CNA. Auto-refreshes every 30 min.
                 </div>
                 <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '13px 0' }} />
                 {[
@@ -668,7 +678,7 @@ export default function NewsPortalPage() {
                   ['Last sync', lastUpdated ? new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' }).format(lastUpdated) : '—'],
                   ['Stories', String(news.length)],
                   ['Categories', String(CATEGORIES.length)],
-                  ['Live channels', `${CHANNELS.length} (free embed)`],
+                  ['Live channels', `${CHANNELS.length} (free · YouTube)`],
                 ].map(([label, val]) => (
                   <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>
                     <span>{label}</span>

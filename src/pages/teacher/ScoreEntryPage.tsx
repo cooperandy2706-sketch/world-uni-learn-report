@@ -71,6 +71,7 @@ export default function ScoreEntryPage() {
 
   const [gradingCategories, setGradingCategories] = useState<GradingCategory[]>([])
   const [gradingScaleLevels, setGradingScaleLevels] = useState<GradingScaleLevel[]>([])
+  const [syncTargetCatId, setSyncTargetCatId] = useState('')  // which category to sync tests/assignments into
 
   const isLocked = (term as any)?.is_locked
   const classOptions = [...new Map(assignments.map((a:any) => [a.class?.id, a.class])).values()].filter(Boolean)
@@ -293,6 +294,15 @@ export default function ScoreEntryPage() {
           const hasData = gradingCategories.some(c => sc.scores[c.id] !== '')
           if (!hasData) return
 
+          // Backward compat: normalize cat[0] → class_score (0-100), cat[1] → exam_score (0-100)
+          const _c0 = gradingCategories[0]
+          const _c1 = gradingCategories[1]
+          const _legacyCS = _c0
+            ? parseFloat(((parseFloat(sc.scores[_c0.id] || '0') / _c0.max_score) * 100).toFixed(2))
+            : null
+          const _legacyES = _c1
+            ? parseFloat(((parseFloat(sc.scores[_c1.id] || '0') / _c1.max_score) * 100).toFixed(2))
+            : null
           upserts.push({
             student_id: s.id,
             subject_id: sub.id,
@@ -301,6 +311,8 @@ export default function ScoreEntryPage() {
             academic_year_id: year!.id,
             teacher_id: teacherRecord.id,
             category_scores: sc.scores,
+            class_score: _legacyCS,
+            exam_score: _legacyES,
             total_score: getTotal(s.id, sub.id),
             teacher_remarks: sc.remarks || null,
             is_submitted: sc.submitted ?? false,
@@ -344,8 +356,10 @@ export default function ScoreEntryPage() {
       return
     }
     
-    // Find the target category (usually "Class Score" or the first non-exam category)
-    const targetCat = gradingCategories.find(c => c.name.toLowerCase().includes('class') || c.id === 'cs') || gradingCategories[0]
+    // Use selected target category, fall back to first class-score-like category
+    const targetCat = (syncTargetCatId ? gradingCategories.find(c => c.id === syncTargetCatId) : null)
+      ?? gradingCategories.find(c => c.name.toLowerCase().includes('class') || c.id === 'cs')
+      ?? gradingCategories[0]
     if (!targetCat) {
       toast.error('No grading categories found to sync into')
       return
@@ -427,7 +441,9 @@ export default function ScoreEntryPage() {
       return
     }
     
-    const targetCat = gradingCategories.find(c => c.name.toLowerCase().includes('class') || c.id === 'cs') || gradingCategories[0]
+    const targetCat = (syncTargetCatId ? gradingCategories.find(c => c.id === syncTargetCatId) : null)
+      ?? gradingCategories.find(c => c.name.toLowerCase().includes('class') || c.id === 'cs')
+      ?? gradingCategories[0]
     if (!targetCat) {
       toast.error('No grading categories found')
       return
@@ -528,6 +544,18 @@ export default function ScoreEntryPage() {
           <div style={{ display:'flex', gap:8 }}>
             {selectedSubjectId !== 'all' && (
               <>
+                {/* Sync target category picker */}
+                <div style={{ display:'flex', flexDirection:'column', gap:3 }}>
+                  <label style={{ fontSize:9, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.06em' }}>Sync into</label>
+                  <select
+                    value={syncTargetCatId}
+                    onChange={e => setSyncTargetCatId(e.target.value)}
+                    style={{ padding:'5px 8px', borderRadius:7, border:'1.5px solid #ddd6fe', fontSize:11, fontWeight:600, color:'#4b5563', background:'#faf5ff', outline:'none', cursor:'pointer' }}
+                  >
+                    <option value="">Auto-detect</option>
+                    {gradingCategories.map(c => <option key={c.id} value={c.id}>{c.name} (max {c.max_score})</option>)}
+                  </select>
+                </div>
                 <button onClick={handleSyncClassTests} disabled={syncingTests} style={{ padding:'10px 16px', borderRadius:9, background:'#fdf2f2', color:'#dc2626', border:'1.5px solid #fecaca', cursor:'pointer', fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
                   {syncingTests ? '⌛' : '📝 Sync Tests'}
                 </button>

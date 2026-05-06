@@ -64,9 +64,11 @@ export const reportsService = {
     // Calculate report for each student
     const reports = students.map((student) => {
       const studentScores = scores?.filter((s) => s.student_id === student.id) ?? []
-      const totalMarks = studentScores.reduce((sum, s) => sum + (s.total_score ?? 0), 0)
-      const averageScore = studentScores.length
-        ? Number((totalMarks / studentScores.length).toFixed(2))
+      // Only average subjects where a score was actually entered (exclude zero/missing)
+      const scoredSubjects = studentScores.filter((s) => (s.total_score ?? 0) > 0)
+      const totalMarks = scoredSubjects.reduce((sum, s) => sum + (s.total_score ?? 0), 0)
+      const averageScore = scoredSubjects.length
+        ? Number((totalMarks / scoredSubjects.length).toFixed(2))
         : 0
 
       return {

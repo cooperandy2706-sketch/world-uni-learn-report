@@ -191,13 +191,10 @@ function addCanvasToPDF(canvas: HTMLCanvasElement, pdf: any) {
 
 async function downloadBulkPDF(reports: any[], className: string) {
   if (!reports?.length) { toast.error('No reports found'); return }
-  const toastId = toast.loading(`Preparing bulk PDF export for ${className}…`)
+  const toastId = toast.loading(`Preparing ${reports.length} report cards for ${className}…`)
   
   const container = document.getElementById('bulk-report-print-area')
   if (!container) { toast.error('Print area not found', { id: toastId }); return }
-
-  // Note: We NO LONGER modify the container visibility/position here
-  // because captureElement handles cloning and isolation.
 
   try {
     const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
@@ -209,14 +206,17 @@ async function downloadBulkPDF(reports: any[], className: string) {
     const studentDivs = Array.from(container.children) as HTMLElement[]
     
     for (let i = 0; i < studentDivs.length; i++) {
-      toast.loading(`Capturing report ${i + 1} of ${studentDivs.length}…`, { id: toastId })
+      // Live progress feedback
+      toast.loading(`Capturing ${i + 1} of ${studentDivs.length}: ${reports[i]?.student?.full_name ?? ''}…`, { id: toastId })
       const canvas = await captureElement(studentDivs[i], html2canvas)
       if (i > 0) pdf.addPage()
       addCanvasToPDF(canvas, pdf)
+      // Small pause to let GC breathe between captures (prevents OOM on 30+ student classes)
+      if (i < studentDivs.length - 1) await new Promise(r => setTimeout(r, 80))
     }
 
     pdf.save(`Bulk_Reports_${className.replace(/\s+/g, '_')}.pdf`)
-    toast.success('Bulk PDF downloaded!', { id: toastId })
+    toast.success(`✅ ${studentDivs.length} report cards exported!`, { id: toastId })
   } catch (e: any) {
     console.error('Bulk PDF failed:', e)
     toast.error('Bulk PDF failed: ' + (e.message || 'Unknown error'), { id: toastId })

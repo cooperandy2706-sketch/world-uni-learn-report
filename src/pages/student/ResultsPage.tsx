@@ -100,7 +100,11 @@ export default function StudentResultsPage() {
     }
   }
 
-  const avg = reportCard?.average_score ?? (scores.length ? scores.reduce((s, x) => s + (x.total_score ?? 0), 0) / scores.length : null)
+  // Only average subjects where a score was actually entered (matches reports.service.ts fix)
+  const scoredSubjectsForAvg = scores.filter((x: any) => (x.total_score ?? 0) > 0)
+  const avg = reportCard?.average_score ?? (scoredSubjectsForAvg.length
+    ? scoredSubjectsForAvg.reduce((s: number, x: any) => s + (x.total_score ?? 0), 0) / scoredSubjectsForAvg.length
+    : null)
   const gradeInfo = avg != null ? getGradeInfo(avg) : null
   const selectedTerm = allTerms.find((t: any) => t.id === selectedTermId)
 

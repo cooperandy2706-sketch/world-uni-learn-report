@@ -491,7 +491,21 @@ export default function TeacherReportsPage() {
                   <table className="resp-table-min" style={{ borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)' }}>
-                        {['Subject', 'Class Score', 'Exam Score', 'Total', 'Grade', 'Position', 'Remark'].map(h => (
+                        {/* Subject column always first */}
+                        <th style={{ padding: '9px 13px', textAlign: 'left', fontSize: 10.5, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.05em', borderBottom: '1.5px solid #ede9fe' }}>Subject</th>
+                        {/* Dynamic category score headers */}
+                        {(gradingCategories.length > 0
+                          ? gradingCategories
+                          : [
+                              { id: 'cs', name: 'Class Score', max_score: 30 },
+                              { id: 'es', name: 'Exam Score', max_score: 70 },
+                            ]
+                        ).map((cat: any) => (
+                          <th key={cat.id} style={{ padding: '9px 13px', textAlign: 'center', fontSize: 10.5, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.05em', borderBottom: '1.5px solid #ede9fe' }}>
+                            {cat.name} <span style={{ fontSize: 9, opacity: 0.7 }}>(/{cat.max_score})</span>
+                          </th>
+                        ))}
+                        {['Total', 'Grade', 'Position', 'Remark'].map(h => (
                           <th key={h} style={{ padding: '9px 13px', textAlign: 'left', fontSize: 10.5, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.05em', borderBottom: '1.5px solid #ede9fe' }}>{h}</th>
                         ))}
                       </tr>
@@ -502,8 +516,23 @@ export default function TeacherReportsPage() {
                         return (
                           <tr key={sc.id} className="rp-row" style={{ borderBottom: i < scores.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background .12s' }}>
                             <td style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: '#111827' }}>{sc.subject?.name}</td>
-                            <td style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: '#6d28d9', textAlign: 'center' }}>{sc.class_score ?? '—'}</td>
-                            <td style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: '#0891b2', textAlign: 'center' }}>{sc.exam_score ?? '—'}</td>
+                            {/* Dynamic category score columns */}
+                            {(gradingCategories.length > 0
+                              ? gradingCategories
+                              : [{ id: 'cs', name: 'Class Score', max_score: 30 }, { id: 'es', name: 'Exam Score', max_score: 70 }]
+                            ).map((cat: any) => {
+                              let val = '—'
+                              if (sc.category_scores?.[cat.id] !== undefined && sc.category_scores[cat.id] !== '') {
+                                val = `${sc.category_scores[cat.id]}/${cat.max_score}`
+                              } else if (cat.id === 'cs' && sc.class_score != null) {
+                                val = sc.class_score.toFixed(1)
+                              } else if (cat.id === 'es' && sc.exam_score != null) {
+                                val = sc.exam_score.toFixed(1)
+                              }
+                              return (
+                                <td key={cat.id} style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: '#6d28d9', textAlign: 'center' }}>{val}</td>
+                              )
+                            })}
                             <td style={{ padding: '9px 13px', textAlign: 'center' }}>
                               <span style={{ fontSize: 14, fontWeight: 800, color: (sc.total_score ?? 0) >= 50 ? '#16a34a' : '#dc2626' }}>{sc.total_score?.toFixed(1) ?? '—'}</span>
                             </td>
