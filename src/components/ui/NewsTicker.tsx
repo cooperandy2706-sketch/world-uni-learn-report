@@ -51,11 +51,9 @@ export const NewsTicker: React.FC = () => {
 
   async function fetchNews() {
     try {
-      const timestamp = new Date().getTime()
-      // 1. Fetch GES News (Ghana) - add timestamp for cache busting
-      const gesRss = encodeURIComponent(`https://news.google.com/rss/search?q=Ghana+Education+Service+news&hl=en-GH&gl=GH&ceid=GH:en&t=${timestamp}`)
-      // 2. Fetch Global News (World)
-      const globalRss = encodeURIComponent(`https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en&t=${timestamp}`)
+      // Use clean URLs without timestamps so rss2json API doesn't hit its unique feed limit
+      const gesRss = encodeURIComponent(`https://news.google.com/rss/search?q=Ghana+Education+Service+news&hl=en-GH&gl=GH&ceid=GH:en`)
+      const globalRss = encodeURIComponent(`https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en`)
       
       const [gesRes, globalRes] = await Promise.all([
         fetch(`https://api.rss2json.com/v1/api.json?rss_url=${gesRss}`),
@@ -78,7 +76,10 @@ export const NewsTicker: React.FC = () => {
   async function fetchWeather() {
     try {
       const res = await fetch(`https://wttr.in/Accra?format=j1&t=${new Date().getTime()}`)
-      const data = await res.json()
+      const text = await res.text()
+      // wttr.in sometimes rate limits and returns HTML instead of JSON
+      if (text.startsWith('<')) throw new Error('wttr.in rate limit')
+      const data = JSON.parse(text)
       const current = data.current_condition[0]
       setWeather({
         temp: current.temp_C,
@@ -86,6 +87,7 @@ export const NewsTicker: React.FC = () => {
         icon: <Sun size={14} />
       })
     } catch {
+      // Fallback if wttr.in fails or returns HTML error
       setWeather({ temp: '28', condition: 'Sunny', icon: <Sun size={14} /> })
     }
   }

@@ -74,12 +74,8 @@ const CATEGORIES: Category[] = [
     label: 'GES / Education',
     icon: GraduationCap,
     feeds: [
-      'https://citinewsroom.com/category/education/feed/',
-      'https://www.myjoyonline.com/category/education/feed/',
-      'https://www.ghanaweb.com/GhanaHomePage/education/rss.xml',
-      'https://www.modernghana.com/rss/education.xml',
-      'https://www.graphic.com.gh/category/education/feed/',
-      'https://pulse.com.gh/rss/education',
+      'https://news.google.com/rss/search?q=Ghana+Education+Service&hl=en-GH&gl=GH&ceid=GH:en',
+      'https://news.google.com/rss/search?q=Ghana+schools+education&hl=en-GH&gl=GH&ceid=GH:en',
     ],
     sourceName: 'Ghana Education',
   },
@@ -89,14 +85,10 @@ const CATEGORIES: Category[] = [
     label: 'Ghana',
     icon: Globe,
     feeds: [
-      'https://www.ghanaweb.com/GhanaHomePage/NewsArchive/rss.xml',
-      'https://www.modernghana.com/rss/news.xml',
-      'https://citinewsroom.com/feed/',
-      'https://www.myjoyonline.com/feed/',
-      'https://pulse.com.gh/rss/news',
-      'https://www.graphic.com.gh/feed/',
+      'https://news.google.com/rss/search?q=Ghana+news&hl=en-GH&gl=GH&ceid=GH:en',
+      'https://news.google.com/rss/search?q=Accra+news&hl=en-GH&gl=GH&ceid=GH:en',
     ],
-    sourceName: 'GhanaWeb',
+    sourceName: 'Ghana News',
   },
   // ── Global THIRD ──
   {
@@ -214,9 +206,8 @@ const CHANNELS: Channel[] = [
 // ═══════════════════════════════════════════════════════════════
 
 const CORS_PROXIES: Array<(url: string) => string> = [
-  (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
   (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  (url) => `https://cors-anywhere.herokuapp.com/${url}`,
+  (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
 ]
 
 // ═══════════════════════════════════════════════════════════════
@@ -529,6 +520,20 @@ export default function NewsPortalPage() {
           transition:color .18s,background .18s;
         }
         .np-navbtn:hover { color:#fff !important; background:rgba(255,255,255,0.04) !important; }
+        .np-layout {
+          display: grid;
+          gap: 26px;
+          align-items: start;
+          grid-template-columns: minmax(0,1fr) 308px;
+        }
+        .np-layout.theater {
+          grid-template-columns: 1fr;
+        }
+        @media (max-width: 1023px) {
+          .np-layout {
+            grid-template-columns: 1fr !important;
+          }
+        }
       `}</style>
 
       <div style={{ fontFamily: "'Sora','DM Sans',sans-serif", background: '#f8f7f4', minHeight: '100vh', color: '#0f0e17' }}>
@@ -591,12 +596,8 @@ export default function NewsPortalPage() {
         </header>
 
         {/* ── Page body ── */}
-        <div style={{
+        <div className={`np-layout ${theater ? 'theater' : ''}`} style={{
           maxWidth: 1400, margin: '0 auto', padding: '26px 20px 80px',
-          display: 'grid',
-          // Theater → full width. Normal → fluid main + fixed 308px sidebar.
-          gridTemplateColumns: theater ? '1fr' : 'minmax(0,1fr) 308px',
-          gap: 26, alignItems: 'start',
         }}>
 
           {/* ── Main column ── */}
