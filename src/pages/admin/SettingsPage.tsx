@@ -120,7 +120,10 @@ export default function SettingsPage() {
   const [watermarkUploading, setWatermarkUploading] = useState(false)
   const [watermarkUrl, setWatermarkUrl] = useState<string | null>(null)
   const [logoHov, setLogoHov] = useState(false)
-  const [activeTab, setActiveTab] = useState<'school' | 'report' | 'sms' | 'grading' | 'account'>('school')
+  const [activeTab, setActiveTab] = useState<'school' | 'report' | 'sms' | 'grading' | 'security' | 'account'>('school')
+  const [lateTime, setLateTime] = useState('08:00')
+  const [cooldownSecs, setCooldownSecs] = useState(30)
+  const [savingSecuritySettings, setSavingSecuritySettings] = useState(false)
   const logoRef = useRef<HTMLInputElement>(null)
   const watermarkRef = useRef<HTMLInputElement>(null)
 
@@ -146,6 +149,11 @@ export default function SettingsPage() {
       })
       setLogoUrl(school?.logo_url ?? null)
       setWatermarkUrl(settings.report_watermark_url ?? null)
+      // Load security settings
+      const secCfg = (settings as any).late_arrival_time
+      if (secCfg) setLateTime(secCfg.slice(0, 5))
+      const cooldown = (settings as any).scan_cooldown_seconds
+      if (cooldown) setCooldownSecs(cooldown)
     }
   }, [settings, reset])
 
@@ -312,6 +320,7 @@ export default function SettingsPage() {
             { id: 'report', label: '📄 Report Card' },
             { id: 'grading', label: '📊 Grading Setup' },
             { id: 'sms', label: '📱 SMS Integration' },
+            { id: 'security', label: '🛡️ Security' },
             { id: 'account', label: '👤 Account' },
           ] as const).map(tab => (
             <button key={tab.id} className="tab-btn" onClick={() => setActiveTab(tab.id)}
@@ -526,6 +535,89 @@ export default function SettingsPage() {
               <GradingSetupTab />
             )}
 
+            {/* ── SECURITY SETTINGS TAB ── */}
+            {activeTab === 'security' && (
+              <>
+                <FieldGroup title="Gate Scanner Rules" icon="🛡️">
+                  <p style={{ fontSize: 12, color: '#9ca3af', marginBottom: 20 }}>Configure how the gate attendance scanner marks students and staff as late or handles duplicate scans.</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+
+                    {/* Late Arrival Time */}
+                    <div style={{ background: '#fafafa', borderRadius: 14, border: '1.5px solid #f1f5f9', padding: '20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                        <div style={{ width: 36, height: 36, borderRadius: 10, background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>⏰</div>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>Late Arrival Cutoff Time</div>
+                          <div style={{ fontSize: 12, color: '#64748b' }}>Scans after this time will be marked as LATE</div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <input type="time" value={lateTime} onChange={e => setLateTime(e.target.value)}
+                          style={{ padding: '12px 16px', borderRadius: 12, border: '2px solid #e2e8f0', fontSize: 22, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#0f172a', outline: 'none', fontFamily: '"DM Sans",sans-serif', flex: 1 }} />
+                        <div style={{ fontSize: 13, color: '#64748b', flex: 1 }}>
+                          Currently set to <strong style={{ color: '#0f172a' }}>{lateTime}</strong>.<br />
+                          Arrivals after this are marked <span style={{ color: '#d97706', fontWeight: 700 }}>LATE</span>.
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Duplicate Scan Cooldown */}
+                    <div style={{ background: '#fafafa', borderRadius: 14, border: '1.5px solid #f1f5f9', padding: '20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                        <div style={{ width: 36, height: 36, borderRadius: 10, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🔁</div>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>Duplicate Scan Guard</div>
+                          <div style={{ fontSize: 12, color: '#64748b' }}>Block re-scans of the same ID within this window</div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <div style={{ flex: 1 }}>
+                          <input type="range" min={10} max={120} step={5} value={cooldownSecs} onChange={e => setCooldownSecs(Number(e.target.value))}
+                            style={{ width: '100%', accentColor: '#334155' }} />
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94a3b8', marginTop: 4 }}>
+                            <span>10s</span><span>60s</span><span>120s</span>
+                          </div>
+                        </div>
+                        <div style={{ width: 70, height: 60, borderRadius: 14, background: '#0f172a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <span style={{ fontSize: 24, fontWeight: 900, color: '#fff', lineHeight: 1 }}>{cooldownSecs}</span>
+                          <span style={{ fontSize: 10, color: '#94a3b8' }}>seconds</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Preview */}
+                    <div style={{ background: 'linear-gradient(135deg,#0f172a,#1e293b)', borderRadius: 14, padding: '16px 20px', display: 'flex', gap: 16, alignItems: 'center' }}>
+                      <div style={{ fontSize: 30 }}>🛡️</div>
+                      <div style={{ color: '#fff' }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>Current Scanner Rules</div>
+                        <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>
+                          ✅ Scans before <strong style={{ color: '#fff' }}>{lateTime}</strong> → ON TIME<br />
+                          ⏰ Scans after <strong style={{ color: '#fbbf24' }}>{lateTime}</strong> → LATE<br />
+                          🔁 Same ID blocked for <strong style={{ color: '#60a5fa' }}>{cooldownSecs} seconds</strong> after each scan
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </FieldGroup>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                  <Btn variant="secondary" onClick={() => { setLateTime('08:00'); setCooldownSecs(30) }}>↩ Reset to Defaults</Btn>
+                  <Btn loading={savingSecuritySettings} onClick={async () => {
+                    setSavingSecuritySettings(true)
+                    try {
+                      await settingsService.upsert(user!.school_id, {
+                        late_arrival_time: `${lateTime}:00`,
+                        scan_cooldown_seconds: cooldownSecs,
+                      } as any)
+                      await qc.invalidateQueries({ queryKey: ['settings', user!.school_id] })
+                      toast.success('Security settings saved')
+                    } catch { toast.error('Failed to save') }
+                    setSavingSecuritySettings(false)
+                  }}>💾 Save Security Settings</Btn>
+                </div>
+              </>
+            )}
+
             {/* ── ACCOUNT TAB ── */}
             {activeTab === 'account' && (
               <FieldGroup title="Admin Account" icon="👤">
@@ -550,7 +642,7 @@ export default function SettingsPage() {
             )}
 
             {/* Save button */}
-            {(activeTab !== 'account' && activeTab !== 'grading') && (
+            {(activeTab !== 'account' && activeTab !== 'grading' && activeTab !== 'security') && (
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                 <Btn variant="secondary" type="button" onClick={() => reset()}>↩ Reset</Btn>
                 <Btn type="submit" loading={isSubmitting} disabled={!isDirty && !isSubmitting}>

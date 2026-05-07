@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Users, FileSpreadsheet, ClipboardCheck, 
   Megaphone, PencilLine, Calendar, Timer, BookOpen, 
   ShieldCheck, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School,
-  CreditCard, Wallet, Gamepad2, Library, Bell, Tv
+  CreditCard, Wallet, Gamepad2, Library, Bell, Tv, ScanLine, AlertTriangle
 } from 'lucide-react'
 import NotificationsModal from '../ui/NotificationsModal'
 
@@ -82,12 +82,20 @@ const parentLinks = [
   { to: '/parent/academics', icon: FileSpreadsheet, label: 'Results' },
   { to: '/parent/billing', icon: Wallet, label: 'Billing' },
   { to: '/parent/messages', icon: MessageSquare, label: 'Messages', notify: true },
-   { to: '/parent/calendar', icon: Calendar, label: 'Calendar' },
+  { to: '/parent/calendar', icon: Calendar, label: 'Calendar' },
   { to: '/parent/news', icon: Tv, label: 'News' },
 ]
 
+const securityLinks = [
+  { to: '/security/dashboard', icon: ShieldCheck, label: 'Home' },
+  { to: '/security/scanner', icon: ScanLine, label: 'Scanner' },
+  { to: '/security/gate-attendance', icon: ClipboardCheck, label: 'Log' },
+  { to: '/security/visitors', icon: Users, label: 'Visitors' },
+  { to: '/security/incidents', icon: AlertTriangle, label: 'Incidents' },
+]
+
 export default function BottomNav() {
-  const { user, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
+  const { user, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher, isSecurity } = useAuth()
   const location = useLocation()
   const [unread, setUnread] = useState(0)
   const [visible, setVisible] = useState(false)
@@ -105,7 +113,7 @@ export default function BottomNav() {
   })
 
   const isParent = user?.role === 'parent'
-  let links = isSuperAdmin ? superAdminLinks : isParent ? parentLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : teacherLinks
+  let links = isSuperAdmin ? superAdminLinks : isSecurity ? securityLinks : isParent ? parentLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : teacherLinks
 
   // Hide daily collections from unauthorized teachers
   if (isTeacher && !loadingAuth && !collectorAuth) {

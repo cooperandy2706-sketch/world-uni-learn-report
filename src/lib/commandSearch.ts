@@ -50,7 +50,9 @@ export const GLOBAL_INTENTS: IntentRule[] = [
   { keywords: ['message', 'inbox', 'chat', 'conversation', 'messages', 'direct message', 'mail', 'internal mail', 'inbox', 'who messaged me', 'unread messages'], label: 'Internal Messages', subtitle: 'Operations → Messages', icon: '💬', path: '/admin/messages', color: '#6d28d9', roles: ['admin', 'teacher'] },
   { keywords: ['task', 'tasks', 'to-do', 'todo', 'checklist', 'admin tasks', 'todo list', 'assign task', 'jobs', 'my tasks', 'what should i do', 'work list'], label: 'Admin Tasks', subtitle: 'Operations → Tasks', icon: '✓', path: '/admin/tasks', color: '#0891b2', roles: ['admin'] },
   { keywords: ['asset', 'assets', 'inventory', 'equipment', 'furniture', 'school property', 'stock', 'items', 'store', 'stationery', 'supplies', 'manage stock', 'what is in store', 'broken items'], label: 'Inventory & Assets', subtitle: 'Operations → Assets', icon: '🗄️', path: '/admin/assets', color: '#374151', roles: ['admin', 'bursar'] },
-  { keywords: ['visitor', 'visit', 'guest', 'reception', 'visitor log', 'sign in guest', 'stranger', 'log book', 'who visited', 'who is at the gate', 'visitor record'], label: 'Visitor Log', subtitle: 'Operations → Visitors', icon: '🚪', path: '/admin/visitors', color: '#6b7280', roles: ['admin'] },
+  { keywords: ['visitor', 'visit', 'guest', 'reception', 'visitor log', 'sign in guest', 'stranger', 'log book', 'who visited', 'who is at the gate', 'visitor record', 'new visitor', 'check in guest'], label: 'Visitor Management', subtitle: 'Operations → Visitors', icon: '🚪', path: '/security/visitors', color: '#6b7280', roles: ['admin', 'security'] },
+  { keywords: ['gate', 'security', 'gate log', 'entry', 'exit', 'student gate', 'gate control', 'who came in', 'who went out', 'patrol', 'guard'], label: 'Gate Control Dashboard', subtitle: 'Security → Dashboard', icon: '🛡️', path: '/security/dashboard', color: '#1e293b', roles: ['admin', 'security'] },
+  { keywords: ['incident', 'security alert', 'theft', 'break in', 'emergency', 'security report', 'incident log'], label: 'Security Incidents', subtitle: 'Security → Incidents', icon: '⚠️', path: '/security/incidents', color: '#dc2626', roles: ['admin', 'security'] },
   { keywords: ['election', 'pec', 'vote', 'voting', 'prefect', 'school prefect', 'src election', 'candidates', 'polls', 'ballot', 'elect prefects', 'who is winning', 'vote count'], label: 'Elections (PEC)', subtitle: 'Operations → Elections', icon: '🗳️', path: '/admin/elections', color: '#ef4444', roles: ['admin', 'teacher', 'student'] },
   { keywords: ['poster', 'poster maker', 'design', 'flyer', 'create poster', 'graphics', 'social media', 'images', 'marketing', 'adverts', 'make a design'], label: 'Poster Maker', subtitle: 'Operations → Poster Maker', icon: '🎨', path: '/admin/poster-maker', color: '#7c3aed', roles: ['admin'] },
   { keywords: ['behaviour', 'behavior', 'discipline', 'conduct', 'punishment', 'offense', 'good behavior', 'bad behavior', 'demerit', 'misconduct', 'discipline list', 'bad kids', 'who was punished'], label: 'Behavior Log', subtitle: 'More → Behavior Log', icon: '⚠️', path: '/teacher/behavior', color: '#f59e0b', roles: ['teacher'] },
@@ -81,7 +83,7 @@ GLOBAL_INTENTS.push(...ADVANCED_INTENTS)
 // ── Main Intent Resolver ──────────────────────────────────────────────────────
 export function resolveIntents(
   query: string,
-  role: { isAdmin: boolean, isTeacher: boolean, isBursar: boolean, isStudent: boolean }
+  role: { isAdmin: boolean, isTeacher: boolean, isBursar: boolean, isStudent: boolean, isSecurity: boolean }
 ): SearchResult[] {
   const q = query.toLowerCase().trim()
   if (q.length < 2) return []
@@ -91,6 +93,7 @@ export function resolveIntents(
   if (role.isTeacher) userRoles.push('teacher')
   if (role.isBursar) userRoles.push('bursar')
   if (role.isStudent) userRoles.push('student')
+  if (role.isSecurity) userRoles.push('security')
 
   const results: SearchResult[] = []
   const seen = new Set<string>()

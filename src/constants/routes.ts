@@ -34,6 +34,10 @@ export const ROUTES = {
   ADMIN_ALUMNI: '/admin/alumni',
   ADMIN_CALENDAR: '/admin/calendar',
   ADMIN_ACCOUNT: '/admin/account',
+  ADMIN_SECURITY: '/admin/security',
+  // Security
+  SECURITY_DASHBOARD: '/security/dashboard',
+  SECURITY_ACCOUNT: '/security/account',
   // Teacher
   TEACHER_DASHBOARD: '/teacher/dashboard',
   TEACHER_MY_CLASSES: '/teacher/my-classes',

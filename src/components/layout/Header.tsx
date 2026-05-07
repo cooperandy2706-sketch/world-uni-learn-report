@@ -56,6 +56,7 @@ const ADMIN_NAV = [
       { label: 'Asset Register', to: '/admin/assets' },
       { label: 'Billing', to: '/admin/billing' },
       { label: 'Bursar Staff', to: '/admin/bursars' },
+      { label: 'Security Personnel', to: ROUTES.ADMIN_SECURITY },
       { label: 'Poster Maker', to: '/admin/poster-maker' },
       { label: 'Elections (PEC)', to: '/admin/elections' },
       { label: 'Alumni', to: ROUTES.ADMIN_ALUMNI },
@@ -178,6 +179,18 @@ const STAFF_NAV = [
   { label: 'Elections (PEC)', to: '/staff/elections', single: true },
 ]
 
+const SECURITY_NAV = [
+  { label: 'Dashboard', to: ROUTES.SECURITY_DASHBOARD, single: true },
+  {
+    label: 'Operations', items: [
+      { label: '🔍 Gate Scanner', to: '/security/scanner' },
+      { label: '📋 Attendance Log', to: '/security/gate-attendance' },
+      { label: '🚪 Visitor Logs', to: '/security/visitors' },
+      { label: '⚠️ Incident Reports', to: '/security/incidents' },
+    ]
+  },
+]
+
 // ─── NavItem component ─────────────────────────────────────────────────────────
 function NavItem({ group }: { group: any }) {
   const [open, setOpen] = useState(false)
@@ -263,7 +276,7 @@ function NavItem({ group }: { group: any }) {
 
 // ─── Main Header ───────────────────────────────────────────────────────────────
 export default function Header() {
-  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
+  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher, isSecurity } = useAuth()
   const isStaff = user?.role === 'staff'
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
@@ -298,6 +311,7 @@ export default function Header() {
     : isAdmin ? ADMIN_NAV
     : isTeacher ? TEACHER_NAV
     : isBursar ? BURSAR_NAV
+    : isSecurity ? SECURITY_NAV
     : isStaff ? STAFF_NAV
     : user?.role === 'parent' ? PARENT_NAV
     : STUDENT_NAV
@@ -380,7 +394,7 @@ export default function Header() {
         const sid = user?.school_id
 
         // 1. Keyword intent navigation (instant)
-        const intents = resolveIntents(q, { isAdmin, isTeacher, isBursar, isStudent })
+        const intents = resolveIntents(q, { isAdmin, isTeacher, isBursar, isStudent, isSecurity })
         intents.forEach(r => results.push({ ...r, resultKind: 'intent' }))
 
         // 2. Person-context intent: "desmond's results", "sir andy timetable", etc.

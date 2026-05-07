@@ -14,7 +14,7 @@ import FloatingClock from '../shared/FloatingClock'
 import FlaskLoader from '../ui/FlaskLoader'
 import { ROUTES } from '../../constants/routes'
 
-interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 'student' | 'bursar' | 'staff' | 'parent' }
+interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'teacher' | 'student' | 'bursar' | 'staff' | 'parent' | 'security' }
 
 export default function AppLayout({ requiredRole }: AppLayoutProps) {
   const { user, loading, initialized } = useAuth()
@@ -32,6 +32,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
     if (user.role === 'student') return <Navigate to="/student/dashboard" replace />
     if (user.role === 'bursar') return <Navigate to={ROUTES.BURSAR_DASHBOARD} replace />
     if (user.role === 'staff') return <Navigate to={ROUTES.STAFF_DASHBOARD} replace />
+    if (user.role === 'security') return <Navigate to={ROUTES.SECURITY_DASHBOARD} replace />
     if (user.role === 'parent') return <Navigate to="/parent/dashboard" replace />
     return <Navigate to={user.role === 'admin' ? ROUTES.ADMIN_DASHBOARD : ROUTES.TEACHER_DASHBOARD} replace />
   }

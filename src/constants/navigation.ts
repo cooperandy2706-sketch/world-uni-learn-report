@@ -8,7 +8,7 @@ import {
   TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag, ChevronDown,
   Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap,
   Smartphone, Calculator, Grid, Vote, Image, UserPlus, Heart, Search, ArrowUpRight,
-  Plus, Monitor, Truck, Armchair, Box
+  Plus, Monitor, Truck, Armchair, Box, ScanLine
 } from 'lucide-react'
 
 export const adminLinks = [
@@ -41,6 +41,7 @@ export const adminLinks = [
   { to: '/admin/assets', label: 'Asset Register', icon: Package },
   { to: '/admin/billing', label: 'Billing & Subscription', icon: CreditCard },
   { to: '/admin/bursars', label: 'Bursar Staff', icon: Wallet },
+  { to: ROUTES.ADMIN_SECURITY, label: 'Security Personnel', icon: Shield },
   { to: '/admin/poster-maker', label: 'Poster Maker', icon: Image },
   { to: '/admin/elections', label: 'Elections (PEC)', icon: Vote },
   { to: ROUTES.ADMIN_ALUMNI, label: 'Alumni & Fundraising', icon: Heart },
@@ -135,6 +136,15 @@ export const bursarLinks = [
 
   { header: 'Tools' },
   { to: ROUTES.BURSAR_SMS, label: 'SMS Reminders', icon: Smartphone },
+]
+
+export const securityLinks = [
+  { header: 'Security Operations' },
+  { to: ROUTES.SECURITY_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/security/scanner', label: 'Gate Scanner', icon: ScanLine },
+  { to: '/security/gate-attendance', label: 'Attendance Log', icon: ClipboardCheck },
+  { to: '/security/visitors', label: 'Visitor Logs', icon: Users },
+  { to: '/security/incidents', label: 'Incident Reports', icon: AlertCircle },
 ]
 
 export const staffLinks = [

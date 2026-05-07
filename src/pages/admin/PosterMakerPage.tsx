@@ -57,6 +57,7 @@ interface TagSide {
   showPhoto: boolean
   customText: string
   pattern: 'none' | 'dots' | 'lines' | 'diagonal'
+  showQRCode: boolean
 }
 
 interface TagConfig {
@@ -455,6 +456,11 @@ function generateBarcodeSVG(text: string, height = 40, moduleWidth = 1.5): strin
   return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${x}" height="${height}" viewBox="0 0 ${x} ${height}">${svgBars}</svg>`)}`
 }
 
+function generateQRCodeURL(data: string, size = 150): string {
+  if (!data) return ''
+  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(data)}`
+}
+
 // Social format presets for flyer
 const SOCIAL_FORMATS = [
   { id: 'square', label: 'Instagram (1:1)', w: 1080, h: 1080 },
@@ -482,6 +488,7 @@ const defaultSide = (isPrimary: boolean): TagSide => ({
   showPhoto: isPrimary,
   customText: isPrimary ? '' : 'This card is property of the school. If found, please return to the school office.',
   pattern: isPrimary ? 'none' : 'diagonal',
+  showQRCode: !isPrimary,
 })
 
 // ─────────────────────────────────────────────
@@ -934,7 +941,10 @@ export default function PosterMakerPage() {
           ${side.showRole ? `<div style="font-size:${Math.max(7, tagW * 0.06)}px;color:#666;font-family:${tc.fontFamily};">${s.role}</div>` : ''}
           ${side.showStudentId && s.studentId ? `<div style="font-size:${Math.max(6, tagW * 0.055)}px;color:#888;font-family:${tc.fontFamily};margin-top:2px;">${s.studentId}</div>` : ''}
         ` : `
-          <div style="font-size:${Math.max(6, tagW * 0.06)}px;color:${side.primaryColor};font-family:${tc.fontFamily};padding:8px;text-align:center;line-height:1.4;">${side.customText || tc.schoolName}</div>
+          <div style="font-size:${Math.max(6, tagW * 0.06)}px;color:${side.primaryColor};font-family:${tc.fontFamily};padding:8px;text-align:center;line-height:1.4;">
+            ${side.showQRCode ? `<div style="margin-bottom:8px;"><img src="${generateQRCodeURL(`WUL:ID:${s.id}`, 120)}" style="width:${tagW * 0.4}px;height:${tagW * 0.4}px;background:#fff;padding:4px;border-radius:4px;" /></div>` : ''}
+            ${side.customText || tc.schoolName}
+          </div>
         `}
       </div>`
     }
@@ -958,6 +968,7 @@ export default function PosterMakerPage() {
             ${side.showLogo && tc.logoUrl ? `<img src="${tc.logoUrl}" style="height:${tagW * 0.15}px;object-fit:contain;opacity:0.9;" />` : `<div style="font-size:${Math.max(6, tagW * 0.08)}px;font-weight:700;color:#fff;font-family:${tc.fontFamily};">${tc.schoolName}</div>`}
           </div>
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;text-align:center;">
+            ${side.showQRCode ? `<div style="margin-bottom:10px;"><img src="${generateQRCodeURL(`WUL:ID:${s.id}`, 120)}" style="width:${tagW * 0.45}px;height:${tagW * 0.45}px;background:#fff;padding:5px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.1);" /></div>` : ''}
             <div style="font-size:${Math.max(6, tagW * 0.06)}px;color:${side.primaryColor};font-family:${tc.fontFamily};line-height:1.5;">${side.customText || 'This ID card must be worn at all times while on school premises.'}</div>
           </div>
           <div style="width:100%;height:4px;background:${side.accentColor};"></div>
@@ -986,9 +997,14 @@ export default function PosterMakerPage() {
           <div style="height:4px;background:${side.accentColor};"></div>
         ` : `
           <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;text-align:center;box-sizing:border-box;">
-            ${side.showLogo && tc.logoUrl ? `<img src="${tc.logoUrl}" style="height:${tagH * 0.2}px;object-fit:contain;margin-bottom:8px;opacity:0.7;" />` : ''}
-            <div style="font-size:${Math.max(6, tagH * 0.065)}px;color:${side.primaryColor};font-family:${tc.fontFamily};line-height:1.5;">${side.customText || 'Return to school office if found.'}</div>
-            <div style="width:60%;height:3px;background:${side.accentColor};border-radius:2px;margin-top:8px;"></div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;">
+              ${side.showQRCode ? `<img src="${generateQRCodeURL(`WUL:ID:${s.id}`, 100)}" style="width:${tagH * 0.3}px;height:${tagH * 0.3}px;background:#fff;padding:3px;border-radius:3px;" />` : ''}
+              <div style="flex:1;text-align:${side.showQRCode ? 'left' : 'center'};">
+                ${side.showLogo && tc.logoUrl ? `<img src="${tc.logoUrl}" style="height:${tagH * 0.18}px;object-fit:contain;margin-bottom:6px;opacity:0.7;" />` : ''}
+                <div style="font-size:${Math.max(6, tagH * 0.06)}px;color:${side.primaryColor};font-family:${tc.fontFamily};line-height:1.4;">${side.customText || 'Return to school office if found.'}</div>
+              </div>
+            </div>
+            <div style="width:60%;height:3px;background:${side.accentColor};border-radius:2px;margin-top:10px;"></div>
           </div>
         `}
       </div>`
@@ -1007,6 +1023,7 @@ export default function PosterMakerPage() {
         </div>
       ` : `
         <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;">
+          ${side.showQRCode ? `<div style="margin-bottom:6px;"><img src="${generateQRCodeURL(`WUL:ID:${s.id}`, 100)}" style="width:${tagW * 0.35}px;height:${tagW * 0.35}px;background:#fff;padding:3px;border-radius:3px;" /></div>` : ''}
           <div style="font-size:${Math.max(6, tagW * 0.065)}px;color:${side.primaryColor};font-family:${tc.fontFamily};text-align:center;line-height:1.5;">${side.customText || tc.schoolName}</div>
         </div>
       `}
@@ -1113,7 +1130,10 @@ export default function PosterMakerPage() {
             {side.showName && <div style={{ fontSize: fs(11), fontWeight: 700, color: side.primaryColor, fontFamily: tc.fontFamily, lineHeight: 1.1, padding: '0 4px' }}>{s.name}</div>}
             {side.showRole && <div style={{ fontSize: fs(8), color: '#666', fontFamily: tc.fontFamily }}>{s.role}</div>}
             {side.showStudentId && s.studentId && <div style={{ fontSize: fs(7), color: '#888', fontFamily: tc.fontFamily, marginTop: 2 }}>{s.studentId}</div>}
-          </> : <div style={{ fontSize: fs(7), color: side.primaryColor, fontFamily: tc.fontFamily, padding: 8, textAlign: 'center', lineHeight: 1.4 }}>{side.customText || tc.schoolName}</div>}
+          </> : <div style={{ fontSize: fs(7), color: side.primaryColor, fontFamily: tc.fontFamily, padding: 8, textAlign: 'center', lineHeight: 1.4 }}>
+            {side.showQRCode && <div style={{ marginBottom: 6 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: pw * 0.4, height: pw * 0.4, background: '#fff', padding: 3, borderRadius: 4 }} /></div>}
+            {side.customText || tc.schoolName}
+          </div>}
         </div>
       )
 
@@ -1137,6 +1157,7 @@ export default function PosterMakerPage() {
               {side.showLogo && tc.logoUrl ? <img src={tc.logoUrl} style={{ height: pw * 0.15, objectFit: 'contain', opacity: 0.9 }} /> : <div style={{ fontSize: fs(7), fontWeight: 700, color: '#fff', fontFamily: tc.fontFamily }}>{tc.schoolName}</div>}
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 8, textAlign: 'center' }}>
+              {side.showQRCode && <div style={{ marginBottom: 8 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 120)} style={{ width: pw * 0.45, height: pw * 0.45, background: '#fff', padding: 4, borderRadius: 4, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }} /></div>}
               <div style={{ fontSize: fs(6.5), color: side.primaryColor, fontFamily: tc.fontFamily, lineHeight: 1.5 }}>{side.customText || 'This ID card must be worn at all times while on school premises.'}</div>
             </div>
             <div style={{ width: '100%', height: 3 * scale, background: side.accentColor }} />
@@ -1164,9 +1185,14 @@ export default function PosterMakerPage() {
             </div>
             <div style={{ height: 3 * scale, background: side.accentColor }} />
           </> : <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 10, textAlign: 'center' }}>
-            {side.showLogo && tc.logoUrl && <img src={tc.logoUrl} style={{ height: ph * 0.2, objectFit: 'contain', marginBottom: 8, opacity: 0.7 }} />}
-            <div style={{ fontSize: fs(6.5), color: side.primaryColor, fontFamily: tc.fontFamily, lineHeight: 1.5 }}>{side.customText || 'Return to school office if found.'}</div>
-            <div style={{ width: '60%', height: 3 * scale, background: side.accentColor, borderRadius: 2, marginTop: 8 }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              {side.showQRCode && <img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: ph * 0.3, height: ph * 0.3, background: '#fff', padding: 3, borderRadius: 3 }} />}
+              <div style={{ textAlign: side.showQRCode ? 'left' : 'center' }}>
+                {side.showLogo && tc.logoUrl && <img src={tc.logoUrl} style={{ height: ph * 0.18, objectFit: 'contain', marginBottom: 4, opacity: 0.7 }} />}
+                <div style={{ fontSize: fs(6.5), color: side.primaryColor, fontFamily: tc.fontFamily, lineHeight: 1.5 }}>{side.customText || 'Return to school office if found.'}</div>
+              </div>
+            </div>
+            <div style={{ width: '60%', height: 3 * scale, background: side.accentColor, borderRadius: 2, marginTop: 4 }} />
           </div>}
         </div>
       )
@@ -1182,7 +1208,8 @@ export default function PosterMakerPage() {
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {side.showLogo && tc.logoUrl ? <img src={tc.logoUrl} style={{ maxHeight: ph * 0.2, objectFit: 'contain', opacity: 0.4 }} /> : <div style={{ fontSize: fs(6), color: '#aaa', fontFamily: tc.fontFamily }}>{tc.schoolName}</div>}
             </div>
-          </> : <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 8 }}>
+          </> : <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 8 }}>
+            {side.showQRCode && <div style={{ marginBottom: 6 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: pw * 0.35, height: pw * 0.35, background: '#fff', padding: 3, borderRadius: 3 }} /></div>}
             <div style={{ fontSize: fs(6.5), color: side.primaryColor, fontFamily: tc.fontFamily, textAlign: 'center', lineHeight: 1.5 }}>{side.customText || tc.schoolName}</div>
           </div>}
         </div>
@@ -1719,7 +1746,7 @@ export default function PosterMakerPage() {
                 <>
                   <p style={secH}>Show on Back</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
-                    {([['showLogo', 'Logo']] as const).map(([key, label]) => (
+                    {([['showLogo', 'Logo'], ['showQRCode', 'Unique QR Code']] as const).map(([key, label]) => (
                       <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#6b7280', cursor: 'pointer' }}>
                         <input type="checkbox" checked={activeSide[key as keyof TagSide] as boolean} onChange={e => setActiveSide({ [key]: e.target.checked })} /> {label}
                       </label>
