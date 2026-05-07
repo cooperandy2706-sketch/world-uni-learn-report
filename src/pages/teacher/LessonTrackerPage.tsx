@@ -420,10 +420,33 @@ export default function LessonTrackerPage() {
         if (!t) { setLoading(false); return }
         setTeacherInfo({ id: t.id, schoolId: t.school_id })
 
+        // Find if this teacher is a substitute for anyone today
+        const today = new Date().toISOString().slice(0, 10)
+        const { data: activeLeaves } = await supabase
+            .from('leave_requests')
+            .select('user_id')
+            .eq('substitute_id', user!.id)
+            .eq('status', 'approved')
+            .lte('start_date', today)
+            .gte('end_date', today)
+            
+        const absentUserIds = activeLeaves?.map((l: any) => l.user_id) || []
+        
+        let absentTeacherIds: string[] = []
+        if (absentUserIds.length > 0) {
+            const { data: absentTeachers } = await supabase
+                .from('teachers')
+                .select('id')
+                .in('user_id', absentUserIds)
+            absentTeacherIds = absentTeachers?.map((t: any) => t.id) || []
+        }
+
+        const allTeacherIdsForSlots = [t.id, ...absentTeacherIds]
+
         const [{ data: slots }] = await Promise.all([
             supabase.from('timetable_slots')
                 .select('*, subject:subjects(id,name), class:classes(id,name), period:timetable_periods(id,name,start_time,end_time,is_break,sort_order)')
-                .eq('teacher_id', t.id)
+                .in('teacher_id', allTeacherIdsForSlots)
                 .eq('term_id', (term as any).id),
         ])
 

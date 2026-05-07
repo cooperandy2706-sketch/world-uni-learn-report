@@ -100,12 +100,34 @@ export default function TeacherDashboardPage() {
       setMyQuizSubs(quizSubsRes.data?.length ?? 0)
       setAnnouncements(announcementsRes.data ?? [])
 
+      // Find if this teacher is a substitute for anyone today
+      const { data: activeLeaves } = await supabase
+        .from('leave_requests')
+        .select('user_id')
+        .eq('substitute_id', user!.id)
+        .eq('status', 'approved')
+        .lte('start_date', today)
+        .gte('end_date', today)
+      
+      const absentUserIds = activeLeaves?.map((l: any) => l.user_id) || []
+      
+      let absentTeacherIds: string[] = []
+      if (absentUserIds.length > 0) {
+        const { data: absentTeachers } = await supabase
+          .from('teachers')
+          .select('id')
+          .in('user_id', absentUserIds)
+        absentTeacherIds = absentTeachers?.map((t: any) => t.id) || []
+      }
+
+      const allTeacherIdsForSlots = [teacher.id, ...absentTeacherIds]
+
       // Load timetable for today
       if (term?.id) {
         const { data: slots } = await supabase
           .from('timetable_slots')
           .select('*, subject:subjects(name), class:classes(name), period:timetable_periods(name,start_time,end_time,is_break,sort_order)')
-          .eq('teacher_id', teacher.id)
+          .in('teacher_id', allTeacherIdsForSlots)
           .eq('term_id', term.id)
           .eq('day_of_week', todayDay)
         // Sort happens on client after fetch because Supabase can struggle to order by related columns depending on schema

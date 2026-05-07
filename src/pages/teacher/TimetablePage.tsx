@@ -25,11 +25,34 @@ export default function TeacherTimetablePage(){
     const {data:t}=await supabase.from('teachers').select('id').eq('user_id',user!.id).single()
     if(!t){setLoading(false);return}
 
+    // Find if this teacher is a substitute for anyone today
+    const today = new Date().toISOString().slice(0, 10)
+    const { data: activeLeaves } = await supabase
+      .from('leave_requests')
+      .select('user_id')
+      .eq('substitute_id', user!.id)
+      .eq('status', 'approved')
+      .lte('start_date', today)
+      .gte('end_date', today)
+      
+    const absentUserIds = activeLeaves?.map((l: any) => l.user_id) || []
+    
+    let absentTeacherIds: string[] = []
+    if (absentUserIds.length > 0) {
+      const { data: absentTeachers } = await supabase
+        .from('teachers')
+        .select('id')
+        .in('user_id', absentUserIds)
+      absentTeacherIds = absentTeachers?.map((t: any) => t.id) || []
+    }
+
+    const allTeacherIdsForSlots = [t.id, ...absentTeacherIds]
+
     const [{data:p},{data:s}]=await Promise.all([
       supabase.from('timetable_periods').select('*').eq('school_id',user!.school_id).order('sort_order'),
       supabase.from('timetable_slots')
         .select('*,subject:subjects(id,name),class:classes(id,name),period:timetable_periods(id,name,start_time,end_time)')
-        .eq('teacher_id',t.id).eq('term_id',(term as any).id),
+        .in('teacher_id',allTeacherIdsForSlots).eq('term_id',(term as any).id),
     ])
     setPeriods(p??[])
     setSlots(s??[])

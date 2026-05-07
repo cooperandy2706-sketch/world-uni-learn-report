@@ -533,7 +533,7 @@ export default function PayrollPage() {
                </button>
                <button onClick={() => {
                    const txt = `Hello ${shareModal.staff.full_name}, your ${shareModal.type} pay of ${GHS(shareModal.type === 'monthly' ? shareModal.data.net_salary : shareModal.data.amount)} has been paid via ${(shareModal.data.payment_method||'Cash').toUpperCase()}. Ref: ${shareModal.data.bank_reference||'None'}.`
-                   window.open(`https://wa.me/${shareModal.staff.phone?.replace(/\D/g, '') || ''}?text=${encodeURIComponent(txt)}`, '_blank')
+                   window.open(`https://wa.me/${shareModal.staff?.phone?.replace(/\D/g, '') || ''}?text=${encodeURIComponent(txt)}`, '_blank')
                }} style={{ padding: 14, borderRadius: 16, border: '1.5px solid #e5e7eb', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <MessageSquare size={24} color="#25d366" /> <span style={{ fontSize: 12, fontWeight: 700 }}>WhatsApp</span>
                </button>

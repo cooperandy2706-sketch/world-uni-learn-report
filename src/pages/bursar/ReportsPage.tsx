@@ -345,7 +345,7 @@ export default function ReportsPage() {
                         <td style={{ padding: '14px 24px', fontSize: 14, fontWeight: 800, color: l.type === 'Revenue' ? '#059669' : '#dc2626' }}>
                           {l.type === 'Revenue' ? '+' : '-'}{GHS(l.amount)}
                         </td>
-                        <td style={{ padding: '14px 24px', fontSize: 12, color: '#9ca3af', textTransform: 'capitalize' }}>{l.method.replace('_', ' ')}</td>
+                        <td style={{ padding: '14px 24px', fontSize: 12, color: '#9ca3af', textTransform: 'capitalize' }}>{(l.method || '').replace('_', ' ')}</td>
                       </tr>
                     ))}
                   </tbody>

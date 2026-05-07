@@ -77,6 +77,12 @@ export const testService = {
 
     if (totalMax === 0) return
 
+    // Grab shared metadata from the first test record
+    const firstTest = tests[0]
+    const academic_year_id = firstTest.academic_year_id
+    const teacher_id = firstTest.teacher_id
+    const school_id = firstTest.school_id
+
     // 2. Get all scores for these tests
     const { data: allScores, error: scoreError } = await supabase
       .from('class_test_scores')
@@ -91,33 +97,24 @@ export const testService = {
       studentAggregates[s.student_id] = (studentAggregates[s.student_id] || 0) + (Number(s.score_attained) || 0)
     })
 
-    // 4. Update the main 'scores' table
-    // We need academic_year_id and school_id for the upsert if record doesn't exist?
-    // Actually, normally 'scores' records are created during the final stage, but we can update existing ones.
-    const updates = await Promise.all(Object.entries(studentAggregates).map(async ([studentId, totalAttained]) => {
+    if (Object.keys(studentAggregates).length === 0) return
+
+    // 4. Build upsert rows for the main 'scores' table.
+    //    All metadata (academic_year_id, teacher_id, school_id) comes from the
+    //    ClassTest records — no undefined variable references.
+    const fullUpserts = Object.entries(studentAggregates).map(([studentId, totalAttained]) => {
       const struckScore = (totalAttained / totalMax) * classWeight
-      
-      // Update existing score record
       return {
         student_id: studentId,
         subject_id: subjectId,
         class_id: classId,
         term_id: termId,
+        academic_year_id,
+        teacher_id,
+        school_id,
         class_score: Number(struckScore.toFixed(2)),
       }
-    }))
-
-    // We use upsert with onConflict on student_id,subject_id,term_id
-    // But we need school_id and academic_year_id if we want to create new records.
-    // For now, let's assume we're updating.
-    // If the record doesn't exist, we might need more info.
-    // Let's grab the metadata from the first test.
-    const fullUpserts = updates.map(u => ({
-      ...u,
-      academic_year_id,
-      teacher_id,
-      // exam_score defaults to 0 or null if we don't have it
-    }))
+    })
 
     const { error: upsertError } = await supabase
       .from('scores')

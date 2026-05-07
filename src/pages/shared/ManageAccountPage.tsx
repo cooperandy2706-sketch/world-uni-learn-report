@@ -161,7 +161,7 @@ export default function ManageAccountPage() {
           <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b', margin: '0 0 4px' }}>{user?.full_name}</h2>
           <div style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>{user?.email}</div>
           <span style={{ display: 'inline-block', padding: '4px 12px', background: '#f1f5f9', color: '#475569', borderRadius: 99, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            {user?.role.replace('_', ' ')}
+            {typeof user?.role === 'string' ? user.role.replace('_', ' ') : ''}
           </span>
         </div>
 

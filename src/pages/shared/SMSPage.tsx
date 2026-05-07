@@ -127,7 +127,7 @@ export default function SMSPage() {
               id: u.id,
               name: u.full_name,
               phone: u.phone,
-              subtitle: `Staff (${u.role.replace('_', ' ')})`,
+              subtitle: `Staff (${(u.role || '').replace('_', ' ')})`,
               type: 'staff'
             })
           }

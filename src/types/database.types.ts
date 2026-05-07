@@ -376,3 +376,23 @@ export interface ElectionVote {
   school_id: string
   created_at: string
 }
+
+export interface LeaveRequest {
+  id: string
+  user_id: string
+  school_id: string
+  leave_type: 'sick' | 'personal' | 'vacation' | 'maternity' | 'paternity' | 'other'
+  start_date: string
+  end_date: string
+  reason?: string
+  status: 'pending' | 'approved' | 'rejected'
+  approved_by?: string
+  admin_notes?: string
+  substitute_id?: string
+  created_at: string
+  updated_at: string
+  // joined
+  user?: User
+  substitute?: User
+  approved_by_user?: User
+}

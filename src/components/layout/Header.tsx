@@ -52,6 +52,7 @@ const ADMIN_NAV = [
       { label: 'Calendar', to: ROUTES.ADMIN_CALENDAR },
       { label: 'Messages', to: ROUTES.ADMIN_MESSAGES },
       { label: 'Staff Requests', to: '/admin/staff-requests' },
+      { label: 'Staff Leave', to: '/admin/staff-leave' },
       { label: 'Asset Register', to: '/admin/assets' },
       { label: 'Billing', to: '/admin/billing' },
       { label: 'Bursar Staff', to: '/admin/bursars' },
@@ -91,6 +92,7 @@ const TEACHER_NAV = [
       { label: 'Lesson Tracker', to: ROUTES.TEACHER_LESSON_TRACKER },
       { label: 'Syllabus', to: ROUTES.TEACHER_SYLLABUS },
       { label: 'Self Service', to: '/teacher/self-service' },
+      { label: 'My Leave', to: '/teacher/leave' },
       { label: 'Messages', to: ROUTES.TEACHER_MESSAGES },
       { label: 'Notifications', to: ROUTES.TEACHER_NOTIFICATIONS },
       { label: 'Daily Collections', to: '/teacher/daily-fees' },
@@ -456,7 +458,7 @@ export default function Header() {
         }
 
         // 4. Plain staff name lookup (fallback)
-        if (!personIntent && isAdmin) {
+        if (!personIntent && (isAdmin || isBursar)) {
           const { data: tr } = await supabase
             .from('users')
             .select('id, full_name, role')
@@ -470,6 +472,74 @@ export default function Header() {
             subtitle: `Staff · ${t.role}`,
             icon: '👩‍🏫', color: '#7c3aed',
             path: `/admin/teachers`,
+          }))
+        }
+
+        // 5. Classes lookup
+        if (!personIntent && isAdmin) {
+          const { data: cls } = await supabase
+            .from('classes')
+            .select('id, name')
+            .eq('school_id', sid)
+            .ilike('name', `%${q}%`)
+            .limit(3)
+          cls?.forEach(c => results.push({
+            resultKind: 'intent', type: 'Class',
+            label: `View Class — ${c.name}`,
+            subtitle: 'Academics → Classes',
+            icon: '🏫', color: '#0891b2',
+            path: `/admin/classes?search=${encodeURIComponent(c.name)}`,
+          }))
+        }
+
+        // 6. Subjects lookup
+        if (!personIntent && isAdmin) {
+          const { data: sub } = await supabase
+            .from('subjects')
+            .select('id, name')
+            .eq('school_id', sid)
+            .ilike('name', `%${q}%`)
+            .limit(3)
+          sub?.forEach(s => results.push({
+            resultKind: 'intent', type: 'Subject',
+            label: `View Subject — ${s.name}`,
+            subtitle: 'Academics → Subjects',
+            icon: '📚', color: '#7c3aed',
+            path: `/admin/subjects?search=${encodeURIComponent(s.name)}`,
+          }))
+        }
+
+        // 7. Inventory lookup
+        if (!personIntent && (isAdmin || isBursar)) {
+          const { data: inv } = await supabase
+            .from('inventory_items')
+            .select('id, item_name')
+            .eq('school_id', sid)
+            .ilike('item_name', `%${q}%`)
+            .limit(3)
+          inv?.forEach(i => results.push({
+            resultKind: 'intent', type: 'Inventory',
+            label: `Inventory — ${i.item_name}`,
+            subtitle: 'Operations → Assets',
+            icon: '📦', color: '#374151',
+            path: `/bursar/inventory?search=${encodeURIComponent(i.item_name)}`,
+          }))
+        }
+
+        // 8. News lookup
+        if (!personIntent) {
+          const { data: news } = await supabase
+            .from('news_articles')
+            .select('id, title')
+            .eq('school_id', sid)
+            .ilike('title', `%${q}%`)
+            .limit(3)
+          news?.forEach(n => results.push({
+            resultKind: 'intent', type: 'News',
+            label: `Read — ${n.title}`,
+            subtitle: 'Notice Board',
+            icon: '📰', color: '#f59e0b',
+            path: `/student/announcements?id=${n.id}`,
           }))
         }
 
@@ -649,66 +719,115 @@ export default function Header() {
                   </div>
                 )}
 
-                {/* Navigation / Action results */}
-                {searchResults.filter((r: any) => r.resultKind === 'intent').length > 0 && (
-                  <div>
-                    <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '6px 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Zap size={10} /> Quick Actions
-                    </div>
-                    {searchResults.filter((r: any) => r.resultKind === 'intent').map((r: any, i: number) => (
-                      <div
-                        key={`intent-${i}`}
-                        onClick={() => { saveRecent(searchQuery); navigate(r.path); setShowResults(false); setSearchQuery(''); setHighlightedIdx(-1) }}
-                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s', background: highlightedIdx === i ? '#f0f4ff' : 'transparent' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
-                        onMouseLeave={e => { e.currentTarget.style.background = highlightedIdx === i ? '#f0f4ff' : 'transparent' }}
-                      >
-                        <div style={{
-                          width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                          background: `${r.color}15`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 18, border: `1px solid ${r.color}25`
-                        }}>
-                          {r.icon}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.label}</div>
-                          <div style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500 }}>{r.subtitle}</div>
-                        </div>
-                        <div style={{ fontSize: 11, color: r.color, fontWeight: 700, background: `${r.color}12`, padding: '2px 8px', borderRadius: 99, whiteSpace: 'nowrap' }}>Go →</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {/* ── Categorized Results ── */}
+                {searchQuery && !selectedPerson && searchResults.length > 0 && (() => {
+                  const intents = searchResults.filter(r => r.resultKind === 'intent')
+                  const people = searchResults.filter(r => r.resultKind === 'person')
+                  const academics = searchResults.filter(r => r.type === 'Class' || r.type === 'Subject')
+                  const operations = searchResults.filter(r => r.type === 'Inventory' || r.type === 'News')
 
-                {/* People results — click to show actions sub-panel */}
-                {!selectedPerson && searchResults.filter((r: any) => r.resultKind === 'person').length > 0 && (
-                  <div style={{ marginTop: searchResults.some((r: any) => r.resultKind === 'intent') ? 8 : 0 }}>
-                    <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '6px 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <User size={10} /> People
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {/* 1. Quick Actions */}
+                      {intents.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <Zap size={10} /> Quick Actions
+                          </div>
+                          {intents.map((r, i) => (
+                            <div
+                              key={`intent-${i}`}
+                              onClick={() => { saveRecent(searchQuery); navigate(r.path); setShowResults(false); setSearchQuery(''); setHighlightedIdx(-1) }}
+                              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s', background: highlightedIdx === i ? '#f0f4ff' : 'transparent' }}
+                              onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                              onMouseLeave={e => { e.currentTarget.style.background = highlightedIdx === i ? '#f0f4ff' : 'transparent' }}
+                            >
+                              <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, border: `1px solid ${r.color}25` }}>{r.icon}</div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.label}</div>
+                                <div style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500 }}>{r.subtitle}</div>
+                              </div>
+                              <div style={{ fontSize: 10, color: r.color, fontWeight: 800, background: `${r.color}10`, padding: '2px 8px', borderRadius: 99 }}>Go</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* 2. People */}
+                      {people.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <User size={10} /> People
+                          </div>
+                          {people.map((r, i) => (
+                            <div
+                              key={`person-${i}`}
+                              onClick={() => setSelectedPerson({ label: r.label, subtitle: r.subtitle, type: r.type, name: r.label })}
+                              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s' }}
+                              onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+                            >
+                              <div style={{ width: 34, height: 34, borderRadius: '50%', background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{r.icon}</div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</div>
+                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.subtitle}</div>
+                              </div>
+                              <ChevronRight size={10} color="#9ca3af" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* 3. Academics */}
+                      {academics.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <BookOpen size={10} /> Academics
+                          </div>
+                          {academics.map((r, i) => (
+                            <div
+                              key={`academic-${i}`}
+                              onClick={() => { saveRecent(searchQuery); navigate(r.path); setShowResults(false); setSearchQuery(''); }}
+                              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s' }}
+                              onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+                            >
+                              <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>{r.icon}</div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.label}</div>
+                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.subtitle}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* 4. Operations */}
+                      {operations.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <Shield size={10} /> Operations
+                          </div>
+                          {operations.map((r, i) => (
+                            <div
+                              key={`op-${i}`}
+                              onClick={() => { saveRecent(searchQuery); navigate(r.path); setShowResults(false); setSearchQuery(''); }}
+                              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s' }}
+                              onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+                            >
+                              <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>{r.icon}</div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.label}</div>
+                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.subtitle}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    {searchResults.filter((r: any) => r.resultKind === 'person').map((r: any, i: number) => (
-                      <div
-                        key={`person-${i}`}
-                        onClick={() => setSelectedPerson({ label: r.label, subtitle: r.subtitle, type: r.type, name: r.label })}
-                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
-                      >
-                        <div style={{ width: 34, height: 34, borderRadius: '50%', background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>
-                          {r.icon}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</div>
-                          <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.subtitle}</div>
-                        </div>
-                        <div style={{ fontSize: 11, color: '#6b7280', background: '#f3f4f6', padding: '3px 10px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 4 }}>
-                          {r.type} <ChevronRight size={10} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  )
+                })()}
 
                 {/* ── Person Action Sub-Panel ── */}
                 {selectedPerson && (() => {

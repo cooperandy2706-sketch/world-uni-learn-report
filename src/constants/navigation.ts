@@ -58,6 +58,7 @@ export const teacherLinks = [
   { to: '/teacher/self-service', label: 'Self Service', icon: UserCheck },
   { to: ROUTES.TEACHER_MESSAGES, label: 'Messages', icon: MessageSquare },
   { to: ROUTES.TEACHER_NOTIFICATIONS, label: 'Notifications', icon: Bell },
+  { to: ROUTES.TEACHER_REQUISITION, label: 'Request Funds', icon: ClipboardList },
 
   { header: 'Instructional' },
   { to: ROUTES.TEACHER_MY_CLASSES, label: 'My Classes', icon: School },
@@ -121,6 +122,7 @@ export const bursarLinks = [
   { to: ROUTES.BURSAR_FEES, label: 'School Fees', icon: CreditCard },
   { to: '/bursar/daily-fees', label: 'Daily Fees', icon: Wallet },
   { to: ROUTES.BURSAR_INVENTORY, label: 'School Store', icon: ShoppingBag },
+  { to: ROUTES.BURSAR_VENDORS, label: 'Vendors Directory', icon: Truck },
 
   { header: 'Financials' },
   { to: ROUTES.BURSAR_DEBTORS, label: 'Debtors List', icon: AlertCircle },
@@ -128,6 +130,7 @@ export const bursarLinks = [
   { to: ROUTES.BURSAR_PAYROLL, label: 'Payroll', icon: Wallet },
   { to: ROUTES.BURSAR_INCOME, label: 'Income', icon: TrendingUp },
   { to: ROUTES.BURSAR_EXPENSES, label: 'Expenses', icon: TrendingDown },
+  { to: ROUTES.BURSAR_REQUISITIONS, label: 'Requisitions', icon: ClipboardList },
   { to: ROUTES.BURSAR_REPORTS, label: 'Financial Reports', icon: FileSpreadsheet },
 
   { header: 'Tools' },

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../hooks/useAuth'
 import { expenseService } from '../../services/bursar.service'
+import { vendorService } from '../../services/vendors.service'
 import toast from 'react-hot-toast'
 import { Plus, Trash2, TrendingDown } from 'lucide-react'
 
@@ -32,8 +33,14 @@ export default function ExpensesPage() {
   const currentYear = new Date().getFullYear()
   const [year, setYear] = useState(currentYear)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ category: CATS[0], description: '', amount: '', date: new Date().toISOString().split('T')[0], vendor: '' })
+  const [form, setForm] = useState({ category: CATS[0], description: '', amount: '', date: new Date().toISOString().split('T')[0], vendor: '', vendor_id: '' })
   const [filterCat, setFilterCat] = useState('')
+
+  const { data: vendors = [] } = useQuery({
+    queryKey: ['vendors', schoolId],
+    queryFn: async () => { const { data } = await vendorService.getAll(schoolId); return data ?? [] },
+    enabled: !!schoolId,
+  })
 
   const { data: records = [], isLoading } = useQuery({
     queryKey: ['expenses', schoolId, year],
@@ -43,7 +50,7 @@ export default function ExpensesPage() {
 
   const addRecord = useMutation({
     mutationFn: (d: any) => expenseService.create(d),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['expenses'] }); setShowForm(false); setForm({ category: CATS[0], description: '', amount: '', date: new Date().toISOString().split('T')[0], vendor: '' }); toast.success('Expense recorded') },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['expenses'] }); setShowForm(false); setForm({ category: CATS[0], description: '', amount: '', date: new Date().toISOString().split('T')[0], vendor: '', vendor_id: '' }); toast.success('Expense recorded') },
     onError: (e: any) => toast.error(e.message),
   })
 
@@ -54,7 +61,17 @@ export default function ExpensesPage() {
 
   function handleAdd() {
     if (!form.amount || !form.description) { toast.error('Enter amount and description'); return }
-    addRecord.mutate({ school_id: schoolId, category: form.category, description: form.description, amount: parseFloat(form.amount), date: form.date, vendor: form.vendor || null, recorded_by: user?.id ?? null })
+    const vendorName = form.vendor_id ? vendors.find((v: any) => v.id === form.vendor_id)?.name : form.vendor
+    addRecord.mutate({ 
+      school_id: schoolId, 
+      category: form.category, 
+      description: form.description, 
+      amount: parseFloat(form.amount), 
+      date: form.date, 
+      vendor: vendorName || null,
+      vendor_id: form.vendor_id || null, 
+      recorded_by: user?.id ?? null 
+    })
   }
 
   const filtered = filterCat ? (records as any[]).filter((r: any) => r.category === filterCat) : records as any[]
@@ -90,7 +107,17 @@ export default function ExpensesPage() {
                 { label: 'Category', content: <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}>{CATS.map(c => <option key={c}>{c}</option>)}</select> },
                 { label: 'Amount (GH₵) *', content: <input type="number" min="0" step="0.01" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))} placeholder="0.00" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
                 { label: 'Date', content: <input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
-                { label: 'Vendor / Payee', content: <input value={form.vendor} onChange={e => setForm(p => ({ ...p, vendor: e.target.value }))} placeholder="Optional" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
+                { label: 'Vendor / Payee', content: (
+                  <select 
+                    value={form.vendor_id} 
+                    onChange={e => setForm(p => ({ ...p, vendor_id: e.target.value, vendor: e.target.value === '' ? '' : p.vendor }))} 
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}
+                  >
+                    <option value="">-- Select Vendor or Type Below --</option>
+                    {vendors.map((v: any) => <option key={v.id} value={v.id}>{v.name}</option>)}
+                  </select>
+                )},
+                { label: 'Manual Vendor Name', content: <input value={form.vendor} disabled={!!form.vendor_id} onChange={e => setForm(p => ({ ...p, vendor: e.target.value }))} placeholder="Only if not in directory" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box', opacity: form.vendor_id ? 0.5 : 1 }} /> },
                 { label: 'Description *', content: <input value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="What was this for?" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />, span: true },
               ].map(f => (
                 <div key={f.label} style={{ gridColumn: (f as any).span ? '1/-1' : undefined }}>

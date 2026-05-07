@@ -23,12 +23,13 @@
 //  ✅ Global — Al Jazeera, BBC World, NYT World, Reuters, France 24, Sky
 // ─────────────────────────────────────────────────────────────────
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Newspaper, Globe, Cpu, Trophy, Activity,
   RefreshCw, Clock, Minimize2, Maximize2,
   FlaskConical, ExternalLink, Wifi, WifiOff, GraduationCap,
+  Moon, Sun, Bookmark, BookmarkCheck, Search, Share2, X,
 } from 'lucide-react'
 
 // ═══════════════════════════════════════════════════════════════
@@ -74,8 +75,9 @@ const CATEGORIES: Category[] = [
     label: 'GES / Education',
     icon: GraduationCap,
     feeds: [
-      'https://news.google.com/rss/search?q=Ghana+Education+Service&hl=en-GH&gl=GH&ceid=GH:en',
-      'https://news.google.com/rss/search?q=Ghana+schools+education&hl=en-GH&gl=GH&ceid=GH:en',
+      'https://www.myjoyonline.com/category/news/education/feed/',
+      'https://www.modernghana.com/rssfeed/?cat_id=14&type=1',
+      'https://news.google.com/rss/search?q=Ghana+Education+Service+news+when:7d&hl=en-GH&gl=GH&ceid=GH:en',
     ],
     sourceName: 'Ghana Education',
   },
@@ -85,8 +87,10 @@ const CATEGORIES: Category[] = [
     label: 'Ghana',
     icon: Globe,
     feeds: [
-      'https://news.google.com/rss/search?q=Ghana+news&hl=en-GH&gl=GH&ceid=GH:en',
-      'https://news.google.com/rss/search?q=Accra+news&hl=en-GH&gl=GH&ceid=GH:en',
+      'https://www.myjoyonline.com/category/news/ghana/feed/',
+      'https://citinewsroom.com/feed/',
+      'https://www.ghanaweb.com/GhanaHomePage/rss/feed.php?cat=news',
+      'https://www.modernghana.com/rssfeed/?cat_id=1&type=1',
     ],
     sourceName: 'Ghana News',
   },
@@ -214,53 +218,115 @@ const CORS_PROXIES: Array<(url: string) => string> = [
 //  HELPERS
 // ═══════════════════════════════════════════════════════════════
 
-const UNSPLASH_TOPICS: Record<string, string> = {
-  top: 'breaking-news,newspaper', ghana: 'accra,africa,ghana',
-  ges: 'education,school,classroom', global: 'globe,world,international',
-  tech: 'technology,computer,code', world: 'globe,world,travel',
-  sports: 'sports,stadium,athlete', health: 'medicine,health,hospital',
-  sci: 'science,laboratory,space',
+// Picsum seeds per category — deterministic so cards don't flicker on re-render
+const CAT_SEEDS: Record<string, number> = {
+  top: 10, ghana: 20, ges: 30, global: 40,
+  tech: 50, world: 60, sports: 70, health: 80, sci: 90,
 }
 
-const fallbackThumb = (catId: string, seed: number) =>
-  `https://source.unsplash.com/800x500/?${UNSPLASH_TOPICS[catId] ?? 'news'}&sig=${seed}`
+const fallbackThumb = (catId: string, idx: number) =>
+  `https://picsum.photos/seed/${CAT_SEEDS[catId] ?? 0}${idx % 50}/800/500`
 
 function decodeEntities(raw: string) {
+  if (!raw) return ''
   return raw
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&apos;/g, "'")
     .replace(/&nbsp;/g, ' ')
 }
 
+// ── Helper to scrape the actual story page for an image (og:image) ──
+async function fetchOGImage(url: string): Promise<string | null> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 6000)
+  
+  for (const makeProxy of CORS_PROXIES) {
+    try {
+      const res = await fetch(makeProxy(url), { signal: controller.signal })
+      if (!res.ok) continue
+      const html = await res.text()
+      // Enhanced regex to catch various meta formats
+      const m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/) ||
+                html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/) ||
+                html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/) ||
+                html.match(/<link[^>]+rel=["']image_src["'][^>]+href=["']([^"']+)["']/)
+      if (m && m[1] && m[1].startsWith('http')) {
+        clearTimeout(timeout)
+        return m[1]
+      }
+    } catch { continue }
+  }
+  clearTimeout(timeout)
+  return null
+}
+
 function parseRSS(xml: string, catId: string, sourceName: string): NewsItem[] {
   const itemBlocks = xml.match(/<item[\s>]([\s\S]*?)<\/item>/g) ?? []
   return itemBlocks.slice(0, 12).map((raw, i): NewsItem => {
+    // ── tag text extractor ──
+    // Order: strip CDATA wrapper → decode HTML entities → strip HTML tags
     const get = (tag: string) => {
       const m = raw.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))
       if (!m) return ''
-      return decodeEntities(
-        m[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
-      )
+      let s = m[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+      s = decodeEntities(s)
+      s = s.replace(/<[^>]+>/g, ' ')
+      s = decodeEntities(s)
+      return s.replace(/\s+/g, ' ').trim()
     }
+    // ── raw CDATA (keep HTML intact for image extraction) ──
+    const rawCDATA = (tag: string) => {
+      const m = raw.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`)) ||
+                raw.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))
+      if (!m) return ''
+      let s = m[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+      return decodeEntities(s)
+    }
+
     const fullTitle = get('title') || '(No title)'
     const [rawTitle, rawSrc] = fullTitle.split(' - ')
     const title = rawTitle?.trim() || fullTitle
-    const source = rawSrc?.trim() || sourceName
-    const link = (get('link') || get('guid') || '').trim()
+
+    // ── Real article URL: prefer <source url="..."> attr, then <link>, then <guid> ──
+    const srcAttrM = raw.match(/<source[^>]+url="([^"]+)"/)
+    const googleLink = (get('link') || get('guid') || '').trim()
+    const link = srcAttrM ? srcAttrM[1].trim() : googleLink
+
+    // Source name: prefer <source> tag text, then split from title
+    const srcTagText = get('source')
+    const source = srcTagText || rawSrc?.trim() || sourceName
+
     const pubDate = get('pubDate') || get('dc:date') || new Date().toISOString()
-    const rawDesc = get('description') || get('summary') || ''
-    const description = rawDesc.slice(0, 190).trim() + (rawDesc.length > 190 ? '…' : '')
+
+    // ── Description: clean up text and avoid bare URLs ──
+    const descHtml = rawCDATA('description')
+    let descText = descHtml
+      ? decodeEntities(descHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim())
+      : get('description') || get('summary') || ''
+    
+    // If description is just a URL or empty, use title
+    if (!descText || descText.startsWith('http') || descText.length < 10) {
+      descText = title
+    }
+    
+    const description = descText.slice(0, 200).trim() + (descText.length > 200 ? '…' : '')
+
+    // ── Thumbnail: check multiple sources in priority order ──
     let thumbnail = ''
     const m1 = raw.match(/<media:thumbnail[^>]+url="([^"]+)"/)
     const m2 = raw.match(/<enclosure[^>]+url="([^"]+)"/)
     const m3 = raw.match(/<media:content[^>]+url="([^"]+)"/)
-    const m4 = raw.match(/<img[^>]+src="([^"]+)"/)
+    // img inside description HTML
+    const m4 = descHtml ? descHtml.match(/<img[^>]+src="([^"]+)"/) : raw.match(/<img[^>]+src="([^"]+)"/)
     if (m1) thumbnail = m1[1]
     else if (m2) thumbnail = m2[1]
     else if (m3) thumbnail = m3[1]
     else if (m4) thumbnail = m4[1]
+    
+    // Filter tracking pixels and small icons
     if (thumbnail && (thumbnail.includes('1x1') || thumbnail.includes('/pixel') || thumbnail.includes('tracking'))) thumbnail = ''
     if (!thumbnail) thumbnail = fallbackThumb(catId, i + Date.now())
+
     return { id: `${catId}-${i}-${Date.now()}`, title, link, pubDate, description, source, category: catId, thumbnail }
   })
 }
@@ -301,18 +367,22 @@ function SkeletonCard() {
   )
 }
 
-function NewsCard({ item, index }: { item: NewsItem; index: number }) {
+function NewsCard({ item, index, cardBg, cardBorder, textPrimary, textMuted, bookmarked, onBookmark, onShare }: {
+  item: NewsItem; index: number
+  cardBg: string; cardBorder: string; textPrimary: string; textMuted: string
+  bookmarked: boolean; onBookmark: (item: NewsItem) => void; onShare: (item: NewsItem) => void
+}) {
   const [imgErr, setImgErr] = useState(false)
   return (
     <motion.article
       initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.38, delay: index * 0.055, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -5, boxShadow: '0 20px 48px rgba(0,0,0,0.12)' }}
+      whileHover={{ y: -5, boxShadow: '0 20px 48px rgba(0,0,0,0.15)' }}
       layout
-      style={{ background: '#fff', border: '1px solid #e4e3de', borderRadius: 20, overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'default', willChange: 'transform', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+      style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 20, overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'default', willChange: 'transform', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
     >
       <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
-        <div style={{ height: 176, overflow: 'hidden', position: 'relative', background: '#f1f0ec', flexShrink: 0 }}>
+        <div style={{ height: 176, overflow: 'hidden', position: 'relative', background: '#1a1a2e', flexShrink: 0 }}>
           <motion.img
             src={imgErr ? fallbackThumb(item.category, index) : item.thumbnail}
             alt={item.title} loading="lazy" onError={() => setImgErr(true)}
@@ -326,21 +396,31 @@ function NewsCard({ item, index }: { item: NewsItem; index: number }) {
       </a>
       <div style={{ padding: '16px 18px 14px', flex: 1, display: 'flex', flexDirection: 'column' }}>
         <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 15, fontWeight: 700, lineHeight: 1.42, color: '#0f0e17', marginBottom: 9, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 15, fontWeight: 700, lineHeight: 1.42, color: textPrimary, marginBottom: 9, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
             {item.title}
           </h3>
         </a>
-        <p style={{ fontSize: 12, color: '#72727f', lineHeight: 1.7, flex: 1, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+        <p style={{ fontSize: 12, color: textMuted, lineHeight: 1.7, flex: 1, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
           {item.description}
         </p>
-        <footer style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 13, paddingTop: 11, borderTop: '1px solid #e4e3de' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#72727f' }}>
+        <footer style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 13, paddingTop: 11, borderTop: `1px solid ${cardBorder}` }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: textMuted }}>
             <Clock size={11} />{formatDate(item.pubDate)}
           </span>
-          <a href={item.link} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: '#c0392b', textDecoration: 'none' }}>
-            Read more <ExternalLink size={11} />
-          </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button onClick={() => onBookmark(item)} title={bookmarked ? 'Remove bookmark' : 'Bookmark'}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: bookmarked ? '#f59e0b' : textMuted, display: 'flex' }}>
+              {bookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+            </button>
+            <button onClick={() => onShare(item)} title="Share"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: textMuted, display: 'flex' }}>
+              <Share2 size={13} />
+            </button>
+            <a href={item.link} target="_blank" rel="noopener noreferrer"
+              style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: '#c0392b', textDecoration: 'none' }}>
+              Read <ExternalLink size={11} />
+            </a>
+          </div>
         </footer>
       </div>
     </motion.article>
@@ -452,7 +532,7 @@ function LiveClock() {
 // ═══════════════════════════════════════════════════════════════
 
 export default function NewsPortalPage() {
-  const [activeTab, setActiveTab] = useState('ges') // GES / Education is default first tab
+  const [activeTab, setActiveTab] = useState('ges')
   const [news, setNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -462,6 +542,50 @@ export default function NewsPortalPage() {
   const [theater, setTheater] = useState(false)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  // ── New features ──
+  const [dark, setDark] = useState(() => localStorage.getItem('np-dark') === '1')
+  const [search, setSearch] = useState('')
+  const [showSearch, setShowSearch] = useState(false)
+  const [bookmarks, setBookmarks] = useState<NewsItem[]>(() => {
+    try { return JSON.parse(localStorage.getItem('np-bookmarks') || '[]') } catch { return [] }
+  })
+  const [showBookmarks, setShowBookmarks] = useState(false)
+
+  useEffect(() => { localStorage.setItem('np-dark', dark ? '1' : '0') }, [dark])
+  useEffect(() => { localStorage.setItem('np-bookmarks', JSON.stringify(bookmarks)) }, [bookmarks])
+
+  const toggleBookmark = useCallback((item: NewsItem) => {
+    setBookmarks(prev =>
+      prev.some(b => b.id === item.id || b.link === item.link)
+        ? prev.filter(b => b.link !== item.link)
+        : [item, ...prev]
+    )
+  }, [])
+
+  const isBookmarked = useCallback((item: NewsItem) =>
+    bookmarks.some(b => b.link === item.link), [bookmarks])
+
+  const shareArticle = useCallback((item: NewsItem) => {
+    if (navigator.share) {
+      navigator.share({ title: item.title, url: item.link }).catch(() => {})
+    } else {
+      navigator.clipboard.writeText(item.link).then(() => alert('Link copied!'))
+    }
+  }, [])
+
+  const filteredNews = useMemo(() =>
+    search.trim()
+      ? news.filter(n => n.title.toLowerCase().includes(search.toLowerCase()) ||
+          n.description.toLowerCase().includes(search.toLowerCase()))
+      : news
+  , [news, search])
+
+  // Theme vars
+  const bg = dark ? '#0d0d1a' : '#f8f7f4'
+  const cardBg = dark ? '#16162a' : '#fff'
+  const cardBorder = dark ? '#2a2a48' : '#e4e3de'
+  const textPrimary = dark ? '#e8e6f0' : '#0f0e17'
+  const textMuted = dark ? '#7a789a' : '#72727f'
 
   useEffect(() => {
     const up = () => setOnline(true)
@@ -480,8 +604,20 @@ export default function NewsPortalPage() {
       const xml = await fetchWithFallback(cat.feeds)
       const items = parseRSS(xml, cat.id, cat.sourceName)
       if (!items.length) throw new Error('No stories found')
+      
       setNews(items)
       setLastUpdated(new Date())
+      
+      // ── "Image Upgrade" pass: try to fetch OG images for stories with fallbacks ──
+      // We do this in the background after initial render for speed
+      items.forEach(async (item, idx) => {
+        if (!item.thumbnail.includes('picsum.photos')) return // Already has a real image
+        const ogImg = await fetchOGImage(item.link)
+        if (ogImg) {
+          setNews(current => current.map(n => n.link === item.link ? { ...n, thumbnail: ogImg } : n))
+        }
+      })
+      
     } catch (e) {
       console.error('[NewsPortal]', e)
       setError("Headlines couldn't load right now. Check your connection or try again.")
@@ -509,96 +645,88 @@ export default function NewsPortalPage() {
         @keyframes np-pulse   { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
         @keyframes np-ticker  { from{transform:translateX(0)} to{transform:translateX(-50%)} }
         @keyframes np-spin    { to{transform:rotate(360deg)} }
-        /* nav: hide scrollbar across engines */
         .np-nav::-webkit-scrollbar { display: none }
         .np-navbtn {
-          display:flex; align-items:center; gap:6px;
-          padding:0 13px; border:none; background:transparent;
-          font-family:'Sora',sans-serif; font-size:10px; font-weight:600;
-          letter-spacing:.06em; text-transform:uppercase;
+          display:flex; align-items:center; gap:5px;
+          padding:6px 11px; border:none; border-radius:20px;
+          font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600;
           cursor:pointer; white-space:nowrap; flex-shrink:0;
-          transition:color .18s,background .18s;
+          transition:all .18s;
         }
-        .np-navbtn:hover { color:#fff !important; background:rgba(255,255,255,0.04) !important; }
         .np-layout {
-          display: grid;
-          gap: 26px;
-          align-items: start;
-          grid-template-columns: minmax(0,1fr) 308px;
+          display: grid; gap: 22px; align-items: start;
+          grid-template-columns: minmax(0,1fr) 296px;
         }
-        .np-layout.theater {
-          grid-template-columns: 1fr;
-        }
-        @media (max-width: 1023px) {
-          .np-layout {
-            grid-template-columns: 1fr !important;
-          }
-        }
+        .np-layout.theater { grid-template-columns: 1fr; }
+        @media (max-width: 1023px) { .np-layout { grid-template-columns: 1fr !important; } }
       `}</style>
 
-      <div style={{ fontFamily: "'Sora','DM Sans',sans-serif", background: '#f8f7f4', minHeight: '100vh', color: '#0f0e17' }}>
+      <div style={{ fontFamily: "'DM Sans',sans-serif", color: textPrimary, transition: 'color .25s' }}>
 
-        {/* ── Masthead ── */}
-        <header style={{ position: 'sticky', top: 0, zIndex: 200, background: '#10103a', borderBottom: '3px solid #c0392b' }}>
-          <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'stretch', minHeight: 50 }}>
+        {/* ── Integrated control bar (sits inside AppLayout, under app header) ── */}
+        <div style={{ background: dark ? '#16162a' : '#10103a', borderRadius: 14, marginBottom: 16, overflow: 'hidden' }}>
+          {/* Top row: online pill + category tabs + controls */}
+          <div style={{ display: 'flex', alignItems: 'stretch', minHeight: 44, padding: '0 8px' }}>
 
-            {/* Brand */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 18px 11px 0', borderRight: '1px solid rgba(255,255,255,.1)', flexShrink: 0 }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#e74c3c', animation: 'np-pulse 1.4s ease-in-out infinite', display: 'inline-block' }} />
-              <div>
-                <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px' }}>NewsFront</div>
-                <div style={{ fontSize: 7, fontWeight: 600, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,.35)', marginTop: 1 }}>Live · Global</div>
-              </div>
-            </div>
-
-            {/* Clock */}
-            <div style={{ padding: '0 13px', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,.4)', borderRight: '1px solid rgba(255,255,255,.1)', display: 'flex', alignItems: 'center', fontVariantNumeric: 'tabular-nums', letterSpacing: '.04em', flexShrink: 0 }}>
-              <LiveClock />
-            </div>
-
-            {/* Online pill */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 11px', borderRight: '1px solid rgba(255,255,255,.1)', fontSize: 10, fontWeight: 600, letterSpacing: '.06em', color: online ? '#2ecc71' : '#e74c3c', flexShrink: 0 }}>
-              {online ? <Wifi size={12} /> : <WifiOff size={12} />}
+            {/* Online indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 10px', fontSize: 10, fontWeight: 700, color: online ? '#2ecc71' : '#e74c3c', flexShrink: 0, borderRight: '1px solid rgba(255,255,255,.08)' }}>
+              {online ? <Wifi size={11} /> : <WifiOff size={11} />}
               {online ? 'Live' : 'Offline'}
             </div>
 
-            {/* Category nav */}
-            <nav className="np-nav" style={{ flex: 1, display: 'flex', alignItems: 'stretch', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {/* Category tabs */}
+            <nav className="np-nav" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2, overflowX: 'auto', scrollbarWidth: 'none', padding: '5px 6px' }}>
               {CATEGORIES.map(cat => {
                 const active = activeTab === cat.id
                 return (
-                  <button
-                    key={cat.id}
-                    className="np-navbtn"
+                  <button key={cat.id} className="np-navbtn"
                     onClick={() => { setActiveTab(cat.id); setTheater(false) }}
                     style={{
-                      color: active ? '#fff' : 'rgba(255,255,255,.5)',
-                      background: active ? 'rgba(255,255,255,0.06)' : 'transparent',
-                      borderBottom: active ? '3px solid #e74c3c' : '3px solid transparent',
-                      marginBottom: -3,
-                    }}
-                  >
-                    <cat.icon size={11} style={{ opacity: 0.8, flexShrink: 0 }} />
+                      background: active ? '#c0392b' : 'rgba(255,255,255,0.07)',
+                      color: active ? '#fff' : 'rgba(255,255,255,.55)',
+                    }}>
+                    <cat.icon size={10} style={{ flexShrink: 0 }} />
                     {cat.label}
                   </button>
                 )
               })}
             </nav>
 
-            {/* Refresh */}
-            <button
-              onClick={() => fetchNews(true)} disabled={refreshing}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, margin: 'auto 8px', background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', borderRadius: '50%', color: 'rgba(255,255,255,.7)', cursor: 'pointer', flexShrink: 0 }}
-            >
-              <RefreshCw size={13} style={{ animation: refreshing ? 'np-spin .9s linear infinite' : 'none' }} />
-            </button>
+            {/* Action buttons */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '0 6px', flexShrink: 0, borderLeft: '1px solid rgba(255,255,255,.08)' }}>
+              {[
+                { icon: showSearch ? X : Search, active: showSearch, title: 'Search', action: () => { setShowSearch(s => !s); setShowBookmarks(false) } },
+                { icon: Bookmark, active: showBookmarks, title: `Bookmarks (${bookmarks.length})`, action: () => { setShowBookmarks(s => !s); setShowSearch(false) }, badge: bookmarks.length },
+                { icon: RefreshCw, active: false, title: 'Refresh', action: () => fetchNews(true), spin: refreshing },
+                { icon: dark ? Sun : Moon, active: false, title: 'Toggle dark', action: () => setDark(d => !d) },
+              ].map(({ icon: Icon, active, title, action, badge, spin }) => (
+                <button key={title} onClick={action} title={title}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, background: active ? '#c0392b' : 'rgba(255,255,255,.08)', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', position: 'relative', flexShrink: 0 }}>
+                  <Icon size={13} style={{ animation: spin ? 'np-spin .9s linear infinite' : 'none' }} />
+                  {badge! > 0 && <span style={{ position: 'absolute', top: -2, right: -2, background: '#e74c3c', color: '#fff', fontSize: 7, fontWeight: 800, borderRadius: '50%', width: 12, height: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{badge}</span>}
+                </button>
+              ))}
+            </div>
           </div>
-        </header>
+
+          {/* Search bar */}
+          <AnimatePresence>
+            {showSearch && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 40, opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                style={{ overflow: 'hidden', borderTop: '1px solid rgba(255,255,255,0.07)', background: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ padding: '0 16px', height: '100%', display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Search size={13} color="rgba(255,255,255,0.4)" />
+                  <input autoFocus value={search} onChange={e => setSearch(e.target.value)} placeholder="Search headlines…"
+                    style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: '#fff', fontSize: 13, fontFamily: 'inherit' }} />
+                  {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex' }}><X size={13} /></button>}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* ── Page body ── */}
-        <div className={`np-layout ${theater ? 'theater' : ''}`} style={{
-          maxWidth: 1400, margin: '0 auto', padding: '26px 20px 80px',
-        }}>
+        <div className={`np-layout ${theater ? 'theater' : ''}`}>
 
           {/* ── Main column ── */}
           <main style={{ minWidth: 0 }}>
@@ -621,10 +749,11 @@ export default function NewsPortalPage() {
             </AnimatePresence>
 
             {/* Section label */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 9, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#72727f', marginBottom: 18 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 9, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: textMuted, marginBottom: 18 }}>
               <activeCat.icon size={11} />
               {activeCat.label}
-              <span style={{ flex: 1, height: 1, background: '#e4e3de' }} />
+              {search && <span style={{ color: '#c0392b', fontWeight: 600 }}>· "{search}" — {filteredNews.length} result{filteredNews.length !== 1 ? 's' : ''}</span>}
+              <span style={{ flex: 1, height: 1, background: cardBorder }} />
             </div>
 
             {/* Cards / loading / error */}
@@ -636,20 +765,31 @@ export default function NewsPortalPage() {
                 </motion.div>
               ) : error ? (
                 <motion.div key="err" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <div style={{ background: '#fff', border: '1px solid #fdd', borderRadius: 20, padding: '52px 24px', textAlign: 'center' }}>
+                  <div style={{ background: cardBg, border: `1px solid #fdd`, borderRadius: 20, padding: '52px 24px', textAlign: 'center' }}>
                     <div style={{ fontSize: 36, marginBottom: 14 }}>📡</div>
-                    <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 20, marginBottom: 8 }}>Feed Unavailable</div>
-                    <p style={{ fontSize: 13, color: '#72727f', marginBottom: 22 }}>{error}</p>
+                    <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 20, marginBottom: 8, color: textPrimary }}>Feed Unavailable</div>
+                    <p style={{ fontSize: 13, color: textMuted, marginBottom: 22 }}>{error}</p>
                     <button onClick={() => fetchNews(true)}
                       style={{ padding: '10px 26px', background: '#c0392b', color: '#fff', border: 'none', borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                       Try Again
                     </button>
                   </div>
                 </motion.div>
+              ) : filteredNews.length === 0 && search ? (
+                <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <div style={{ textAlign: 'center', padding: '60px 24px', color: textMuted }}>
+                    <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+                    <p>No results for <strong>"{search}"</strong></p>
+                  </div>
+                </motion.div>
               ) : (
-                <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                <motion.div key={activeTab + search} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 20 }}>
-                  {news.map((item, i) => <NewsCard key={item.id} item={item} index={i} />)}
+                  {filteredNews.map((item, i) => (
+                    <NewsCard key={item.id} item={item} index={i}
+                      cardBg={cardBg} cardBorder={cardBorder} textPrimary={textPrimary} textMuted={textMuted}
+                      bookmarked={isBookmarked(item)} onBookmark={toggleBookmark} onShare={shareArticle} />
+                  ))}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -663,6 +803,30 @@ export default function NewsPortalPage() {
 
               {/* 4-col × 3-row channel switcher */}
               <ChannelGrid channels={CHANNELS} activeChannel={channel} onSelect={setChannel} />
+
+              {/* Bookmarks panel */}
+              <AnimatePresence>
+                {showBookmarks && (
+                  <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                    style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 20, padding: 16 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: textPrimary, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <BookmarkCheck size={13} color="#f59e0b" /> Saved ({bookmarks.length})
+                      </div>
+                      {bookmarks.length > 0 && <button onClick={() => setBookmarks([])} style={{ background: 'none', border: 'none', fontSize: 10, color: '#c0392b', cursor: 'pointer', fontWeight: 600 }}>Clear all</button>}
+                    </div>
+                    {bookmarks.length === 0
+                      ? <p style={{ fontSize: 11, color: textMuted, textAlign: 'center', padding: '16px 0' }}>No bookmarks yet</p>
+                      : bookmarks.map(b => (
+                        <a key={b.link} href={b.link} target="_blank" rel="noopener noreferrer"
+                          style={{ display: 'block', fontSize: 12, fontWeight: 600, color: textPrimary, textDecoration: 'none', paddingBottom: 10, marginBottom: 10, borderBottom: `1px solid ${cardBorder}`, lineHeight: 1.4 }}>
+                          {b.title.slice(0, 80)}{b.title.length > 80 ? '…' : ''}
+                        </a>
+                      ))
+                    }
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Status card */}
               <div style={{ background: '#10103a', borderRadius: 20, padding: 20, color: '#fff' }}>
@@ -678,7 +842,7 @@ export default function NewsPortalPage() {
                   ['Status', online ? '● Connected' : '○ Offline'],
                   ['Last sync', lastUpdated ? new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' }).format(lastUpdated) : '—'],
                   ['Stories', String(news.length)],
-                  ['Categories', String(CATEGORIES.length)],
+                  ['Bookmarks', String(bookmarks.length)],
                   ['Live channels', `${CHANNELS.length} (free · YouTube)`],
                 ].map(([label, val]) => (
                   <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>
