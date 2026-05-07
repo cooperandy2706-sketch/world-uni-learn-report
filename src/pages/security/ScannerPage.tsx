@@ -3,12 +3,14 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'html5-qrcode'
-import { QrCode, Usb, Camera, CheckCircle, XCircle, Clock, LogIn, LogOut, AlertTriangle } from 'lucide-react'
+import { QrCode, Usb, Camera, CheckCircle, XCircle, Clock, LogIn, LogOut, AlertTriangle, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { format } from 'date-fns'
+import { format, parse } from 'date-fns'
+import { useSettings, useCurrentTerm } from '../../hooks/useSettings'
 
-const LATE_HOUR = 8
-const DUPLICATE_COOLDOWN_MS = 30_000
+// Defaults if settings not loaded
+const DEFAULT_LATE_HOUR = 8
+const DEFAULT_COOLDOWN_MS = 30_000
 
 interface ScanCard {
   name: string
@@ -23,6 +25,8 @@ interface ScanCard {
 
 export default function ScannerPage() {
   const { user } = useAuth()
+  const { data: settings } = useSettings()
+  const { data: term } = useCurrentTerm()
   const schoolId = user?.school_id ?? ''
   const [mode, setMode] = useState<'camera' | 'usb'>('camera')
   const [card, setCard] = useState<ScanCard | null>(null)
@@ -63,22 +67,37 @@ export default function ScannerPage() {
       return
     }
 
-    processingRef.current = true
-    setProcessing(true)
-    setErrorMsg('')
-    setCard(null)
-
     try {
+      // 0. Resolve settings
+      const lateTimeStr = (settings as any)?.late_arrival_time || '08:00:00'
+      const cooldownSecs = (settings as any)?.scan_cooldown_seconds || 30
+      const cooldownMs = cooldownSecs * 1000
+
+      // Duplicate cooldown per ID
+      const lastTime = lastScanMap.current.get(code)
+      if (lastTime && Date.now() - lastTime < cooldownMs) {
+        const secsLeft = Math.ceil((cooldownMs - (Date.now() - lastTime)) / 1000)
+        toast(`⏳ Wait ${secsLeft}s before scanning again`, { duration: 2000, icon: '⏱️' })
+        setUsbInput('')
+        return
+      }
+
+      processingRef.current = true
+      setProcessing(true)
+      setErrorMsg('')
+      setCard(null)
+
       // 1. Look up student
       let personType: 'student' | 'teacher' | null = null
       let personDbId = ''
       let personName = ''
       let className = ''
       let photoUrl = ''
+      let studentClassId = ''
 
       const { data: student } = await (isUniqueFormat
-        ? supabase.from('students').select('id, full_name, photo_url, class:classes(name)').eq('id', code).maybeSingle()
-        : supabase.from('students').select('id, full_name, photo_url, class:classes(name)').eq('school_id', schoolId).eq('student_id', code).maybeSingle())
+        ? supabase.from('students').select('id, full_name, photo_url, class_id, class:classes(name)').eq('id', code).maybeSingle()
+        : supabase.from('students').select('id, full_name, photo_url, class_id, class:classes(name)').eq('school_id', schoolId).eq('student_id', code).maybeSingle())
 
       if (student) {
         personType = 'student'
@@ -86,6 +105,7 @@ export default function ScannerPage() {
         personName = student.full_name
         className = (student as any).class?.name ?? 'No Class'
         photoUrl = student.photo_url ?? ''
+        studentClassId = student.class_id ?? ''
       } else {
         const { data: teacher } = await (isUniqueFormat
           ? supabase.from('teachers').select('id, user:users(full_name, avatar_url)').eq('id', code).maybeSingle()
@@ -126,7 +146,9 @@ export default function ScannerPage() {
 
       // 3. Determine status
       const now = new Date()
-      const isLate = direction === 'in' && now.getHours() >= LATE_HOUR
+      // Parse lateTimeStr (format HH:mm:ss or HH:mm)
+      const lateTime = parse(lateTimeStr.slice(0, 5), 'HH:mm', now)
+      const isLate = direction === 'in' && now > lateTime
       const status: 'on_time' | 'late' = isLate ? 'late' : 'on_time'
 
       // 4. Save scan
@@ -143,10 +165,62 @@ export default function ScannerPage() {
         scanned_by: user?.id,
       })
 
-      // 5. Record cooldown
+      // 5. Sync to Academic Attendance (only for first student 'in' of the day)
+      if (personType === 'student' && direction === 'in' && !lastScan && term) {
+        try {
+          // Check if already has an academic record for today (maybe manual register or from another gate)
+          const { data: existingRec } = await supabase
+            .from('attendance_records')
+            .select('id')
+            .eq('student_id', personDbId)
+            .eq('date', today)
+            .maybeSingle()
+
+          if (!existingRec) {
+            // Record daily log
+            await supabase.from('attendance_records').insert({
+              student_id: personDbId,
+              class_id: studentClassId,
+              term_id: (term as any).id,
+              school_id: schoolId,
+              date: today,
+              status: status === 'late' ? 'late' : 'present',
+              notes: 'Recorded via Gate Scanner'
+            })
+
+            // Update term totals
+            const { data: attTotal } = await supabase
+              .from('attendance')
+              .select('id, total_days, days_present, days_absent')
+              .eq('student_id', personDbId)
+              .eq('term_id', (term as any).id)
+              .maybeSingle()
+
+            if (attTotal) {
+              await supabase.from('attendance').update({
+                total_days: (attTotal.total_days ?? 0) + 1,
+                days_present: (attTotal.days_present ?? 0) + 1,
+              }).eq('id', attTotal.id)
+            } else {
+              await supabase.from('attendance').insert({
+                student_id: personDbId,
+                term_id: (term as any).id,
+                total_days: 1,
+                days_present: 1,
+                days_absent: 0,
+              })
+            }
+          }
+        } catch (e) {
+          console.error('Failed to sync to academic attendance:', e)
+          // Don't fail the gate scan if academic sync fails, but maybe log it
+        }
+      }
+
+      // 6. Record cooldown
       lastScanMap.current.set(code, Date.now())
 
-      // 6. Show card
+      // 7. Show card
       showCard({ name: personName, personType, className, photoUrl, direction, status, scanTime: format(now, 'hh:mm:ss a') }, 'success')
     } catch {
       setErrorMsg('Scan failed — please try again')
@@ -155,7 +229,7 @@ export default function ScannerPage() {
       processingRef.current = false
       setUsbInput('')
     }
-  }, [schoolId, user?.id])
+  }, [schoolId, user?.id, settings, term])
 
   // Camera scanner
   useEffect(() => {

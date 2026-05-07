@@ -40,6 +40,7 @@ export default function TeacherAttendancePage() {
   
   const [students, setStudents] = useState<Student[]>([])
   const [marks, setMarks] = useState<Record<string, Mark>>({})
+  const [dbMarks, setDbMarks] = useState<Record<string, Mark>>({})
   const [submittedToday, setSubmittedToday] = useState(false)
   const [termTotals, setTermTotals] = useState<Record<string, { total: number; present: number }>>({})
   const todayDate = new Date().toISOString().slice(0, 10)
@@ -102,16 +103,25 @@ export default function TeacherAttendancePage() {
 
   async function checkDbSubmitted(classId: string) {
     if (!term) return
-    const { data: alreadyLogged } = await supabase
+    // We now check if ALL students have records, or just use this to show partial status
+    const { count } = await supabase
         .from('attendance_records')
-        .select('id')
+        .select('*', { count: 'exact', head: true })
         .eq('class_id', classId)
         .eq('date', todayDate)
-        .limit(1)
 
-    if (alreadyLogged && alreadyLogged.length > 0) {
+    const { data: studentCount } = await supabase
+        .from('students')
+        .select('*', { count: 'exact', head: true })
+        .eq('class_id', classId)
+        .eq('is_active', true)
+
+    if (count !== null && studentCount !== null && count >= studentCount && studentCount > 0) {
       localStorage.setItem(TODAY_KEY(user!.id, classId), '1')
       setSubmittedToday(true)
+    } else {
+      localStorage.removeItem(TODAY_KEY(user!.id, classId))
+      setSubmittedToday(false)
     }
   }
 
@@ -149,9 +159,24 @@ export default function TeacherAttendancePage() {
     }
     setTermTotals(totals)
 
-    // Default all to present
+    // 3. Load today's marks (e.g. from QR scanner)
+    const { data: todayRecs } = await supabase
+      .from('attendance_records')
+      .select('student_id, status')
+      .eq('class_id', classId)
+      .eq('date', todayDate)
+
+    const dbM: Record<string, Mark> = {}
+    for (const r of todayRecs ?? []) {
+      dbM[r.student_id] = r.status as Mark
+    }
+    setDbMarks(dbM)
+
+    // Default all to present, but use DB marks if they exist
     const defaultMarks: Record<string, Mark> = {}
-    for (const s of studs) defaultMarks[s.id] = 'present'
+    for (const s of studs) {
+      defaultMarks[s.id] = dbM[s.id] || 'present'
+    }
     setMarks(defaultMarks)
   }
 
@@ -171,16 +196,17 @@ export default function TeacherAttendancePage() {
     setSaving(true)
 
     try {
-      // 1. Verify if attendance was already logged today for this class
-      const { data: alreadyLogged } = await supabase
+      // 1. Get existing records for this class today
+      const { data: existingRecs } = await supabase
         .from('attendance_records')
-        .select('id')
+        .select('student_id')
         .eq('class_id', myClass.id)
         .eq('date', todayDate)
-        .limit(1)
 
-      if (alreadyLogged && alreadyLogged.length > 0) {
-        toast.error('Attendance has already been submitted for this class today!')
+      const alreadyMarkedIds = new Set((existingRecs || []).map(r => r.student_id))
+
+      if (alreadyMarkedIds.size >= students.length && students.length > 0) {
+        toast.error('Attendance has already been submitted for all students today!')
         localStorage.setItem(TODAY_KEY(user!.id, myClass.id), '1')
         setSubmittedToday(true)
         setSaving(false)
@@ -190,6 +216,8 @@ export default function TeacherAttendancePage() {
       for (const student of students) {
         const mark = marks[student.id] ?? 'present'
         const isPresent = mark === 'present' || mark === 'late'
+
+        if (alreadyMarkedIds.has(student.id)) continue
 
         // Check if attendance record exists for this student+term
         const { data: existing } = await supabase
@@ -496,7 +524,10 @@ export default function TeacherAttendancePage() {
                           {s.full_name.charAt(0)}
                         </div>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.full_name}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {s.full_name}
+                            {dbMarks[s.id] && <span style={{ marginLeft: 8, fontSize: 10, background: '#f0fdf4', color: '#16a34a', padding: '2px 6px', borderRadius: 6 }}>QR SCAN</span>}
+                          </div>
                           <div style={{ fontSize: 11, color: '#9ca3af' }}>{s.student_id ?? (s.gender ? (s.gender === 'male' ? '♂' : '♀') : '')}</div>
                         </div>
                       </div>
@@ -525,6 +556,7 @@ export default function TeacherAttendancePage() {
                             <button
                               key={opt.m}
                               className="att-btn"
+                              disabled={!!dbMarks[s.id]}
                               onClick={() => setMark(s.id, opt.m)}
                               style={{
                                 padding: '8px 12px',
@@ -536,7 +568,9 @@ export default function TeacherAttendancePage() {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                gap: 2
+                                gap: 2,
+                                opacity: dbMarks[s.id] ? 0.5 : 1,
+                                cursor: dbMarks[s.id] ? 'default' : 'pointer'
                               }}
                             >
                               <span style={{ fontSize: 16 }}>{opt.icon}</span>
