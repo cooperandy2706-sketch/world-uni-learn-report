@@ -125,12 +125,6 @@ export default function SecurityDashboard() {
       .order('scan_time', { ascending: false })
 
     const all = scans ?? []
-    const latestPerPerson: Record<string, GateScan> = {}
-    all.forEach((s: GateScan) => {
-      if (!latestPerPerson[s.id]) {
-        // Actually group by person_db_id to compute on-premise count
-      }
-    })
 
     // Compute who is currently on premise (last scan = 'in')
     const byPerson: Record<string, GateScan[]> = {}
@@ -277,6 +271,7 @@ export default function SecurityDashboard() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
                   { label: 'Open Gate Scanner', emoji: '📷', path: '/security/scanner', color: '#0f172a' },
+                  { label: 'Print Student Tags (QR)', emoji: '🪪', path: '/admin/poster-maker?tab=tags', color: '#7c3aed' },
                   { label: 'View Attendance Log', emoji: '📋', path: '/security/gate-attendance', color: '#2563eb' },
                   { label: 'Register Visitor', emoji: '🚪', path: '/security/visitors', color: '#059669' },
                 ].map(({ label, emoji, path, color }) => (

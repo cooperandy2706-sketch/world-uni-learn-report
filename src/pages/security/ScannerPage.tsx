@@ -2,8 +2,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
-import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'html5-qrcode'
-import { QrCode, Usb, Camera, CheckCircle, XCircle, Clock, LogIn, LogOut, AlertTriangle, RefreshCw } from 'lucide-react'
+import { Html5Qrcode } from 'html5-qrcode'
+import { QrCode, Usb, Camera, CheckCircle, XCircle, Clock, LogIn, LogOut, AlertTriangle, Volume2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { format, parse } from 'date-fns'
 import { useSettings, useCurrentTerm } from '../../hooks/useSettings'
@@ -34,8 +34,9 @@ export default function ScannerPage() {
   const [errorMsg, setErrorMsg] = useState('')
   const [processing, setProcessing] = useState(false)
   const [usbInput, setUsbInput] = useState('')
+  const [cameraError, setCameraError] = useState('')
   const usbRef = useRef<HTMLInputElement>(null)
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null)
+  const scannerRef = useRef<Html5Qrcode | null>(null)
   const lastScanMap = useRef<Map<string, number>>(new Map())
   const cardTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const usbTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -58,13 +59,22 @@ export default function ScannerPage() {
       code = code.replace('WUL:ID:', '')
     }
 
-    // Duplicate cooldown per ID
-    const lastTime = lastScanMap.current.get(code)
-    if (lastTime && Date.now() - lastTime < DUPLICATE_COOLDOWN_MS) {
-      const secsLeft = Math.ceil((DUPLICATE_COOLDOWN_MS - (Date.now() - lastTime)) / 1000)
-      toast(`⏳ Wait ${secsLeft}s before scanning again`, { duration: 2000, icon: '⏱️' })
-      setUsbInput('')
-      return
+    // Audio Feedback helper
+    const playBeep = () => {
+      try {
+        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
+        const osc = audioCtx.createOscillator()
+        const gain = audioCtx.createGain()
+        osc.connect(gain)
+        gain.connect(audioCtx.destination)
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime) // A5
+        gain.gain.setValueAtTime(0, audioCtx.currentTime)
+        gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.01)
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2)
+        osc.start()
+        osc.stop(audioCtx.currentTime + 0.2)
+      } catch (e) { console.error('Audio fail', e) }
     }
 
     try {
@@ -220,41 +230,111 @@ export default function ScannerPage() {
       // 6. Record cooldown
       lastScanMap.current.set(code, Date.now())
 
-      // 7. Show card
+      // 7. Show card & Play Beep
+      playBeep()
       showCard({ name: personName, personType, className, photoUrl, direction, status, scanTime: format(now, 'hh:mm:ss a') }, 'success')
-    } catch {
+    } catch (e: any) {
+      console.error('Scan process error:', e)
       setErrorMsg('Scan failed — please try again')
     } finally {
       setProcessing(false)
       processingRef.current = false
       setUsbInput('')
     }
-  }, [schoolId, user?.id, settings, term])
+  }, [schoolId, user?.id, (settings as any)?.late_arrival_time, (settings as any)?.scan_cooldown_seconds, (term as any)?.id])
 
-  // Camera scanner
+  // Camera scanner automatic start
   useEffect(() => {
     if (mode !== 'camera') return
-    const el = document.getElementById('qr-reader')
-    if (!el) return
-    const scanner = new Html5QrcodeScanner('qr-reader', {
-      fps: 15,
-      qrbox: { width: 250, height: 250 },
-      aspectRatio: 1.0,
-      showTorchButtonIfSupported: true,
-      formatsToSupport: [
-        Html5QrcodeSupportedFormats.QR_CODE,
-        Html5QrcodeSupportedFormats.CODE_128,
-        Html5QrcodeSupportedFormats.CODE_39,
-        Html5QrcodeSupportedFormats.EAN_13,
-        Html5QrcodeSupportedFormats.EAN_8,
-      ],
-    }, false)
-    scanner.render(
-      (text) => { if (!processingRef.current) processBarcode(text) },
-      () => {}
-    )
-    scannerRef.current = scanner
-    return () => { scanner.clear().catch(() => {}) }
+    
+    let isMounted = true
+    let scanner: Html5Qrcode | null = null
+
+    async function start() {
+      if (!isMounted) return
+      
+      try {
+        // 1. Get cameras first (static call, no DOM dependency)
+        const cameras = await Html5Qrcode.getCameras()
+        if (!isMounted) return
+
+        if (!cameras || cameras.length === 0) {
+          setCameraError('No cameras found')
+          return
+        }
+
+        // 2. Wait for the element to be ready and have dimensions
+        // This is crucial for html5-qrcode to avoid "clientWidth of null" errors
+        const getEl = () => document.getElementById('qr-reader')
+        const isReady = () => {
+          const el = getEl()
+          return el && el.clientWidth > 0
+        }
+
+        if (!isReady()) {
+          let attempts = 0
+          while (!isReady() && attempts < 30 && isMounted) {
+            await new Promise(r => setTimeout(r, 100))
+            attempts++
+          }
+        }
+
+        if (!isMounted || !isReady()) return
+
+        // 3. Cleanup previous instance properly
+        if (scannerRef.current) {
+          try {
+            if (scannerRef.current.isScanning) {
+              await scannerRef.current.stop()
+            }
+            // Some versions of html5-qrcode need clear() or just stop()
+            try { (scannerRef.current as any).clear() } catch(e) {}
+          } catch (e) {
+            console.warn('Scanner cleanup error:', e)
+          }
+        }
+
+        // 4. Initialize and start
+        const backCam = cameras.find(c => c.label.toLowerCase().includes('back')) || cameras[0]
+        
+        // Final check immediately before creation to ensure element wasn't removed
+        if (!isMounted || !getEl()) return
+        
+        const newScanner = new Html5Qrcode('qr-reader')
+        scannerRef.current = newScanner
+        scanner = newScanner // for the cleanup closure
+
+        await newScanner.start(
+          backCam.id,
+          {
+            fps: 15,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0,
+          },
+          (text) => { if (!processingRef.current) processBarcode(text) },
+          () => {}
+        )
+        
+        if (isMounted) setCameraError('')
+      } catch (err: any) {
+        // Only report error if still mounted (ignore race-condition errors during unmount)
+        if (isMounted) {
+          console.error('Camera start fail:', err)
+          setCameraError('Camera access denied or already in use')
+        }
+      }
+    }
+
+    start()
+
+    return () => {
+      isMounted = false
+      if (scanner) {
+        if (scanner.isScanning) {
+          scanner.stop().catch(e => console.log('Stop error', e))
+        }
+      }
+    }
   }, [mode, processBarcode])
 
   useEffect(() => {
@@ -284,13 +364,14 @@ export default function ScannerPage() {
         @keyframes sc_shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
         @keyframes sc_spin { to{transform:rotate(360deg)} }
         @keyframes sc_pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+        @keyframes sc_scan { 0%{top:0} 100%{top:100%} }
         .sc-card { animation: sc_pop .4s cubic-bezier(.34,1.56,.64,1) forwards; }
         .sc-err { animation: sc_shake .4s ease; }
-        #qr-reader { border: none !important; width: 100% !important; }
-        #qr-reader video { border-radius: 20px !important; width: 100% !important; }
-        #qr-reader__scan_region { border-radius: 20px !important; }
-        #qr-reader__dashboard { padding: 12px 16px !important; }
-        #qr-reader__dashboard_section_csr button { background: #0f172a !important; border-radius: 10px !important; color: #fff !important; border: none !important; padding: 8px 16px !important; font-weight: 700 !important; cursor: pointer !important; }
+        #qr-reader { border: none !important; width: 100% !important; background: #000; position: relative; }
+        #qr-reader video { border-radius: 20px !important; width: 100% !important; object-fit: cover; }
+        .qr-hud { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px solid rgba(255,255,255,0.2); border-radius: 20px; pointer-events: none; z-index: 10; display: flex; align-items: center; justifyContent: center; }
+        .qr-line { position: absolute; left: 10%; right: 10%; height: 2px; background: rgba(34,197,94,0.5); box-shadow: 0 0 8px rgba(34,197,94,0.8); animation: sc_scan 2s linear infinite; }
+        #qr-reader__dashboard { display: none !important; }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",sans-serif', maxWidth: 500, margin: '0 auto', paddingBottom: 100 }}>
@@ -317,10 +398,25 @@ export default function ScannerPage() {
 
         {/* Camera Mode */}
         {mode === 'camera' && (
-          <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 20, boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
-            <div id="qr-reader" />
-            <div style={{ padding: '12px 20px', background: '#f8fafc', borderTop: '1px solid #f1f5f9', fontSize: 12, color: '#94a3b8', textAlign: 'center', fontWeight: 600 }}>
-              Point camera at any QR code or barcode · Supports CODE-128, EAN, QR
+          <div style={{ background: '#000', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 20, boxShadow: '0 4px 24px rgba(0,0,0,0.1)', position: 'relative' }}>
+            {cameraError ? (
+              <div style={{ padding: '60px 20px', textAlign: 'center', color: '#fca5a5' }}>
+                <AlertTriangle size={48} style={{ marginBottom: 12, opacity: 0.5 }} />
+                <div style={{ fontSize: 16, fontWeight: 800 }}>Camera Error</div>
+                <div style={{ fontSize: 13, marginTop: 4 }}>{cameraError}</div>
+                <button onClick={() => window.location.reload()} style={{ marginTop: 16, padding: '8px 16px', borderRadius: 8, background: '#fff', color: '#dc2626', border: 'none', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Retry</button>
+              </div>
+            ) : (
+              <div style={{ position: 'relative' }}>
+                <div id="qr-reader" />
+                <div className="qr-hud">
+                  <div className="qr-line" />
+                  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 250, height: 250, border: '2px solid #22c55e', borderRadius: 20, boxShadow: '0 0 0 4000px rgba(0,0,0,0.4)' }} />
+                </div>
+              </div>
+            )}
+            <div style={{ padding: '12px 20px', background: '#0f172a', fontSize: 11, color: '#94a3b8', textAlign: 'center', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <Volume2 size={12} /> BEEP SOUND ENABLED · AUTO-RECORDING ACTIVE
             </div>
           </div>
         )}

@@ -1,5 +1,6 @@
 // src/pages/admin/PosterMakerPage.tsx
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import html2canvas from 'html2canvas'
@@ -500,7 +501,10 @@ export default function PosterMakerPage() {
   const defaultSchoolName = school?.name || 'World Uni-Learn Portal'
   const defaultLogo = school?.logo_url || ''
 
-  const [activeTab, setActiveTab] = useState<ActiveTab>('poster')
+  const [searchParams] = useSearchParams()
+  const [activeTab, setActiveTab] = useState<ActiveTab>(
+    (searchParams.get('tab') as any) === 'tags' ? 'tags' : 'poster'
+  )
   const [showTemplates, setShowTemplates] = useState(false)
 
   // ── Poster state ──
