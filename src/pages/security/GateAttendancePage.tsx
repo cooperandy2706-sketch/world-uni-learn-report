@@ -1,10 +1,9 @@
-// src/pages/security/GateAttendancePage.tsx
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { format } from 'date-fns'
-import { Users, Clock, LogIn, LogOut, AlertTriangle, Search, Filter } from 'lucide-react'
+import { Users, Clock, LogIn, LogOut, AlertTriangle, Search } from 'lucide-react'
 
 function StatCard({ icon: Icon, label, value, color, bg }: any) {
   return (
@@ -27,6 +26,8 @@ export default function GateAttendancePage() {
   const [filter, setFilter] = useState<'all' | 'student' | 'teacher' | 'late'>('all')
   const today = new Date().toISOString().split('T')[0]
 
+  const qc = useQueryClient()
+
   const { data: scans = [], isLoading } = useQuery({
     queryKey: ['gate-scans', schoolId, today],
     queryFn: async () => {
@@ -39,8 +40,25 @@ export default function GateAttendancePage() {
       return data ?? []
     },
     enabled: !!schoolId,
-    refetchInterval: 15000,
+    // No polling needed — real-time subscription below handles live updates
   })
+
+  // Real-time subscription: invalidate query instantly when a new scan arrives
+  useEffect(() => {
+    if (!schoolId) return
+    const channel = supabase
+      .channel('gate-attendance-log-rt')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'gate_scans',
+        filter: `school_id=eq.${schoolId}`,
+      }, () => {
+        qc.invalidateQueries({ queryKey: ['gate-scans', schoolId, today] })
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [schoolId, today, qc])
 
   const filtered = scans.filter((s: any) => {
     const matchSearch = s.person_name.toLowerCase().includes(search.toLowerCase())
@@ -54,7 +72,8 @@ export default function GateAttendancePage() {
   const totalIn = scans.filter((s: any) => s.direction === 'in').length
   const totalOut = scans.filter((s: any) => s.direction === 'out').length
   const totalLate = scans.filter((s: any) => s.status === 'late').length
-  const onPremise = totalIn - totalOut
+  // Fix: on-premise can't be negative (guards against exit without entry)
+  const onPremise = Math.max(0, totalIn - totalOut)
 
   return (
     <div style={{ fontFamily: '"DM Sans",sans-serif', paddingBottom: 40 }}>

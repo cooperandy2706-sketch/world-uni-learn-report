@@ -36,3 +36,65 @@ body { font-family: 'DM Sans', system-ui, sans-serif; background: #f8f7ff; color
 
 /* ── Table row hover ── */
 .table-row-hover:hover { background: #faf5ff; }
+
+/* ══════════════════════════════════════════════════════════════════
+   GLOBAL COMPONENT STYLES
+   Moved here from inline <style> tags to prevent per-render re-parsing
+   which was causing the app to freeze under real-time updates.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Bottom Nav ── */
+@keyframes _bn_in { from{opacity:0;transform:translateY(100%)} to{opacity:1;transform:translateY(0)} }
+@keyframes _bn_pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+.bn-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; min-width: 76px; }
+.bn-item:active { transform: scale(0.95); }
+.bn-active .bn-icon-box { background: rgba(124, 58, 237, 0.1) !important; transform: translateY(-2px); }
+.bn-active .bn-label { color: #6d28d9; font-weight: 700; transform: translateY(-1px); }
+.bn-fab { animation: _bn_pulse 2s ease-in-out infinite; }
+.bn-fab:hover { transform: scale(1.1) !important; animation: none; }
+.bn-fab:active { transform: scale(0.9) !important; }
+nav::-webkit-scrollbar { display: none; }
+
+/* ── Scanner Page ── */
+@keyframes sc_pop { 0%{opacity:0;transform:scale(.8) translateY(24px)} 70%{transform:scale(1.04) translateY(-4px)} 100%{opacity:1;transform:scale(1) translateY(0)} }
+@keyframes sc_shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
+@keyframes sc_spin { to{transform:rotate(360deg)} }
+@keyframes sc_pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+@keyframes sc_scan { 0%{top:0} 100%{top:100%} }
+.sc-card { animation: sc_pop .4s cubic-bezier(.34,1.56,.64,1) forwards; }
+.sc-err { animation: sc_shake .4s ease; }
+#qr-reader { border: none !important; width: 100% !important; background: #000; position: relative; }
+#qr-reader video { border-radius: 20px !important; width: 100% !important; object-fit: cover; }
+.qr-hud { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px solid rgba(255,255,255,0.2); border-radius: 20px; pointer-events: none; z-index: 10; display: flex; align-items: center; justify-content: center; }
+.qr-line { position: absolute; left: 10%; right: 10%; height: 2px; background: rgba(34,197,94,0.5); box-shadow: 0 0 8px rgba(34,197,94,0.8); animation: sc_scan 2s linear infinite; }
+#qr-reader__dashboard { display: none !important; }
+
+/* ── News Ticker ── */
+@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.ticker-content { display: inline-block; white-space: nowrap; padding-right: 50px; animation: ticker 80s linear infinite; font-size: 12px; font-weight: 600; }
+.ticker-content:hover { animation-play-state: paused; }
+
+/* ── Announcement Popup ── */
+@keyframes ann_bg_in { from{opacity:0} to{opacity:1} }
+@keyframes ann_out { to{opacity:0} }
+@keyframes ann_card_in { from{opacity:0;transform:translateY(28px) scale(.95)} to{opacity:1;transform:none} }
+@keyframes ann_card_slide { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:none} }
+.ann-btn { transition:all 0.2s; cursor:pointer; border:none; }
+.ann-btn:hover { filter:brightness(1.1); transform:scale(1.02); }
+.ann-btn:active { transform:scale(0.98); }
+.ann-close:hover { background:rgba(255,255,255,0.2)!important; }
+
+/* ── Splash Screen ── */
+@keyframes _sp_in { from{opacity:0;transform:scale(0.96) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+@keyframes _sp_shimmer { 0%{background-position:-100%} 100%{background-position:200%} }
+@keyframes _sp_icon_float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.sp-container { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; font-family: "DM Sans", system-ui, sans-serif; padding: 20px; background: transparent !important; transition: background 0.5s ease; }
+body.sp-active { background: transparent !important; }
+@media (min-width: 1024px) { .sp-card { box-shadow: 0 40px 120px rgba(0,0,0,0.2) !important; border: 1px solid #f1f5f9; } .sp-branding, .sp-footer { opacity: 0.4; } }
+@media (display-mode: standalone), (display-mode: fullscreen) { .sp-container { background: #ffffff !important; } .sp-card { box-shadow: none !important; border: none; } .sp-branding, .sp-footer { display: none !important; } }
+.sp-card { width: 100%; max-width: 440px; background: #fff; border-radius: 28px; padding: 48px 40px; box-shadow: 0 25px 60px -12px rgba(109, 40, 217, 0.15), 0 0 1px rgba(109, 40, 217, 0.2); text-align: center; animation: _sp_in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; border: 1px solid rgba(109, 40, 217, 0.05); position: relative; overflow: hidden; }
+.sp-shimmer { background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.03), transparent); background-size: 200% 100%; animation: _sp_shimmer 2s infinite linear; position: absolute; inset: 0; pointer-events: none; }
+
+/* ── App Layout main padding ── */
+.app-main { padding: 28px 32px 80px; }
+@media (max-width: 600px) { .app-main { padding: 20px 16px 100px; } }

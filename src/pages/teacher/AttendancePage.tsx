@@ -103,20 +103,21 @@ export default function TeacherAttendancePage() {
 
   async function checkDbSubmitted(classId: string) {
     if (!term) return
-    // We now check if ALL students have records, or just use this to show partial status
-    const { count } = await supabase
+    // Count today's attendance_records for this class (from both QR gate scan and manual entry)
+    const { count: recordCount } = await supabase
         .from('attendance_records')
         .select('*', { count: 'exact', head: true })
         .eq('class_id', classId)
         .eq('date', todayDate)
 
-    const { data: studentCount } = await supabase
+    // BUG FIX: was `data: studentCount` (always null). Correct destructuring is `count: studentCount`
+    const { count: studentCount } = await supabase
         .from('students')
         .select('*', { count: 'exact', head: true })
         .eq('class_id', classId)
         .eq('is_active', true)
 
-    if (count !== null && studentCount !== null && count >= studentCount && studentCount > 0) {
+    if (recordCount !== null && studentCount !== null && recordCount >= studentCount && studentCount > 0) {
       localStorage.setItem(TODAY_KEY(user!.id, classId), '1')
       setSubmittedToday(true)
     } else {
@@ -196,7 +197,14 @@ export default function TeacherAttendancePage() {
     setSaving(true)
 
     try {
-      // 1. Get existing records for this class today
+      // 0. Fetch teacher ID ONCE — not inside the loop (perf fix)
+      const { data: tRecord } = await supabase
+        .from('teachers')
+        .select('id')
+        .eq('user_id', user!.id)
+        .single()
+
+      // 1. Get existing records for this class today (from both gate scanner and previous submit)
       const { data: existingRecs } = await supabase
         .from('attendance_records')
         .select('student_id')
@@ -205,72 +213,93 @@ export default function TeacherAttendancePage() {
 
       const alreadyMarkedIds = new Set((existingRecs || []).map(r => r.student_id))
 
-      if (alreadyMarkedIds.size >= students.length && students.length > 0) {
-        toast.error('Attendance has already been submitted for all students today!')
+      // Students who still need manual marking
+      const pendingStudents = students.filter(s => !alreadyMarkedIds.has(s.id))
+
+      if (pendingStudents.length === 0) {
+        toast.success('✅ All students are already marked for today (via Gate Scanner or previous submit)!')
         localStorage.setItem(TODAY_KEY(user!.id, myClass.id), '1')
         setSubmittedToday(true)
         setSaving(false)
         return
       }
 
-      for (const student of students) {
+      // 2. Batch-build the attendance_records rows to insert
+      const recordsToInsert = pendingStudents
+        .filter(student => tRecord?.id) // only if teacher record exists
+        .map(student => ({
+          student_id: student.id,
+          class_id: myClass.id,
+          teacher_id: tRecord!.id,
+          term_id: (term as any).id,
+          school_id: user!.school_id,
+          date: todayDate,
+          status: marks[student.id] ?? 'present',
+        }))
+
+      // 3. Batch insert all pending records at once (replaces the per-student loop)
+      if (recordsToInsert.length > 0) {
+        const { error: insertErr } = await supabase
+          .from('attendance_records')
+          .insert(recordsToInsert)
+        if (insertErr) throw insertErr
+      }
+
+      // 4. Update attendance term totals for each pending student
+      //    (still per-student since each has different values, but now runs in parallel)
+      const termId = (term as any).id
+      const { data: existingTotals } = await supabase
+        .from('attendance')
+        .select('id, student_id, total_days, days_present, days_absent')
+        .in('student_id', pendingStudents.map(s => s.id))
+        .eq('term_id', termId)
+
+      const totalsMap = new Map((existingTotals ?? []).map(r => [r.student_id, r]))
+
+      // Build parallel update/insert promises
+      const totalUpdates = pendingStudents.map(student => {
         const mark = marks[student.id] ?? 'present'
         const isPresent = mark === 'present' || mark === 'late'
-
-        if (alreadyMarkedIds.has(student.id)) continue
-
-        // Check if attendance record exists for this student+term
-        const { data: existing } = await supabase
-          .from('attendance')
-          .select('id, total_days, days_present, days_absent')
-          .eq('student_id', student.id)
-          .eq('term_id', (term as any).id)
-          .maybeSingle()
+        const existing = totalsMap.get(student.id)
 
         if (existing) {
-          // Increment running totals
-          await supabase.from('attendance').update({
+          return supabase.from('attendance').update({
             total_days: (existing.total_days ?? 0) + 1,
             days_present: (existing.days_present ?? 0) + (isPresent ? 1 : 0),
             days_absent: (existing.days_absent ?? 0) + (isPresent ? 0 : 1),
           }).eq('id', existing.id)
         } else {
-          // Create new record
-          await supabase.from('attendance').insert({
+          return supabase.from('attendance').insert({
             student_id: student.id,
-            term_id: (term as any).id,
+            term_id: termId,
             total_days: 1,
             days_present: isPresent ? 1 : 0,
             days_absent: isPresent ? 0 : 1,
           })
         }
+      })
 
-        // ── RECORD DAILY LOG ──
-        const { data: tRecord } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single();
-        if (tRecord?.id) {
-          await supabase.from('attendance_records').insert({
-            student_id: student.id,
-            class_id: myClass.id,
-            teacher_id: tRecord.id,
-            term_id: (term as any).id,
-            school_id: user!.school_id, 
-            date: todayDate,
-            status: mark,
-          })
-        }
-      }
+      // Run all updates in parallel
+      await Promise.all(totalUpdates)
 
       // Mark as submitted today
       localStorage.setItem(TODAY_KEY(user!.id, myClass.id), '1')
       setSubmittedToday(true)
 
-      // Refresh term totals
-      await loadStudents(myClass.id, (term as any).id)
+      // Refresh term totals display
+      await loadStudents(myClass.id, termId)
 
-      const presentCount = Object.values(marks).filter(m => m === 'present' || m === 'late').length
-      const absentCount = Object.values(marks).filter(m => m === 'absent').length
-      toast.success(`✅ Register submitted! ${presentCount} present, ${absentCount} absent.`, { duration: 6000 })
+      const presentCount = pendingStudents.filter(s => (marks[s.id] ?? 'present') !== 'absent').length
+      const absentCount = pendingStudents.filter(s => marks[s.id] === 'absent').length
+      const qrCount = alreadyMarkedIds.size
+      toast.success(
+        `✅ Register submitted! ${presentCount} present, ${absentCount} absent.${
+          qrCount > 0 ? ` (${qrCount} already auto-marked via Gate Scanner)` : ''
+        }`,
+        { duration: 6000 }
+      )
     } catch (err: any) {
+      console.error('Attendance submit error:', err)
       toast.error('Failed to save: ' + (err.message ?? 'Unknown error'))
     } finally {
       setSaving(false)
@@ -439,19 +468,27 @@ export default function TeacherAttendancePage() {
               )}
             </div>
 
-            {/* Already submitted today banner */}
+            {/* Already submitted / auto-marked banner */}
             {submittedToday && (
-              <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 12, padding: '12px 18px', marginBottom: 18, fontSize: 13, color: '#15803d', fontWeight: 600, display: 'flex', gap: 10, alignItems: 'center' }}>
-                <span>✅</span>
-                <span>You've already submitted the morning register for today. The term totals below are up to date.</span>
+              <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 12, padding: '14px 18px', marginBottom: 18, fontSize: 13, color: '#15803d', fontWeight: 600, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 20 }}>✅</span>
+                <div>
+                  <div style={{ fontWeight: 800, marginBottom: 2 }}>Register complete for today</div>
+                  <div style={{ fontWeight: 500, opacity: 0.85 }}>
+                    {Object.keys(dbMarks).length > 0
+                      ? `${Object.keys(dbMarks).length} of ${students.length} students were auto-marked via Gate Scanner. No further action needed.`
+                      : `The morning register has been submitted. Term totals below are up to date.`
+                    }
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Reminder: autofill note */}
+            {/* Info tip: Gate Scanner auto-attendance */}
             <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '10px 16px', marginBottom: 18, fontSize: 12, color: '#1e40af', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <span>💡</span>
+              <span>🔍</span>
               <span>
-                <strong>Term totals auto-fill from the system.</strong> Each morning submission adds 1 day to each student's running total. The admin's Reports page will always show up-to-date figures.
+                <strong>Gate Scanner Integration:</strong> Students who scanned their QR tag at the gate are automatically marked as <em>Present</em> or <em>Late</em> — shown with a <strong>QR SCAN</strong> badge. You only need to manually mark students who did <strong>not</strong> use the gate scanner today.
               </span>
             </div>
 

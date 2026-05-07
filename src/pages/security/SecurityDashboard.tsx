@@ -1,6 +1,7 @@
 // src/pages/security/SecurityDashboard.tsx
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+// Note: FloatingClock (global widget) handles live time display — no local clock needed
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { format, formatDistanceToNow } from 'date-fns'
@@ -107,13 +108,8 @@ export default function SecurityDashboard() {
     recentScans: [], lastScanTime: null,
   })
   const [loading, setLoading] = useState(true)
-  const [currentTime, setCurrentTime] = useState(new Date())
-
-  // Live clock
-  useEffect(() => {
-    const t = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(t)
-  }, [])
+  // Use a static time snapshot — FloatingClock widget (global) handles live clock display
+  const currentTime = new Date()
 
   const fetchStats = useCallback(async () => {
     if (!schoolId) return
@@ -197,11 +193,10 @@ export default function SecurityDashboard() {
             </p>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 36, fontWeight: 900, color: '#0f172a', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
-              {format(currentTime, 'hh:mm')}
-              <span style={{ fontSize: 18, color: '#64748b', marginLeft: 4 }}>{format(currentTime, 'ss')}</span>
+            <div style={{ fontSize: 22, fontWeight: 700, color: '#64748b', letterSpacing: '-0.01em' }}>
+              {format(currentTime, 'EEEE, MMMM d yyyy')}
             </div>
-            <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600 }}>{format(currentTime, 'a')}</div>
+            <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600, marginTop: 2 }}>See floating clock for live time</div>
           </div>
         </div>
 

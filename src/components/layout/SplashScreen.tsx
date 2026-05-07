@@ -34,71 +34,7 @@ export default function SplashScreen() {
 
   return (
     <div className="sp-container">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Playfair+Display:wght@700&display=swap');
-        
-        @keyframes _sp_in { from{opacity:0;transform:scale(0.96) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
-        @keyframes _sp_shimmer { 0%{background-position:-100%} 100%{background-position:200%} }
-        @keyframes _sp_icon_float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-        
-        .sp-container {
-          position: fixed; inset: 0; z-index: 9999;
-          display: flex; align-items: center; justify-content: center;
-          font-family: "DM Sans", system-ui, sans-serif;
-          padding: 20px;
-          background: transparent !important;
-          transition: background 0.5s ease;
-        }
-
-        /* Force body transparency during splash */
-        body { background: transparent !important; }
-
-        /* Desktop View: Card Only Focus */
-        @media (min-width: 1024px) {
-          .sp-card {
-            box-shadow: 0 40px 120px rgba(0,0,0,0.2) !important;
-            border: 1px solid #f1f5f9;
-          }
-          .sp-branding, .sp-footer {
-            opacity: 0.4;
-          }
-        }
-
-        /* PWA Mode: Maximum Minimalism */
-        @media (display-mode: standalone), (display-mode: fullscreen) {
-          .sp-container {
-            background: #ffffff !important;
-          }
-          .sp-card {
-            box-shadow: none !important;
-            border: none;
-          }
-          .sp-branding, .sp-footer {
-            display: none !important;
-          }
-        }
-
-        .sp-card {
-          width: 100%; max-width: 440px;
-          background: #fff;
-          border-radius: 28px;
-          padding: 48px 40px;
-          box-shadow: 0 25px 60px -12px rgba(109, 40, 217, 0.15), 0 0 1px rgba(109, 40, 217, 0.2);
-          text-align: center;
-          animation: _sp_in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-          border: 1px solid rgba(109, 40, 217, 0.05);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .sp-shimmer {
-          background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.03), transparent);
-          background-size: 200% 100%;
-          animation: _sp_shimmer 2s infinite linear;
-          position: absolute; inset: 0; pointer-events: none;
-        }
-      `}</style>
-
+      
       <div className="sp-card">
         <div className="sp-shimmer" />
 

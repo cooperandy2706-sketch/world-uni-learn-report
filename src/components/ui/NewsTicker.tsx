@@ -170,22 +170,7 @@ export const NewsTicker: React.FC = () => {
 
       {/* Scrolling Container */}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center' }}>
-        <style>{`
-          @keyframes ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          .ticker-content {
-            display: inline-block;
-            white-space: nowrap;
-            padding-right: 50px;
-            animation: ticker 80s linear infinite;
-            font-size: 12px;
-            font-weight: 600;
-          }
-          .ticker-content:hover { animation-play-state: paused; }
-        `}</style>
-        <div className="ticker-content" dangerouslySetInnerHTML={{ __html: fullTickerText + '        |        ' + fullTickerText }} />
+                <div className="ticker-content" dangerouslySetInnerHTML={{ __html: fullTickerText + '        |        ' + fullTickerText }} />
       </div>
 
       {/* Time/Status Label */}

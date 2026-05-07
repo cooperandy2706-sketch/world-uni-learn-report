@@ -131,18 +131,7 @@ export default function AnnouncementPopup() {
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
       animation: exiting ? 'ann_out 0.28s ease forwards' : 'ann_bg_in 0.3s ease',
     }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
-        @keyframes ann_bg_in { from{opacity:0} to{opacity:1} }
-        @keyframes ann_out { to{opacity:0} }
-        @keyframes ann_card_in { from{opacity:0;transform:translateY(28px) scale(.95)} to{opacity:1;transform:none} }
-        @keyframes ann_card_slide { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:none} }
-        .ann-btn { transition:all 0.2s; cursor:pointer; border:none; }
-        .ann-btn:hover { filter:brightness(1.1); transform:scale(1.02); }
-        .ann-btn:active { transform:scale(0.98); }
-        .ann-close:hover { background:rgba(255,255,255,0.2)!important; }
-      `}</style>
-
+      
       <div
         onClick={e => e.stopPropagation()}
         style={{

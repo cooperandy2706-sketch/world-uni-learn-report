@@ -186,17 +186,6 @@ export default function BottomNav() {
 
   return (
     <>
-      <style>{`
-        @keyframes _bn_in { from{opacity:0;transform:translateY(100%)} to{opacity:1;transform:translateY(0)} }
-        @keyframes _bn_pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
-        .bn-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; min-width: 76px; }
-        .bn-item:active { transform: scale(0.95); }
-        .bn-active .bn-icon-box { background: rgba(124, 58, 237, 0.1) !important; transform: translateY(-2px); }
-        .bn-active .bn-label { color: #6d28d9; font-weight: 700; transform: translateY(-1px); }
-        .bn-fab { animation: _bn_pulse 2s ease-in-out infinite; }
-        .bn-fab:hover { transform: scale(1.1) !important; animation: none; }
-        .bn-fab:active { transform: scale(0.9) !important; }
-      `}</style>
 
       {/* Floating Notification Trigger */}
       <div style={{
@@ -261,7 +250,6 @@ export default function BottomNav() {
         overflowX: 'auto',
         scrollbarWidth: 'none',
       }}>
-        <style>{`nav::-webkit-scrollbar { display: none; }`}</style>
         {links.map(({ to, icon: Icon, label, notify }: any) => {
           const isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to))
 

@@ -104,11 +104,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
           <NewsTicker />
           <Header />
-          <style>{`
-            .app-main { padding: 28px 32px 80px; }
-            @media (max-width: 600px) { .app-main { padding: 20px 16px 100px; } }
-          `}</style>
-          <main className="app-main" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                    <main className="app-main" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
             <EnablePushButton />
             <Outlet />
           </main>
