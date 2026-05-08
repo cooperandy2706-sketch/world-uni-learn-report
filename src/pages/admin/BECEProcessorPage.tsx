@@ -223,11 +223,7 @@ export default function BECEProcessorPage() {
       `}</style>
 
       {/* Header */}
-      <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        <div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: T.slate, margin: 0 }}>BECE CA Processor</h1>
-          <p style={{ color: T.muted, marginTop: 4 }}>Calculate WAEC-ready Continuous Assessment scores (20/10/70 rule).</p>
-        </div>
+      <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
         <div style={{ display: 'flex', gap: 12 }}>
           <button 
             onClick={processBECE}

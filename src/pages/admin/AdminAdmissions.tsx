@@ -1821,19 +1821,7 @@ export default function AdminAdmissions() {
     : ''
 
   return (
-    <div style={{ padding: '28px 32px', fontFamily: '"DM Sans", system-ui, sans-serif', maxWidth: 1200, margin: '0 auto' }}>
-      {/* Page Header */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 14, background: 'linear-gradient(135deg,#1e0646,#5b21b6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <GraduationCap size={24} color="#fbbf24" />
-          </div>
-          <div>
-            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#1e0646' }}>Admissions Office</h1>
-            <p style={{ margin: '3px 0 0', fontSize: 13, color: '#6b7280' }}>Manage fee schedules, enquiries, scholarships and application forms</p>
-          </div>
-        </div>
-      </div>
+    <div style={{ fontFamily: '"DM Sans", system-ui, sans-serif', maxWidth: 1200, margin: '0 auto' }}>
 
       {/* ── Quick Print Panel ── */}
       <div style={{

@@ -48,7 +48,7 @@ function TinyInput({ value, max, onChange, disabled }: {
   )
 }
 
-export default function ScoreEntryPage() {
+export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: boolean }) {
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
@@ -532,19 +532,50 @@ export default function ScoreEntryPage() {
         .grade-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;font-size:11px;font-weight:800}
       `}</style>
 
-      <div style={{ marginBottom:20, display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
-        <div>
-          <h1 style={{ fontFamily:'"Playfair Display",serif', fontSize:24, fontWeight:700, margin:0 }}>Flexible Score Entry</h1>
-          <p style={{ fontSize:13, color:'#6b7280', marginTop:3 }}>
-            {dirty && !saving && <span style={{ color:'#d97706' }}>● Unsaved changes</span>}
-            {saving && <span style={{ color:'#6d28d9' }}>Saving…</span>}
-          </p>
+      {!isAdminView && (
+        <div style={{ marginBottom:20, display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
+          <div>
+            <h1 style={{ fontFamily:'"Playfair Display",serif', fontSize:24, fontWeight:700, margin:0 }}>Flexible Score Entry</h1>
+            <p style={{ fontSize:13, color:'#6b7280', marginTop:3 }}>
+              {dirty && !saving && <span style={{ color:'#d97706' }}>● Unsaved changes</span>}
+              {saving && <span style={{ color:'#6d28d9' }}>Saving…</span>}
+            </p>
+          </div>
+          {/* Actions moved to next block so they are still available if needed, or maybe they are kept here? */}
+          {selectedClass && students.length > 0 && !isLocked && (
+            <div style={{ display:'flex', gap:8 }}>
+              {selectedSubjectId !== 'all' && (
+                <>
+                  <div style={{ display:'flex', flexDirection:'column', gap:3 }}>
+                    <label style={{ fontSize:9, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.06em' }}>Sync into</label>
+                    <select
+                      value={syncTargetCatId}
+                      onChange={e => setSyncTargetCatId(e.target.value)}
+                      style={{ padding:'5px 8px', borderRadius:7, border:'1.5px solid #ddd6fe', fontSize:11, fontWeight:600, color:'#4b5563', background:'#faf5ff', outline:'none', cursor:'pointer' }}
+                    >
+                      <option value="">Auto-detect</option>
+                      {gradingCategories.map(c => <option key={c.id} value={c.id}>{c.name} (max {c.max_score})</option>)}
+                    </select>
+                  </div>
+                  <button onClick={handleSyncClassTests} disabled={syncingTests} style={{ padding:'10px 16px', borderRadius:9, background:'#fdf2f2', color:'#dc2626', border:'1.5px solid #fecaca', cursor:'pointer', fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
+                    {syncingTests ? '⌛' : '📝 Sync Tests'}
+                  </button>
+                  <button onClick={handleSyncAssignments} disabled={syncingTests} style={{ padding:'10px 16px', borderRadius:9, background:'#f5f3ff', color:'#6d28d9', border:'1.5px solid #ddd6fe', cursor:'pointer', fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
+                    {syncingTests ? '⌛' : '🤖 Sync Assignments'}
+                  </button>
+                </>
+              )}
+              <button onClick={() => handleSave(true)} disabled={saving || !dirty} style={{ padding:'10px 16px', borderRadius:9, background:'#fff', border:'1px solid #e5e7eb', cursor:'pointer' }}>💾 Save</button>
+              <button onClick={handleSubmit} disabled={submitting || enteredCount === 0} style={{ padding:'10px 16px', borderRadius:9, background:'#6d28d9', color:'#fff', border:'none', cursor:'pointer' }}>📤 Submit</button>
+            </div>
+          )}
         </div>
-        {selectedClass && students.length > 0 && !isLocked && (
-          <div style={{ display:'flex', gap:8 }}>
+      )}
+
+      {isAdminView && selectedClass && students.length > 0 && !isLocked && (
+        <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
             {selectedSubjectId !== 'all' && (
               <>
-                {/* Sync target category picker */}
                 <div style={{ display:'flex', flexDirection:'column', gap:3 }}>
                   <label style={{ fontSize:9, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.06em' }}>Sync into</label>
                   <select
@@ -566,9 +597,9 @@ export default function ScoreEntryPage() {
             )}
             <button onClick={() => handleSave(true)} disabled={saving || !dirty} style={{ padding:'10px 16px', borderRadius:9, background:'#fff', border:'1px solid #e5e7eb', cursor:'pointer' }}>💾 Save</button>
             <button onClick={handleSubmit} disabled={submitting || enteredCount === 0} style={{ padding:'10px 16px', borderRadius:9, background:'#6d28d9', color:'#fff', border:'none', cursor:'pointer' }}>📤 Submit</button>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
+
 
       <div style={{ background:'#fff', borderRadius:14, padding:'16px 20px', border:'1px solid #e5e7eb', marginBottom:18, display:'flex', gap:16, flexWrap: 'wrap' }}>
         <div style={{ flex:'1 1 200px' }}>

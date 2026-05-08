@@ -6,6 +6,7 @@ import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { useSchoolInvoices } from '../../hooks/useBilling'
 import { supabase } from '../../lib/supabase'
 import NotificationBell from './NotificationBell'
+import AdminAnnouncementHeaderPill from './AdminAnnouncementHeaderPill'
 import {
   Search, Settings, ChevronDown, ChevronLeft, ChevronRight,
   LogOut, User, Shield, Calendar, AlertTriangle, CreditCard,
@@ -22,27 +23,20 @@ const ADMIN_NAV = [
   },
   {
     label: 'Academics', items: [
-      { label: 'Departments', to: ROUTES.ADMIN_DEPARTMENTS },
-      { label: 'Classes', to: ROUTES.ADMIN_CLASSES },
-      { label: 'Subjects', to: ROUTES.ADMIN_SUBJECTS },
+      { label: 'Academic Structure', to: '/admin/academic-structure' },
+      { label: 'Assessment Hub', to: '/admin/assessment-hub' },
       { label: 'Attendance', to: ROUTES.ADMIN_ATTENDANCE },
       { label: 'Timetable', to: ROUTES.ADMIN_TIMETABLE },
       { label: 'Syllabus', to: ROUTES.ADMIN_SYLLABUS },
       { label: 'Weekly Goals', to: ROUTES.ADMIN_WEEKLY_GOALS },
-      { label: 'Report Cards', to: ROUTES.ADMIN_REPORTS },
-      { label: 'Score Entry', to: '/admin/score-entry' },
-      { label: 'Batch Promotion', to: '/admin/batch-promotion' },
-      { label: 'BECE CA Processor', to: '/admin/bece-processor' },
       { label: 'Lesson Plans', to: '/admin/lesson-plans' },
     ]
   },
   {
     label: 'People', items: [
-      { label: 'Students', to: ROUTES.ADMIN_STUDENTS },
-      { label: 'Student Vault', to: '/admin/student-vault' },
-      { label: 'Staff', to: ROUTES.ADMIN_TEACHERS },
+      { label: 'Student Directory', to: '/admin/student-directory' },
+      { label: 'Staff Directory', to: ROUTES.ADMIN_TEACHERS },
       { label: 'Parent Logins', to: '/admin/parents' },
-      { label: 'Admissions', to: '/admin/admissions' },
       { label: 'SMS Messaging', to: ROUTES.ADMIN_SMS },
     ]
   },
@@ -51,12 +45,13 @@ const ADMIN_NAV = [
       { label: 'Admin Tasks', to: '/admin/tasks' },
       { label: 'Calendar', to: ROUTES.ADMIN_CALENDAR },
       { label: 'Messages', to: ROUTES.ADMIN_MESSAGES },
-      { label: 'Staff Requests', to: '/admin/staff-requests' },
-      { label: 'Staff Leave', to: '/admin/staff-leave' },
+      { label: 'Staff Operations', to: '/admin/staff-operations' },
       { label: 'Asset Register', to: '/admin/assets' },
       { label: 'Billing', to: '/admin/billing' },
       { label: 'Bursar Staff', to: '/admin/bursars' },
       { label: 'Security Personnel', to: ROUTES.ADMIN_SECURITY },
+      { label: 'Drivers', to: '/admin/drivers' },
+      { label: 'Live Tracking', to: '/admin/fleet/live' },
       { label: 'Poster Maker', to: '/admin/poster-maker' },
       { label: 'Elections (PEC)', to: '/admin/elections' },
       { label: 'Alumni', to: ROUTES.ADMIN_ALUMNI },
@@ -65,8 +60,7 @@ const ADMIN_NAV = [
   {
     label: 'Insights', items: [
       { label: 'Analytics', to: ROUTES.ADMIN_ANALYTICS },
-      { label: 'Academic Years', to: ROUTES.ADMIN_ACADEMIC_YEARS },
-      { label: 'Terms', to: ROUTES.ADMIN_TERMS },
+      { label: 'Academic Calendar', to: '/admin/academic-calendar' },
       { label: 'Settings', to: ROUTES.ADMIN_SETTINGS },
     ]
   },
@@ -191,6 +185,12 @@ const SECURITY_NAV = [
   },
 ]
 
+const DRIVER_NAV = [
+  { label: '🚌 Dashboard', to: '/driver/dashboard', single: true },
+  { label: '📋 Trip Logs', to: '/driver/logs', single: true },
+  { label: '🗺️ Assigned Routes', to: '/driver/routes', single: true },
+]
+
 // ─── NavItem component ─────────────────────────────────────────────────────────
 function NavItem({ group }: { group: any }) {
   const [open, setOpen] = useState(false)
@@ -276,7 +276,7 @@ function NavItem({ group }: { group: any }) {
 
 // ─── Main Header ───────────────────────────────────────────────────────────────
 export default function Header() {
-  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher, isSecurity } = useAuth()
+  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher, isSecurity, isDriver } = useAuth()
   const isStaff = user?.role === 'staff'
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
@@ -312,6 +312,7 @@ export default function Header() {
     : isTeacher ? TEACHER_NAV
     : isBursar ? BURSAR_NAV
     : isSecurity ? SECURITY_NAV
+    : isDriver ? DRIVER_NAV
     : isStaff ? STAFF_NAV
     : user?.role === 'parent' ? PARENT_NAV
     : STUDENT_NAV
@@ -564,7 +565,7 @@ export default function Header() {
     return () => clearTimeout(timer)
   }, [searchQuery, isAdmin, isBursar, isTeacher, isStudent])
 
-  const rolePath = isSuperAdmin ? 'super-admin' : isStudent ? 'student' : isAdmin ? 'admin' : isBursar ? 'bursar' : 'teacher'
+  const rolePath = isSuperAdmin ? 'super-admin' : isStudent ? 'student' : isAdmin ? 'admin' : isBursar ? 'bursar' : isDriver ? 'driver' : 'teacher'
 
   return (
     <>
@@ -634,6 +635,9 @@ export default function Header() {
             </div>
           </div>
         </div>
+
+        {/* ── MIDDLE: Admin Announcement Pill ── */}
+        <AdminAnnouncementHeaderPill />
 
         {/* ── RIGHT PILL: Nav + Bell + Profile ── */}
         <div className="header-pill-container" style={{

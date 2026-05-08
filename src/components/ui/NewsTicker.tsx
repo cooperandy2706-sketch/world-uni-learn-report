@@ -75,19 +75,26 @@ export const NewsTicker: React.FC = () => {
 
   async function fetchWeather() {
     try {
-      const res = await fetch(`https://wttr.in/Accra?format=j1&t=${new Date().getTime()}`)
-      const text = await res.text()
-      // wttr.in sometimes rate limits and returns HTML instead of JSON
-      if (text.startsWith('<')) throw new Error('wttr.in rate limit')
-      const data = JSON.parse(text)
-      const current = data.current_condition[0]
+      const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=5.6037&longitude=-0.1870&current=temperature_2m,weather_code')
+      if (!res.ok) throw new Error('Weather API failed')
+      const data = await res.json()
+      
+      const temp = Math.round(data.current.temperature_2m)
+      const code = data.current.weather_code
+      let condition = 'Clear'
+      if (code > 0 && code <= 3) condition = 'Cloudy'
+      else if (code > 3 && code <= 48) condition = 'Fog'
+      else if (code > 48 && code <= 67) condition = 'Rain'
+      else if (code > 67 && code <= 82) condition = 'Showers'
+      else if (code > 82) condition = 'Thunderstorm'
+
       setWeather({
-        temp: current.temp_C,
-        condition: current.weatherDesc[0].value,
+        temp: temp.toString(),
+        condition: condition,
         icon: <Sun size={14} />
       })
     } catch {
-      // Fallback if wttr.in fails or returns HTML error
+      // Fallback if weather API fails
       setWeather({ temp: '28', condition: 'Sunny', icon: <Sun size={14} /> })
     }
   }

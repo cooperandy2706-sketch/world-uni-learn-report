@@ -36,7 +36,7 @@ export default function AnnouncementsPage(){
   const [announcements,setAnnouncements]=useState<any[]>([])
   const [loading,setLoading]=useState(true)
   const [modalOpen,setModalOpen]=useState(false)
-  const [form,setForm]=useState({title:'',body:'',type:'announcement',target_role:'all',meeting_date:'',meeting_link:'',is_pinned:false,send_push:false})
+  const [form,setForm]=useState({title:'',body:'',type:'announcement',target_role:'all',meeting_date:'',meeting_link:'',is_pinned:false,send_push:false, expires_at:'', trigger_at:'', is_alarm:false})
   const [saving,setSaving]=useState(false)
   const [teachers,setTeachers]=useState<any[]>([])
   const [students,setStudents]=useState<any[]>([])
@@ -46,6 +46,8 @@ export default function AnnouncementsPage(){
     all:     { label: 'Everyone', icon: '🌐', bg: '#f0fdf4', color: '#16a34a' },
     staff:   { label: 'Staff Only', icon: '👨‍🏫', bg: '#eff6ff', color: '#0369a1' },
     student: { label: 'Students Only', icon: '🎓', bg: '#fdf4ff', color: '#a21caf' },
+    driver:  { label: 'Drivers', icon: '🚌', bg: '#fef3c7', color: '#b45309' },
+    security:{ label: 'Security', icon: '🛡️', bg: '#fee2e2', color: '#b91c1c' },
   }
 
   useEffect(()=>{load()},[])
@@ -54,7 +56,9 @@ export default function AnnouncementsPage(){
     setLoading(true)
     const [{data:ann},{data:t},{data:stu}]=await Promise.all([
       supabase.from('announcements').select('*,from_user:users(full_name),reads:announcement_reads(id)')
-        .eq('school_id',user!.school_id).order('is_pinned',{ascending:false}).order('created_at',{ascending:false}),
+        .eq('school_id',user!.school_id)
+        .or(`expires_at.is.null,expires_at.gte.${new Date().toISOString()}`)
+        .order('is_pinned',{ascending:false}).order('created_at',{ascending:false}),
       supabase.from('teachers').select('id,user:users(id,full_name,email)').eq('school_id',user!.school_id),
       supabase.from('students').select('id,user_id,full_name').eq('school_id',user!.school_id).eq('is_active',true),
     ])
@@ -77,6 +81,9 @@ export default function AnnouncementsPage(){
       meeting_date:form.meeting_date||null,
       meeting_link:form.meeting_link||null,
       is_pinned:form.is_pinned,
+      expires_at:form.expires_at||null,
+      trigger_at:form.trigger_at||null,
+      is_alarm:form.is_alarm,
     }).select().single()
     if(error){toast.error(error.message);setSaving(false);return}
 
@@ -120,7 +127,7 @@ export default function AnnouncementsPage(){
     toast.success('Posted successfully')
     setSaving(false)
     setModalOpen(false)
-    setForm({title:'',body:'',type:'announcement',target_role:'all',meeting_date:'',meeting_link:'',is_pinned:false,send_push:false})
+    setForm({title:'',body:'',type:'announcement',target_role:'all',meeting_date:'',meeting_link:'',is_pinned:false,send_push:false,expires_at:'',trigger_at:'',is_alarm:false})
     load()
   }
 
@@ -283,7 +290,7 @@ export default function AnnouncementsPage(){
                 <div>
                   <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Audience</label>
                   <div style={{display:'flex',gap:6}}>
-                    {(['all','staff','student'] as const).map(r=>{
+                    {(['all','staff','student','driver','security'] as const).map(r=>{
                       const ac=AUDIENCE_CONFIG[r]
                       const sel=form.target_role===r
                       return(
@@ -311,11 +318,36 @@ export default function AnnouncementsPage(){
                     style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
                 </div>
               )}
+              
+              {/* Expiration Date */}
+              <div>
+                <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Expiration Date (Optional)</label>
+                <div style={{fontSize:11,color:'#6b7280',marginBottom:6}}>Notification will automatically disappear from feeds after this time.</div>
+                <input type="datetime-local" value={form.expires_at} onChange={e=>setForm(f=>({...f,expires_at:e.target.value}))}
+                  style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:12,outline:'none',fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
+              </div>
+
               <div style={{display:'flex',flexDirection:'column',gap:8}}>
                 <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',fontSize:13,color:'#374151'}}>
                   <input type="checkbox" checked={form.is_pinned} onChange={e=>setForm(f=>({...f,is_pinned:e.target.checked}))}/>
                   📌 Pin this post (shows at top)
                 </label>
+                
+                <div style={{background:'#fffbeb',border:'1.5px solid #d97706',borderRadius:10,padding:'12px',marginTop:8}}>
+                  <label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer',fontSize:13,color:'#111827',fontWeight:600}}>
+                    <input type="checkbox" checked={form.is_alarm} onChange={e=>setForm(f=>({...f,is_alarm:e.target.checked}))} style={{marginTop:3,accentColor:'#d97706'}}/>
+                    <div style={{flex:1}}>
+                      <div>⏰ Set as Scheduled Alarm</div>
+                      <div style={{fontSize:11,color:'#6b7280',fontWeight:500,marginTop:2}}>Triggers a massive full-screen pop-up alarm on targeted users' devices.</div>
+                      {form.is_alarm && (
+                        <div style={{marginTop:8}}>
+                          <input type="datetime-local" value={form.trigger_at} onChange={e=>setForm(f=>({...f,trigger_at:e.target.value}))} required
+                            style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1px solid #d1d5db',fontSize:12,outline:'none',fontFamily:'"DM Sans",sans-serif'}}/>
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                </div>
                 
                 <div style={{background:'#f5f3ff',border:'1.5px solid #6d28d9',borderRadius:10,padding:'12px',marginTop:8}}>
                   <label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer',fontSize:13,color:'#111827',fontWeight:600}}>

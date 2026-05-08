@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast'
 import { router } from './router'
 import { queryClient } from './lib/queryClient'
 import SplashScreen from './components/layout/SplashScreen'
+import GlobalAlarm from './components/ui/GlobalAlarm'
 import { useAuthStore } from './store/authStore'
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
+      <GlobalAlarm />
       <Toaster
         position="top-right"
         toastOptions={{

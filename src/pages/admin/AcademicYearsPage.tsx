@@ -92,11 +92,7 @@ export default function AcademicYearsPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_fadeIn 0.4s ease' }}>
 
         {/* Header */}
-        <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Academic Years</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage your school's academic calendar</p>
-          </div>
+        <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 12 }}>
           <Btn onClick={() => { reset({}); setModalOpen(true) }}>➕ Add Year</Btn>
         </div>
 

@@ -88,7 +88,7 @@ export default function StaffRequestsPage() {
     )
 
     return (
-        <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto', animation: 'fadeIn 0.5s ease' }}>
+        <div style={{ animation: 'fadeIn 0.5s ease' }}>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .card { background: white; border-radius: 16px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
@@ -98,15 +98,7 @@ export default function StaffRequestsPage() {
                 .status-pending { background: #fef3c7; color: #d97706; }
                 .status-approved { background: #dcfce7; color: #16a34a; }
                 .status-rejected { background: #fee2e2; color: #dc2626; }
-                @media (max-width: 768px) { .header-row { flex-direction: column; align-items: flex-start !important; } }
             `}</style>
-
-            <div className="header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
-                <div>
-                    <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 32, fontWeight: 700, color: '#111827', margin: 0 }}>Staff Requests</h1>
-                    <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Review and manage leave applications and documents from your team.</p>
-                </div>
-            </div>
 
             <div style={{ display: 'flex', gap: 32, borderBottom: '1px solid #e5e7eb', marginBottom: 24 }}>
                 <button className={`tab-btn ${activeTab === 'leave' ? 'active' : ''}`} onClick={() => setActiveTab('leave')}>Leave Applications</button>

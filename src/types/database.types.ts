@@ -1,5 +1,5 @@
 // src/types/database.types.ts
-export type Role = 'super_admin' | 'admin' | 'teacher' | 'student' | 'bursar' | 'staff'
+export type Role = 'super_admin' | 'admin' | 'teacher' | 'student' | 'bursar' | 'staff' | 'security' | 'parent' | 'driver'
 export type PaymentMethod = 'cash' | 'momo' | 'bank' | 'cheque'
 
 export interface FeeStructure {
@@ -395,4 +395,53 @@ export interface LeaveRequest {
   user?: User
   substitute?: User
   approved_by_user?: User
+}
+
+export interface TransportRoute {
+  id: string
+  school_id: string
+  name: string
+  description?: string
+  fee_amount: number
+  created_at: string
+}
+
+export interface TransportVehicle {
+  id: string
+  school_id: string
+  plate_number: string
+  capacity: number
+  make_model?: string
+  driver_id?: string
+  created_at: string
+  // joined
+  driver?: User
+}
+
+export interface TransportBoardingLog {
+  id: string
+  school_id: string
+  student_id: string
+  vehicle_id: string
+  direction: 'pickup' | 'dropoff'
+  location_name?: string
+  time_scanned: string
+  created_at: string
+  // joined
+  student?: Student
+  vehicle?: TransportVehicle
+}
+
+export interface TransportLiveLocation {
+  id: string
+  school_id: string
+  vehicle_id: string
+  driver_id: string
+  latitude: number
+  longitude: number
+  speed?: number
+  heading?: number
+  is_active: boolean
+  last_updated: string
+  created_at: string
 }

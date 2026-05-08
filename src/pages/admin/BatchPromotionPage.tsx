@@ -82,17 +82,12 @@ export default function BatchPromotionPage() {
     }
 
     return (
-        <div style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto', animation: 'fadeIn 0.5s ease' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', animation: 'fadeIn 0.5s ease' }}>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .card { background: white; border-radius: 16px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
                 .student-row:hover { background: #f9fafb; }
             `}</style>
-
-            <div style={{ marginBottom: 32 }}>
-                <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 32, fontWeight: 700, color: '#111827', margin: 0 }}>Batch Promotion</h1>
-                <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Move entire classes or groups of students to the next grade level.</p>
-            </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 32 }}>
                 <div className="card" style={{ padding: '24px' }}>

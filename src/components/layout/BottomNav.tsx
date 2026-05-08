@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Users, FileSpreadsheet, ClipboardCheck, 
   Megaphone, PencilLine, Calendar, Timer, BookOpen, 
   ShieldCheck, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School,
-  CreditCard, Wallet, Gamepad2, Library, Bell, Tv, ScanLine, AlertTriangle
+  CreditCard, Wallet, Gamepad2, Library, Bell, Tv, ScanLine, AlertTriangle, MapPin
 } from 'lucide-react'
 import NotificationsModal from '../ui/NotificationsModal'
 
@@ -94,8 +94,14 @@ const securityLinks = [
   { to: '/security/incidents', icon: AlertTriangle, label: 'Incidents' },
 ]
 
+const driverLinks = [
+  { to: '/driver/dashboard', icon: LayoutDashboard, label: 'Home' },
+  { to: '/driver/routes', icon: MapPin, label: 'Routes' },
+  { to: '/driver/logs', icon: ClipboardList, label: 'Logs' },
+]
+
 export default function BottomNav() {
-  const { user, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher, isSecurity } = useAuth()
+  const { user, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher, isSecurity, isDriver } = useAuth()
   const location = useLocation()
   const [unread, setUnread] = useState(0)
   const [visible, setVisible] = useState(false)
@@ -113,7 +119,7 @@ export default function BottomNav() {
   })
 
   const isParent = user?.role === 'parent'
-  let links = isSuperAdmin ? superAdminLinks : isSecurity ? securityLinks : isParent ? parentLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : teacherLinks
+  let links = isSuperAdmin ? superAdminLinks : isSecurity ? securityLinks : isParent ? parentLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : isDriver ? driverLinks : teacherLinks
 
   // Hide daily collections from unauthorized teachers
   if (isTeacher && !loadingAuth && !collectorAuth) {

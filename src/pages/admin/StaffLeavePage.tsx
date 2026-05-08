@@ -104,16 +104,8 @@ export default function AdminStaffLeavePage() {
       
       <div style={{ fontFamily: '"DM Sans", system-ui, sans-serif', animation: 'fadeIn 0.4s ease', paddingBottom: 40 }}>
         
-        {/* Header */}
-        <div style={{ marginBottom: 32, animation: 'fadeUp 0.4s ease both' }}>
-          <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>
-            Staff Leave Management
-          </h1>
-          <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>Review leave requests and assign substitute teachers</p>
-        </div>
-
         {/* Filters & Search */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', marginBottom: 32, animation: 'fadeUp 0.4s ease 0.1s both' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', marginBottom: 24, animation: 'fadeUp 0.4s ease 0.1s both' }}>
           <div style={{ position: 'relative', flex: '1 1 300px', maxWidth: 400 }}>
             <Search size={18} color="#9ca3af" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)' }} />
             <input 

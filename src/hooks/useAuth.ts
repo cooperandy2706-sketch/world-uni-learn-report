@@ -20,6 +20,7 @@ export function useAuth() {
     isStudent: user?.role === 'student',
     isBursar: user?.role === 'bursar',
     isSecurity: user?.role === 'security',
+    isDriver: user?.role === 'driver',
     isAuthenticated: !!user,
     signIn,
     signOut,

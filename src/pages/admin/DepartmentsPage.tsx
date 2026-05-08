@@ -181,11 +181,7 @@ export default function DepartmentsPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_dfadeIn 0.4s ease' }}>
 
         {/* Header */}
-        <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Departments</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Organise your school by academic departments — assign subjects and staff</p>
-          </div>
+        <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 12 }}>
           <Btn onClick={openCreate}>➕ New Department</Btn>
         </div>
 
