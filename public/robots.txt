@@ -10,4 +10,4 @@ Disallow: /driver/
 Disallow: /bursar/
 Disallow: /security/
 
-Sitemap: https://world-uni-learn.com/sitemap.xml
+Sitemap: https://reportgem.vercel.app/sitemap.xml
