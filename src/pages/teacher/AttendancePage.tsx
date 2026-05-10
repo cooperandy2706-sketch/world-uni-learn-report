@@ -300,7 +300,7 @@ export default function TeacherAttendancePage() {
       )
     } catch (err: any) {
       console.error('Attendance submit error:', err)
-      toast.error('Failed to save: ' + (err.message ?? 'Unknown error'))
+      toast.error('Failed to save: ' + (err?.message || 'Unknown error'))
     } finally {
       setSaving(false)
     }

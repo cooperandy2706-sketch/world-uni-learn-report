@@ -4,8 +4,10 @@ import { supabase } from '../../lib/supabase'
 import { useCurrentTerm } from '../../hooks/useSettings'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts'
 import { Search, Filter, TrendingUp, Users, BookOpen, AlertCircle } from 'lucide-react'
+import { useAuth } from '../../hooks/useAuth'
 
 export default function AdminTestAnalytics() {
+  const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const [loading, setLoading] = useState(true)
   const [classes, setClasses] = useState<any[]>([])
@@ -28,8 +30,8 @@ export default function AdminTestAnalytics() {
 
   async function loadMetadata() {
     const [{ data: cls }, { data: sub }] = await Promise.all([
-      supabase.from('classes').select('id, name').order('name'),
-      supabase.from('subjects').select('id, name').order('name')
+      supabase.from('classes').select('id, name').eq('school_id', user!.school_id).order('name'),
+      supabase.from('subjects').select('id, name').eq('school_id', user!.school_id).order('name')
     ])
     setClasses(cls ?? [])
     setSubjects(sub ?? [])

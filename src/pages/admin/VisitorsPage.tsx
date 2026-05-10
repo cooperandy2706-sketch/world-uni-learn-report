@@ -82,6 +82,7 @@ export default function VisitorsPage() {
         .from('visitors')
         .update({ time_out: new Date().toISOString() })
         .eq('id', id)
+        .eq('school_id', schoolId)
       
       if (error) throw error
       qc.invalidateQueries({ queryKey: ['visitors'] })
@@ -94,7 +95,7 @@ export default function VisitorsPage() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this visitor record?')) return
     try {
-      const { error } = await supabase.from('visitors').delete().eq('id', id)
+      const { error } = await supabase.from('visitors').delete().eq('id', id).eq('school_id', schoolId)
       if (error) throw error
       qc.invalidateQueries({ queryKey: ['visitors'] })
       toast.success('Record deleted')

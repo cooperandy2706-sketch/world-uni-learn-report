@@ -13,11 +13,11 @@ export const classesService = {
   async create(data: any) {
     return supabase.from('classes').insert(data).select().single()
   },
-  async update(id: string, data: any) {
-    return supabase.from('classes').update(data).eq('id', id).select().single()
+  async update(schoolId: string, id: string, data: any) {
+    return supabase.from('classes').update(data).eq('id', id).eq('school_id', schoolId).select().single()
   },
-  async delete(id: string) {
-    return supabase.from('classes').delete().eq('id', id)
+  async delete(schoolId: string, id: string) {
+    return supabase.from('classes').delete().eq('id', id).eq('school_id', schoolId)
   },
 }
 
@@ -33,11 +33,11 @@ export const subjectsService = {
   async create(data: any) {
     return supabase.from('subjects').insert(data).select().single()
   },
-  async update(id: string, data: any) {
-    return supabase.from('subjects').update(data).eq('id', id).select().single()
+  async update(schoolId: string, id: string, data: any) {
+    return supabase.from('subjects').update(data).eq('id', id).eq('school_id', schoolId).select().single()
   },
-  async delete(id: string) {
-    return supabase.from('subjects').delete().eq('id', id)
+  async delete(schoolId: string, id: string) {
+    return supabase.from('subjects').delete().eq('id', id).eq('school_id', schoolId)
   },
 }
 
@@ -49,11 +49,11 @@ export const departmentsService = {
   async create(data: any) {
     return supabase.from('departments').insert(data).select().single()
   },
-  async update(id: string, data: any) {
-    return supabase.from('departments').update(data).eq('id', id).select().single()
+  async update(schoolId: string, id: string, data: any) {
+    return supabase.from('departments').update(data).eq('id', id).eq('school_id', schoolId).select().single()
   },
-  async delete(id: string) {
-    return supabase.from('departments').delete().eq('id', id)
+  async delete(schoolId: string, id: string) {
+    return supabase.from('departments').delete().eq('id', id).eq('school_id', schoolId)
   },
 }
 
@@ -66,18 +66,31 @@ export const teachersService = {
       .eq('school_id', schoolId)
       .order('id')
   },
-  async getAssignments(teacherId: string, termId: string) {
+  async getAssignments(schoolId: string, teacherId: string, termId: string) {
     return supabase
       .from('teacher_assignments')
       .select('*, class:classes(id, name), subject:subjects(id, name)')
+      .eq('school_id', schoolId)
       .eq('teacher_id', teacherId)
       .eq('term_id', termId)
+  },
+  async getLetters(schoolId: string, teacherId: string) {
+    return supabase
+      .from('staff_documents')
+      .select('*')
+      .eq('school_id', schoolId)
+      .eq('teacher_id', teacherId)
+      .order('created_at', { ascending: false })
+  },
+  async saveLetter(data: any) {
+    // Standardize data with school_id if not present, though UI usually provides it
+    return supabase.from('staff_documents').insert(data).select().single()
   },
   async createAssignment(data: any) {
     return supabase.from('teacher_assignments').insert(data).select().single()
   },
-  async deleteAssignment(id: string) {
-    return supabase.from('teacher_assignments').delete().eq('id', id)
+  async deleteAssignment(schoolId: string, id: string) {
+    return supabase.from('teacher_assignments').delete().eq('id', id).eq('school_id', schoolId)
   },
 }
 
@@ -103,7 +116,7 @@ export const yearsService = {
   },
   async setCurrent(id: string, schoolId: string) {
     await supabase.from('academic_years').update({ is_current: false }).eq('school_id', schoolId)
-    return supabase.from('academic_years').update({ is_current: true }).eq('id', id).select().single()
+    return supabase.from('academic_years').update({ is_current: true }).eq('id', id).eq('school_id', schoolId).select().single()
   },
 }
 
@@ -153,11 +166,11 @@ export const termsService = {
 
     return term
   },
-  async lock(id: string) {
-    return supabase.from('terms').update({ is_locked: true }).eq('id', id).select().single()
+  async lock(schoolId: string, id: string) {
+    return supabase.from('terms').update({ is_locked: true }).eq('id', id).eq('school_id', schoolId).select().single()
   },
-  async unlock(id: string) {
-    return supabase.from('terms').update({ is_locked: false }).eq('id', id).select().single()
+  async unlock(schoolId: string, id: string) {
+    return supabase.from('terms').update({ is_locked: false }).eq('id', id).eq('school_id', schoolId).select().single()
   },
   async setCurrent(id: string, schoolId: string) {
     // Check if there is an active term already that we are switching away from
@@ -206,7 +219,7 @@ export const termsService = {
     }
 
     await supabase.from('terms').update({ is_current: false }).eq('school_id', schoolId)
-    return supabase.from('terms').update({ is_current: true }).eq('id', id).select().single()
+    return supabase.from('terms').update({ is_current: true }).eq('id', id).eq('school_id', schoolId).select().single()
   },
 }
 
@@ -257,11 +270,11 @@ export const agendaService = {
   async upsertAgenda(data: any) {
     return supabase.from('term_agendas').upsert(data).select().single()
   },
-  async publishAgenda(id: string, published: boolean) {
-    return supabase.from('term_agendas').update({ is_published: published }).eq('id', id)
+  async publishAgenda(schoolId: string, id: string, published: boolean) {
+    return supabase.from('term_agendas').update({ is_published: published }).eq('id', id).eq('school_id', schoolId)
   },
-  async deleteAgenda(id: string) {
-    return supabase.from('term_agendas').delete().eq('id', id)
+  async deleteAgenda(schoolId: string, id: string) {
+    return supabase.from('term_agendas').delete().eq('id', id).eq('school_id', schoolId)
   },
   // Teacher ops
   async getPublishedAgendas(schoolId: string, termId: string) {

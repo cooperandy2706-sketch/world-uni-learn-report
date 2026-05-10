@@ -651,7 +651,7 @@ export default function PosterMakerPage() {
   }
 
   const deleteCustomTemplate = async (id: string) => {
-    const { error } = await supabase.from('poster_templates').delete().eq('id', id)
+    const { error } = await supabase.from('poster_templates').delete().eq('id', id).eq('school_id', user!.school_id)
     if (error) { toast.error('Failed to delete'); return }
     toast.success('Template deleted')
     setCustomTemplates(t => t.filter(x => x.id !== id))

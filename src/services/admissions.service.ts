@@ -118,18 +118,16 @@ export const billsService = {
     },
 
     /**
-     * Upsert one or more bill items (insert or update by id).
-     * Pass items without `id` to insert; with `id` to update.
-     */
-    async upsert(items: Partial<BillItem>[]) {
+    async upsert(schoolId: string, items: Partial<BillItem>[]) {
+        const payload = items.map(i => ({ ...i, school_id: schoolId }))
         return supabase
             .from('admission_bills')
-            .upsert(items, { onConflict: 'id' })
+            .upsert(payload, { onConflict: 'id' })
             .select()
     },
 
-    async delete(id: string) {
-        return supabase.from('admission_bills').delete().eq('id', id)
+    async delete(schoolId: string, id: string) {
+        return supabase.from('admission_bills').delete().eq('id', id).eq('school_id', schoolId)
     },
 
     /**
@@ -166,16 +164,16 @@ export const scholarshipsService = {
             .order('name')
     },
 
-    async upsert(scholarship: Partial<Scholarship>) {
+    async upsert(schoolId: string, scholarship: Partial<Scholarship>) {
         return supabase
             .from('admission_scholarships')
-            .upsert(scholarship, { onConflict: 'id' })
+            .upsert({ ...scholarship, school_id: schoolId }, { onConflict: 'id' })
             .select()
             .single()
     },
 
-    async delete(id: string) {
-        return supabase.from('admission_scholarships').delete().eq('id', id)
+    async delete(schoolId: string, id: string) {
+        return supabase.from('admission_scholarships').delete().eq('id', id).eq('school_id', schoolId)
     },
 }
 
@@ -206,17 +204,18 @@ export const enquiriesService = {
             .single()
     },
 
-    async update(id: string, data: Partial<AdmissionEnquiry>) {
+    async update(schoolId: string, id: string, data: Partial<AdmissionEnquiry>) {
         return supabase
             .from('admission_enquiries')
             .update({ ...data, updated_at: new Date().toISOString() })
             .eq('id', id)
+            .eq('school_id', schoolId)
             .select()
             .single()
     },
 
-    async delete(id: string) {
-        return supabase.from('admission_enquiries').delete().eq('id', id)
+    async delete(schoolId: string, id: string) {
+        return supabase.from('admission_enquiries').delete().eq('id', id).eq('school_id', schoolId)
     },
 }
 
@@ -252,17 +251,18 @@ export const applicationsService = {
             .single()
     },
 
-    async update(id: string, data: Partial<AdmissionApplication>) {
+    async update(schoolId: string, id: string, data: Partial<AdmissionApplication>) {
         return supabase
             .from('admission_applications')
             .update({ ...data, updated_at: new Date().toISOString() })
             .eq('id', id)
+            .eq('school_id', schoolId)
             .select()
             .single()
     },
 
-    async delete(id: string) {
-        return supabase.from('admission_applications').delete().eq('id', id)
+    async delete(schoolId: string, id: string) {
+        return supabase.from('admission_applications').delete().eq('id', id).eq('school_id', schoolId)
     },
 }
 
@@ -324,15 +324,16 @@ export const suppliesService = {
         return q
     },
 
-    async upsert(items: Partial<SchoolSupply>[]) {
+    async upsert(schoolId: string, items: Partial<SchoolSupply>[]) {
+        const payload = items.map(i => ({ ...i, school_id: schoolId }))
         return supabase
             .from('school_supplies')
-            .upsert(items, { onConflict: 'id' })
+            .upsert(payload, { onConflict: 'id' })
             .select()
     },
 
-    async delete(id: string) {
-        return supabase.from('school_supplies').delete().eq('id', id)
+    async delete(schoolId: string, id: string) {
+        return supabase.from('school_supplies').delete().eq('id', id).eq('school_id', schoolId)
     },
 
     /**

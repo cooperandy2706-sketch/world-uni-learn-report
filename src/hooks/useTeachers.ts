@@ -42,10 +42,11 @@ export function useTeachers() {
 
 // Single teacher with full assignments, syllabus, goals
 export function useTeacherDetail(teacherId: string) {
-  const { data: term } = { data: null } as any // will be passed in
+  const { user } = useAuth()
+  const schoolId = user?.school_id ?? ''
 
   return useQuery({
-    queryKey: ['teacher-detail', teacherId],
+    queryKey: ['teacher-detail', teacherId, schoolId],
     queryFn: async () => {
       const [
         { data: teacher },
@@ -55,30 +56,36 @@ export function useTeacherDetail(teacherId: string) {
         supabase.from('teachers')
           .select('*, user:users(*)')
           .eq('id', teacherId)
+          .eq('school_id', schoolId)
           .single(),
         supabase.from('teacher_assignments')
           .select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)')
           .eq('teacher_id', teacherId)
+          .eq('school_id', schoolId)
           .order('class(name)'),
         supabase.from('weekly_goals')
           .select('*, class:classes(name), subject:subjects(name)')
           .eq('teacher_id', teacherId)
+          .eq('school_id', schoolId)
           .order('week_number', { ascending: false })
           .limit(10),
       ])
       return { teacher, assignments: assignments ?? [], goals: goals ?? [] }
     },
-    enabled: !!teacherId,
+    enabled: !!teacherId && !!schoolId,
   })
 }
 
 export function useUpdateTeacher() {
   const qc = useQueryClient()
+  const { user } = useAuth()
+  const schoolId = user?.school_id ?? ''
+
   return useMutation({
     mutationFn: async ({ teacherId, userId, teacherData, userData }: any) => {
       const [t, u] = await Promise.all([
-        supabase.from('teachers').update(teacherData).eq('id', teacherId).select().single(),
-        supabase.from('users').update(userData).eq('id', userId).select().single(),
+        supabase.from('teachers').update(teacherData).eq('id', teacherId).eq('school_id', schoolId).select().single(),
+        supabase.from('users').update(userData).eq('id', userId).eq('school_id', schoolId).select().single(),
       ])
       if (t.error) throw t.error
       if (u.error) throw u.error
@@ -94,12 +101,15 @@ export function useUpdateTeacher() {
 
 export function useDeleteTeacher() {
   const qc = useQueryClient()
+  const { user } = useAuth()
+  const schoolId = user?.school_id ?? ''
+
   return useMutation({
     mutationFn: async ({ teacherId, userId }: { teacherId: string; userId: string }) => {
-      await supabase.from('teacher_assignments').delete().eq('teacher_id', teacherId)
-      await supabase.from('weekly_goals').delete().eq('teacher_id', teacherId)
-      await supabase.from('teachers').delete().eq('id', teacherId)
-      await supabase.from('users').delete().eq('id', userId)
+      await supabase.from('teacher_assignments').delete().eq('teacher_id', teacherId).eq('school_id', schoolId)
+      await supabase.from('weekly_goals').delete().eq('teacher_id', teacherId).eq('school_id', schoolId)
+      await supabase.from('teachers').delete().eq('id', teacherId).eq('school_id', schoolId)
+      await supabase.from('users').delete().eq('id', userId).eq('school_id', schoolId)
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['teachers'] })

@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
 import ReactMarkdown from 'react-markdown'
+import toast from 'react-hot-toast'
 
 export default function TeacherSubjectDetailsPage() {
   const { id } = useParams()

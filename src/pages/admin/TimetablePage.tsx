@@ -381,8 +381,9 @@ export default function TimetablePage() {
         id: settings.id,
         settings: { ...current, ...updates },
       })
-    } catch (e) {
+    } catch (e: any) {
       console.error('persistConfig failed', e)
+      toast.error('Settings could not be saved: ' + (e?.message || 'Unknown error'))
     }
   }
 
@@ -438,14 +439,14 @@ export default function TimetablePage() {
     }
 
     if (force && conflict?.id) {
-      await supabase.from('timetable_slots').delete().eq('id', conflict.id)
+      await supabase.from('timetable_slots').delete().eq('id', conflict.id).eq('school_id', user!.school_id)
     }
 
     // Remove existing slots for this day/period across all joined classes
     const oldIds = slots
       .filter(s => s.day_of_week === editing.day && s.period_id === editing.period_id && targetClasses.includes(s.class_id))
       .map(s => s.id)
-    if (oldIds.length) await supabase.from('timetable_slots').delete().in('id', oldIds)
+    if (oldIds.length) await supabase.from('timetable_slots').delete().in('id', oldIds).eq('school_id', user!.school_id)
 
     if (editForm.subject_id) {
       await supabase.from('timetable_slots').insert(
@@ -494,11 +495,11 @@ export default function TimetablePage() {
           is_break: p.is_break, school_id: user!.school_id, sort_order: p.sort_order ?? 99,
         })
       } else if (p._deleted) {
-        await supabase.from('timetable_periods').delete().eq('id', p.id)
+        await supabase.from('timetable_periods').delete().eq('id', p.id).eq('school_id', user!.school_id)
       } else {
         await supabase.from('timetable_periods').update({
           name: p.name, start_time: p.start_time, end_time: p.end_time, is_break: p.is_break,
-        }).eq('id', p.id)
+        }).eq('id', p.id).eq('school_id', user!.school_id)
       }
     }
     toast.success('Periods saved!')
@@ -518,6 +519,7 @@ export default function TimetablePage() {
       .delete()
       .eq('term_id', (term as any).id)
       .in('class_id', targets)
+      .eq('school_id', user!.school_id)
     toast.success(`Timetable cleared for ${selectedClassName}`)
     loadClassSlots()
   }

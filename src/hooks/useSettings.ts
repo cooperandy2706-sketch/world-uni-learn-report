@@ -70,14 +70,15 @@ export function useTeachers() {
 }
 
 export function useTeacherAssignments(teacherId: string, termId: string) {
+  const { user } = useAuth()
   return useQuery({
     queryKey: ['teacher-assignments', teacherId, termId],
     queryFn: async () => {
-      const { data, error } = await teachersService.getAssignments(teacherId, termId)
+      const { data, error } = await teachersService.getAssignments(user?.school_id ?? '', teacherId, termId)
       if (error) throw error
       return data ?? []
     },
-    enabled: !!teacherId && !!termId,
+    enabled: !!teacherId && !!termId && !!user?.school_id,
   })
 }
 

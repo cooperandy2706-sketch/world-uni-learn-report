@@ -40,8 +40,9 @@ export default function StudentVaultPage() {
     }, [user])
 
     async function loadStudents() {
+        if (!user?.school_id) return
         setLoading(true)
-        const { data, error } = await supabase.from('students').select('*, class:classes(name)').order('full_name')
+        const { data, error } = await supabase.from('students').select('*, class:classes(name)').eq('school_id', user.school_id).order('full_name')
         if (error) toast.error(error.message)
         else setStudents(data || [])
         setLoading(false)
@@ -85,7 +86,7 @@ export default function StudentVaultPage() {
 
     async function deleteDoc(id: string) {
         if (!confirm('Are you sure you want to delete this document from the vault?')) return
-        const { error } = await supabase.from('student_documents').delete().eq('id', id)
+        const { error } = await supabase.from('student_documents').delete().eq('id', id).eq('school_id', user!.school_id)
         if (error) toast.error(error.message)
         else loadDocuments(selectedStudent.id)
     }

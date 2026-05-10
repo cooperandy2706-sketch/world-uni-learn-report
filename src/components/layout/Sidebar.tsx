@@ -16,7 +16,8 @@ import {
   TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag, ChevronDown,
   Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap,
   Smartphone, Calculator, Grid, Vote, Image, UserPlus, Heart, Search, ArrowUpRight,
-  Plus, Monitor, Truck, Armchair, Box
+  Plus, Monitor, Truck, Armchair, Box, Tv, MonitorPlay, Pill, History,
+  ScanLine, Printer, AlertTriangle, MapPin
 } from 'lucide-react'
 
 const adminLinks = [
@@ -52,6 +53,7 @@ const adminLinks = [
   { to: '/admin/assets', label: 'Asset Register', icon: Package },
   { to: '/admin/billing', label: 'Billing & Subscription', icon: CreditCard },
   { to: '/admin/bursars', label: 'Bursar Staff', icon: Wallet },
+  { to: '/admin/other-staff', label: 'Other Staff', icon: Users },
   { to: '/admin/poster-maker', label: 'Poster Maker', icon: Image },
   { to: '/admin/elections', label: 'Elections (PEC)', icon: Vote },
   { to: ROUTES.ADMIN_ALUMNI, label: 'Alumni & Fundraising', icon: Heart },
@@ -82,6 +84,7 @@ const teacherLinks = [
   { to: ROUTES.TEACHER_SYLLABUS, label: 'Syllabus', icon: Book },
   { to: ROUTES.TEACHER_LESSON_TRACKER, label: 'Lesson Tracker', icon: Timer },
   { to: ROUTES.TEACHER_ASSIGNMENTS, label: 'Assignments', icon: ClipboardList },
+  { to: '/teacher/video-assignments', label: 'Video Assignments', icon: MonitorPlay },
   { to: ROUTES.TEACHER_SUBJECTS, label: 'Library', icon: BookOpen },
   { to: '/teacher/daily-fees', label: 'Daily Collections', icon: CreditCard },
 
@@ -115,6 +118,7 @@ const studentLinks = [
   { to: ROUTES.STUDENT_SCHEDULE, label: 'My Timetable', icon: Timer },
 
   { header: 'Resources & Billing' },
+  { to: '/student/wula-tv', label: 'WULA TV', icon: Tv },
   { to: ROUTES.STUDENT_RESOURCES, label: 'Resources Hub', icon: BookOpen },
   { to: ROUTES.STUDENT_LIBRARY, label: 'Global Library', icon: Library },
   { to: ROUTES.STUDENT_BILLING, label: 'Fees & Billing', icon: Wallet },
@@ -150,6 +154,23 @@ const staffLinks = [
   { to: '/staff/elections', label: 'Elections (PEC)', icon: Vote },
 ]
 
+const securityLinks = [
+  { header: 'Security Portal' },
+  { to: '/security/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/security/scanner', label: 'Gate Scanner', icon: ScanLine },
+  { to: '/security/gate-attendance', label: 'Gate Log', icon: ClipboardCheck },
+  { to: '/security/visitors', label: 'Visitor Log', icon: Users },
+  { to: '/security/visitor-badges', label: 'Visitor Badges', icon: Printer },
+  { to: '/security/incidents', label: 'Incidents', icon: AlertTriangle },
+]
+
+const driverLinks = [
+  { header: 'Transport' },
+  { to: '/driver/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/driver/routes', label: 'Bus Routes', icon: MapPin },
+  { to: '/driver/logs', label: 'Trip Logs', icon: ClipboardList },
+]
+
 const parentLinks = [
   { header: 'Overview' },
   { to: '/parent/dashboard', label: 'My Wards', icon: Users },
@@ -163,8 +184,34 @@ const parentLinks = [
   { to: '/parent/messages', label: 'Messages', icon: MessageSquare },
 ]
 
+const nurseLinks = [
+  { header: 'Clinic Portal' },
+  { to: '/nurse/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/nurse/visits', label: 'Clinic Visits Log', icon: ClipboardList },
+  { to: '/nurse/medication', label: 'Medication Tracker', icon: Pill },
+]
+
+const librarianLinks = [
+  { header: 'Library Portal' },
+  { to: '/librarian/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/librarian/fines', label: 'Overdue & Fines', icon: AlertCircle },
+  { to: '/librarian/history', label: 'Checkout History', icon: History },
+  { to: '/librarian/inventory', label: 'QR Inventory', icon: Package },
+]
+
+const proprietorLinks = [
+  { header: 'Executive Overview' },
+  { to: '/proprietor/dashboard', label: 'Executive Dashboard', icon: LayoutDashboard },
+  { to: '/proprietor/analytics', label: 'Academic Performance', icon: BarChart3 },
+  { to: '/proprietor/finances', label: 'Financial Health', icon: TrendingUp },
+  
+  { header: 'Demographics' },
+  { to: '/proprietor/students', label: 'Student Demographics', icon: Users },
+  { to: '/proprietor/staff', label: 'Staff & Payroll', icon: UserCheck },
+]
+
 export default function Sidebar() {
-  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher } = useAuth()
+  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher, isNurse, isLibrarian, isProprietor, isSecurity, isDriver } = useAuth()
   const navigate = useNavigate()
   const isStaff = user?.role === 'staff'
   const school = user?.school as any
@@ -211,7 +258,7 @@ export default function Sidebar() {
   }, [user?.id, isStudent, isBursar])
 
   const isParent = user?.role === 'parent'
-  let links = isSuperAdmin ? superAdminLinks : isParent ? parentLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : isStaff ? staffLinks : teacherLinks
+  let links = isSuperAdmin ? superAdminLinks : isProprietor ? proprietorLinks : isParent ? parentLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : isNurse ? nurseLinks : isLibrarian ? librarianLinks : isSecurity ? securityLinks : isDriver ? driverLinks : isStaff ? staffLinks : teacherLinks
 
   // Hide daily collections from unauthorized teachers
   if (isTeacher && !loadingAuth && !collectorAuth) {

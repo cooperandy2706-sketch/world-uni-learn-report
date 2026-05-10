@@ -79,12 +79,12 @@ export default function DepartmentsPage() {
     onError: () => toast.error('Failed to create department'),
   })
   const updateDept = useMutation({
-    mutationFn: ({ id, ...data }: any) => departmentsService.update(id, data),
+    mutationFn: ({ id, ...data }: any) => departmentsService.update(user!.school_id, id, data),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['departments'] }); toast.success('Department updated') },
     onError: () => toast.error('Failed to update department'),
   })
   const removeDept = useMutation({
-    mutationFn: (id: string) => departmentsService.delete(id),
+    mutationFn: (id: string) => departmentsService.delete(user!.school_id, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['departments'] }); toast.success('Department deleted') },
     onError: () => toast.error('Failed to delete'),
   })

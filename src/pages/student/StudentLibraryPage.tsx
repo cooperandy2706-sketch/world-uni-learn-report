@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import ReactMarkdown from 'react-markdown'
+import rehypeRaw from 'rehype-raw'
 
 type ContentType = 'video' | 'link' | 'passage' | 'google_doc'
 
@@ -158,7 +159,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
               fontFamily: 'Georgia, "Times New Roman", serif',
             }}>
               <div className="lib-markdown" style={{ fontSize: 16, color: '#1f2937' }}>
-                <ReactMarkdown>{resource.content || '*No content available.*'}</ReactMarkdown>
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>{resource.content || '*No content available.*'}</ReactMarkdown>
               </div>
             </div>
           )}

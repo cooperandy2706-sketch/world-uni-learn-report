@@ -35,9 +35,13 @@ export const ROUTES = {
   ADMIN_CALENDAR: '/admin/calendar',
   ADMIN_ACCOUNT: '/admin/account',
   ADMIN_SECURITY: '/admin/security',
-  // Security
   SECURITY_DASHBOARD: '/security/dashboard',
   SECURITY_ACCOUNT: '/security/account',
+  SECURITY_SCANNER: '/security/scanner',
+  SECURITY_VISITORS: '/security/visitors',
+  SECURITY_VISITOR_BADGES: '/security/visitor-badges',
+  SECURITY_INCIDENTS: '/security/incidents',
+  SECURITY_GATE: '/security/gate-attendance',
   // Teacher
   TEACHER_DASHBOARD: '/teacher/dashboard',
   TEACHER_MY_CLASSES: '/teacher/my-classes',
@@ -93,6 +97,11 @@ export const ROUTES = {
   // Other Staff
   STAFF_DASHBOARD: '/staff/dashboard',
   STAFF_ACCOUNT: '/staff/account',
+  // Librarian
+  LIBRARIAN_DASHBOARD: '/librarian/dashboard',
+  LIBRARIAN_FINES: '/librarian/fines',
+  LIBRARIAN_HISTORY: '/librarian/history',
+  LIBRARIAN_INVENTORY: '/librarian/inventory',
 
   // Super Admin
   SUPER_ADMIN_DASHBOARD: '/super-admin/dashboard',
@@ -102,11 +111,18 @@ export const ROUTES = {
   SUPER_ADMIN_ANALYTICS: '/super-admin/analytics',
   SUPER_ADMIN_RESOURCES: '/super-admin/resources',
   SUPER_ADMIN_SUBJECTS: '/super-admin/subjects',
-  SUPER_ADMIN_MESSAGES: '/super-admin/messaging',
   SUPER_ADMIN_ACCOUNT: '/super-admin/account',
 
   // Parent
   PARENT_DASHBOARD: '/parent/dashboard',
   PARENT_BILLING: '/parent/billing',
   PARENT_ACCOUNT: '/parent/account',
+
+  // Proprietor
+  PROPRIETOR_DASHBOARD: '/proprietor/dashboard',
+  PROPRIETOR_ANALYTICS: '/proprietor/analytics',
+  PROPRIETOR_FINANCES: '/proprietor/finances',
+  PROPRIETOR_STAFF: '/proprietor/staff',
+  PROPRIETOR_STUDENTS: '/proprietor/students',
+  PROPRIETOR_ACCOUNT: '/proprietor/account',
 } as const

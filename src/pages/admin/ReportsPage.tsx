@@ -219,7 +219,7 @@ async function downloadBulkPDF(reports: any[], className: string) {
     toast.success(`✅ ${studentDivs.length} report cards exported!`, { id: toastId })
   } catch (e: any) {
     console.error('Bulk PDF failed:', e)
-    toast.error('Bulk PDF failed: ' + (e.message || 'Unknown error'), { id: toastId })
+    toast.error('Bulk PDF failed: ' + (e?.message || 'Unknown error'), { id: toastId })
   }
 }
 

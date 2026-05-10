@@ -3,6 +3,7 @@ import { Calendar, Clock, CheckCircle, XCircle, AlertCircle, Plus, X } from 'luc
 import { useAuth } from '../../hooks/useAuth'
 import { LeaveService } from '../../services/leave.service'
 import FlaskLoader from '../../components/ui/FlaskLoader'
+import toast from 'react-hot-toast'
 
 export default function TeacherLeavePage() {
   const { user } = useAuth()
@@ -27,8 +28,9 @@ export default function TeacherLeavePage() {
     try {
       const data = await LeaveService.getMyRequests(user!.id)
       setRequests(data || [])
-    } catch (err) {
-      console.error(err)
+    } catch (err: any) {
+      console.error('[LeaveLoad]', err)
+      toast.error(err?.message || 'Failed to load leave requests')
     } finally {
       setLoading(false)
     }
@@ -53,8 +55,9 @@ export default function TeacherLeavePage() {
       setReason('')
       setLeaveType('sick')
       loadRequests()
-    } catch (err) {
-      console.error(err)
+    } catch (err: any) {
+      console.error('[LeaveSubmit]', err)
+      toast.error(err?.message || 'Failed to submit leave request')
     } finally {
       setSubmitting(false)
     }

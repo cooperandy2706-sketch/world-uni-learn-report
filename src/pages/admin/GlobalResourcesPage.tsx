@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
 import { formatDate } from '../../lib/utils'
 import ReactMarkdown from 'react-markdown'
+import rehypeRaw from 'rehype-raw'
 import toast from 'react-hot-toast'
 
 interface GlobalResourceData {
@@ -148,6 +149,12 @@ export default function GlobalResourcesPage() {
   const [editorMode, setEditorMode] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // AI Generator State
+  const [aiModalOpen, setAiModalOpen] = useState(false)
+  const [aiTopic, setAiTopic] = useState('')
+  const [aiLength, setAiLength] = useState('Standard Chapter')
+  const [isGenerating, setIsGenerating] = useState(false)
+
   // Builder State
   const [form, setForm] = useState<GlobalResourceData>({
     title: '',
@@ -250,8 +257,9 @@ export default function GlobalResourcesPage() {
       }
       const { data: subs } = await query.order('name')
       setSubjects(subs ?? [])
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to load subjects:', err)
+      toast.error('Failed to load subject list')
     }
   }
 
@@ -371,6 +379,74 @@ export default function GlobalResourcesPage() {
       toast.error(err.message || err.details || 'Failed to update global resource')
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  async function handleGenerateTextbookAI() {
+    if (!aiTopic.trim()) { toast.error("Please enter a topic"); return; }
+    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+    if (!apiKey) { toast.error("VITE_GROQ_API_KEY is missing from environment variables"); return; }
+
+    setIsGenerating(true)
+    try {
+      const prompt = `You are an expert curriculum designer. Your task is to write an educational textbook passage in Markdown format about the following topic: "${aiTopic}".
+The desired length/depth is: ${aiLength}. Do not exceed 1500 words to ensure the output does not cut off.
+
+IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
+1. Output valid JSON ONLY, matching this exact schema:
+{
+  "title": "A catchy, educational title",
+  "description": "A short 2-sentence summary of the chapter",
+  "topic": "The core topic name",
+  "content": "The full markdown content"
+}
+
+2. The "content" field MUST be written in Markdown. Use H1, H2 headers, bullet points, and bold text.
+3. IMAGES: Embed exactly 2 highly relevant images into the Markdown using Pollinations AI. 
+   Syntax: ![Alt Text](https://image.pollinations.ai/prompt/{url-encoded-description}?width=800&height=400&nologo=true)
+   Make sure the descriptions are specific and descriptive (e.g., highly-detailed-diagram-of-plant-cell).
+4. VIDEOS: Embed exactly 1 highly relevant, real educational YouTube video using an HTML iframe.
+   Syntax: <iframe width="100%" height="400" src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe>
+   You MUST use a REAL, verified YouTube video ID (e.g. from CrashCourse, Khan Academy, or TED-Ed) that relates to "${aiTopic}". Do not make up fake IDs.
+5. End the chapter with a "Check Your Understanding" section containing 3 quick questions.
+`
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: 'llama-3.1-8b-instant',
+          messages: [{ role: 'user', content: prompt }],
+          response_format: { type: "json_object" },
+          max_tokens: 4000
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error?.message || 'API request failed')
+      }
+
+      const data = await res.json()
+      const parsed = JSON.parse(data.choices[0].message.content)
+
+      setForm({
+        title: parsed.title || '',
+        description: parsed.description || '',
+        subject_id: '',
+        content_type: 'passage',
+        content: parsed.content || '',
+        is_published: false,
+        topic: parsed.topic || aiTopic,
+        cover_image_url: ''
+      })
+      
+      toast.success("Textbook chapter generated successfully!")
+      setAiModalOpen(false)
+      setEditorMode(true)
+    } catch (err: any) {
+      toast.error("Generation failed: " + err.message)
+    } finally {
+      setIsGenerating(false)
     }
   }
 
@@ -566,7 +642,7 @@ export default function GlobalResourcesPage() {
                    
                    <div className="markdown-preview" style={{ fontSize: 13, color: '#64748b', borderTop: '1px solid #f8fafc', paddingTop: 12 }}>
                       {form.content_type === 'passage' ? (
-                        <ReactMarkdown>{form.content || '*No content yet...*'}</ReactMarkdown>
+                        <ReactMarkdown rehypePlugins={[rehypeRaw]}>{form.content || '*No content yet...*'}</ReactMarkdown>
                       ) : (
                         <p>{form.description || 'Preview of link/video content...'}</p>
                       )}
@@ -596,6 +672,7 @@ export default function GlobalResourcesPage() {
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Distribute standard learning materials mapped to the global curriculum.</p>
           </div>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <Btn variant="secondary" onClick={() => setAiModalOpen(true)}>✨ AI Generate Textbook</Btn>
             <Btn onClick={() => {
               setForm({
                 title: '',
@@ -623,7 +700,10 @@ export default function GlobalResourcesPage() {
             <div style={{ fontSize: 48, marginBottom: 12 }}>📚</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No learning materials available</h3>
             <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>Publish your first video tutorial or study guide for students.</p>
-            <Btn onClick={() => setEditorMode(true)}>➕ Upload First Material</Btn>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+              <Btn variant="secondary" onClick={() => setAiModalOpen(true)}>✨ Auto-Generate Topic</Btn>
+              <Btn onClick={() => setEditorMode(true)}>➕ Upload First Material</Btn>
+            </div>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 18 }}>
@@ -689,6 +769,50 @@ export default function GlobalResourcesPage() {
           </div>
         )}
       </div>
+
+      {/* ── AI TEXTBOOK GENERATOR MODAL ── */}
+      <Modal
+        open={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        title="✨ Auto-Generate Textbook Module"
+        subtitle="Powered by Groq & Pollinations"
+        size="md"
+        footer={<>
+          <Btn variant="secondary" onClick={() => setAiModalOpen(false)}>Cancel</Btn>
+          <Btn onClick={handleGenerateTextbookAI} loading={isGenerating}>Generate Chapter</Btn>
+        </>}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ background: '#f5f3ff', padding: '12px 16px', borderRadius: 12, border: '1.5px solid #ede9fe' }}>
+            <p style={{ fontSize: 12, color: '#6d28d9', margin: 0, fontWeight: 600 }}>
+              The AI will write a comprehensive Markdown chapter, automatically embedding dynamic images and in-app educational videos based on your topic.
+            </p>
+          </div>
+          <div className="field-group">
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#4b5563', marginBottom: 6, display: 'block' }}>Topic / Chapter Name *</label>
+            <input
+              type="text"
+              value={aiTopic}
+              onChange={e => setAiTopic(e.target.value)}
+              placeholder="e.g. The Solar System for Grade 6"
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}
+            />
+          </div>
+          <div className="field-group">
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#4b5563', marginBottom: 6, display: 'block' }}>Depth / Length</label>
+            <select
+              value={aiLength}
+              onChange={e => setAiLength(e.target.value)}
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', background: '#fff' }}
+            >
+              <option value="Short Overview (500 words)">Short Overview</option>
+              <option value="Standard Chapter (1000 words)">Standard Chapter</option>
+              <option value="Comprehensive Deep Dive (2000+ words)">Comprehensive Deep Dive</option>
+            </select>
+          </div>
+        </div>
+      </Modal>
+
     </>
   )
 }

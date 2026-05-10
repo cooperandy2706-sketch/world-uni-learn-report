@@ -1,214 +1,513 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404: Lost in the Library | World Uni-Learn</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #7c3aed;
-            --secondary: #6d28d9;
-            --accent: #a78bfa;
-            --bg-start: #f5f3ff;
-            --bg-end: #c4b5fd;
-            --text: #1e1b4b;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page Not Found | WULA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --ink: #0f172a;
+      --purple: #7c3aed;
+      --purple-light: #a78bfa;
+      --amber: #f59e0b;
+    }
 
-        @keyframes meshMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+    /* ── Dark starfield background ── */
+    body {
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      background: #060714;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      padding: 20px;
+    }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(-2deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
-        }
+    /* Animated gradient orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      animation: drift 12s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .orb1 { width: 500px; height: 500px; background: #4c1d95; top: -150px; left: -100px; animation-delay: 0s; }
+    .orb2 { width: 400px; height: 400px; background: #1e3a8a; bottom: -100px; right: -80px; animation-delay: -4s; }
+    .orb3 { width: 300px; height: 300px; background: #7c3aed; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -8s; }
 
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, -40px) scale(1.1); }
+    }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    /* Canvas stars */
+    #stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(-45deg, #f5f3ff, #ede9fe, #ddd6fe, #c4b5fd);
-            background-size: 400% 400%;
-            animation: meshMove 15s ease infinite;
-            padding: 20px;
-            overflow: hidden;
-            color: var(--text);
-        }
+    /* ── Main card ── */
+    .card {
+      position: relative;
+      z-index: 10;
+      background: rgba(15,7,40,0.75);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 32px;
+      padding: 56px 44px 48px;
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 0 1px rgba(167,139,250,0.08), 0 40px 120px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+      animation: riseIn 0.9s cubic-bezier(0.16,1,0.3,1) both;
+    }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 40px 100px rgba(109, 40, 217, 0.12);
-            border-radius: 40px;
-            padding: 60px 40px;
-            max-width: 560px;
-            width: 100%;
-            text-align: center;
-            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-            position: relative;
-            z-index: 10;
-        }
+    @keyframes riseIn {
+      from { opacity:0; transform: translateY(40px) scale(0.96); }
+      to   { opacity:1; transform: translateY(0)   scale(1); }
+    }
 
-        .visual-area {
-            position: relative;
-            width: 220px;
-            height: 160px;
-            margin: 0 auto 40px;
-        }
+    /* ── Astronaut scene ── */
+    .scene {
+      position: relative;
+      height: 170px;
+      margin-bottom: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .book-icon {
-            font-size: 90px;
-            animation: float 4s ease-in-out infinite;
-            display: block;
-        }
+    /* Planet */
+    .planet {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #6d28d9, #1e1b4b);
+      box-shadow: 0 0 40px rgba(109,40,217,0.6), inset -12px -8px 0 rgba(0,0,0,0.3);
+      position: relative;
+      animation: pulse-glow 3s ease-in-out infinite alternate;
+    }
+    /* Planet ring */
+    .planet::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 140px; height: 30px;
+      border: 3px solid rgba(167,139,250,0.4);
+      border-radius: 50%;
+      transform: translate(-50%,-50%) rotateX(70deg);
+      box-shadow: 0 0 20px rgba(167,139,250,0.3);
+    }
 
-        .orbital {
-            position: absolute;
-            inset: -20px;
-            border: 2px dashed rgba(124, 58, 237, 0.2);
-            border-radius: 50%;
-            animation: spin 10s linear infinite;
-        }
+    @keyframes pulse-glow {
+      from { box-shadow: 0 0 30px rgba(109,40,217,0.5); }
+      to   { box-shadow: 0 0 60px rgba(109,40,217,0.9); }
+    }
 
-        .orbital-outer {
-            position: absolute;
-            inset: -40px;
-            border: 1px solid rgba(124, 58, 237, 0.1);
-            border-radius: 50%;
-            animation: spin 15s linear infinite reverse;
-        }
+    /* Astronaut floating */
+    .astronaut {
+      font-size: 64px;
+      position: absolute;
+      right: 50px;
+      top: 20px;
+      animation: tumble 6s ease-in-out infinite;
+      filter: drop-shadow(0 0 16px rgba(167,139,250,0.6));
+      cursor: pointer;
+      user-select: none;
+    }
 
-        .error-code {
-            font-family: 'Syne', sans-serif;
-            font-size: 110px;
-            font-weight: 800;
-            line-height: 1;
-            background: linear-gradient(135deg, #6d28d9, #7c3aed, #a78bfa);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 12px;
-            position: relative;
-            display: inline-block;
-        }
+    @keyframes tumble {
+      0%   { transform: translateY(0)   rotate(-5deg); }
+      30%  { transform: translateY(-18px) rotate(8deg);  }
+      60%  { transform: translateY(-8px)  rotate(-3deg); }
+      100% { transform: translateY(0)   rotate(-5deg); }
+    }
 
-        .badge {
-            position: absolute;
-            bottom: 12px;
-            right: -25px;
-            background: var(--primary);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            transform: rotate(12deg);
-        }
+    /* Orbit path */
+    .orbit-ring {
+      position: absolute;
+      width: 200px; height: 200px;
+      border: 1px dashed rgba(167,139,250,0.18);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      animation: spin-slow 20s linear infinite;
+    }
+    .orbit-dot {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--purple-light);
+      top: -4px; left: calc(50% - 4px);
+      box-shadow: 0 0 8px var(--purple-light);
+    }
 
-        h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: 32px;
-            margin-bottom: 14px;
-            letter-spacing: -0.02em;
-        }
+    @keyframes spin-slow { to { transform: translate(-50%,-50%) rotate(360deg); } }
 
-        p {
-            color: #4b5563;
-            margin-bottom: 40px;
-            line-height: 1.6;
-            font-size: 16px;
-        }
+    /* ── 404 number ── */
+    .code-wrap {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
 
-        .btn-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
+    .code {
+      font-family: 'Syne', sans-serif;
+      font-size: 120px;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, #c4b5fd 0%, #7c3aed 40%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -4px;
+      position: relative;
+    }
 
-        .btn {
-            height: 54px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
+    /* Glitch effect layers */
+    .code::before,
+    .code::after {
+      content: '404';
+      position: absolute;
+      inset: 0;
+      background: inherit;
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .code::before {
+      color: transparent;
+      text-shadow: -2px 0 #f59e0b;
+      animation: glitch-a 3.5s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+    }
+    .code::after {
+      color: transparent;
+      text-shadow: 2px 0 #06b6d4;
+      animation: glitch-b 3.5s infinite;
+      clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+    }
 
-        .btn-primary {
-            background: var(--text);
-            color: white;
-            box-shadow: 0 10px 30px rgba(30, 27, 75, 0.2);
-        }
+    @keyframes glitch-a {
+      0%,89%,100% { transform: none; opacity: 0; }
+      90%          { transform: translate(-3px, 0); opacity: 0.7; }
+      95%          { transform: translate(2px, 0);  opacity: 0.7; }
+    }
+    @keyframes glitch-b {
+      0%,89%,100% { transform: none; opacity: 0; }
+      91%          { transform: translate(3px, 0);  opacity: 0.7; }
+      96%          { transform: translate(-2px, 0); opacity: 0.7; }
+    }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            background: #000;
-        }
+    .lost-tag {
+      position: absolute;
+      bottom: 14px; right: -20px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      transform: rotate(14deg);
+      box-shadow: 0 4px 12px rgba(245,158,11,0.4);
+    }
 
-        .btn-secondary {
-            background: white;
-            color: var(--text);
-            border: 2px solid #f1f5f9;
-        }
+    /* ── Text ── */
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: #f1f5f9;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
 
-        .btn-secondary:hover {
-            background: #f8fafc;
-            transform: translateY(-2px);
-        }
+    p {
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.65;
+      margin-bottom: 36px;
+      max-width: 380px;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-        @media (max-width: 480px) {
-            .btn-group { grid-template-columns: 1fr; }
-            .error-code { font-size: 80px; }
-            h1 { font-size: 26px; }
-        }
-    </style>
+    /* ── Typewriter hint ── */
+    .type-hint {
+      font-size: 13px;
+      color: rgba(167,139,250,0.6);
+      font-family: 'DM Sans', monospace;
+      margin-bottom: 28px;
+      height: 20px;
+    }
+    .cursor { animation: blink .7s step-end infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── Buttons ── */
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn {
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-home {
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(109,40,217,0.35);
+    }
+    .btn-home:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(109,40,217,0.5); }
+
+    .btn-back {
+      background: rgba(255,255,255,0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-back:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 36px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(167,139,250,0.3);
+    }
+
+    /* ── Score easter egg ── */
+    .score {
+      position: fixed;
+      top: 20px; right: 20px;
+      z-index: 100;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      color: rgba(167,139,250,0.5);
+      font-weight: 700;
+      letter-spacing: .06em;
+      transition: color .3s;
+    }
+    .score.active { color: #a78bfa; }
+
+    /* ── Floating particles ── */
+    .particle {
+      position: fixed;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: rgba(167,139,250,0.6);
+      pointer-events: none;
+      animation: rise linear infinite;
+    }
+    @keyframes rise {
+      from { transform: translateY(100vh) scale(0); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      to   { transform: translateY(-20px) scale(1); opacity: 0; }
+    }
+
+    @media (max-width: 500px) {
+      .card { padding: 40px 24px 36px; border-radius: 24px; }
+      .code { font-size: 88px; }
+      h1 { font-size: 22px; }
+      .astronaut { font-size: 48px; right: 20px; }
+      .btn-group { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-    <div class="glass-card">
-        <div class="visual-area">
-            <span class="book-icon">📚</span>
-            <div class="orbital"></div>
-            <div class="orbital-outer"></div>
-        </div>
+  <!-- Background orbs -->
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
 
-        <div class="error-code">
-            404
-            <div class="badge">LOST</div>
-        </div>
+  <!-- Stars canvas -->
+  <canvas id="stars"></canvas>
 
-        <h1>Lost in the Library?</h1>
-        <p>The resource you're searching for has vanished from the shelves. Let's get you back to the main halls.</p>
+  <!-- Score easter egg -->
+  <div class="score" id="score">✦ CLICKS: 0</div>
 
-        <div class="btn-group">
-            <a href="/" class="btn btn-primary">🏠 Back to Dashboard</a>
-            <a href="javascript:history.back()" class="btn btn-secondary">← Go Back Home</a>
-        </div>
-
-        <div style="margin-top: 40px; opacity: 0.5; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; color: var(--primary);">
-            WULA LEARNING PLATFORM
-        </div>
+  <!-- Main card -->
+  <div class="card">
+    <!-- Scene -->
+    <div class="scene">
+      <div class="planet"></div>
+      <div class="orbit-ring">
+        <div class="orbit-dot"></div>
+      </div>
+      <div class="astronaut" id="astro" title="Click me!">🧑‍🚀</div>
     </div>
+
+    <!-- Code -->
+    <div class="code-wrap">
+      <div class="code">404</div>
+      <div class="lost-tag">LOST</div>
+    </div>
+
+    <!-- Text -->
+    <h1>Houston, We Have a Problem</h1>
+    <p>The page you're looking for drifted off into deep space. It might have been moved, deleted, or never existed at all.</p>
+
+    <!-- Typewriter -->
+    <div class="type-hint" id="typeHint"><span class="cursor">_</span></div>
+
+    <!-- Buttons -->
+    <div class="btn-group">
+      <a href="/" class="btn btn-home">🏠 Back to Base</a>
+      <a href="javascript:history.back()" class="btn btn-back">← Go Back</a>
+    </div>
+
+    <div class="footer">WULA · World Uni-Learn Platform</div>
+  </div>
+
+  <script>
+    // ── Starfield ──────────────────────────────────────────
+    const canvas = document.getElementById('stars')
+    const ctx = canvas.getContext('2d')
+    let stars = []
+
+    function resize() {
+      canvas.width  = window.innerWidth
+      canvas.height = window.innerHeight
+      initStars()
+    }
+
+    function initStars() {
+      stars = Array.from({ length: 180 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.5 + 0.3,
+        a: Math.random(),
+        da: (Math.random() - 0.5) * 0.008,
+        speed: Math.random() * 0.15 + 0.05,
+      }))
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      stars.forEach(s => {
+        s.a = Math.max(0.1, Math.min(1, s.a + s.da))
+        if (s.a <= 0.1 || s.a >= 1) s.da *= -1
+        s.y -= s.speed
+        if (s.y < 0) { s.y = canvas.height; s.x = Math.random() * canvas.width }
+        ctx.beginPath()
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(200, 180, 255, ${s.a})`
+        ctx.fill()
+      })
+      requestAnimationFrame(drawStars)
+    }
+
+    window.addEventListener('resize', resize)
+    resize()
+    drawStars()
+
+    // ── Floating particles ─────────────────────────────────
+    function spawnParticle() {
+      const el = document.createElement('div')
+      el.className = 'particle'
+      el.style.cssText = `
+        left: ${Math.random() * 100}vw;
+        animation-duration: ${Math.random() * 8 + 6}s;
+        animation-delay: ${Math.random() * 5}s;
+        opacity: 0;
+        width: ${Math.random() * 3 + 1}px;
+        height: ${Math.random() * 3 + 1}px;
+      `
+      document.body.appendChild(el)
+      setTimeout(() => el.remove(), 14000)
+    }
+    setInterval(spawnParticle, 600)
+
+    // ── Typewriter hints ───────────────────────────────────
+    const hints = [
+      'error: route not found in cosmos...',
+      'searching galaxy for this page...',
+      'coordinates unknown — return to base?',
+      'signal lost at /unknown/destination',
+    ]
+    const hintEl = document.getElementById('typeHint')
+    let hintIdx = 0, charIdx = 0, deleting = false
+
+    function typeWrite() {
+      const current = hints[hintIdx]
+      if (!deleting) {
+        hintEl.innerHTML = current.slice(0, charIdx + 1) + '<span class="cursor">_</span>'
+        charIdx++
+        if (charIdx >= current.length) { deleting = true; setTimeout(typeWrite, 1800); return }
+      } else {
+        hintEl.innerHTML = current.slice(0, charIdx - 1) + '<span class="cursor">_</span>'
+        charIdx--
+        if (charIdx <= 0) { deleting = false; hintIdx = (hintIdx + 1) % hints.length }
+      }
+      setTimeout(typeWrite, deleting ? 40 : 65)
+    }
+    setTimeout(typeWrite, 1200)
+
+    // ── Astronaut click easter egg ─────────────────────────
+    const astro = document.getElementById('astro')
+    const scoreEl = document.getElementById('score')
+    const emojis = ['🧑‍🚀','👾','🛸','☄️','🌌','🚀','🌠','💫','⭐','🪐']
+    let clicks = 0
+
+    astro.addEventListener('click', () => {
+      clicks++
+      scoreEl.textContent = `✦ CLICKS: ${clicks}`
+      scoreEl.classList.add('active')
+      astro.textContent = emojis[clicks % emojis.length]
+
+      // Burst particles from astronaut
+      const rect = astro.getBoundingClientRect()
+      for (let i = 0; i < 6; i++) {
+        const burst = document.createElement('div')
+        burst.style.cssText = `
+          position:fixed; border-radius:50%;
+          width:6px; height:6px;
+          background:hsl(${Math.random()*60+260},80%,70%);
+          left:${rect.left + rect.width/2}px;
+          top:${rect.top + rect.height/2}px;
+          pointer-events:none;
+          z-index:999;
+          transition: transform 0.6s ease, opacity 0.6s ease;
+        `
+        document.body.appendChild(burst)
+        const angle = (i / 6) * Math.PI * 2
+        const dist  = 60 + Math.random() * 40
+        requestAnimationFrame(() => {
+          burst.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`
+          burst.style.opacity = '0'
+        })
+        setTimeout(() => burst.remove(), 700)
+      }
+
+      if (clicks === 10) {
+        astro.style.animation = 'none'
+        astro.style.transition = 'transform 1s'
+        astro.style.transform = 'translateX(200vw) rotate(720deg)'
+        setTimeout(() => {
+          astro.style.transform = ''
+          astro.style.animation = ''
+          astro.textContent = '🧑‍🚀'
+        }, 1200)
+      }
+    })
+  </script>
 </body>
 </html>

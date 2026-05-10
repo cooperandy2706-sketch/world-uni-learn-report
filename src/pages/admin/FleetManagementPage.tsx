@@ -144,28 +144,28 @@ export default function FleetManagementPage() {
 
   async function deleteVehicle(id: string) {
     if (!confirm('Are you sure you want to delete this vehicle?')) return
-    await supabase.from('transport_vehicles').delete().eq('id', id)
+    await supabase.from('transport_vehicles').delete().eq('id', id).eq('school_id', user!.school_id)
     toast.success('Vehicle deleted')
     loadData()
   }
 
   async function deleteRoute(id: string) {
     if (!confirm('Are you sure you want to delete this route?')) return
-    await supabase.from('transport_routes').delete().eq('id', id)
+    await supabase.from('transport_routes').delete().eq('id', id).eq('school_id', user!.school_id)
     toast.success('Route deleted')
     loadData()
   }
 
   async function deleteAssignment(id: string) {
     if (!confirm('Remove this student from transport?')) return
-    await supabase.from('transport_student_assignments').delete().eq('id', id)
+    await supabase.from('transport_student_assignments').delete().eq('id', id).eq('school_id', user!.school_id)
     toast.success('Assignment removed')
     loadData()
   }
 
   async function resolveMaintenance(id: string) {
     if (!confirm('Mark this issue as resolved?')) return
-    await supabase.from('transport_maintenance_logs').update({ status: 'resolved' }).eq('id', id)
+    await supabase.from('transport_maintenance_logs').update({ status: 'resolved' }).eq('id', id).eq('school_id', user!.school_id)
     toast.success('Issue marked resolved')
     loadData()
   }

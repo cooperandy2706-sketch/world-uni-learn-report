@@ -55,7 +55,7 @@ export default function ExpensesPage() {
   })
 
   const delRecord = useMutation({
-    mutationFn: (id: string) => expenseService.delete(id),
+    mutationFn: (id: string) => expenseService.delete(schoolId, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['expenses'] }); toast.success('Deleted') },
   })
 

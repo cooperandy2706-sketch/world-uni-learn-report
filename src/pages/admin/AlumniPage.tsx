@@ -211,7 +211,7 @@ export default function AlumniPage() {
                       <ExternalLink size={14} /> Profile
                     </a>
                   )}
-                  <button onClick={() => { if(confirm('Remove record?')) supabase.from('alumni').delete().eq('id', a.id).then(() => qc.invalidateQueries({queryKey:['alumni']})) }}
+                  <button onClick={() => { if(confirm('Remove record?')) supabase.from('alumni').delete().eq('id', a.id).eq('school_id', schoolId).then(() => qc.invalidateQueries({queryKey:['alumni']})) }}
                     style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid #fecaca', background: 'transparent', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Trash2 size={14} />
                   </button>

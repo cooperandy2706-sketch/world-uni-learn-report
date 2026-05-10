@@ -20,14 +20,17 @@ export function useStudents() {
 }
 
 export function useStudentsByClass(classId: string) {
+  const { user } = useAuth()
+  const schoolId = user?.school_id ?? ''
+
   return useQuery({
     queryKey: ['students', 'class', classId],
     queryFn: async () => {
-      const { data, error } = await studentsService.getByClass(classId)
+      const { data, error } = await studentsService.getByClass(schoolId, classId)
       if (error) throw error
       return data ?? []
     },
-    enabled: !!classId,
+    enabled: !!classId && !!schoolId,
   })
 }
 
@@ -59,10 +62,11 @@ export function useCreateStudent() {
 
 export function useUpdateStudent() {
   const qc = useQueryClient()
+  const { user } = useAuth()
 
   return useMutation({
     mutationFn: async ({ id, ...data }: any) => {
-      const { data: res, error } = await studentsService.update(id, data)
+      const { data: res, error } = await studentsService.update(user?.school_id ?? '', id, data)
       if (error) throw error
       return res
     },
@@ -76,10 +80,11 @@ export function useUpdateStudent() {
 
 export function useDeleteStudent() {
   const qc = useQueryClient()
+  const { user } = useAuth()
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await studentsService.delete(id)
+      const { data, error } = await studentsService.delete(user?.school_id ?? '', id)
       if (error) throw error
       return data
     },

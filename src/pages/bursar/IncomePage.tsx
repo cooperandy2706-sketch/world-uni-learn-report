@@ -48,7 +48,7 @@ export default function IncomePage() {
   })
 
   const delRecord = useMutation({
-    mutationFn: (id: string) => incomeService.delete(id),
+    mutationFn: (id: string) => incomeService.delete(schoolId, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['income'] }); toast.success('Deleted') },
   })
 

@@ -332,7 +332,7 @@ export default function AssignmentsPage() {
   async function handleDelete(id: string) {
     if (!confirm('Are you sure you want to delete this assignment?')) return
     try {
-      const { error } = await supabase.from('assignments').delete().eq('id', id)
+      const { error } = await supabase.from('assignments').delete().eq('id', id).eq('school_id', user!.school_id)
       if (error) throw error
       toast.success('Assignment deleted')
       loadAssignments()

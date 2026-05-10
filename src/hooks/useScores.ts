@@ -1,42 +1,46 @@
 // src/hooks/useScores.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { scoresService } from '../services/scores.service'
+import { useAuth } from './useAuth'
 import { calculateClassPositions } from '../utils/grading'
 import toast from 'react-hot-toast'
 
 export function useScoresByClassTerm(classId: string, termId: string) {
+  const { user } = useAuth()
   return useQuery({
     queryKey: ['scores', 'class', classId, termId],
     queryFn: async () => {
-      const { data, error } = await scoresService.getByClassAndTerm(classId, termId)
+      const { data, error } = await scoresService.getByClassAndTerm(user?.school_id ?? '', classId, termId)
       if (error) throw error
       return data ?? []
     },
-    enabled: !!classId && !!termId,
+    enabled: !!classId && !!termId && !!user?.school_id,
   })
 }
 
 export function useScoresBySubject(subjectId: string, classId: string, termId: string) {
+  const { user } = useAuth()
   return useQuery({
     queryKey: ['scores', 'subject', subjectId, classId, termId],
     queryFn: async () => {
-      const { data, error } = await scoresService.getBySubjectClassTerm(subjectId, classId, termId)
+      const { data, error } = await scoresService.getBySubjectClassTerm(user?.school_id ?? '', subjectId, classId, termId)
       if (error) throw error
       return data ?? []
     },
-    enabled: !!subjectId && !!classId && !!termId,
+    enabled: !!subjectId && !!classId && !!termId && !!user?.school_id,
   })
 }
 
 export function useStudentScores(studentId: string, termId: string) {
+  const { user } = useAuth()
   return useQuery({
     queryKey: ['scores', 'student', studentId, termId],
     queryFn: async () => {
-      const { data, error } = await scoresService.getStudentScores(studentId, termId)
+      const { data, error } = await scoresService.getStudentScores(user?.school_id ?? '', studentId, termId)
       if (error) throw error
       return data ?? []
     },
-    enabled: !!studentId && !!termId,
+    enabled: !!studentId && !!termId && !!user?.school_id,
   })
 }
 
@@ -90,10 +94,11 @@ export function useBulkUpsertScores() {
 
 export function useSubmitScores() {
   const qc = useQueryClient()
+  const { user } = useAuth()
 
   return useMutation({
     mutationFn: ({ classId, subjectId, termId }: { classId: string; subjectId: string; termId: string }) =>
-      scoresService.submitScores(classId, subjectId, termId),
+      scoresService.submitScores(user?.school_id ?? '', classId, subjectId, termId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['scores'] })
       toast.success('Scores submitted successfully')

@@ -60,6 +60,7 @@ export const TimetableService = {
       const { data: otherSlots } = await supabase
         .from('timetable_slots')
         .select('teacher_id, day_of_week, period_id')
+        .eq('school_id', schoolId)
         .eq('term_id', termId)
         .not('class_id', 'in', `(${targetCids.join(',')})`)
       

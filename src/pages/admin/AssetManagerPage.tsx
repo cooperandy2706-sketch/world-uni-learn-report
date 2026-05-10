@@ -42,7 +42,7 @@ export default function AssetManagerPage() {
 
     async function loadData() {
         setLoading(true)
-        const { data, error } = await supabase.from('school_assets').select('*').order('created_at', { ascending: false })
+        const { data, error } = await supabase.from('school_assets').select('*').eq('school_id', user!.school_id).order('created_at', { ascending: false })
         if (error) toast.error(error.message)
         else setAssets(data || [])
         setLoading(false)
@@ -77,7 +77,7 @@ export default function AssetManagerPage() {
 
     async function deleteAsset(id: string) {
         if (!confirm('Are you sure you want to remove this asset?')) return
-        const { error } = await supabase.from('school_assets').delete().eq('id', id)
+        const { error } = await supabase.from('school_assets').delete().eq('id', id).eq('school_id', user!.school_id)
         if (error) toast.error(error.message)
         else loadData()
     }

@@ -1,8 +1,8 @@
 // src/pages/teacher/TeacherElectionsHub.tsx
 import { useState, useEffect } from 'react'
+import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
-import toast from 'react-hot-toast'
 import { Election, ElectionPosition, ElectionCandidate, ElectionVote } from '../../types/database.types'
 
 export default function TeacherElectionsHub() {
@@ -99,7 +99,7 @@ export default function TeacherElectionsHub() {
   const cancelVote = async (voteId: string) => {
     if (!confirm('Are you sure you want to cancel your vote?')) return
     try {
-      const { error } = await supabase.from('election_votes').delete().eq('id', voteId)
+      const { error } = await supabase.from('election_votes').delete().eq('id', voteId).eq('school_id', user!.school_id)
       if (error) throw error
       toast.success('Vote cancelled successfully!')
       loadData()

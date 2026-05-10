@@ -142,6 +142,7 @@ export default function DriverDashboard() {
       
       supabase.from('transport_live_locations')
         .update({ is_active: false })
+        .eq('school_id', user!.school_id)
         .eq('vehicle_id', vehicle.id)
         .eq('driver_id', user!.id)
         .eq('is_active', true)
@@ -174,7 +175,7 @@ export default function DriverDashboard() {
         if (existing) {
           await supabase.from('transport_live_locations').update({
             latitude, longitude, speed: speed || 0, heading: heading || 0, last_updated: new Date().toISOString()
-          }).eq('id', existing.id)
+          }).eq('id', existing.id).eq('school_id', user!.school_id)
         } else {
           await supabase.from('transport_live_locations').insert({
             school_id: user!.school_id,

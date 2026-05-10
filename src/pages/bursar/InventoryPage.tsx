@@ -77,7 +77,7 @@ export default function InventoryPage() {
   })
 
   const deleteSupplyMutation = useMutation({
-    mutationFn: (id: string) => suppliesService.delete(id),
+    mutationFn: (id: string) => suppliesService.delete(schoolId, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['all-school-supplies'] })
       toast.success('Item removed')

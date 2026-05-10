@@ -1,14 +1,13 @@
 // src/pages/security/SecurityDashboard.tsx
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-// Note: FloatingClock (global widget) handles live time display — no local clock needed
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { format, formatDistanceToNow } from 'date-fns'
 import {
   Shield, QrCode, Users, LogIn, LogOut,
   AlertTriangle, Clock, Phone, UserCheck,
-  UserX, TrendingUp, Activity, ChevronRight
+  TrendingUp, Activity, ChevronRight
 } from 'lucide-react'
 
 interface GateScan {
@@ -39,7 +38,7 @@ function StatCard({ icon: Icon, label, value, sub, color, bg, onClick }: any) {
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: '#fff', borderRadius: 22, padding: '22px', border: '1.5px solid #f1f5f9',
+        background: '#fff', borderRadius: 18, padding: '16px', border: '1.5px solid #f1f5f9',
         display: 'flex', flexDirection: 'column', gap: 8,
         boxShadow: hov ? '0 8px 32px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.04)',
         transform: hov ? 'translateY(-2px)' : 'none',
@@ -47,14 +46,14 @@ function StatCard({ icon: Icon, label, value, sub, color, bg, onClick }: any) {
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ width: 48, height: 48, borderRadius: 14, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color }}>
-          <Icon size={24} />
+        <div style={{ width: 42, height: 42, borderRadius: 12, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color }}>
+          <Icon size={20} />
         </div>
-        {onClick && <ChevronRight size={16} color="#cbd5e1" />}
+        {onClick && <ChevronRight size={15} color="#cbd5e1" />}
       </div>
       <div>
-        <div style={{ fontSize: 30, fontWeight: 900, color: '#0f172a', lineHeight: 1 }}>{value}</div>
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#64748b', marginTop: 4 }}>{label}</div>
+        <div style={{ fontSize: 26, fontWeight: 900, color: '#0f172a', lineHeight: 1 }}>{value}</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', marginTop: 4 }}>{label}</div>
         {sub && <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{sub}</div>}
       </div>
     </div>
@@ -64,24 +63,24 @@ function StatCard({ icon: Icon, label, value, sub, color, bg, onClick }: any) {
 function ScanFeedItem({ scan }: { scan: GateScan }) {
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
+      display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px',
       borderBottom: '1px solid #f8fafc', animation: 'sc_slide .3s ease',
     }}>
       {scan.photo_url ? (
-        <img src={scan.photo_url} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #f1f5f9' }} />
+        <img src={scan.photo_url} style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #f1f5f9' }} />
       ) : (
-        <div style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: scan.direction === 'in' ? '#dcfce7' : '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 800, color: scan.direction === 'in' ? '#059669' : '#2563eb' }}>
+        <div style={{ width: 38, height: 38, borderRadius: '50%', flexShrink: 0, background: scan.direction === 'in' ? '#dcfce7' : '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 800, color: scan.direction === 'in' ? '#059669' : '#2563eb' }}>
           {scan.person_name.charAt(0)}
         </div>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{scan.person_name}</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{scan.person_name}</div>
         <div style={{ fontSize: 11, color: '#94a3b8' }}>{scan.person_type === 'student' ? '🎓' : '👩‍🏫'} {scan.class_name || (scan.person_type === 'teacher' ? 'Teaching Staff' : '')}</div>
       </div>
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
           <span style={{
-            fontSize: 11, fontWeight: 800, padding: '3px 9px', borderRadius: 99,
+            fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 99,
             background: scan.direction === 'in' ? '#dcfce7' : '#dbeafe',
             color: scan.direction === 'in' ? '#15803d' : '#1d4ed8',
           }}>{scan.direction === 'in' ? '↓ IN' : '↑ OUT'}</span>
@@ -89,7 +88,7 @@ function ScanFeedItem({ scan }: { scan: GateScan }) {
             <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 99, background: '#fef3c7', color: '#b45309' }}>LATE</span>
           )}
         </div>
-        <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 3 }}>
+        <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 3 }}>
           {formatDistanceToNow(new Date(scan.scan_time), { addSuffix: true })}
         </div>
       </div>
@@ -108,7 +107,6 @@ export default function SecurityDashboard() {
     recentScans: [], lastScanTime: null,
   })
   const [loading, setLoading] = useState(true)
-  // Use a static time snapshot — FloatingClock widget (global) handles live clock display
   const currentTime = new Date()
 
   const fetchStats = useCallback(async () => {
@@ -122,7 +120,6 @@ export default function SecurityDashboard() {
 
     const all = scans ?? []
 
-    // Compute who is currently on premise (last scan = 'in')
     const byPerson: Record<string, GateScan[]> = {}
     all.forEach((s: GateScan) => {
       const key = `${s.person_type}-${s.person_name}`
@@ -150,11 +147,8 @@ export default function SecurityDashboard() {
     setLoading(false)
   }, [schoolId, today])
 
-  useEffect(() => {
-    fetchStats()
-  }, [fetchStats])
+  useEffect(() => { fetchStats() }, [fetchStats])
 
-  // Realtime subscription
   useEffect(() => {
     if (!schoolId) return
     const channel = supabase
@@ -177,70 +171,77 @@ export default function SecurityDashboard() {
         @keyframes sc_fi { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
         @keyframes pulse_ring { 0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)} 70%{box-shadow:0 0 0 12px rgba(34,197,94,0)} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0)} }
         .sec-dash { animation: sc_fi .4s ease; font-family: "DM Sans",sans-serif; }
+        .sec-main-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
+        @media (max-width: 768px) {
+          .sec-main-grid { grid-template-columns: 1fr !important; }
+          .sec-header-row { flex-direction: column !important; gap: 8px !important; }
+          .sec-header-date-col { display: none !important; }
+          .sec-stat-grid { grid-template-columns: repeat(2,1fr) !important; }
+          .sec-quick-grid { grid-template-columns: repeat(2,1fr) !important; }
+        }
       `}</style>
 
-      <div className="sec-dash" style={{ paddingBottom: 48 }}>
+      <div className="sec-dash" style={{ paddingBottom: 80 }}>
 
         {/* Top Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
+        <div className="sec-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg,#0f172a,#1e293b)', color: '#fff', padding: '7px 16px', borderRadius: 99, fontSize: 12, fontWeight: 700, marginBottom: 10, letterSpacing: '.04em' }}>
-              <Shield size={14} /> SECURITY OPERATIONS CENTER
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'linear-gradient(135deg,#0f172a,#1e293b)', color: '#fff', padding: '6px 14px', borderRadius: 99, fontSize: 11, fontWeight: 700, marginBottom: 8, letterSpacing: '.04em' }}>
+              <Shield size={12} /> SECURITY OPERATIONS CENTER
             </div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: '#0f172a', margin: 0 }}>Gate Control Dashboard</h1>
-            <p style={{ color: '#64748b', fontSize: 13, marginTop: 4 }}>
-              Welcome, <strong>{user?.full_name}</strong> · {format(currentTime, 'EEEE, MMMM d yyyy')}
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 24, fontWeight: 700, color: '#0f172a', margin: 0 }}>Gate Control Dashboard</h1>
+            <p style={{ color: '#64748b', fontSize: 12, marginTop: 3 }}>
+              Welcome, <strong>{user?.full_name}</strong> · {format(currentTime, 'EEE, MMM d yyyy')}
             </p>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: '#64748b', letterSpacing: '-0.01em' }}>
-              {format(currentTime, 'EEEE, MMMM d yyyy')}
-            </div>
-            <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600, marginTop: 2 }}>See floating clock for live time</div>
+          <div className="sec-header-date-col" style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#64748b' }}>{format(currentTime, 'EEEE, MMMM d yyyy')}</div>
+            <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, marginTop: 2 }}>See floating clock for live time</div>
           </div>
         </div>
 
         {/* Live Indicator */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24, padding: '10px 16px', background: '#f0fdf4', borderRadius: 12, border: '1px solid #bbf7d0', width: 'fit-content' }}>
-          <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#22c55e', animation: 'pulse_ring 2s infinite', flexShrink: 0 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, padding: '9px 14px', background: '#f0fdf4', borderRadius: 12, border: '1px solid #bbf7d0', flexWrap: 'wrap' }}>
+          <div style={{ width: 9, height: 9, borderRadius: '50%', background: '#22c55e', animation: 'pulse_ring 2s infinite', flexShrink: 0 }} />
           <span style={{ fontSize: 12, fontWeight: 700, color: '#15803d' }}>LIVE — Auto-refreshing in real time</span>
           {stats.lastScanTime && (
             <span style={{ fontSize: 11, color: '#86efac' }}>· Last scan {formatDistanceToNow(new Date(stats.lastScanTime), { addSuffix: true })}</span>
           )}
         </div>
 
-        {/* Stat Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 16, marginBottom: 28 }}>
-          <StatCard icon={Users} label="Students On Premise" value={loading ? '…' : stats.totalStudentsIn} sub="Currently inside campus" color="#2563eb" bg="#eff6ff" onClick={() => navigate('/security/gate-attendance')} />
-          <StatCard icon={UserCheck} label="Teachers On Premise" value={loading ? '…' : stats.totalTeachersIn} sub="Teaching staff present" color="#7c3aed" bg="#f5f3ff" onClick={() => navigate('/security/gate-attendance')} />
-          <StatCard icon={AlertTriangle} label="Late Arrivals" value={loading ? '…' : stats.lateArrivals} sub="Arrived after 8:00 AM" color="#d97706" bg="#fffbeb" onClick={() => navigate('/security/gate-attendance?filter=late')} />
-          <StatCard icon={LogOut} label="Exits Today" value={loading ? '…' : stats.exits} sub="Left campus today" color="#dc2626" bg="#fef2f2" onClick={() => navigate('/security/gate-attendance')} />
+        {/* Stat Cards — 2×2 on mobile */}
+        <div className="sec-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 20 }}>
+          <StatCard icon={Users} label="Students On Premise" value={loading ? '…' : stats.totalStudentsIn} sub="Currently inside" color="#2563eb" bg="#eff6ff" onClick={() => navigate('/security/gate-attendance')} />
+          <StatCard icon={UserCheck} label="Teachers On Premise" value={loading ? '…' : stats.totalTeachersIn} sub="Staff present" color="#7c3aed" bg="#f5f3ff" onClick={() => navigate('/security/gate-attendance')} />
+          <StatCard icon={AlertTriangle} label="Late Arrivals" value={loading ? '…' : stats.lateArrivals} sub="After 8:00 AM" color="#d97706" bg="#fffbeb" onClick={() => navigate('/security/gate-attendance?filter=late')} />
+          <StatCard icon={LogOut} label="Exits Today" value={loading ? '…' : stats.exits} sub="Left campus" color="#dc2626" bg="#fef2f2" onClick={() => navigate('/security/gate-attendance')} />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 24, alignItems: 'start' }}>
+        {/* Main grid — stacks on mobile */}
+        <div className="sec-main-grid">
 
           {/* Recent Scan Feed */}
-          <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-            <div style={{ padding: '20px 20px 14px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f1f5f9', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+            <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', margin: 0 }}>Live Scan Feed</h2>
-                <p style={{ fontSize: 12, color: '#94a3b8', margin: '2px 0 0' }}>Real-time gate activity · today</p>
+                <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: 0 }}>Live Scan Feed</h2>
+                <p style={{ fontSize: 11, color: '#94a3b8', margin: '2px 0 0' }}>Real-time gate activity · today</p>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#059669', fontWeight: 700, background: '#dcfce7', padding: '5px 12px', borderRadius: 99 }}>
-                <Activity size={13} /> {stats.recentScans.length} scans
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#059669', fontWeight: 700, background: '#dcfce7', padding: '5px 10px', borderRadius: 99 }}>
+                <Activity size={12} /> {stats.recentScans.length} scans
               </div>
             </div>
 
             {loading ? (
               <div style={{ padding: 40, textAlign: 'center', color: '#cbd5e1' }}>
-                <Clock size={32} style={{ marginBottom: 8 }} />
+                <Clock size={30} style={{ marginBottom: 8 }} />
                 <div>Loading…</div>
               </div>
             ) : stats.recentScans.length === 0 ? (
-              <div style={{ padding: '48px 24px', textAlign: 'center', color: '#94a3b8' }}>
-                <QrCode size={44} style={{ marginBottom: 12, opacity: .3 }} />
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#334155', marginBottom: 6 }}>No scans yet today</div>
-                <p style={{ fontSize: 13, marginBottom: 20 }}>Gate activity will appear here in real time as students and staff scan in.</p>
+              <div style={{ padding: '40px 20px', textAlign: 'center', color: '#94a3b8' }}>
+                <QrCode size={40} style={{ marginBottom: 10, opacity: .3 }} />
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#334155', marginBottom: 6 }}>No scans yet today</div>
+                <p style={{ fontSize: 13, marginBottom: 18 }}>Gate activity will appear here in real time.</p>
                 <button onClick={() => navigate('/security/scanner')}
                   style={{ padding: '11px 22px', borderRadius: 12, border: 'none', background: '#0f172a', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                   🔍 Open Gate Scanner
@@ -250,7 +251,7 @@ export default function SecurityDashboard() {
               <div>
                 {stats.recentScans.map(scan => <ScanFeedItem key={scan.id} scan={scan} />)}
                 <div onClick={() => navigate('/security/gate-attendance')}
-                  style={{ padding: '14px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#2563eb', cursor: 'pointer', borderTop: '1px solid #f1f5f9' }}>
+                  style={{ padding: '13px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#2563eb', cursor: 'pointer', borderTop: '1px solid #f1f5f9' }}>
                   View Full Attendance Log →
                 </div>
               </div>
@@ -258,12 +259,12 @@ export default function SecurityDashboard() {
           </div>
 
           {/* Right Sidebar */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
             {/* Quick Actions */}
-            <div style={{ background: '#fff', borderRadius: 22, border: '1.5px solid #f1f5f9', padding: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-              <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 14 }}>Quick Actions</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+              <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>Quick Actions</h3>
+              <div className="sec-quick-grid" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
                   { label: 'Open Gate Scanner', emoji: '📷', path: '/security/scanner', color: '#0f172a' },
                   { label: 'Print Student Tags (QR)', emoji: '🪪', path: '/admin/poster-maker?tab=tags', color: '#7c3aed' },
@@ -271,20 +272,20 @@ export default function SecurityDashboard() {
                   { label: 'Register Visitor', emoji: '🚪', path: '/security/visitors', color: '#059669' },
                 ].map(({ label, emoji, path, color }) => (
                   <button key={path} onClick={() => navigate(path)}
-                    style={{ width: '100%', padding: '12px 16px', borderRadius: 14, border: '1.5px solid #f1f5f9', background: '#f8fafc', color, fontSize: 14, fontWeight: 700, cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10, transition: 'all .15s' }}
+                    style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1.5px solid #f1f5f9', background: '#f8fafc', color, fontSize: 13, fontWeight: 700, cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10, transition: 'all .15s' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f1f5f9' }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc' }}>
-                    <span style={{ fontSize: 20 }}>{emoji}</span> {label}
+                    <span style={{ fontSize: 18 }}>{emoji}</span> {label}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Today Summary Donut */}
-            <div style={{ background: 'linear-gradient(135deg,#0f172a,#1e293b)', borderRadius: 22, padding: '22px', color: '#fff' }}>
-              <h3 style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginBottom: 4 }}>Today's Summary</h3>
-              <p style={{ fontSize: 11, color: '#94a3b8', marginBottom: 18 }}>{format(new Date(), 'MMMM d, yyyy')}</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* Today Summary */}
+            <div style={{ background: 'linear-gradient(135deg,#0f172a,#1e293b)', borderRadius: 20, padding: '20px', color: '#fff' }}>
+              <h3 style={{ fontSize: 14, fontWeight: 800, color: '#fff', marginBottom: 4 }}>Today's Summary</h3>
+              <p style={{ fontSize: 11, color: '#94a3b8', marginBottom: 16 }}>{format(new Date(), 'MMMM d, yyyy')}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[
                   { label: 'Total Scans', value: stats.recentScans.length, color: '#60a5fa' },
                   { label: 'On Premise Now', value: onPremise, color: '#34d399' },
@@ -293,7 +294,7 @@ export default function SecurityDashboard() {
                 ].map(({ label, value, color }) => (
                   <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
+                      <div style={{ width: 7, height: 7, borderRadius: '50%', background: color }} />
                       <span style={{ fontSize: 13, color: '#cbd5e1' }}>{label}</span>
                     </div>
                     <span style={{ fontSize: 16, fontWeight: 900, color }}>{loading ? '…' : value}</span>
@@ -303,28 +304,28 @@ export default function SecurityDashboard() {
             </div>
 
             {/* Emergency Contacts */}
-            <div style={{ background: '#fff', borderRadius: 22, border: '1.5px solid #f1f5f9', padding: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-              <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Phone size={16} color="#dc2626" /> Emergency Contacts
+            <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+              <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 7 }}>
+                <Phone size={14} color="#dc2626" /> Emergency Contacts
               </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
                   { name: 'Headteacher', role: 'Admin Office', phone: 'ext. 100', icon: '🏫' },
                   { name: 'Ambulance', role: 'Medical Emergency', phone: '193', icon: '🚑' },
                   { name: 'Police', role: 'Security Emergency', phone: '191 / 18555', icon: '👮' },
                   { name: 'Fire Service', role: 'Fire Emergency', phone: '192', icon: '🚒' },
                 ].map((c, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 12, background: '#f8fafc' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span style={{ fontSize: 18 }}>{c.icon}</span>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 10px', borderRadius: 10, background: '#f8fafc' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                      <span style={{ fontSize: 17 }}>{c.icon}</span>
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{c.name}</div>
-                        <div style={{ fontSize: 11, color: '#64748b' }}>{c.role}</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>{c.name}</div>
+                        <div style={{ fontSize: 10, color: '#64748b' }}>{c.role}</div>
                       </div>
                     </div>
                     <a href={`tel:${c.phone}`}
-                      style={{ width: 34, height: 34, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
-                      <Phone size={14} color="#dc2626" />
+                      style={{ width: 32, height: 32, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
+                      <Phone size={13} color="#dc2626" />
                     </a>
                   </div>
                 ))}

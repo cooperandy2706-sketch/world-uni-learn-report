@@ -117,7 +117,7 @@ export default function AdminElectionsPage() {
 
   const toggleElectionState = async (id: string, field: 'nomination_open' | 'voting_open' | 'is_archived', currentValue: boolean) => {
     try {
-      const { error } = await supabase.from('elections').update({ [field]: !currentValue }).eq('id', id)
+      const { error } = await supabase.from('elections').update({ [field]: !currentValue }).eq('id', id).eq('school_id', user!.school_id)
       if (error) throw error
       toast.success('Updated successfully')
       loadData()
@@ -129,7 +129,7 @@ export default function AdminElectionsPage() {
   const deleteElection = async (id: string) => {
     if (!confirm('Are you sure you want to delete this election? All positions, candidates, and votes will be permanently deleted. This cannot be undone.')) return
     try {
-      const { error } = await supabase.from('elections').delete().eq('id', id)
+      const { error } = await supabase.from('elections').delete().eq('id', id).eq('school_id', user!.school_id)
       if (error) throw error
       toast.success('Election deleted successfully')
       setSelectedElectionId('')
@@ -148,7 +148,7 @@ export default function AdminElectionsPage() {
         vet_notes: vetForm.vet_notes,
         vetted_by: user!.id,
         vetted_at: new Date().toISOString()
-      }).eq('id', vettingCandidate.id)
+      }).eq('id', vettingCandidate.id).eq('school_id', user!.school_id)
       
       if (error) throw error
       toast.success('Candidate vetted successfully')
@@ -201,7 +201,7 @@ export default function AdminElectionsPage() {
   const adminCancelVote = async (voteId: string) => {
     if (!confirm('Are you sure you want to cancel this proxy vote?')) return
     try {
-      const { error } = await supabase.from('election_votes').delete().eq('id', voteId)
+      const { error } = await supabase.from('election_votes').delete().eq('id', voteId).eq('school_id', user!.school_id)
       if (error) throw error
       toast.success('Proxy vote cancelled')
       loadData()

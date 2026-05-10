@@ -42,8 +42,8 @@ export default function StaffRequestsPage() {
                 { data: lData },
                 { data: dData }
             ] = await Promise.all([
-                supabase.from('leave_requests').select('*, user:users(full_name, role)').order('created_at', { ascending: false }),
-                supabase.from('staff_documents').select('*, user:users(full_name)').order('created_at', { ascending: false })
+                supabase.from('leave_requests').select('*, user:users(full_name, role)').eq('school_id', adminUser!.school_id).order('created_at', { ascending: false }),
+                supabase.from('staff_documents').select('*, user:users(full_name)').eq('school_id', adminUser!.school_id).order('created_at', { ascending: false })
             ])
 
             setLeaves(lData || [])
@@ -64,7 +64,7 @@ export default function StaffRequestsPage() {
             admin_notes: adminNotes,
             approved_by: adminUser!.id,
             updated_at: new Date().toISOString()
-        }).eq('id', selectedLeave.id)
+        }).eq('id', selectedLeave.id).eq('school_id', adminUser!.school_id)
 
         if (error) {
             toast.error(error.message)

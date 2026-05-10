@@ -1,253 +1,429 @@
 // src/pages/admin/AttendancePage.tsx
-// Admin dashboard for viewing daily attendance logs
-
 import { useState, useEffect } from 'react'
+import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useClasses } from '../../hooks/useClasses'
-import { useCurrentTerm } from '../../hooks/useSettings'
-import toast from 'react-hot-toast'
+import { useAuth } from '../../hooks/useAuth'
+import { Phone, RefreshCw } from 'lucide-react'
 
-interface AttendanceRecord {
-  id: string
-  date: string
-  status: 'present' | 'absent' | 'late' | 'excused'
-  student_name: string
-  student_id: string
-  teacher_name: string
+type Tab = 'students' | 'teachers' | 'absent'
+
+interface StudentRow {
+  id: string; status: string; student_name: string
+  student_id: string; teacher_name: string; source: 'register' | 'gate'
+}
+interface TeacherRow {
+  teacher_id: string; teacher_name: string; photo_url: string
+  time_in: string | null; time_out: string | null; on_campus: boolean; left_mid_day: boolean
+}
+interface AbsentRow {
+  id: string; full_name: string; student_id: string
+  guardian_name: string; guardian_phone: string
 }
 
-// ── helpers ───────────────────────────────────────────────
-function Btn({ children, onClick, variant = 'primary', type = 'button', disabled, loading, style }: any) {
-  const [hov, setHov] = useState(false)
-  const variants: Record<string, React.CSSProperties> = {
-    primary:   { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+function StatusBadge({ status }: { status: string }) {
+  const map: any = {
+    present: ['#f0fdf4', '#16a34a'],
+    absent:  ['#fef2f2', '#dc2626'],
+    late:    ['#fffbeb', '#d97706'],
+    excused: ['#eff6ff', '#2563eb'],
   }
+  const [bg, color] = map[status] ?? ['#f1f5f9', '#64748b']
+  return <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 99, background: bg, color }}>{status.toUpperCase()}</span>
+}
+
+function TabBtn({ label, active, onClick, count }: any) {
   return (
-    <button type={type} onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: disabled ? 'not-allowed' : 'pointer', transition: 'all 0.15s', opacity: disabled ? 0.6 : 1, fontFamily: '"DM Sans",sans-serif', ...variants[variant], ...style }}>
-      {loading && <span style={{ width: 13, height: 13, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', animation: '_spin 0.7s linear infinite', flexShrink: 0 }} />}
-      {children}
+    <button onClick={onClick} style={{
+      padding: '9px 16px', borderRadius: 10, border: 'none', fontFamily: '"DM Sans",sans-serif',
+      fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all .15s',
+      background: active ? '#0f172a' : '#f1f5f9', color: active ? '#fff' : '#475569',
+      display: 'flex', alignItems: 'center', gap: 6,
+    }}>
+      {label}
+      {count !== undefined && (
+        <span style={{ fontSize: 11, fontWeight: 800, padding: '1px 7px', borderRadius: 99, background: active ? 'rgba(255,255,255,0.2)' : '#e2e8f0', color: active ? '#fff' : '#64748b' }}>{count}</span>
+      )}
     </button>
   )
 }
 
-// ═══════════════════════════════════════════════════════════
 export default function AdminAttendancePage() {
+  const { user } = useAuth()
   const { data: classes = [] } = useClasses()
-  const { data: term } = useCurrentTerm()
+  const schoolId = user?.school_id ?? ''
 
+  const [tab, setTab] = useState<Tab>('students')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [selectedClass, setSelectedClass] = useState('')
-  const [records, setRecords] = useState<AttendanceRecord[]>([])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    if (date && selectedClass) load()
-  }, [date, selectedClass])
+  const [studentRows, setStudentRows] = useState<StudentRow[]>([])
+  const [teacherRows, setTeacherRows] = useState<TeacherRow[]>([])
+  const [absentRows, setAbsentRows] = useState<AbsentRow[]>([])
 
-  async function load() {
+  useEffect(() => { if (date && schoolId) loadTeachers() }, [date, schoolId])
+  useEffect(() => { if (date && selectedClass && schoolId) { loadStudents(); loadAbsent() } }, [date, selectedClass, schoolId])
+
+  // ── STUDENTS (register + gate merged) ──────────────────────
+  async function loadStudents() {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('attendance_records')
-      .select(`
-        id,
-        status,
-        date,
-        student:students (
-          full_name,
-          student_id
-        ),
-        teacher:teachers (
-          user:users (
-            full_name
-          )
-        )
-      `)
-      .eq('class_id', selectedClass)
-      .eq('date', date)
+    try {
+      const { data: regData } = await supabase
+        .from('attendance_records')
+        .select('id, status, date, student:students(id, full_name, student_id), teacher:teachers(user:users(full_name))')
+        .eq('school_id', schoolId).eq('class_id', selectedClass).eq('date', date)
 
-    if (error) {
-      console.error('[AdminAttendance] Load error:', error)
-      toast.error('Failed to load records: ' + error.message)
-      setRecords([])
-    } else {
-      // Map and Flatten the results
-      const flattened: AttendanceRecord[] = (data as any[] ?? []).map(r => ({
-        id: r.id,
-        date: r.date,
-        status: r.status,
-        student_name: r.student?.full_name || 'Unknown Student',
-        student_id: r.student?.student_id || 'No ID',
-        teacher_name: r.teacher?.user?.full_name || 'System'
-      }))
+      const registerRows: StudentRow[] = (regData ?? []).map((r: any) => ({
+        id: r.id, status: r.status,
+        student_name: r.student?.full_name ?? 'Unknown',
+        student_id: r.student?.student_id ?? '',
+        teacher_name: r.teacher?.user?.full_name ?? 'Teacher',
+        source: 'register', _dbId: r.student?.id,
+      } as any))
 
-      // Sort manually by student name
-      flattened.sort((a, b) => a.student_name.localeCompare(b.student_name))
-      setRecords(flattened)
-    }
+      const { data: classStudents } = await supabase
+        .from('students').select('id, full_name, student_id').eq('class_id', selectedClass).eq('school_id', schoolId)
+      const studentIds = (classStudents ?? []).map((s: any) => s.id)
+
+      let gateRows: StudentRow[] = []
+      if (studentIds.length > 0) {
+        const { data: gateData } = await supabase
+          .from('gate_scans')
+          .select('id, person_db_id, person_name, direction, status, scan_time')
+          .eq('school_id', schoolId).eq('scan_date', date)
+          .eq('person_type', 'student').in('person_db_id', studentIds)
+          .order('scan_time', { ascending: true })
+
+        const seen = new Set<string>()
+        for (const gs of (gateData ?? [])) {
+          if (gs.direction === 'in' && !seen.has(gs.person_db_id)) {
+            seen.add(gs.person_db_id)
+            const cs: any = (classStudents ?? []).find((s: any) => s.id === gs.person_db_id)
+            gateRows.push({
+              id: `gate-${gs.id}`, status: gs.status === 'late' ? 'late' : 'present',
+              student_name: gs.person_name, student_id: cs?.student_id ?? '',
+              teacher_name: 'Gate Scanner', source: 'gate', _dbId: gs.person_db_id,
+            } as any)
+          }
+        }
+        const regIds = new Set(registerRows.map((r: any) => r._dbId))
+        gateRows = gateRows.filter((g: any) => !regIds.has(g._dbId))
+      }
+
+      const merged = [...registerRows, ...gateRows]
+      merged.sort((a, b) => a.student_name.localeCompare(b.student_name))
+      setStudentRows(merged)
+    } catch (e) { toast.error('Failed to load students') }
     setLoading(false)
   }
 
-  const filtered = records.filter(r =>
-    !search ||
-    r.student_name.toLowerCase().includes(search.toLowerCase()) ||
-    r.student_id.toLowerCase().includes(search.toLowerCase())
-  )
+  // ── TEACHERS ───────────────────────────────────────────────
+  async function loadTeachers() {
+    try {
+      const { data: gateData } = await supabase
+        .from('gate_scans')
+        .select('person_db_id, person_name, photo_url, direction, scan_time')
+        .eq('school_id', schoolId).eq('scan_date', date)
+        .eq('person_type', 'teacher')
+        .order('scan_time', { ascending: true })
 
-  const stats = {
-    total: records.length,
-    present: records.filter(r => r.status === 'present').length,
-    absent: records.filter(r => r.status === 'absent').length,
-    late: records.filter(r => r.status === 'late').length,
+      const byTeacher: Record<string, any[]> = {}
+      for (const gs of (gateData ?? [])) {
+        if (!byTeacher[gs.person_db_id]) byTeacher[gs.person_db_id] = []
+        byTeacher[gs.person_db_id].push(gs)
+      }
+
+      const rows: TeacherRow[] = Object.entries(byTeacher).map(([tid, scans]) => {
+        const firstIn = scans.find(s => s.direction === 'in')
+        const lastScan = scans[scans.length - 1]
+        const hasOut = scans.some(s => s.direction === 'out')
+        const lastIsOut = lastScan?.direction === 'out'
+        return {
+          teacher_id: tid,
+          teacher_name: scans[0].person_name,
+          photo_url: scans[0].photo_url ?? '',
+          time_in: firstIn?.scan_time ?? null,
+          time_out: lastIsOut ? lastScan.scan_time : null,
+          on_campus: !lastIsOut,
+          left_mid_day: hasOut && firstIn !== undefined,
+        }
+      })
+      rows.sort((a, b) => a.teacher_name.localeCompare(b.teacher_name))
+      setTeacherRows(rows)
+    } catch (e: any) { console.error('Teacher load error:', e); toast.error('Failed to load teacher attendance data') }
+  }
+
+  // ── ABSENT STUDENTS ────────────────────────────────────────
+  async function loadAbsent() {
+    try {
+      const { data: classStudents } = await supabase
+        .from('students')
+        .select('id, full_name, student_id, guardian_name, guardian_phone')
+        .eq('class_id', selectedClass).eq('school_id', user!.school_id).eq('is_active', true)
+
+      const studentIds = (classStudents ?? []).map((s: any) => s.id)
+      if (studentIds.length === 0) { setAbsentRows([]); return }
+
+      const { data: regData } = await supabase
+        .from('attendance_records').select('student_id')
+        .eq('school_id', schoolId).eq('class_id', selectedClass).eq('date', date)
+
+      const { data: gateData } = await supabase
+        .from('gate_scans').select('person_db_id')
+        .eq('school_id', schoolId).eq('scan_date', date)
+        .eq('person_type', 'student').eq('direction', 'in')
+        .in('person_db_id', studentIds)
+
+      const presentIds = new Set([
+        ...(regData ?? []).map((r: any) => r.student_id),
+        ...(gateData ?? []).map((g: any) => g.person_db_id),
+      ])
+
+      const absent: AbsentRow[] = (classStudents ?? [])
+        .filter((s: any) => !presentIds.has(s.id))
+        .map((s: any) => ({
+          id: s.id, full_name: s.full_name,
+          student_id: s.student_id ?? '',
+          guardian_name: s.guardian_name ?? '',
+          guardian_phone: s.guardian_phone ?? '',
+        }))
+      absent.sort((a, b) => a.full_name.localeCompare(b.full_name))
+      setAbsentRows(absent)
+    } catch (e: any) { console.error('Absent load error:', e); toast.error('Failed to load student absentee data') }
+  }
+
+  const filterStr = search.toLowerCase()
+  const filteredStudents = studentRows.filter(r =>
+    r.student_name.toLowerCase().includes(filterStr) || r.student_id.toLowerCase().includes(filterStr))
+  const filteredTeachers = teacherRows.filter(r => r.teacher_name.toLowerCase().includes(filterStr))
+  const filteredAbsent = absentRows.filter(r =>
+    r.full_name.toLowerCase().includes(filterStr) || r.guardian_name.toLowerCase().includes(filterStr))
+
+  function fmtTime(iso: string | null) {
+    if (!iso) return '—'
+    try { return new Date(iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) } catch { return '—' }
   }
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _spin { to{transform:rotate(360deg)} }
-        @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes _fadeIn { from{opacity:0} to{opacity:1} }
-
-        @media (max-width: 768px) {
-          .adm-filters { flex-direction: column; align-items: stretch !important; }
-          .adm-filters > div { width: 100% !important; max-width: none !important; }
-          .adm-table { display: none; }
-          .adm-cards { display: grid !important; grid-template-columns: 1fr; gap: 12px; }
+        @keyframes _fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .att-filters { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+        @media(max-width:640px){
+          .att-filters { flex-direction:column; align-items:stretch; }
+          .att-tab-row { gap:6px !important; }
+          .att-tab-row button { font-size:12px !important; padding:8px 10px !important; }
+          .att-table { display:none !important; }
+          .att-cards { display:flex !important; flex-direction:column; gap:10px; }
         }
       `}</style>
+      <div style={{ fontFamily: '"DM Sans",sans-serif', paddingBottom: 80 }}>
 
-      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_fadeIn 0.4s ease' }}>
-
-        {/* ── Header ── */}
-        <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Attendance Monitoring</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>View daily morning register records by class and date.</p>
-          </div>
+        {/* Header */}
+        <div style={{ marginBottom: 20 }}>
+          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 24, fontWeight: 700, color: '#111827', margin: 0 }}>Attendance Monitoring</h1>
+          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Gate scans, teacher register, and absence tracking.</p>
         </div>
 
-        {/* ── Filters ── */}
-        <div className="adm-filters" style={{ background: '#fff', borderRadius: 16, padding: '18px 20px', border: '1.5px solid #f0eefe', marginBottom: 20, boxShadow: '0 1px 4px rgba(109,40,217,.06)', display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-          <div style={{ flex: 1, minWidth: 140 }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>Select Date</label>
-            <input type="date" value={date} onChange={e => setDate(e.target.value)}
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', outline: 'none', background: '#faf5ff', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
-          </div>
-          <div style={{ flex: '1 1 200px', maxWidth: 300 }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>Select Class</label>
-            <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', outline: 'none', background: '#faf5ff', fontFamily: '"DM Sans",sans-serif' }}>
-              <option value="">Choose a class…</option>
-              {(classes as any[]).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </div>
-          <div style={{ flex: '1 1 200px' }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>Search Student</label>
-            <input placeholder="Name or ID…" value={search} onChange={e => setSearch(e.target.value)}
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', outline: 'none', background: '#faf5ff', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
-          </div>
-          <Btn onClick={load} loading={loading} style={{ height: 42 }}>🔄 Refresh</Btn>
+        {/* Tabs */}
+        <div className="att-tab-row" style={{ display: 'flex', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
+          <TabBtn label="👨‍🎓 Students" active={tab === 'students'} onClick={() => setTab('students')} count={studentRows.length} />
+          <TabBtn label="👩‍🏫 Teachers" active={tab === 'teachers'} onClick={() => setTab('teachers')} count={teacherRows.length} />
+          <TabBtn label="❌ Absent" active={tab === 'absent'} onClick={() => setTab('absent')} count={absentRows.length} />
         </div>
 
-        {/* ── Summary statistics ── */}
-        {records.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 12, marginBottom: 20 }}>
-            {[
-              { label: 'Total Logs', value: stats.total, color: '#6d28d9', bg: '#f5f3ff' },
-              { label: 'Present', value: stats.present, color: '#16a34a', bg: '#f0fdf4' },
-              { label: 'Absent', value: stats.absent, color: '#dc2626', bg: '#fef2f2' },
-              { label: 'Late', value: stats.late, color: '#d97706', bg: '#fffbeb' },
-            ].map((s, i) => (
-              <div key={i} style={{ background: '#fff', borderRadius: 14, padding: '14px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', animation: `_fadeUp 0.4s ease ${i * 0.05}s both` }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 4 }}>{s.label}</div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value}</div>
+        {/* Filters */}
+        <div style={{ background: '#fff', borderRadius: 14, padding: '16px', border: '1.5px solid #f0eefe', marginBottom: 18 }}>
+          <div className="att-filters">
+            <div style={{ flex: 1, minWidth: 130 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.05em' }}>Date</label>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+            {tab !== 'teachers' && (
+              <div style={{ flex: '1 1 180px' }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.05em' }}>Class</label>
+                <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', background: '#fff' }}>
+                  <option value="">Choose class…</option>
+                  {(classes as any[]).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
               </div>
-            ))}
+            )}
+            <div style={{ flex: '1 1 160px' }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.05em' }}>Search</label>
+              <input placeholder="Name or ID…" value={search} onChange={e => setSearch(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+            <button onClick={() => { if (date && selectedClass) { loadStudents(); loadAbsent() }; loadTeachers() }}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', background: '#0f172a', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+              <RefreshCw size={14} style={loading ? { animation: '_spin 0.7s linear infinite' } : {}} /> Refresh
+            </button>
           </div>
-        )}
+        </div>
 
-        {/* ── Tables ── */}
-        {!selectedClass && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
-            <div style={{ fontSize: 52, marginBottom: 12 }}>📋</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>Select a class</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Select a class to view its daily attendance records.</p>
-          </div>
-        )}
-
-        {selectedClass && !loading && records.length === 0 && (
-          <div style={{ background: '#fffbeb', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #fde68a' }}>
-            <div style={{ fontSize: 52, marginBottom: 12 }}>⏳</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No records for this date</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>The class teacher has not submitted the register for this day yet.</p>
-          </div>
-        )}
-
-        {selectedClass && filtered.length > 0 && (
+        {/* ── STUDENTS TAB ── */}
+        {tab === 'students' && (
           <>
-            {/* Desktop Table View */}
-            <div className="adm-table" style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom: '1.5px solid #ede9fe' }}>
-                    {['Student Name', 'Status', 'Time Recorded', 'Recorded By'].map(h => (
-                      <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.06em' }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((r, i) => (
-                    <tr key={r.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid #fafafa' : 'none', animation: `_fadeUp 0.3s ease ${i * 0.02}s both` }}>
-                      <td style={{ padding: '12px 16px' }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.student_name}</div>
-                        <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.student_id}</div>
-                      </td>
-                      <td style={{ padding: '12px 16px' }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 99, background: r.status === 'present' ? '#f0fdf4' : r.status === 'absent' ? '#fef2f2' : '#fffbeb', color: r.status === 'present' ? '#16a34a' : r.status === 'absent' ? '#dc2626' : '#d97706' }}>
-                          {r.status.toUpperCase()}
-                        </span>
-                      </td>
-                      <td style={{ padding: '12px 16px', fontSize: 12, color: '#6b7280' }}>
-                        {new Date(date).toLocaleDateString()}
-                      </td>
-                      <td style={{ padding: '12px 16px', fontSize: 12, color: '#4b5563', fontWeight: 500 }}>
-                        {r.teacher_name}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile Card View */}
-            <div className="adm-cards" style={{ display: 'none' }}>
-              {filtered.map((r, i) => (
-                <div key={r.id} style={{ background: '#fff', borderRadius: 14, padding: '16px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', animation: `_fadeUp 0.3s ease ${i * 0.02}s both` }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{r.student_name}</div>
-                      <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.student_id}</div>
-                    </div>
-                    <span style={{ fontSize: 10, fontWeight: 800, padding: '3px 10px', borderRadius: 99, background: r.status === 'present' ? '#f0fdf4' : r.status === 'absent' ? '#fef2f2' : '#fffbeb', color: r.status === 'present' ? '#16a34a' : r.status === 'absent' ? '#dc2626' : '#d97706' }}>
-                      {r.status.toUpperCase()}
-                    </span>
-                  </div>
-                  <div style={{ borderTop: '1px solid #f9fafb', paddingTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ fontSize: 11, color: '#6b7280' }}>
-                      <span style={{ fontWeight: 600 }}>By:</span> {r.teacher_name}
-                    </div>
-                    <div style={{ fontSize: 11, color: '#9ca3af' }}>{new Date(date).toLocaleDateString()}</div>
-                  </div>
+            {!selectedClass && <EmptyPrompt icon="📋" title="Select a class" sub="Choose a class to view student attendance." />}
+            {selectedClass && !loading && filteredStudents.length === 0 && (
+              <EmptyPrompt icon="⏳" title="No attendance for this date" sub="No gate scans or register entries found for this class." />
+            )}
+            {selectedClass && filteredStudents.length > 0 && (
+              <>
+                <div className="att-table" style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: '#faf5ff', borderBottom: '1.5px solid #ede9fe' }}>
+                        {['Student', 'Status', 'Source', 'Recorded By'].map(h => (
+                          <th key={h} style={{ padding: '11px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.05em' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredStudents.map((r, i) => (
+                        <tr key={r.id} style={{ borderBottom: i < filteredStudents.length - 1 ? '1px solid #fafafa' : 'none' }}>
+                          <td style={{ padding: '12px 16px' }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.student_name}</div>
+                            <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.student_id}</div>
+                          </td>
+                          <td style={{ padding: '12px 16px' }}><StatusBadge status={r.status} /></td>
+                          <td style={{ padding: '12px 16px' }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: (r as any).source === 'gate' ? '#ecfdf5' : '#f5f3ff', color: (r as any).source === 'gate' ? '#059669' : '#7c3aed' }}>
+                              {(r as any).source === 'gate' ? '🔒 Gate' : '📋 Register'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px 16px', fontSize: 12, color: '#4b5563' }}>{r.teacher_name}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              ))}
-            </div>
+                <div className="att-cards" style={{ display: 'none' }}>
+                  {filteredStudents.map(r => (
+                    <div key={r.id} style={{ background: '#fff', borderRadius: 12, padding: '14px', border: `1.5px solid ${(r as any).source === 'gate' ? '#bbf7d0' : '#ede9fe'}` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{r.student_name}</div>
+                          <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{r.student_id}</div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                          <StatusBadge status={r.status} />
+                          <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 5, background: (r as any).source === 'gate' ? '#ecfdf5' : '#f5f3ff', color: (r as any).source === 'gate' ? '#059669' : '#7c3aed' }}>
+                            {(r as any).source === 'gate' ? '🔒 Gate' : '📋 Register'}
+                          </span>
+                        </div>
+                      </div>
+                      <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #f9fafb', fontSize: 11, color: '#6b7280' }}>By: {r.teacher_name}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        )}
+
+        {/* ── TEACHERS TAB ── */}
+        {tab === 'teachers' && (
+          <>
+            {teacherRows.length === 0 && <EmptyPrompt icon="👩‍🏫" title="No teacher scans today" sub="No teachers have scanned at the gate today." />}
+            {teacherRows.length > 0 && (
+              <>
+                {/* Summary pills */}
+                <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+                  {[
+                    { label: 'On Campus', value: teacherRows.filter(t => t.on_campus).length, color: '#059669', bg: '#dcfce7' },
+                    { label: 'Left Campus', value: teacherRows.filter(t => !t.on_campus && t.time_out).length, color: '#dc2626', bg: '#fee2e2' },
+                    { label: 'Left Mid-Day', value: teacherRows.filter(t => t.left_mid_day && t.on_campus).length, color: '#d97706', bg: '#fef3c7' },
+                  ].map(({ label, value, color, bg }) => (
+                    <div key={label} style={{ background: bg, borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 20, fontWeight: 900, color }}>{value}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color }}>{label}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {filteredTeachers.map(t => (
+                    <div key={t.teacher_id} style={{ background: '#fff', borderRadius: 14, border: `1.5px solid ${t.left_mid_day && !t.on_campus ? '#fca5a5' : t.left_mid_day ? '#fed7aa' : '#f0eefe'}`, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                      <div style={{ width: 44, height: 44, borderRadius: '50%', background: t.on_campus ? '#dcfce7' : '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 900, color: t.on_campus ? '#059669' : '#dc2626', flexShrink: 0 }}>
+                        {t.teacher_name.charAt(0)}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{t.teacher_name}</div>
+                        <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>
+                          In: {fmtTime(t.time_in)}
+                          {t.time_out && <> · Out: <span style={{ color: '#dc2626', fontWeight: 700 }}>{fmtTime(t.time_out)}</span></>}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 99, background: t.on_campus ? '#dcfce7' : '#fee2e2', color: t.on_campus ? '#059669' : '#dc2626' }}>
+                          {t.on_campus ? '✓ On Campus' : '↑ Left Campus'}
+                        </span>
+                        {t.left_mid_day && t.on_campus && (
+                          <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: '#fef3c7', color: '#d97706' }}>⚠ Left Mid-Day</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        )}
+
+        {/* ── ABSENT TAB ── */}
+        {tab === 'absent' && (
+          <>
+            {!selectedClass && <EmptyPrompt icon="❌" title="Select a class" sub="Choose a class to see absent students." />}
+            {selectedClass && absentRows.length === 0 && <EmptyPrompt icon="🎉" title="Full attendance!" sub="No absent students found for this class today." />}
+            {selectedClass && filteredAbsent.length > 0 && (
+              <>
+                <div style={{ padding: '10px 14px', background: '#fef2f2', borderRadius: 10, border: '1px solid #fca5a5', marginBottom: 14, fontSize: 13, color: '#dc2626', fontWeight: 600 }}>
+                  ❌ {absentRows.length} student{absentRows.length !== 1 ? 's' : ''} absent — not scanned in and no register entry
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {filteredAbsent.map(s => (
+                    <div key={s.id} style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #fca5a5', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                      <div style={{ width: 42, height: 42, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, fontWeight: 900, color: '#dc2626', flexShrink: 0 }}>
+                        {s.full_name.charAt(0)}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{s.full_name}</div>
+                        <div style={{ fontSize: 11, color: '#9ca3af' }}>{s.student_id}</div>
+                        {s.guardian_name && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>👤 {s.guardian_name}</div>}
+                      </div>
+                      <div style={{ flexShrink: 0 }}>
+                        {s.guardian_phone ? (
+                          <a href={`tel:${s.guardian_phone}`}
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 10, background: '#0f172a', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
+                            <Phone size={13} /> {s.guardian_phone}
+                          </a>
+                        ) : (
+                          <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, background: '#f1f5f9', padding: '6px 10px', borderRadius: 8 }}>No phone</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </>
         )}
       </div>
     </>
+  )
+}
+
+function EmptyPrompt({ icon, title, sub }: { icon: string; title: string; sub: string }) {
+  return (
+    <div style={{ background: '#fff', borderRadius: 14, padding: '50px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+      <div style={{ fontSize: 48, marginBottom: 10 }}>{icon}</div>
+      <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 6 }}>{title}</div>
+      <p style={{ fontSize: 13, color: '#9ca3af', margin: 0 }}>{sub}</p>
+    </div>
   )
 }

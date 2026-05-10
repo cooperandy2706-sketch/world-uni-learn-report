@@ -81,7 +81,7 @@ export default function BursarStudentsPage() {
       const currentArrears = Number(selectedStudent.fees_arrears || 0)
       const amount = Number(arrAmt)
       const newArrears = arrAction === 'set' ? amount : currentArrears + amount
-      return scholarshipService.updateStudentArrears(selectedStudent.id, Math.max(0, newArrears))
+      return scholarshipService.updateStudentArrears(schoolId, selectedStudent.id, Math.max(0, newArrears))
     },
     onSuccess: () => {
       toast.success(arrAction === 'set' ? 'Arrears updated' : 'Additional arrears added')
@@ -96,7 +96,7 @@ export default function BursarStudentsPage() {
   // Daily Fee mutation
   const dailyFeeMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from('students').update({ daily_fee_mode: dailyFeeMode }).eq('id', selectedStudent.id)
+      const { error } = await supabase.from('students').update({ daily_fee_mode: dailyFeeMode }).eq('id', selectedStudent.id).eq('school_id', schoolId)
       if (error) throw error
     },
     onSuccess: () => {

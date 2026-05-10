@@ -34,8 +34,9 @@ export default function AdminStaffLeavePage() {
       ])
       setRequests(reqs || [])
       setTeachers(staff || [])
-    } catch (err) {
-      console.error(err)
+    } catch (err: any) {
+      console.error('[StaffLeaveLoad]', err)
+      toast.error(err?.message || 'Failed to load leave requests')
     } finally {
       setLoading(false)
     }
@@ -56,8 +57,9 @@ export default function AdminStaffLeavePage() {
       setSubstituteId('')
       setAdminNotes('')
       loadData()
-    } catch (err) {
-      console.error(err)
+    } catch (err: any) {
+      console.error('[StaffLeaveAction]', err)
+      toast.error(err?.message || 'Failed to update leave request')
     } finally {
       setProcessing(false)
     }

@@ -31,7 +31,8 @@ export default function BatchPromotionPage() {
     }, [user])
 
     async function loadClasses() {
-        const { data } = await supabase.from('classes').select('*').order('name')
+        if (!user?.school_id) return
+        const { data } = await supabase.from('classes').select('*').eq('school_id', user.school_id).order('name')
         setClasses(data || [])
     }
 

@@ -618,7 +618,7 @@ export default function StudentsPage() {
 
       const { data: urlData } = supabase.storage.from('school-assets').getPublicUrl(path)
       
-      const { error: updateError } = await supabase.from('students').update({ photo_url: urlData.publicUrl }).eq('id', student.id)
+      const { error: updateError } = await supabase.from('students').update({ photo_url: urlData.publicUrl }).eq('id', student.id).eq('school_id', user!.school_id)
       if (updateError) throw updateError
 
       qc.invalidateQueries({ queryKey: ['students'] })
@@ -711,7 +711,7 @@ export default function StudentsPage() {
         const { error: uploadError } = await supabase.storage.from('school-assets').upload(path, formPhotoFile)
         if (!uploadError) {
           const { data: urlData } = supabase.storage.from('school-assets').getPublicUrl(path)
-          await supabase.from('students').update({ photo_url: urlData.publicUrl }).eq('id', studentId)
+          await supabase.from('students').update({ photo_url: urlData.publicUrl }).eq('id', studentId).eq('school_id', user!.school_id)
         }
       }
 

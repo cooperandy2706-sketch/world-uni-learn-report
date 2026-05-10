@@ -91,8 +91,9 @@ export default function ClassesPage() {
     queryFn: async () => {
       if (!term?.id) return []
       const { data } = await supabase.from('teacher_assignments')
-        .select('*, teacher:teachers(id, staff_id, user:users(full_name, avatar_url))')
+        .select('*, teacher:teachers!inner(id, staff_id, school_id, user:users(full_name, avatar_url))')
         .eq('term_id', term.id)
+        .eq('teachers.school_id', user!.school_id)
       return data ?? []
     },
     enabled: !!term?.id

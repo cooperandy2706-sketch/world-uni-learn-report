@@ -87,14 +87,14 @@ export default function AdminAgendaPage() {
   }
 
   async function togglePublish(id: string, published: boolean) {
-    await agendaService.publishAgenda(id, !published)
+    await agendaService.publishAgenda(user!.school_id, id, !published)
     loadAgendas()
     toast.success(!published ? 'Agenda published to teachers' : 'Agenda hidden from teachers')
   }
 
   async function deleteItem(id: string) {
     if (!confirm('Delete this agenda item?')) return
-    await agendaService.deleteAgenda(id)
+    await agendaService.deleteAgenda(user!.school_id, id)
     loadAgendas()
     toast.success('Item deleted')
   }

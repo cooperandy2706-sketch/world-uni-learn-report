@@ -45,7 +45,7 @@ export default function AdminTasksPage() {
                 { data: tData },
                 { data: sData }
             ] = await Promise.all([
-                supabase.from('admin_tasks').select('*, assignee:users(full_name)').order('created_at', { ascending: false }),
+                supabase.from('admin_tasks').select('*, assignee:users(full_name)').eq('school_id', user!.school_id).order('created_at', { ascending: false }),
                 supabase.from('users').select('id, full_name').eq('school_id', user!.school_id).in('role', ['admin', 'bursar'])
             ])
 
@@ -86,14 +86,14 @@ export default function AdminTasksPage() {
 
     async function toggleStatus(task: any) {
         const newStatus = task.status === 'completed' ? 'pending' : 'completed'
-        const { error } = await supabase.from('admin_tasks').update({ status: newStatus }).eq('id', task.id)
+        const { error } = await supabase.from('admin_tasks').update({ status: newStatus }).eq('id', task.id).eq('school_id', user!.school_id)
         if (error) toast.error(error.message)
         else loadData()
     }
 
     async function deleteTask(id: string) {
         if (!confirm('Are you sure you want to delete this task?')) return
-        const { error } = await supabase.from('admin_tasks').delete().eq('id', id)
+        const { error } = await supabase.from('admin_tasks').delete().eq('id', id).eq('school_id', user!.school_id)
         if (error) toast.error(error.message)
         else {
             toast.success('Task deleted')

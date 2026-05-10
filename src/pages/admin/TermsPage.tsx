@@ -90,11 +90,11 @@ export default function TermsPage() {
     onError: () => toast.error('Failed to create term'),
   })
   const lock = useMutation({
-    mutationFn: (id: string) => termsService.lock(id),
+    mutationFn: (id: string) => termsService.lock(user!.school_id, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['terms'] }); qc.invalidateQueries({ queryKey: ['term-current'] }); toast.success('Term locked — teachers cannot submit scores') },
   })
   const unlock = useMutation({
-    mutationFn: (id: string) => termsService.unlock(id),
+    mutationFn: (id: string) => termsService.unlock(user!.school_id, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['terms'] }); qc.invalidateQueries({ queryKey: ['term-current'] }); toast.success('Term unlocked') },
   })
   const setCurrent = useMutation({

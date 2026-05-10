@@ -133,13 +133,13 @@ export default function AnnouncementsPage(){
 
   async function deleteAnn(id:string){
     if(!confirm('Delete this announcement?'))return
-    await supabase.from('announcements').delete().eq('id',id)
+    await supabase.from('announcements').delete().eq('id',id).eq('school_id',user!.school_id)
     toast.success('Deleted')
     load()
   }
 
   async function togglePin(id:string,pinned:boolean){
-    await supabase.from('announcements').update({is_pinned:!pinned}).eq('id',id)
+    await supabase.from('announcements').update({is_pinned:!pinned}).eq('id',id).eq('school_id',user!.school_id)
     load()
   }
 

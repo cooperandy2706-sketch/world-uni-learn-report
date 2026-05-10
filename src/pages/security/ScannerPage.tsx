@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { Html5Qrcode } from 'html5-qrcode'
-import { QrCode, Usb, Camera, CheckCircle, XCircle, Clock, LogIn, LogOut, AlertTriangle, Volume2 } from 'lucide-react'
+import { QrCode, Usb, Camera, CheckCircle, XCircle, Clock, LogIn, LogOut, AlertTriangle, Volume2, Printer, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { format, parse } from 'date-fns'
 import { useSettings, useCurrentTerm } from '../../hooks/useSettings'
@@ -11,10 +11,23 @@ import { useSettings, useCurrentTerm } from '../../hooks/useSettings'
 // Defaults if settings not loaded
 const DEFAULT_LATE_HOUR = 8
 const DEFAULT_COOLDOWN_MS = 30_000
+const PURPOSES = ['Parent Visit', 'Delivery', 'Official Meeting', 'Interview', 'Contractor', 'Inspection', 'Other']
+
+function QRImg({ value, size = 80 }: { value: string; size?: number }) {
+  const encoded = encodeURIComponent(value)
+  return (
+    <img
+      src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}&margin=2`}
+      width={size} height={size}
+      style={{ imageRendering: 'pixelated', display: 'block' }}
+      alt="QR"
+    />
+  )
+}
 
 interface ScanCard {
   name: string
-  personType: 'student' | 'teacher'
+  personType: 'student' | 'teacher' | 'visitor'
   className: string
   photoUrl: string
   direction: 'in' | 'out'
@@ -41,6 +54,90 @@ export default function ScannerPage() {
   const cardTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const usbTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const processingRef = useRef(false)
+
+  // Visitor state
+  const [visitorFormOpen, setVisitorFormOpen] = useState(false)
+  const [visitorSaving, setVisitorSaving] = useState(false)
+  const [printingVisitor, setPrintingVisitor] = useState<any>(null)
+  const [visitorForm, setVisitorForm] = useState({
+    full_name: '', phone: '', purpose: 'Parent Visit',
+    person_to_see: '', id_number: '', host_department: ''
+  })
+
+  async function submitVisitor() {
+    if (!visitorForm.full_name.trim()) { toast.error('Full name is required'); return }
+    setVisitorSaving(true)
+    const { data, error } = await supabase
+      .from('visitors')
+      .insert({ school_id: schoolId, ...visitorForm })
+      .select('*')
+      .single()
+    if (error) { toast.error('Failed to register visitor'); setVisitorSaving(false); return }
+    toast.success(`${visitorForm.full_name} signed in!`)
+    setVisitorFormOpen(false)
+    setVisitorForm({ full_name: '', phone: '', purpose: 'Parent Visit', person_to_see: '', id_number: '', host_department: '' })
+    setVisitorSaving(false)
+    if (data) setTimeout(() => setPrintingVisitor(data), 300)
+    // Show on scanner screen
+    showCard({ name: data.full_name, personType: 'visitor', className: 'Visitor', photoUrl: '', direction: 'in', status: 'on_time', scanTime: format(new Date(), 'hh:mm:ss a') }, 'success')
+    setUsbInput('')
+  }
+
+  function printBadge() {
+    if (!printingVisitor) return
+    const printWin = window.open('', '_blank', 'width=400,height=600')
+    if (!printWin) { toast.error('Allow pop-ups to print'); return }
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`VISITOR:${printingVisitor.id}`)}&margin=2`
+    const schoolName = user?.full_name ?? 'School'
+    printWin.document.write(`
+      <html><head><title>Visitor Badge</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .badge { width: 320px; border: 3px solid #0f172a; border-radius: 16px; overflow: hidden; page-break-inside: avoid; }
+        .badge-header { background: #0f172a; color: #fff; padding: 14px 18px; text-align: center; }
+        .badge-header .school { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; opacity: .7; margin-bottom: 2px; }
+        .badge-header .visitor-tag { font-size: 22px; font-weight: 900; letter-spacing: .05em; }
+        .badge-body { padding: 18px; }
+        .avatar { width: 64px; height: 64px; border-radius: 50%; background: #f1f5f9; border: 3px solid #0f172a; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 900; color: #0f172a; margin: 0 auto 12px; }
+        .name { font-size: 22px; font-weight: 900; color: #0f172a; text-align: center; margin-bottom: 4px; }
+        .purpose { font-size: 13px; font-weight: 700; color: #475569; text-align: center; margin-bottom: 14px; }
+        .row { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 0; border-bottom: 1px solid #f1f5f9; }
+        .row .label { color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+        .row .val { color: #0f172a; font-weight: 700; text-align: right; max-width: 60%; }
+        .qr-wrap { display: flex; flex-direction: column; align-items: center; margin-top: 14px; gap: 4px; }
+        .qr-note { font-size: 9px; color: #94a3b8; font-weight: 600; letter-spacing: .05em; }
+        .badge-footer { background: #dc2626; padding: 8px; text-align: center; font-size: 10px; font-weight: 800; color: #fff; letter-spacing: .08em; }
+        @media print { body { min-height: unset; } }
+      </style></head>
+      <body>
+        <div class="badge">
+          <div class="badge-header">
+            <div class="school">WULA Platform — ${schoolName}</div>
+            <div class="visitor-tag">🪪 VISITOR PASS</div>
+          </div>
+          <div class="badge-body">
+            <div class="avatar">${printingVisitor.full_name?.charAt(0).toUpperCase()}</div>
+            <div class="name">${printingVisitor.full_name}</div>
+            <div class="purpose">${printingVisitor.purpose || 'General Visit'}</div>
+            <div class="row"><span class="label">Date</span><span class="val">${format(new Date(printingVisitor.time_in), 'MMM d, yyyy')}</span></div>
+            <div class="row"><span class="label">Time In</span><span class="val">${format(new Date(printingVisitor.time_in), 'hh:mm a')}</span></div>
+            ${printingVisitor.person_to_see ? `<div class="row"><span class="label">Seeing</span><span class="val">${printingVisitor.person_to_see}</span></div>` : ''}
+            ${printingVisitor.id_number ? `<div class="row"><span class="label">ID</span><span class="val">${printingVisitor.id_number}</span></div>` : ''}
+            ${printingVisitor.phone ? `<div class="row"><span class="label">Phone</span><span class="val">${printingVisitor.phone}</span></div>` : ''}
+            <div class="qr-wrap">
+              <img src="${qrUrl}" width="100" height="100" />
+              <div class="qr-note">SCAN TO SIGN OUT</div>
+            </div>
+          </div>
+          <div class="badge-footer">MUST BE WORN & VISIBLE AT ALL TIMES</div>
+        </div>
+        <script>window.onload=()=>{window.print();setTimeout(()=>window.close(),500)}<\/script>
+      </body></html>
+    `)
+    printWin.document.close()
+  }
 
   const showCard = (c: ScanCard, type: 'success' | 'error' | 'warning') => {
     setCard(c)
@@ -131,7 +228,26 @@ export default function ScannerPage() {
       }
 
       if (!personType) {
-        setErrorMsg(`Unknown ID: "${code}" — not found in students or staff.`)
+        // Check if it's a Visitor Checkout
+        if (code.startsWith('VISITOR:')) {
+          const vId = code.replace('VISITOR:', '')
+          const { data: vis } = await supabase.from('visitors').select('id, full_name, time_out').eq('id', vId).maybeSingle()
+          if (vis && !vis.time_out) {
+            await supabase.from('visitors').update({ time_out: new Date().toISOString() }).eq('id', vis.id)
+            playBeep()
+            showCard({ name: vis.full_name, personType: 'visitor', className: 'Visitor Check-Out', photoUrl: '', direction: 'out', status: 'on_time', scanTime: format(new Date(), 'hh:mm:ss a') }, 'success')
+            setProcessing(false)
+            processingRef.current = false
+            setUsbInput('')
+            return
+          }
+        }
+
+        // Otherwise, pop up visitor form for unknown code
+        playBeep()
+        setVisitorFormOpen(true)
+        setVisitorForm({ full_name: '', phone: '', purpose: 'Parent Visit', person_to_see: '', id_number: code, host_department: '' })
+        
         setProcessing(false)
         processingRef.current = false
         setUsbInput('')
@@ -176,54 +292,72 @@ export default function ScannerPage() {
       })
 
       // 5. Sync to Academic Attendance (only for first student 'in' of the day)
-      if (personType === 'student' && direction === 'in' && !lastScan && term) {
+      if (personType === 'student' && direction === 'in' && !lastScan) {
         try {
-          // Check if already has an academic record for today (maybe manual register or from another gate)
-          const { data: existingRec } = await supabase
-            .from('attendance_records')
+          // Fetch term fresh at scan-time — do NOT rely on hook closure which may be null
+          const { data: currentTerm } = await supabase
+            .from('terms')
             .select('id')
-            .eq('student_id', personDbId)
-            .eq('date', today)
+            .eq('school_id', schoolId)
+            .eq('is_current', true)
             .maybeSingle()
 
-          if (!existingRec) {
-            // Record daily log
-            await supabase.from('attendance_records').insert({
-              student_id: personDbId,
-              class_id: studentClassId,
-              term_id: (term as any).id,
-              school_id: schoolId,
-              date: today,
-              status: status === 'late' ? 'late' : 'present',
-              notes: 'Recorded via Gate Scanner'
-            })
-
-            // Update term totals
-            const { data: attTotal } = await supabase
-              .from('attendance')
-              .select('id, total_days, days_present, days_absent')
+          if (!currentTerm) {
+            console.warn('[Scanner] No current term set — gate scan recorded but academic attendance skipped.')
+            toast(`⚠️ No active term set. Gate scan saved, but academic register not updated.`, { duration: 4000 })
+          } else {
+            // Check if already has an academic record for today
+            const { data: existingRec } = await supabase
+              .from('attendance_records')
+              .select('id')
               .eq('student_id', personDbId)
-              .eq('term_id', (term as any).id)
+              .eq('date', today)
               .maybeSingle()
 
-            if (attTotal) {
-              await supabase.from('attendance').update({
-                total_days: (attTotal.total_days ?? 0) + 1,
-                days_present: (attTotal.days_present ?? 0) + 1,
-              }).eq('id', attTotal.id)
-            } else {
-              await supabase.from('attendance').insert({
+            if (!existingRec) {
+              const { error: insErr } = await supabase.from('attendance_records').insert({
                 student_id: personDbId,
-                term_id: (term as any).id,
-                total_days: 1,
-                days_present: 1,
-                days_absent: 0,
+                class_id: studentClassId,
+                term_id: currentTerm.id,
+                school_id: schoolId,
+                date: today,
+                status: status === 'late' ? 'late' : 'present',
+                notes: 'Recorded via Gate Scanner'
               })
+
+              if (insErr) {
+                console.error('[Scanner] attendance_records insert failed:', insErr)
+                toast(`⚠️ Gate scan saved, but register sync failed: ${insErr.message}`, { duration: 5000 })
+              } else {
+                // Update term totals
+                const { data: attTotal } = await supabase
+                  .from('attendance')
+                  .select('id, total_days, days_present, days_absent')
+                  .eq('student_id', personDbId)
+                  .eq('term_id', currentTerm.id)
+                  .maybeSingle()
+
+                if (attTotal) {
+                  await supabase.from('attendance').update({
+                    total_days: (attTotal.total_days ?? 0) + 1,
+                    days_present: (attTotal.days_present ?? 0) + 1,
+                  }).eq('id', attTotal.id)
+                } else {
+                  await supabase.from('attendance').insert({
+                    student_id: personDbId,
+                    term_id: currentTerm.id,
+                    school_id: schoolId,
+                    total_days: 1,
+                    days_present: 1,
+                    days_absent: 0,
+                  })
+                }
+              }
             }
           }
         } catch (e) {
-          console.error('Failed to sync to academic attendance:', e)
-          // Don't fail the gate scan if academic sync fails, but maybe log it
+          console.error('[Scanner] Academic attendance sync error:', e)
+          toast(`⚠️ Register sync error — gate scan still saved.`, { duration: 4000 })
         }
       }
 
@@ -368,22 +502,26 @@ export default function ScannerPage() {
         .sc-card { animation: sc_pop .4s cubic-bezier(.34,1.56,.64,1) forwards; }
         .sc-err { animation: sc_shake .4s ease; }
         #qr-reader { border: none !important; width: 100% !important; background: #000; position: relative; }
-        #qr-reader video { border-radius: 20px !important; width: 100% !important; object-fit: cover; }
-        .qr-hud { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px solid rgba(255,255,255,0.2); border-radius: 20px; pointer-events: none; z-index: 10; display: flex; align-items: center; justifyContent: center; }
+        #qr-reader video { border-radius: 16px !important; width: 100% !important; object-fit: cover; }
+        .qr-hud { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px solid rgba(255,255,255,0.2); border-radius: 16px; pointer-events: none; z-index: 10; display: flex; align-items: center; justify-content: center; }
         .qr-line { position: absolute; left: 10%; right: 10%; height: 2px; background: rgba(34,197,94,0.5); box-shadow: 0 0 8px rgba(34,197,94,0.8); animation: sc_scan 2s linear infinite; }
         #qr-reader__dashboard { display: none !important; }
+        @media (max-width: 480px) {
+          .sc-h1 { font-size: 22px !important; }
+          .sc-qrbox div { width: 200px !important; height: 200px !important; }
+        }
       `}</style>
 
-      <div style={{ fontFamily: '"DM Sans",sans-serif', maxWidth: 500, margin: '0 auto', paddingBottom: 100 }}>
+      <div style={{ fontFamily: '"DM Sans",sans-serif', maxWidth: 500, margin: '0 auto', paddingBottom: 100, paddingLeft: 4, paddingRight: 4 }}>
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#0f172a', color: '#fff', padding: '7px 18px', borderRadius: 99, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>
             <QrCode size={14} /> GATE SCANNER
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>Scan to Mark Attendance</h1>
-          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>
-            {format(new Date(), 'EEEE, MMMM d · hh:mm a')}
+          <h1 className="sc-h1" style={{ fontSize: 26, fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>Scan to Mark Attendance</h1>
+          <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>
+            {format(new Date(), 'EEE, MMM d · hh:mm a')}
           </p>
         </div>
 
@@ -411,7 +549,7 @@ export default function ScannerPage() {
                 <div id="qr-reader" />
                 <div className="qr-hud">
                   <div className="qr-line" />
-                  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 250, height: 250, border: '2px solid #22c55e', borderRadius: 20, boxShadow: '0 0 0 4000px rgba(0,0,0,0.4)' }} />
+                  <div className="sc-qrbox" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'min(250px, 65vw)', height: 'min(250px, 65vw)', border: '2px solid #22c55e', borderRadius: 16, boxShadow: '0 0 0 4000px rgba(0,0,0,0.4)' }} />
                 </div>
               </div>
             )}
@@ -485,10 +623,13 @@ export default function ScannerPage() {
                   {card.name.charAt(0).toUpperCase()}
                 </div>
               )}
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 20, fontWeight: 900, color: '#0f172a', lineHeight: 1.2 }}>{card.name}</div>
-                <div style={{ fontSize: 13, color: '#475569', marginTop: 3 }}>
-                  {card.personType === 'student' ? '🎓 Student' : '👩‍🏫 Teacher'} · {card.className}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#0f172a', lineHeight: 1.1, marginBottom: 4 }}>{card.name}</div>
+                <div style={{ fontSize: 13, color: '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {card.personType === 'student' ? '🎓' : card.personType === 'teacher' ? '👨‍🏫' : '🪪'} 
+                  <span style={{ background: '#f1f5f9', padding: '3px 8px', borderRadius: 6, color: '#475569' }}>
+                    {card.className}
+                  </span>
                 </div>
               </div>
             </div>
@@ -539,7 +680,115 @@ export default function ScannerPage() {
 
         {/* Mini Today Stats */}
         <TodayStats schoolId={schoolId} />
+        {/* Sound toggle hidden but available if needed */}
       </div>
+
+      {/* ── Visitor Sign In Modal ── */}
+      {visitorFormOpen && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 9999 }}
+          onClick={e => { if (e.target === e.currentTarget) setVisitorFormOpen(false) }}>
+          <div style={{ background: '#fff', borderRadius: '22px 22px 0 0', padding: '24px 20px 90px', width: '100%', maxWidth: 500, maxHeight: '92vh', overflowY: 'auto', boxSizing: 'border-box', animation: 'ss_pop .25s ease' }}>
+            <div style={{ width: 40, height: 4, borderRadius: 4, background: '#e2e8f0', margin: '0 auto 20px' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <div>
+                <h2 style={{ fontSize: 20, fontWeight: 900, color: '#0f172a', margin: 0 }}>Unrecognized ID Scanned</h2>
+                <p style={{ fontSize: 12, color: '#64748b', margin: '3px 0 0' }}>Register this person as a new visitor.</p>
+              </div>
+              <button onClick={() => setVisitorFormOpen(false)} style={{ width: 34, height: 34, borderRadius: '50%', border: 'none', background: '#f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
+            </div>
+
+            {/* Purpose */}
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 11, fontWeight: 800, color: '#334155', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.05em' }}>Purpose of Visit *</label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {PURPOSES.map(p => (
+                  <button key={p} onClick={() => setVisitorForm(f => ({ ...f, purpose: p }))}
+                    style={{ padding: '6px 12px', borderRadius: 99, border: `1.5px solid ${visitorForm.purpose === p ? '#0f172a' : '#e2e8f0'}`, background: visitorForm.purpose === p ? '#0f172a' : '#fff', color: visitorForm.purpose === p ? '#fff' : '#334155', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {[
+              { label: 'Full Name *', key: 'full_name', placeholder: 'e.g. Kwame Mensah' },
+              { label: 'Phone Number', key: 'phone', placeholder: '0244 000 000' },
+              { label: 'Person to See', key: 'person_to_see', placeholder: 'Teacher name, Admin Office…' },
+              { label: 'ID / Scanned Code', key: 'id_number', placeholder: 'GHA-000000000-0' },
+              { label: 'Department / Block', key: 'host_department', placeholder: 'Main Office, Block A…' },
+            ].map(({ label, key, placeholder }) => (
+              <div key={key} style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 11, fontWeight: 800, color: '#334155', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.05em' }}>{label}</label>
+                <input value={(visitorForm as any)[key]} onChange={e => setVisitorForm(f => ({ ...f, [key]: e.target.value }))} placeholder={placeholder}
+                  style={{ width: '100%', padding: '12px 14px', borderRadius: 12, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif' }}
+                  onFocus={e => e.currentTarget.style.borderColor = '#0f172a'}
+                  onBlur={e => e.currentTarget.style.borderColor = '#e2e8f0'} />
+              </div>
+            ))}
+
+            <button onClick={submitVisitor} disabled={visitorSaving || !visitorForm.full_name.trim()}
+              style={{ width: '100%', padding: '14px', borderRadius: 14, border: 'none', background: visitorSaving || !visitorForm.full_name.trim() ? '#e2e8f0' : '#0f172a', color: visitorSaving || !visitorForm.full_name.trim() ? '#94a3b8' : '#fff', fontSize: 14, fontWeight: 800, cursor: visitorSaving || !visitorForm.full_name.trim() ? 'not-allowed' : 'pointer', marginTop: 8, fontFamily: '"DM Sans",sans-serif' }}>
+              {visitorSaving ? 'Signing In…' : '🪪 Sign In & Print Badge'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Badge Preview Modal ── */}
+      {printingVisitor && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}
+          onClick={e => { if (e.target === e.currentTarget) setPrintingVisitor(null) }}>
+          <div style={{ background: '#fff', borderRadius: 24, maxWidth: 360, width: '100%', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.3)', animation: 'ss_pop .2s ease' }}>
+            <div style={{ background: '#0f172a', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,.5)', letterSpacing: '.08em', textTransform: 'uppercase' }}>Badge Preview</div>
+                <div style={{ fontSize: 16, fontWeight: 900, color: '#fff' }}>🪪 VISITOR PASS</div>
+              </div>
+              <button onClick={() => setPrintingVisitor(null)} style={{ width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,.1)', cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
+            </div>
+
+            <div style={{ padding: '24px 24px 16px' }}>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 16 }}>
+                <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 900, color: '#2563eb', flexShrink: 0, border: '3px solid #0f172a' }}>
+                  {printingVisitor.full_name?.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: '#0f172a' }}>{printingVisitor.full_name}</div>
+                  <div style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>{printingVisitor.purpose}</div>
+                </div>
+              </div>
+
+              {[
+                { l: 'Date', v: format(new Date(printingVisitor.time_in), 'MMM d, yyyy') },
+                { l: 'Time In', v: format(new Date(printingVisitor.time_in), 'hh:mm a') },
+                printingVisitor.person_to_see ? { l: 'Seeing', v: printingVisitor.person_to_see } : null,
+                printingVisitor.id_number ? { l: 'ID No.', v: printingVisitor.id_number } : null,
+              ].filter(Boolean).map((row: any) => (
+                <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '5px 0', borderBottom: '1px solid #f1f5f9' }}>
+                  <span style={{ color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em' }}>{row.l}</span>
+                  <span style={{ fontWeight: 700, color: '#0f172a' }}>{row.v}</span>
+                </div>
+              ))}
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 16, gap: 4 }}>
+                <QRImg value={`VISITOR:${printingVisitor.id}`} size={90} />
+                <div style={{ fontSize: 9, color: '#94a3b8', fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase' }}>Scan to sign out</div>
+              </div>
+            </div>
+
+            <div style={{ background: '#dc2626', padding: '8px', textAlign: 'center', fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '.08em' }}>
+              MUST BE WORN & VISIBLE AT ALL TIMES
+            </div>
+
+            <div style={{ padding: '16px 24px', display: 'flex', gap: 8 }}>
+              <button onClick={() => setPrintingVisitor(null)} style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1.5px solid #e2e8f0', background: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', color: '#334155' }}>Close</button>
+              <button onClick={printBadge} style={{ flex: 2, padding: '11px', borderRadius: 12, border: 'none', background: '#0f172a', fontSize: 13, fontWeight: 800, cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+                <Printer size={15} /> Print Badge
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

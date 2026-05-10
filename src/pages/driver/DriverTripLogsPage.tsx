@@ -19,6 +19,19 @@ export default function DriverTripLogsPage() {
   async function loadLogs() {
     setLoading(true)
     
+    // First, fetch the driver's vehicle
+    const { data: vehicle } = await supabase
+      .from('transport_vehicles')
+      .select('id')
+      .eq('driver_id', user!.id)
+      .single()
+
+    if (!vehicle) {
+      setLogs([])
+      setLoading(false)
+      return
+    }
+
     let query = supabase
       .from('transport_boarding_logs')
       .select(`
@@ -26,6 +39,7 @@ export default function DriverTripLogsPage() {
         student:students(full_name, student_id, class:classes(name))
       `)
       .eq('school_id', user!.school_id)
+      .eq('vehicle_id', vehicle.id)
       .order('time_scanned', { ascending: false })
 
     if (filterDirection !== 'all') {
@@ -49,7 +63,7 @@ export default function DriverTripLogsPage() {
       <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: '#111827' }}>Trip Logs</h1>
-          <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: 14 }}>History of scanned student boardings and drop-offs.</p>
+          <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: 14 }}>History of scanned student boardings and drop-offs for your vehicle.</p>
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 // src/types/database.types.ts
-export type Role = 'super_admin' | 'admin' | 'teacher' | 'student' | 'bursar' | 'staff' | 'security' | 'parent' | 'driver'
+export type Role = 'super_admin' | 'admin' | 'proprietor' | 'teacher' | 'student' | 'bursar' | 'staff' | 'security' | 'parent' | 'driver' | 'nurse' | 'librarian'
 export type PaymentMethod = 'cash' | 'momo' | 'bank' | 'cheque'
 
 export interface FeeStructure {
@@ -444,4 +444,73 @@ export interface TransportLiveLocation {
   is_active: boolean
   last_updated: string
   created_at: string
+}
+
+export interface MedicalRecord {
+  id: string
+  student_id: string
+  school_id: string
+  blood_type?: string
+  allergies?: string
+  chronic_conditions?: string
+  emergency_contact_name?: string
+  emergency_contact_phone?: string
+  notes?: string
+  created_at: string
+  updated_at: string
+  // joined
+  student?: Student
+}
+
+export interface ClinicVisit {
+  id: string
+  school_id: string
+  student_id: string
+  nurse_id: string
+  visit_date: string
+  symptoms: string
+  treatment?: string
+  medication_given?: string
+  time_in: string
+  time_out?: string
+  parent_notified: boolean
+  notes?: string
+  created_at: string
+  // joined
+  student?: Student
+  nurse?: User
+}
+
+export interface LibraryBook {
+  id: string
+  school_id: string
+  title: string
+  author?: string
+  isbn?: string
+  barcode: string
+  dewey_decimal?: string
+  category?: string
+  copies_total: number
+  copies_available: number
+  location?: string
+  created_at: string
+}
+
+export interface LibraryCheckout {
+  id: string
+  school_id: string
+  book_id: string
+  student_id?: string
+  teacher_id?: string
+  checkout_date: string
+  due_date: string
+  return_date?: string
+  fine_amount: number
+  fine_paid: boolean
+  status: 'active' | 'returned' | 'lost'
+  created_at: string
+  // joined
+  book?: LibraryBook
+  student?: Student
+  teacher?: User
 }

@@ -94,7 +94,7 @@ export default function SyllabusPage(){
       const path=fileUrl.split('/syllabus/')[1]
       if(path) await supabase.storage.from('syllabus').remove([path])
     }
-    await supabase.from('syllabus').delete().eq('id',id)
+    await supabase.from('syllabus').delete().eq('id',id).eq('school_id',user!.school_id)
     toast.success('Deleted')
     load()
   }

@@ -110,6 +110,11 @@ export default function AuthPage() {
       student: ROUTES.STUDENT_DASHBOARD,
       bursar: ROUTES.BURSAR_DASHBOARD,
       staff: ROUTES.STAFF_DASHBOARD,
+      nurse: '/nurse/dashboard',
+      librarian: '/librarian/dashboard',
+      security: '/security/dashboard',
+      driver: '/driver/dashboard',
+      parent: '/parent/dashboard',
     }
 
     const dest = roleRedirects[u.role] || ROUTES.TEACHER_DASHBOARD

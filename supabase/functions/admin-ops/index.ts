@@ -198,6 +198,12 @@ Deno.serve(async (req) => {
       const { target_user_id, password } = payload;
       if (!isAdmin) throw new Error("Only admins can reset passwords.");
 
+      // ── Security: verify the target user belongs to the caller's school ──
+      const { data: targetUser } = await adminClient.from('users').select('school_id').eq('id', target_user_id).single();
+      if (callerProfile.role !== 'super_admin' && targetUser?.school_id !== callerProfile.school_id) {
+        throw new Error("Cannot reset password for a user from a different school.");
+      }
+
       const { error } = await adminClient.auth.admin.updateUserById(target_user_id, { password });
       if (error) throw error;
 

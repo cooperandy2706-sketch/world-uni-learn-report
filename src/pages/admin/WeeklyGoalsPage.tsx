@@ -95,13 +95,13 @@ export default function WeeklyGoalsPage(){
   }
 
   async function toggleDone(id:string,done:boolean){
-    await supabase.from('weekly_goals').update({is_completed:!done}).eq('id',id)
+    await supabase.from('weekly_goals').update({is_completed:!done}).eq('id',id).eq('school_id',user!.school_id)
     load()
   }
 
   async function deleteGoal(id:string){
     if(!confirm('Delete this goal?'))return
-    await supabase.from('weekly_goals').delete().eq('id',id)
+    await supabase.from('weekly_goals').delete().eq('id',id).eq('school_id',user!.school_id)
     load()
   }
 

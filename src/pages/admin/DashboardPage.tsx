@@ -228,9 +228,9 @@ export default function DashboardPage() {
     let reports = 0, totalForReports = students ?? 0, pendingScores = 0, totalDebt = 0, pendingApproval = 0
     if (term?.id) {
       const [{ count: r }, { count: p }, { count: pa }] = await Promise.all([
-        supabase.from('report_cards').select('*', { count: 'exact', head: true }).eq('term_id', term.id),
-        supabase.from('scores').select('*', { count: 'exact', head: true }).eq('term_id', term.id).eq('is_submitted', false),
-        supabase.from('report_cards').select('*', { count: 'exact', head: true }).eq('term_id', term.id).eq('is_approved', false),
+        supabase.from('report_cards').select('*', { count: 'exact', head: true }).eq('school_id', sid).eq('term_id', term.id),
+        supabase.from('scores').select('*', { count: 'exact', head: true }).eq('school_id', sid).eq('term_id', term.id).eq('is_submitted', false),
+        supabase.from('report_cards').select('*', { count: 'exact', head: true }).eq('school_id', sid).eq('term_id', term.id).eq('is_approved', false),
       ])
       reports = r ?? 0; pendingScores = p ?? 0; pendingApproval = pa ?? 0
 
@@ -248,7 +248,7 @@ export default function DashboardPage() {
         feePaymentsService.getAll(sid, term.id),
         supabase.from('daily_fee_class_rates').select('*').eq('school_id', sid).eq('term_id', term.id),
         supabase.from('daily_fees_collected').select('student_id, amount, fee_type').eq('school_id', sid).eq('term_id', term.id),
-        supabase.from('attendance').select('student_id, days_present').eq('term_id', term.id),
+        supabase.from('attendance').select('student_id, days_present').eq('school_id', sid).eq('term_id', term.id),
       ])
 
       const structuresByClass: Record<string, number> = {}
@@ -324,7 +324,7 @@ export default function DashboardPage() {
     const sid = user!.school_id
     const [{ data: recentSubs }, { data: recentScores }, { data: recentStudents }] = await Promise.all([
       supabase.from('assignment_submissions').select('submitted_at, student:students(full_name), assignment:assignments!inner(title)').eq('assignments.school_id', sid).order('submitted_at', { ascending: false }).limit(4),
-      supabase.from('scores').select('updated_at, total_score, student:students(full_name), subject:subjects(name)').eq('school_id', sid).order('updated_at', { ascending: false }).limit(4),
+      supabase.from('scores').select('updated_at, total_score, student:students!inner(full_name, school_id), subject:subjects(name)').eq('students.school_id', sid).order('updated_at', { ascending: false }).limit(4),
       supabase.from('students').select('created_at, full_name').eq('school_id', sid).order('created_at', { ascending: false }).limit(3),
     ])
 
@@ -342,7 +342,8 @@ export default function DashboardPage() {
     // Fetch all scores for the current term to calculate live rankings
     const { data: scores, error } = await supabase
       .from('scores')
-      .select('student_id, total_score, student:students(full_name, class:classes(name))')
+      .select('student_id, total_score, student:students!inner(full_name, school_id, class:classes(name))')
+      .eq('students.school_id', user!.school_id)
       .eq('term_id', term.id)
     
     if (error || !scores) return
@@ -389,7 +390,7 @@ export default function DashboardPage() {
       const { count: sc } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('class_id', cls.id).eq('is_active', true)
       let avg = null, done = 0
       if (term?.id) {
-        const { data: rpts } = await supabase.from('report_cards').select('average_score').eq('class_id', cls.id).eq('term_id', term.id)
+        const { data: rpts } = await supabase.from('report_cards').select('average_score').eq('school_id', user!.school_id).eq('class_id', cls.id).eq('term_id', term.id)
         if (rpts?.length) { avg = rpts.reduce((s, r) => s + (r.average_score ?? 0), 0) / rpts.length; done = rpts.length }
       }
       return { id: cls.id, name: cls.name, student_count: sc ?? 0, avg_score: avg, reports_done: done }
@@ -403,7 +404,7 @@ export default function DashboardPage() {
   }
 
   async function markRead(id: string) {
-    await supabase.from('messages').update({ is_read: true }).eq('id', id)
+    await supabase.from('messages').update({ is_read: true }).eq('id', id).eq('school_id', user!.school_id)
     setMessages(prev => prev.map(m => m.id === id ? { ...m, is_read: true } : m))
     setStats(prev => prev ? { ...prev, unreadMessages: Math.max(0, prev.unreadMessages - 1) } : prev)
   }

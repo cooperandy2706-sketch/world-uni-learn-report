@@ -511,7 +511,7 @@ export default function DailyFeesPage() {
                     <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600 }}>{c.teacher?.user?.full_name}</td>
                     <td style={{ padding: '12px 16px' }}><span style={{ textTransform: 'capitalize', fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '3px 8px', borderRadius: 99 }}>{c.collection_type}</span></td>
                     <td style={{ padding: '12px 16px' }}>
-                      <button onClick={() => { if(confirm('Remove access?')) dailyFeesService.removeCollector(c.id).then(() => qc.invalidateQueries({queryKey:['daily-fee-collectors']})) }} style={{ border: 'none', background: '#fef2f2', color: '#dc2626', width: 28, height: 28, borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trash2 size={14}/></button>
+                      <button onClick={() => { if(confirm('Remove access?')) dailyFeesService.removeCollector(schoolId, c.id).then(() => qc.invalidateQueries({queryKey:['daily-fee-collectors']})) }} style={{ border: 'none', background: '#fef2f2', color: '#dc2626', width: 28, height: 28, borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trash2 size={14}/></button>
                     </td>
                   </tr>
                 ))}

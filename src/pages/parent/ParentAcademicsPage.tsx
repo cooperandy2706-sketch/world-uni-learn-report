@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase'
 import { getGradeInfo } from '../../utils/grading'
 import { ChevronDown, ChevronUp, BarChart3, Trophy, BookOpen, Calendar } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 export default function ParentAcademicsPage() {
   const { user } = useAuth()
@@ -62,8 +63,9 @@ export default function ParentAcademicsPage() {
           report: reportRes.data,
           scores: scoresRes.data || []
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(`Failed to load academics for ward ${ward.id}`, err)
+        toast.error(`Could not load results for ${ward.full_name}`)
       }
     }
     

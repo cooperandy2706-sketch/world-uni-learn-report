@@ -62,7 +62,7 @@ export default function VendorsPage() {
 
   const saveMutation = useMutation({
     mutationFn: async (data: Partial<Vendor>) => {
-      if (editingVendor) return vendorService.update(editingVendor.id, data)
+      if (editingVendor) return vendorService.update(schoolId, editingVendor.id, data)
       return vendorService.create({ ...data, school_id: schoolId })
     },
     onSuccess: () => {
@@ -74,7 +74,7 @@ export default function VendorsPage() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => vendorService.delete(id),
+    mutationFn: (id: string) => vendorService.delete(schoolId, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['vendors'] })
       toast.success('Vendor removed')

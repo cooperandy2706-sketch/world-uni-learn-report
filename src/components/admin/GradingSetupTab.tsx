@@ -123,8 +123,8 @@ export default function GradingSetupTab() {
     setApplying(departmentId)
     try {
       // 1. Delete existing categories & scales for this department
-      await supabase.from('department_grading_categories').delete().eq('department_id', departmentId)
-      await supabase.from('grading_scales').delete().eq('department_id', departmentId)
+      await supabase.from('department_grading_categories').delete().eq('department_id', departmentId).eq('school_id', user.school_id)
+      await supabase.from('grading_scales').delete().eq('department_id', departmentId).eq('school_id', user.school_id)
 
       // 2. Insert new scale
       const { data: scaleData, error: sErr } = await supabase.from('grading_scales').insert({

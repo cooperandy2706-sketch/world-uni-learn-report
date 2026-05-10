@@ -150,7 +150,7 @@ export default function TeacherStudentsPage() {
 
       const { data: urlData } = supabase.storage.from('school-assets').getPublicUrl(path)
       
-      const { error: updateError } = await supabase.from('students').update({ photo_url: urlData.publicUrl }).eq('id', student.id)
+      const { error: updateError } = await supabase.from('students').update({ photo_url: urlData.publicUrl }).eq('id', student.id).eq('school_id', user!.school_id)
       if (updateError) throw updateError
 
       loadStudents() // Refresh list

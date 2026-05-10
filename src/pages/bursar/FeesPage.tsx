@@ -165,10 +165,10 @@ export default function FeesPage() {
   }, [filteredStudents])
 
   // ── Structure form ─────────────────────────────────────────────
-  const [sf, setSf] = useState({ class_id: '', fee_name: '', amount: '', description: '' })
+  const [sf, setSf] = useState({ class_id: '', fee_name: '', amount: '', description: '', is_discountable: true })
   const createStructure = useMutation({
     mutationFn: (d: any) => feeStructuresService.create(d),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['fee-structures'] }); setStructureModal(false); setSf({ class_id: '', fee_name: '', amount: '', description: '' }); toast.success('Fee structure created') },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['fee-structures'] }); setStructureModal(false); setSf({ class_id: '', fee_name: '', amount: '', description: '', is_discountable: true }); toast.success('Fee structure created') },
     onError: (e: any) => toast.error(e.message),
   })
 
@@ -230,7 +230,7 @@ export default function FeesPage() {
   })
 
   const delPayment = useMutation({
-    mutationFn: (id: string) => feePaymentsService.delete(id),
+    mutationFn: (id: string) => feePaymentsService.delete(schoolId, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['fee-payments'] }); qc.invalidateQueries({ queryKey: ['students-all'] }); qc.invalidateQueries({ queryKey: ['students-class-debt'] }); toast.success('Payment deleted & arrears restored') },
   })
 
@@ -470,7 +470,7 @@ export default function FeesPage() {
             <div class="info-box">
               <h3>Student Details</h3>
               <p>${data.student.full_name}</p>
-              <p style="font-size: 12px; color: #64748b; font-weight: 400;">ID: ${data.student.student_id} • Grade: ${data.student.class?.name}</p>
+              <p style="font-size: 12px; color: #64748b; font-weight: 400;">ID: ${data.student.student_id} • Grade: ${(data.student.class as any)?.name}</p>
             </div>
             <div class="info-box" style="text-align: right;">
               <h3>Payment Details</h3>
@@ -999,7 +999,7 @@ export default function FeesPage() {
                       border: pf.student_id === s.id ? '1.5px solid #ddd6fe' : '1px solid transparent'
                     }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: pf.student_id === s.id ? '#6d28d9' : '#111827' }}>{s.full_name}</div>
-                      <div style={{ fontSize: 10, color: '#6b7280' }}>{s.class?.name || 'No Class'}</div>
+                      <div style={{ fontSize: 10, color: '#6b7280' }}>{(s.class as any)?.name || 'No Class'}</div>
                     </div>
                   ))}
                 </div>
@@ -1013,7 +1013,7 @@ export default function FeesPage() {
                   <h3 style={{ fontSize: 16, fontWeight: 800, color: '#1e0646', margin: 0 }}>Available Items</h3>
                   {pf.student_id && (
                     <span style={{ fontSize: 10, color: '#6d28d9', fontWeight: 700, background: '#f5f3ff', padding: '2px 8px', borderRadius: 20 }}>
-                      Filtered for {students.find((s:any) => s.id === pf.student_id)?.class?.name}
+                      Filtered for {(students.find((s:any) => s.id === pf.student_id) as any)?.class?.name}
                     </span>
                   )}
                 </div>
@@ -1029,7 +1029,7 @@ export default function FeesPage() {
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
                 {filteredStoreItems
-                  .filter((i: any) => !pf.student_id || !i.class_id || i.class_id === students.find((s:any) => s.id === pf.student_id)?.class?.id)
+                  .filter((i: any) => !pf.student_id || !i.class_id || i.class_id === (students.find((s:any) => s.id === pf.student_id) as any)?.class?.id)
                   .map((item: any) => {
                     const inCart = storeCart.find(x => x.id === item.id)
                     return (
@@ -1249,7 +1249,7 @@ export default function FeesPage() {
                     const openingArrears = Number(s.fees_arrears || 0) + arrearsPaid;
                     const charges = openingArrears + netTermCharges;
                     const bal = charges - paid;
-                    return [s.full_name, s.class?.name || '—', openingArrears.toFixed(2), netTermCharges.toFixed(2), charges.toFixed(2), paid.toFixed(2), bal.toFixed(2)].join(',');
+                    return [s.full_name, (s.class as any)?.name || '—', openingArrears.toFixed(2), netTermCharges.toFixed(2), charges.toFixed(2), paid.toFixed(2), bal.toFixed(2)].join(',');
                   })
                 ];
                 const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
@@ -1295,7 +1295,7 @@ export default function FeesPage() {
                           {s.full_name}
                           {s.scholarship_percentage > 0 && <div style={{ fontSize: 9, color: '#16a34a', fontWeight: 800 }}>🎓 {s.scholarship_percentage}% Scholar</div>}
                         </td>
-                        <td style={{ padding: '12px 14px' }}><span style={{ fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: 99 }}>{s.class?.name || '—'}</span></td>
+                        <td style={{ padding: '12px 14px' }}><span style={{ fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: 99 }}>{(s.class as any)?.name || '—'}</span></td>
                         <td style={{ padding: '12px 14px', fontSize: 13, color: '#6b7280' }}>{GHS(openingArrears)}</td>
                         <td style={{ padding: '12px 14px', fontSize: 13, color: '#6b7280' }}>{GHS(netTermCharges)}</td>
                         <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#1e0646' }}>{GHS(totalBill)}</td>
@@ -1398,7 +1398,7 @@ export default function FeesPage() {
               const grouped: Record<string, { name: string; items: any[] }> = {};
               (structures as any[]).forEach((s: any) => {
                 const cId = s.class_id || 'general';
-                const cName = s.class?.name || 'General Fees';
+                const cName = (s.class as any)?.name || 'General Fees';
                 if (!grouped[cId]) grouped[cId] = { name: cName, items: [] };
                 grouped[cId].items.push(s);
               });
@@ -1418,7 +1418,7 @@ export default function FeesPage() {
                             <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{s.fee_name}</div>
                             <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{s.term?.name}</div>
                           </div>
-                          <button onClick={() => { if (confirm('Delete this fee structure?')) feeStructuresService.delete(s.id).then(() => qc.invalidateQueries({ queryKey: ['fee-structures'] })) }}
+                          <button onClick={() => { if (confirm('Delete this fee structure?')) feeStructuresService.delete(schoolId, s.id).then(() => qc.invalidateQueries({ queryKey: ['fee-structures'] })) }}
                             style={{ width: 28, height: 28, borderRadius: 7, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <Trash2 size={13} />
                           </button>

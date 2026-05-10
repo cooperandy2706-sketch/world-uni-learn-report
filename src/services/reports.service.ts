@@ -105,37 +105,41 @@ export const reportsService = {
       .select()
   },
 
-  async getByClassAndTerm(classId: string, termId: string) {
+  async getByClassAndTerm(schoolId: string, classId: string, termId: string) {
     return supabase
       .from('report_cards')
       .select('*, student:students(*, class:classes(id, name, department_id))')
+      .eq('school_id', schoolId)
       .eq('class_id', classId)
       .eq('term_id', termId)
       .order('overall_position')
   },
 
-  async getStudentReport(studentId: string, termId: string) {
+  async getStudentReport(schoolId: string, studentId: string, termId: string) {
     return supabase
       .from('report_cards')
       .select('*, student:students(*), class:classes(*), term:terms(*)')
+      .eq('school_id', schoolId)
       .eq('student_id', studentId)
       .eq('term_id', termId)
       .single()
   },
 
   async updateRemarks(
+    schoolId: string,
     reportId: string,
     remarks: { class_teacher_remarks?: string; headteacher_remarks?: string }
   ) {
     return supabase
       .from('report_cards')
       .update({ ...remarks, updated_at: new Date().toISOString() })
+      .eq('school_id', schoolId)
       .eq('id', reportId)
       .select()
       .single()
   },
 
-  async approve(reportId: string, approvedBy: string) {
+  async approve(schoolId: string, reportId: string, approvedBy: string) {
     return supabase
       .from('report_cards')
       .update({
@@ -143,6 +147,7 @@ export const reportsService = {
         approved_by: approvedBy,
         approved_at: new Date().toISOString(),
       })
+      .eq('school_id', schoolId)
       .eq('id', reportId)
       .select()
       .single()

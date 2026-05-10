@@ -93,7 +93,7 @@ export default function TeacherDailyFeesPage() {
           // Unchanged amount? skip
           if (existing.amount === amt) return null
           // Update
-          return supabase.from('daily_fees_collected').update({ amount: amt }).eq('id', existing.id)
+          return supabase.from('daily_fees_collected').update({ amount: amt }).eq('id', existing.id).eq('school_id', schoolId)
         } else {
           // Insert
           return supabase.from('daily_fees_collected').insert({

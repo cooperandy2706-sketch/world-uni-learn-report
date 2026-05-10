@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { useClasses } from '../../hooks/useClasses'
 import { useSubjects } from '../../hooks/useSubjects'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
+import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
 import { utils, writeFile } from 'xlsx'
 import toast from 'react-hot-toast'
@@ -51,6 +52,7 @@ export default function BECEProcessorPage() {
   const { data: subjects = [] } = useSubjects()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
+  const { user } = useAuth()
 
   const [selectedClass, setSelectedClass] = useState('')
   const [selectedSubject, setSelectedSubject] = useState('')
@@ -73,6 +75,7 @@ export default function BECEProcessorPage() {
         .from('students')
         .select('id, full_name, student_id')
         .eq('class_id', selectedClass)
+        .eq('school_id', user!.school_id)
         .eq('is_active', true)
         .order('full_name')
       setStudents(data || [])

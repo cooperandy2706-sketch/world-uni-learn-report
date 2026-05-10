@@ -2,6 +2,7 @@
 // Full platform hub: timetable, attendance status, quiz submissions, all features
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
@@ -169,8 +170,9 @@ export default function TeacherDashboardPage() {
       setPendingCount(classStatsData.reduce((s: number, c: any) => s + c.pendingEntries, 0))
       setSubmittedCount(classStatsData.reduce((s: number, c: any) => s + c.submitted, 0))
 
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
+      toast.error('Failed to load dashboard data')
     } finally {
       setLoading(false)
       setFirstLoadComplete(true)

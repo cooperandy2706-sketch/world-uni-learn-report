@@ -202,8 +202,9 @@ export default function AssessmentsPage() {
     try {
       await bulkUpsert.mutateAsync(scoresToUpsert)
       setDirty(false)
-    } catch (error) {
-      console.error(error)
+    } catch (error: any) {
+      console.error('[AssessmentsSave]', error)
+      toast.error(error?.message || 'Failed to save scores')
     }
   }
 

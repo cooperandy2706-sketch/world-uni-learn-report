@@ -43,8 +43,9 @@ export default function ParentBillingPage() {
       try {
         const data = await billSheetService.getStudentBillData(ward.id, term!.id, ward.school_id)
         newBillingData[ward.id] = data
-      } catch (err) {
+      } catch (err: any) {
         console.error(`Failed to load billing for ward ${ward.id}`, err)
+        toast.error(`Could not load billing for ${ward.full_name}`)
       }
     }
     setBillingData(newBillingData)

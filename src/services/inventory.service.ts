@@ -13,11 +13,11 @@ export const inventoryService = {
   async createItem(data: any) {
     return supabase.from('inventory_items').insert(data).select().single()
   },
-  async updateItem(id: string, data: any) {
-    return supabase.from('inventory_items').update(data).eq('id', id).select().single()
+  async updateItem(schoolId: string, id: string, data: any) {
+    return supabase.from('inventory_items').update(data).eq('id', id).eq('school_id', schoolId).select().single()
   },
-  async deleteItem(id: string) {
-    return supabase.from('inventory_items').delete().eq('id', id)
+  async deleteItem(schoolId: string, id: string) {
+    return supabase.from('inventory_items').delete().eq('id', id).eq('school_id', schoolId)
   },
 
   // Sales
@@ -54,10 +54,10 @@ export const inventoryService = {
 
     // 4. Decrement stock only if not virtual
     if (!isVirtual && realItemId) {
-      const { data: item } = await supabase.from('inventory_items').select('current_stock').eq('id', realItemId).single()
+      const { data: item } = await supabase.from('inventory_items').select('current_stock').eq('id', realItemId).eq('school_id', data.school_id).single()
       if (item) {
         const newStock = (item.current_stock || 0) - data.quantity
-        await supabase.from('inventory_items').update({ current_stock: newStock }).eq('id', realItemId)
+        await supabase.from('inventory_items').update({ current_stock: newStock }).eq('id', realItemId).eq('school_id', data.school_id)
         
         // 5. Log the stock change for auditing
         await supabase.from('inventory_stock_logs').insert({
@@ -86,12 +86,12 @@ export const inventoryService = {
     if (itemId) q = q.eq('item_id', itemId)
     return q
   },
-  async recordStockChange(data: any) {
+  async recordStockChange(schoolId: string, data: any) {
     // 1. Log the change
-    const { error: logError } = await supabase.from('inventory_stock_logs').insert(data)
+    const { error: logError } = await supabase.from('inventory_stock_logs').insert({ ...data, school_id: schoolId })
     if (logError) throw logError
 
     // 2. Update item stock
-    await supabase.from('inventory_items').update({ current_stock: data.new_stock }).eq('id', data.item_id)
+    await supabase.from('inventory_items').update({ current_stock: data.new_stock }).eq('id', data.item_id).eq('school_id', schoolId)
   }
 }

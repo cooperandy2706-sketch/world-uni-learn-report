@@ -133,7 +133,7 @@ export default function SuperAdminDashboard() {
       setPendingInvoices(invData || [])
     } catch (err: any) {
       console.error(err)
-      toast.error('Failed to sync platform data')
+      toast.error(err?.message || 'Failed to sync platform data')
     } finally {
       setLoading(false)
     }

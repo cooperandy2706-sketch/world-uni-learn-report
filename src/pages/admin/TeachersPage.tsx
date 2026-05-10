@@ -859,6 +859,7 @@ export default function TeachersPage() {
     supabase.from('teacher_assignments')
       .select('teacher_id,class_id,subject_id')
       .in('teacher_id', teacherIds)
+      .eq('school_id', user?.school_id)
       .then(({ data }) => {
         if (!data) return
         const m: Record<string, { classes: Set<string>; subjects: Set<string> }> = {}
@@ -890,8 +891,8 @@ export default function TeachersPage() {
   const { data: lettersHistory, isLoading: loadingLetters } = useQuery({
     queryKey: ['lettersHistory', hrTeacher?.id],
     queryFn: async () => {
-      if (!hrTeacher) return []
-      const { data, error } = await teachersService.getLetters(hrTeacher.id)
+      if (!hrTeacher || !user?.school_id) return []
+      const { data, error } = await teachersService.getLetters(user.school_id, hrTeacher.id)
       if (error) throw error
       return data
     },
@@ -989,8 +990,8 @@ export default function TeachersPage() {
   async function onSubmit(data: TForm) {
     try {
       if (editingTeacher) {
-        await supabase.from('users').update({ full_name: data.full_name, phone: data.phone || null }).eq('id', editingTeacher.user_id)
-        await supabase.from('teachers').update({ staff_id: data.staff_id || null, qualification: data.qualification || null }).eq('id', editingTeacher.id)
+        await supabase.from('users').update({ full_name: data.full_name, phone: data.phone || null }).eq('id', editingTeacher.user_id).eq('school_id', user!.school_id)
+        await supabase.from('teachers').update({ staff_id: data.staff_id || null, qualification: data.qualification || null }).eq('id', editingTeacher.id).eq('school_id', user!.school_id)
         toast.success('Teacher updated')
         qc.invalidateQueries({ queryKey: ['teachers'] })
       } else {
@@ -1041,7 +1042,7 @@ export default function TeachersPage() {
   // ── Remove / reactivate ──
   async function openRemoveModal(t: any) {
     setRemovingTeacher(t); setReplacementTeacherId('')
-    const { data } = await supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', t.id)
+    const { data } = await supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', t.id).eq('school_id', user!.school_id)
     setRemovingAssignments(data ?? [])
     setRemoveModal(true)
   }
@@ -1053,10 +1054,10 @@ export default function TeachersPage() {
     setRemoving(true)
     try {
       if (hasAssignments && replacementTeacherId) {
-        await supabase.from('teacher_assignments').update({ teacher_id: replacementTeacherId }).eq('teacher_id', removingTeacher.id)
-        await supabase.from('classes').update({ class_teacher_id: replacementTeacherId }).eq('class_teacher_id', removingTeacher.id)
+        await supabase.from('teacher_assignments').update({ teacher_id: replacementTeacherId }).eq('teacher_id', removingTeacher.id).eq('school_id', user!.school_id)
+        await supabase.from('classes').update({ class_teacher_id: replacementTeacherId }).eq('class_teacher_id', removingTeacher.id).eq('school_id', user!.school_id)
       }
-      await supabase.from('users').update({ is_active: false }).eq('id', removingTeacher.user_id)
+      await supabase.from('users').update({ is_active: false }).eq('id', removingTeacher.user_id).eq('school_id', user!.school_id)
       qc.invalidateQueries({ queryKey: ['teachers'] })
       toast.success(`${removingTeacher.user?.full_name} deactivated${hasAssignments ? ' and classes reassigned' : ''}`)
       setRemoveModal(false); setRemovingTeacher(null)
@@ -1065,7 +1066,7 @@ export default function TeachersPage() {
   }
 
   async function handleReactivate(t: any) {
-    await supabase.from('users').update({ is_active: true }).eq('id', t.user_id)
+    await supabase.from('users').update({ is_active: true }).eq('id', t.user_id).eq('school_id', user!.school_id)
     qc.invalidateQueries({ queryKey: ['teachers'] })
     toast.success(`${t.user?.full_name} reactivated`)
   }
@@ -1073,7 +1074,7 @@ export default function TeachersPage() {
   // ── Assign ──
   async function openAssign(t: any) {
     setAssigningTeacher(t)
-    const { data } = await supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', t.id).order('class(name)')
+    const { data } = await supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', t.id).eq('school_id', user!.school_id).order('class(name)')
     setAssignments(data ?? [])
     setAssignModal(true)
   }
@@ -1082,6 +1083,7 @@ export default function TeachersPage() {
     if (newClassIds.length === 0 || newSubjectIds.length === 0 || !term?.id) { toast.error('Select at least one class and subject'); return }
     const inserts: any[] = []
     newClassIds.forEach(cId => newSubjectIds.forEach(subId => inserts.push({ 
+      school_id: user!.school_id,
       teacher_id: assigningTeacher.id, 
       class_id: cId, 
       subject_id: subId, 
@@ -1095,6 +1097,7 @@ export default function TeachersPage() {
         .update({ is_class_teacher: false })
         .in('class_id', classTeacherClassIds)
         .eq('term_id', term.id)
+        .eq('school_id', user!.school_id)
     }
 
     const { error } = await supabase.from('teacher_assignments').insert(inserts)
@@ -1109,18 +1112,19 @@ export default function TeachersPage() {
       const { error: clsErr } = await supabase.from('classes')
         .update({ class_teacher_id: assigningTeacher.id })
         .in('id', classTeacherClassIds)
+        .eq('school_id', user!.school_id)
       if (clsErr) console.error('Failed to update class_teacher_id:', clsErr)
     }
 
     toast.success(`${inserts.length} assignment(s) added`)
     setNewClassIds([]); setNewSubjectIds([]); setClassTeacherClassIds([])
-    const { data } = await supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', assigningTeacher.id).order('class(name)')
+    const { data } = await supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', assigningTeacher.id).eq('school_id', user!.school_id).order('class(name)')
     setAssignments(data ?? [])
   }
 
   async function removeAssignment(id: string) {
     const toRemove = assignments.find(a => a.id === id)
-    await supabase.from('teacher_assignments').delete().eq('id', id)
+    await supabase.from('teacher_assignments').delete().eq('id', id).eq('school_id', user!.school_id)
     
     if (toRemove?.is_class_teacher) {
       // Check if any other assignments for this class still mark this teacher as CT
@@ -1143,6 +1147,7 @@ export default function TeachersPage() {
           .update({ is_class_teacher: false })
           .eq('class_id', a.class_id)
           .eq('term_id', a.term_id)
+          .eq('school_id', user!.school_id)
         
         // Setting THIS teacher's records for this class as CT
         await supabase.from('teacher_assignments')
@@ -1150,19 +1155,21 @@ export default function TeachersPage() {
           .eq('teacher_id', a.teacher_id)
           .eq('class_id', a.class_id)
           .eq('term_id', a.term_id)
+          .eq('school_id', user!.school_id)
 
-        await supabase.from('classes').update({ class_teacher_id: a.teacher_id }).eq('id', a.class_id)
+        await supabase.from('classes').update({ class_teacher_id: a.teacher_id }).eq('id', a.class_id).eq('school_id', user!.school_id)
       } else {
         await supabase.from('teacher_assignments')
           .update({ is_class_teacher: false })
           .eq('teacher_id', a.teacher_id)
           .eq('class_id', a.class_id)
           .eq('term_id', a.term_id)
+          .eq('school_id', user!.school_id)
         
-        await supabase.from('classes').update({ class_teacher_id: null }).eq('id', a.class_id).eq('class_teacher_id', a.teacher_id)
+        await supabase.from('classes').update({ class_teacher_id: null }).eq('id', a.class_id).eq('class_teacher_id', a.teacher_id).eq('school_id', user!.school_id)
       }
       
-      const { data } = await supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', assigningTeacher.id).order('class(name)')
+      const { data } = await supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', assigningTeacher.id).eq('school_id', user!.school_id).order('class(name)')
       setAssignments(data ?? [])
       toast.success(newStatus ? 'Assigned as Class Teacher' : 'Removed Class Teacher status')
     } catch (e: any) {
@@ -1174,8 +1181,8 @@ export default function TeachersPage() {
   async function openView(t: any) {
     setViewingTeacher(t); setViewModal(true)
     const [{ data: assign }, { data: goals }] = await Promise.all([
-      supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', t.id).order('class(name)'),
-      supabase.from('weekly_goals').select('*, class:classes(name), subject:subjects(name)').eq('teacher_id', t.id).order('week_number', { ascending: false }).limit(8),
+      supabase.from('teacher_assignments').select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)').eq('teacher_id', t.id).eq('school_id', user!.school_id).order('class(name)'),
+      supabase.from('weekly_goals').select('*, class:classes(name), subject:subjects(name)').eq('teacher_id', t.id).eq('school_id', user!.school_id).order('week_number', { ascending: false }).limit(8),
     ])
     setViewingTeacher((prev: any) => ({ ...prev, _assignments: assign ?? [], _goals: goals ?? [] }))
   }

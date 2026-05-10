@@ -275,7 +275,7 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
         class_id: item.id ? item.class_id : (item.class_id || selClass || null),
         academic_year_id: item.id ? item.academic_year_id : (item.academic_year_id || selYear || null),
       }
-      return billsService.upsert([payload as BillItem])
+      return billsService.upsert(schoolId, [payload as BillItem])
     },
     onSuccess: async () => { 
       await Promise.all([
@@ -294,7 +294,7 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => billsService.delete(id),
+    mutationFn: (id: string) => billsService.delete(schoolId, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bills'] })
       qc.invalidateQueries({ queryKey: ['supplies'] })
@@ -500,12 +500,12 @@ function ScholarshipsSection({ schoolId }: { schoolId: string }) {
   })
 
   const saveMutation = useMutation({
-    mutationFn: (s: Scholarship) => scholarshipsService.upsert({ ...s, school_id: schoolId }),
+    mutationFn: (s: Scholarship) => scholarshipsService.upsert(schoolId, s),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['scholarships'] }); setShowForm(false); setForm({ type: 'partial' }) }
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => scholarshipsService.delete(id),
+    mutationFn: (id: string) => scholarshipsService.delete(schoolId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['scholarships'] })
   })
 
@@ -589,14 +589,14 @@ function EnquiriesTab({ schoolId, classes, academicYears }: any) {
       // Strip Supabase join artefacts (classes, scholarships) — not real DB columns
       const { classes: _c, scholarships: _s, ...safe } = d as any
       return editing
-        ? enquiriesService.update(editing.id, safe)
+        ? enquiriesService.update(schoolId, editing.id, safe)
         : enquiriesService.create({ ...safe, school_id: schoolId })
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['enquiries'] }); setShowForm(false); setEditing(null); setForm({ status: 'enquiry' }) }
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => enquiriesService.delete(id),
+    mutationFn: (id: string) => enquiriesService.delete(schoolId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['enquiries'] })
   })
 
@@ -762,14 +762,14 @@ function AdmissionFormTab({ schoolId, classes, academicYears, school }: any) {
       // Strip Supabase join artefacts (classes, scholarships) — not real DB columns
       const { classes: _c, scholarships: _s, ...safe } = d as any
       return editing
-        ? applicationsService.update(editing.id, safe)
+        ? applicationsService.update(schoolId, editing.id, safe)
         : applicationsService.create({ ...safe, school_id: schoolId })
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['applications'] }); setShowForm(false); setEditing(null); setForm({ status: 'pending' }) }
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => applicationsService.delete(id),
+    mutationFn: (id: string) => applicationsService.delete(schoolId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['applications'] })
   })
 
@@ -979,7 +979,7 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
         class_id: item.id ? item.class_id : (item.class_id || selClass || null),
         academic_year_id: item.id ? item.academic_year_id : (item.academic_year_id || selYear || null),
       }
-      return suppliesService.upsert([payload as SchoolSupply])
+      return suppliesService.upsert(schoolId, [payload as SchoolSupply])
     },
     onSuccess: async () => {
       await Promise.all([
@@ -998,7 +998,7 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => suppliesService.delete(id),
+    mutationFn: (id: string) => suppliesService.delete(schoolId, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['supplies'] })
       qc.invalidateQueries({ queryKey: ['bills'] })

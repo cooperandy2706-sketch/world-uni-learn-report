@@ -65,6 +65,7 @@ export default function ParentsPage() {
       const { data, error } = await supabase
         .from('students')
         .select('*, class:classes(name)')
+        .eq('school_id', user!.school_id)
         .eq('is_active', true)
         .order('full_name')
       if (error) throw error
@@ -74,14 +75,16 @@ export default function ParentsPage() {
 
   // 2. Fetch Parent Wards for existing links
   const { data: links = [] } = useQuery({
-    queryKey: ['parent_ward_links'],
+    queryKey: ['parent_ward_links', user?.school_id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('parent_wards')
         .select('*, parent:users!parent_wards_parent_user_id_fkey(full_name, email)')
+        .eq('school_id', user!.school_id)
       if (error) throw error
       return data
-    }
+    },
+    enabled: !!user?.school_id,
   })
 
   const filteredStudents = useMemo(() => {

@@ -106,7 +106,7 @@ export default function StudentElectionsPage() {
   const cancelVote = async (voteId: string) => {
     if (!confirm('Are you sure you want to cancel your vote for this position?')) return
     try {
-      const { error } = await supabase.from('election_votes').delete().eq('id', voteId)
+      const { error } = await supabase.from('election_votes').delete().eq('id', voteId).eq('school_id', user!.school_id)
       if (error) throw error
       toast.success('Vote cancelled successfully!')
       loadData()

@@ -30,19 +30,21 @@ export const vendorService = {
       .single()
   },
 
-  async update(id: string, vendor: Partial<Vendor>) {
+  async update(schoolId: string, id: string, vendor: Partial<Vendor>) {
     return supabase
       .from('vendors')
       .update(vendor)
       .eq('id', id)
+      .eq('school_id', schoolId)
       .select()
       .single()
   },
 
-  async delete(id: string) {
+  async delete(schoolId: string, id: string) {
     return supabase
       .from('vendors')
       .delete()
       .eq('id', id)
+      .eq('school_id', schoolId)
   }
 }

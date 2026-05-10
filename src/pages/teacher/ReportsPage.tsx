@@ -177,7 +177,7 @@ export default function TeacherReportsPage() {
         class_teacher_remarks: teacherRemark,
         headteacher_remarks: htRemark,
         updated_at: new Date().toISOString(),
-      }).eq('id', reportCard.id)
+      }).eq('id', reportCard.id).eq('school_id', user!.school_id)
       if (error) throw error
       setRemarksDirty(false)
       toast.success('Remarks saved ✓')
@@ -200,7 +200,7 @@ export default function TeacherReportsPage() {
         class_teacher_remarks: teacherRemark,
         headteacher_remarks: htRemark,
         updated_at: new Date().toISOString(),
-      }).eq('id', reportCard.id)
+      }).eq('id', reportCard.id).eq('school_id', user!.school_id)
 
       await supabase.from('messages').insert({
         school_id: user!.school_id,

@@ -15,11 +15,11 @@ export const feeStructuresService = {
   async create(data: any) {
     return supabase.from('fee_structures').insert(data).select().single()
   },
-  async update(id: string, data: any) {
-    return supabase.from('fee_structures').update(data).eq('id', id).select().single()
+  async update(schoolId: string, id: string, data: any) {
+    return supabase.from('fee_structures').update(data).eq('id', id).eq('school_id', schoolId).select().single()
   },
-  async delete(id: string) {
-    return supabase.from('fee_structures').delete().eq('id', id)
+  async delete(schoolId: string, id: string) {
+    return supabase.from('fee_structures').delete().eq('id', id).eq('school_id', schoolId)
   },
 }
 
@@ -114,12 +114,13 @@ export const feePaymentsService = {
     return supabase.from('fee_payments').insert(data).select().single()
   },
 
-  async delete(id: string) {
+  async delete(schoolId: string, id: string) {
     // When deleting a payment, we need to restore the balance
     const { data: payment } = await supabase
       .from('fee_payments')
       .select('student_id, term_id, amount_paid, arrears_paid, school_id')
       .eq('id', id)
+      .eq('school_id', schoolId)
       .single()
 
     if (payment) {
@@ -151,7 +152,7 @@ export const feePaymentsService = {
       }
     }
 
-    return supabase.from('fee_payments').delete().eq('id', id)
+    return supabase.from('fee_payments').delete().eq('id', id).eq('school_id', schoolId)
   },
 
   // Returns aggregated paid amounts per student per term
@@ -205,8 +206,8 @@ export const payrollService = {
       .select('*, user:users(id, full_name, email, role, phone)')
       .single()
   },
-  async delete(id: string) {
-    return supabase.from('staff_payroll').delete().eq('id', id)
+  async delete(schoolId: string, id: string) {
+    return supabase.from('staff_payroll').delete().eq('id', id).eq('school_id', schoolId)
   },
 
   // ── Adjustments ──────────────────────────────────────────────────
@@ -255,8 +256,8 @@ export const payrollService = {
       .select()
       .single()
   },
-  async deleteAdjustment(id: string) {
-    return supabase.from('payroll_adjustments').delete().eq('id', id)
+  async deleteAdjustment(schoolId: string, id: string) {
+    return supabase.from('payroll_adjustments').delete().eq('id', id).eq('school_id', schoolId)
   },
 
   // ── Weekly / Daily Config ─────────────────────────────────────────
@@ -303,8 +304,8 @@ export const incomeService = {
   async create(data: any) {
     return supabase.from('income_records').insert(data).select().single()
   },
-  async delete(id: string) {
-    return supabase.from('income_records').delete().eq('id', id)
+  async delete(schoolId: string, id: string) {
+    return supabase.from('income_records').delete().eq('id', id).eq('school_id', schoolId)
   },
 }
 
@@ -324,8 +325,8 @@ export const expenseService = {
   async create(data: any) {
     return supabase.from('expense_records').insert(data).select().single()
   },
-  async delete(id: string) {
-    return supabase.from('expense_records').delete().eq('id', id)
+  async delete(schoolId: string, id: string) {
+    return supabase.from('expense_records').delete().eq('id', id).eq('school_id', schoolId)
   },
 }
 
@@ -346,8 +347,8 @@ export const dailyFeesService = {
   async addCollector(data: any) {
     return supabase.from('daily_fee_collectors').insert(data).select().single()
   },
-  async removeCollector(id: string) {
-    return supabase.from('daily_fee_collectors').delete().eq('id', id)
+  async removeCollector(schoolId: string, id: string) {
+    return supabase.from('daily_fee_collectors').delete().eq('id', id).eq('school_id', schoolId)
   },
   async isTeacherCollector(userId: string) {
     const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', userId).maybeSingle()
@@ -365,8 +366,8 @@ export const dailyFeesService = {
   async recordCollection(data: any) {
     return supabase.from('daily_fees_collected').insert(data).select().single()
   },
-  async deleteCollection(id: string) {
-    return supabase.from('daily_fees_collected').delete().eq('id', id)
+  async deleteCollection(schoolId: string, id: string) {
+    return supabase.from('daily_fees_collected').delete().eq('id', id).eq('school_id', schoolId)
   }
 }
 
@@ -389,8 +390,8 @@ export const scholarshipService = {
       .neq('scholarship_type', 'none')
       .order('full_name')
   },
-  async updateStudentArrears(studentId: string, amount: number) {
-    return supabase.from('students').update({ fees_arrears: amount }).eq('id', studentId).select().single()
+  async updateStudentArrears(schoolId: string, studentId: string, amount: number) {
+    return supabase.from('students').update({ fees_arrears: amount }).eq('id', studentId).eq('school_id', schoolId).select().single()
   },
   async rolloverTermArrears(schoolId: string, termId: string) {
     const { data: students } = await supabase.from('students').select('id').eq('school_id', schoolId).eq('is_active', true)
@@ -399,7 +400,7 @@ export const scholarshipService = {
       const bill = await billSheetService.getStudentBillData(s.id, termId, schoolId)
       return { id: s.id, fees_arrears: bill.summary.balance }
     }))
-    await Promise.all(updates.map(u => supabase.from('students').update({ fees_arrears: u.fees_arrears }).eq('id', u.id)))
+    await Promise.all(updates.map(u => supabase.from('students').update({ fees_arrears: u.fees_arrears }).eq('id', u.id).eq('school_id', schoolId)))
     return updates
   }
 }

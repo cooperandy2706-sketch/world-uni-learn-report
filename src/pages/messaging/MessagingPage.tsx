@@ -52,13 +52,14 @@ function convDisplayName(conv: Conversation) {
 }
 
 // ─── Group provisioning ───────────────────────────────────────────────────────
-async function upsertGroup(key: string, name: string | null, memberIds: string[], type: 'group' | 'direct' = 'group'): Promise<string | null> {
+async function upsertGroup(key: string, name: string | null, memberIds: string[], type: 'group' | 'direct' = 'group', schoolId?: string | null): Promise<string | null> {
   const { data: ex } = await supabase.from('chat_conversations').select('id').eq('group_key', key).maybeSingle()
   let convId = ex?.id ?? null
   if (!convId) {
     const newId = crypto.randomUUID()
-    const { error } = await supabase.from('chat_conversations')
-      .insert({ id: newId, name, type, group_key: key })
+    const payload: Record<string, unknown> = { id: newId, name, type, group_key: key }
+    if (schoolId) payload.school_id = schoolId
+    const { error } = await supabase.from('chat_conversations').insert(payload)
     
     if (error) {
       // Possible race condition
@@ -131,19 +132,21 @@ export default function MessagingPage() {
 
   async function provisionGroups() {
     if (!user) return
+    const sid = user.school_id
     if (isSuperAdmin) {
       const [{ data: admins }, { data: teachers }, { data: schools }] = await Promise.all([
         supabase.from('users').select('id').eq('role', 'admin'),
         supabase.from('users').select('id').eq('role', 'teacher'),
         supabase.from('schools').select('id, name'),
       ])
+      // Global groups span all schools — no school_id intentionally
       await upsertGroup('global_admins', '📢 Global Admins',
         [user.id, ...(admins?.map(a => a.id) ?? [])])
       await upsertGroup('global_teachers', '🌍 All Teachers',
         [user.id, ...(teachers?.map(t => t.id) ?? [])])
       for (const school of schools ?? []) {
         const { data: st } = await supabase.from('users').select('id').eq('role', 'teacher').eq('school_id', school.id)
-        if (st?.length) await upsertGroup(`school_${school.id}_teachers`, `🏫 ${school.name} Teachers`, [...new Set([user.id, ...st.map(t => t.id)])])
+        if (st?.length) await upsertGroup(`school_${school.id}_teachers`, `🏫 ${school.name} Teachers`, [...new Set([user.id, ...st.map(t => t.id)])], 'group', school.id)
       }
       // Auto-provision 1-on-1 DM threads immediately for everyone
       const allUsers = [...(admins ?? []), ...(teachers ?? [])]
@@ -164,7 +167,7 @@ export default function MessagingPage() {
       const allUsers = [...(sa ?? []), ...(al ?? [])]
       const promises = allUsers.map(u => {
         const sorted = [user.id, u.id].sort().join('_')
-        return upsertGroup(`dm_${sorted}`, null, [user.id, u.id], 'direct')
+        return upsertGroup(`dm_${sorted}`, null, [user.id, u.id], 'direct', sid)
       })
       await Promise.all(promises)
     } else if (isTeacher) {
@@ -178,7 +181,7 @@ export default function MessagingPage() {
         const { data: st } = await supabase.from('users').select('id').eq('role', 'teacher').eq('school_id', user.school_id)
         const schoolName = (user as any).school?.name ?? 'My School'
         await upsertGroup(`school_${user.school_id}_teachers`, `🏫 ${schoolName} Teachers`,
-          [...new Set([user.id, ...(st?.map(t => t.id) ?? [])])])
+          [...new Set([user.id, ...(st?.map(t => t.id) ?? [])])], 'group', user.school_id)
       }
       
       // Teacher DM auto-provisioning
@@ -186,7 +189,7 @@ export default function MessagingPage() {
       const promises = allUsers.map(u => {
         if (u.id === user.id) return Promise.resolve(null)
         const sorted = [user.id, u.id].sort().join('_')
-        return upsertGroup(`dm_${sorted}`, null, [user.id, u.id], 'direct')
+        return upsertGroup(`dm_${sorted}`, null, [user.id, u.id], 'direct', sid)
       })
       await Promise.all(promises)
     }
@@ -326,7 +329,7 @@ export default function MessagingPage() {
       }
     }
     const newId = crypto.randomUUID()
-    const { error } = await supabase.from('chat_conversations').insert({ id: newId, type: 'direct' })
+    const { error } = await supabase.from('chat_conversations').insert({ id: newId, type: 'direct', school_id: user!.school_id })
     if (!error) {
       await supabase.from('chat_members').insert([
         { conversation_id: newId, user_id: user.id },

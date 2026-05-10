@@ -34,12 +34,12 @@ export default function OtherStaffPage() {
   const [selectedUser, setSelectedUser] = useState<any>(null)
   const [saving, setSaving] = useState(false)
   const [newPw, setNewPw] = useState('')
-  const [form, setForm] = useState({ full_name: '', email: '', phone: '', designation: '', password: '' })
+  const [form, setForm] = useState({ full_name: '', email: '', phone: '', designation: '', password: '', role: 'staff' })
 
   const { data: staffList = [], isLoading } = useQuery({
     queryKey: ['other-staff', schoolId],
     queryFn: async () => {
-      const { data } = await supabase.from('users').select('*').eq('school_id', schoolId).eq('role', 'staff').order('full_name')
+      const { data } = await supabase.from('users').select('*').eq('school_id', schoolId).in('role', ['staff', 'nurse', 'librarian', 'proprietor']).order('full_name')
       return data ?? []
     },
     enabled: !!schoolId,
@@ -57,7 +57,7 @@ export default function OtherStaffPage() {
             email: form.email,
             password: pw,
             full_name: form.full_name,
-            role: 'staff',
+            role: form.role,
             phone: form.phone || null,
             target_school_id: schoolId,
             designation: form.designation // Passed to edge function to store in users table
@@ -68,10 +68,10 @@ export default function OtherStaffPage() {
       if (error) throw error
       if (data?.error) throw new Error(String(data.error))
 
-      toast.success(`Staff created · ${form.email} · Password: ${pw}`, { duration: 8000 })
+      toast.success(`Staff created! Login: ${form.email}`, { duration: 6000 })
       qc.invalidateQueries({ queryKey: ['other-staff'] })
       setCreateModal(false)
-      setForm({ full_name: '', email: '', phone: '', designation: '', password: '' })
+      setForm({ full_name: '', email: '', phone: '', designation: '', password: '', role: 'staff' })
     } catch (e: unknown) {
       toast.error(e instanceof Error ? (e.message ?? 'Failed to create staff') : 'Failed to create staff')
     } finally {
@@ -117,8 +117,8 @@ export default function OtherStaffPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_osp_fi .4s ease' }}>
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#1e293b', margin: 0 }}>Other Staff</h1>
-            <p style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>Manage non-teaching staff (Cooks, Cleaners, Drivers, etc.)</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#1e293b', margin: 0 }}>Other Staff & Executives</h1>
+            <p style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>Manage non-teaching staff and school proprietors.</p>
           </div>
           <Btn onClick={() => setCreateModal(true)}><Plus size={14} /> Add Staff Member</Btn>
         </div>
@@ -137,7 +137,7 @@ export default function OtherStaffPage() {
         ) : (staffList as any[]).length === 0 ? (
           <div style={{ background: '#fff', borderRadius: 18, padding: '60px', textAlign: 'center', border: '1.5px solid #f1f5f9' }}>
             <Users size={48} color="#cbd5e1" style={{ marginBottom: 16 }} />
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#1e293b', marginBottom: 8 }}>No Other Staff Yes</h3>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#1e293b', marginBottom: 8 }}>No Staff Added Yet</h3>
             <p style={{ fontSize: 13, color: '#64748b', marginBottom: 20 }}>Add your non-teaching staff here to manage their payments and records.</p>
             <Btn onClick={() => setCreateModal(true)}><Plus size={14} /> Add First Staff Member</Btn>
           </div>
@@ -179,6 +179,15 @@ export default function OtherStaffPage() {
       <Modal open={createModal} onClose={() => setCreateModal(false)} title="Add Staff Member" subtitle="Create a record for non-teaching staff" size="sm"
         footer={<><Btn variant="secondary" onClick={() => setCreateModal(false)}>Cancel</Btn><Btn onClick={handleCreate} loading={saving}>Create Account</Btn></>}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#64748b', marginBottom: 5 }}>System Role *</label>
+            <select value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e2e8f0', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif', background: '#fff' }}>
+              <option value="staff">General Staff (Cooks, Cleaners, etc.)</option>
+              <option value="nurse">School Nurse (Clinic Access)</option>
+              <option value="librarian">Librarian (Library Access)</option>
+              <option value="proprietor">Proprietor (Executive Access)</option>
+            </select>
+          </div>
           {[
             { label: 'Full Name *', key: 'full_name', placeholder: 'e.g. John Doe', type: 'text' },
             { label: 'Designtation / Job Title *', key: 'designation', placeholder: 'e.g. Bus Driver, Cook, Cleaner', type: 'text' },

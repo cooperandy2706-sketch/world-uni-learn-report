@@ -5,26 +5,28 @@ import { useAuth } from './useAuth'
 import toast from 'react-hot-toast'
 
 export function useReportsByClassTerm(classId: string, termId: string) {
+  const { user } = useAuth()
   return useQuery({
     queryKey: ['reports', classId, termId],
     queryFn: async () => {
-      const { data, error } = await reportsService.getByClassAndTerm(classId, termId)
+      const { data, error } = await reportsService.getByClassAndTerm(user?.school_id ?? '', classId, termId)
       if (error) throw error
       return data ?? []
     },
-    enabled: !!classId && !!termId,
+    enabled: !!classId && !!termId && !!user?.school_id,
   })
 }
 
 export function useStudentReport(studentId: string, termId: string) {
+  const { user } = useAuth()
   return useQuery({
     queryKey: ['report', studentId, termId],
     queryFn: async () => {
-      const { data, error } = await reportsService.getStudentReport(studentId, termId)
+      const { data, error } = await reportsService.getStudentReport(user?.school_id ?? '', studentId, termId)
       if (error) throw error
       return data
     },
-    enabled: !!studentId && !!termId,
+    enabled: !!studentId && !!termId && !!user?.school_id,
   })
 }
 
@@ -51,10 +53,11 @@ export function useGenerateReports() {
 
 export function useUpdateReportRemarks() {
   const qc = useQueryClient()
+  const { user } = useAuth()
 
   return useMutation({
     mutationFn: ({ reportId, remarks }: { reportId: string; remarks: any }) =>
-      reportsService.updateRemarks(reportId, remarks),
+      reportsService.updateRemarks(user?.school_id ?? '', reportId, remarks),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['reports'] })
       toast.success('Remarks updated')
@@ -68,7 +71,7 @@ export function useApproveReport() {
   const { user } = useAuth()
 
   return useMutation({
-    mutationFn: (reportId: string) => reportsService.approve(reportId, user!.id),
+    mutationFn: (reportId: string) => reportsService.approve(user?.school_id ?? '', reportId, user!.id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['reports'] })
       toast.success('Report approved')

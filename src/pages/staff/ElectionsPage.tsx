@@ -1,8 +1,8 @@
 // src/pages/staff/ElectionsPage.tsx
 import { useState, useEffect } from 'react'
+import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
-import toast from 'react-hot-toast'
 import { Election, ElectionPosition, ElectionCandidate } from '../../types/database.types'
 
 export default function StaffElectionsPage() {

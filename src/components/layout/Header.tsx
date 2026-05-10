@@ -46,6 +46,7 @@ const ADMIN_NAV = [
       { label: 'Calendar', to: ROUTES.ADMIN_CALENDAR },
       { label: 'Messages', to: ROUTES.ADMIN_MESSAGES },
       { label: 'Staff Operations', to: '/admin/staff-operations' },
+      { label: 'Other Staff', to: '/admin/other-staff' },
       { label: 'Asset Register', to: '/admin/assets' },
       { label: 'Billing', to: '/admin/billing' },
       { label: 'Bursar Staff', to: '/admin/bursars' },
@@ -75,6 +76,7 @@ const TEACHER_NAV = [
       { label: 'Score Entry', to: ROUTES.TEACHER_SCORE_ENTRY },
       { label: 'Attendance', to: ROUTES.TEACHER_ATTENDANCE },
       { label: 'Class Tests', to: '/teacher/class-tests' },
+      { label: 'Video Assignments', to: '/teacher/video-assignments' },
       { label: 'Reports', to: ROUTES.TEACHER_REPORTS },
       { label: 'Timetable', to: ROUTES.TEACHER_TIMETABLE },
       { label: 'Assignments', to: ROUTES.TEACHER_ASSIGNMENTS },
@@ -110,6 +112,7 @@ const STUDENT_NAV = [
   },
   {
     label: 'Explore', items: [
+      { label: 'WULA TV', to: '/student/wula-tv' },
       { label: 'Global Library', to: ROUTES.STUDENT_LIBRARY },
       { label: 'Resources', to: ROUTES.STUDENT_RESOURCES },
       { label: 'Typing Nitro', to: ROUTES.STUDENT_TYPING_GAME },
@@ -160,6 +163,16 @@ const SUPER_ADMIN_NAV = [
   { label: 'Resources', to: ROUTES.SUPER_ADMIN_RESOURCES, single: true },
 ]
 
+const PROPRIETOR_NAV = [
+  { label: 'Executive Dashboard', to: '/proprietor/dashboard', single: true },
+  { label: 'Academic Performance', to: '/proprietor/analytics', single: true },
+  { label: 'Financial Health', to: '/proprietor/finances', single: true },
+  { label: 'Demographics', items: [
+    { label: 'Student Demographics', to: '/proprietor/students' },
+    { label: 'Staff & Payroll', to: '/proprietor/staff' },
+  ]},
+]
+
 const PARENT_NAV = [
   { label: 'Wards', to: '/parent/dashboard', single: true },
   { label: 'Academics', to: '/parent/academics', single: true },
@@ -180,6 +193,7 @@ const SECURITY_NAV = [
       { label: '🔍 Gate Scanner', to: '/security/scanner' },
       { label: '📋 Attendance Log', to: '/security/gate-attendance' },
       { label: '🚪 Visitor Logs', to: '/security/visitors' },
+      { label: '🪪 Visitor Badges', to: '/security/visitor-badges' },
       { label: '⚠️ Incident Reports', to: '/security/incidents' },
     ]
   },
@@ -189,6 +203,27 @@ const DRIVER_NAV = [
   { label: '🚌 Dashboard', to: '/driver/dashboard', single: true },
   { label: '📋 Trip Logs', to: '/driver/logs', single: true },
   { label: '🗺️ Assigned Routes', to: '/driver/routes', single: true },
+]
+
+const NURSE_NAV = [
+  { label: 'Dashboard', to: '/nurse/dashboard', single: true },
+  {
+    label: 'Clinic', items: [
+      { label: '📋 Visits Log', to: '/nurse/visits' },
+      { label: '💊 Medication Tracker', to: '/nurse/medication' },
+    ]
+  },
+]
+
+const LIBRARIAN_NAV = [
+  { label: 'Dashboard', to: '/librarian/dashboard', single: true },
+  {
+    label: 'Management', items: [
+      { label: '⚠️ Overdue & Fines', to: '/librarian/fines' },
+      { label: '📜 Checkout History', to: '/librarian/history' },
+      { label: '📦 QR Inventory', to: '/librarian/inventory' },
+    ]
+  },
 ]
 
 // ─── NavItem component ─────────────────────────────────────────────────────────
@@ -276,7 +311,7 @@ function NavItem({ group }: { group: any }) {
 
 // ─── Main Header ───────────────────────────────────────────────────────────────
 export default function Header() {
-  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher, isSecurity, isDriver } = useAuth()
+  const { user, signOut, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher, isSecurity, isDriver, isNurse, isLibrarian, isProprietor } = useAuth()
   const isStaff = user?.role === 'staff'
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
@@ -308,11 +343,14 @@ export default function Header() {
   }
 
   const navGroups = isSuperAdmin ? SUPER_ADMIN_NAV
+    : isProprietor ? PROPRIETOR_NAV
     : isAdmin ? ADMIN_NAV
     : isTeacher ? TEACHER_NAV
     : isBursar ? BURSAR_NAV
     : isSecurity ? SECURITY_NAV
     : isDriver ? DRIVER_NAV
+    : isNurse ? NURSE_NAV
+    : isLibrarian ? LIBRARIAN_NAV
     : isStaff ? STAFF_NAV
     : user?.role === 'parent' ? PARENT_NAV
     : STUDENT_NAV
@@ -565,7 +603,7 @@ export default function Header() {
     return () => clearTimeout(timer)
   }, [searchQuery, isAdmin, isBursar, isTeacher, isStudent])
 
-  const rolePath = isSuperAdmin ? 'super-admin' : isStudent ? 'student' : isAdmin ? 'admin' : isBursar ? 'bursar' : isDriver ? 'driver' : 'teacher'
+  const rolePath = isSuperAdmin ? 'super-admin' : isProprietor ? 'proprietor' : isStudent ? 'student' : isAdmin ? 'admin' : isBursar ? 'bursar' : isDriver ? 'driver' : 'teacher'
 
   return (
     <>

@@ -19,4 +19,21 @@ export const authService = {
   async updatePassword(newPassword: string) {
     return supabase.auth.updateUser({ password: newPassword })
   },
+
+  async getPendingUsers(schoolId: string) {
+    return supabase
+      .from('users')
+      .select('*')
+      .eq('school_id', schoolId)
+      .eq('is_active', false)
+      .order('created_at', { ascending: false })
+  },
+
+  async approveUser(userId: string) {
+    return supabase.from('users').update({ is_active: true }).eq('id', userId)
+  },
+
+  async rejectUser(userId: string) {
+    return supabase.from('users').delete().eq('id', userId).eq('is_active', false)
+  },
 }

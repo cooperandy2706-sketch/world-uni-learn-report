@@ -12,19 +12,21 @@ export const studentsService = {
       .order('full_name')
   },
 
-  async getByClass(classId: string) {
+  async getByClass(schoolId: string, classId: string) {
     return supabase
       .from('students')
       .select('*, class:classes(id, name)')
+      .eq('school_id', schoolId)
       .eq('class_id', classId)
       .eq('is_active', true)
       .order('full_name')
   },
 
-  async getById(id: string) {
+  async getById(schoolId: string, id: string) {
     return supabase
       .from('students')
       .select('*, class:classes(id, name)')
+      .eq('school_id', schoolId)
       .eq('id', id)
       .single()
   },
@@ -33,12 +35,12 @@ export const studentsService = {
     return supabase.from('students').insert(student).select().single()
   },
 
-  async update(id: string, updates: Partial<Student>) {
-    return supabase.from('students').update(updates).eq('id', id).select().single()
+  async update(schoolId: string, id: string, updates: Partial<Student>) {
+    return supabase.from('students').update(updates).eq('school_id', schoolId).eq('id', id).select().single()
   },
 
-  async delete(id: string) {
-    return supabase.from('students').update({ is_active: false }).eq('id', id)
+  async delete(schoolId: string, id: string) {
+    return supabase.from('students').update({ is_active: false }).eq('school_id', schoolId).eq('id', id)
   },
 
   async bulkCreate(students: Omit<Student, 'id' | 'created_at'>[]) {

@@ -24,8 +24,8 @@ const schema = z.object({
   school_fees_info: z.string().optional(),
   school_news: z.string().optional(),
   paystack_public_key: z.string().optional().or(z.literal('')),
-  report_theme: z.enum(['modern', 'classic', 'professional']).default('modern'),
-  primary_color: z.string().default('#1e3a8a'),
+  report_theme: z.enum(['modern', 'classic', 'professional']),
+  primary_color: z.string(),
 })
 type FormData = z.infer<typeof schema>
 
@@ -190,7 +190,7 @@ export default function SettingsPage() {
       toast.success('Settings saved successfully')
     } catch (err: any) {
       console.error('Settings save error:', err)
-      toast.error(err?.message ?? 'Failed to save settings')
+      toast.error(err?.message || 'Failed to save settings')
     }
   }
 

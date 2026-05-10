@@ -10,7 +10,8 @@ import {
   LayoutDashboard, Users, FileSpreadsheet, ClipboardCheck, 
   Megaphone, PencilLine, Calendar, Timer, BookOpen, 
   ShieldCheck, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School,
-  CreditCard, Wallet, Gamepad2, Library, Bell, Tv, ScanLine, AlertTriangle, MapPin
+  CreditCard, Wallet, Gamepad2, Library, Bell, Tv, ScanLine, AlertTriangle, MapPin,
+  Printer, Package
 } from 'lucide-react'
 import NotificationsModal from '../ui/NotificationsModal'
 
@@ -34,6 +35,7 @@ const teacherLinks = [
   { to: '/teacher/daily-fees', icon: CreditCard, label: 'Fees' },
   { to: '/teacher/messages', icon: MessageSquare, label: 'Messages', notify: true },
   { to: '/teacher/assignments', icon: ClipboardList, label: 'Tasks' },
+  { to: '/teacher/video-assignments', icon: Tv, label: 'Videos' },
   { to: '/teacher/behavior', icon: ShieldCheck, label: 'Behavior' },
   { to: '/teacher/syllabus', icon: BookOpen, label: 'Syllabus' },
   { to: '/teacher/timetable', icon: Calendar, label: 'Schedule' },
@@ -54,6 +56,7 @@ const superAdminLinks = [
 const studentLinks = [
   { to: '/student/dashboard', icon: Home, label: 'Portal' },
   { to: '/student/assignments', icon: ClipboardList, label: 'Tasks' },
+  { to: '/student/wula-tv', icon: Tv, label: 'WULA TV' },
   { to: '/student/library', icon: Library, label: 'Library' },
   { to: '/student/results', icon: BarChart3, label: 'Results' },
   { to: '/student/schedule', icon: Calendar, label: 'Schedule' },
@@ -91,6 +94,7 @@ const securityLinks = [
   { to: '/security/scanner', icon: ScanLine, label: 'Scanner' },
   { to: '/security/gate-attendance', icon: ClipboardCheck, label: 'Log' },
   { to: '/security/visitors', icon: Users, label: 'Visitors' },
+  { to: '/security/visitor-badges', icon: Printer, label: 'Badges' },
   { to: '/security/incidents', icon: AlertTriangle, label: 'Incidents' },
 ]
 
@@ -100,8 +104,37 @@ const driverLinks = [
   { to: '/driver/logs', icon: ClipboardList, label: 'Logs' },
 ]
 
+const nurseLinks = [
+  { to: '/nurse/dashboard', icon: LayoutDashboard, label: 'Home' },
+  { to: '/nurse/visits', icon: ClipboardList, label: 'Visits' },
+  { to: '/nurse/medication', icon: BookOpen, label: 'Meds' },
+  { to: '/nurse/news', icon: Tv, label: 'News' },
+]
+
+const librarianLinks = [
+  { to: '/librarian/dashboard', icon: LayoutDashboard, label: 'Home' },
+  { to: '/librarian/fines', icon: AlertTriangle, label: 'Fines' },
+  { to: '/librarian/history', icon: Book, label: 'History' },
+  { to: '/librarian/inventory', icon: Package, label: 'Inventory' },
+  { to: '/librarian/news', icon: Tv, label: 'News' },
+]
+
+const proprietorLinks = [
+  { to: '/proprietor/dashboard', icon: LayoutDashboard, label: 'Home' },
+  { to: '/proprietor/analytics', icon: BarChart3, label: 'Stats' },
+  { to: '/proprietor/finances', icon: Wallet, label: 'Finances' },
+  { to: '/proprietor/students', icon: Users, label: 'Students' },
+  { to: '/proprietor/staff', icon: UserCheck, label: 'Staff' },
+]
+
+const staffLinks = [
+  { to: '/staff/dashboard', icon: LayoutDashboard, label: 'Home' },
+  { to: '/staff/elections', icon: ClipboardList, label: 'Elections' },
+  { to: '/staff/news', icon: Tv, label: 'News' },
+]
+
 export default function BottomNav() {
-  const { user, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher, isSecurity, isDriver } = useAuth()
+  const { user, isAdmin, isSuperAdmin, isStudent, isBursar, isTeacher, isSecurity, isDriver, isNurse, isLibrarian, isProprietor, isStaff } = useAuth()
   const location = useLocation()
   const [unread, setUnread] = useState(0)
   const [visible, setVisible] = useState(false)
@@ -119,7 +152,7 @@ export default function BottomNav() {
   })
 
   const isParent = user?.role === 'parent'
-  let links = isSuperAdmin ? superAdminLinks : isSecurity ? securityLinks : isParent ? parentLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : isDriver ? driverLinks : teacherLinks
+  let links = isSuperAdmin ? superAdminLinks : isSecurity ? securityLinks : isParent ? parentLinks : isStudent ? studentLinks : isAdmin ? adminLinks : isBursar ? bursarLinks : isDriver ? driverLinks : isNurse ? nurseLinks : isLibrarian ? librarianLinks : isProprietor ? proprietorLinks : isStaff ? staffLinks : teacherLinks
 
   // Hide daily collections from unauthorized teachers
   if (isTeacher && !loadingAuth && !collectorAuth) {

@@ -111,11 +111,11 @@ export default function PayrollPage() {
   })
 
   const delRow = useMutation({
-    mutationFn: (id: string) => payrollService.delete(id),
+    mutationFn: (id: string) => payrollService.delete(schoolId, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['payroll'] }); toast.success('Removed') }
   })
   const delAdj = useMutation({
-    mutationFn: (id: string) => payrollService.deleteAdjustment(id),
+    mutationFn: (id: string) => payrollService.deleteAdjustment(schoolId, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey:['payroll-adj-all'] }); qc.invalidateQueries({ queryKey:['payroll'] }); toast.success('Removed') }
   })
 
