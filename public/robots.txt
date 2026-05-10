@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Prevent indexing of internal authenticated routes (optional, as they are protected anyway)
+Disallow: /admin/
+Disallow: /teacher/
+Disallow: /student/
+Disallow: /parent/
+Disallow: /driver/
+Disallow: /bursar/
+Disallow: /security/
+
+Sitemap: https://world-uni-learn.com/sitemap.xml
