@@ -67,7 +67,7 @@ export default function InventoryPage() {
   const saveSupplyMutation = useMutation({
     mutationFn: (item: any) => {
       const { classes: _c, ...safeItem } = item
-      return suppliesService.upsert([safeItem])
+      return suppliesService.upsert(schoolId, [safeItem])
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['all-school-supplies'] })
@@ -84,7 +84,7 @@ export default function InventoryPage() {
     }
   })
   const saveItem = useMutation({
-    mutationFn: (d: any) => itemModal.id ? inventoryService.updateItem(itemModal.id, d) : inventoryService.createItem(d),
+    mutationFn: (d: any) => itemModal.id ? inventoryService.updateItem(schoolId, itemModal.id, d) : inventoryService.createItem(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['inv-items'] }); setItemModal(null); toast.success('Item saved') },
     onError: (e: any) => toast.error(e.message)
   })
@@ -94,7 +94,7 @@ export default function InventoryPage() {
     onError: (e: any) => toast.error(e.message)
   })
   const recordStockChange = useMutation({
-    mutationFn: (d: any) => inventoryService.recordStockChange(d),
+    mutationFn: (d: any) => inventoryService.recordStockChange(schoolId, d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['inv-items'] }); qc.invalidateQueries({ queryKey: ['inv-logs'] }); setRestockModal(null); toast.success('Stock updated') },
     onError: (e: any) => toast.error(e.message)
   })
@@ -222,7 +222,7 @@ export default function InventoryPage() {
                       <div style={{ background: '#f5f3ff', color: '#6d28d9', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8, textTransform: 'uppercase' }}>{item.category}</div>
                       <div style={{ display: 'flex', gap: 6 }}>
                         <button onClick={() => setItemModal(item)} style={{ padding: 6, borderRadius: 8, border: 'none', background: '#f9fafb', color: '#6b7280', cursor: 'pointer' }}><Edit size={14}/></button>
-                        <button onClick={() => { if(confirm('Delete this item?')) inventoryService.deleteItem(item.id).then(() => qc.invalidateQueries({queryKey:['inv-items']})) }} style={{ padding: 6, borderRadius: 8, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer' }}><Trash2 size={14}/></button>
+                        <button onClick={() => { if(confirm('Delete this item?')) inventoryService.deleteItem(schoolId, item.id).then(() => qc.invalidateQueries({queryKey:['inv-items']})) }} style={{ padding: 6, borderRadius: 8, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer' }}><Trash2 size={14}/></button>
                       </div>
                     </div>
                     <h3 style={{ fontSize: 17, fontWeight: 800, color: '#111827', margin: '0 0 4px' }}>{item.name}</h3>

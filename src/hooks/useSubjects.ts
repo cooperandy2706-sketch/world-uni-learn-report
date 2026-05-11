@@ -37,9 +37,11 @@ export function useCreateSubject() {
 
 export function useUpdateSubject() {
   const qc = useQueryClient()
+  const { user } = useAuth()
+  const schoolId = user?.school_id ?? ''
 
   return useMutation({
-    mutationFn: ({ id, ...data }: any) => subjectsService.update(id, data),
+    mutationFn: ({ id, ...data }: any) => subjectsService.update(schoolId, id, data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['subjects'] })
       toast.success('Subject updated')
@@ -50,9 +52,11 @@ export function useUpdateSubject() {
 
 export function useDeleteSubject() {
   const qc = useQueryClient()
+  const { user } = useAuth()
+  const schoolId = user?.school_id ?? ''
 
   return useMutation({
-    mutationFn: (id: string) => subjectsService.delete(id),
+    mutationFn: (id: string) => subjectsService.delete(schoolId, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['subjects'] })
       toast.success('Subject deleted')

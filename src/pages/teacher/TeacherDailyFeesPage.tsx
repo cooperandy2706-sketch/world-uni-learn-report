@@ -61,7 +61,12 @@ export default function TeacherDailyFeesPage() {
   })
 
   // Prepare ledger state for fast entry
-  const defaultAmount = feeType === 'feeding' ? (config?.expected_feeding_fee || 0) : (config?.expected_studies_fee || 0)
+  const selectedClassConfig = useMemo(() => {
+    if (!Array.isArray(config)) return null
+    return config.find((c: any) => c.class_id === selectedClass)
+  }, [config, selectedClass])
+
+  const defaultAmount = feeType === 'feeding' ? (selectedClassConfig?.expected_feeding_fee || 0) : (selectedClassConfig?.expected_studies_fee || 0)
   const [entries, setEntries] = useState<Record<string, string>>({})
 
   // If a teacher is strictly authorized for 'studies', ensure the state defaults correctly
@@ -157,8 +162,8 @@ export default function TeacherDailyFeesPage() {
         <div style={{ flex: '1 1 100%' }}>
           <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Fee Type</label>
           <select value={feeType} onChange={e => setFeeType(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid #e5e7eb', outline: 'none', fontSize: 14, background: '#fff' }}>
-            {(allowedTypes === 'both' || allowedTypes === 'feeding') && <option value="feeding">Feeding Fee (GH₵ {config?.expected_feeding_fee || '0'})</option>}
-            {(allowedTypes === 'both' || allowedTypes === 'studies') && <option value="studies">Studies Fee (GH₵ {config?.expected_studies_fee || '0'})</option>}
+            {(allowedTypes === 'both' || allowedTypes === 'feeding') && <option value="feeding">Feeding Fee (GH₵ {selectedClassConfig?.expected_feeding_fee || '0'})</option>}
+            {(allowedTypes === 'both' || allowedTypes === 'studies') && <option value="studies">Studies Fee (GH₵ {selectedClassConfig?.expected_studies_fee || '0'})</option>}
           </select>
         </div>
       </div>

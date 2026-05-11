@@ -105,6 +105,13 @@ export interface SchoolSettings {
   school_news?: string
   academic_year_id?: string
   current_term_id?: string
+  // Branding & Theme
+  primary_color?: string
+  report_theme?: 'modern' | 'classic' | 'professional'
+  report_watermark_url?: string
+  // Security / Scanner
+  late_arrival_time?: string
+  scan_cooldown_seconds?: number
   created_at: string
   updated_at: string
 }

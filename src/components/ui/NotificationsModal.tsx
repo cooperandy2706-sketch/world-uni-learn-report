@@ -191,7 +191,7 @@ export default function NotificationsModal({ open, onClose, onRead }: Notificati
               background: '#f8f7ff'
             }}>
               {loading ? (
-                <div style={{ py: 40, textAlign: 'center' }}>
+                <div style={{ padding: '40px 0', textAlign: 'center' }}>
                   <div style={{ 
                     width: 24, height: 24, borderRadius: '50%', 
                     border: '2px solid #ede9fe', borderTopColor: '#6d28d9',

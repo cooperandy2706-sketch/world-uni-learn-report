@@ -278,7 +278,7 @@ export default function GlobalAnalyticsPage() {
         <div style={{ background: '#fff', padding: 24, borderRadius: 24, border: '1px solid #f1f5f9' }}>
            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', marginBottom: 24 }}>Library Distribution</h3>
            <div style={{ height: 350, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-             <ResponsiveContainer width="100%" height="250">
+             <ResponsiveContainer width="100%" height={250}>
                <PieChart>
                  <Pie
                    data={stats.pieData}

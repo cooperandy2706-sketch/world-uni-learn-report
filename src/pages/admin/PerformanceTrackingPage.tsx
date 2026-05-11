@@ -131,7 +131,7 @@ export default function PerformanceTrackingPage() {
 
       const subMap: Record<string, any> = {}
       scores?.forEach(s => {
-        const subName = s.subject?.name || 'Unknown'
+        const subName = (s.subject as any)?.name || 'Unknown'
         const termName = reports?.find(r => r.term_id === s.term_id)?.term?.name || 'Unknown'
         if (!subMap[subName]) subMap[subName] = { name: subName }
         subMap[subName][termName] = s.total_score
@@ -210,7 +210,7 @@ export default function PerformanceTrackingPage() {
         bottom = bottom.map(b => {
           const studentScores = bScores?.filter(s => s.student_id === b.student_id) || []
           const worst = [...studentScores].sort((x, y) => (x.total_score || 0) - (y.total_score || 0))[0]
-          return { ...b, worstSubject: worst?.subject?.name || 'Core Topics' }
+          return { ...b, worstSubject: (worst?.subject as any)?.name || 'Core Topics' }
         })
       }
 
