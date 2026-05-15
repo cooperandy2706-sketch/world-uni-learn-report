@@ -139,7 +139,6 @@ export default function MessagingPage() {
         supabase.from('users').select('id').eq('role', 'teacher'),
         supabase.from('schools').select('id, name'),
       ])
-      // Global groups span all schools — no school_id intentionally
       await upsertGroup('global_admins', '📢 Global Admins',
         [user.id, ...(admins?.map(a => a.id) ?? [])])
       await upsertGroup('global_teachers', '🌍 All Teachers',
@@ -148,7 +147,6 @@ export default function MessagingPage() {
         const { data: st } = await supabase.from('users').select('id').eq('role', 'teacher').eq('school_id', school.id)
         if (st?.length) await upsertGroup(`school_${school.id}_teachers`, `🏫 ${school.name} Teachers`, [...new Set([user.id, ...st.map(t => t.id)])], 'group', school.id)
       }
-      // Auto-provision 1-on-1 DM threads immediately for everyone
       const allUsers = [...(admins ?? []), ...(teachers ?? [])]
       const promises = allUsers.map(u => {
         const sorted = [user.id, u.id].sort().join('_')
@@ -162,8 +160,6 @@ export default function MessagingPage() {
       ])
       await upsertGroup('global_admins', '📢 Global Admins',
         [...new Set([user.id, ...(sa?.map(s => s.id) ?? []), ...(al?.map(a => a.id) ?? [])])])
-      
-      // Admin DM auto-provisioning
       const allUsers = [...(sa ?? []), ...(al ?? [])]
       const promises = allUsers.map(u => {
         const sorted = [user.id, u.id].sort().join('_')
@@ -183,8 +179,6 @@ export default function MessagingPage() {
         await upsertGroup(`school_${user.school_id}_teachers`, `🏫 ${schoolName} Teachers`,
           [...new Set([user.id, ...(st?.map(t => t.id) ?? [])])], 'group', user.school_id)
       }
-      
-      // Teacher DM auto-provisioning
       const allUsers = [...(sa ?? []), ...(at ?? [])]
       const promises = allUsers.map(u => {
         if (u.id === user.id) return Promise.resolve(null)
@@ -192,6 +186,19 @@ export default function MessagingPage() {
         return upsertGroup(`dm_${sorted}`, null, [user.id, u.id], 'direct', sid)
       })
       await Promise.all(promises)
+    } else if (user.role === 'parent') {
+      if (user.school_id) {
+        const [{ data: teachers }, { data: admins }] = await Promise.all([
+          supabase.from('users').select('id').eq('role', 'teacher').eq('school_id', user.school_id),
+          supabase.from('users').select('id').eq('role', 'admin').eq('school_id', user.school_id),
+        ])
+        const allContacts = [...(teachers ?? []), ...(admins ?? [])]
+        const promises = allContacts.map(contact => {
+          const sorted = [user.id, contact.id].sort().join('_')
+          return upsertGroup(`dm_${sorted}`, null, [user.id, contact.id], 'direct', user.school_id)
+        })
+        await Promise.all(promises)
+      }
     }
   }
 
@@ -309,7 +316,7 @@ export default function MessagingPage() {
     if (!eligibleUsers.length) {
       const { data } = await supabase.from('users')
         .select('id, full_name, role, school_id')
-        .in('role', ['super_admin', 'admin', 'teacher']).neq('id', user!.id).order('full_name')
+        .in('role', ['super_admin', 'admin', 'teacher', 'parent']).neq('id', user!.id).order('full_name')
       setEligibleUsers(data ?? [])
     }
   }

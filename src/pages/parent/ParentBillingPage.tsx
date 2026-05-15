@@ -6,6 +6,8 @@ import { useCurrentTerm } from '../../hooks/useSettings'
 import { billSheetService } from '../../services/bursar.service'
 import { paymentService } from '../../services/payment.service'
 import { Wallet, ChevronDown, ChevronUp, CreditCard, X, ShieldCheck } from 'lucide-react'
+import { formatCurrency } from '../../utils/currency'
+import { feePaymentsService } from '../../services/bursar.service'
 import toast from 'react-hot-toast'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -22,10 +24,11 @@ export default function ParentBillingPage() {
   const [billingData, setBillingData] = useState<Record<string, any>>({})
   const [loading, setLoading] = useState(false)
   const [expandedWard, setExpandedWard] = useState<string | null>(null)
+  const [schoolCurrency, setSchoolCurrency] = useState('GHS')
   
   const [showPayModal, setShowPayModal] = useState(false)
   const [payStep, setPayStep] = useState<1 | 2>(1)
-  const [schoolInfo, setSchoolInfo] = useState<{name: string, subaccount: string} | null>(null)
+  const [schoolInfo, setSchoolInfo] = useState<{name: string, subaccount: string, currency: string} | null>(null)
   const [selectedWardForPay, setSelectedWardForPay] = useState<any>(null)
   const [payAmount, setPayAmount] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
@@ -49,6 +52,14 @@ export default function ParentBillingPage() {
       }
     }
     setBillingData(newBillingData)
+    // Pre-load school currency for display before pay modal
+    if (wards[0]?.school_id) {
+      try {
+        const { supabase: sb } = await import('../../lib/supabase')
+        const { data: school } = await sb.from('schools').select('currency_code').eq('id', wards[0].school_id).single()
+        if (school?.currency_code) setSchoolCurrency(school.currency_code)
+      } catch { /* keep default GHS */ }
+    }
     setLoading(false)
   }
 
@@ -66,7 +77,7 @@ export default function ParentBillingPage() {
     try {
       const { data: school, error: schoolErr } = await (await import('../../lib/supabase')).supabase
         .from('schools')
-        .select('name, paystack_public_key, id')
+        .select('name, paystack_public_key, id, currency_code')
         .eq('id', selectedWardForPay.school_id)
         .single()
 
@@ -77,7 +88,11 @@ export default function ParentBillingPage() {
         throw new Error('This school has not been configured for online payments yet.')
       }
 
-      setSchoolInfo({ name: school.name, subaccount: subaccountCode })
+      setSchoolInfo({ 
+        name: school.name, 
+        subaccount: subaccountCode, 
+        currency: school.currency_code || 'GHS' 
+      })
       setPayStep(2)
     } catch (err: any) {
       toast.error(err.message || 'Verification failed')
@@ -107,6 +122,7 @@ export default function ParentBillingPage() {
         amount: amountToPay,
         publicKey: masterPublicKey,
         reference: reference,
+        currency: schoolInfo.currency || 'GHS',
         subaccount: subaccountCode,
         metadata: {
           student_id: selectedWardForPay.id,
@@ -120,21 +136,37 @@ export default function ParentBillingPage() {
           toast.loading('Verifying payment...', { id: 'verify_payment' })
           try {
             // 3. Verify on server
-            await paymentService.verifyPaymentOnServer(
-              response.reference,
-              selectedWardForPay.id,
-              term!.id,
-              selectedWardForPay.school_id
-            )
-            toast.success('Payment successful! Your balance has been updated.', { id: 'verify_payment' })
-            setShowPayModal(false)
-            loadBilling() 
-          } catch (err) {
-            toast.error('Verification failed. Please contact school admin.', { id: 'verify_payment' })
-          } finally {
-            setIsProcessing(false)
-          }
-        },
+              await paymentService.verifyPaymentOnServer(
+                response.reference,
+                selectedWardForPay.id,
+                term!.id,
+                selectedWardForPay.school_id
+              )
+
+              // 4. Record payment in the database (Frontend Automation)
+              await feePaymentsService.createWithAllocation({
+                school_id: selectedWardForPay.school_id,
+                student_id: selectedWardForPay.id,
+                term_id: term!.id,
+                academic_year_id: term!.academic_year_id,
+                amount_paid: amountToPay,
+                payment_date: new Date().toISOString(),
+                payment_method: 'online',
+                reference_number: response.reference,
+                currency_code: schoolInfo.currency,
+                notes: `Online payment via Paystack. Ref: ${response.reference}`
+              })
+
+              toast.success('Payment successful! Your balance has been updated.', { id: 'verify_payment' })
+              setShowPayModal(false)
+              loadBilling() 
+            } catch (err) {
+              console.error('Payment verification/recording error:', err)
+              toast.error('Verification failed. Please contact school admin.', { id: 'verify_payment' })
+            } finally {
+              setIsProcessing(false)
+            }
+          },
         onClose: () => {
           setIsProcessing(false)
         }
@@ -172,7 +204,7 @@ export default function ParentBillingPage() {
           const isExpanded = expandedWard === ward.id
 
           return (
-            <div key={ward.id} style={{ background: '#fff', borderRadius: 24, border: '1.5|px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 16px rgba(109,40,217,0.03)' }}>
+            <div key={ward.id} style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 16px rgba(109,40,217,0.03)' }}>
               
               <div 
                 onClick={() => setExpandedWard(isExpanded ? null : ward.id)}
@@ -190,9 +222,9 @@ export default function ParentBillingPage() {
 
                 <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: 16 }}>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{bill?.summary?.balance < 0 ? 'Credit Balance' : 'Balance'}</div>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{bill?.summary?.balance < 0 ? 'Credit Balance' : 'Balance Due'}</div>
                     <div style={{ fontSize: 18, fontWeight: 900, color: bill?.summary?.balance > 0 ? '#ef4444' : '#10b981' }}>
-                      {bill?.summary?.balance < 0 ? `(Credit) GH₵ ${Math.abs(bill.summary.balance).toLocaleString()}` : `GH₵ ${bill?.summary?.balance?.toLocaleString() || '0'}`}
+                      {bill?.summary?.balance < 0 ? `(Credit) ${formatCurrency(Math.abs(bill.summary.balance), schoolCurrency)}` : formatCurrency(bill?.summary?.balance || 0, schoolCurrency)}
                     </div>
                   </div>
                   <div style={{ color: '#d1d5db', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: '#f8fafc' }}>
@@ -207,11 +239,11 @@ export default function ParentBillingPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 20 }}>
                     <div style={{ background: '#fff', padding: 16, borderRadius: 16, border: '1px solid #e2e8f0' }}>
                       <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Total Charges</div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: '#1e293b', marginTop: 4 }}>GH₵ {bill.summary.totalCharges.toLocaleString()}</div>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: '#1e293b', marginTop: 4 }}>{formatCurrency(bill.summary.totalCharges, schoolInfo?.currency || 'GHS')}</div>
                     </div>
                     <div style={{ background: '#fff', padding: 16, borderRadius: 16, border: '1px solid #e2e8f0' }}>
                       <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Amount Paid</div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: '#16a34a', marginTop: 4 }}>GH₵ {bill.summary.totalPaid.toLocaleString()}</div>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: '#16a34a', marginTop: 4 }}>{formatCurrency(bill.summary.totalPaid, schoolInfo?.currency || 'GHS')}</div>
                     </div>
                   </div>
 
@@ -235,7 +267,7 @@ export default function ParentBillingPage() {
                         {bill.arrears > 0 && (
                           <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
                             <td style={{ padding: '12px 16px', fontSize: 13, color: '#ef4444', fontWeight: 600 }}>Previous Balance (Arrears)</td>
-                            <td style={{ padding: '12px 16px', fontSize: 13, color: '#ef4444', fontWeight: 800, textAlign: 'right' }}>GH₵ {bill.arrears.toLocaleString()}</td>
+                            <td style={{ padding: '12px 16px', fontSize: 13, color: '#ef4444', fontWeight: 800, textAlign: 'right' }}>{formatCurrency(bill.arrears, schoolInfo?.currency || 'GHS')}</td>
                           </tr>
                         )}
                         {bill.structures.map((f: any) => (
@@ -244,7 +276,7 @@ export default function ParentBillingPage() {
                               {f.fee_name}
                               {f.is_discountable === false && <span style={{ fontSize: 10, color: '#ef4444', marginLeft: 6, fontWeight: 700 }}>[NO SCHOLARSHIP DISCOUNT]</span>}
                             </td>
-                            <td style={{ padding: '12px 16px', fontSize: 13, color: '#334155', fontWeight: 800, textAlign: 'right' }}>GH₵ {f.amount.toLocaleString()}</td>
+                            <td style={{ padding: '12px 16px', fontSize: 13, color: '#334155', fontWeight: 800, textAlign: 'right' }}>{formatCurrency(f.amount, schoolInfo?.currency || 'GHS')}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -265,7 +297,7 @@ export default function ParentBillingPage() {
                             <div style={{ fontSize: 11, color: '#64748b' }}>{new Date(p.payment_date).toLocaleDateString()} {p.reference ? `· Ref: ${p.reference.slice(-8)}` : ''} · <span style={{ color: '#7c3aed', fontWeight: 600 }}>Official Receipt available at Office</span></div>
                           </div>
                           <div style={{ fontSize: 15, fontWeight: 800, color: '#16a34a' }}>
-                            GH₵ {p.amount_paid.toLocaleString()}
+                            {formatCurrency(p.amount_paid, schoolInfo?.currency || 'GHS')}
                           </div>
                         </div>
                       ))}
@@ -308,7 +340,7 @@ export default function ParentBillingPage() {
                  </div>
 
                  <div style={{ marginBottom: 24 }}>
-                    <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>Amount to Pay (GH₵)</label>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>Amount to Pay ({schoolInfo?.currency || 'GHS'})</label>
                     <input 
                       type="number"
                       value={payAmount}
@@ -339,7 +371,7 @@ export default function ParentBillingPage() {
                  </div>
                  <h3 style={{ fontSize: 22, fontWeight: 800, color: '#111827', margin: '0 0 12px' }}>Confirm Payment</h3>
                  <p style={{ fontSize: 15, color: '#64748b', margin: '0 0 32px', lineHeight: 1.6 }}>
-                   You are about to securely pay <strong style={{ color: '#111827' }}>GH₵ {Number(payAmount).toLocaleString()}</strong> directly to:<br/>
+                   You are about to securely pay <strong style={{ color: '#111827' }}>{formatCurrency(payAmount || 0, schoolInfo?.currency || 'GHS')}</strong> directly to:<br/>
                    <span style={{ color: '#6d28d9', fontSize: 18, fontWeight: 800, display: 'inline-block', marginTop: 8 }}>{schoolInfo?.name}</span>
                  </p>
 

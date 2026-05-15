@@ -109,6 +109,27 @@ export default function ParentDashboard() {
             <div style={{ fontSize: 15, fontWeight: 700, color: '#9a3412' }}>Calendar</div>
             <div style={{ fontSize: 12, color: '#c2410c', marginTop: 2 }}>School events</div>
           </div>
+
+          <div className="action-card" onClick={() => navigate('/parent/exeats')}
+            style={{ background: 'linear-gradient(135deg,#fef2f2,#fee2e2)', borderRadius: 16, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #fecaca' }}>
+            <div style={{ fontSize: 28, marginBottom: 12 }}>🚪</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#b91c1c' }}>Exeats</div>
+            <div style={{ fontSize: 12, color: '#dc2626', marginTop: 2 }}>Request leave</div>
+          </div>
+
+          <div className="action-card" onClick={() => navigate('/parent/attendance')}
+            style={{ background: 'linear-gradient(135deg,#f0f9ff,#e0f2fe)', borderRadius: 16, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #bae6fd' }}>
+            <div style={{ fontSize: 28, marginBottom: 12 }}>📋</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#0369a1' }}>Attendance</div>
+            <div style={{ fontSize: 12, color: '#0284c7', marginTop: 2 }}>Track daily presence</div>
+          </div>
+          
+          <div className="action-card" onClick={() => navigate('/parent/news')}
+            style={{ background: 'linear-gradient(135deg,#f8fafc,#f1f5f9)', borderRadius: 16, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #e2e8f0' }}>
+            <div style={{ fontSize: 28, marginBottom: 12 }}>📰</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#334155' }}>News</div>
+            <div style={{ fontSize: 12, color: '#475569', marginTop: 2 }}>School updates</div>
+          </div>
         </div>
       </div>
 

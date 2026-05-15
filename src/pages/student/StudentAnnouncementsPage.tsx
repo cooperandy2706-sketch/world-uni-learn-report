@@ -3,7 +3,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { ROUTES } from '../../constants/routes'
 import { Link } from 'react-router-dom'
-import { Megaphone, Calendar, Clock, Search, Filter, Pin, ChevronRight } from 'lucide-react'
+import { Megaphone, Calendar, Clock, Search, Filter, Pin, ChevronRight, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const TYPE_CONFIG: any = {
@@ -21,6 +21,19 @@ export default function StudentAnnouncementsPage() {
   const [mounted, setMounted] = useState(false)
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
+  const [readIds, setReadIds] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem('wula_read_announcements') || '[]')) }
+    catch { return new Set() }
+  })
+
+  function markAsRead(id: string) {
+    setReadIds(prev => {
+      const next = new Set(prev)
+      next.add(id)
+      localStorage.setItem('wula_read_announcements', JSON.stringify([...next]))
+      return next
+    })
+  }
 
   useEffect(() => {
     setTimeout(() => setMounted(true), 50)
@@ -125,7 +138,7 @@ export default function StudentAnnouncementsPage() {
             filtered.map((a, i) => {
               const tc = TYPE_CONFIG[a.type] || TYPE_CONFIG.announcement
               return (
-                <div key={a.id} className="ann-card" style={{ animation: `_sfu .4s ease ${.2 + i * .05}s both`, borderLeft: a.is_pinned ? '6px solid #fbbf24' : undefined }}>
+                <div key={a.id} className="ann-card" style={{ animation: `_sfu .4s ease ${.2 + i * .05}s both`, borderLeft: a.is_pinned ? '6px solid #fbbf24' : undefined, opacity: readIds.has(a.id) ? 0.6 : 1, transition: 'opacity .3s' }}>
                   <div style={{ display: 'flex', gap: 20 }}>
                     <div style={{ width: 56, height: 56, borderRadius: 18, background: tc.bg, color: tc.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>
                       {tc.icon}
@@ -161,9 +174,18 @@ export default function StudentAnnouncementsPage() {
                           <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#6d28d9', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800 }}>{a.from_user?.full_name?.charAt(0)}</div>
                           <span style={{ fontSize: 12, color: '#64748b' }}>By {a.from_user?.full_name || 'School Administration'}</span>
                         </div>
-                        <button style={{ background: 'none', border: 'none', color: '#6d28d9', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
-                          Mark as Read <ChevronRight size={16} />
-                        </button>
+                        {readIds.has(a.id) ? (
+                          <span style={{ fontSize: 12, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
+                            <CheckCircle size={14} /> Read
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => markAsRead(a.id)}
+                            style={{ background: 'none', border: 'none', color: '#6d28d9', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
+                          >
+                            Mark as Read <ChevronRight size={16} />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

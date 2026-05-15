@@ -9,6 +9,7 @@ import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { getGradeInfo } from '../../utils/grading'
 import { ROUTES } from '../../constants/routes'
 import { ordinal } from '../../lib/utils'
+import ReportCard from '../../components/reports/ReportCard'
 
 
 function timeAgo(ts: string) {

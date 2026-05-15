@@ -14,21 +14,44 @@ export default function ProprietorAnalytics() {
   const [topClasses, setTopClasses] = useState<{name: string, avg: number}[]>([])
   const [passRate, setPassRate] = useState(0)
   const [avgScore, setAvgScore] = useState(0)
+  const [enrollment, setEnrollment] = useState(0)
+  const [allTerms, setAllTerms] = useState<any[]>([])
+  const [selectedTermId, setSelectedTermId] = useState('')
 
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
 
   useEffect(() => {
-    if (!user?.school_id || !term?.id) {
-      if (!term?.id) setLoading(false)
-      return
+    if (user?.school_id) {
+      loadTerms()
+      loadEnrollment()
     }
-    loadAnalytics()
-  }, [user?.school_id, term?.id])
+  }, [user?.school_id])
+
+  useEffect(() => {
+    if (term?.id && !selectedTermId) setSelectedTermId(term.id)
+  }, [term])
+
+  useEffect(() => {
+    if (user?.school_id && selectedTermId) {
+      loadAnalytics()
+    }
+  }, [user?.school_id, selectedTermId])
+
+  async function loadTerms() {
+    const { data } = await supabase.from('terms').select('*').eq('school_id', user!.school_id).order('start_date', { ascending: false })
+    setAllTerms(data || [])
+  }
+
+  async function loadEnrollment() {
+    const { count } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('school_id', user!.school_id)
+    setEnrollment(count || 0)
+  }
 
   async function loadAnalytics() {
+    setLoading(true)
     try {
       const sid = user!.school_id
-      const tid = term!.id
+      const tid = selectedTermId
 
       const { data: reports } = await supabase
         .from('report_cards')
@@ -108,9 +131,29 @@ export default function ProprietorAnalytics() {
       `}</style>
       
       <div className="analytics-wrap">
-        <h1 style={{ fontSize: 32, fontWeight: 800, margin: '0 0 32px', color: '#0f172a' }}>Academic Performance</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
+          <h1 style={{ fontSize: 32, fontWeight: 800, margin: 0, color: '#0f172a' }}>Academic Performance</h1>
+          <select 
+            value={selectedTermId} 
+            onChange={e => setSelectedTermId(e.target.value)}
+            style={{ padding: '10px 16px', borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 14, fontWeight: 600, outline: 'none', cursor: 'pointer' }}
+          >
+            {allTerms.map(t => (
+              <option key={t.id} value={t.id}>{t.name} ({t.academic_year})</option>
+            ))}
+          </select>
+        </div>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24, marginBottom: 32 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 32 }}>
+          <div className="stat-box">
+            <div className="stat-icon" style={{ background: '#f5f3ff', color: '#7c3aed' }}>
+              <GraduationCap size={28} />
+            </div>
+            <div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{enrollment}</div>
+              <div style={{ fontSize: 14, color: '#64748b', fontWeight: 600, marginTop: 4 }}>Total Enrollment</div>
+            </div>
+          </div>
           <div className="stat-box">
             <div className="stat-icon" style={{ background: '#eff6ff', color: '#3b82f6' }}>
               <Target size={28} />

@@ -165,10 +165,10 @@ export default function FeesPage() {
   }, [filteredStudents])
 
   // ── Structure form ─────────────────────────────────────────────
-  const [sf, setSf] = useState({ class_id: '', fee_name: '', amount: '', description: '', is_discountable: true })
+  const [sf, setSf] = useState({ class_id: '', fee_name: '', amount: '', currency_code: 'GHS', description: '', is_discountable: true })
   const createStructure = useMutation({
     mutationFn: (d: any) => feeStructuresService.create(d),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['fee-structures'] }); setStructureModal(false); setSf({ class_id: '', fee_name: '', amount: '', description: '', is_discountable: true }); toast.success('Fee structure created') },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['fee-structures'] }); setStructureModal(false); setSf({ class_id: '', fee_name: '', amount: '', currency_code: 'GHS', description: '', is_discountable: true }); toast.success('Fee structure created') },
     onError: (e: any) => toast.error(e.message),
   })
 
@@ -192,6 +192,7 @@ export default function FeesPage() {
         academic_year_id: year?.id,
         fee_name: s.fee_name,
         amount: s.amount,
+        currency_code: s.currency_code,
         description: s.description
       }))
       
@@ -208,7 +209,7 @@ export default function FeesPage() {
   }
 
   // ── Payment form ───────────────────────────────────────────────
-  const [pf, setPf] = useState({ student_id: '', fee_structure_id: '', selected_fee_ids: [] as string[], amount_paid: '', payment_method: 'cash' as typeof METHODS[number], reference_number: '', notes: '', payment_date: new Date().toISOString().split('T')[0] })
+  const [pf, setPf] = useState({ student_id: '', fee_structure_id: '', selected_fee_ids: [] as string[], amount_paid: '', currency_code: 'GHS', payment_method: 'cash' as typeof METHODS[number], reference_number: '', notes: '', payment_date: new Date().toISOString().split('T')[0] })
   const recordPayment = useMutation({
     mutationFn: (d: any) => feePaymentsService.createWithAllocation(d),
     onSuccess: (res) => {
@@ -261,6 +262,7 @@ export default function FeesPage() {
       term_id: term?.id ?? null,
       academic_year_id: (year as any)?.id ?? null,
       amount_paid: parseFloat(pf.amount_paid),
+      currency_code: pf.currency_code,
       payment_method: pf.payment_method,
       reference_number: pf.reference_number || null,
       notes: autoNotes || null,
@@ -950,7 +952,7 @@ export default function FeesPage() {
                     })()}
                   </div>
                 )},
-                { label: 'Amount Paid (GH₵)', children: <input type="number" min="0" step="0.01" value={pf.amount_paid} onChange={e => setPf(p => ({ ...p, amount_paid: e.target.value }))} placeholder="0.00" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} /> },
+                { label: 'Amount Paid', children: <div style={{ display: 'flex', gap: 8 }}><select value={pf.currency_code} onChange={e => setPf(p => ({ ...p, currency_code: e.target.value }))} style={{ padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', background: '#f8fafc' }}><option value="GHS">GHS</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select><input type="number" min="0" step="0.01" value={pf.amount_paid} onChange={e => setPf(p => ({ ...p, amount_paid: e.target.value }))} placeholder="0.00" style={{ flex: 1, padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} /></div> },
               ].map(f => (
                 <div key={f.label}>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{f.label}</label>
@@ -1446,12 +1448,12 @@ export default function FeesPage() {
 
       {/* ── Create Structure Modal ── */}
       <Modal open={structureModal} onClose={() => setStructureModal(false)} title="New Fee Structure" subtitle="Define a fee for a class and term" size="sm"
-        footer={<><Btn variant="secondary" onClick={() => setStructureModal(false)}>Cancel</Btn><Btn onClick={() => { if (!sf.class_id || !sf.fee_name || !sf.amount) { toast.error('Fill required fields'); return } createStructure.mutate({ school_id: schoolId, class_id: sf.class_id, term_id: term?.id, academic_year_id: (year as any)?.id, fee_name: sf.fee_name, amount: parseFloat(sf.amount), description: sf.description || null, is_discountable: sf.is_discountable !== false }) }} loading={createStructure.isPending}>Create</Btn></>}>
+        footer={<><Btn variant="secondary" onClick={() => setStructureModal(false)}>Cancel</Btn><Btn onClick={() => { if (!sf.class_id || !sf.fee_name || !sf.amount) { toast.error('Fill required fields'); return } createStructure.mutate({ school_id: schoolId, class_id: sf.class_id, term_id: term?.id, academic_year_id: (year as any)?.id, fee_name: sf.fee_name, amount: parseFloat(sf.amount), currency_code: sf.currency_code, description: sf.description || null, is_discountable: sf.is_discountable !== false }) }} loading={createStructure.isPending}>Create</Btn></>}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[
             { label: 'Class *', children: <select value={sf.class_id} onChange={e => setSf(p => ({ ...p, class_id: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}><option value="">Select class…</option>{(classes as any[]).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</select> },
             { label: 'Fee Name *', children: <input value={sf.fee_name} onChange={e => setSf(p => ({ ...p, fee_name: e.target.value }))} placeholder="e.g. Tuition Fee" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
-            { label: 'Amount (GH₵) *', children: <input type="number" value={sf.amount} onChange={e => setSf(p => ({ ...p, amount: e.target.value }))} placeholder="0.00" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
+            { label: 'Amount *', children: <div style={{ display: 'flex', gap: 8 }}><select value={sf.currency_code} onChange={e => setSf(p => ({ ...p, currency_code: e.target.value }))} style={{ padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', background: '#f8fafc' }}><option value="GHS">GHS</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select><input type="number" value={sf.amount} onChange={e => setSf(p => ({ ...p, amount: e.target.value }))} placeholder="0.00" style={{ flex: 1, padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /></div> },
             { label: 'Description', children: <input value={sf.description} onChange={e => setSf(p => ({ ...p, description: e.target.value }))} placeholder="Optional note" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
             { label: 'Discount Policy', children: (
               <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#f8fafc', borderRadius: 10, border: '1.5px solid #e2e8f0', cursor: 'pointer' }}>

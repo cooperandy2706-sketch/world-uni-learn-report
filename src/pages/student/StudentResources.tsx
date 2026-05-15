@@ -40,7 +40,7 @@ export default function StudentResourcesPage() {
             .order('due_date', { ascending: true })
             .limit(10),
           // Syllabus/Resources items
-          supabase.from('syllabus_items')
+          supabase.from('syllabus')
             .select('*, subject:subjects(name)')
             .eq('class_id', s.class_id)
             .order('created_at', { ascending: false })
@@ -153,7 +153,7 @@ export default function StudentResourcesPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                       <div style={{ width: 40, height: 40, borderRadius: 10, background: '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📚</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.topic}</div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.title}</div>
                         <div style={{ fontSize: 11, color: '#0891b2', fontWeight: 600 }}>{r.subject?.name}</div>
                       </div>
                     </div>
@@ -161,12 +161,21 @@ export default function StudentResourcesPage() {
                       {r.description || 'Reference material for your class.'}
                     </p>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button style={{ flex: 1, background: '#f8fafc', border: '1.5px solid #e2e8f0', color: '#475569', padding: '8px', borderRadius: 10, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>
+                      <a 
+                        href={r.file_url} 
+                        download={r.file_name}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ flex: 1, background: '#f8fafc', border: '1.5px solid #e2e8f0', color: '#475569', padding: '8px', borderRadius: 10, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', textDecoration: 'none' }}>
                         <Download size={14} /> Download
-                      </button>
-                      <button style={{ width: 40, background: '#f8fafc', border: '1.5px solid #e2e8f0', color: '#475569', padding: '8px', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                      </a>
+                      <a 
+                        href={r.file_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ width: 40, background: '#f8fafc', border: '1.5px solid #e2e8f0', color: '#475569', padding: '8px', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', textDecoration: 'none' }}>
                         <ExternalLink size={14} />
-                      </button>
+                      </a>
                     </div>
                   </div>
                 ))}

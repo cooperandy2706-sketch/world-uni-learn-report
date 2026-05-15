@@ -202,13 +202,40 @@ export default function TeacherReportsPage() {
         updated_at: new Date().toISOString(),
       }).eq('id', reportCard.id).eq('school_id', user!.school_id)
 
-      await supabase.from('messages').insert({
-        school_id: user!.school_id,
-        from_user_id: user!.id,
-        subject: `Report ready: ${selectedStudent?.full_name} — ${selectedClassName}`,
-        body: `Remarks completed for ${selectedStudent?.full_name}.\n\nClass Teacher: ${teacherRemark || 'Not set'}\nHeadteacher: ${htRemark || 'Not set'}\n\nPlease review and approve from the Reports section.`,
-        priority: 'normal',
-      })
+      // Send notification via chat (unified messaging system)
+      const schoolId = user!.school_id
+      const groupKey = `staff_inbox_${schoolId}`
+      let convId: string
+      const { data: existing } = await supabase
+        .from('chat_conversations')
+        .select('id')
+        .eq('group_key', groupKey)
+        .maybeSingle()
+
+      if (existing?.id) {
+        convId = existing.id
+      } else {
+        const { data: created } = await supabase
+          .from('chat_conversations')
+          .insert({ group_key: groupKey, school_id: schoolId, name: 'Staff Inbox', type: 'group' })
+          .select('id')
+          .single()
+        convId = created?.id
+      }
+
+      if (convId) {
+        await supabase.from('chat_members').upsert(
+          { conversation_id: convId, user_id: user!.id },
+          { onConflict: 'conversation_id,user_id', ignoreDuplicates: true }
+        )
+        await supabase.from('chat_messages').insert({
+          conversation_id: convId,
+          sender_id: user!.id,
+          school_id: schoolId,
+          body: `[REPORT READY] ${selectedStudent?.full_name} — ${selectedClassName}\n\nRemarks completed. Class Teacher: ${teacherRemark || 'Not set'}\nHeadteacher: ${htRemark || 'Not set'}\n\nPlease review and approve from the Reports section.`,
+        })
+      }
+
       setRemarksDirty(false)
       toast.success('Remarks saved & admin notified ✓', { duration: 5000 })
       await loadReport()
@@ -218,6 +245,7 @@ export default function TeacherReportsPage() {
       setSavingRemarks(false)
     }
   }
+
 
   // ── print  ────────────────────────────────────────────────────────────────
   // FIX: old code called printReport(name) with no html arg → blank window

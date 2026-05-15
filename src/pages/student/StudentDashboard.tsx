@@ -581,6 +581,7 @@ export default function StudentDashboard() {
                   { icon: '📝', label: 'Assignments', to: ROUTES.STUDENT_ASSIGNMENTS },
                   { icon: '✅', label: 'Attendance', to: ROUTES.STUDENT_ATTENDANCE },
                   { icon: '🗓️', label: 'School Calendar', to: ROUTES.STUDENT_CALENDAR },
+                  { icon: '🚪', label: 'My Exeats', to: '/student/exeats' },
                 ].map(({ icon, label, to }) => (
                   <Link key={label} to={to} className="sd-link"
                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 10, background: '#faf5ff', textDecoration: 'none' }}>

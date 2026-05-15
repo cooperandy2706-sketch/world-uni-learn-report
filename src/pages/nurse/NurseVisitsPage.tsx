@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns'
-import { ClipboardList, Search, Filter, Bell, BellOff, Download, ChevronDown, ChevronUp } from 'lucide-react'
+import { ClipboardList, Search, Filter, Bell, BellOff, Download, ChevronDown, ChevronUp, Plus, X } from 'lucide-react'
+import { useStudents } from '../../hooks/useStudents'
+import toast from 'react-hot-toast'
 
 const T = {
   primary: '#0ea5e9',
@@ -50,6 +52,15 @@ export default function NurseVisitsPage() {
   const [search, setSearch] = useState('')
   const [period, setPeriod] = useState('this_month')
   const [expandedId, setExpandedId] = useState<string | null>(null)
+
+  const { data: students = [] } = useStudents()
+  const [modalOpen, setModalOpen] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState<any>(null)
+  const [studentSearch, setStudentSearch] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [visitForm, setVisitForm] = useState({
+    symptoms: '', treatment: '', medication_given: '', parent_notified: false, notes: ''
+  })
 
   const fetchVisits = async () => {
     if (!user?.school_id) return
@@ -107,8 +118,58 @@ export default function NurseVisitsPage() {
     a.href = url; a.download = `clinic_visits_${period}.csv`; a.click()
   }
 
+  const handleLogVisit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedStudent || !user?.school_id) return
+    setSaving(true)
+    
+    try {
+      const timeIn = format(new Date(), 'HH:mm')
+      const payload = {
+        school_id: user.school_id,
+        student_id: selectedStudent.id,
+        nurse_id: user.id,
+        visit_date: format(new Date(), 'yyyy-MM-dd'),
+        time_in: timeIn,
+        time_out: timeIn,
+        ...visitForm
+      }
+      
+      await supabase.from('clinic_visits').insert(payload)
+      
+      if (visitForm.parent_notified) {
+        const { data: parentRel } = await supabase
+          .from('students')
+          .select('user_id')
+          .eq('id', selectedStudent.id)
+          .single()
+          
+        if (parentRel?.user_id) {
+          await supabase.from('notifications').insert({
+            school_id: user.school_id,
+            user_id: parentRel.user_id,
+            title: `Clinic Visit: ${selectedStudent.full_name}`,
+            body: `Your ward visited the clinic today for: ${visitForm.symptoms}.`,
+            type: 'alert'
+          })
+        }
+      }
+      
+      toast.success('Visit logged successfully')
+      setVisitForm({ symptoms: '', treatment: '', medication_given: '', parent_notified: false, notes: '' })
+      setSelectedStudent(null)
+      setModalOpen(false)
+      fetchVisits()
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to log visit')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
-    <div style={{ padding: '24px', maxWidth: 1100, margin: '0 auto', fontFamily: '"DM Sans", sans-serif' }}>
+    <>
+      <div style={{ padding: '24px', maxWidth: 1100, margin: '0 auto', fontFamily: '"DM Sans", sans-serif' }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');`}</style>
 
       {/* Header */}
@@ -122,9 +183,14 @@ export default function NurseVisitsPage() {
             <p style={{ fontSize: 13, color: T.muted, margin: '2px 0 0' }}>Full history of all sick bay visits</p>
           </div>
         </div>
-        <button onClick={exportCSV} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, border: `1px solid ${T.border}`, background: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: T.text }}>
-          <Download size={15} /> Export CSV
-        </button>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button onClick={exportCSV} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, border: `1px solid ${T.border}`, background: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: T.text }}>
+            <Download size={15} /> Export CSV
+          </button>
+          <button onClick={() => setModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, border: 'none', background: T.primary, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: '#fff', boxShadow: `0 4px 12px ${T.primary}40` }}>
+            <Plus size={16} /> Log New Visit
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -225,5 +291,69 @@ export default function NurseVisitsPage() {
         )}
       </div>
     </div>
+      
+      {/* Log Visit Modal */}
+      {modalOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: 500, borderRadius: 20, overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+            <div style={{ padding: '20px 24px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Log Clinic Visit</h3>
+              <button onClick={() => setModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.muted }}><X size={20} /></button>
+            </div>
+            
+            <form onSubmit={handleLogVisit} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {!selectedStudent ? (
+                <div>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: T.text, marginBottom: 8 }}>Search Student</label>
+                  <div style={{ position: 'relative', marginBottom: 12 }}>
+                    <Search size={16} color={T.muted} style={{ position: 'absolute', left: 12, top: 12 }} />
+                    <input autoFocus placeholder="Start typing name..." value={studentSearch} onChange={e => setStudentSearch(e.target.value)} style={{ width: '100%', padding: '10px 12px 10px 38px', borderRadius: 10, border: `1px solid ${T.border}`, outline: 'none' }} />
+                  </div>
+                  <div style={{ maxHeight: 200, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {students.filter((s:any) => s.full_name.toLowerCase().includes(studentSearch.toLowerCase())).slice(0, 5).map((s:any) => (
+                      <div key={s.id} onClick={() => setSelectedStudent(s)} style={{ padding: '10px 14px', borderRadius: 8, border: `1px solid ${T.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${T.primary}20`, color: T.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{s.full_name[0]}</div>
+                        <div style={{ fontSize: 13, fontWeight: 600 }}>{s.full_name} <span style={{ color: T.muted, fontWeight: 400 }}>({s.class?.name})</span></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div style={{ background: T.bg, padding: 12, borderRadius: 8, fontSize: 14, fontWeight: 700, color: T.primary, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Patient: {selectedStudent.full_name}</span>
+                    <button onClick={() => setSelectedStudent(null)} style={{ background: 'none', border: 'none', color: T.primary, fontSize: 11, cursor: 'pointer', fontWeight: 700 }}>Change</button>
+                  </div>
+                  
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: T.text, marginBottom: 6 }}>Symptoms *</label>
+                    <textarea required value={visitForm.symptoms} onChange={e => setVisitForm({...visitForm, symptoms: e.target.value})} rows={2} style={{ width: '100%', padding: 10, borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontFamily: 'inherit' }} placeholder="Fever, headache, stomach pain..." />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: T.text, marginBottom: 6 }}>Treatment / Action</label>
+                    <textarea value={visitForm.treatment} onChange={e => setVisitForm({...visitForm, treatment: e.target.value})} rows={2} style={{ width: '100%', padding: 10, borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontFamily: 'inherit' }} placeholder="Rest in sick bay, applied bandage..." />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: T.text, marginBottom: 6 }}>Medication Given</label>
+                    <input type="text" value={visitForm.medication_given} onChange={e => setVisitForm({...visitForm, medication_given: e.target.value})} style={{ width: '100%', padding: 10, borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontFamily: 'inherit' }} placeholder="e.g. Paracetamol 500mg" />
+                  </div>
+
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', background: `${T.orange}10`, padding: 12, borderRadius: 8, border: `1px solid ${T.orange}30` }}>
+                    <input type="checkbox" checked={visitForm.parent_notified} onChange={e => setVisitForm({...visitForm, parent_notified: e.target.checked})} style={{ width: 16, height: 16 }} />
+                    <span style={{ fontSize: 14, fontWeight: 600, color: T.orange }}>Send SMS/Push Alert to Parents</span>
+                  </label>
+
+                  <button disabled={saving} type="submit" style={{ width: '100%', background: T.primary, color: '#fff', border: 'none', padding: 14, borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer', marginTop: 8 }}>
+                    {saving ? 'Saving...' : 'Save Visit Record'}
+                  </button>
+                </>
+              )}
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   )
 }

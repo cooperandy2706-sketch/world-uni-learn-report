@@ -3,7 +3,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { format } from 'date-fns'
-import { Users, Clock, LogIn, LogOut, AlertTriangle, Search } from 'lucide-react'
+import { Users, Clock, LogIn, LogOut, AlertTriangle, Search, Send } from 'lucide-react'
+import { boardingService } from '../../services/boarding.service'
 
 function StatCard({ icon: Icon, label, value, color, bg }: any) {
   return (
@@ -48,6 +49,15 @@ export default function GateAttendancePage() {
     return () => { supabase.removeChannel(channel) }
   }, [schoolId, today, qc])
 
+  const { data: exeats = [] } = useQuery({
+    queryKey: ['active-exeats', schoolId],
+    queryFn: async () => {
+      const { data } = await boardingService.getExeats(schoolId)
+      return (data || []).filter((e: any) => e.status === 'approved' || e.status === 'departed')
+    },
+    enabled: !!schoolId,
+  })
+
   const filtered = scans.filter((s: any) => {
     const matchSearch = s.person_name.toLowerCase().includes(search.toLowerCase())
     const matchFilter = filter === 'all' ? true : filter === 'late' ? s.status === 'late' : s.person_type === filter
@@ -85,7 +95,7 @@ export default function GateAttendancePage() {
         <StatCard icon={Users} label="On Premise" value={onPremise} color="#059669" bg="#ecfdf5" />
         <StatCard icon={LogIn} label="Entries" value={totalIn} color="#2563eb" bg="#eff6ff" />
         <StatCard icon={LogOut} label="Exits" value={totalOut} color="#7c3aed" bg="#f5f3ff" />
-        <StatCard icon={AlertTriangle} label="Late" value={totalLate} color="#d97706" bg="#fffbeb" />
+        <StatCard icon={Send} label="Active Exeats" value={exeats.length} color="#ea580c" bg="#fff7ed" />
       </div>
 
       {/* Search + Filters */}
@@ -153,6 +163,26 @@ export default function GateAttendancePage() {
           </div>
         )}
       </div>
+
+      {/* Active Exeats Section */}
+      {exeats.length > 0 && (
+        <div style={{ marginTop: 32 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', marginBottom: 16 }}>Approved Exeats (Expected Today)</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+            {exeats.map((ex: any) => (
+              <div key={ex.id} style={{ background: '#fff', padding: 16, borderRadius: 16, border: '1.5px solid #ffedd5' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#1e0646' }}>{ex.student?.full_name}</div>
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: ex.status === 'departed' ? '#f3e8ff' : '#d1fae5', color: ex.status === 'departed' ? '#7c3aed' : '#059669', textTransform: 'uppercase' }}>{ex.status}</span>
+                </div>
+                <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}><strong>Dest:</strong> {ex.destination}</div>
+                <div style={{ fontSize: 12, color: '#475569' }}><strong>Out:</strong> {new Date(ex.departure_time).toLocaleString()}</div>
+                <div style={{ fontSize: 12, color: '#475569' }}><strong>Return:</strong> {new Date(ex.expected_return_time).toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

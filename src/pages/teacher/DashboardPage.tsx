@@ -183,11 +183,54 @@ export default function TeacherDashboardPage() {
     if (!msgSubject.trim() || !msgBody.trim()) return
     setSendingMsg(true)
     try {
-      await supabase.from('messages').insert({ school_id: user!.school_id, from_user_id: user!.id, subject: msgSubject, body: msgBody, priority: msgPriority })
+      const schoolId = user!.school_id
+      const groupKey = `staff_inbox_${schoolId}`
+
+      // Find or create the school staff-inbox conversation
+      let convId: string
+      const { data: existing } = await supabase
+        .from('chat_conversations')
+        .select('id')
+        .eq('group_key', groupKey)
+        .maybeSingle()
+
+      if (existing?.id) {
+        convId = existing.id
+      } else {
+        const { data: created, error: convErr } = await supabase
+          .from('chat_conversations')
+          .insert({
+            group_key: groupKey,
+            school_id: schoolId,
+            name: 'Staff Inbox',
+            type: 'group',
+          })
+          .select('id')
+          .single()
+        if (convErr || !created) throw convErr ?? new Error('Could not create conversation')
+        convId = created.id
+      }
+
+      // Ensure the sender is a member
+      await supabase.from('chat_members').upsert(
+        { conversation_id: convId, user_id: user!.id },
+        { onConflict: 'conversation_id,user_id', ignoreDuplicates: true }
+      )
+
+      // Insert the message (priority + subject encoded in body for visibility)
+      const priorityTag = msgPriority !== 'normal' ? `[${msgPriority.toUpperCase()}] ` : ''
+      await supabase.from('chat_messages').insert({
+        conversation_id: convId,
+        sender_id: user!.id,
+        body: `${priorityTag}${msgSubject}\n\n${msgBody}`,
+        school_id: schoolId,
+      })
+
       setMsgOpen(false); setMsgSubject(''); setMsgBody(''); setMsgPriority('normal')
     } catch { }
     finally { setSendingMsg(false) }
   }
+
 
   const uniqueClasses = [...new Map(assignments.map((a: any) => [a.class?.id, a.class])).values()].filter(Boolean)
   const uniqueSubjects = [...new Map(assignments.map((a: any) => [a.subject?.id, a.subject])).values()].filter(Boolean)

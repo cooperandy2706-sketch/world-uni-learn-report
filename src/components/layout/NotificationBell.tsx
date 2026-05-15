@@ -13,9 +13,22 @@ export default function NotificationBell(){
   const ref=useRef<HTMLDivElement>(null)
 
   useEffect(()=>{
-    if(user) load()
-    const t=setInterval(()=>{ if(user) load() },30000)
-    return()=>clearInterval(t)
+    if(user) {
+      load()
+      
+      const channel = supabase.channel('public:notifications')
+        .on('postgres_changes', { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`
+          }, 
+          () => load()
+        )
+        .subscribe()
+
+      return () => { supabase.removeChannel(channel) }
+    }
   },[user])
 
   useEffect(()=>{

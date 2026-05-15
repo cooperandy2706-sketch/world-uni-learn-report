@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import FlaskLoader from '../../components/ui/FlaskLoader'
-import { Wallet, CreditCard, ArrowDownRight, ArrowUpRight } from 'lucide-react'
+import { Wallet, CreditCard, ArrowDownRight, ArrowUpRight, Calendar, Download } from 'lucide-react'
+import { format, subMonths } from 'date-fns'
 
 export default function ProprietorFinances() {
   const { user } = useAuth()
@@ -15,23 +16,38 @@ export default function ProprietorFinances() {
     recentPayments: [] as any[],
     recentExpenses: [] as any[],
   })
+  const [dateRange, setDateRange] = useState({ 
+    start: format(subMonths(new Date(), 1), 'yyyy-MM-dd'),
+    end: format(new Date(), 'yyyy-MM-dd')
+  })
 
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
 
   useEffect(() => {
     if (!user?.school_id) return
     loadFinances()
-  }, [user?.school_id])
+  }, [user?.school_id, dateRange])
 
   async function loadFinances() {
     const sid = user!.school_id
+    setLoading(true)
     try {
       const [
         { data: payments },
         { data: expenses }
       ] = await Promise.all([
-        supabase.from('fee_payments').select('amount_paid, payment_date, student:students(full_name)').eq('school_id', sid).order('payment_date', { ascending: false }).limit(20),
-        supabase.from('expense_records').select('amount, date, description').eq('school_id', sid).order('date', { ascending: false }).limit(20)
+        supabase.from('fee_payments')
+          .select('amount_paid, payment_date, student:students(full_name)')
+          .eq('school_id', sid)
+          .gte('payment_date', dateRange.start)
+          .lte('payment_date', dateRange.end)
+          .order('payment_date', { ascending: false }),
+        supabase.from('expense_records')
+          .select('amount, date, description')
+          .eq('school_id', sid)
+          .gte('date', dateRange.start)
+          .lte('date', dateRange.end)
+          .order('date', { ascending: false })
       ])
 
       const totalCollected = (payments || []).reduce((s, p) => s + Number(p.amount_paid), 0)
@@ -40,12 +56,25 @@ export default function ProprietorFinances() {
       setFinances({
         totalCollected,
         totalExpenses,
-        recentPayments: (payments || []).slice(0, 5),
-        recentExpenses: (expenses || []).slice(0, 5),
+        recentPayments: (payments || []).slice(0, 10),
+        recentExpenses: (expenses || []).slice(0, 10),
       })
     } finally {
       setLoading(false)
     }
+  }
+
+  const exportCSV = () => {
+    const rows = [
+      ['Type', 'Date', 'Description/Student', 'Amount'],
+      ...finances.recentPayments.map(p => ['Income', p.payment_date, p.student?.full_name, p.amount_paid]),
+      ...finances.recentExpenses.map(e => ['Expense', e.date, e.description, e.amount])
+    ]
+    const csv = rows.map(r => r.join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = `finances_${dateRange.start}_to_${dateRange.end}.csv`; a.click()
   }
 
   if (loading) return <FlaskLoader fullScreen={false} label="Loading financials..." />
@@ -90,7 +119,20 @@ export default function ProprietorFinances() {
       `}</style>
 
       <div className="finances-wrap">
-        <h1 style={{ fontSize: 32, fontWeight: 800, margin: '0 0 32px', color: '#0f172a' }}>Financial Health</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
+          <h1 style={{ fontSize: 32, fontWeight: 800, margin: 0, color: '#0f172a' }}>Financial Health</h1>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: '#fff', padding: '6px 12px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+              <Calendar size={14} color="#64748b" />
+              <input type="date" value={dateRange.start} onChange={e => setDateRange({...dateRange, start: e.target.value})} style={{ border: 'none', fontSize: 13, fontWeight: 600, outline: 'none' }} />
+              <span style={{ color: '#94a3b8' }}>→</span>
+              <input type="date" value={dateRange.end} onChange={e => setDateRange({...dateRange, end: e.target.value})} style={{ border: 'none', fontSize: 13, fontWeight: 600, outline: 'none' }} />
+            </div>
+            <button onClick={exportCSV} style={{ padding: '10px 20px', borderRadius: 12, background: '#0f172a', color: '#fff', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Download size={16} /> Export
+            </button>
+          </div>
+        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 32 }}>
           <div className="fin-card">

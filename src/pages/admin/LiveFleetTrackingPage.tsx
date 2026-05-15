@@ -1,7 +1,30 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
-import { MapPin, Bus, User, Navigation, CheckCircle, Clock } from 'lucide-react'
+import { MapPin, Bus, User, Navigation, CheckCircle, Clock, Maximize2 } from 'lucide-react'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+
+// Fix for default marker icons in Leaflet with Vite
+import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+
+let DefaultIcon = L.icon({
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+})
+L.Marker.prototype.options.icon = DefaultIcon
+
+function RecenterMap({ coords }: { coords: [number, number] }) {
+  const map = useMap()
+  useEffect(() => {
+    map.setView(coords)
+  }, [coords])
+  return null
+}
 
 type ActiveTrip = {
   id: string
@@ -21,6 +44,7 @@ export default function LiveFleetTrackingPage() {
   const { user } = useAuth()
   const [activeTrips, setActiveTrips] = useState<ActiveTrip[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null)
 
   useEffect(() => {
     if (user?.school_id) {
@@ -109,7 +133,8 @@ export default function LiveFleetTrackingPage() {
   if (loading) return <div style={{ padding: 40, textAlign: 'center' }}>Loading Live Tracking...</div>
 
   return (
-    <div style={{ padding: '32px 24px', maxWidth: 1200, margin: '0 auto', fontFamily: '"DM Sans", sans-serif' }}>
+    <>
+      <div style={{ padding: '24px', maxWidth: 1100, margin: '0 auto', fontFamily: '"DM Sans", sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
         <div>
           <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0, color: '#111827', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -130,83 +155,91 @@ export default function LiveFleetTrackingPage() {
           <p style={{ color: '#64748b', marginTop: 8 }}>Vehicles will appear here when drivers start their trip on the Driver Portal.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: 24 }}>
-          {activeTrips.map(trip => {
-            const expectedCount = trip.expectedStudents.length
-            const boardedCount = trip.expectedStudents.filter(s => trip.boardedStudentIds.has(s.student_id)).length
-            const progress = expectedCount === 0 ? 0 : (boardedCount / expectedCount) * 100
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 24, height: 'calc(100vh - 200px)', minHeight: 600 }}>
+          
+          {/* Left: Map */}
+          <div style={{ background: '#fff', borderRadius: 24, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', position: 'relative' }}>
+            <MapContainer 
+              center={[activeTrips[0]?.latitude || 5.6037, activeTrips[0]?.longitude || -0.1870]} 
+              zoom={13} 
+              style={{ width: '100%', height: '100%' }}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              {activeTrips.map(trip => (
+                <Marker 
+                  key={trip.id} 
+                  position={[trip.latitude, trip.longitude]}
+                  eventHandlers={{ click: () => setSelectedTripId(trip.id) }}
+                >
+                  <Popup>
+                    <div style={{ padding: '4px' }}>
+                      <div style={{ fontWeight: 800, fontSize: 14, color: '#1e293b' }}>{trip.vehicle?.plate_number}</div>
+                      <div style={{ fontSize: 12, color: '#64748b' }}>Driver: {trip.driver?.full_name}</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#3b82f6', marginTop: 4 }}>{Math.round(trip.speed)} km/h</div>
+                    </div>
+                  </Popup>
+                </Marker>
+             ))}
+              {selectedTripId && activeTrips.find(t => t.id === selectedTripId) && (
+                <RecenterMap coords={[activeTrips.find(t => t.id === selectedTripId)!.latitude, activeTrips.find(t => t.id === selectedTripId)!.longitude]} />
+              )}
+            </MapContainer>
+          </div>
 
-            return (
-              <div key={trip.id} style={{ background: '#fff', borderRadius: 24, overflow: 'hidden', boxShadow: trip.speed > 80 ? '0 0 20px rgba(239, 68, 68, 0.4)' : '0 4px 20px rgba(0,0,0,0.04)', border: trip.speed > 80 ? '2px solid #ef4444' : '1px solid #e2e8f0', transition: 'all 0.3s' }}>
-                {/* Header */}
-                <div style={{ padding: 20, background: trip.speed > 80 ? '#7f1d1d' : '#1e293b', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', transition: 'background 0.3s' }}>
-                  <div>
-                    <div style={{ fontSize: 18, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <Bus size={20} color={trip.speed > 80 ? '#fca5a5' : '#60a5fa'} /> {trip.vehicle?.plate_number || 'Unknown Vehicle'}
-                    </div>
-                    <div style={{ fontSize: 13, color: trip.speed > 80 ? '#fecaca' : '#94a3b8', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <User size={14} /> Driver: {trip.driver?.full_name || 'Unknown'}
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: trip.speed > 80 ? '#fecaca' : '#38bdf8', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      {trip.speed > 80 && <span style={{ padding: '2px 6px', background: '#dc2626', borderRadius: 4, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em', animation: 'pulse 1s infinite' }}>Speeding Alert</span>}
-                      {Math.round(trip.speed || 0)} km/h
-                    </div>
-                    <div style={{ fontSize: 12, color: trip.speed > 80 ? '#fca5a5' : '#94a3b8', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
-                      <Clock size={12} /> {getTimeAgo(trip.last_updated)}
-                    </div>
-                  </div>
-                </div>
+          {/* Right: Sidebar with Manifests */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', paddingRight: 4 }}>
+            {activeTrips.map(trip => {
+              const expectedCount = trip.expectedStudents.length
+              const boardedCount = trip.expectedStudents.filter(s => trip.boardedStudentIds.has(s.student_id)).length
+              const progress = expectedCount === 0 ? 0 : (boardedCount / expectedCount) * 100
+              const isSelected = selectedTripId === trip.id
 
-                {/* GPS Info */}
-                <div style={{ padding: '16px 20px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <MapPin size={18} color="#3b82f6" />
-                  <div style={{ fontSize: 13, color: '#475569', fontFamily: 'monospace', fontWeight: 600 }}>
-                    {trip.latitude.toFixed(5)}, {trip.longitude.toFixed(5)}
-                  </div>
-                </div>
-
-                {/* Manifest Summary */}
-                <div style={{ padding: 20 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 }}>
+              return (
+                <div 
+                  key={trip.id} 
+                  onClick={() => setSelectedTripId(trip.id)}
+                  style={{ 
+                    background: '#fff', 
+                    borderRadius: 20, 
+                    overflow: 'hidden', 
+                    boxShadow: isSelected ? '0 8px 24px rgba(59,130,246,0.15)' : '0 2px 8px rgba(0,0,0,0.04)', 
+                    border: isSelected ? '2px solid #3b82f6' : '1px solid #e2e8f0', 
+                    transition: 'all 0.2s',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {/* Trip Header */}
+                  <div style={{ padding: '12px 16px', background: isSelected ? '#3b82f6' : '#1e293b', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Passenger Manifest</div>
-                      <div style={{ fontSize: 24, fontWeight: 800, color: '#111827', marginTop: 4 }}>
-                        {boardedCount} <span style={{ fontSize: 16, color: '#94a3b8' }}>/ {expectedCount} Onboard</span>
-                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 800 }}>{trip.vehicle?.plate_number}</div>
+                      <div style={{ fontSize: 11, opacity: 0.8 }}>{trip.driver?.full_name}</div>
                     </div>
-                    {progress === 100 && expectedCount > 0 && (
-                      <div style={{ padding: '6px 12px', background: '#d1fae5', color: '#059669', borderRadius: 20, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <CheckCircle size={14} /> All Boarded
-                      </div>
-                    )}
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: 14, fontWeight: 800 }}>{Math.round(trip.speed)} <span style={{ fontSize: 10 }}>km/h</span></div>
+                    </div>
                   </div>
 
-                  {/* Progress Bar */}
-                  <div style={{ height: 8, background: '#e2e8f0', borderRadius: 4, overflow: 'hidden', marginBottom: 20 }}>
-                    <div style={{ height: '100%', background: progress === 100 ? '#10b981' : '#3b82f6', width: progress + '%', transition: 'width 0.5s ease-in-out' }} />
-                  </div>
+                  {/* Manifest Summary */}
+                  <div style={{ padding: 16 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b' }}>BOARDING</div>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: '#1e293b' }}>{boardedCount} / {expectedCount}</div>
+                    </div>
+                    <div style={{ height: 6, background: '#f1f5f9', borderRadius: 3, overflow: 'hidden', marginBottom: 12 }}>
+                      <div style={{ height: '100%', background: progress === 100 ? '#10b981' : '#3b82f6', width: progress + '%' }} />
+                    </div>
 
-                  {/* Detailed Student List */}
-                  <div style={{ maxHeight: 200, overflowY: 'auto', paddingRight: 8 }}>
-                    {trip.expectedStudents.length === 0 ? (
-                      <div style={{ fontSize: 13, color: '#94a3b8', fontStyle: 'italic' }}>No students assigned to this vehicle.</div>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {isSelected && (
+                      <div style={{ maxHeight: 200, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12, borderTop: '1px solid #f1f5f9', paddingTop: 12 }}>
                         {trip.expectedStudents.map(assignment => {
                           const isBoarded = trip.boardedStudentIds.has(assignment.student_id)
                           return (
-                            <div key={assignment.student_id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: isBoarded ? '#ecfdf5' : '#f1f5f9', borderRadius: 12, border: isBoarded ? '1px solid #10b981' : '1px solid transparent' }}>
-                              <div>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: isBoarded ? '#065f46' : '#334155', textDecoration: isBoarded ? 'line-through' : 'none' }}>
-                                  {assignment.student?.full_name}
-                                </div>
-                                <div style={{ fontSize: 12, color: isBoarded ? '#047857' : '#64748b' }}>
-                                  {assignment.student?.class?.name}
-                                </div>
-                              </div>
-                              {isBoarded ? <CheckCircle size={18} color="#10b981" /> : <div style={{ fontSize: 12, fontWeight: 600, color: '#94a3b8' }}>Awaiting</div>}
+                            <div key={assignment.student_id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 8px', background: isBoarded ? '#ecfdf5' : '#f8fafc', borderRadius: 8 }}>
+                              <div style={{ fontSize: 12, fontWeight: 600, color: isBoarded ? '#059669' : '#334155' }}>{assignment.student?.full_name}</div>
+                              {isBoarded ? <CheckCircle size={14} color="#10b981" /> : <div style={{ fontSize: 10, color: '#94a3b8' }}>Pending</div>}
                             </div>
                           )
                         })}
@@ -214,10 +247,9 @@ export default function LiveFleetTrackingPage() {
                     )}
                   </div>
                 </div>
-
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       )}
       
@@ -228,6 +260,7 @@ export default function LiveFleetTrackingPage() {
           100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
       `}</style>
-    </div>
+      </div>
+    </>
   )
 }

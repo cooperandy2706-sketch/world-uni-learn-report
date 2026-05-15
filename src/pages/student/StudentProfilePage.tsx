@@ -11,6 +11,8 @@ export default function StudentProfilePage() {
   const [studentData, setStudentData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [changingPassword, setChangingPassword] = useState(false)
 
   useEffect(() => {
     setTimeout(() => setMounted(true), 50)
@@ -33,6 +35,63 @@ export default function StudentProfilePage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+
+    setUploading(true)
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}-${Math.random()}.${fileExt}`
+      const filePath = `avatars/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id)
+
+      if (updateError) throw updateError
+      
+      toast.success('Avatar updated!')
+      window.location.reload()
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to upload avatar')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function handleChangePassword() {
+    const newPassword = prompt('Enter your new password (min 6 characters):')
+    if (!newPassword) return
+    if (newPassword.length < 6) return toast.error('Password too short')
+
+    setChangingPassword(true)
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      if (error) throw error
+      toast.success('Password updated successfully')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to change password')
+    } finally {
+      setChangingPassword(false)
+    }
+  }
+
+  function handleContactSupport() {
+    window.location.href = `mailto:support@worldunlearn.com?subject=Student Support Request - ${user?.full_name}`
   }
 
   if (loading) return (
@@ -79,12 +138,13 @@ export default function StudentProfilePage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32, animation: '_sfu .5s ease .1s both' }}>
             <div className="profile-card" style={{ textAlign: 'center' }}>
               <div style={{ position: 'relative', width: 140, height: 140, margin: '0 auto 24px' }}>
-                <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48, fontWeight: 800, color: '#fff', boxShadow: '0 12px 24px rgba(109,40,217,0.2)' }}>
-                  {user?.full_name?.charAt(0).toUpperCase()}
+                <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: user?.avatar_url ? `url(${user.avatar_url}) center/cover no-repeat` : 'linear-gradient(135deg, #7c3aed, #6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48, fontWeight: 800, color: '#fff', boxShadow: '0 12px 24px rgba(109,40,217,0.2)' }}>
+                  {!user?.avatar_url && user?.full_name?.charAt(0).toUpperCase()}
                 </div>
-                <div style={{ position: 'absolute', bottom: 4, right: 4, width: 36, height: 36, borderRadius: '50%', background: '#fff', border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#6d28d9', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                  📸
-                </div>
+                <label style={{ position: 'absolute', bottom: 4, right: 4, width: 36, height: 36, borderRadius: '50%', background: '#fff', border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#6d28d9', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                  {uploading ? '⏳' : '📸'}
+                  <input type="file" hidden accept="image/*" onChange={handleAvatarUpload} disabled={uploading} />
+                </label>
               </div>
               <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 24, fontWeight: 700, color: '#1e293b', margin: '0 0 4px' }}>{user?.full_name}</h2>
               <p style={{ fontSize: 14, color: '#64748b', margin: '0 0 20px' }}>{studentData?.student_id || 'ID Pending'}</p>
@@ -104,8 +164,11 @@ export default function StudentProfilePage() {
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 4 }}>Email Address</div>
                   <div style={{ fontSize: 14, color: '#1e293b' }}>{user?.email}</div>
                 </div>
-                <button style={{ width: '100%', padding: '12px', borderRadius: 12, background: '#fff', color: '#6d28d9', fontSize: 13, fontWeight: 700, border: '1.5px solid #6d28d9', cursor: 'pointer', transition: 'all 0.2s' }}>
-                  Change Password
+                <button 
+                  onClick={handleChangePassword}
+                  disabled={changingPassword}
+                  style={{ width: '100%', padding: '12px', borderRadius: 12, background: '#fff', color: '#6d28d9', fontSize: 13, fontWeight: 700, border: '1.5px solid #6d28d9', cursor: 'pointer', transition: 'all 0.2s', opacity: changingPassword ? 0.6 : 1 }}>
+                  {changingPassword ? 'Updating...' : 'Change Password'}
                 </button>
               </div>
             </div>
@@ -189,7 +252,9 @@ export default function StudentProfilePage() {
               <div style={{ position: 'absolute', right: -20, bottom: -20, fontSize: 100, opacity: 0.1 }}>📞</div>
               <h4 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>Need to update your details?</h4>
               <p style={{ fontSize: 13, opacity: 0.8, margin: '0 0 16px', maxWidth: 400 }}>If any of your information is incorrect or has changed, please contact the school administration office to request an update.</p>
-              <button style={{ padding: '10px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', backdropFilter: 'blur(10px)' }}>
+              <button 
+                onClick={handleContactSupport}
+                style={{ padding: '10px 20px', borderRadius: 10, background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', backdropFilter: 'blur(10px)' }}>
                 Contact Support
               </button>
             </div>

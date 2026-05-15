@@ -64,6 +64,19 @@ export default function LoginPage() {
     }
   }
 
+  const handleOAuthSignIn = async (provider: 'google' | 'azure') => {
+    const { supabase } = await import('../../lib/supabase')
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: window.location.origin + ROUTES.ADMIN_DASHBOARD
+      }
+    })
+    if (error) {
+      setServerError(`Failed to connect with ${provider}. Please try again.`)
+    }
+  }
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -166,6 +179,28 @@ export default function LoginPage() {
           40%, 80% { transform: translateX(6px); }
         }
         .shake { animation: _l_shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        .sso-btn {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 12px;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          color: #fff;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .sso-btn:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border-color: rgba(255, 255, 255, 0.2);
+          transform: translateY(-1px);
+        }
       `}</style>
 
       <div style={{
@@ -257,6 +292,25 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          {/* SSO Separator */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, margin: '24px 0' }}>
+            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Or continue with</span>
+            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
+          </div>
+
+          {/* OAuth Buttons */}
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button className="sso-btn" onClick={() => handleOAuthSignIn('google')}>
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: 18, height: 18 }} />
+              Google
+            </button>
+            <button className="sso-btn" onClick={() => handleOAuthSignIn('azure')}>
+              <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" style={{ width: 18, height: 18 }} />
+              Microsoft
+            </button>
+          </div>
 
           {/* Server error */}
           {serverError && (

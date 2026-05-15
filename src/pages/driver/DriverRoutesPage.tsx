@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
-import { MapPin, Navigation, Info, Bus } from 'lucide-react'
+import { MapPin, Navigation, Info, Bus, Play, Square } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 export default function DriverRoutesPage() {
   const { user } = useAuth()
   const [routes, setRoutes] = useState<any[]>([])
   const [vehicle, setVehicle] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [activeTrip, setActiveTrip] = useState<any>(null)
+  const [updating, setUpdating] = useState(false)
 
   useEffect(() => {
     if (user?.school_id) loadRoutes()
@@ -25,6 +28,17 @@ export default function DriverRoutesPage() {
 
     setVehicle(vData)
 
+    if (vData) {
+      // Check for active trip
+      const { data: active } = await supabase
+        .from('transport_live_locations')
+        .select('*')
+        .eq('vehicle_id', vData.id)
+        .eq('is_active', true)
+        .maybeSingle()
+      setActiveTrip(active)
+    }
+
     // Fetch routes for the school
     const { data: rData } = await supabase
       .from('transport_routes')
@@ -35,6 +49,79 @@ export default function DriverRoutesPage() {
     setRoutes(rData || [])
     setLoading(false)
   }
+
+  async function startTrip() {
+    if (!vehicle || !user) return
+    setUpdating(true)
+    try {
+      // Create new active location record
+      const { data, error } = await supabase
+        .from('transport_live_locations')
+        .insert({
+          school_id: user.school_id,
+          vehicle_id: vehicle.id,
+          driver_id: user.id,
+          latitude: 5.6037, // Default Accra coords
+          longitude: -0.1870,
+          speed: 0,
+          is_active: true,
+          last_updated: new Date().toISOString()
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      setActiveTrip(data)
+      toast.success('Trip started! Drive safely.')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to start trip')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  async function endTrip() {
+    if (!activeTrip) return
+    if (!confirm('Are you sure you want to end this trip?')) return
+    setUpdating(true)
+    try {
+      const { error } = await supabase
+        .from('transport_live_locations')
+        .update({ is_active: false, last_updated: new Date().toISOString() })
+        .eq('id', activeTrip.id)
+
+      if (error) throw error
+      setActiveTrip(null)
+      toast.success('Trip ended.')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to end trip')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  // Simulated location updates
+  useEffect(() => {
+    let interval: any
+    if (activeTrip) {
+      interval = setInterval(async () => {
+        const newLat = activeTrip.latitude + (Math.random() - 0.5) * 0.001
+        const newLng = activeTrip.longitude + (Math.random() - 0.5) * 0.001
+        const newSpeed = Math.floor(Math.random() * 40) + 20
+
+        await supabase
+          .from('transport_live_locations')
+          .update({
+            latitude: newLat,
+            longitude: newLng,
+            speed: newSpeed,
+            last_updated: new Date().toISOString()
+          })
+          .eq('id', activeTrip.id)
+      }, 15000)
+    }
+    return () => clearInterval(interval)
+  }, [activeTrip])
 
   if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>Loading routes...</div>
 
@@ -55,15 +142,32 @@ export default function DriverRoutesPage() {
           </div>
         </div>
       ) : (
-        <div style={{ marginBottom: 24, padding: 20, background: '#eff6ff', borderRadius: 16, border: '1px solid #bfdbfe', display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ width: 48, height: 48, background: '#3b82f6', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+        <div style={{ marginBottom: 24, padding: 20, background: activeTrip ? '#ecfdf5' : '#eff6ff', borderRadius: 16, border: activeTrip ? '1px solid #10b981' : '1px solid #bfdbfe', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.3s' }}>
+          <div style={{ width: 48, height: 48, background: activeTrip ? '#10b981' : '#3b82f6', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', transition: 'background 0.3s' }}>
             <Bus size={24} />
           </div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Your Vehicle</div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: '#1e3a8a' }}>{vehicle.plate_number}</div>
-            <div style={{ fontSize: 13, color: '#3b82f6', fontWeight: 600 }}>{vehicle.make_model}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: activeTrip ? '#059669' : '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{activeTrip ? 'Active Trip' : 'Your Vehicle'}</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: activeTrip ? '#064e3b' : '#1e3a8a' }}>{vehicle.plate_number}</div>
+            <div style={{ fontSize: 13, color: activeTrip ? '#059669' : '#3b82f6', fontWeight: 600 }}>{vehicle.make_model}</div>
           </div>
+          {activeTrip ? (
+            <button 
+              onClick={endTrip}
+              disabled={updating}
+              style={{ padding: '10px 20px', borderRadius: 12, background: '#ef4444', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(239,68,68,0.2)' }}
+            >
+              End Trip
+            </button>
+          ) : (
+            <button 
+              onClick={startTrip}
+              disabled={updating}
+              style={{ padding: '10px 20px', borderRadius: 12, background: '#10b981', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(16,185,129,0.2)' }}
+            >
+              Start Trip
+            </button>
+          )}
         </div>
       )}
 

@@ -127,7 +127,7 @@ export default function ParentAcademicsPage() {
           const avg = data?.report?.average_score ?? (data?.scores.length ? data.scores.reduce((s: any, x: any) => s + (x.total_score ?? 0), 0) / data.scores.length : null)
           const gradeInfo = avg != null ? getGradeInfo(avg) : null
           
-          const totalOutstanding = (Number(ward.fees_arrears ?? 0) + (ward.other_fees ?? []).reduce((s: number, f: any) => s + Math.max(0, Number(f.amount) - Number(f.paid ?? 0)), 0))
+          const totalOutstanding = (Number(ward.fees_arrears ?? 0) + (ward.other_fees || []).reduce((s: number, f: any) => s + Math.max(0, Number(f.amount) - Number(f.paid ?? 0)), 0))
           const isFinancialHold = totalOutstanding > 0
 
           return (

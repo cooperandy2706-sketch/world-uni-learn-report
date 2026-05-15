@@ -1,6 +1,7 @@
 // src/pages/admin/SettingsPage.tsx
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { KeyRound, Eye, EyeOff } from 'lucide-react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { supabase } from '../../lib/supabase'
@@ -24,6 +25,7 @@ const schema = z.object({
   school_fees_info: z.string().optional(),
   school_news: z.string().optional(),
   paystack_public_key: z.string().optional().or(z.literal('')),
+  currency_code: z.string().optional(),
   report_theme: z.enum(['modern', 'classic', 'professional']),
   primary_color: z.string(),
 })
@@ -108,6 +110,107 @@ const MOCK_SCORES = [
   { id: 's3', subject: { name: 'Integrated Science' }, total_score: 89, category_scores: { cs: 27, es: 62 } },
 ]
 
+// ─── Password Change Panel ────────────────────────────────
+function PasswordChangePanel() {
+  const [newPw, setNewPw] = useState('')
+  const [confirmPw, setConfirmPw] = useState('')
+  const [showNew, setShowNew] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  async function handleChange(e: React.FormEvent) {
+    e.preventDefault()
+    if (newPw.length < 8) { toast.error('Password must be at least 8 characters'); return }
+    if (newPw !== confirmPw) { toast.error('Passwords do not match'); return }
+    setSaving(true)
+    const { error } = await supabase.auth.updateUser({ password: newPw })
+    setSaving(false)
+    if (error) { toast.error(error.message || 'Failed to update password'); return }
+    toast.success('Password updated successfully!')
+    setNewPw(''); setConfirmPw('')
+  }
+
+  const inputStyle: React.CSSProperties = {
+    flex: 1, padding: '9px 12px', borderRadius: 9, fontSize: 13,
+    border: '1.5px solid #e5e7eb', background: '#fff', color: '#111827',
+    fontFamily: '"DM Sans",sans-serif', outline: 'none', boxSizing: 'border-box',
+  }
+
+  return (
+    <FieldGroup title="Change Password" icon="🔐">
+      <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 16 }}>
+        Choose a strong password with at least 8 characters.
+      </p>
+      <form onSubmit={handleChange}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <Field label="New Password">
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input
+                type={showNew ? 'text' : 'password'}
+                value={newPw}
+                onChange={e => setNewPw(e.target.value)}
+                placeholder="Enter new password"
+                style={{ ...inputStyle, paddingRight: 38 }}
+                onFocus={e => (e.currentTarget.style.borderColor = '#7c3aed')}
+                onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
+              />
+              <button type="button" onClick={() => setShowNew(p => !p)}
+                style={{ position: 'absolute', right: 10, background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex', padding: 0 }}>
+                {showNew ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+          </Field>
+
+          <Field label="Confirm New Password">
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                value={confirmPw}
+                onChange={e => setConfirmPw(e.target.value)}
+                placeholder="Repeat new password"
+                style={{
+                  ...inputStyle, paddingRight: 38,
+                  borderColor: confirmPw && confirmPw !== newPw ? '#f87171' : '#e5e7eb',
+                }}
+                onFocus={e => (e.currentTarget.style.borderColor = '#7c3aed')}
+                onBlur={e => (e.currentTarget.style.borderColor = confirmPw && confirmPw !== newPw ? '#f87171' : '#e5e7eb')}
+              />
+              <button type="button" onClick={() => setShowConfirm(p => !p)}
+                style={{ position: 'absolute', right: 10, background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex', padding: 0 }}>
+                {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+            {confirmPw && confirmPw !== newPw && (
+              <p style={{ fontSize: 11, color: '#ef4444', marginTop: 3 }}>⚠ Passwords do not match</p>
+            )}
+          </Field>
+
+          {/* Strength indicator */}
+          {newPw.length > 0 && (
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              {[1,2,3,4].map(i => (
+                <div key={i} style={{
+                  flex: 1, height: 4, borderRadius: 2, transition: 'background 0.2s',
+                  background: newPw.length >= i * 3 ? (newPw.length >= 12 ? '#16a34a' : newPw.length >= 8 ? '#f59e0b' : '#ef4444') : '#e5e7eb',
+                }} />
+              ))}
+              <span style={{ fontSize: 10, color: '#6b7280', marginLeft: 6, whiteSpace: 'nowrap' }}>
+                {newPw.length < 8 ? 'Too short' : newPw.length < 12 ? 'Fair' : 'Strong'}
+              </span>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Btn type="submit" loading={saving} disabled={saving || !newPw || newPw !== confirmPw} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <KeyRound size={14} /> Update Password
+            </Btn>
+          </div>
+        </div>
+      </form>
+    </FieldGroup>
+  )
+}
+
 // ═══════════════════════════════════════════════════════════
 export default function SettingsPage() {
   const { user } = useAuth()
@@ -144,6 +247,7 @@ export default function SettingsPage() {
         school_fees_info: settings.school_fees_info ?? '',
         school_news: settings.school_news ?? '',
         paystack_public_key: school?.paystack_public_key ?? '',
+        currency_code: school?.currency_code ?? 'GHS',
         report_theme: settings.report_theme ?? 'modern',
         primary_color: settings.primary_color ?? '#1e3a8a',
       })
@@ -170,6 +274,7 @@ export default function SettingsPage() {
           address: data.school_address,
           headteacher_name: data.headteacher_name,
           paystack_public_key: data.paystack_public_key,
+          currency_code: data.currency_code,
         })
         .eq('id', user!.school_id)
       if (schoolError) throw schoolError
@@ -363,6 +468,17 @@ export default function SettingsPage() {
                     <div style={{ gridColumn: '1 / -1' }}>
                       <Field label="Paystack Public Key" hint="Used for secure online fee payments. Starts with 'pk_test_' or 'pk_live_'">
                         <StyledInput {...register('paystack_public_key')} placeholder="pk_test_..." />
+                      </Field>
+                      <Field label="School Currency" hint="Default currency for all billing displays">
+                        <select {...register('currency_code')} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }}>
+                          <option value="GHS">GHS - Ghana Cedi</option>
+                          <option value="USD">USD - US Dollar</option>
+                          <option value="EUR">EUR - Euro</option>
+                          <option value="GBP">GBP - British Pound</option>
+                          <option value="NGN">NGN - Nigerian Naira</option>
+                          <option value="KES">KES - Kenyan Shilling</option>
+                          <option value="ZAR">ZAR - South African Rand</option>
+                        </select>
                       </Field>
                     </div>
                   </div>
@@ -620,25 +736,22 @@ export default function SettingsPage() {
 
             {/* ── ACCOUNT TAB ── */}
             {activeTab === 'account' && (
-              <FieldGroup title="Admin Account" icon="👤">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px', background: '#faf5ff', borderRadius: 12, marginBottom: 16 }}>
-                  <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 900, color: '#fff', flexShrink: 0 }}>
-                    {user?.full_name?.charAt(0).toUpperCase()}
+              <>
+                <FieldGroup title="Admin Account" icon="👤">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px', background: '#faf5ff', borderRadius: 12, marginBottom: 16 }}>
+                    <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 900, color: '#fff', flexShrink: 0 }}>
+                      {user?.full_name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{user?.full_name}</div>
+                      <div style={{ fontSize: 12, color: '#6b7280' }}>{user?.email}</div>
+                      <span style={{ fontSize: 11, fontWeight: 700, background: '#f5f3ff', color: '#6d28d9', padding: '2px 8px', borderRadius: 99, marginTop: 4, display: 'inline-block' }}>Administrator</span>
+                    </div>
                   </div>
-                  <div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{user?.full_name}</div>
-                    <div style={{ fontSize: 12, color: '#6b7280' }}>{user?.email}</div>
-                    <span style={{ fontSize: 11, fontWeight: 700, background: '#f5f3ff', color: '#6d28d9', padding: '2px 8px', borderRadius: 99, marginTop: 4, display: 'inline-block' }}>Administrator</span>
-                  </div>
-                </div>
-                <div style={{ background: '#ecfeff', border: '1px solid #a5f3fc', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: 16 }}>🔐</span>
-                  <div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: '#0e7490', marginBottom: 2 }}>Password Management</p>
-                    <p style={{ fontSize: 12, color: '#0891b2' }}>To change your password, go to Supabase Dashboard → Authentication → Users → find your account → Update Password.</p>
-                  </div>
-                </div>
-              </FieldGroup>
+                </FieldGroup>
+
+                <PasswordChangePanel />
+              </>
             )}
 
             {/* Save button */}

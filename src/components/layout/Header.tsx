@@ -37,6 +37,14 @@ const ADMIN_NAV = [
       { label: 'Student Directory', to: '/admin/student-directory' },
       { label: 'Staff Directory', to: ROUTES.ADMIN_TEACHERS },
       { label: 'Parent Logins', to: '/admin/parents' },
+      { label: 'Other Staff', to: '/admin/other-staff' },
+      { label: 'Bursar Staff', to: '/admin/bursars' },
+      { label: 'Security Personnel', to: ROUTES.ADMIN_SECURITY },
+      { label: 'Drivers', to: '/admin/drivers' },
+      { label: 'Alumni', to: ROUTES.ADMIN_ALUMNI },
+      { label: 'Boarding & Dorms', to: '/admin/boarding' },
+      { label: 'Exeat Requests', to: '/admin/exeats' },
+      { label: 'Pastoral Care', to: '/admin/pastoral' },
       { label: 'SMS Messaging', to: ROUTES.ADMIN_SMS },
     ]
   },
@@ -46,16 +54,11 @@ const ADMIN_NAV = [
       { label: 'Calendar', to: ROUTES.ADMIN_CALENDAR },
       { label: 'Messages', to: ROUTES.ADMIN_MESSAGES },
       { label: 'Staff Operations', to: '/admin/staff-operations' },
-      { label: 'Other Staff', to: '/admin/other-staff' },
       { label: 'Asset Register', to: '/admin/assets' },
       { label: 'Billing', to: '/admin/billing' },
-      { label: 'Bursar Staff', to: '/admin/bursars' },
-      { label: 'Security Personnel', to: ROUTES.ADMIN_SECURITY },
-      { label: 'Drivers', to: '/admin/drivers' },
       { label: 'Live Tracking', to: '/admin/fleet/live' },
       { label: 'Poster Maker', to: '/admin/poster-maker' },
       { label: 'Elections (PEC)', to: '/admin/elections' },
-      { label: 'Alumni', to: ROUTES.ADMIN_ALUMNI },
     ]
   },
   {
@@ -96,6 +99,7 @@ const TEACHER_NAV = [
       { label: 'Term Agenda', to: '/teacher/agenda' },
       { label: 'Elections (PEC)', to: '/teacher/elections-hub' },
       { label: 'Typing Nitro', to: ROUTES.TEACHER_TYPING_GAME },
+      { label: 'Pastoral Care', to: '/teacher/pastoral' },
     ]
   },
 ]
@@ -119,6 +123,7 @@ const STUDENT_NAV = [
       { label: 'PEC Elections', to: ROUTES.STUDENT_ELECTIONS },
       { label: 'Notice Board', to: ROUTES.STUDENT_ANNOUNCEMENTS },
       { label: 'Calendar', to: ROUTES.STUDENT_CALENDAR },
+      { label: 'My Exeats', to: '/student/exeats' },
     ]
   },
   {
@@ -176,9 +181,11 @@ const PROPRIETOR_NAV = [
 const PARENT_NAV = [
   { label: 'Wards', to: '/parent/dashboard', single: true },
   { label: 'Academics', to: '/parent/academics', single: true },
+  { label: 'Attendance', to: '/parent/attendance', single: true },
   { label: 'Billing', to: '/parent/billing', single: true },
   { label: 'Messaging', to: '/parent/messages', single: true },
   { label: 'Calendar', to: '/parent/calendar', single: true },
+  { label: 'Exeats', to: '/parent/exeats', single: true },
 ]
 
 const STAFF_NAV = [
@@ -1023,9 +1030,7 @@ export default function Header() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <button
                     onClick={() => { 
-                      if (user?.role) {
-                        navigate(`/${user.role.replace('_', '-')}/account`)
-                      }
+                      navigate('/account')
                       setProfileOpen(false) 
                     }}
                     style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', background: '#f3f4f6', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left' }}
@@ -1033,6 +1038,17 @@ export default function Header() {
                     onMouseLeave={e => e.currentTarget.style.background = '#f3f4f6'}
                   >
                     <Settings size={15} /> Manage Account
+                  </button>
+                  <button
+                    onClick={() => { 
+                      navigate('/privacy')
+                      setProfileOpen(false) 
+                    }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', background: '#f3f4f6', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#e5e7eb'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#f3f4f6'}
+                  >
+                    <Shield size={15} /> Data & Privacy
                   </button>
                   <button
                     onClick={handleSignOut}

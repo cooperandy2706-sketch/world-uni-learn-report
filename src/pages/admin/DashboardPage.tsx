@@ -20,7 +20,7 @@ interface Stats {
   totalDebt: number; pendingApproval: number
 }
 interface TopStudent { student_id: string; full_name: string; class_name: string; average_score: number; overall_position: number; total_students: number }
-interface Message { id: string; subject: string; body: string; priority: string; created_at: string; is_read: boolean; from_user?: { full_name: string } }
+interface Message { id: string; body: string; created_at: string; is_read: boolean; sender?: { full_name: string } }
 interface ClassStat { id: string; name: string; student_count: number; avg_score: number | null; reports_done: number }
 interface RecentActivity { type: string; label: string; sub: string; time: string; icon: string; color: string }
 
@@ -132,7 +132,7 @@ export default function DashboardPage() {
 
     // Real-time listeners
     const channel = supabase.channel('dashboard-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `school_id=eq.${user.school_id}` }, () => loadMessages())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages', filter: `school_id=eq.${user.school_id}` }, () => loadMessages())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'fee_payments', filter: `school_id=eq.${user.school_id}` }, () => {
         loadStats()
         loadFinancePerformance()
@@ -219,7 +219,9 @@ export default function DashboardPage() {
       supabase.from('classes').select('*', { count: 'exact', head: true }).eq('school_id', sid),
       supabase.from('subjects').select('*', { count: 'exact', head: true }).eq('school_id', sid),
       supabase.from('departments').select('*', { count: 'exact', head: true }).eq('school_id', sid),
-      supabase.from('messages').select('*', { count: 'exact', head: true }).eq('school_id', sid).eq('is_read', false),
+      // Unread count: chat messages in school conversations newer than admin's last_read_at
+      supabase.from('chat_messages').select('*', { count: 'exact', head: true }).eq('school_id', sid)
+        .gt('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
       supabase.from('assignments').select('*', { count: 'exact', head: true }).eq('school_id', sid),
       supabase.from('assignment_submissions').select('*, assignment:assignments!inner(*)', { count: 'exact', head: true }).eq('assignments.school_id', sid),
       supabase.from('announcements').select('*', { count: 'exact', head: true }).eq('school_id', sid),
@@ -379,8 +381,39 @@ export default function DashboardPage() {
   }
 
   async function loadMessages() {
-    const { data } = await supabase.from('messages').select('*, from_user:users(full_name)').eq('school_id', user!.school_id).order('created_at', { ascending: false }).limit(6)
-    setMessages(data ?? [])
+    const schoolId = user!.school_id
+    const groupKey = `staff_inbox_${schoolId}`
+    // Find the staff inbox conversation
+    const { data: conv } = await supabase
+      .from('chat_conversations')
+      .select('id')
+      .eq('group_key', groupKey)
+      .maybeSingle()
+    if (!conv?.id) { setMessages([]); return }
+    // Fetch latest messages with sender name
+    const { data } = await supabase
+      .from('chat_messages')
+      .select('id, body, created_at, sender_id, sender:users!chat_messages_sender_id_fkey(full_name)')
+      .eq('conversation_id', conv.id)
+      .order('created_at', { ascending: false })
+      .limit(6)
+    // Mark unread: messages newer than admin's last_read_at
+    const { data: membership } = await supabase
+      .from('chat_members')
+      .select('last_read_at')
+      .eq('conversation_id', conv.id)
+      .eq('user_id', user!.id)
+      .maybeSingle()
+    const lastRead = membership?.last_read_at ? new Date(membership.last_read_at) : new Date(0)
+    setMessages(
+      (data ?? []).map((m: any) => ({
+        id: m.id,
+        body: m.body,
+        created_at: m.created_at,
+        is_read: new Date(m.created_at) <= lastRead,
+        sender: m.sender,
+      }))
+    )
   }
 
   async function loadClassStats() {
@@ -404,7 +437,19 @@ export default function DashboardPage() {
   }
 
   async function markRead(id: string) {
-    await supabase.from('messages').update({ is_read: true }).eq('id', id).eq('school_id', user!.school_id)
+    // Update last_read_at to now in chat_members for the staff_inbox conversation
+    const groupKey = `staff_inbox_${user!.school_id}`
+    const { data: conv } = await supabase
+      .from('chat_conversations')
+      .select('id')
+      .eq('group_key', groupKey)
+      .maybeSingle()
+    if (conv?.id) {
+      await supabase.from('chat_members')
+        .update({ last_read_at: new Date().toISOString() })
+        .eq('conversation_id', conv.id)
+        .eq('user_id', user!.id)
+    }
     setMessages(prev => prev.map(m => m.id === id ? { ...m, is_read: true } : m))
     setStats(prev => prev ? { ...prev, unreadMessages: Math.max(0, prev.unreadMessages - 1) } : prev)
   }
@@ -759,6 +804,9 @@ export default function DashboardPage() {
                 { icon: '📊', label: 'Analytics', to: ROUTES.ADMIN_ANALYTICS, color: '#06b6d4' },
                 { icon: '📱', label: 'SMS', to: ROUTES.ADMIN_SMS, color: '#14b8a6' },
                 { icon: '⚙️', label: 'Settings', to: ROUTES.ADMIN_SETTINGS, color: '#64748b' },
+                { icon: '🛏️', label: 'Boarding', to: '/admin/boarding', color: '#10b981' },
+                { icon: '🚪', label: 'Exeats', to: '/admin/exeats', color: '#f59e0b' },
+                { icon: '❤️', label: 'Pastoral', to: '/admin/pastoral', color: '#ef4444' },
               ].map(({ icon, label, to, color }) => (
                 <Link key={label} to={to} className="op-card">
                   <div style={{ width: 44, height: 44, borderRadius: 14, background: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: color }}>
@@ -778,8 +826,8 @@ export default function DashboardPage() {
             <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 24, width: '100%', maxWidth: 520, boxShadow: '0 24px 64px rgba(0,0,0,0.2)', overflow: 'hidden', animation: 'scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
               <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', background: '#f8fafc' }}>
                 <div>
-                  <p style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.02em' }}>{activeMsg.subject}</p>
-                  <p style={{ fontSize: 14, color: '#64748b', margin: '6px 0 0', fontWeight: 500 }}>From: {activeMsg.from_user?.full_name ?? 'Teacher'} • {timeAgo(activeMsg.created_at)}</p>
+                  <p style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.02em' }}>{activeMsg.body.split("\n")[0].slice(0, 80)}</p>
+                  <p style={{ fontSize: 14, color: '#64748b', margin: '6px 0 0', fontWeight: 500 }}>From: {activeMsg.sender?.full_name ?? 'Staff'} • {timeAgo(activeMsg.created_at)}</p>
                 </div>
                 <button onClick={() => setActiveMsg(null)} style={{ width: 36, height: 36, borderRadius: 12, border: 'none', background: '#e2e8f0', cursor: 'pointer', fontSize: 16, color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#cbd5e1'} onMouseLeave={e => e.currentTarget.style.background = '#e2e8f0'}>✕</button>
               </div>

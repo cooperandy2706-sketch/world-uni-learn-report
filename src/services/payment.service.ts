@@ -30,6 +30,7 @@ export const paymentService = {
     amount: number
     publicKey: string
     reference: string
+    currency?: string
     subaccount?: string
     metadata?: any
     onSuccess: (response: any) => void
@@ -45,6 +46,7 @@ export const paymentService = {
       key: options.publicKey,
       email: options.email,
       amount: Math.round(options.amount * 100), // Paystack works in kobo/pesewas
+      currency: options.currency || 'GHS',
       ref: options.reference,
       subaccount: options.subaccount || undefined,
       metadata: options.metadata || {},

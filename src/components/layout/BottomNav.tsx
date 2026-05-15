@@ -9,7 +9,7 @@ import { dailyFeesService } from '../../services/bursar.service'
 import { 
   LayoutDashboard, Users, FileSpreadsheet, ClipboardCheck, 
   Megaphone, PencilLine, Calendar, Timer, BookOpen, 
-  ShieldCheck, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School,
+  ShieldCheck, Shield, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School,
   CreditCard, Wallet, Gamepad2, Library, Bell, Tv, ScanLine, AlertTriangle, MapPin,
   Printer, Package
 } from 'lucide-react'
@@ -24,7 +24,9 @@ const adminLinks = [
   { to: '/admin/billing', icon: CreditCard, label: 'Billing' },
   { to: '/admin/reports', icon: FileSpreadsheet, label: 'Reports' },
   { to: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
-   { to: '/admin/settings', icon: ShieldCheck, label: 'Settings' },
+  { to: '/admin/boarding', icon: MapPin, label: 'Boarding' },
+  { to: '/admin/settings', icon: ShieldCheck, label: 'Settings' },
+  { to: '/privacy', icon: Shield, label: 'Privacy' },
   { to: '/admin/news', icon: Tv, label: 'News' },
 ]
 
@@ -41,6 +43,7 @@ const teacherLinks = [
   { to: '/teacher/timetable', icon: Calendar, label: 'Schedule' },
   { to: '/teacher/reports', icon: FileSpreadsheet, label: 'Reports' },
   { to: '/teacher/self-service', icon: UserCheck, label: 'Service' },
+  { to: '/teacher/pastoral', icon: ClipboardList, label: 'Pastoral' },
    { to: '/teacher/typing-game', icon: Gamepad2, label: 'Nitro' },
   { to: '/teacher/news', icon: Tv, label: 'News' },
 ]
@@ -63,6 +66,7 @@ const studentLinks = [
   { to: '/student/billing', icon: CreditCard, label: 'Billing' },
   { to: '/student/profile', icon: Users, label: 'Profile' },
   { to: '/student/announcements', icon: Megaphone, label: 'Notices' },
+  { to: '/student/exeats', icon: MapPin, label: 'Exeats' },
    { to: '/student/typing-game', icon: Gamepad2, label: 'Nitro' },
   { to: '/student/news', icon: Tv, label: 'News' },
 ]
@@ -83,9 +87,11 @@ const bursarLinks = [
 const parentLinks = [
   { to: '/parent/dashboard', icon: Home, label: 'Wards' },
   { to: '/parent/academics', icon: FileSpreadsheet, label: 'Results' },
+  { to: '/parent/attendance', icon: ClipboardCheck, label: 'Register' },
   { to: '/parent/billing', icon: Wallet, label: 'Billing' },
   { to: '/parent/messages', icon: MessageSquare, label: 'Messages', notify: true },
   { to: '/parent/calendar', icon: Calendar, label: 'Calendar' },
+  { to: '/parent/exeats', icon: MapPin, label: 'Exeats' },
   { to: '/parent/news', icon: Tv, label: 'News' },
 ]
 

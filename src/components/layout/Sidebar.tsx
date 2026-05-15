@@ -57,9 +57,13 @@ const adminLinks = [
   { to: '/admin/poster-maker', label: 'Poster Maker', icon: Image },
   { to: '/admin/elections', label: 'Elections (PEC)', icon: Vote },
   { to: ROUTES.ADMIN_ALUMNI, label: 'Alumni & Fundraising', icon: Heart },
+  { to: '/admin/boarding', label: 'Boarding & Dorms', icon: Building2 },
+  { to: '/admin/exeats', label: 'Exeat Requests', icon: MapPin },
+  { to: '/admin/pastoral', label: 'Pastoral Care', icon: ShieldCheck },
 
   { header: 'Insights & Setup' },
   { to: ROUTES.ADMIN_ANALYTICS, label: 'School Analytics', icon: BarChart3 },
+  { to: '/admin/audit-logs', label: 'Audit Logs', icon: ShieldCheck },
   { to: ROUTES.ADMIN_ACADEMIC_YEARS, label: 'Academic Years', icon: Calendar },
   { to: ROUTES.ADMIN_TERMS, label: 'Terms Management', icon: Calendar },
   { to: ROUTES.ADMIN_SETTINGS, label: 'System Settings', icon: Settings },
@@ -90,6 +94,7 @@ const teacherLinks = [
 
   { header: 'Extras' },
   { to: '/teacher/agenda', label: 'Term Agenda', icon: ClipboardList },
+  { to: '/teacher/pastoral', label: 'Pastoral Care', icon: ShieldCheck },
   { to: '/teacher/elections-hub', label: 'Elections (PEC)', icon: Vote },
   { to: ROUTES.TEACHER_TYPING_GAME, label: 'Typing Nitro', icon: Gamepad2 },
 ]
@@ -122,6 +127,7 @@ const studentLinks = [
   { to: ROUTES.STUDENT_RESOURCES, label: 'Resources Hub', icon: BookOpen },
   { to: ROUTES.STUDENT_LIBRARY, label: 'Global Library', icon: Library },
   { to: ROUTES.STUDENT_BILLING, label: 'Fees & Billing', icon: Wallet },
+  { to: '/student/exeats', label: 'My Exeats', icon: MapPin },
   { to: ROUTES.STUDENT_ELECTIONS, label: 'PEC Elections', icon: Vote },
   { to: ROUTES.STUDENT_TYPING_GAME, label: 'Typing Nitro', icon: Gamepad2 },
 ]
@@ -178,10 +184,12 @@ const parentLinks = [
   
   { header: 'Academics & Billing' },
   { to: '/parent/academics', label: 'Academics', icon: FileSpreadsheet },
+  { to: '/parent/attendance', label: 'Attendance', icon: ClipboardCheck },
   { to: '/parent/billing', label: 'Billing & Fees', icon: Wallet },
   
   { header: 'Communication' },
   { to: '/parent/messages', label: 'Messages', icon: MessageSquare },
+  { to: '/parent/exeats', label: 'Exeat Requests', icon: MapPin },
 ]
 
 const nurseLinks = [

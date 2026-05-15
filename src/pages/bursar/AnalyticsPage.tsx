@@ -77,22 +77,46 @@ export default function AnalyticsPage() {
     { label: 'Fee Collection', value: GHS(summary.fees), color: '#7c3aed', bg: '#f5f3ff', note: String(year) },
   ]
 
+  // Export summary as CSV
+  function exportCSV() {
+    const rows = [
+      ['Month', 'Income', 'Expenses', 'Net'],
+      ...monthly.map(m => [m.month, m.income.toFixed(2), m.expenses.toFixed(2), m.net.toFixed(2)])
+    ]
+    const csv = rows.map(r => r.join(',')).join('\n')
+    const a = document.createElement('a')
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv)
+    a.download = `wula_analytics_${year}.csv`
+    a.click()
+  }
+
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
         @keyframes _an_fi { from{opacity:0} to{opacity:1} }
         @keyframes _an_spin { to{transform:rotate(360deg)} }
+        .analytics-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 20px; }
+        @media (max-width: 900px) { .analytics-3col { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 600px) { .analytics-3col { grid-template-columns: 1fr; } }
+        .analytics-kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 28px; }
+        .analytics-export-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 9px; border: 1.5px solid #e5e7eb; background: #fff; font-size: 13px; font-weight: 700; cursor: pointer; color: #374151; transition: all .2s; }
+        .analytics-export-btn:hover { background: #f5f3ff; border-color: #6d28d9; color: #6d28d9; }
       `}</style>
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_an_fi .4s ease' }}>
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
             <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Financial Analytics</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Full financial overview and trends</p>
+            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Full financial overview and trends · {year}</p>
           </div>
-          <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ padding: '9px 14px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', fontWeight: 600 }}>
-            {[currentYear, currentYear - 1, currentYear - 2].map(y => <option key={y} value={y}>{y}</option>)}
-          </select>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+            <button onClick={exportCSV} className="analytics-export-btn">
+              📥 Export CSV
+            </button>
+            <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ padding: '9px 14px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', fontWeight: 600 }}>
+              {[currentYear, currentYear - 1, currentYear - 2].map(y => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
         </div>
 
         {loading ? (
@@ -103,12 +127,15 @@ export default function AnalyticsPage() {
         ) : (
           <>
             {/* KPI Row */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 14, marginBottom: 28 }}>
-              {kpis.map((k, i) => (
+            <div className="analytics-kpis">
+              {kpis.map((k) => (
                 <div key={k.label} style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: k.color, fontFamily: '"Playfair Display",serif', marginBottom: 4 }}>{k.value}</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 2 }}>{k.label}</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af' }}>{k.note}</div>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>{k.label}</div>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: k.color, fontFamily: '"Playfair Display",serif', marginBottom: 4 }}>{k.value}</div>
+                  <div style={{ fontSize: 11, color: '#9ca3af', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: k.color, display: 'inline-block' }} />
+                    {k.note}
+                  </div>
                 </div>
               ))}
             </div>
@@ -135,7 +162,7 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Net Profit Line + Pie row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18, marginBottom: 20 }}>
+            <div className="analytics-3col">
 
               {/* Net Line */}
               <div style={{ background: '#fff', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
@@ -175,6 +202,32 @@ export default function AnalyticsPage() {
                 ) : <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>No data</div>}
               </div>
             </div>
+
+            {/* Top income vs expense months insight */}
+            {(() => {
+              const top = [...monthly].sort((a,b) => b.income - a.income)[0]
+              const bottom = [...monthly].sort((a,b) => a.income - b.income)[0]
+              const deficit = monthly.filter(m => m.net < 0)
+              return (
+                <div style={{ background: 'linear-gradient(135deg,#1e0646,#3730a3)', borderRadius: 18, padding: '20px 24px', marginBottom: 20, color: '#fff', display: 'flex', flexWrap: 'wrap', gap: 20 }}>
+                  <div style={{ flex: 1, minWidth: 160 }}>
+                    <div style={{ fontSize: 10, fontWeight: 800, opacity: 0.6, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>Peak Month</div>
+                    <div style={{ fontSize: 18, fontWeight: 900 }}>{top?.month ?? '—'}</div>
+                    <div style={{ fontSize: 12, opacity: 0.8, marginTop: 2 }}>Highest income: {top ? GHS(top.income) : '—'}</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 160 }}>
+                    <div style={{ fontSize: 10, fontWeight: 800, opacity: 0.6, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>Lowest Month</div>
+                    <div style={{ fontSize: 18, fontWeight: 900 }}>{bottom?.month ?? '—'}</div>
+                    <div style={{ fontSize: 12, opacity: 0.8, marginTop: 2 }}>Lowest income: {bottom ? GHS(bottom.income) : '—'}</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 160 }}>
+                    <div style={{ fontSize: 10, fontWeight: 800, opacity: 0.6, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>Deficit Months</div>
+                    <div style={{ fontSize: 18, fontWeight: 900, color: deficit.length > 0 ? '#fca5a5' : '#86efac' }}>{deficit.length}</div>
+                    <div style={{ fontSize: 12, opacity: 0.8, marginTop: 2 }}>{deficit.length > 0 ? deficit.map(m => m.month).join(', ') : 'None — surplus all year'}</div>
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* Monthly breakdown bar */}
             <div style={{ background: '#fff', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>

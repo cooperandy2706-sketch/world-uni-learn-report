@@ -10,6 +10,7 @@ export interface FeeStructure {
   academic_year_id: string
   fee_name: string
   amount: number
+  currency_code?: string
   description?: string
   created_at: string
   // joined
@@ -27,6 +28,7 @@ export interface FeePayment {
   amount_paid: number
   payment_date: string
   payment_method: PaymentMethod
+  currency_code?: string
   reference_number?: string
   notes?: string
   recorded_by?: string
@@ -91,6 +93,7 @@ export interface School {
   logo_url?: string
   headteacher_name?: string
   headteacher_signature_url?: string
+  currency_code?: string
   created_at: string
   // Storage allocation
   storage_limit_gb: number     // Quota in GB (default: 5)
@@ -520,4 +523,116 @@ export interface LibraryCheckout {
   book?: LibraryBook
   student?: Student
   teacher?: User
+}
+
+export interface Dormitory {
+  id: string
+  school_id: string
+  name: string
+  capacity: number
+  gender_restriction?: 'male' | 'female' | 'mixed'
+  house_parent_id?: string
+  created_at: string
+  updated_at: string
+  // joined
+  house_parent?: User
+}
+
+export interface DormRoom {
+  id: string
+  dormitory_id: string
+  room_number: string
+  capacity: number
+  created_at: string
+}
+
+export interface DormAssignment {
+  id: string
+  school_id: string
+  student_id: string
+  room_id: string
+  start_date: string
+  end_date?: string
+  created_at: string
+  // joined
+  student?: Student
+  room?: DormRoom
+}
+
+export interface DormLog {
+  id: string
+  dormitory_id: string
+  recorded_by: string
+  date: string
+  incident_type: 'routine' | 'behavioral' | 'maintenance' | 'medical' | 'other'
+  notes: string
+  created_at: string
+  // joined
+  recorder?: User
+}
+
+export interface ExeatRequest {
+  id: string
+  school_id: string
+  student_id: string
+  requested_by?: string
+  reason: string
+  destination: string
+  departure_time: string
+  expected_return_time: string
+  actual_return_time?: string
+  status: 'pending' | 'approved' | 'rejected' | 'departed' | 'returned'
+  approved_by?: string
+  parent_notified: boolean
+  security_notified: boolean
+  notes?: string
+  created_at: string
+  updated_at: string
+  // joined
+  student?: Student
+  requester?: User
+  approver?: User
+}
+
+export interface PastoralLog {
+  id: string
+  school_id: string
+  student_id: string
+  counselor_id: string
+  date: string
+  category: 'academic' | 'behavioral' | 'emotional' | 'family' | 'peer' | 'other'
+  notes: string
+  follow_up_date?: string
+  is_private: boolean
+  created_at: string
+  // joined
+  student?: Student
+  counselor?: User
+}
+
+export interface AuditLog {
+  id: string
+  school_id: string
+  user_id?: string
+  table_name: string
+  action: 'INSERT' | 'UPDATE' | 'DELETE'
+  record_id: string
+  old_data?: any
+  new_data?: any
+  created_at: string
+  // joined
+  user?: User
+}
+
+export interface PrivacyConsent {
+  id: string
+  school_id: string
+  user_id: string
+  data_processing_consent: boolean
+  marketing_consent: boolean
+  photo_media_consent: boolean
+  deletion_requested: boolean
+  deletion_requested_at?: string
+  created_at: string
+  updated_at: string
 }

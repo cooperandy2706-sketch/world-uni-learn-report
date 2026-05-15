@@ -35,6 +35,8 @@ export default function ParentWardPage() {
     { icon: '💳', label: 'Pay Fees', sub: 'Outstanding balance', path: '/parent/billing', bg: 'linear-gradient(135deg,#fdf4ff,#fae8ff)', border: '#f5d0fe', textC: '#86198f' },
     { icon: '💬', label: 'Messages', sub: 'Contact teachers', path: '/parent/messages', bg: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', border: '#bbf7d0', textC: '#166534' },
     { icon: '📅', label: 'Calendar', sub: 'School events', path: '/parent/calendar', bg: 'linear-gradient(135deg,#fff7ed,#ffedd5)', border: '#fed7aa', textC: '#9a3412' },
+    { icon: '📋', label: 'Attendance', sub: 'Track daily presence', path: '/parent/attendance', bg: 'linear-gradient(135deg,#f0f9ff,#e0f2fe)', border: '#bae6fd', textC: '#0369a1' },
+    { icon: '🚪', label: 'Exeats', sub: 'Request leave', path: '/parent/exeats', bg: 'linear-gradient(135deg,#fef2f2,#fee2e2)', border: '#fecaca', textC: '#b91c1c' },
   ]
 
   return (

@@ -1,5 +1,6 @@
 // src/pages/admin/SuperAdminDashboard.tsx
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'react-hot-toast'
 import { Link } from 'react-router-dom'
@@ -17,6 +18,7 @@ interface School {
   address: string; motto: string; status: SchoolStatus; created_at: string
   logo_url?: string; storage_limit_gb: number; storage_used_bytes: number
   paystack_public_key?: string;
+  currency_code?: string;
 }
 
 // ─── animated counter ─────────────────────────────────────
@@ -85,7 +87,7 @@ export default function SuperAdminDashboard() {
   const [createModal, setCreateModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
-    name: '', email: '', phone: '', address: '', motto: '',
+    name: '', email: '', phone: '', address: '', motto: '', currency: 'GHS',
     adminName: '', adminEmail: '', adminPassword: ''
   })
 
@@ -205,6 +207,17 @@ export default function SuperAdminDashboard() {
     }
   }
 
+  async function handleUpdateCurrency(schoolId: string, currency: string) {
+    try {
+      const { error } = await supabase.from('schools').update({ currency_code: currency }).eq('id', schoolId)
+      if (error) throw error
+      toast.success('Currency updated!')
+      loadPlatformData()
+    } catch (err: any) {
+      toast.error('Failed to update currency')
+    }
+  }
+
   async function handleCreateSchool() {
     if (!form.name || !form.adminEmail || !form.adminPassword) {
       toast.error('School name, admin email and password are required')
@@ -224,6 +237,7 @@ export default function SuperAdminDashboard() {
               phone: form.phone,
               address: form.address,
               motto: form.motto,
+              currency_code: form.currency,
               status: 'active'
             },
             admin: {
@@ -241,7 +255,7 @@ export default function SuperAdminDashboard() {
 
       toast.success('School and Admin created successfully!')
       setCreateModal(false)
-      setForm({ name: '', email: '', phone: '', address: '', motto: '', adminName: '', adminEmail: '', adminPassword: '' })
+      setForm({ name: '', email: '', phone: '', address: '', motto: '', currency: 'GHS', adminName: '', adminEmail: '', adminPassword: '' })
       loadPlatformData()
     } catch (err: any) {
       toast.error(err.message || 'Failed to create school')
@@ -307,6 +321,9 @@ export default function SuperAdminDashboard() {
         <StatCard icon="👨‍🏫" label="Total Teachers" value={stats?.totalTeachers || 0} color="#0891b2" bg="#ecfeff" />
         <StatCard icon="🎓" label="Total Students" value={stats?.totalStudents || 0} color="#059669" bg="#f0fdf4" />
       </div>
+
+      {/* AI Usage Summary */}
+      <AiUsageSection />
 
       {/* Pending Billing Approvals */}
       {pendingInvoices.length > 0 && (
@@ -472,6 +489,24 @@ export default function SuperAdminDashboard() {
                                onFocus={e => e.target.style.borderColor = '#6d28d9'} 
                              />
                           </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                             <span style={{ fontSize: 13, fontWeight: 600, color: '#475569' }}>Currency</span>
+                             <select 
+                               defaultValue={school.currency_code || 'GHS'} 
+                               onChange={(e) => handleUpdateCurrency(school.id, e.target.value)} 
+                               style={{ width: 140, padding: '6px 10px', borderRadius: 8, border: '1.5px solid #cbd5e1', fontSize: 13, fontWeight: 700, outline: 'none', transition: 'border-color 0.2s' }} 
+                               onFocus={e => e.target.style.borderColor = '#6d28d9'}
+                             >
+                                <option value="GHS">GHS</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="GBP">GBP</option>
+                                <option value="NGN">NGN</option>
+                                <option value="KES">KES</option>
+                                <option value="ZAR">ZAR</option>
+                             </select>
+                          </div>
                        </div>
                     </div>
                   </div>
@@ -537,6 +572,27 @@ export default function SuperAdminDashboard() {
               <Input label="School Phone" value={form.phone} onChange={v => setForm(f => ({...f, phone:v}))} />
               <Input label="Address" value={form.address} onChange={v => setForm(f => ({...f, address:v}))} />
               <Input label="Motto" value={form.motto} onChange={v => setForm(f => ({...f, motto:v}))} />
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6 }}>Currency</label>
+                <select
+                  value={form.currency}
+                  onChange={e => setForm(f => ({...f, currency: e.target.value}))}
+                  style={{
+                    width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #f1f5f9',
+                    fontSize: 14, outline: 'none', transition: 'all 0.2s', fontFamily: 'inherit'
+                  }}
+                  onFocus={e => { e.target.style.borderColor = '#6d28d9'; e.target.style.boxShadow = '0 0 0 4px rgba(109,40,217,0.1)' }}
+                  onBlur={e => { e.target.style.borderColor = '#f1f5f9'; e.target.style.boxShadow = 'none' }}
+                >
+                  <option value="GHS">GHS</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="GBP">GBP</option>
+                  <option value="NGN">NGN</option>
+                  <option value="KES">KES</option>
+                  <option value="ZAR">ZAR</option>
+                </select>
+              </div>
             </div>
           </section>
           <section style={{ borderLeft: '1px solid #f1f5f9', paddingLeft: 24 }}>
@@ -571,6 +627,90 @@ function Input({ label, value, onChange, type = 'text' }: any) {
         onFocus={e => { e.target.style.borderColor = '#6d28d9'; e.target.style.boxShadow = '0 0 0 4px rgba(109,40,217,0.1)' }}
         onBlur={e => { e.target.style.borderColor = '#f1f5f9'; e.target.style.boxShadow = 'none' }}
       />
+    </div>
+  )
+}
+
+// ─── AI Usage Section ─────────────────────────────────────────────────────────
+function AiUsageSection() {
+  const { data: usage = [], isLoading } = useQuery({
+    queryKey: ['super-admin-ai-usage'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ai_usage_logs')
+        .select('feature, model_used, school_id, created_at, school:schools(name)')
+        .order('created_at', { ascending: false })
+        .limit(500)
+      if (error) throw error
+      return data || []
+    },
+  })
+
+  if (isLoading || usage.length === 0) return null
+
+  // Group by feature
+  const featureMap: Record<string, number> = {}
+  const schoolMap: Record<string, number> = {}
+  usage.forEach((u: any) => {
+    featureMap[u.feature] = (featureMap[u.feature] || 0) + 1
+    const sName = u.school?.name ?? u.school_id ?? 'Unknown'
+    schoolMap[sName] = (schoolMap[sName] || 0) + 1
+  })
+
+  const features = Object.entries(featureMap).sort((a, b) => b[1] - a[1]).slice(0, 8)
+  const topSchools = Object.entries(schoolMap).sort((a, b) => b[1] - a[1]).slice(0, 5)
+  const maxFeature = features[0]?.[1] || 1
+  const maxSchool = topSchools[0]?.[1] || 1
+
+  const FEATURE_COLORS: Record<string, string> = {
+    quiz_generation: '#7c3aed', lesson_plan: '#2563eb', resource_chapter: '#0891b2',
+    pdf_extraction: '#16a34a', image_generation: '#d97706', report_summary: '#dc2626',
+  }
+
+  return (
+    <div style={{ background: '#fff', borderRadius: 24, border: '1px solid #f1f5f9', padding: '28px 32px', marginBottom: 48, boxShadow: '0 4px 24px rgba(0,0,0,0.02)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
+        <div>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: '#1e0646', margin: 0 }}>🤖 AI Usage Analytics</h2>
+          <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>{usage.length.toLocaleString()} total AI calls logged across all schools</p>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+        {/* Feature Breakdown */}
+        <div>
+          <h4 style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 16px' }}>By Feature</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {features.map(([feat, count]) => (
+              <div key={feat}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+                  <span style={{ color: '#334155', textTransform: 'capitalize' }}>{feat.replace(/_/g, ' ')}</span>
+                  <span style={{ color: '#1e0646', fontWeight: 800 }}>{count.toLocaleString()}</span>
+                </div>
+                <div style={{ height: 8, background: '#f1f5f9', borderRadius: 99, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${(count / maxFeature) * 100}%`, background: FEATURE_COLORS[feat] ?? '#7c3aed', borderRadius: 99, transition: 'width 0.6s ease' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Top Schools */}
+        <div>
+          <h4 style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 16px' }}>Top Schools by AI Usage</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {topSchools.map(([school, count]) => (
+              <div key={school}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+                  <span style={{ color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>{school}</span>
+                  <span style={{ color: '#1e0646', fontWeight: 800 }}>{count.toLocaleString()}</span>
+                </div>
+                <div style={{ height: 8, background: '#f1f5f9', borderRadius: 99, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${(count / maxSchool) * 100}%`, background: '#059669', borderRadius: 99, transition: 'width 0.6s ease' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
