@@ -6,6 +6,7 @@ import { formatDate } from '../../lib/utils'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import toast from 'react-hot-toast'
+import AIQuizGenerator from '../../components/admin/AIQuizGenerator'
 
 interface GlobalResourceData {
   title: string
@@ -154,6 +155,9 @@ export default function GlobalResourcesPage() {
   const [aiTopic, setAiTopic] = useState('')
   const [aiLength, setAiLength] = useState('Standard Chapter')
   const [isGenerating, setIsGenerating] = useState(false)
+
+  // Quiz Generator State
+  const [quizGenResource, setQuizGenResource] = useState<any | null>(null)
 
   // Builder State
   const [form, setForm] = useState<GlobalResourceData>({
@@ -734,6 +738,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
                       )}
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => setQuizGenResource(res)} style={{ border: 'none', background: '#f5f3ff', padding: '4px 8px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 700, color: '#7c3aed' }} title="Generate Quiz with AI">✨ Quiz</button>
                       <button onClick={() => { 
                         setForm({
                           ...res,
@@ -813,6 +818,16 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
         </div>
       </Modal>
 
+      {/* ── AI QUIZ GENERATOR MODAL ── */}
+      {quizGenResource && (
+        <AIQuizGenerator
+          open={!!quizGenResource}
+          onClose={() => setQuizGenResource(null)}
+          initialText={quizGenResource.content_type === 'passage' ? quizGenResource.content : ''}
+          subjectId={quizGenResource.subject_id}
+          titlePrefix={quizGenResource.title}
+        />
+      )}
     </>
   )
 }

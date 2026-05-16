@@ -15,7 +15,7 @@ import { suppliesService, SchoolSupply } from '../../services/admissions.service
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
 
-const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
+import { formatCurrency } from '../../utils/currency'
 
 export default function InventoryPage() {
   const { user } = useAuth()
@@ -33,6 +33,16 @@ export default function InventoryPage() {
     queryFn: async () => { const { data } = await supabase.from('classes').select('id, name').eq('school_id', schoolId).order('name'); return data ?? [] },
     enabled: !!schoolId
   })
+
+  // School context for currency
+  const { data: school } = useQuery({
+    queryKey: ['school-currency', schoolId],
+    queryFn: async () => { const { data } = await supabase.from('schools').select('currency_code').eq('id', schoolId).single(); return data },
+    enabled: !!schoolId,
+  })
+
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
 
   // Data fetching
   const { data: items = [], isLoading: loadingItems } = useQuery({
@@ -237,7 +247,7 @@ export default function InventoryPage() {
                       </div>
                       <div style={{ background: '#f9fafb', padding: '10px 14px', borderRadius: 14 }}>
                         <div style={{ fontSize: 10, color: '#9ca3af', fontWeight: 600 }}>Retail Price</div>
-                        <div style={{ fontSize: 16, fontWeight: 900, color: '#059669' }}>{GHS(item.selling_price)}</div>
+                        <div style={{ fontSize: 16, fontWeight: 900, color: '#059669' }}>{CUR(item.selling_price)}</div>
                       </div>
                     </div>
 
@@ -304,7 +314,7 @@ export default function InventoryPage() {
                               <span style={{ fontSize: 11, color: '#9ca3af' }}>No link</span>
                             )}
                           </td>
-                          <td style={{ padding: '16px 20px', fontSize: 14, fontWeight: 800 }}>{item.unit_price ? GHS(item.unit_price) : '—'}</td>
+                          <td style={{ padding: '16px 20px', fontSize: 14, fontWeight: 800 }}>{item.unit_price ? CUR(item.unit_price) : '—'}</td>
                           <td style={{ padding: '16px 20px' }}>
                             <div style={{ display: 'flex', gap: 8 }}>
                               <button onClick={() => setSupplyModal(item)} style={{ background: 'none', border: 'none', color: '#6d28d9', cursor: 'pointer' }}><Edit3 size={16}/></button>
@@ -340,7 +350,7 @@ export default function InventoryPage() {
                         </td>
                         <td style={{ padding: '14px 24px', fontSize: 13, color: '#4b5563' }}>{s.student?.full_name || s.buyer_name || 'Counter Sale'}</td>
                         <td style={{ padding: '14px 24px', fontSize: 14, fontWeight: 700 }}>{s.quantity}</td>
-                        <td style={{ padding: '14px 24px', fontSize: 14, fontWeight: 800, color: '#059669' }}>{GHS(s.total_amount)}</td>
+                        <td style={{ padding: '14px 24px', fontSize: 14, fontWeight: 800, color: '#059669' }}>{CUR(s.total_amount)}</td>
                         <td style={{ padding: '14px 24px' }}><button style={{ color: '#9ca3af', border: 'none', background: 'none' }}><ChevronRight size={16}/></button></td>
                       </tr>
                     ))}
@@ -485,7 +495,7 @@ export default function InventoryPage() {
                    </div>
                    <div style={{ marginTop: 10, padding: 16, background: '#fcfaff', borderRadius: 16, border: '1.5px dashed #e5e7eb', textAlign: 'center' }}>
                       <div style={{ fontSize: 12, color: '#4b5563', fontWeight: 600 }}>Total Customer Pays:</div>
-                      <div style={{ fontSize: 28, fontWeight: 900, color: '#059669', margin: '4px 0' }}>{GHS(saleModal.total_amount)}</div>
+                      <div style={{ fontSize: 28, fontWeight: 900, color: '#059669', margin: '4px 0' }}>{CUR(saleModal.total_amount)}</div>
                    </div>
                 </div>
                 <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>

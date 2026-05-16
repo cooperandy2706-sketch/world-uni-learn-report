@@ -6,14 +6,14 @@ import { useCurrentTerm } from '../../hooks/useSettings'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 import { Link } from 'react-router-dom'
 import { ROUTES } from '../../constants/routes'
+import { formatCurrency } from '../../utils/currency'
 import {
   DollarSign, TrendingUp, TrendingDown, AlertCircle, Users,
-  CreditCard, PiggyBank, Receipt, GraduationCap, FileText, Banknote
+  CreditCard, PiggyBank, Receipt, GraduationCap, FileText, Banknote,
+  ArrowRight, Activity
 } from 'lucide-react'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { getEngagingGreeting } from '../../lib/utils'
-
-const GHS = (n: number) => `GH₵ ${n.toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
 
 export default function BursarDashboard() {
   const { setFirstLoadComplete } = useAuthStore()
@@ -27,7 +27,30 @@ export default function BursarDashboard() {
   const [monthlyData, setMonthlyData] = useState<any[]>([])
   const [recentPayments, setRecentPayments] = useState<any[]>([])
   const [expenseByCategory, setExpenseByCategory] = useState<any[]>([])
+  const [schoolCurrency, setSchoolCurrency] = useState('GHS')
+  const [displayCurrency, setDisplayCurrency] = useState('NATIVE') // 'NATIVE' or 'USD'
   const [loading, setLoading] = useState(true)
+  const [flippedCards, setFlippedCards] = useState<number[]>([])
+
+  const toggleFlip = (idx: number) => {
+    setFlippedCards(prev => 
+      prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+    )
+  }
+
+  // Mock exchange rates to USD for demonstration
+  const EXCHANGE_RATES: Record<string, number> = {
+    'GHS': 0.071, // 1 GHS = 0.071 USD
+    'EUR': 1.08,  // 1 EUR = 1.08 USD
+    'GBP': 1.25,  // 1 GBP = 1.25 USD
+    'USD': 1.0,
+  }
+
+  // Helper to get the correct numeric value based on toggle
+  const getDisplayValue = (val: number) => {
+    const rate = EXCHANGE_RATES[schoolCurrency] || 1
+    return val * rate
+  }
 
   useEffect(() => {
     if (!schoolId) return
@@ -49,10 +72,15 @@ export default function BursarDashboard() {
         supabase.from('daily_fees_collected').select('student_id, amount, fee_type').eq('school_id', schoolId).eq('term_id', term?.id),
         supabase.from('fee_payments').select('amount_paid, student_id').eq('school_id', schoolId).eq('term_id', term?.id),
         supabase.from('daily_fees_collected').select('amount, date').eq('school_id', schoolId).gte('date', `${currentYear}-01-01`),
-        supabase.from('attendance').select('student_id, days_present').eq('term_id', term?.id)
+        supabase.from('attendance').select('student_id, days_present').eq('term_id', term?.id),
+        supabase.from('schools').select('currency_code').eq('id', schoolId).single()
       ])
 
-      const [paymentsRes, incomeRes, expensesRes, payrollRes, recentRes, studentsRes, structRes, dailyConfRes, dailyCollRes, termPaymentsRes, dailyCollFullYearRes, attendanceRes] = resData as any
+      const [paymentsRes, incomeRes, expensesRes, payrollRes, recentRes, studentsRes, structRes, dailyConfRes, dailyCollRes, termPaymentsRes, dailyCollFullYearRes, attendanceRes, schoolRes] = resData as any
+
+      if (schoolRes?.data?.currency_code) {
+        setSchoolCurrency(schoolRes.data.currency_code)
+      }
 
       const dailyTotalFullYear = (dailyCollFullYearRes?.data ?? []).reduce((s: number, r: any) => s + Number(r.amount), 0)
       const tuitionTotal = (paymentsRes?.data ?? []).reduce((s: number, p: any) => s + (p.amount_paid || 0), 0)
@@ -141,159 +169,301 @@ export default function BursarDashboard() {
     }
   }
 
-  const COLORS = ['#7c3aed', '#0891b2', '#16a34a', '#d97706', '#dc2626', '#ec4899']
+  const COLORS = ['#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#ec4899']
   const net = stats.totalIncome - stats.totalExpenses
 
   const cards = [
-    { label: 'Total Fees Collected', value: GHS(stats.totalCollected), icon: CreditCard, color: '#16a34a', bg: '#f0fdf4', trend: '' },
-    { label: 'Term Tuition Collected', value: GHS(stats.tuitionCollected), icon: Banknote, color: '#0891b2', bg: '#ecfeff', trend: '' },
-    { label: 'Daily Fees Collected', value: GHS(stats.dailyCollected), icon: PiggyBank, color: '#059669', bg: '#ecfdf5', trend: '' },
-    { label: 'Net Bank Balance', value: GHS(net), icon: DollarSign, color: net >= 0 ? '#16a34a' : '#1d4ed8', bg: net >= 0 ? '#f0fdf4' : '#eff6ff', trend: '' },
-    { label: 'Overall Total Debt', value: GHS(stats.overallDebt), icon: AlertCircle, color: '#dc2626', bg: '#fef2f2', trend: '' },
-    { label: 'Scholarship Students', value: String(stats.scholarshipCount), icon: GraduationCap, color: '#6d28d9', bg: '#f5f3ff', trend: '' },
+    { label: 'Total Fees Collected', nativeValue: formatCurrency(stats.totalCollected, schoolCurrency), usdValue: formatCurrency(getDisplayValue(stats.totalCollected), 'USD'), icon: CreditCard, color: '#10b981', bg: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' },
+    { label: 'Term Tuition Collected', nativeValue: formatCurrency(stats.tuitionCollected, schoolCurrency), usdValue: formatCurrency(getDisplayValue(stats.tuitionCollected), 'USD'), icon: Banknote, color: '#0ea5e9', bg: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)' },
+    { label: 'Daily Fees Collected', nativeValue: formatCurrency(stats.dailyCollected, schoolCurrency), usdValue: formatCurrency(getDisplayValue(stats.dailyCollected), 'USD'), icon: PiggyBank, color: '#f59e0b', bg: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' },
+    { label: 'Net Bank Balance', nativeValue: formatCurrency(net, schoolCurrency), usdValue: formatCurrency(getDisplayValue(net), 'USD'), icon: DollarSign, color: net >= 0 ? '#10b981' : '#6366f1', bg: net >= 0 ? 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' : 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)' },
+    { label: 'Overall Total Debt', nativeValue: formatCurrency(stats.overallDebt, schoolCurrency), usdValue: formatCurrency(getDisplayValue(stats.overallDebt), 'USD'), icon: AlertCircle, color: '#ef4444', bg: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)' },
+    { label: 'Scholarship Students', nativeValue: String(stats.scholarshipCount), usdValue: String(stats.scholarshipCount), icon: GraduationCap, color: '#8b5cf6', bg: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)' },
   ]
 
   const quickLinks = [
-    { to: ROUTES.BURSAR_FEES, label: 'Record Payment', icon: CreditCard, color: '#16a34a' },
-    { to: ROUTES.BURSAR_DEBTORS, label: 'View Debtors', icon: AlertCircle, color: '#dc2626' },
-    { to: ROUTES.BURSAR_BILL_SHEET, label: 'Bill Sheet', icon: FileText, color: '#1e0646' },
-    { to: ROUTES.BURSAR_PAYROLL, label: 'Run Payroll', icon: Users, color: '#7c3aed' },
-    { to: ROUTES.BURSAR_INCOME, label: 'Add Income', icon: TrendingUp, color: '#0891b2' },
-    { to: ROUTES.BURSAR_EXPENSES, label: 'Add Expense', icon: Receipt, color: '#d97706' },
-    { to: ROUTES.BURSAR_ANALYTICS, label: 'Analytics', icon: DollarSign, color: '#ec4899' },
+    { to: ROUTES.BURSAR_FEES, label: 'Record Payment', icon: CreditCard, color: '#10b981' },
+    { to: ROUTES.BURSAR_DEBTORS, label: 'View Debtors', icon: AlertCircle, color: '#ef4444' },
+    { to: ROUTES.BURSAR_BILL_SHEET, label: 'Bill Sheet', icon: FileText, color: '#1e293b' },
+    { to: ROUTES.BURSAR_PAYROLL, label: 'Run Payroll', icon: Users, color: '#8b5cf6' },
+    { to: ROUTES.BURSAR_INCOME, label: 'Add Income', icon: TrendingUp, color: '#0ea5e9' },
+    { to: ROUTES.BURSAR_EXPENSES, label: 'Add Expense', icon: Receipt, color: '#f59e0b' },
+    { to: ROUTES.BURSAR_ANALYTICS, label: 'Analytics', icon: Activity, color: '#ec4899' },
   ]
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
-        @keyframes _bd_fu { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes _bd_fi { from{opacity:0} to{opacity:1} }
-        @keyframes _bd_spin { to{transform:rotate(360deg)} }
-        .bd-card { transition: all .2s; }
-        .bd-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important; }
-        .bd-ql:hover { background: #f5f3ff !important; transform: translateY(-2px); }
-        .bd-ql { transition: all .2s; }
-      `}</style>
-      <div style={{ fontFamily: '"DM Sans", system-ui, sans-serif', animation: '_bd_fi .4s ease' }}>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .card-perspective {
+          perspective: 1000px;
+          height: 160px;
+          cursor: pointer;
+        }
 
-        {/* Header */}
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
-            {timeGreeting}, {user?.full_name?.split(' ')[0]} 👋
-          </h1>
-          <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4, fontWeight: 500 }}>{roleMessage}</p>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
-            Financial overview for {currentYear} · {term ? `Current term: ${term.name}` : 'No active term'}
-          </p>
+        .card-inner {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+          transform-style: preserve-3d;
+        }
+
+        .card-flipped .card-inner {
+          transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          backface-visibility: hidden;
+          border-radius: 20px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 24px;
+          border: 1px solid #e2e8f0;
+          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+
+        .card-back {
+          transform: rotateY(180deg);
+          background: #1e1b4b !important;
+          border-color: #312e81;
+        }
+
+        .bursar-card { 
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+
+        .bursar-card:hover { 
+          transform: translateY(-4px); 
+          box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08) !important; 
+        }
+        
+        .ql-btn { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .ql-btn:hover { background: #f8fafc !important; transform: translateY(-2px); box-shadow: 0 10px 20px -10px rgba(0,0,0,0.05); }
+        
+        .stat-icon-wrap {
+          transition: transform 0.3s ease;
+        }
+        .bursar-card:hover .stat-icon-wrap {
+          transform: scale(1.1) rotate(-5deg);
+        }
+      `}</style>
+      <div style={{ fontFamily: '"Inter", system-ui, sans-serif', animation: 'fadeIn .4s ease' }}>
+
+        {/* Hero Section */}
+        <div style={{ 
+          background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)', 
+          borderRadius: 24, 
+          padding: '32px 40px', 
+          marginBottom: 32,
+          color: 'white',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: '0 20px 40px -10px rgba(49, 46, 129, 0.3)'
+        }}>
+          <div style={{ position: 'absolute', top: -50, right: -50, width: 250, height: 250, background: 'radial-gradient(circle, rgba(99,102,241,0.4) 0%, rgba(99,102,241,0) 70%)', borderRadius: '50%' }} />
+          <div style={{ position: 'absolute', bottom: -100, right: 100, width: 300, height: 300, background: 'radial-gradient(circle, rgba(139,92,246,0.3) 0%, rgba(139,92,246,0) 70%)', borderRadius: '50%' }} />
+          
+          <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#c7d2fe', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Financial Command Center</p>
+              <h1 style={{ fontFamily: '"Outfit", sans-serif', fontSize: 36, fontWeight: 800, margin: '8px 0 12px', letterSpacing: '-0.02em' }}>
+                {timeGreeting}, {user?.full_name?.split(' ')[0]}
+              </h1>
+              <p style={{ margin: 0, fontSize: 15, color: '#e0e7ff', fontWeight: 400, maxWidth: 450, lineHeight: 1.5 }}>
+                {roleMessage} Track {currentYear} performance, monitor arrears, and manage payroll across the platform.
+              </p>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 13, color: '#c7d2fe', fontWeight: 500, marginBottom: 4 }}>Net Term Balance</div>
+              <div style={{ fontFamily: '"Outfit", sans-serif', fontSize: 42, fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
+                {!loading ? formatCurrency(net, schoolCurrency) : '---'}
+              </div>
+            </div>
+          </div>
         </div>
 
         {loading ? (
-          <div style={{ padding: '40px 0' }}>
-            <FlaskLoader fullScreen={false} label="Loading financial data…" />
+          <div style={{ padding: '60px 0', display: 'flex', justifyContent: 'center' }}>
+            <FlaskLoader fullScreen={false} label="Syncing financial ledgers…" />
           </div>
         ) : (
           <>
-            {/* Summary cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 24 }}>
+            {/* KPI Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 32 }}>
               {cards.map((c, i) => (
-                <div key={c.label} className="bd-card" style={{ background: '#fff', borderRadius: 16, padding: '18px 20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', animation: `_bd_fu .35s ease ${i * 0.06}s both` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 12, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <c.icon size={18} color={c.color} strokeWidth={2.5} />
+                <div 
+                  key={c.label} 
+                  className={`card-perspective ${flippedCards.includes(i) ? 'card-flipped' : ''}`}
+                  onClick={() => toggleFlip(i)}
+                >
+                  <div className="card-inner">
+                    {/* Front */}
+                    <div className="card-front bursar-card" style={{ background: '#fff' }}>
+                      <div className="stat-icon-wrap" style={{ width: 40, height: 40, borderRadius: 12, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                        <c.icon size={20} color={c.color} strokeWidth={2.5} />
+                      </div>
+                      <div style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', fontFamily: '"Outfit", sans-serif', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                        {c.nativeValue}
+                      </div>
+                      <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, fontWeight: 500 }}>
+                        {c.label}
+                      </div>
                     </div>
-                    {c.trend && <span style={{ fontSize: 11, fontWeight: 700, color: '#16a34a', background: '#f0fdf4', padding: '2px 7px', borderRadius: 99 }}>{c.trend}</span>}
+
+                    {/* Back */}
+                    <div className="card-back" style={{ background: '#1e1b4b' }}>
+                      <div style={{ fontSize: 11, color: '#c7d2fe', fontWeight: 600, textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>
+                        USD Equivalent
+                      </div>
+                      <div style={{ fontSize: 24, fontWeight: 800, color: '#fff', fontFamily: '"Outfit", sans-serif', letterSpacing: '-0.02em' }}>
+                        {c.usdValue}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 8 }}>
+                        Click to flip back
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: c.color, fontFamily: '"Playfair Display", serif', lineHeight: 1.1 }}>{c.value}</div>
-                  <div style={{ fontSize: 11, color: '#6b7280', marginTop: 4, fontWeight: 600 }}>{c.label}</div>
                 </div>
               ))}
             </div>
 
-            {/* Quick actions */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10, marginBottom: 28 }}>
-              {quickLinks.map(q => (
-                <Link key={q.to} to={q.to} style={{ textDecoration: 'none' }}>
-                  <div className="bd-ql" style={{ background: '#fff', borderRadius: 14, padding: '16px', border: '1.5px solid #f0eefe', textAlign: 'center', cursor: 'pointer' }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 12, background: `${q.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px' }}>
-                      <q.icon size={20} color={q.color} strokeWidth={2} />
+            {/* Quick Actions Strip */}
+            <div style={{ marginBottom: 32 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', marginBottom: 16, fontFamily: '"Outfit", sans-serif' }}>Quick Actions</h3>
+              <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 10, scrollbarWidth: 'none' }}>
+                {quickLinks.map((q, i) => (
+                  <Link key={q.to} to={q.to} style={{ textDecoration: 'none', flexShrink: 0 }}>
+                    <div className="ql-btn" style={{ 
+                      background: '#fff', 
+                      borderRadius: 16, 
+                      padding: '14px 20px', 
+                      border: '1px solid #e2e8f0', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: 12,
+                      animation: `fadeUp 0.4s ease ${i * 0.05}s both`
+                    }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 10, background: `${q.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <q.icon size={18} color={q.color} strokeWidth={2} />
+                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: '#334155' }}>{q.label}</div>
                     </div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>{q.label}</div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
+              </div>
             </div>
 
-            {/* Charts row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 18, marginBottom: 24 }}>
-
+            {/* Main Content Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, marginBottom: 32 }}>
+              
               {/* Income vs Expenses Bar Chart */}
-              <div style={{ background: '#fff', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>Income vs Expenses — {currentYear}</h3>
-                <p style={{ fontSize: 12, color: '#9ca3af', margin: '0 0 20px' }}>Monthly financial overview</p>
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={monthlyData} barSize={10}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => `${v/1000}k`} />
-                    <Tooltip formatter={(v: any) => GHS(v)} contentStyle={{ borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', fontSize: 12 }} />
-                    <Legend />
-                    <Bar dataKey="income" name="Income" fill="#16a34a" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="expenses" name="Expenses" fill="#dc2626" radius={[4, 4, 0, 0]} />
+              <div style={{ background: '#fff', borderRadius: 24, padding: '28px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+                <div style={{ marginBottom: 24 }}>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Income vs Expenses</h3>
+                  <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Monthly financial flow for {currentYear}</p>
+                </div>
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={monthlyData} barSize={12}>
+                    <defs>
+                      <linearGradient id="colorInc" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={1}/>
+                        <stop offset="95%" stopColor="#34d399" stopOpacity={0.8}/>
+                      </linearGradient>
+                      <linearGradient id="colorExp" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#ef4444" stopOpacity={1}/>
+                        <stop offset="95%" stopColor="#f87171" stopOpacity={0.8}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="4 4" stroke="#f1f5f9" vertical={false} />
+                    <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dy={10} />
+                    <YAxis tick={{ fontSize: 12, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dx={-10} tickFormatter={v => `${v/1000}k`} />
+                    <Tooltip 
+                      formatter={(v: any) => formatCurrency(v, schoolCurrency)} 
+                      cursor={{ fill: '#f8fafc' }}
+                      contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: 13, fontWeight: 600, padding: '12px 16px' }} 
+                    />
+                    <Legend iconType="circle" wrapperStyle={{ paddingTop: 20, fontSize: 13, fontWeight: 500, color: '#475569' }} />
+                    <Bar dataKey="income" name="Income" fill="url(#colorInc)" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="expenses" name="Expenses" fill="url(#colorExp)" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
 
               {/* Expenses by category */}
-              <div style={{ background: '#fff', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>Expenses by Category</h3>
-                <p style={{ fontSize: 12, color: '#9ca3af', margin: '0 0 16px' }}>Spending breakdown</p>
+              <div style={{ background: '#fff', borderRadius: 24, padding: '28px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+                <div style={{ marginBottom: 24 }}>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Expense Distribution</h3>
+                  <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Where is the money going?</p>
+                </div>
                 {expenseByCategory.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={220}>
+                  <ResponsiveContainer width="100%" height={260}>
                     <PieChart>
-                      <Pie data={expenseByCategory} cx="50%" cy="50%" outerRadius={75} dataKey="value" nameKey="name">
-                        {expenseByCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                      <Pie data={expenseByCategory} cx="50%" cy="50%" innerRadius={70} outerRadius={100} dataKey="value" nameKey="name" paddingAngle={5}>
+                        {expenseByCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="none" />)}
                       </Pie>
-                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-                      <Tooltip formatter={(v: any) => GHS(v)} contentStyle={{ borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', fontSize: 12 }} />
+                      <Legend iconType="circle" iconSize={8} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: 13, fontWeight: 500, color: '#475569' }} />
+                      <Tooltip 
+                        formatter={(v: any) => formatCurrency(v, schoolCurrency)} 
+                        contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: 13, fontWeight: 600 }} 
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div style={{ height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 13 }}>No expense data yet</div>
+                  <div style={{ height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 14, fontWeight: 500 }}>No expense data recorded</div>
                 )}
               </div>
             </div>
 
-            {/* Recent payments */}
-            <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-              <div style={{ padding: '18px 22px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>Recent Fee Payments</h3>
-                <Link to={ROUTES.BURSAR_FEES} style={{ fontSize: 12, fontWeight: 600, color: '#6d28d9', textDecoration: 'none' }}>View all →</Link>
+            {/* Recent payments Data Table */}
+            <div style={{ background: '#fff', borderRadius: 24, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+              <div style={{ padding: '24px 28px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0, fontFamily: '"Outfit", sans-serif' }}>Recent Transactions</h3>
+                <Link to={ROUTES.BURSAR_FEES} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#6366f1', textDecoration: 'none', padding: '6px 12px', background: '#eef2ff', borderRadius: 99 }}>
+                  View Ledger <ArrowRight size={14} />
+                </Link>
               </div>
               {recentPayments.length === 0 ? (
-                <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No payments recorded yet</div>
+                <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', fontSize: 14, fontWeight: 500 }}>No recent transactions</div>
               ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ background: '#faf5ff' }}>
-                      {['Student', 'Class', 'Fee Type', 'Amount', 'Method', 'Date'].map(h => (
-                        <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.06em' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentPayments.map((p: any, i) => (
-                      <tr key={p.id} style={{ borderBottom: i < recentPayments.length - 1 ? '1px solid #faf5ff' : 'none' }}>
-                        <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600, color: '#111827' }}>{p.student?.full_name ?? '—'}</td>
-                        <td style={{ padding: '12px 16px' }}><span style={{ fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: 99, fontWeight: 600 }}>{(p.student as any)?.class?.name ?? '—'}</span></td>
-                        <td style={{ padding: '12px 16px', fontSize: 12, color: '#6b7280' }}>{p.fee_structure?.fee_name ?? 'General'}</td>
-                        <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 700, color: '#16a34a' }}>{GHS(p.amount_paid)}</td>
-                        <td style={{ padding: '12px 16px' }}><span style={{ fontSize: 11, fontWeight: 600, background: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: 99, textTransform: 'capitalize' }}>{p.payment_method}</span></td>
-                        <td style={{ padding: '12px 16px', fontSize: 12, color: '#6b7280' }}>{new Date(p.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', whiteSpace: 'nowrap' }}>
+                    <thead>
+                      <tr style={{ background: '#f8fafc' }}>
+                        {['Student', 'Class', 'Fee Category', 'Amount', 'Method', 'Date'].map(h => (
+                          <th key={h} style={{ padding: '16px 28px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {recentPayments.map((p: any, i) => (
+                        <tr key={p.id} style={{ borderBottom: i < recentPayments.length - 1 ? '1px solid #f1f5f9' : 'none', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                          <td style={{ padding: '16px 28px', fontSize: 14, fontWeight: 600, color: '#0f172a' }}>{p.student?.full_name ?? '—'}</td>
+                          <td style={{ padding: '16px 28px' }}>
+                            <span style={{ fontSize: 12, background: '#f1f5f9', color: '#475569', padding: '4px 10px', borderRadius: 6, fontWeight: 600 }}>{(p.student as any)?.class?.name ?? '—'}</span>
+                          </td>
+                          <td style={{ padding: '16px 28px', fontSize: 13, color: '#64748b', fontWeight: 500 }}>{p.fee_structure?.fee_name ?? 'General'}</td>
+                          <td style={{ padding: '16px 28px', fontSize: 14, fontWeight: 700, color: '#10b981' }}>{formatCurrency(p.amount_paid, schoolCurrency)}</td>
+                          <td style={{ padding: '16px 28px' }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, background: '#ecfdf5', color: '#10b981', padding: '4px 10px', borderRadius: 99, textTransform: 'capitalize' }}>
+                              {p.payment_method}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 28px', fontSize: 13, color: '#64748b', fontWeight: 500 }}>
+                            {new Date(p.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           </>

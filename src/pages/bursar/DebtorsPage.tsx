@@ -12,7 +12,7 @@ import { ROUTES } from '../../constants/routes'
 import Modal from '../../components/ui/Modal'
 import toast from 'react-hot-toast'
 
-const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
+import { formatCurrency } from '../../utils/currency'
 
 export default function DebtorsPage() {
   const { user } = useAuth()
@@ -22,6 +22,16 @@ export default function DebtorsPage() {
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
   const { data: classes = [] } = useClasses()
+
+  // School context for currency
+  const { data: school } = useQuery({
+    queryKey: ['school-currency', schoolId],
+    queryFn: async () => { const { data } = await supabase.from('schools').select('currency_code').eq('id', schoolId).single(); return data },
+    enabled: !!schoolId,
+  })
+
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
   const [selectedClass, setSelectedClass] = useState('')
   const [filter, setFilter] = useState<'all' | 'debtors' | 'paid' | 'scholarship'>('all')
   const [searchQ, setSearchQ] = useState('')
@@ -173,7 +183,7 @@ export default function DebtorsPage() {
     const tbody = filtered.map(r => {
       const schBadge = r.scholarship_type && r.scholarship_type !== 'none'
         ? ' <span style="background:#f0fdf4;color:#16a34a;padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700">' + (r.scholarship_type === 'full' ? 'FULL' : r.scholarshipPct + '%') + '</span>' : ''
-      return '<tr><td>' + r.full_name + schBadge + '</td><td>' + (r.student_id ?? '\u2014') + '</td><td>' + ((r.class as any)?.name ?? '\u2014') + '</td><td style="color:' + (r.feesArrears > 0 ? '#dc2626' : '#374151') + '">' + GHS(r.feesArrears) + '</td><td>' + GHS(r.totalPaid) + '</td><td>' + GHS(r.tuitionOwed) + '</td><td>' + GHS(r.dailyOwed) + '</td><td style="font-weight:800;color:' + (r.totalOwed > 0 ? '#dc2626' : '#16a34a') + '">' + GHS(r.totalOwed) + '</td><td><span style="background:' + (r.status === 'paid' ? '#f0fdf4' : r.status === 'partial' ? '#fef3c7' : '#fef2f2') + ';color:' + (r.status === 'paid' ? '#16a34a' : r.status === 'partial' ? '#92400e' : '#dc2626') + ';padding:2px 8px;border-radius:99px;font-weight:700;font-size:11px">' + r.status.toUpperCase() + '</span></td></tr>'
+      return '<tr><td>' + r.full_name + schBadge + '</td><td>' + (r.student_id ?? '\u2014') + '</td><td>' + ((r.class as any)?.name ?? '\u2014') + '</td><td style="color:' + (r.feesArrears > 0 ? '#dc2626' : '#374151') + '">' + CUR(r.feesArrears) + '</td><td>' + CUR(r.totalPaid) + '</td><td>' + CUR(r.tuitionOwed) + '</td><td>' + CUR(r.dailyOwed) + '</td><td style="font-weight:800;color:' + (r.totalOwed > 0 ? '#dc2626' : '#16a34a') + '">' + CUR(r.totalOwed) + '</td><td><span style="background:' + (r.status === 'paid' ? '#f0fdf4' : r.status === 'partial' ? '#fef3c7' : '#fef2f2') + ';color:' + (r.status === 'paid' ? '#16a34a' : r.status === 'partial' ? '#92400e' : '#dc2626') + ';padding:2px 8px;border-radius:99px;font-weight:700;font-size:11px">' + r.status.toUpperCase() + '</span></td></tr>'
     }).join('')
     const html = [
       '<!DOCTYPE html><html><head><title>Debtors List</title>',
@@ -187,8 +197,8 @@ export default function DebtorsPage() {
       '<p style="color:#6b7280;font-size:12px">' + (term?.name ?? '') + ' \u00B7 Printed ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + '</p>',
       '<div class="summary">',
       '<div class="sum-card"><div class="sum-val">' + debtorCount + '</div><div class="sum-label">Total Debtors</div></div>',
-      '<div class="sum-card"><div class="sum-val" style="color:#dc2626">' + GHS(totalOwed) + '</div><div class="sum-label">Total Outstanding</div></div>',
-      '<div class="sum-card"><div class="sum-val" style="color:#16a34a">' + GHS(totalCollected) + '</div><div class="sum-label">Total Collected</div></div>',
+      '<div class="sum-card"><div class="sum-val" style="color:#dc2626">' + CUR(totalOwed) + '</div><div class="sum-label">Total Outstanding</div></div>',
+      '<div class="sum-card"><div class="sum-val" style="color:#16a34a">' + CUR(totalCollected) + '</div><div class="sum-label">Total Collected</div></div>',
       '</div>',
       '<table><thead><tr><th>Student</th><th>ID</th><th>Class</th><th>Arrears</th><th>Paid</th><th>Tuition Owed</th><th>Daily Owed</th><th>Total Debt</th><th>Status</th></tr></thead><tbody>' + tbody + '</tbody></table>',
       '</body></html>',
@@ -235,8 +245,8 @@ export default function DebtorsPage() {
             { label: 'Fully Paid', value: paidCount, color: '#16a34a', icon: '✅' },
             { label: 'Debtors', value: debtorCount, color: '#dc2626', icon: '⚠️' },
             { label: 'Scholarship', value: scholarshipCount, color: '#059669', icon: '🎓' },
-            { label: 'Total Collected', value: GHS(totalCollected), color: '#16a34a', icon: '💰' },
-            { label: 'Outstanding Debt', value: GHS(totalOwed), color: '#dc2626', icon: '📉' },
+            { label: 'Total Collected', value: CUR(totalCollected), color: '#16a34a', icon: '💰' },
+            { label: 'Outstanding Debt', value: CUR(totalOwed), color: '#dc2626', icon: '📉' },
           ].map(c => (
             <div key={c.label} style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
               <div style={{ fontSize: 22, marginBottom: 8 }}>{c.icon}</div>
@@ -306,11 +316,11 @@ export default function DebtorsPage() {
                         </td>
                         <td style={{ padding: '11px 14px' }}><span style={{ fontSize: 11, fontFamily: 'monospace', background: '#f5f3ff', color: '#6d28d9', padding: '2px 7px', borderRadius: 5 }}>{r.student_id ?? '—'}</span></td>
                         <td style={{ padding: '11px 14px' }}><span style={{ fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: 99, fontWeight: 600 }}>{(r.class as any)?.name ?? '—'}</span></td>
-                        <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: r.feesArrears > 0 ? '#dc2626' : '#9ca3af' }}>{GHS(r.feesArrears)}</td>
-                        <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 700, color: '#16a34a' }}>{GHS(r.totalPaid)}</td>
-                        <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: r.tuitionOwed > 0 ? '#dc2626' : '#9ca3af' }}>{GHS(r.tuitionOwed)}</td>
-                        <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: r.dailyOwed > 0 ? '#d97706' : '#9ca3af' }}>{GHS(r.dailyOwed)}</td>
-                        <td style={{ padding: '11px 14px', fontSize: 14, fontWeight: 900, color: r.totalOwed > 0 ? '#dc2626' : '#16a34a' }}>{GHS(r.totalOwed)}</td>
+                        <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: r.feesArrears > 0 ? '#dc2626' : '#9ca3af' }}>{CUR(r.feesArrears)}</td>
+                        <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 700, color: '#16a34a' }}>{CUR(r.totalPaid)}</td>
+                        <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: r.tuitionOwed > 0 ? '#dc2626' : '#9ca3af' }}>{CUR(r.tuitionOwed)}</td>
+                        <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: r.dailyOwed > 0 ? '#d97706' : '#9ca3af' }}>{CUR(r.dailyOwed)}</td>
+                        <td style={{ padding: '11px 14px', fontSize: 14, fontWeight: 900, color: r.totalOwed > 0 ? '#dc2626' : '#16a34a' }}>{CUR(r.totalOwed)}</td>
                         <td style={{ padding: '11px 14px' }}>
                           <span style={{ fontSize: 11, fontWeight: 700, background: si.bg, color: si.color, padding: '3px 10px', borderRadius: 99 }}>{si.label}</span>
                         </td>
@@ -326,11 +336,11 @@ export default function DebtorsPage() {
                 <tfoot>
                   <tr style={{ background: '#faf5ff', borderTop: '2px solid #ede9fe' }}>
                     <td colSpan={3} style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#6d28d9' }}>TOTALS ({filtered.length} students)</td>
-                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#dc2626' }}>{GHS(filtered.reduce((s, r) => s + r.feesArrears, 0))}</td>
-                    <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 900, color: '#16a34a' }}>{GHS(filtered.reduce((s, r) => s + r.totalPaid, 0))}</td>
-                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#dc2626' }}>{GHS(filtered.reduce((s, r) => s + r.tuitionOwed, 0))}</td>
-                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#d97706' }}>{GHS(filtered.reduce((s, r) => s + r.dailyOwed, 0))}</td>
-                    <td style={{ padding: '12px 14px', fontSize: 14, fontWeight: 900, color: '#dc2626' }}>{GHS(filtered.reduce((s, r) => s + r.totalOwed, 0))}</td>
+                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#dc2626' }}>{CUR(filtered.reduce((s, r) => s + r.feesArrears, 0))}</td>
+                    <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 900, color: '#16a34a' }}>{CUR(filtered.reduce((s, r) => s + r.totalPaid, 0))}</td>
+                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#dc2626' }}>{CUR(filtered.reduce((s, r) => s + r.tuitionOwed, 0))}</td>
+                    <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 800, color: '#d97706' }}>{CUR(filtered.reduce((s, r) => s + r.dailyOwed, 0))}</td>
+                    <td style={{ padding: '12px 14px', fontSize: 14, fontWeight: 900, color: '#dc2626' }}>{CUR(filtered.reduce((s, r) => s + r.totalOwed, 0))}</td>
                     <td colSpan={2} />
                   </tr>
                 </tfoot>

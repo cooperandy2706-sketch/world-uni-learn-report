@@ -55,27 +55,27 @@ const FEATURES = [
   { num: '02', title: 'Data Isolation', label: 'Multi-Tenant Security', desc: 'Enterprise-grade Row Level Security ensures school data is completely isolated. Absolute privacy guaranteed.', color: '#0f172a' },
   { num: '03', title: 'Batch Promotions', label: 'Academic Transitions', desc: 'Move hundreds of students to the next academic year instantly with smart graduation and promotion algorithms.', color: '#db2777' },
   { num: '04', title: 'Asset & Facilities', label: 'Infrastructure', desc: 'Track school buses, lab equipment, and dormitory capacity from a centralized administrative dashboard.', color: '#475569' },
-  
+
   // ── Finance & Bursary ──
   { num: '05', title: 'Dynamic Billing Engine', label: 'Smart Fees', desc: 'Automate term fees, daily collections, and arrears. Parents get real-time receipts, bursars get zero paperwork.', color: '#059669' },
   { num: '06', title: 'Scholarships', label: 'Financial Aid', desc: 'Assign full or partial percentage-based scholarships directly to student profiles to automatically adjust their billing.', color: '#10b981' },
   { num: '07', title: 'Admissions & Enquiries', label: 'Lead Tracking', desc: 'Digital admission pipelines. Convert prospect enquiries into enrolled students with just one click.', color: '#0ea5e9' },
-  
+
   // ── Teachers & Academics ──
   { num: '08', title: 'Automated BECE Grading', label: 'GES Compliant', desc: 'Instant CA calculations, grade tallying, and GES-compliant report generation. Termly stress eliminated.', color: '#7c3aed' },
   { num: '09', title: 'Syllabus Tracker', label: 'Curriculum', desc: 'Teachers log daily lesson plans and track syllabus coverage percentages against term objectives.', color: '#f59e0b' },
   { num: '10', title: 'Staff Substitution', label: 'Operations', desc: 'When a teacher is absent, instantly aggregate their timetable onto a substitute teacher\'s dashboard.', color: '#8b5cf6' },
-  
+
   // ── Students & Interactive Learning ──
   { num: '11', title: 'Digital Student Vault', label: 'Records', desc: 'Students can securely access their past report cards, health records, and academic history anytime.', color: '#0284c7' },
   { num: '12', title: 'School Elections', label: 'Digital Democracy', desc: 'Host secure SRC/Prefect elections. Students vote securely from their mobile portal with live administrative tallying.', color: '#14b8a6' },
   { num: '13', title: 'Global Resources', label: 'Digital Library', desc: 'Grant students access to PDFs, rich multimedia files, and textbook chapters for offline reading.', color: '#6366f1' },
-  
+
   // ── Parents & Communication ──
   { num: '14', title: 'Smart SMS Hub', label: 'Instant Alerts', desc: 'Blast automated report cards, attendance alerts, and fee reminders directly to parents\' phones.', color: '#d97706' },
   { num: '15', title: 'Parent Portal', label: 'Transparency', desc: 'Parents log in to view their child\'s timetable, behavioral records, and pay tuition fees digitally.', color: '#ec4899' },
   { num: '16', title: 'Pastoral Care', label: 'Discipline', desc: 'Log disciplinary infractions, counseling sessions, and exeats, instantly alerting the linked parent.', color: '#eab308' },
-  
+
   // ── Operations (Transport, Security, Health) ──
   { num: '17', title: 'Fleet Routing & GPS', label: 'Transport', desc: 'Turn-by-turn navigation for drivers with active student manifests and live GPS tracking for the administration.', color: '#ef4444' },
   { num: '18', title: 'Gate Scanners', label: 'Security', desc: 'Offline-first QR ID scanning. If Wi-Fi drops, attendance logs locally and syncs automatically when reconnected.', color: '#10b981' },
@@ -118,8 +118,8 @@ const PRICING_TIERS = [
   {
     name: 'Standard',
     desc: 'Perfect for small to medium schools beginning their digital transformation.',
-    onboardingGHS: 'GH₵ 2,500',
-    onboardingUSD: '$180',
+    onboardingGHS: 'GH₵ 1,800',
+    onboardingUSD: '$120',
     termGHS: 'GH₵ 800',
     termUSD: '$60',
     semesterGHS: 'GH₵ 1,200',
@@ -129,10 +129,10 @@ const PRICING_TIERS = [
   {
     name: 'Advanced',
     desc: 'Full-featured suite for growing institutions requiring robust communication and tracking.',
-    onboardingGHS: 'GH₵ 5,000',
-    onboardingUSD: '$350',
-    termGHS: 'GH₵ 1,500',
-    termUSD: '$110',
+    onboardingGHS: 'GH₵ 2,700',
+    onboardingUSD: '$190',
+    termGHS: 'GH₵ 1,200',
+    termUSD: '$90',
     semesterGHS: 'GH₵ 2,250',
     semesterUSD: '$165',
     features: ['Up to 2,000 Students', 'Automated SMS Alerts', 'Library & Fleet Management', 'Custom Grading Scales', 'Priority 24/7 Support']
@@ -187,6 +187,42 @@ const CSS = `
   .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
   .reveal.in { opacity: 1; transform: translateY(0); }
 
+  @keyframes float1 {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+  }
+  @keyframes float2 {
+    0% { transform: translateY(0) translateX(0) scale(1); }
+    50% { transform: translateY(-15px) translateX(15px) scale(1.05); }
+    100% { transform: translateY(0) translateX(0) scale(1); }
+  }
+  @keyframes colorFade {
+    0% { background: linear-gradient(135deg, var(--primary) 0%, #170238 100%); }
+    50% { background: linear-gradient(135deg, #170238 0%, var(--primary-light) 100%); }
+    100% { background: linear-gradient(135deg, var(--primary) 0%, #170238 100%); }
+  }
+  @keyframes drawArt { to { stroke-dashoffset: 0; } }
+
+  .hero-art { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.4; pointer-events: none; z-index: 1; filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.5)); }
+  .hero-art path, .hero-art circle, .hero-art rect { stroke: #fbbf24; stroke-width: 2.5; fill: none; stroke-dasharray: 2000; stroke-dashoffset: 2000; animation: drawArt 20s cubic-bezier(0.4, 0, 0.2, 1) forwards infinite alternate; }
+  
+  .global-contact-float {
+    position: fixed; bottom: 2rem; right: 2rem;
+    background: rgba(30, 6, 70, 0.9); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15);
+    padding: 1.25rem 1.5rem; border-radius: 20px; display: flex; flex-direction: column; gap: 0.85rem; z-index: 9999;
+    color: white; font-size: 0.95rem; font-weight: 600; white-space: nowrap;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    transition: transform 0.3s;
+  }
+  .global-contact-float:hover { transform: translateY(-5px); }
+  @media (max-width: 768px) {
+    .global-contact-float { bottom: 1rem; right: 1rem; left: 1rem; border-radius: 16px; align-items: center; text-align: center; }
+  }
+  .global-contact-item { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: rgba(255,255,255,0.9); transition: color 0.3s; }
+  .global-contact-item:hover { color: #fbbf24; }
+  .global-contact-header { font-size: 0.75rem; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; margin-bottom: -0.25rem; }
+
   /* ── NAV ── */
   .nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
@@ -240,58 +276,40 @@ const CSS = `
     background: var(--primary);
     overflow: hidden;
     padding: 8rem 0 4rem;
+    animation: colorFade 15s infinite alternate ease-in-out;
   }
   
-  /* The Background Image */
-  .hero-bg {
-    position: absolute;
-    top: 0; right: 0; bottom: 0; left: 20%;
-    background-image: url('/kids2.JPG');
-    background-size: cover;
-    background-position: center 30%;
-    z-index: 1;
-    opacity: 0.9;
-  }
-  @media (max-width: 1024px) {
-    .hero-bg { left: 0; opacity: 0.4; }
-  }
-
-  /* The Color Fade Overlay */
-  .hero-fade {
-    position: absolute;
-    top: 0; right: 0; bottom: 0; left: 0;
-    /* Fades from solid primary to transparent to blend the image */
-    background: linear-gradient(90deg, var(--primary) 0%, var(--primary) 45%, rgba(30, 6, 70, 0.8) 60%, transparent 100%);
-    z-index: 2;
-  }
-  @media (max-width: 1024px) {
-    .hero-fade { background: linear-gradient(0deg, var(--primary) 0%, rgba(30, 6, 70, 0.9) 100%); }
-  }
+  .hero-shapes { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; opacity: 0.4; }
+  .shape { position: absolute; background: rgba(255,255,255,0.03); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.05); }
+  .shape-circle-1 { width: 400px; height: 400px; border-radius: 50%; top: -100px; right: -50px; animation: float1 12s infinite ease-in-out; background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%); }
+  .shape-circle-2 { width: 300px; height: 300px; border-radius: 50%; bottom: -50px; left: -100px; animation: float2 15s infinite reverse ease-in-out; background: radial-gradient(circle, rgba(59,11,134,0.3) 0%, transparent 70%); }
+  .shape-rect { width: 250px; height: 250px; border-radius: 40px; top: 30%; right: 15%; animation: float1 18s infinite ease-in-out; transform: rotate(15deg); }
+  .shape-polygon { width: 180px; height: 180px; top: 20%; left: 10%; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); animation: float2 14s infinite ease-in-out; background: rgba(124,58,237,0.05); }
 
   .hero .container { position: relative; z-index: 10; }
   
-  .hero-content { max-width: 650px; }
+  .hero-content { max-width: 700px; margin: 0 auto; text-align: center; }
   
   .hero-badge {
     display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 100px; color: #fbbf24; font-size: 0.75rem; font-weight: 800;
     text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(10px);
   }
   .hero-title { 
-    font-family: var(--serif); font-size: clamp(3rem, 8vw, 5rem); line-height: 1.1; font-weight: 700;
+    font-family: var(--sans); font-size: clamp(3rem, 7vw, 4.5rem); line-height: 1.1; font-weight: 900; letter-spacing: -0.02em;
     margin-bottom: 1.5rem; color: white;
   }
-  .hero-subtitle { font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 2.5rem; line-height: 1.7; }
+  .hero-subtitle { font-size: 1.2rem; color: rgba(255,255,255,0.7); margin-bottom: 2.5rem; line-height: 1.6; max-width: 600px; margin-inline: auto; font-weight: 400; }
   
-  .hero-btns { display: flex; flex-direction: column; gap: 1rem; }
+  .hero-btns { display: flex; flex-direction: column; gap: 1rem; justify-content: center; }
   @media (min-width: 640px) { .hero-btns { flex-direction: row; align-items: center; } }
   
   /* ── MARQUEE ── */
-  .marquee { background: var(--primary-light); color: white; padding: 1.5rem 0; overflow: hidden; white-space: nowrap; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .marquee { background: rgba(0,0,0,0.2); backdrop-filter: blur(10px); color: white; padding: 1.5rem 0; overflow: hidden; white-space: nowrap; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
   .marquee-content { display: inline-block; animation: marquee 30s linear infinite; }
-  .marquee-item { display: inline-flex; align-items: center; gap: 1rem; padding: 0 2rem; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .marquee-item { display: inline-flex; align-items: center; gap: 1rem; padding: 0 2rem; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7); }
   .marquee-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
   @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
@@ -300,7 +318,7 @@ const CSS = `
   .section-header { text-align: center; max-width: 700px; margin: 0 auto 4rem; }
   .section-header.left { text-align: left; margin: 0 0 3rem 0; }
   .section-eyebrow { font-weight: 800; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
-  .section-title { font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 700; color: var(--primary); line-height: 1.1; }
+  .section-title { font-family: var(--sans); font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.02em; color: var(--primary); line-height: 1.1; }
   
   .features-grid { display: grid; gap: 2rem; }
   @media (min-width: 640px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -324,61 +342,70 @@ const CSS = `
   .pillars .feature-title { color: white; }
   .pillars .feature-desc { color: rgba(255, 255, 255, 0.6); }
 
-  /* ── HORIZONTAL SCROLLING PRICING ── */
+  /* ── VERTICAL SCROLLING PRICING ── */
   .pricing-section { background: var(--bg); position: relative; overflow: hidden; }
-  .pricing-header-container { text-align: center; margin-bottom: 3rem; }
+  .pricing-header-container { text-align: center; margin-bottom: 4rem; }
   
-  .pricing-marquee-wrapper {
-    display: flex;
-    overflow: hidden;
-    user-select: none;
-    gap: 2rem;
-    padding: 2rem 0 4rem;
+  .pricing-toggle-wrapper {
+    display: inline-flex; align-items: center; gap: 1rem;
+    background: white; padding: 0.5rem 1rem; border-radius: 100px;
+    box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.05);
+    margin: 0 auto;
   }
+  .pricing-toggle-wrapper span { font-size: 0.9rem; font-weight: 700; color: var(--text-light); transition: color 0.3s; }
+  .pricing-toggle-wrapper span.active { color: var(--primary); }
   
-  .pricing-marquee-content {
-    display: flex;
-    flex-shrink: 0;
-    justify-content: space-around;
-    min-width: 100%;
-    gap: 2rem;
-    animation: scrollX 35s linear infinite;
+  .pricing-toggle-btn {
+    width: 60px; height: 32px; background: var(--accent); border-radius: 30px; border: none;
+    position: relative; cursor: pointer; transition: background 0.3s; outline: none;
   }
-  
-  .pricing-marquee-wrapper:hover .pricing-marquee-content {
-    animation-play-state: paused;
+  .pricing-toggle-circle {
+    width: 24px; height: 24px; background: white; border-radius: 50%;
+    position: absolute; top: 4px; left: 4px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   }
-  
-  @keyframes scrollX {
-    from { transform: translateX(0); }
-    to { transform: translateX(calc(-100% - 2rem)); }
+  .pricing-toggle-btn.toggled .pricing-toggle-circle { transform: translateX(28px); }
+
+  .pricing-cards-container {
+    display: flex; flex-direction: column; gap: 2rem;
+    max-height: 800px; overflow-y: auto; padding: 1rem 0 3rem;
+    scrollbar-width: thin; scrollbar-color: var(--accent) transparent;
+  }
+  .pricing-cards-container::-webkit-scrollbar { width: 6px; }
+  .pricing-cards-container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+  @media (min-width: 1024px) {
+    .pricing-cards-container { flex-direction: row; justify-content: center; max-height: none; overflow-y: visible; }
   }
 
   .pricing-card {
-    background: white; border-radius: 32px; padding: 2.5rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.06);
-    width: 380px; flex-shrink: 0;
-    transition: all 0.3s ease;
+    background: white; border-radius: 24px; padding: 3rem 2.5rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.06);
+    flex: 1; max-width: 400px; margin: 0 auto; width: 100%;
+    transition: all 0.4s ease; display: flex; flex-direction: column;
   }
-  .pricing-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-    border-color: var(--accent);
+  @media (min-width: 1024px) {
+    .pricing-card.featured { transform: scale(1.05); z-index: 10; border-color: var(--accent); box-shadow: 0 20px 50px rgba(124,58,237,0.1); }
   }
   
-  .pricing-tier { font-size: 1.6rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem; }
+  .pricing-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+  @media (min-width: 1024px) {
+    .pricing-card.featured:hover { transform: scale(1.05) translateY(-5px); }
+  }
+  
+  .pricing-tier { font-size: 1.8rem; font-weight: 900; color: var(--primary); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
   .pricing-desc { font-size: 0.95rem; color: var(--text-light); margin-bottom: 2rem; line-height: 1.5; }
   
-  .pricing-cost-group { display: grid; gap: 1rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px dashed #e2e8f0; }
-  .pricing-label { font-size: 0.8rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+  .pricing-cost-group { margin-bottom: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px dashed #e2e8f0; }
+  .pricing-label { font-size: 0.8rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
   
   .pricing-amount { display: flex; align-items: baseline; gap: 0.5rem; }
-  .pricing-ghs { font-family: var(--serif); font-size: 1.8rem; font-weight: 700; color: var(--primary); line-height: 1; }
-  .pricing-usd { font-size: 0.9rem; font-weight: 700; color: var(--text-light); }
+  .pricing-ghs { font-family: var(--sans); font-size: 2.5rem; font-weight: 900; color: var(--primary); line-height: 1; letter-spacing: -0.03em; }
+  .pricing-usd { font-size: 1rem; font-weight: 700; color: var(--text-light); }
   
-  .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 2.5rem; }
-  .pricing-feature { display: flex; align-items: center; gap: 0.75rem; font-weight: 600; font-size: 0.9rem; color: var(--text); }
-  .pricing-check { width: 22px; height: 22px; border-radius: 50%; background: #f0fdf4; color: #16a34a; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; flex-shrink: 0; }
+  .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 3rem; }
+  .pricing-feature { display: flex; align-items: flex-start; gap: 0.75rem; font-weight: 600; font-size: 0.95rem; color: var(--text); }
+  .pricing-check { width: 20px; height: 20px; border-radius: 50%; background: #f5f3ff; color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
 
   /* ── WORKFLOW ── */
   .workflow-list { display: grid; gap: 1.5rem; }
@@ -444,7 +471,7 @@ const CSS = `
 function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v: boolean) => void }) {
   // If not scrolled, we are at the top of the hero (which is dark purple)
   const navClass = scrolled ? 'nav scrolled' : 'nav hero-top';
-  
+
   return (
     <nav className={navClass}>
       <div className="container">
@@ -453,18 +480,18 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
             <div className="logo-icon">W</div>
             <span>World Uni-Learn</span>
           </a>
-          
+
           <div className="nav-links">
             {['Features', 'Pillars', 'Workflow', 'Pricing'].map(item => (
               <a key={item} href={`#${item.toLowerCase()}`} className="nav-link" aria-label={`Navigate to ${item}`}>{item}</a>
             ))}
           </div>
-          
+
           <div className="nav-actions">
             <a href="/login" className="btn-login">Sign In</a>
             <a href="/register-school" className="btn-primary">Register School</a>
           </div>
-          
+
           <button className="mobile-toggle" onClick={() => setMenuOpen(true)}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
           </button>
@@ -477,10 +504,20 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
 function Hero() {
   return (
     <section className="hero">
-      {/* Background Image & Color Fade */}
-      <div className="hero-bg" />
-      <div className="hero-fade" />
-      
+      <svg className="hero-art" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+        <path d="M-200,800 C100,600 300,1000 500,800 C700,600 900,900 1200,700" />
+        <path d="M-100,200 C200,400 400,100 600,300 C800,500 1000,200 1200,400" />
+        <path d="M 200,-100 Q 400,400 800,-100" />
+        <circle cx="850" cy="850" r="100" />
+        <rect x="150" y="700" width="100" height="100" transform="rotate(45 200 750)" />
+      </svg>
+      <div className="hero-shapes">
+        <div className="shape shape-circle-1" />
+        <div className="shape shape-circle-2" />
+        <div className="shape shape-rect" />
+        <div className="shape shape-polygon" />
+      </div>
+
       <div className="container">
         <div className="hero-content">
           <div className="hero-badge">
@@ -494,14 +531,14 @@ function Hero() {
           <p className="hero-subtitle">
             Empower students, equip educators, and automate administrative GES reporting
             from a single unified platform built specifically for Ghanaian and West African schools.
-            The ultimate School Management System.
           </p>
           <div className="hero-btns">
-            <a href="/register-school" className="btn-primary" style={{ padding: '1.1rem 2.5rem', fontSize: '1.05rem' }}>Register Your School</a>
-            <a href="/login" className="btn-login" style={{ fontSize: '1.05rem', borderBottom: '2px solid rgba(255,255,255,0.3)', marginLeft: '1rem', paddingBottom: '2px', transition: 'border-color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.borderColor = 'white'} onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'}>Sign In to Portal</a>
+            <a href="/register-school" className="btn-primary" style={{ padding: '1.2rem 2.5rem', fontSize: '1.05rem', borderRadius: '14px' }}>Get Started Free</a>
+            <a href="/login" className="btn-login" style={{ fontSize: '1.05rem', padding: '1.2rem 2.5rem', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', transition: 'all 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}>Sign In to Portal</a>
           </div>
         </div>
       </div>
+
     </section>
   );
 }
@@ -540,69 +577,74 @@ function Reveal({ children }: { children: React.ReactNode }) {
 }
 
 function PricingSection() {
-  const renderCards = () => PRICING_TIERS.map((tier, i) => (
-    <div className="pricing-card" key={i}>
-      <h3 className="pricing-tier">{tier.name}</h3>
-      <p className="pricing-desc">{tier.desc}</p>
-      
-      <div className="pricing-cost-group">
-        <div>
-          <div className="pricing-label">One-Time Onboarding</div>
-          <div className="pricing-amount">
-            <span className="pricing-ghs">{tier.onboardingGHS}</span>
-            <span className="pricing-usd">{tier.onboardingUSD}</span>
-          </div>
-        </div>
-        <div>
-          <div className="pricing-label">Termly Fee (Lower)</div>
-          <div className="pricing-amount">
-            <span className="pricing-ghs">{tier.termGHS}</span>
-            <span className="pricing-usd">{tier.termUSD}</span>
-          </div>
-        </div>
-        <div>
-          <div className="pricing-label">Semester Fee (Higher)</div>
-          <div className="pricing-amount">
-            <span className="pricing-ghs">{tier.semesterGHS}</span>
-            <span className="pricing-usd">{tier.semesterUSD}</span>
-          </div>
-        </div>
-      </div>
-
-      <ul className="pricing-features">
-        {tier.features.map((feature, j) => (
-          <li className="pricing-feature" key={j}>
-            <span className="pricing-check">✓</span>
-            {feature}
-          </li>
-        ))}
-      </ul>
-      
-      <a href="/register-school" className="btn-primary" style={{ display: 'block', textAlign: 'center', background: i === 1 ? 'var(--primary)' : 'var(--accent)', marginTop: 'auto' }}>
-        {i === 2 ? 'Contact Sales' : 'Select ' + tier.name}
-      </a>
-    </div>
-  ));
+  const [billingCycle, setBillingCycle] = useState<'term' | 'semester'>('term');
 
   return (
     <section className="section pricing-section" id="pricing">
       <div className="container pricing-header-container">
-        <SectionHeader 
-          eyebrow="Transparent Pricing" 
-          title="Simple pricing for schools of all sizes." 
+        <SectionHeader
+          eyebrow="Transparent Pricing"
+          title="Simple pricing for schools of all sizes."
         />
-        <p style={{ color: 'var(--text-light)', fontSize: '1.1rem', maxWidth: 600, margin: '0 auto' }}>
+        <p style={{ color: 'var(--text-light)', fontSize: '1.1rem', maxWidth: 600, margin: '0 auto', marginBottom: '2.5rem' }}>
           Our pricing scales with your institution. Choose between Termly or Semester-based billing options.
         </p>
-      </div>
-      
-      <div className="pricing-marquee-wrapper">
-        <div className="pricing-marquee-content">
-          {renderCards()}
+
+        <div className="pricing-toggle-wrapper">
+          <span className={billingCycle === 'term' ? 'active' : ''}>Termly Billing</span>
+          <button
+            className={`pricing-toggle-btn ${billingCycle === 'semester' ? 'toggled' : ''}`}
+            onClick={() => setBillingCycle(prev => prev === 'term' ? 'semester' : 'term')}
+            aria-label="Toggle billing cycle"
+          >
+            <div className="pricing-toggle-circle"></div>
+          </button>
+          <span className={billingCycle === 'semester' ? 'active' : ''}>Semester Billing</span>
         </div>
-        {/* Duplicate content for seamless infinite scrolling */}
-        <div className="pricing-marquee-content" aria-hidden="true">
-          {renderCards()}
+      </div>
+
+      <div className="container">
+        <div className="pricing-cards-container">
+          {PRICING_TIERS.map((tier, i) => {
+            const currentGHS = billingCycle === 'term' ? tier.termGHS : tier.semesterGHS;
+            const currentUSD = billingCycle === 'term' ? tier.termUSD : tier.semesterUSD;
+
+            return (
+              <div className={`pricing-card ${i === 1 ? 'featured' : ''}`} key={i}>
+                <h3 className="pricing-tier">{tier.name}</h3>
+                <p className="pricing-desc">{tier.desc}</p>
+
+                <div className="pricing-cost-group">
+                  <div className="pricing-amount">
+                    <span className="pricing-ghs">{currentGHS}</span>
+                    <span className="pricing-usd">{currentUSD}</span>
+                  </div>
+                  <div className="pricing-label">per {billingCycle}</div>
+
+                  <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px dashed #e2e8f0' }}>
+                    <div className="pricing-label">One-Time Onboarding</div>
+                    <div className="pricing-amount">
+                      <span className="pricing-ghs" style={{ fontSize: '1.25rem' }}>{tier.onboardingGHS}</span>
+                      <span className="pricing-usd" style={{ fontSize: '0.85rem' }}>{tier.onboardingUSD}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <ul className="pricing-features">
+                  {tier.features.map((feature, j) => (
+                    <li className="pricing-feature" key={j}>
+                      <span className="pricing-check">✓</span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <a href="/register-school" className="btn-primary" style={{ display: 'block', textAlign: 'center', background: i === 1 ? 'var(--primary)' : 'var(--accent)', marginTop: 'auto', padding: '1rem' }}>
+                  {i === 2 ? 'Contact Sales' : 'Select ' + tier.name}
+                </a>
+              </div>
+            )
+          })}
         </div>
       </div>
     </section>
@@ -632,9 +674,23 @@ export default function LandingPage() {
       </div>
 
       <Navbar scrolled={scrolled} setMenuOpen={setMenuOpen} />
-      
+
+      <div className="global-contact-float">
+        <div className="global-contact-header">Sales & Support</div>
+        <div className="global-contact-item" style={{ fontSize: '1rem', color: 'white' }}>Cooper Andy Mawunyo</div>
+        <div className="global-contact-item" style={{ opacity: 0.8 }}>Novara Techs</div>
+        <a href="mailto:hello@worldunilearn.com" className="global-contact-item" style={{ marginTop: '0.25rem' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          hello@worldunilearn.com
+        </a>
+        <a href="tel:+233537996934" className="global-contact-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          +233 537 996 934
+        </a>
+      </div>
+
       <Hero />
-      
+
       <MarqueeBand />
 
       <section className="section" id="features">

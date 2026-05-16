@@ -191,7 +191,7 @@ export const payrollService = {
     momo_number?: string
     momo_network?: string
   }) {
-    return supabase
+    const res = await supabase
       .from('staff_payroll')
       .update({
         is_paid: true,
@@ -205,6 +205,32 @@ export const payrollService = {
       .eq('id', id)
       .select('*, user:users(id, full_name, email, role, phone)')
       .single()
+
+    if (res.data) {
+      const [year, monthNum] = res.data.month.split('-')
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      const monthText = monthNames[parseInt(monthNum, 10) - 1] || res.data.month
+      
+      const allowancesJson = res.data.allowances > 0 ? [{ name: 'Total Allowances', amount: res.data.allowances }] : []
+      const deductionsJson = res.data.deductions > 0 ? [{ name: 'Total Deductions', amount: res.data.deductions }] : []
+
+      // Generate the payslip record
+      await supabase.from('staff_payslips').insert({
+        school_id: res.data.school_id,
+        user_id: res.data.user_id,
+        month: monthText,
+        year: parseInt(year, 10),
+        basic_salary: res.data.basic_salary,
+        allowances: allowancesJson,
+        deductions: deductionsJson,
+        net_salary: res.data.net_salary,
+        payment_method: res.data.payment_method,
+        bank_name: res.data.bank_name,
+        account_number: res.data.bank_reference || res.data.momo_number,
+      })
+    }
+
+    return res
   },
   async delete(schoolId: string, id: string) {
     return supabase.from('staff_payroll').delete().eq('id', id).eq('school_id', schoolId)

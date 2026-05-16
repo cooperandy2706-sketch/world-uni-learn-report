@@ -4,10 +4,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../hooks/useAuth'
 import { expenseService } from '../../services/bursar.service'
 import { vendorService } from '../../services/vendors.service'
+import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 import { Plus, Trash2, TrendingDown } from 'lucide-react'
 
-const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
+import { formatCurrency } from '../../utils/currency'
+
 const CATS = ['Utilities (Water/Electric)', 'Salaries & Wages', 'Teaching Materials', 'Maintenance & Repairs', 'School Events', 'Examination Costs', 'Transport', 'Stationery & Supplies', 'Catering', 'Security', 'ICT / Equipment', 'Other']
 
 function Btn({ children, onClick, variant = 'primary', disabled, loading, style }: any) {
@@ -47,6 +49,16 @@ export default function ExpensesPage() {
     queryFn: async () => { const { data } = await expenseService.getAll(schoolId, year); return data ?? [] },
     enabled: !!schoolId,
   })
+
+  // School context for currency
+  const { data: school } = useQuery({
+    queryKey: ['school-currency', schoolId],
+    queryFn: async () => { const { data } = await supabase.from('schools').select('currency_code').eq('id', schoolId).single(); return data },
+    enabled: !!schoolId,
+  })
+
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
 
   const addRecord = useMutation({
     mutationFn: (d: any) => expenseService.create(d),
@@ -93,7 +105,7 @@ export default function ExpensesPage() {
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
             <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Expense Records</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Total expenditure — {GHS(totalExpenses)}</p>
+            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Total expenditure — {CUR(totalExpenses)}</p>
           </div>
           <Btn variant="danger" onClick={() => setShowForm(v => !v)}><Plus size={14} /> {showForm ? 'Hide Form' : 'Record Expense'}</Btn>
         </div>
@@ -105,7 +117,7 @@ export default function ExpensesPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               {[
                 { label: 'Category', content: <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}>{CATS.map(c => <option key={c}>{c}</option>)}</select> },
-                { label: 'Amount (GH₵) *', content: <input type="number" min="0" step="0.01" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))} placeholder="0.00" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
+                { label: `Amount (${schoolCurrency}) *`, content: <input type="number" min="0" step="0.01" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))} placeholder="0.00" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
                 { label: 'Date', content: <input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
                 { label: 'Vendor / Payee', content: (
                   <select 
@@ -136,10 +148,10 @@ export default function ExpensesPage() {
         {/* Category pills */}
         {Object.keys(byCategory).length > 0 && (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 22 }}>
-            <button onClick={() => setFilterCat('')} style={{ padding: '5px 14px', borderRadius: 99, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', background: !filterCat ? '#dc2626' : '#fef2f2', color: !filterCat ? '#fff' : '#dc2626' }}>All ({GHS(totalExpenses)})</button>
+            <button onClick={() => setFilterCat('')} style={{ padding: '5px 14px', borderRadius: 99, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', background: !filterCat ? '#dc2626' : '#fef2f2', color: !filterCat ? '#fff' : '#dc2626' }}>All ({CUR(totalExpenses)})</button>
             {Object.entries(byCategory).sort((a, b) => b[1] - a[1]).map(([cat, total]) => (
               <button key={cat} onClick={() => setFilterCat(filterCat === cat ? '' : cat)} style={{ padding: '5px 14px', borderRadius: 99, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', background: filterCat === cat ? '#dc2626' : '#fef2f2', color: filterCat === cat ? '#fff' : '#dc2626' }}>
-                {cat.split('(')[0].trim()} ({GHS(total)})
+                {cat.split('(')[0].trim()} ({CUR(total)})
               </button>
             ))}
           </div>
@@ -151,7 +163,7 @@ export default function ExpensesPage() {
           <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}>
             {[currentYear, currentYear - 1, currentYear - 2].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
-          {filterCat && <span style={{ fontSize: 12, color: '#dc2626', fontWeight: 700 }}>Showing: {GHS(filteredTotal)}</span>}
+          {filterCat && <span style={{ fontSize: 12, color: '#dc2626', fontWeight: 700 }}>Showing: {CUR(filteredTotal)}</span>}
         </div>
 
         {/* Table */}
@@ -178,7 +190,7 @@ export default function ExpensesPage() {
                       <td style={{ padding: '11px 16px' }}><span style={{ fontSize: 10, background: '#fee2e2', color: '#b91c1c', padding: '2px 8px', borderRadius: 99, fontWeight: 700 }}>{r.category.split('(')[0].trim()}</span></td>
                       <td style={{ padding: '11px 16px', fontSize: 13, color: '#374151', fontWeight: 600 }}>{r.description}</td>
                       <td style={{ padding: '11px 16px', fontSize: 12, color: '#9ca3af' }}>{r.vendor ?? '—'}</td>
-                      <td style={{ padding: '11px 16px', fontSize: 14, fontWeight: 800, color: '#dc2626' }}>{GHS(r.amount)}</td>
+                      <td style={{ padding: '11px 16px', fontSize: 14, fontWeight: 800, color: '#dc2626' }}>{CUR(r.amount)}</td>
                       <td style={{ padding: '11px 16px' }}>
                         <button onClick={() => { if (confirm('Delete this expense?')) delRecord.mutate(r.id) }} style={{ width: 28, height: 28, borderRadius: 7, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trash2 size={12} /></button>
                       </td>
@@ -188,7 +200,7 @@ export default function ExpensesPage() {
                 <tfoot>
                   <tr style={{ background: '#fef2f2', borderTop: '2px solid #fecaca' }}>
                     <td colSpan={4} style={{ padding: '11px 16px', fontSize: 12, fontWeight: 700, color: '#dc2626' }}>TOTAL EXPENSES</td>
-                    <td style={{ padding: '11px 16px', fontSize: 15, fontWeight: 900, color: '#dc2626' }}>{GHS(filteredTotal)}</td>
+                    <td style={{ padding: '11px 16px', fontSize: 15, fontWeight: 900, color: '#dc2626' }}>{CUR(filteredTotal)}</td>
                     <td />
                   </tr>
                 </tfoot>

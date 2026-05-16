@@ -53,7 +53,7 @@ export default function NotificationBell(){
     setCount(0); setPreview([]); setOpen(false)
   }
 
-  const teacherNotifPath='/teacher/notifications'
+  const notifPath = user?.role ? `/${user.role}/notifications` : '#'
 
   return(
     <div ref={ref} style={{position:'relative'}}>
@@ -90,7 +90,7 @@ export default function NotificationBell(){
             }
           </div>
           <div style={{padding:'10px 16px',borderTop:'1px solid #f0eefe'}}>
-            <button onClick={()=>{setOpen(false);navigate(teacherNotifPath)}}
+            <button onClick={()=>{setOpen(false);navigate(notifPath)}}
               style={{width:'100%',padding:'8px',borderRadius:9,border:'1.5px solid #ddd6fe',background:'#f5f3ff',color:'#6d28d9',fontSize:12,fontWeight:600,cursor:'pointer',fontFamily:'"DM Sans",sans-serif'}}>
               View All Notifications →
             </button>

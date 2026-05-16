@@ -513,10 +513,67 @@ export default function ReportsPage() {
       <div style={{ fontFamily:'"DM Sans",system-ui,sans-serif', animation:'_rfadeIn .4s ease' }}>
         
         {/* ── Header ── */}
-        <div style={{ marginBottom:22, display:'flex', alignItems:'flex-start', justifyContent:'flex-end', flexWrap:'wrap', gap:12 }}>
-          <Btn variant="warning" onClick={handleExportAll} loading={exportingAll} disabled={exportingAll || !(term as any)?.id}>
-            📦 Export All Classes
-          </Btn>
+        <div style={{ marginBottom: 20 }}>
+          {/* Page title row */}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:12, marginBottom:16 }}>
+            <div>
+              <h2 style={{ fontSize:26, fontWeight:800, color:'#1e1b4b', margin:0, letterSpacing:'-0.02em' }}>
+                📄 Report Cards
+              </h2>
+              <p style={{ fontSize:13, color:'#6b7280', marginTop:4, fontWeight:500 }}>
+                Generate, manage and print student report cards for the current academic period.
+              </p>
+            </div>
+            <Btn variant="warning" onClick={handleExportAll} loading={exportingAll} disabled={exportingAll || !(term as any)?.id}>
+              📦 Export All Classes
+            </Btn>
+          </div>
+
+          {/* Academic context pill bar */}
+          <div style={{
+            display:'flex', alignItems:'center', gap:10, flexWrap:'wrap',
+            background:'linear-gradient(135deg,#1e1b4b,#312e81)',
+            borderRadius:16, padding:'12px 20px',
+            boxShadow:'0 6px 20px -4px rgba(30,27,75,0.3)'
+          }}>
+            <span style={{ fontSize:12, fontWeight:800, color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'.08em', marginRight:4 }}>
+              Reporting for:
+            </span>
+
+            {year?.name ? (
+              <span style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(99,102,241,0.25)', color:'#c7d2fe', padding:'4px 12px', borderRadius:100, fontSize:12, fontWeight:700 }}>
+                <span style={{ width:6,height:6,borderRadius:'50%',background:'#818cf8',flexShrink:0 }} />
+                {year.name}
+              </span>
+            ) : (
+              <span style={{ fontSize:12, color:'#fca5a5', fontWeight:700 }}>No academic year set</span>
+            )}
+
+            {term ? (
+              <span style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(34,197,94,0.2)', color:'#86efac', padding:'4px 12px', borderRadius:100, fontSize:12, fontWeight:700 }}>
+                <span style={{ width:6,height:6,borderRadius:'50%',background:'#4ade80',flexShrink:0, animation:'_rp_spin 3s linear infinite' }} />
+                {(term as any).name}
+                <span style={{ fontSize:10, opacity:.8, textTransform:'uppercase', letterSpacing:'.06em' }}>ACTIVE</span>
+              </span>
+            ) : (
+              <span style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(239,68,68,0.2)', color:'#fca5a5', padding:'4px 12px', borderRadius:100, fontSize:12, fontWeight:700 }}>
+                ⚠ No active term — reports cannot be generated
+              </span>
+            )}
+
+            <div style={{ marginLeft:'auto', display:'flex', gap:16 }}>
+              {[
+                { label:'Classes', value:(classes as any[]).length },
+                { label:'Total Reports', value:(reports as any[]).length },
+                { label:'Approved', value:(reports as any[]).filter((r:any)=>r.is_approved).length },
+              ].map(s => (
+                <div key={s.label} style={{ textAlign:'center' }}>
+                  <div style={{ fontSize:16, fontWeight:800, color:'#fff', lineHeight:1 }}>{s.value}</div>
+                  <div style={{ fontSize:10, color:'rgba(255,255,255,0.5)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.06em', marginTop:2 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* ── Export progress ── */}
@@ -533,6 +590,7 @@ export default function ReportsPage() {
             </div>
           </div>
         )}
+
 
         {/* ── Controls ── */}
         <div style={{ background:'#fff', borderRadius:16, padding:'18px 20px', border:'1.5px solid #f0eefe', marginBottom:20, boxShadow:'0 1px 4px rgba(109,40,217,.06)' }}>

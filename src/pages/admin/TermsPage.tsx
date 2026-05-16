@@ -12,12 +12,24 @@ import { formatDate } from '../../lib/utils'
 import toast from 'react-hot-toast'
 
 const schema = z.object({
-  name:             z.string().min(1, 'Term name is required'),
+  name:             z.string().min(1, 'Name is required'),
+  period_type:      z.enum(['term', 'semester', 'quarter', 'custom']).default('term'),
   academic_year_id: z.string().min(1, 'Select an academic year'),
   start_date:       z.string().optional(),
   end_date:         z.string().optional(),
 })
 type FormData = z.infer<typeof schema>
+
+const PERIOD_OPTIONS = {
+  term:     ['Term 1', 'Term 2', 'Term 3'],
+  semester: ['Semester 1', 'Semester 2'],
+  quarter:  ['Quarter 1', 'Quarter 2', 'Quarter 3', 'Quarter 4'],
+  custom:   [],
+} as const
+
+const PERIOD_LABELS: Record<string, string> = {
+  term: 'Term', semester: 'Semester', quarter: 'Quarter', custom: 'Custom',
+}
 
 function Btn({ children, onClick, variant = 'primary', type = 'button', disabled, loading, style, form }: any) {
   const [hov, setHov] = useState(false)
@@ -65,9 +77,15 @@ function StyledSelect({ label, error, children, ...props }: React.SelectHTMLAttr
 }
 
 const TERM_COLORS: Record<string, { color: string; bg: string; light: string }> = {
-  'Term 1': { color: '#6d28d9', bg: '#f5f3ff', light: '#ede9fe' },
-  'Term 2': { color: '#0891b2', bg: '#ecfeff', light: '#cffafe' },
-  'Term 3': { color: '#d97706', bg: '#fffbeb', light: '#fef3c7' },
+  'Term 1':     { color: '#6d28d9', bg: '#f5f3ff', light: '#ede9fe' },
+  'Term 2':     { color: '#0891b2', bg: '#ecfeff', light: '#cffafe' },
+  'Term 3':     { color: '#d97706', bg: '#fffbeb', light: '#fef3c7' },
+  'Semester 1': { color: '#1d4ed8', bg: '#eff6ff', light: '#dbeafe' },
+  'Semester 2': { color: '#7c3aed', bg: '#f5f3ff', light: '#ede9fe' },
+  'Quarter 1':  { color: '#0f766e', bg: '#f0fdfa', light: '#ccfbf1' },
+  'Quarter 2':  { color: '#16a34a', bg: '#f0fdf4', light: '#dcfce7' },
+  'Quarter 3':  { color: '#d97706', bg: '#fffbeb', light: '#fef3c7' },
+  'Quarter 4':  { color: '#dc2626', bg: '#fef2f2', light: '#fee2e2' },
 }
 
 function getTermColor(name: string) {
@@ -107,12 +125,21 @@ export default function TermsPage() {
     onError: () => toast.error('Failed to change term. Could not compute rollovers.'),
   })
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({ resolver: zodResolver(schema) })
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { period_type: 'term' },
+  })
+
+  const periodType = watch('period_type') as keyof typeof PERIOD_OPTIONS
+  const nameOptions = PERIOD_OPTIONS[periodType] ?? []
+  const periodLabel = PERIOD_LABELS[periodType] ?? 'Period'
 
   async function onSubmit(data: FormData) {
-    await create.mutateAsync(data)
+    // strip period_type — it's UI-only, not a DB column
+    const { period_type, ...payload } = data
+    await create.mutateAsync(payload)
     setModalOpen(false)
-    reset({})
+    reset({ period_type: 'term' })
   }
 
   const currentTerm = terms.find((t: any) => t.is_current)
@@ -132,7 +159,7 @@ export default function TermsPage() {
 
         {/* Header */}
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 12 }}>
-          <Btn onClick={() => { reset({ academic_year_id: effectiveYearId }); setModalOpen(true) }}>➕ Add Term</Btn>
+          <Btn onClick={() => { reset({ academic_year_id: effectiveYearId, period_type: 'term' }); setModalOpen(true) }}>➕ Add Term / Semester</Btn>
         </div>
 
         {/* Stats */}
@@ -177,7 +204,7 @@ export default function TermsPage() {
             <div style={{ fontSize: 52, marginBottom: 12 }}>📆</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No terms yet</h3>
             <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>Add terms for the selected academic year.</p>
-            <Btn onClick={() => { reset({ academic_year_id: effectiveYearId }); setModalOpen(true) }}>➕ Add First Term</Btn>
+          <Btn onClick={() => { reset({ academic_year_id: effectiveYearId, period_type: 'term' }); setModalOpen(true) }}>➕ Add First Term / Semester</Btn>
           </div>
         )}
 
@@ -272,26 +299,60 @@ export default function TermsPage() {
 
         {/* Add Modal */}
         <Modal open={modalOpen} onClose={() => setModalOpen(false)}
-          title="Add Term"
-          subtitle="Create a new term for the selected academic year"
+          title={`Add ${periodLabel}`}
+          subtitle={`Create a new ${periodLabel.toLowerCase()} for the selected academic year`}
           size="sm"
           footer={<>
             <Btn variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Btn>
-            <Btn onClick={handleSubmit(onSubmit)} loading={isSubmitting}>Add Term</Btn>
+            <Btn onClick={handleSubmit(onSubmit)} loading={isSubmitting}>Add {periodLabel}</Btn>
           </>}
         >
           <form id="term-form" onSubmit={handleSubmit(onSubmit)}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              
+              {/* Period type toggle */}
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 8 }}>Period Type *</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                  {(['term', 'semester', 'quarter', 'custom'] as const).map(pt => (
+                    <button
+                      key={pt}
+                      type="button"
+                      onClick={() => { setValue('period_type', pt); setValue('name', '') }}
+                      style={{
+                        padding: '9px 6px', borderRadius: 10, fontSize: 12, fontWeight: 700,
+                        border: `2px solid ${periodType === pt ? '#7c3aed' : '#e5e7eb'}`,
+                        background: periodType === pt ? '#f5f3ff' : '#fff',
+                        color: periodType === pt ? '#7c3aed' : '#6b7280',
+                        cursor: 'pointer', transition: 'all 0.15s', textTransform: 'capitalize',
+                      }}
+                    >
+                      {pt === 'term' ? '📆 Term' : pt === 'semester' ? '🗓️ Semester' : pt === 'quarter' ? '📊 Quarter' : '✏️ Custom'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <StyledSelect label="Academic Year *" {...register('academic_year_id')} error={errors.academic_year_id?.message}>
                 <option value="">Select year…</option>
                 {(years as any[]).map((y: any) => <option key={y.id} value={y.id}>{y.name}</option>)}
               </StyledSelect>
-              <StyledSelect label="Term Name *" {...register('name')} error={errors.name?.message}>
-                <option value="">Select term…</option>
-                <option value="Term 1">Term 1</option>
-                <option value="Term 2">Term 2</option>
-                <option value="Term 3">Term 3</option>
-              </StyledSelect>
+
+              {/* Name — dropdown for preset types, text input for custom */}
+              {periodType === 'custom' ? (
+                <StyledInput
+                  label="Period Name *"
+                  {...register('name')}
+                  error={errors.name?.message}
+                  placeholder={`e.g. Trimester 1, Block A, …`}
+                />
+              ) : (
+                <StyledSelect label={`${periodLabel} Name *`} {...register('name')} error={errors.name?.message}>
+                  <option value="">Select {periodLabel.toLowerCase()}…</option>
+                  {nameOptions.map(n => <option key={n} value={n}>{n}</option>)}
+                </StyledSelect>
+              )}
+
               <StyledInput label="Start Date" {...register('start_date')} type="date" />
               <StyledInput label="End Date" {...register('end_date')} type="date" />
             </div>

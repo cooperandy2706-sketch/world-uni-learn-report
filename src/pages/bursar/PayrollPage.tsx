@@ -11,7 +11,7 @@ import { Plus, CheckCircle2, Users, DollarSign, Trash2, Calendar, FileText, Chev
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, getISOWeek } from 'date-fns'
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts'
 
-const GHS = (n: number) => `GH₵ ${Number(n || 0).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
+import { formatCurrency } from '../../utils/currency'
 
 const CREST_SVG = `
   <svg width="48" height="48" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
@@ -43,6 +43,8 @@ export default function PayrollPage() {
   const schoolId = user?.school_id ?? ''
   const { data: settings } = useSettings()
   const school = settings?.school
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
   
   const now = new Date()
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
@@ -163,10 +165,10 @@ export default function PayrollPage() {
       <div>Date: ${row.paid_date || format(new Date(), 'dd/MM/yyyy')}</div>
       <div class="hr"></div>
       <table>
-        <tr><td>${desc}</td><td align="right" class="b">${GHS(net)}</td></tr>
+        <tr><td>${desc}</td><td align="right" class="b">${CUR(net)}</td></tr>
       </table>
       <div class="hr"></div>
-      <div class="b">Total Paid: ${GHS(net)}</div>
+      <div class="b">Total Paid: ${CUR(net)}</div>
       <div class="mode">Mode: ${(row.payment_method || 'CASH').toUpperCase()}</div>
       ${row.bank_reference ? `<div style="font-size:9px">Ref: ${row.bank_reference}</div>` : ''}
       <div class="hr"></div>
@@ -230,13 +232,13 @@ export default function PayrollPage() {
           </div>
           <table><thead><tr><th>Description of Payment</th><th align="right">Amount Allocated</th></tr></thead>
             <tbody>
-              <tr><td style="font-weight:600">${desc}</td><td align="right" style="font-weight:800;color:#111827">${GHS(net)}</td></tr>
+              <tr><td style="font-weight:600">${desc}</td><td align="right" style="font-weight:800;color:#111827">${CUR(net)}</td></tr>
             </tbody>
           </table>
           <div class="total-row">
             <div>
               <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;opacity:0.8;margin-bottom:4px">Net Amount Disbursed</div>
-              <div class="val">${GHS(net)}</div>
+              <div class="val">${CUR(net)}</div>
             </div>
             <div style="text-align:right">
               ${row.bank_reference ? `<div style="font-size:12px;opacity:0.9">Ref: ${row.bank_reference}</div>` : ''}
@@ -310,10 +312,10 @@ export default function PayrollPage() {
                     <div style={{ fontSize: 15, fontWeight: 800 }}>{row.user?.full_name}</div>
                     <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600, textTransform: 'capitalize' }}>{row.user?.designation || row.user?.role}</div>
                   </td>
-                  <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 700 }}>{GHS(row.basic_salary)}</td>
-                  <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 700, color: '#059669' }}>+{GHS(row.allowances)}</td>
-                  <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 800 }}>{GHS(row.net_salary)}</td>
-                  <td style={{ padding: '14px 20px', fontSize: 15, fontWeight: 900, color: bal > 0 ? '#16a34a' : '#9ca3af' }}>{GHS(bal)}</td>
+                  <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 700 }}>{CUR(row.basic_salary)}</td>
+                  <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 700, color: '#059669' }}>+{CUR(row.allowances)}</td>
+                  <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 800 }}>{CUR(row.net_salary)}</td>
+                  <td style={{ padding: '14px 20px', fontSize: 15, fontWeight: 900, color: bal > 0 ? '#16a34a' : '#9ca3af' }}>{CUR(bal)}</td>
                   <td style={{ padding: '14px 20px' }}>
                     <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                       {row.is_paid ? (
@@ -373,7 +375,7 @@ export default function PayrollPage() {
                         <div style={{ fontWeight: 800 }}>{row.user?.full_name}</div>
                         <div style={{ fontSize: 10, color: '#6b7280', fontWeight: 600, textTransform: 'capitalize' }}>{row.user?.designation || row.user?.role}</div>
                       </td>
-                      <td style={{ padding: '14px 20px', fontWeight: 800 }}>{GHS(row.amount)}</td>
+                      <td style={{ padding: '14px 20px', fontWeight: 800 }}>{CUR(row.amount)}</td>
                       <td style={{ padding: '14px 20px' }}>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                           {row.is_paid ? <span style={{ color: '#059669', fontSize: 12, fontWeight: 800 }}><CheckCircle2 size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }}/>Paid</span> : <Btn onClick={() => setPayModal({ type: 'weekly', data: row, staff: row.user, amount: row.amount })}>Pay</Btn>}
@@ -441,7 +443,7 @@ export default function PayrollPage() {
                       <td style={{ padding: '14px 20px', color: '#6b7280', fontSize: 13 }}>{row.description}</td>
                       <td style={{ padding: '14px 20px' }}>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                          <span style={{ fontWeight: 800, color: '#059669' }}>{GHS(row.amount)}</span>
+                          <span style={{ fontWeight: 800, color: '#059669' }}>{CUR(row.amount)}</span>
                           <button onClick={() => { if(confirm('Delete daily expected payout?')) delAdj.mutate(row.id) }} style={{ border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', display: 'inline-flex', padding: 6, borderRadius: 6, marginLeft: 'auto' }}>
                             <Trash2 size={14} />
                           </button>
@@ -456,7 +458,7 @@ export default function PayrollPage() {
           </div>
           <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, height: 'fit-content' }}>
              <h3 style={{ fontSize: 15, fontWeight: 800, marginBottom: 20 }}>Today's Total Cashout</h3>
-             <div style={{ fontSize: 32, fontWeight: 900, color: '#6d28d9' }}>{GHS(dailyData.reduce((s:any, x:any) => s + Number(x.amount), 0))}</div>
+             <div style={{ fontSize: 32, fontWeight: 900, color: '#6d28d9' }}>{CUR(dailyData.reduce((s:any, x:any) => s + Number(x.amount), 0))}</div>
           </div>
         </div>
       )}
@@ -467,15 +469,15 @@ export default function PayrollPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 20, marginBottom: 30 }}>
              <div style={{ background: '#fff', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
                <div style={{ color: '#6b7280', fontSize: 13, fontWeight: 700 }}>Total Month Gross</div>
-               <div style={{ fontSize: 28, fontWeight: 900, color: '#1e0646', marginTop: 8 }}>{GHS(payroll.reduce((s,x) => s + x.basic_salary + x.allowances, 0))}</div>
+               <div style={{ fontSize: 28, fontWeight: 900, color: '#1e0646', marginTop: 8 }}>{CUR(payroll.reduce((s,x) => s + x.basic_salary + x.allowances, 0))}</div>
              </div>
              <div style={{ background: '#fff', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
                <div style={{ color: '#6b7280', fontSize: 13, fontWeight: 700 }}>Total Paid to Date</div>
-               <div style={{ fontSize: 28, fontWeight: 900, color: '#059669', marginTop: 8 }}>{GHS(payroll.filter(p=>p.is_paid).reduce((s,x) => s + x.net_salary, 0))}</div>
+               <div style={{ fontSize: 28, fontWeight: 900, color: '#059669', marginTop: 8 }}>{CUR(payroll.filter(p=>p.is_paid).reduce((s,x) => s + x.net_salary, 0))}</div>
              </div>
              <div style={{ background: '#fff', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
                <div style={{ color: '#6b7280', fontSize: 13, fontWeight: 700 }}>Outstanding Month Balance</div>
-               <div style={{ fontSize: 28, fontWeight: 900, color: '#dc2626', marginTop: 8 }}>{GHS(payroll.filter(p=>!p.is_paid).reduce((s,x) => s + (x.net_salary - (x.adjustments_paid_total||0)), 0))}</div>
+               <div style={{ fontSize: 28, fontWeight: 900, color: '#dc2626', marginTop: 8 }}>{CUR(payroll.filter(p=>!p.is_paid).reduce((s,x) => s + (x.net_salary - (x.adjustments_paid_total||0)), 0))}</div>
              </div>
           </div>
           <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24 }}>
@@ -510,7 +512,7 @@ export default function PayrollPage() {
       </Modal>
 
       {payModal && (
-        <Modal open={true} onClose={() => setPayModal(null)} title="Process Payment" subtitle={`Paying ${payModal.staff?.full_name} — ${GHS(payModal.amount)}`}>
+        <Modal open={true} onClose={() => setPayModal(null)} title="Process Payment" subtitle={`Paying ${payModal.staff?.full_name} — ${CUR(payModal.amount)}`}>
            <PaymentMethodForm onConfirm={(details:any) => recordPay.mutate({ type: payModal.type, item: payModal.data, staff: payModal.staff, details })} />
         </Modal>
       )}
@@ -521,7 +523,7 @@ export default function PayrollPage() {
             <div style={{ width: 64, height: 64, background: '#ecfdf5', borderRadius: '50%', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                <CheckCircle2 size={32} color="#10b981" />
             </div>
-            <h3 style={{ fontSize: 20, fontWeight: 900 }}>{GHS(shareModal.type === 'monthly' ? shareModal.data.net_salary : shareModal.data.amount)} Paid</h3>
+            <h3 style={{ fontSize: 20, fontWeight: 900 }}>{CUR(shareModal.type === 'monthly' ? shareModal.data.net_salary : shareModal.data.amount)} Paid</h3>
             <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 24, marginTop: 4 }}>To {shareModal.staff?.full_name} via {shareModal.data.payment_method?.toUpperCase() || 'CASH'}</p>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -532,7 +534,7 @@ export default function PayrollPage() {
                   <Receipt size={24} color="#a21caf" /> <span style={{ fontSize: 12, fontWeight: 700 }}>Thermal Rec.</span>
                </button>
                <button onClick={() => {
-                   const txt = `Hello ${shareModal.staff.full_name}, your ${shareModal.type} pay of ${GHS(shareModal.type === 'monthly' ? shareModal.data.net_salary : shareModal.data.amount)} has been paid via ${(shareModal.data.payment_method||'Cash').toUpperCase()}. Ref: ${shareModal.data.bank_reference||'None'}.`
+                   const txt = `Hello ${shareModal.staff.full_name}, your ${shareModal.type} pay of ${CUR(shareModal.type === 'monthly' ? shareModal.data.net_salary : shareModal.data.amount)} has been paid via ${(shareModal.data.payment_method||'Cash').toUpperCase()}. Ref: ${shareModal.data.bank_reference||'None'}.`
                    window.open(`https://wa.me/${shareModal.staff?.phone?.replace(/\D/g, '') || ''}?text=${encodeURIComponent(txt)}`, '_blank')
                }} style={{ padding: 14, borderRadius: 16, border: '1.5px solid #e5e7eb', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <MessageSquare size={24} color="#25d366" /> <span style={{ fontSize: 12, fontWeight: 700 }}>WhatsApp</span>

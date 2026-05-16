@@ -5,7 +5,7 @@ import { incomeService, expenseService, feePaymentsService } from '../../service
 import { supabase } from '../../lib/supabase'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line, AreaChart, Area } from 'recharts'
 
-const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
+import { formatCurrency } from '../../utils/currency'
 const COLORS = ['#7c3aed','#16a34a','#0891b2','#d97706','#dc2626','#ec4899','#6366f1','#14b8a6']
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
@@ -20,6 +20,17 @@ export default function AnalyticsPage() {
   const [expByCat, setExpByCat] = useState<any[]>([])
   const [incByCat, setIncByCat] = useState<any[]>([])
   const [summary, setSummary] = useState({ income: 0, expenses: 0, fees: 0, net: 0 })
+
+  // School context for currency
+  const [school, setSchool] = useState<any>(null)
+  useEffect(() => {
+    if (schoolId) {
+      supabase.from('schools').select('currency_code').eq('id', schoolId).single().then(({ data }) => setSchool(data))
+    }
+  }, [schoolId])
+
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
 
   useEffect(() => { if (schoolId) load() }, [schoolId, year])
 
@@ -71,10 +82,10 @@ export default function AnalyticsPage() {
   }
 
   const kpis = [
-    { label: 'Total Income', value: GHS(summary.income + summary.fees), color: '#16a34a', bg: '#f0fdf4', note: `Incl. ${GHS(summary.fees)} fees` },
-    { label: 'Total Expenses', value: GHS(summary.expenses), color: '#dc2626', bg: '#fef2f2', note: 'All categories' },
-    { label: 'Net Balance', value: GHS(summary.net), color: summary.net >= 0 ? '#16a34a' : '#dc2626', bg: summary.net >= 0 ? '#f0fdf4' : '#fef2f2', note: summary.net >= 0 ? 'Surplus' : 'Deficit' },
-    { label: 'Fee Collection', value: GHS(summary.fees), color: '#7c3aed', bg: '#f5f3ff', note: String(year) },
+    { label: 'Total Income', value: CUR(summary.income + summary.fees), color: '#16a34a', bg: '#f0fdf4', note: `Incl. ${CUR(summary.fees)} fees` },
+    { label: 'Total Expenses', value: CUR(summary.expenses), color: '#dc2626', bg: '#fef2f2', note: 'All categories' },
+    { label: 'Net Balance', value: CUR(summary.net), color: summary.net >= 0 ? '#16a34a' : '#dc2626', bg: summary.net >= 0 ? '#f0fdf4' : '#fef2f2', note: summary.net >= 0 ? 'Surplus' : 'Deficit' },
+    { label: 'Fee Collection', value: CUR(summary.fees), color: '#7c3aed', bg: '#f5f3ff', note: String(year) },
   ]
 
   // Export summary as CSV
@@ -153,7 +164,7 @@ export default function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(v: any) => GHS(v)} contentStyle={{ borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', fontSize: 12 }} />
+                  <Tooltip formatter={(v: any) => CUR(v)} contentStyle={{ borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', fontSize: 12 }} />
                   <Legend />
                   <Area type="monotone" dataKey="income" name="Income" stroke="#16a34a" strokeWidth={2.5} fill="url(#incGrad)" />
                   <Area type="monotone" dataKey="expenses" name="Expenses" stroke="#dc2626" strokeWidth={2.5} fill="url(#expGrad)" />
@@ -172,7 +183,7 @@ export default function AnalyticsPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                    <Tooltip formatter={(v: any) => GHS(v)} contentStyle={{ borderRadius: 10, border: 'none', fontSize: 11 }} />
+                    <Tooltip formatter={(v: any) => CUR(v)} contentStyle={{ borderRadius: 10, border: 'none', fontSize: 11 }} />
                     <Line type="monotone" dataKey="net" name="Net" stroke="#7c3aed" strokeWidth={2.5} dot={{ fill: '#7c3aed', r: 3 }} />
                   </LineChart>
                 </ResponsiveContainer>
@@ -185,7 +196,7 @@ export default function AnalyticsPage() {
                   <ResponsiveContainer width="100%" height={180}>
                     <PieChart><Pie data={expByCat} cx="50%" cy="50%" outerRadius={65} dataKey="value" nameKey="name">
                       {expByCat.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                    </Pie><Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize: 10 }} /><Tooltip formatter={(v: any) => GHS(v)} contentStyle={{ borderRadius: 10, border: 'none', fontSize: 11 }} /></PieChart>
+                    </Pie><Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize: 10 }} /><Tooltip formatter={(v: any) => CUR(v)} contentStyle={{ borderRadius: 10, border: 'none', fontSize: 11 }} /></PieChart>
                   </ResponsiveContainer>
                 ) : <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>No data</div>}
               </div>
@@ -197,7 +208,7 @@ export default function AnalyticsPage() {
                   <ResponsiveContainer width="100%" height={180}>
                     <PieChart><Pie data={incByCat} cx="50%" cy="50%" outerRadius={65} dataKey="value" nameKey="name">
                       {incByCat.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                    </Pie><Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize: 10 }} /><Tooltip formatter={(v: any) => GHS(v)} contentStyle={{ borderRadius: 10, border: 'none', fontSize: 11 }} /></PieChart>
+                    </Pie><Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize: 10 }} /><Tooltip formatter={(v: any) => CUR(v)} contentStyle={{ borderRadius: 10, border: 'none', fontSize: 11 }} /></PieChart>
                   </ResponsiveContainer>
                 ) : <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>No data</div>}
               </div>
@@ -213,12 +224,12 @@ export default function AnalyticsPage() {
                   <div style={{ flex: 1, minWidth: 160 }}>
                     <div style={{ fontSize: 10, fontWeight: 800, opacity: 0.6, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>Peak Month</div>
                     <div style={{ fontSize: 18, fontWeight: 900 }}>{top?.month ?? '—'}</div>
-                    <div style={{ fontSize: 12, opacity: 0.8, marginTop: 2 }}>Highest income: {top ? GHS(top.income) : '—'}</div>
+                    <div style={{ fontSize: 12, opacity: 0.8, marginTop: 2 }}>Highest income: {top ? CUR(top.income) : '—'}</div>
                   </div>
                   <div style={{ flex: 1, minWidth: 160 }}>
                     <div style={{ fontSize: 10, fontWeight: 800, opacity: 0.6, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>Lowest Month</div>
                     <div style={{ fontSize: 18, fontWeight: 900 }}>{bottom?.month ?? '—'}</div>
-                    <div style={{ fontSize: 12, opacity: 0.8, marginTop: 2 }}>Lowest income: {bottom ? GHS(bottom.income) : '—'}</div>
+                    <div style={{ fontSize: 12, opacity: 0.8, marginTop: 2 }}>Lowest income: {bottom ? CUR(bottom.income) : '—'}</div>
                   </div>
                   <div style={{ flex: 1, minWidth: 160 }}>
                     <div style={{ fontSize: 10, fontWeight: 800, opacity: 0.6, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>Deficit Months</div>
@@ -237,7 +248,7 @@ export default function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(v: any) => GHS(v)} contentStyle={{ borderRadius: 10, border: 'none', fontSize: 12 }} />
+                  <Tooltip formatter={(v: any) => CUR(v)} contentStyle={{ borderRadius: 10, border: 'none', fontSize: 12 }} />
                   <Legend />
                   <Bar dataKey="income" name="Income" fill="#16a34a" radius={[4,4,0,0]} />
                   <Bar dataKey="expenses" name="Expenses" fill="#dc2626" radius={[4,4,0,0]} />

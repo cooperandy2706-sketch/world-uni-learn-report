@@ -33,6 +33,8 @@ export const ROUTES = {
   ADMIN_PROMOTION: '/admin/promotion',
   ADMIN_ALUMNI: '/admin/alumni',
   ADMIN_CALENDAR: '/admin/calendar',
+  ADMIN_FLEET: '/admin/fleet',
+  ADMIN_FLEET_LIVE: '/admin/fleet/live',
   ADMIN_ACCOUNT: '/admin/account',
   ADMIN_SECURITY: '/admin/security',
   SECURITY_DASHBOARD: '/security/dashboard',

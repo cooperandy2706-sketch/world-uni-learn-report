@@ -148,3 +148,80 @@ IMPORTANT RULES:
     throw new Error(`AI Error (Groq): ${err.message ?? String(err)}`)
   }
 }
+
+export interface GeneratedQuizContent {
+  title: string
+  description: string
+  questions: any[]
+}
+
+/**
+ * Generates a multiple choice quiz from provided text using Groq.
+ */
+export async function generateQuizFromText(text: string, count: number = 10): Promise<GeneratedQuizContent> {
+  if (!API_KEY) throw new Error('VITE_GROQ_API_KEY is not set in your .env file.')
+
+  const prompt = `You are an expert educational AI. Your task is to output exactly ${count} multiple choice questions in JSON format based on the text below.
+
+IMPORTANT INSTRUCTIONS:
+1. If the provided text already contains a list of questions (e.g. a past exam paper or quiz), you MUST EXTRACT those exact questions, their options, and determine the correct answers. Do not make up new questions if they are already provided in the text.
+2. If the provided text is study material (e.g. a textbook chapter, syllabus, or notes), you must GENERATE ${count} new questions based on the facts in the text.
+3. Return ONLY valid JSON matching this exact schema WITHOUT any markdown formatting blocks like \`\`\`json:
+
+{
+  "title": "Quiz Title",
+  "description": "Quiz Description",
+  "questions": [
+    {
+      "text": "The question text?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctAnswer": "The exact text of the correct option"
+    }
+  ]
+}
+
+Text to process:
+${text}
+`
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: "json_object" }
+      })
+    })
+
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.error?.message || "Failed to generate")
+    }
+
+    const data = await res.json()
+    let textResponse = data.choices[0].message.content
+    
+    // Clean up markdown block if present
+    if (textResponse.startsWith('\`\`\`json')) {
+      textResponse = textResponse.replace(/^\`\`\`json/m, '').replace(/\`\`\`$/m, '').trim()
+    } else if (textResponse.startsWith('\`\`\`')) {
+      textResponse = textResponse.replace(/^\`\`\`/m, '').replace(/\`\`\`$/m, '').trim()
+    }
+
+    const parsed = JSON.parse(textResponse)
+    
+    return {
+      title: parsed.title || 'AI Generated Quiz',
+      description: parsed.description || '',
+      questions: parsed.questions || []
+    }
+  } catch (err: any) {
+    throw new Error(`AI Error: ${err.message ?? 'Failed to generate quiz.'}`)
+  }
+}
+

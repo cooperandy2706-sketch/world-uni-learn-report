@@ -9,7 +9,7 @@ import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 import { Settings, Users, Monitor, Save, UserPlus, Trash2, CheckCircle, PencilLine, Printer } from 'lucide-react'
 
-const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
+import { formatCurrency } from '../../utils/currency'
 
 const CREST_SVG = `
   <svg width="40" height="40" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
@@ -35,6 +35,9 @@ function Btn({ children, onClick, variant = 'primary', style, loading }: any) {
 
 function RecordTab({ schoolId, term, students, configArray, user, school }: any) {
   const qc = useQueryClient()
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
+
   const [recDate, setRecDate] = useState(() => new Date().toISOString().split('T')[0])
   const [recClass, setRecClass] = useState('')
   const [recEntries, setRecEntries] = useState<Record<string, { feeding: string; studies: string }>>({})
@@ -165,7 +168,7 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
             const ent = recEntries[s.id] || { feeding: '0', studies: '0' }
             const f = Number(ent.feeding || 0)
             const st = Number(ent.studies || 0)
-            return `<tr><td style="font-weight:600">${s.full_name}</td><td>${f > 0 ? GHS(f) : '—'}</td><td>${st > 0 ? GHS(st) : '—'}</td><td style="font-weight:700">${GHS(f + st)}</td></tr>`
+            return `<tr><td style="font-weight:600">${s.full_name}</td><td>${f > 0 ? CUR(f) : '—'}</td><td>${st > 0 ? CUR(st) : '—'}</td><td style="font-weight:700">${CUR(f + st)}</td></tr>`
           }).join('')}
         </tbody>
       </table>
@@ -291,6 +294,9 @@ export default function DailyFeesPage() {
     queryFn: async () => { const { data } = await supabase.from('schools').select('*').eq('id', schoolId).single(); return data },
     enabled: !!schoolId,
   })
+
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
   
   const [tab, setTab] = useState<'config' | 'collectors' | 'overview' | 'record'>('overview')
 
@@ -550,7 +556,7 @@ export default function DailyFeesPage() {
               <div key={cls.class_name} style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
                 <div style={{ background: '#faf5ff', padding: '12px 16px', borderBottom: '1px solid #f0eefe', display: 'flex', justifyContent: 'space-between' }}>
                   <div style={{ fontWeight: 700, color: '#5b21b6', fontSize: 14 }}>{cls.class_name}</div>
-                  <div style={{ fontSize: 12, color: '#6d28d9', fontWeight: 600 }}>Total Class Debt: {GHS(cls.total_owed)}</div>
+                  <div style={{ fontSize: 12, color: '#6d28d9', fontWeight: 600 }}>Total Class Debt: {CUR(cls.total_owed)}</div>
                 </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <tbody>
@@ -558,11 +564,11 @@ export default function DailyFeesPage() {
                       <tr key={stu.id} style={{ borderBottom: '1px solid #f8fafc' }}>
                         <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 500, color: '#374151', width: '40%' }}>{stu.full_name}</td>
                         <td style={{ padding: '10px 16px', fontSize: 13, width: '30%' }}>
-                          <span style={{ color: '#16a34a', fontWeight: 600 }}>Paid: {GHS(stu.paid)}</span>
+                          <span style={{ color: '#16a34a', fontWeight: 600 }}>Paid: {CUR(stu.paid)}</span>
                         </td>
                         <td style={{ padding: '10px 16px', fontSize: 13, textAlign: 'right' }}>
                           <span style={{ fontSize: 11, color: '#6b7280', marginRight: 12 }}>({stu.daysPresent} days)</span>
-                          {stu.owes > 0 ? <span style={{ background: '#fef2f2', color: '#dc2626', padding: '3px 8px', borderRadius: 99, fontWeight: 700, fontSize: 12 }}>Owes {GHS(stu.owes)}</span> : <span style={{ color: '#9ca3af', fontSize: 12 }}>Cleared ✅</span>}
+                          {stu.owes > 0 ? <span style={{ background: '#fef2f2', color: '#dc2626', padding: '3px 8px', borderRadius: 99, fontWeight: 700, fontSize: 12 }}>Owes {CUR(stu.owes)}</span> : <span style={{ color: '#9ca3af', fontSize: 12 }}>Cleared ✅</span>}
                         </td>
                       </tr>
                     ))}

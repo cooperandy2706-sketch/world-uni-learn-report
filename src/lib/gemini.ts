@@ -155,6 +155,84 @@ IMPORTANT RULES:
     )
   }
 
-  throw new Error(`AI Error: ${finalErr?.message ?? 'Connection failed. Please check your API key.'}`)
+}
+
+export interface GeneratedQuizContent {
+  title: string
+  description: string
+  questions: any[]
+}
+
+/**
+ * Generates a multiple choice quiz from provided text.
+ */
+export async function generateQuizFromText(text: string, count: number = 10): Promise<GeneratedQuizContent> {
+  if (!API_KEY) throw new Error('VITE_GEMINI_API_KEY is not set in your .env file.')
+
+  const genAI = new GoogleGenerativeAI(API_KEY)
+
+  const prompt = `You are an expert educational AI. Your task is to output exactly ${count} multiple choice questions in JSON format based on the text below.
+
+IMPORTANT INSTRUCTIONS:
+1. If the provided text already contains a list of questions (e.g. a past exam paper or quiz), you MUST EXTRACT those exact questions, their options, and determine the correct answers. Do not make up new questions if they are already provided in the text.
+2. If the provided text is study material (e.g. a textbook chapter, syllabus, or notes), you must GENERATE ${count} new questions based on the facts in the text.
+3. Return ONLY valid JSON matching this exact schema WITHOUT any markdown formatting blocks like \`\`\`json:
+
+{
+  "title": "Quiz Title",
+  "description": "Quiz Description",
+  "questions": [
+    {
+      "text": "The question text?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctAnswer": "The exact text of the correct option"
+    }
+  ]
+}
+
+Text to process:
+${text}
+`
+
+  let lastError: any = null
+  let firstError: any = null
+
+  for (const modelName of MODEL_CHAIN) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName })
+      const result = await model.generateContent(prompt)
+      let textResponse = result.response.text()
+      
+      // Clean up markdown block if present
+      if (textResponse.startsWith('\`\`\`json')) {
+        textResponse = textResponse.replace(/^\`\`\`json/m, '').replace(/\`\`\`$/m, '').trim()
+      } else if (textResponse.startsWith('\`\`\`')) {
+        textResponse = textResponse.replace(/^\`\`\`/m, '').replace(/\`\`\`$/m, '').trim()
+      }
+
+      const parsed = JSON.parse(textResponse)
+      
+      return {
+        title: parsed.title || 'AI Generated Quiz',
+        description: parsed.description || '',
+        questions: parsed.questions || []
+      }
+    } catch (err: any) {
+      if (!firstError) firstError = err
+      lastError = err
+      const is429 = err?.message?.includes('429') || err?.message?.includes('quota')
+      const is404 = err?.message?.includes('404') || err?.message?.includes('not found')
+      if (is429 || is404) continue 
+      // If it's a JSON parse error, it might be due to the model failing instructions, try the next model just in case
+      continue
+    }
+  }
+
+  const finalErr = firstError || lastError
+  if (finalErr?.message?.includes('429') || finalErr?.message?.includes('quota')) {
+    throw new Error('⚠️ Your Gemini API key has exceeded its free quota for today. Please try again tomorrow.')
+  }
+
+  throw new Error(\`AI Error: \${finalErr?.message ?? 'Failed to generate quiz.'}\`)
 }
 

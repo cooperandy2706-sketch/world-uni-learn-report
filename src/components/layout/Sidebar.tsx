@@ -17,7 +17,7 @@ import {
   Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap,
   Smartphone, Calculator, Grid, Vote, Image, UserPlus, Heart, Search, ArrowUpRight,
   Plus, Monitor, Truck, Armchair, Box, Tv, MonitorPlay, Pill, History,
-  ScanLine, Printer, AlertTriangle, MapPin
+  ScanLine, Printer, AlertTriangle, MapPin, Navigation
 } from 'lucide-react'
 
 const adminLinks = [
@@ -60,19 +60,23 @@ const adminLinks = [
   { to: '/admin/boarding', label: 'Boarding & Dorms', icon: Building2 },
   { to: '/admin/exeats', label: 'Exeat Requests', icon: MapPin },
   { to: '/admin/pastoral', label: 'Pastoral Care', icon: ShieldCheck },
+  { to: ROUTES.ADMIN_FLEET, label: 'Fleet Management', icon: Truck },
+  { to: ROUTES.ADMIN_FLEET_LIVE, label: 'Live Tracking', icon: Navigation },
 
   { header: 'Insights & Setup' },
   { to: ROUTES.ADMIN_ANALYTICS, label: 'School Analytics', icon: BarChart3 },
   { to: '/admin/audit-logs', label: 'Audit Logs', icon: ShieldCheck },
   { to: ROUTES.ADMIN_ACADEMIC_YEARS, label: 'Academic Years', icon: Calendar },
-  { to: ROUTES.ADMIN_TERMS, label: 'Terms Management', icon: Calendar },
+  { to: ROUTES.ADMIN_TERMS, label: 'Academic Periods', icon: Calendar },
   { to: ROUTES.ADMIN_SETTINGS, label: 'System Settings', icon: Settings },
 ]
 
 const teacherLinks = [
-  { header: 'General' },
+  { header: 'Overview' },
   { to: ROUTES.TEACHER_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
   { to: '/teacher/self-service', label: 'Self Service', icon: UserCheck },
+  { to: '/teacher/leave', label: 'My Leave', icon: Calendar },
+  { to: '/teacher/payslips', label: 'Payslips', icon: FileText },
   { to: ROUTES.TEACHER_MESSAGES, label: 'Messages', icon: MessageSquare },
   { to: ROUTES.TEACHER_NOTIFICATIONS, label: 'Notifications', icon: Bell },
 
@@ -113,6 +117,7 @@ const studentLinks = [
   { header: 'General' },
   { to: ROUTES.STUDENT_DASHBOARD, label: 'My Portal', icon: LayoutDashboard },
   { to: ROUTES.STUDENT_PROFILE, label: 'My Profile', icon: UserCheck },
+  { to: '/student/messages', label: 'Messages', icon: MessageSquare },
   { to: ROUTES.STUDENT_ANNOUNCEMENTS, label: 'Notice Board', icon: Megaphone },
   { to: ROUTES.STUDENT_CALENDAR, label: 'School Calendar', icon: Calendar },
 
@@ -156,7 +161,12 @@ const bursarLinks = [
 ]
 
 const staffLinks = [
+  { header: 'Staff Portal' },
   { to: '/staff/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/staff/self-service', label: 'Self Service', icon: UserCheck },
+  { to: '/staff/leave', label: 'My Leave', icon: Calendar },
+  { to: '/staff/payslips', label: 'Payslips', icon: FileText },
+  { to: '/staff/messages', label: 'Messages', icon: MessageSquare },
   { to: '/staff/elections', label: 'Elections (PEC)', icon: Vote },
 ]
 
@@ -197,6 +207,7 @@ const nurseLinks = [
   { to: '/nurse/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/nurse/visits', label: 'Clinic Visits Log', icon: ClipboardList },
   { to: '/nurse/medication', label: 'Medication Tracker', icon: Pill },
+  { to: '/nurse/records', label: 'Health Records', icon: UserCheck },
 ]
 
 const librarianLinks = [

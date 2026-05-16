@@ -56,7 +56,8 @@ const ADMIN_NAV = [
       { label: 'Staff Operations', to: '/admin/staff-operations' },
       { label: 'Asset Register', to: '/admin/assets' },
       { label: 'Billing', to: '/admin/billing' },
-      { label: 'Live Tracking', to: '/admin/fleet/live' },
+      { label: 'Fleet Management', to: ROUTES.ADMIN_FLEET },
+      { label: 'Live Tracking', to: ROUTES.ADMIN_FLEET_LIVE },
       { label: 'Poster Maker', to: '/admin/poster-maker' },
       { label: 'Elections (PEC)', to: '/admin/elections' },
     ]
@@ -190,6 +191,9 @@ const PARENT_NAV = [
 
 const STAFF_NAV = [
   { label: 'Dashboard', to: '/staff/dashboard', single: true },
+  { label: 'Self Service', to: '/staff/self-service', single: true },
+  { label: 'My Leave', to: '/staff/leave', single: true },
+  { label: 'Messages', to: '/staff/messages', single: true },
   { label: 'Elections (PEC)', to: '/staff/elections', single: true },
 ]
 
@@ -675,7 +679,7 @@ export default function Header() {
                   {year.name} · {term.name}
                 </span>
               ) : (
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#ef4444' }}>No Active Term</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#ef4444' }}>No Active Period</span>
               )}
             </div>
           </div>

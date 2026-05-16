@@ -8,7 +8,7 @@ import { supabase } from '../../lib/supabase'
 import { billSheetService, scholarshipService } from '../../services/bursar.service'
 import { Printer, FileText, Search, GraduationCap, AlertCircle, CheckCircle2, ChevronRight, Trash2, Plus } from 'lucide-react'
 
-const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
+import { formatCurrency } from '../../utils/currency'
 
 const CREST_SVG = `
   <svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
@@ -32,6 +32,9 @@ export default function BillSheetPage() {
     queryFn: async () => { const { data } = await supabase.from('schools').select('*').eq('id', schoolId).single(); return data },
     enabled: !!schoolId,
   })
+
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
 
   // Load all students
   const { data: students = [] } = useQuery({
@@ -98,24 +101,24 @@ export default function BillSheetPage() {
     const isCredit = grandBalance < 0
 
     const scholarshipRow = d.scholarship.type !== 'none'
-      ? '<tr style="color:#16a34a"><td style="padding:10px 14px;font-size:13px">\u{1F393} Scholarship Discount (' + d.scholarship.percentage + '%)</td><td style="padding:10px 14px;text-align:right;font-weight:700;font-size:13px">\u2212 ' + GHS(d.scholarship.discount) + '</td></tr>' : ''
+      ? '<tr style="color:#16a34a"><td style="padding:10px 14px;font-size:13px">\u{1F393} Scholarship Discount (' + d.scholarship.percentage + '%)</td><td style="padding:10px 14px;text-align:right;font-weight:700;font-size:13px">\u2212 ' + CUR(d.scholarship.discount) + '</td></tr>' : ''
 
     const arrearsRow = d.arrears > 0
-      ? '<tr><td style="padding:10px 14px;font-size:13px;border-bottom:1px solid #f1f5f9;color:#dc2626;font-weight:700">Previous Arrears (Brought Forward)</td><td style="padding:10px 14px;text-align:right;font-weight:800;font-size:13px;border-bottom:1px solid #f1f5f9;color:#dc2626">' + GHS(d.arrears) + '</td></tr>' : ''
+      ? '<tr><td style="padding:10px 14px;font-size:13px;border-bottom:1px solid #f1f5f9;color:#dc2626;font-weight:700">Previous Arrears (Brought Forward)</td><td style="padding:10px 14px;text-align:right;font-weight:800;font-size:13px;border-bottom:1px solid #f1f5f9;color:#dc2626">' + CUR(d.arrears) + '</td></tr>' : ''
 
     const feeRows = d.structures.map((f: any) =>
-      '<tr><td style="padding:10px 14px;font-size:13px;border-bottom:1px solid #f1f5f9">' + f.fee_name + '</td><td style="padding:10px 14px;text-align:right;font-weight:700;font-size:13px;border-bottom:1px solid #f1f5f9">' + GHS(f.amount) + '</td></tr>'
+      '<tr><td style="padding:10px 14px;font-size:13px;border-bottom:1px solid #f1f5f9">' + f.fee_name + '</td><td style="padding:10px 14px;text-align:right;font-weight:700;font-size:13px;border-bottom:1px solid #f1f5f9">' + CUR(f.amount) + '</td></tr>'
     ).join('')
 
     const customRows = customItems.map(c =>
-      '<tr><td style="padding:10px 14px;font-size:13px;border-bottom:1px solid #f1f5f9;color:' + (c.amount > 0 ? '#374151' : '#16a34a') + '">' + c.name + (c.amount < 0 ? ' (Discount)' : '') + '</td><td style="padding:10px 14px;text-align:right;font-weight:700;font-size:13px;border-bottom:1px solid #f1f5f9;color:' + (c.amount > 0 ? '#374151' : '#16a34a') + '">' + (c.amount > 0 ? '' : '\u2212 ') + GHS(Math.abs(c.amount)) + '</td></tr>'
+      '<tr><td style="padding:10px 14px;font-size:13px;border-bottom:1px solid #f1f5f9;color:' + (c.amount > 0 ? '#374151' : '#16a34a') + '">' + c.name + (c.amount < 0 ? ' (Discount)' : '') + '</td><td style="padding:10px 14px;text-align:right;font-weight:700;font-size:13px;border-bottom:1px solid #f1f5f9;color:' + (c.amount > 0 ? '#374151' : '#16a34a') + '">' + (c.amount > 0 ? '' : '\u2212 ') + CUR(Math.abs(c.amount)) + '</td></tr>'
     ).join('')
 
     const paymentRows = d.payments.length > 0 ? d.payments.map((p: any) =>
       '<tr><td style="padding:8px 14px;font-size:12px;border-bottom:1px solid #f1f5f9">' + new Date(p.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + '</td>' +
       '<td style="padding:8px 14px;font-size:12px;border-bottom:1px solid #f1f5f9">' + (p.fee_structure?.fee_name ?? 'General') + '</td>' +
       '<td style="padding:8px 14px;font-size:12px;text-transform:capitalize;border-bottom:1px solid #f1f5f9">' + p.payment_method + '</td>' +
-      '<td style="padding:8px 14px;font-size:12px;font-weight:700;color:#16a34a;text-align:right;border-bottom:1px solid #f1f5f9">' + GHS(p.amount_paid) + '</td></tr>'
+      '<td style="padding:8px 14px;font-size:12px;font-weight:700;color:#16a34a;text-align:right;border-bottom:1px solid #f1f5f9">' + CUR(p.amount_paid) + '</td></tr>'
     ).join('') : '<tr><td colspan="4" style="padding:16px;text-align:center;color:#9ca3af;font-size:12px">No payments recorded this term</td></tr>'
 
     // Build the daily fees section
@@ -125,18 +128,18 @@ export default function BillSheetPage() {
       if (d.dailyFees.feeding.expected > 0) {
         dailyRows += '<tr>' +
           '<td style="padding:10px 14px;font-size:13px;border-bottom:1px solid #f1f5f9">Feeding Fee</td>' +
-          '<td style="padding:10px 14px;font-size:13px;text-align:right;border-bottom:1px solid #f1f5f9">' + GHS(d.dailyFees.feeding.rate) + '/day</td>' +
-          '<td style="padding:10px 14px;font-size:13px;text-align:right;border-bottom:1px solid #f1f5f9">' + GHS(d.dailyFees.feeding.expected) + '</td>' +
-          '<td style="padding:10px 14px;font-size:13px;text-align:right;color:#16a34a;font-weight:700;border-bottom:1px solid #f1f5f9">' + GHS(d.dailyFees.feeding.paid) + '</td>' +
-          '<td style="padding:10px 14px;font-size:13px;text-align:right;color:' + (d.dailyFees.feeding.owed > 0 ? '#dc2626' : '#16a34a') + ';font-weight:700;border-bottom:1px solid #f1f5f9">' + GHS(d.dailyFees.feeding.owed) + '</td></tr>'
+          '<td style="padding:10px 14px;font-size:13px;text-align:right;border-bottom:1px solid #f1f5f9">' + CUR(d.dailyFees.feeding.rate) + '/day</td>' +
+          '<td style="padding:10px 14px;font-size:13px;text-align:right;border-bottom:1px solid #f1f5f9">' + CUR(d.dailyFees.feeding.expected) + '</td>' +
+          '<td style="padding:10px 14px;font-size:13px;text-align:right;color:#16a34a;font-weight:700;border-bottom:1px solid #f1f5f9">' + CUR(d.dailyFees.feeding.paid) + '</td>' +
+          '<td style="padding:10px 14px;font-size:13px;text-align:right;color:' + (d.dailyFees.feeding.owed > 0 ? '#dc2626' : '#16a34a') + ';font-weight:700;border-bottom:1px solid #f1f5f9">' + CUR(d.dailyFees.feeding.owed) + '</td></tr>'
       }
       if (d.dailyFees.studies.expected > 0) {
         dailyRows += '<tr>' +
           '<td style="padding:10px 14px;font-size:13px;border-bottom:1px solid #f1f5f9">Studies Fee</td>' +
-          '<td style="padding:10px 14px;font-size:13px;text-align:right;border-bottom:1px solid #f1f5f9">' + GHS(d.dailyFees.studies.rate) + '/day</td>' +
-          '<td style="padding:10px 14px;font-size:13px;text-align:right;border-bottom:1px solid #f1f5f9">' + GHS(d.dailyFees.studies.expected) + '</td>' +
-          '<td style="padding:10px 14px;font-size:13px;text-align:right;color:#16a34a;font-weight:700;border-bottom:1px solid #f1f5f9">' + GHS(d.dailyFees.studies.paid) + '</td>' +
-          '<td style="padding:10px 14px;font-size:13px;text-align:right;color:' + (d.dailyFees.studies.owed > 0 ? '#dc2626' : '#16a34a') + ';font-weight:700;border-bottom:1px solid #f1f5f9">' + GHS(d.dailyFees.studies.owed) + '</td></tr>'
+          '<td style="padding:10px 14px;font-size:13px;text-align:right;border-bottom:1px solid #f1f5f9">' + CUR(d.dailyFees.studies.rate) + '/day</td>' +
+          '<td style="padding:10px 14px;font-size:13px;text-align:right;border-bottom:1px solid #f1f5f9">' + CUR(d.dailyFees.studies.expected) + '</td>' +
+          '<td style="padding:10px 14px;font-size:13px;text-align:right;color:#16a34a;font-weight:700;border-bottom:1px solid #f1f5f9">' + CUR(d.dailyFees.studies.paid) + '</td>' +
+          '<td style="padding:10px 14px;font-size:13px;text-align:right;color:' + (d.dailyFees.studies.owed > 0 ? '#dc2626' : '#16a34a') + ';font-weight:700;border-bottom:1px solid #f1f5f9">' + CUR(d.dailyFees.studies.owed) + '</td></tr>'
       }
       dailySection = '<div class="section"><div class="section-title">Daily Fees (' + d.dailyFees.feeding.days + ' school days elapsed)</div>' +
         '<table class="fee-table"><thead><tr><th>Fee Type</th><th style="text-align:right">Daily Rate</th><th style="text-align:right">Expected</th><th style="text-align:right">Paid</th><th style="text-align:right">Owing</th></tr></thead>' +
@@ -152,11 +155,11 @@ export default function BillSheetPage() {
       : ''
 
     const paymentsFooter = d.payments.length > 0
-      ? '<tfoot><tr class="subtotal"><td colspan="3">Total Payments</td><td style="text-align:right;font-size:14px">' + GHS(d.summary.totalPaid) + '</td></tr></tfoot>'
+      ? '<tfoot><tr class="subtotal"><td colspan="3">Total Payments</td><td style="text-align:right;font-size:14px">' + CUR(d.summary.totalPaid) + '</td></tr></tfoot>'
       : ''
 
     const tuitionSubtotal = d.tuition.total > 0
-      ? '<tr class="subtotal"><td>Tuition Subtotal</td><td style="text-align:right">' + GHS(d.tuition.total) + '</td></tr>'
+      ? '<tr class="subtotal"><td>Tuition Subtotal</td><td style="text-align:right">' + CUR(d.tuition.total) + '</td></tr>'
       : ''
 
     const html = [
@@ -213,12 +216,12 @@ export default function BillSheetPage() {
       '<div class="section"><div class="section-title">Tuition & Term Charges</div>',
       '<table class="fee-table"><thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead>',
       '<tbody>' + arrearsRow + (feeRows || '<tr><td colspan="2" style="padding:16px;text-align:center;color:#9ca3af;font-size:12px">No specific fee structures recorded</td></tr>') + customRows + scholarshipRow + '</tbody>',
-      '<tfoot><tr class="subtotal"><td>Subtotal Charges</td><td style="text-align:right">' + GHS(grandTotalCharges) + '</td></tr></tfoot></table></div>',
+      '<tfoot><tr class="subtotal"><td>Subtotal Charges</td><td style="text-align:right">' + CUR(grandTotalCharges) + '</td></tr></tfoot></table></div>',
       dailySection,
       '<div class="section"><div class="section-title">Payments & Credits</div>',
       '<table class="fee-table"><thead><tr><th>Date</th><th>Item</th><th>Method</th><th style="text-align:right">Paid</th></tr></thead>',
       '<tbody>' + paymentRows + '</tbody>' + paymentsFooter + '</table></div>',
-      '<div class="grand-total-box" style="background: ' + (isCredit ? 'linear-gradient(135deg, #059669, #065f46)' : 'linear-gradient(135deg, #4c1d95, #2e1065)') + '"><div><div class="grand-label">' + (isCredit ? 'Credit Balance (Prepaid)' : 'Current Balance Outstanding') + '</div><div class="grand-val">' + GHS(Math.abs(grandBalance)) + '</div></div>',
+      '<div class="grand-total-box" style="background: ' + (isCredit ? 'linear-gradient(135deg, #059669, #065f46)' : 'linear-gradient(135deg, #4c1d95, #2e1065)') + '"><div><div class="grand-label">' + (isCredit ? 'Credit Balance (Prepaid)' : 'Current Balance Outstanding') + '</div><div class="grand-val">' + CUR(Math.abs(grandBalance)) + '</div></div>',
       '<div><div class="status-badge" style="background:' + (isCredit ? '#ecfdf5' : st.bg) + ';color:' + (isCredit ? '#059669' : st.color) + '">' + (isCredit ? 'CREDIT / PREPAID' : st.label) + '</div></div></div>',
       '<div class="signature-row"><div><div style="height:40px"></div><div class="sig-line">Bursar\'s Approval / Stamp</div></div><div><div style="height:40px"></div><div class="sig-line">Parent / Guardian Signature</div></div></div>',
       '<div class="footer"><p>This is an electronically generated official document. <br/> For clarifications, please visit the bursary office or call ' + (school?.phone || 'the school') + '.</p>',
@@ -303,7 +306,7 @@ export default function BillSheetPage() {
                     </div>
                     <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2, display: 'flex', justifyContent: 'space-between' }}>
                       <span>{(s.class as any)?.name ?? 'No class'} {s.student_id ? `· ${s.student_id}` : ''}</span>
-                      {Number(s.fees_arrears) > 0 && <span style={{ color: '#dc2626', fontWeight: 800 }}>{GHS(Number(s.fees_arrears))}</span>}
+                      {Number(s.fees_arrears) > 0 && <span style={{ color: '#dc2626', fontWeight: 800 }}>{CUR(Number(s.fees_arrears))}</span>}
                     </div>
                   </div>
                   <ChevronRight size={14} color={selectedStudentId === s.id ? '#6d28d9' : '#d1d5db'} />
@@ -359,10 +362,10 @@ export default function BillSheetPage() {
                   {/* Summary cards row */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 16 }}>
                     {[
-                      { label: 'Total Charges', value: GHS(grandTotalCharges), color: '#374151', bg: '#f8fafc' },
-                      { label: 'Scholarship Discount', value: billData.scholarship.discount > 0 ? `− ${GHS(billData.scholarship.discount)}` : '—', color: '#16a34a', bg: '#f0fdf4' },
-                      { label: 'Total Paid', value: GHS(billData.summary.totalPaid), color: '#16a34a', bg: '#f0fdf4' },
-                      { label: grandBalance < 0 ? 'Credit Balance' : 'Balance Due', value: GHS(Math.abs(grandBalance)), color: grandBalance > 0 ? '#dc2626' : '#16a34a', bg: grandBalance > 0 ? '#fef2f2' : '#f0fdf4' },
+                      { label: 'Total Charges', value: CUR(grandTotalCharges), color: '#374151', bg: '#f8fafc' },
+                      { label: 'Scholarship Discount', value: billData.scholarship.discount > 0 ? `− ${CUR(billData.scholarship.discount)}` : '—', color: '#16a34a', bg: '#f0fdf4' },
+                      { label: 'Total Paid', value: CUR(billData.summary.totalPaid), color: '#16a34a', bg: '#f0fdf4' },
+                      { label: grandBalance < 0 ? 'Credit Balance' : 'Balance Due', value: CUR(Math.abs(grandBalance)), color: grandBalance > 0 ? '#dc2626' : '#16a34a', bg: grandBalance > 0 ? '#fef2f2' : '#f0fdf4' },
                     ].map((c, i) => (
                       <div key={c.label} className="bs-card" style={{ background: '#fff', borderRadius: 14, padding: '14px 16px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', animation: `_bs_fu .3s ease ${i * 0.05}s both` }}>
                         <div style={{ fontSize: 18, fontWeight: 900, color: c.color, fontFamily: '"Playfair Display",serif' }}>{c.value}</div>
@@ -377,7 +380,7 @@ export default function BillSheetPage() {
                       <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
                         <FileText size={14} color="#6d28d9" /> Term Fee Charges
                       </h3>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: '#6d28d9' }}>Net: {GHS(billData.tuition.net)}</span>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: '#6d28d9' }}>Net: {CUR(billData.tuition.net)}</span>
                     </div>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
@@ -393,7 +396,7 @@ export default function BillSheetPage() {
                               {billData.arrears > 0 ? 'Previous Arrears (Brought Forward)' : 'Credit / Prepayment (Brought Forward)'}
                             </td>
                             <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 800, color: billData.arrears > 0 ? '#dc2626' : '#16a34a', textAlign: 'right' }}>
-                              {billData.arrears > 0 ? GHS(billData.arrears) : `− ${GHS(Math.abs(billData.arrears))}`}
+                              {billData.arrears > 0 ? CUR(billData.arrears) : `− ${CUR(Math.abs(billData.arrears))}`}
                             </td>
                           </tr>
                         )}
@@ -405,7 +408,7 @@ export default function BillSheetPage() {
                               {f.fee_name}
                               {f.is_discountable === false && <span style={{ fontSize: 10, color: '#dc2626', fontWeight: 800, marginLeft: 8 }}>[EXEMPT FROM DISCOUNT]</span>}
                             </td>
-                            <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 700, color: '#374151', textAlign: 'right' }}>{GHS(f.amount)}</td>
+                            <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 700, color: '#374151', textAlign: 'right' }}>{CUR(f.amount)}</td>
                           </tr>
                         ))}
                         {billData.scholarship.discount > 0 && (
@@ -413,7 +416,7 @@ export default function BillSheetPage() {
                             <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 700, color: '#16a34a', display: 'flex', alignItems: 'center', gap: 6 }}>
                               <GraduationCap size={13} /> Scholarship Discount ({billData.scholarship.percentage}%)
                             </td>
-                            <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 800, color: '#16a34a', textAlign: 'right' }}>− {GHS(billData.scholarship.discount)}</td>
+                            <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 800, color: '#16a34a', textAlign: 'right' }}>− {CUR(billData.scholarship.discount)}</td>
                           </tr>
                         )}
                       </tbody>
@@ -421,9 +424,9 @@ export default function BillSheetPage() {
                         <tr style={{ background: '#faf5ff', borderTop: '2px solid #ede9fe' }}>
                           <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 800, color: '#111827' }}>Tuition — Paid / Owed</td>
                           <td style={{ padding: '10px 20px', textAlign: 'right' }}>
-                            <span style={{ color: '#16a34a', fontWeight: 700, fontSize: 12 }}>{GHS(billData.tuition.paid)}</span>
+                            <span style={{ color: '#16a34a', fontWeight: 700, fontSize: 12 }}>{CUR(billData.tuition.paid)}</span>
                             <span style={{ color: '#9ca3af', margin: '0 4px' }}>/</span>
-                            <span style={{ color: billData.tuition.owed > 0 ? '#dc2626' : '#16a34a', fontWeight: 800, fontSize: 13 }}>{GHS(billData.tuition.owed)}</span>
+                            <span style={{ color: billData.tuition.owed > 0 ? '#dc2626' : '#16a34a', fontWeight: 800, fontSize: 13 }}>{CUR(billData.tuition.owed)}</span>
                           </td>
                         </tr>
                       </tfoot>
@@ -450,19 +453,19 @@ export default function BillSheetPage() {
                           {billData.dailyFees.feeding.expected > 0 && (
                             <tr style={{ borderBottom: '1px solid #faf5ff' }}>
                               <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#374151' }}>Feeding Fee</td>
-                              <td style={{ padding: '10px 16px', fontSize: 12, color: '#6b7280', textAlign: 'right' }}>{GHS(billData.dailyFees.feeding.rate)}/day</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, textAlign: 'right' }}>{GHS(billData.dailyFees.feeding.expected)}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, color: '#16a34a', textAlign: 'right' }}>{GHS(billData.dailyFees.feeding.paid)}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 800, color: billData.dailyFees.feeding.owed > 0 ? '#dc2626' : '#16a34a', textAlign: 'right' }}>{GHS(billData.dailyFees.feeding.owed)}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 12, color: '#6b7280', textAlign: 'right' }}>{CUR(billData.dailyFees.feeding.rate)}/day</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, textAlign: 'right' }}>{CUR(billData.dailyFees.feeding.expected)}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, color: '#16a34a', textAlign: 'right' }}>{CUR(billData.dailyFees.feeding.paid)}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 800, color: billData.dailyFees.feeding.owed > 0 ? '#dc2626' : '#16a34a', textAlign: 'right' }}>{CUR(billData.dailyFees.feeding.owed)}</td>
                             </tr>
                           )}
                           {billData.dailyFees.studies.expected > 0 && (
                             <tr style={{ borderBottom: '1px solid #faf5ff' }}>
                               <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#374151' }}>Studies Fee</td>
-                              <td style={{ padding: '10px 16px', fontSize: 12, color: '#6b7280', textAlign: 'right' }}>{GHS(billData.dailyFees.studies.rate)}/day</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, textAlign: 'right' }}>{GHS(billData.dailyFees.studies.expected)}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, color: '#16a34a', textAlign: 'right' }}>{GHS(billData.dailyFees.studies.paid)}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 800, color: billData.dailyFees.studies.owed > 0 ? '#dc2626' : '#16a34a', textAlign: 'right' }}>{GHS(billData.dailyFees.studies.owed)}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 12, color: '#6b7280', textAlign: 'right' }}>{CUR(billData.dailyFees.studies.rate)}/day</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, textAlign: 'right' }}>{CUR(billData.dailyFees.studies.expected)}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, color: '#16a34a', textAlign: 'right' }}>{CUR(billData.dailyFees.studies.paid)}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 800, color: billData.dailyFees.studies.owed > 0 ? '#dc2626' : '#16a34a', textAlign: 'right' }}>{CUR(billData.dailyFees.studies.owed)}</td>
                             </tr>
                           )}
                         </tbody>
@@ -474,7 +477,7 @@ export default function BillSheetPage() {
                   <div className="bs-card" style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>Payments Received This Term</h3>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: '#16a34a' }}>{GHS(billData.summary.totalPaid)}</span>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: '#16a34a' }}>{CUR(billData.summary.totalPaid)}</span>
                     </div>
                     {billData.payments.length === 0 ? (
                       <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No payments recorded this term</div>
@@ -494,7 +497,7 @@ export default function BillSheetPage() {
                               <td style={{ padding: '10px 16px', fontSize: 12, color: '#374151' }}>{p.fee_structure?.fee_name ?? 'General'}</td>
                               <td style={{ padding: '10px 16px' }}><span style={{ fontSize: 10, fontWeight: 600, background: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: 99, textTransform: 'capitalize' }}>{p.payment_method}</span></td>
                               <td style={{ padding: '10px 16px', fontSize: 11, color: '#9ca3af', fontFamily: 'monospace' }}>{p.reference_number ?? '—'}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 800, color: '#16a34a', textAlign: 'right' }}>{GHS(p.amount_paid)}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 800, color: '#16a34a', textAlign: 'right' }}>{CUR(p.amount_paid)}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -528,7 +531,7 @@ export default function BillSheetPage() {
                               <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                                 <td style={{ padding: '10px 0', fontSize: 13, color: '#374151' }}>{item.name}</td>
                                 <td style={{ padding: '10px 0', fontSize: 13, fontWeight: 700, color: item.amount > 0 ? '#dc2626' : '#16a34a', textAlign: 'right' }}>
-                                  {item.amount > 0 ? '+' : ''}{GHS(item.amount)}
+                                  {item.amount > 0 ? '+' : ''}{CUR(item.amount)}
                                 </td>
                                 <td style={{ padding: '10px 0', width: 40, textAlign: 'right' }}>
                                   <button onClick={() => setCustomItems(prev => prev.filter(i => i.id !== item.id))} style={{ background: '#fef2f2', border: 'none', color: '#dc2626', cursor: 'pointer', width: 28, height: 28, borderRadius: 6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>

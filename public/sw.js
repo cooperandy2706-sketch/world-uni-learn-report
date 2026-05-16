@@ -1,5 +1,5 @@
 // public/sw.js — WULA Reports Service Worker v1
-const CACHE_NAME = 'wula-v1'
+const CACHE_NAME = 'wula-v2'
 
 self.addEventListener('install', (e) => {
   console.log('[SW] Installing...')
@@ -15,14 +15,14 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('push', (e) => {
   const rawData = e.data?.text() || ''
   console.log('[SW] Push received raw:', rawData)
-  
-  let data = { 
-    title: 'WULA Reports', 
-    body: 'You have a new notification', 
-    url: '/', 
-    icon: '/icon-192.png' 
+
+  let data = {
+    title: 'WULA Reports',
+    body: 'You have a new notification',
+    url: '/',
+    icon: '/icon-192.png'
   }
-  
+
   try {
     if (rawData) {
       const parsed = JSON.parse(rawData)
@@ -44,8 +44,8 @@ self.addEventListener('push', (e) => {
       requireInteraction: true, // This keeps it on screen until you click it
       data: { url: data.url || '/' },
     })
-    .then(() => console.log('[SW] Notification shown successfully'))
-    .catch(err => console.error('[SW] showNotification failed:', err))
+      .then(() => console.log('[SW] Notification shown successfully'))
+      .catch(err => console.error('[SW] showNotification failed:', err))
   )
 })
 
@@ -53,9 +53,9 @@ self.addEventListener('push', (e) => {
 self.addEventListener('notificationclick', (e) => {
   console.log('[SW] Notification clicked')
   e.notification.close()
-  
+
   const url = e.notification.data?.url || '/'
-  
+
   e.waitUntil(
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })

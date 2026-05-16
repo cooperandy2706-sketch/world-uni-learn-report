@@ -57,26 +57,18 @@ function StatCard({ icon, label, value, color, bg, link, pulse, sub }: {
 }) {
   const [hov, setHov] = useState(false)
   return (
-    <Link to={link} style={{ textDecoration: 'none', display: 'block' }}>
-      <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-        style={{ 
-          background: '#fff', borderRadius: 20, padding: '20px', 
-          border: '1px solid #e5e7eb', 
-          boxShadow: hov ? `0 12px 24px -8px ${color}30` : '0 4px 6px -1px rgba(0,0,0,0.05)', 
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
-          transform: hov ? 'translateY(-4px)' : 'none', 
-          cursor: 'pointer', position: 'relative', overflow: 'hidden' 
-        }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-          <div style={{ width: 42, height: 42, borderRadius: 12, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, transition: 'transform 0.3s', transform: hov ? 'scale(1.1) rotate(-5deg)' : 'none', position: 'relative' }}>
+    <Link to={link} className="stat-card" style={{ '--accent': color } as any}>
+      <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 14, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, transition: 'transform 0.3s', transform: hov ? 'scale(1.12) rotate(-6deg)' : 'none', position: 'relative' }}>
             {icon}
-            {pulse && <span style={{ position: 'absolute', top: -4, right: -4, width: 12, height: 12, borderRadius: '50%', background: color, border: '2px solid #fff', animation: '_pulse 1.5s infinite' }} />}
+            {pulse && <span style={{ position: 'absolute', top: -4, right: -4, width: 11, height: 11, borderRadius: '50%', background: color, border: '2px solid #fff', animation: '_pulse 1.5s infinite' }} />}
           </div>
-          <span style={{ fontSize: 16, color: '#d1d5db', fontWeight: 600, transition: 'all 0.3s', transform: hov ? 'translateX(4px)' : 'none' }}>→</span>
+          <span style={{ fontSize: 18, color: '#e2e8f0', fontWeight: 600, transition: 'all 0.25s', transform: hov ? 'translateX(3px)' : 'none', opacity: hov ? 1 : 0.6 }}>→</span>
         </div>
-        <div style={{ fontSize: 28, fontWeight: 800, color: '#111827', lineHeight: 1, letterSpacing: '-0.03em' }}><AnimNum to={value} /></div>
-        <div style={{ fontSize: 13, color: '#6b7280', fontWeight: 600, marginTop: 6 }}>{label}</div>
-        {sub && <div style={{ fontSize: 11, color: color, fontWeight: 700, marginTop: 4 }}>{sub}</div>}
+        <div style={{ fontSize: 30, fontWeight: 800, color: '#0f172a', lineHeight: 1, letterSpacing: '-0.03em' }}><AnimNum to={value} /></div>
+        <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 700, marginTop: 6, textTransform: 'uppercase', letterSpacing: '.04em' }}>{label}</div>
+        {sub && <div style={{ fontSize: 11, color, fontWeight: 700, marginTop: 5, background: `${color}15`, padding: '3px 8px', borderRadius: 6, display: 'inline-block' }}>{sub}</div>}
       </div>
     </Link>
   )
@@ -504,11 +496,15 @@ export default function DashboardPage() {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        
-        @keyframes floatBubble {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
+
+        @keyframes floatBubble { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes scaleIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+        @keyframes pulseGlow { 0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,0.4)} 50%{box-shadow:0 0 0 8px rgba(99,102,241,0)} }
+        @keyframes slideInRight { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes _pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(0.8);opacity:0.5} }
+        @keyframes countUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
         .dashboard-container {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -520,126 +516,176 @@ export default function DashboardPage() {
           padding-bottom: 60px;
         }
 
-        /* Animations */
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes scaleIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        
-        .anim-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
+        .anim-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+        .delay-1 { animation-delay: 0.08s; }
+        .delay-2 { animation-delay: 0.16s; }
+        .delay-3 { animation-delay: 0.24s; }
+        .delay-4 { animation-delay: 0.32s; }
+        .delay-5 { animation-delay: 0.40s; }
 
-        /* Premium Cards */
         .glass-card {
-          background: rgba(255, 255, 255, 0.85);
+          background: rgba(255,255,255,0.92);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.6);
+          border: 1px solid rgba(255,255,255,0.7);
           border-radius: 24px;
-          box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 4px 24px -4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1);
+          transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
           position: relative;
           overflow: hidden;
         }
         .glass-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,1);
+          box-shadow: 0 16px 40px -8px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,1);
         }
 
-        /* Action Buttons */
+        .stat-card {
+          background: #fff;
+          border-radius: 20px;
+          padding: 22px;
+          border: 1px solid #f1f5f9;
+          box-shadow: 0 2px 12px -2px rgba(0,0,0,0.06);
+          transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+          position: relative;
+          overflow: hidden;
+          cursor: pointer;
+          text-decoration: none;
+          display: block;
+        }
+        .stat-card:hover {
+          transform: translateY(-4px) scale(1.01);
+          box-shadow: 0 12px 28px -6px rgba(0,0,0,0.10);
+          border-color: #e2e8f0;
+        }
+        .stat-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 3px;
+          background: var(--accent, #6366f1);
+          opacity: 0;
+          transition: opacity 0.25s;
+        }
+        .stat-card:hover::before { opacity: 1; }
+
         .btn-primary {
-          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-          color: white;
-          border: none;
-          padding: 12px 24px;
-          border-radius: 14px;
-          font-weight: 700;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          text-decoration: none;
+          background: linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);
+          color: white; border: none; padding: 11px 22px; border-radius: 13px;
+          font-weight: 700; font-size: 14px; cursor: pointer;
+          transition: all 0.25s ease;
+          box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+          display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
         }
-        .btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
-        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99,102,241,0.45); }
+
         .btn-secondary {
-          background: white;
-          color: #334155;
-          border: 1px solid #e2e8f0;
-          padding: 12px 24px;
-          border-radius: 14px;
-          font-weight: 700;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          text-decoration: none;
+          background: white; color: #334155; border: 1px solid #e2e8f0;
+          padding: 11px 22px; border-radius: 13px; font-weight: 700; font-size: 14px;
+          cursor: pointer; transition: all 0.25s ease;
+          display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
         }
-        .btn-secondary:hover {
-          background: #f8fafc;
-          border-color: #cbd5e1;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        .btn-secondary:hover { background:#f8fafc; border-color:#cbd5e1; transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.05); }
+
+        .context-pill {
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 5px 12px; border-radius: 100px;
+          font-size: 13px; font-weight: 700;
+          transition: all 0.2s;
         }
+        .context-pill:hover { transform: scale(1.03); }
 
         .op-card {
-           display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
-           padding: 24px 12px; border-radius: 20px; background: #f8fafc; text-decoration: none;
-           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent;
+          display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+          padding: 20px 10px; border-radius: 18px; background: #f8fafc; text-decoration: none;
+          transition: all 0.25s cubic-bezier(0.4,0,0.2,1); border: 1.5px solid transparent;
         }
         .op-card:hover {
-           background: #fff; border-color: #e2e8f0; transform: translateY(-4px) scale(1.02); 
-           box-shadow: 0 12px 24px -8px rgba(0,0,0,0.08);
+          background: #fff; border-color: #e2e8f0; transform: translateY(-4px) scale(1.03);
+          box-shadow: 0 10px 24px -6px rgba(0,0,0,0.08);
         }
-        
-        .chart-bar-wrap:hover .chart-bar {
-          filter: brightness(1.1);
+
+        .chart-bar-wrap:hover .chart-bar { filter: brightness(1.15); }
+
+        .activity-row {
+          display: flex; align-items: center; gap: 14px;
+          padding: 12px 0; border-bottom: 1px solid #f8fafc;
+          transition: background 0.2s; border-radius: 12px;
+          cursor: default;
         }
+        .activity-row:hover { background: #f8fafc; padding-left: 10px; padding-right: 10px; margin: 0 -10px; }
+        .activity-row:last-child { border-bottom: none; }
       `}</style>
 
       <div className="dashboard-container">
         
         {/* ── HEADER SECTION ── */}
-        <div className="anim-fade-up" style={{ marginBottom: 40, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
-          <div>
-            <h2 style={{ fontSize: 32, fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.04em' }}>
-              {timeGreeting}, <span style={{ background: 'linear-gradient(135deg, #4f46e5, #9333ea)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{user?.full_name?.split(' ')[0]}</span> 👋
-            </h2>
-            <p style={{ fontSize: 15, color: '#6b7280', marginTop: 6, fontWeight: 500 }}>{roleMessage}</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 14, fontWeight: 600, color: '#64748b' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#f1f5f9', padding: '4px 10px', borderRadius: 8 }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#3b82f6' }} />
-                {year?.name}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#f0fdf4', color: '#16a34a', padding: '4px 10px', borderRadius: 8 }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#16a34a' }} />
-                {term?.name ?? 'No active term'}
-              </div>
-              <span>{new Date().toLocaleDateString('en-GH', { weekday: 'long', day: 'numeric', month: 'short' })}</span>
-              <span style={{ color: '#8b5cf6', background: '#f5f3ff', padding: '4px 10px', borderRadius: 8 }}><DashboardClock /></span>
+        <div className="anim-fade-up" style={{ marginBottom: 28 }}>
+          {/* Top row: greeting + actions */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 20 }}>
+            <div>
+              <h2 style={{ fontSize: 30, fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.03em', lineHeight: 1.2 }}>
+                {timeGreeting}, <span style={{ background: 'linear-gradient(135deg,#4f46e5,#9333ea)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{user?.full_name?.split(' ')[0]}</span> 👋
+              </h2>
+              <p style={{ fontSize: 14, color: '#64748b', marginTop: 5, fontWeight: 500 }}>{roleMessage}</p>
+            </div>
+            <div style={{ display: 'flex', gap: 10, flexShrink: 0, alignItems: 'center' }}>
+              <Link to={ROUTES.ADMIN_ANNOUNCEMENTS} className="btn-secondary" style={{ fontSize: 13, padding: '10px 18px' }}>
+                📢 Announce
+              </Link>
+              <Link to={ROUTES.ADMIN_REPORTS} className="btn-primary" style={{ fontSize: 13, padding: '10px 18px' }}>
+                📄 Reports
+              </Link>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <Link to={ROUTES.ADMIN_ANNOUNCEMENTS} className="btn-secondary">
-              <span style={{ fontSize: 16 }}>📢</span> Announce
-            </Link>
-            <Link to={ROUTES.ADMIN_REPORTS} className="btn-primary">
-              <span style={{ fontSize: 16 }}>📄</span> Reports
-            </Link>
+
+          {/* Academic context banner */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+            background: 'linear-gradient(135deg,#1e1b4b 0%,#312e81 100%)',
+            borderRadius: 18, padding: '14px 22px',
+            boxShadow: '0 8px 24px -6px rgba(30,27,75,0.35)'
+          }}>
+            {/* School name */}
+            <div style={{ display:'flex', alignItems:'center', gap: 8, marginRight: 4 }}>
+              <span style={{ fontSize: 20 }}>{userSchool?.logo_url ? <img src={userSchool.logo_url} alt="" style={{ width:28,height:28,objectFit:'contain',borderRadius:6 }} /> : '🏫'}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
+                {userSchool?.name ?? 'Your School'}
+              </span>
+            </div>
+
+            <div style={{ width:1, height:20, background:'rgba(255,255,255,0.15)', margin:'0 6px' }} />
+
+            {/* Academic year */}
+            {year?.name && (
+              <span className="context-pill" style={{ background:'rgba(99,102,241,0.25)', color:'#c7d2fe' }}>
+                <span style={{ width:6,height:6,borderRadius:'50%',background:'#818cf8',flexShrink:0 }} />
+                {year.name}
+              </span>
+            )}
+
+            {/* Term / Semester — shows full name exactly as stored */}
+            {term ? (
+              <span className="context-pill" style={{ background:'rgba(34,197,94,0.2)', color:'#86efac' }}>
+                <span style={{ width:6,height:6,borderRadius:'50%',background:'#4ade80',flexShrink:0, animation:'_pulse 2s ease infinite' }} />
+                {term.name}
+                <span style={{ fontSize:10, opacity:.8, fontWeight:600, textTransform:'uppercase', letterSpacing:'.06em', marginLeft:2 }}>ACTIVE</span>
+              </span>
+            ) : (
+              <span className="context-pill" style={{ background:'rgba(239,68,68,0.2)', color:'#fca5a5' }}>
+                <span style={{ width:6,height:6,borderRadius:'50%',background:'#f87171',flexShrink:0 }} />
+                No Active Term
+              </span>
+            )}
+
+            <div style={{ width:1, height:20, background:'rgba(255,255,255,0.15)', margin:'0 6px' }} />
+
+            {/* Date + Clock */}
+            <span style={{ fontSize:13, fontWeight:600, color:'rgba(255,255,255,0.6)' }}>
+              {new Date().toLocaleDateString('en-GH',{ weekday:'short', day:'numeric', month:'short' })}
+            </span>
+            <span style={{ fontSize:13, fontWeight:800, color:'#a5b4fc', background:'rgba(99,102,241,0.2)', padding:'3px 10px', borderRadius:8 }}>
+              <DashboardClock />
+            </span>
           </div>
         </div>
 
@@ -690,35 +736,119 @@ export default function DashboardPage() {
           </div>
 
           {/* Reports Progress Card */}
-          <div className="glass-card anim-fade-up delay-2" style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #fff 100%)', padding: 40, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 800, color: '#9a3412', margin: 0 }}>Reports Progress</h3>
-              <div style={{ background: '#ffedd5', color: '#ea580c', padding: '6px 12px', borderRadius: 20, fontSize: 13, fontWeight: 700 }}>Term {term?.name?.match(/\d+/)?.[0] || '1'}</div>
-            </div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: 32, marginBottom: 30 }}>
-              <div style={{ position: 'relative', width: 100, height: 100, borderRadius: '50%', background: `conic-gradient(#f97316 ${reportPct}%, #fed7aa 0)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(249,115,22,0.15)' }}>
-                <div style={{ width: 80, height: 80, background: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: 24, fontWeight: 800, color: '#111827' }}>{reportPct}%</span>
-                </div>
-              </div>
+          <div className="glass-card anim-fade-up delay-2" style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #fffbf5 100%)', padding: 32, display: 'flex', flexDirection: 'column', gap: 0 }}>
+
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <div>
-                <div style={{ fontSize: 36, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{reportsRemaining}</div>
-                <div style={{ fontSize: 14, color: '#7c2d12', fontWeight: 600, marginTop: 6 }}>reports left to generate</div>
+                <h3 style={{ fontSize: 17, fontWeight: 800, color: '#9a3412', margin: 0 }}>Report Cards</h3>
+                <p style={{ fontSize: 12, color: '#c2410c', margin: '3px 0 0', fontWeight: 600 }}>
+                  {term?.name ?? 'No active term set'}
+                </p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                {/* Donut */}
+                <div style={{ position: 'relative', width: 64, height: 64 }}>
+                  <svg width="64" height="64" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="26" fill="none" stroke="#fed7aa" strokeWidth="8"/>
+                    <circle cx="32" cy="32" r="26" fill="none"
+                      stroke={reportPct === 100 ? '#16a34a' : '#f97316'} strokeWidth="8"
+                      strokeDasharray={`${(reportPct / 100) * 163.4} 163.4`}
+                      strokeLinecap="round"
+                      transform="rotate(-90 32 32)"
+                      style={{ transition: 'stroke-dasharray 1s ease' }}
+                    />
+                  </svg>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: reportPct === 100 ? '#16a34a' : '#ea580c' }}>
+                    {reportPct}%
+                  </div>
+                </div>
               </div>
             </div>
 
-            <p style={{ fontSize: 15, color: '#7c2d12', lineHeight: 1.6, margin: '0 0 24px', fontWeight: 500 }}>
-              {reportsRemaining > 0 
-                ? 'Keep teachers moving forward to complete the academic grading cycle successfully.'
-                : 'All reports have been successfully generated for this term. Great job!'}
-            </p>
-            
-            <Link to={ROUTES.ADMIN_REPORTS} style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', padding: '16px 24px', borderRadius: 16, textDecoration: 'none', color: '#9a3412', fontWeight: 700, border: '1px solid #ffedd5', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', transition: 'all 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
-              Manage Reports
-              <span style={{ background: '#ffedd5', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ea580c' }}>→</span>
-            </Link>
+            {/* Stats row */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 18 }}>
+              {[
+                { label: 'Generated', value: stats?.reportsGenerated ?? 0, color: '#f97316', bg: '#fff7ed' },
+                { label: 'Approved', value: stats?.reportsGenerated ? (stats.reportsGenerated - (stats.pendingApproval ?? 0)) : 0, color: '#16a34a', bg: '#f0fdf4' },
+                { label: 'Pending ✍️', value: stats?.pendingApproval ?? 0, color: stats?.pendingApproval ? '#dc2626' : '#94a3b8', bg: stats?.pendingApproval ? '#fef2f2' : '#f8fafc' },
+              ].map(s => (
+                <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '10px 12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: s.color, lineHeight: 1 }}><AnimNum to={s.value} /></div>
+                  <div style={{ fontSize: 10, color: '#9ca3af', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', marginTop: 4 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Progress bar */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, color: '#9ca3af', marginBottom: 6 }}>
+                <span>Progress</span>
+                <span>{stats?.reportsGenerated ?? 0} / {stats?.totalStudentsForReports ?? 0} students</span>
+              </div>
+              <div style={{ height: 8, background: '#fed7aa', borderRadius: 99, overflow: 'hidden' }}>
+                <div style={{
+                  height: '100%',
+                  width: `${reportPct}%`,
+                  background: reportPct === 100 ? 'linear-gradient(90deg,#16a34a,#22c55e)' : 'linear-gradient(90deg,#f97316,#fb923c)',
+                  borderRadius: 99,
+                  transition: 'width 1.2s cubic-bezier(0.4,0,0.2,1)'
+                }} />
+              </div>
+            </div>
+
+            {/* Pending approval alert */}
+            {(stats?.pendingApproval ?? 0) > 0 && (
+              <div style={{ background: '#fef2f2', border: '1.5px solid #fecaca', borderRadius: 12, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: '#dc2626' }}>
+                    {stats?.pendingApproval} report{(stats?.pendingApproval ?? 0) > 1 ? 's' : ''} awaiting your approval
+                  </div>
+                  <div style={{ fontSize: 11, color: '#ef4444', marginTop: 2 }}>Review and approve to finalise this term</div>
+                </div>
+              </div>
+            )}
+
+            {/* Scores not submitted alert */}
+            {(stats?.pendingScores ?? 0) > 0 && (
+              <div style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 12, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 18, flexShrink: 0 }}>✏️</span>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: '#d97706' }}>
+                    {stats?.pendingScores} score{(stats?.pendingScores ?? 0) > 1 ? 's' : ''} not yet submitted by teachers
+                  </div>
+                  <div style={{ fontSize: 11, color: '#ca8a04', marginTop: 2 }}>Reports can't be generated until all scores are in</div>
+                </div>
+              </div>
+            )}
+
+            {/* Done state */}
+            {reportPct === 100 && (stats?.pendingApproval ?? 0) === 0 && (
+              <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 12, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 18 }}>🎉</span>
+                <div style={{ fontSize: 12, fontWeight: 800, color: '#16a34a' }}>All reports generated & approved!</div>
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div style={{ marginTop: 'auto', display: 'flex', gap: 10 }}>
+              <Link to={ROUTES.ADMIN_REPORTS} style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                background: 'linear-gradient(135deg,#ea580c,#f97316)', color: '#fff',
+                padding: '13px 16px', borderRadius: 14, textDecoration: 'none',
+                fontWeight: 800, fontSize: 14,
+                boxShadow: '0 6px 18px rgba(249,115,22,0.35)',
+                transition: 'all 0.2s'
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 24px rgba(249,115,22,0.45)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(249,115,22,0.35)' }}
+              >
+                📄 Manage Reports →
+              </Link>
+            </div>
           </div>
+
 
         </div>
 

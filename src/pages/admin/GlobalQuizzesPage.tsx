@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
 import { formatDate } from '../../lib/utils'
 import toast from 'react-hot-toast'
+import AIQuizGenerator from '../../components/admin/AIQuizGenerator'
 
 interface Question {
   id: string
@@ -124,11 +125,6 @@ export default function AdminGlobalQuizzesPage() {
 
   // AI Generator State
   const [aiModalOpen, setAiModalOpen] = useState(false)
-  const [aiText, setAiText] = useState('')
-  const [aiCount, setAiCount] = useState<number | ''>(10)
-  const [aiTimer, setAiTimer] = useState<number | ''>('')
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [isExtractingPdf, setIsExtractingPdf] = useState(false)
 
   // ── Submissions panel ──
   const [submissionsQuiz, setSubmissionsQuiz] = useState<any | null>(null)
@@ -262,118 +258,7 @@ export default function AdminGlobalQuizzesPage() {
     }))
   }
 
-  async function handlePdfUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const target = e.target
-    const file = target.files?.[0]
-    if (!file) return
-
-    setIsExtractingPdf(true)
-    try {
-      const pdfjsLib = await import('pdfjs-dist')
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`
-
-      const arrayBuffer = await file.arrayBuffer()
-      const pdf = await pdfjsLib.getDocument(arrayBuffer).promise
-      
-      let fullText = ''
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i)
-        const textContent = await page.getTextContent()
-        const pageText = textContent.items.map((item: any) => item.str).join(' ')
-        if (pageText.trim()) {
-          fullText += pageText.trim() + '\n\n'
-        }
-      }
-      
-      if (!fullText.trim()) {
-        toast.error("No readable text found. This PDF appears to be a scanned image!")
-      } else {
-        setAiText(prev => prev + (prev ? '\n\n' : '') + fullText)
-        toast.success(`Extracted ${pdf.numPages} pages successfully!`)
-      }
-    } catch (err: any) {
-      toast.error("Failed to read PDF: " + err.message)
-    } finally {
-      setIsExtractingPdf(false)
-      target.value = '' // reset input safely
-    }
-  }
-
-  async function handleGenerateAI() {
-    if (!aiText.trim()) { toast.error("Please paste some text"); return; }
-    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
-    if (!apiKey) { toast.error("VITE_GROQ_API_KEY is missing from environment variables"); return; }
-
-    setIsGenerating(true)
-    try {
-      const prompt = `You are an expert educational AI. Your task is to output exactly ${aiCount} multiple choice questions in JSON format based on the text below.
-
-IMPORTANT INSTRUCTIONS:
-1. If the provided text already contains a list of questions (e.g. a past exam paper or quiz), you MUST EXTRACT those exact questions, their options, and determine the correct answers. Do not make up new questions if they are already provided in the text.
-2. If the provided text is study material (e.g. a textbook chapter, syllabus, or notes), you must GENERATE ${aiCount} new questions based on the facts in the text.
-3. Return ONLY valid JSON matching this exact schema:
-
-{
-  "title": "Quiz Title",
-  "description": "Quiz Description",
-  "questions": [
-    {
-      "text": "The question text?",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correctAnswer": "The exact text of the correct option"
-    }
-  ]
-}
-
-Text to process:
-${aiText}
-`;
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          messages: [{ role: 'user', content: prompt }],
-          response_format: { type: "json_object" }
-        })
-      });
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error?.message || "Failed to generate")
-      }
-      const data = await res.json();
-      const content = data.choices[0].message.content;
-      const parsed = JSON.parse(content);
-      
-      const mappedQuestions = parsed.questions.map((q: any) => ({
-        id: Math.random().toString(36).slice(2, 9),
-        text: q.text,
-        type: 'mcq',
-        options: q.options,
-        correctAnswer: q.correctAnswer,
-        points: q.points || 1
-      }))
-
-      setForm({
-        title: parsed.title || 'AI Generated Quiz',
-        description: parsed.description || '',
-        subject_id: '',
-        duration_minutes: typeof aiTimer === 'number' ? aiTimer : 0,
-        shuffle_questions: true,
-        is_published: false,
-        content: { questions: mappedQuestions }
-      })
-      
-      setAiText('')
-      setAiModalOpen(false)
-      setModalOpen(true) // Open the builder so they can review and assign subject
-      toast.success("AI generated questions successfully. Please review and save.")
-    } catch (e: any) {
-      toast.error("AI Generation failed: " + e.message)
-    } finally {
-      setIsGenerating(false)
-    }
-  }
+  // AI logic removed as it's now handled by AIQuizGenerator
 
   async function handleSubmit() {
     if (!form.title || !form.subject_id || form.content.questions.length === 0) {
@@ -787,50 +672,11 @@ ${aiText}
         </Modal>
 
         {/* ── AI GENERATOR MODAL ── */}
-        <Modal
+        <AIQuizGenerator
           open={aiModalOpen}
           onClose={() => setAiModalOpen(false)}
-          title="✨ AI Question Generator"
-          subtitle="Powered by Groq"
-          size="md"
-          footer={<>
-            <Btn variant="secondary" onClick={() => setAiModalOpen(false)}>Cancel</Btn>
-            <Btn onClick={handleGenerateAI} loading={isGenerating} disabled={isExtractingPdf}>Generate Questions</Btn>
-          </>}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ background: '#f5f3ff', padding: '12px 16px', borderRadius: 12, border: '1.5px solid #ede9fe' }}>
-              <p style={{ fontSize: 12, color: '#6d28d9', margin: 0, fontWeight: 600 }}>Upload a PDF or paste text. The AI will extract the key facts and generate multiple-choice questions automatically.</p>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-              <Field label="Upload PDF">
-                <label style={{ 
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13,
-                  border: '1.5px dashed #7c3aed', background: '#faf5ff', color: '#6d28d9',
-                  cursor: isExtractingPdf ? 'wait' : 'pointer', fontWeight: 600, boxSizing: 'border-box'
-                }}>
-                  {isExtractingPdf ? 'Extracting text...' : '📄 Select PDF File'}
-                  <input type="file" accept="application/pdf" style={{ display: 'none' }} onChange={handlePdfUpload} disabled={isExtractingPdf} />
-                </label>
-              </Field>
-              <Field label="Quiz Timer (Mins)">
-                <StyledInput type="number" value={aiTimer} onChange={e => setAiTimer(e.target.value === '' ? '' : parseInt(e.target.value) || 0)} placeholder="0 = No limit" />
-              </Field>
-            </div>
-            <Field label="Source Text *">
-              <textarea
-                value={aiText}
-                onChange={e => setAiText(e.target.value)}
-                placeholder="Extracted PDF text will appear here. Or, you can manually paste the text you want to generate questions from..."
-                style={{ width: '100%', padding: '12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', height: 180, fontFamily: 'inherit', resize: 'vertical' }}
-              />
-            </Field>
-            <Field label="Number of Questions">
-              <StyledInput type="number" value={aiCount} onChange={e => setAiCount(e.target.value === '' ? '' : parseInt(e.target.value) || 1)} min={1} max={50} />
-            </Field>
-          </div>
-        </Modal>
+          onQuizCreated={loadQuizzes}
+        />
 
       </div>
     </>

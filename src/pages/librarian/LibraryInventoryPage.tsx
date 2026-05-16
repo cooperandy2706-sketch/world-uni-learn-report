@@ -140,14 +140,17 @@ export default function LibraryInventoryPage() {
     const printWin = window.open('', '_blank', 'width=800,height=600')
     if (!printWin) { toast.error('Allow pop-ups to print'); return }
 
-    const items = toPrint.map(b => `
-      <div class="label">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(b.barcode)}&margin=1" width="80" height="80" />
-        <div class="book-title">${b.title.length > 22 ? b.title.slice(0, 22) + '…' : b.title}</div>
-        <div class="book-sub">${b.barcode}</div>
-        <div class="book-sub">${b.location || b.category || ''}</div>
-      </div>
-    `).join('')
+    const items = toPrint.flatMap(b => {
+      const numCopies = Math.max(1, b.copies_available || 1)
+      return Array.from({ length: numCopies }).map(() => `
+        <div class="label">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(b.barcode)}&margin=1" width="80" height="80" />
+          <div class="book-title">${b.title.length > 22 ? b.title.slice(0, 22) + '…' : b.title}</div>
+          <div class="book-sub">${b.barcode}</div>
+          <div class="book-sub">${b.location || b.category || ''}</div>
+        </div>
+      `)
+    }).join('')
 
     printWin.document.write(`
       <html><head><title>Book QR Labels</title>

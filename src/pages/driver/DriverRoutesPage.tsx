@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
-import { MapPin, Navigation, Info, Bus, Play, Square } from 'lucide-react'
+import { MapPin, Navigation, Info, Bus, Play, Square, Users, CheckCircle, XCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
+import FlaskLoader from '../../components/ui/FlaskLoader'
 
 export default function DriverRoutesPage() {
   const { user } = useAuth()
@@ -11,6 +12,9 @@ export default function DriverRoutesPage() {
   const [loading, setLoading] = useState(true)
   const [activeTrip, setActiveTrip] = useState<any>(null)
   const [updating, setUpdating] = useState(false)
+  const [activeRouteId, setActiveRouteId] = useState<string | null>(null)
+  const [students, setStudents] = useState<any[]>([])
+  const [studentLogs, setStudentLogs] = useState<Record<string, any>>({})
 
   useEffect(() => {
     if (user?.school_id) loadRoutes()
@@ -24,7 +28,7 @@ export default function DriverRoutesPage() {
       .from('transport_vehicles')
       .select('id, plate_number, make_model')
       .eq('driver_id', user!.id)
-      .single()
+      .maybeSingle()
 
     setVehicle(vData)
 
@@ -36,7 +40,12 @@ export default function DriverRoutesPage() {
         .eq('vehicle_id', vData.id)
         .eq('is_active', true)
         .maybeSingle()
+      
       setActiveTrip(active)
+      if (active) {
+         // Attempt to find if we saved route_id in a metadata column, or just use state
+         // For now, driver selects the route explicitly below if they want to view manifest.
+      }
     }
 
     // Fetch routes for the school
@@ -50,11 +59,10 @@ export default function DriverRoutesPage() {
     setLoading(false)
   }
 
-  async function startTrip() {
+  async function startTrip(routeId: string) {
     if (!vehicle || !user) return
     setUpdating(true)
     try {
-      // Create new active location record
       const { data, error } = await supabase
         .from('transport_live_locations')
         .insert({
@@ -72,12 +80,37 @@ export default function DriverRoutesPage() {
 
       if (error) throw error
       setActiveTrip(data)
+      setActiveRouteId(routeId)
+      loadManifest(routeId, data.id)
       toast.success('Trip started! Drive safely.')
     } catch (err: any) {
       toast.error(err.message || 'Failed to start trip')
     } finally {
       setUpdating(false)
     }
+  }
+
+  async function loadManifest(routeId: string, tripId: string) {
+     if (!user?.school_id) return
+     // Load students on this route
+     const { data: routeStudents } = await supabase
+       .from('transport_route_students')
+       .select('student_id, pickup_stop, dropoff_stop, student:students(full_name, class:classes(name))')
+       .eq('route_id', routeId)
+     
+     setStudents(routeStudents || [])
+
+     // Load any existing logs for today/this trip
+     const today = new Date().toISOString().split('T')[0]
+     const { data: logs } = await supabase
+       .from('transport_student_logs')
+       .select('*')
+       .eq('trip_id', tripId)
+       .eq('date', today)
+
+     const logMap: any = {}
+     if (logs) logs.forEach((l:any) => logMap[l.student_id] = l)
+     setStudentLogs(logMap)
   }
 
   async function endTrip() {
@@ -92,12 +125,45 @@ export default function DriverRoutesPage() {
 
       if (error) throw error
       setActiveTrip(null)
+      setActiveRouteId(null)
+      setStudents([])
+      setStudentLogs({})
       toast.success('Trip ended.')
     } catch (err: any) {
       toast.error(err.message || 'Failed to end trip')
     } finally {
       setUpdating(false)
     }
+  }
+
+  async function updateStudentStatus(studentId: string, status: 'boarded' | 'dropped_off' | 'absent') {
+     if (!activeTrip || !activeRouteId) return
+     const today = new Date().toISOString().split('T')[0]
+     
+     try {
+       const updateData: any = {
+          school_id: user!.school_id,
+          route_id: activeRouteId,
+          trip_id: activeTrip.id,
+          student_id: studentId,
+          date: today,
+          status: status
+       }
+       if (status === 'boarded') updateData.boarded_at = new Date().toISOString()
+       if (status === 'dropped_off') updateData.dropped_off_at = new Date().toISOString()
+
+       const { data, error } = await supabase
+         .from('transport_student_logs')
+         .upsert(updateData, { onConflict: 'trip_id,student_id,date' })
+         .select()
+         .single()
+       
+       if (error) throw error
+       setStudentLogs(prev => ({...prev, [studentId]: data}))
+     } catch (err: any) {
+       toast.error('Failed to update student status')
+       console.error(err)
+     }
   }
 
   // Simulated location updates
@@ -123,14 +189,17 @@ export default function DriverRoutesPage() {
     return () => clearInterval(interval)
   }, [activeTrip])
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>Loading routes...</div>
+  if (loading) return <FlaskLoader fullScreen={false} label="Loading Routes..." />
 
   return (
-    <div style={{ padding: '24px 20px', maxWidth: 800, margin: '0 auto', fontFamily: '"DM Sans", sans-serif' }}>
+    <div style={{ padding: '24px 20px', maxWidth: 800, margin: '0 auto', fontFamily: '"DM Sans", sans-serif', animation: '_fadeIn 0.3s ease' }}>
+      <style>{`
+        @keyframes _fadeIn { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
+      `}</style>
       
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: '#111827' }}>Assigned Routes</h1>
-        <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: 14 }}>Destinations and paths for your vehicle.</p>
+        <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: 14 }}>Manage your routes and live student manifests.</p>
       </div>
 
       {!vehicle ? (
@@ -151,21 +220,13 @@ export default function DriverRoutesPage() {
             <div style={{ fontSize: 18, fontWeight: 800, color: activeTrip ? '#064e3b' : '#1e3a8a' }}>{vehicle.plate_number}</div>
             <div style={{ fontSize: 13, color: activeTrip ? '#059669' : '#3b82f6', fontWeight: 600 }}>{vehicle.make_model}</div>
           </div>
-          {activeTrip ? (
+          {activeTrip && (
             <button 
               onClick={endTrip}
               disabled={updating}
               style={{ padding: '10px 20px', borderRadius: 12, background: '#ef4444', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(239,68,68,0.2)' }}
             >
-              End Trip
-            </button>
-          ) : (
-            <button 
-              onClick={startTrip}
-              disabled={updating}
-              style={{ padding: '10px 20px', borderRadius: 12, background: '#10b981', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(16,185,129,0.2)' }}
-            >
-              Start Trip
+              <Square size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 6 }} /> End Trip
             </button>
           )}
         </div>
@@ -177,22 +238,79 @@ export default function DriverRoutesPage() {
             No routes configured for this school.
           </div>
         ) : (
-          routes.map((route) => (
-            <div key={route.id} style={{ background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', padding: 20, display: 'flex', gap: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-              <div style={{ width: 40, height: 40, background: '#f1f5f9', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569', flexShrink: 0 }}>
-                <MapPin size={20} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 16, fontWeight: 800, color: '#1e293b' }}>{route.name}</div>
-                {route.description && (
-                  <div style={{ fontSize: 14, color: '#64748b', marginTop: 4, lineHeight: 1.5 }}>{route.description}</div>
-                )}
-                <div style={{ marginTop: 12, display: 'inline-flex', alignItems: 'center', gap: 6, background: '#f8fafc', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, color: '#475569', border: '1px solid #e2e8f0' }}>
-                  <Navigation size={14} /> Scheduled Route
+          routes.map((route) => {
+             const isActive = activeRouteId === route.id
+             return (
+              <div key={route.id} style={{ background: '#fff', borderRadius: 16, border: isActive ? '2px solid #6d28d9' : '1px solid #e2e8f0', overflow: 'hidden', boxShadow: isActive ? '0 8px 24px rgba(109,40,217,0.1)' : '0 2px 8px rgba(0,0,0,0.02)', transition: 'all 0.2s' }}>
+                <div style={{ padding: 20, display: 'flex', gap: 16, background: isActive ? '#faf5ff' : '#fff' }}>
+                  <div style={{ width: 40, height: 40, background: isActive ? '#ede9fe' : '#f1f5f9', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isActive ? '#6d28d9' : '#475569', flexShrink: 0 }}>
+                    <MapPin size={20} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: '#1e293b' }}>{route.name}</div>
+                    {route.description && (
+                      <div style={{ fontSize: 14, color: '#64748b', marginTop: 4, lineHeight: 1.5 }}>{route.description}</div>
+                    )}
+                  </div>
+                  {!activeTrip && (
+                     <button onClick={() => startTrip(route.id)} disabled={updating} style={{ padding: '8px 16px', borderRadius: 10, background: '#10b981', color: '#fff', border: 'none', fontWeight: 700, fontSize: 13, cursor: 'pointer', alignSelf: 'center' }}>
+                       <Play size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} /> Start
+                     </button>
+                  )}
+                  {isActive && (
+                     <div style={{ padding: '6px 12px', background: '#ecfdf5', color: '#059669', borderRadius: 8, fontSize: 12, fontWeight: 800, alignSelf: 'center', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', animation: 'pulse 2s infinite' }} /> Active
+                     </div>
+                  )}
                 </div>
+
+                {/* Manifest View */}
+                {isActive && (
+                   <div style={{ padding: 20, borderTop: '1.5px solid #f0eefe', background: '#fff' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                         <Users size={18} color="#6d28d9" />
+                         <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1e0646', margin: 0 }}>Live Student Manifest</h3>
+                      </div>
+                      
+                      {students.length === 0 ? (
+                         <div style={{ padding: 20, textAlign: 'center', color: '#6b7280', fontSize: 13, background: '#f8fafc', borderRadius: 12, border: '1px dashed #e2e8f0' }}>
+                            No students assigned to this route.
+                         </div>
+                      ) : (
+                         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            {students.map(s => {
+                               const log = studentLogs[s.student_id]
+                               const status = log?.status || 'pending'
+                               return (
+                                  <div key={s.student_id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 14, borderRadius: 12, border: '1px solid #e2e8f0', background: status === 'boarded' ? '#f0fdf4' : status === 'dropped_off' ? '#eff6ff' : status === 'absent' ? '#fef2f2' : '#fff' }}>
+                                     <div>
+                                        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{s.student?.full_name}</div>
+                                        <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{s.student?.class?.name} • Stop: {s.pickup_stop || 'Any'}</div>
+                                     </div>
+                                     <div style={{ display: 'flex', gap: 6 }}>
+                                        {status === 'pending' ? (
+                                           <>
+                                              <button onClick={() => updateStudentStatus(s.student_id, 'boarded')} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #bbf7d0', background: '#dcfce7', color: '#166534', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Boarded</button>
+                                              <button onClick={() => updateStudentStatus(s.student_id, 'absent')} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #fecaca', background: '#fee2e2', color: '#991b1b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Absent</button>
+                                           </>
+                                        ) : status === 'boarded' ? (
+                                           <button onClick={() => updateStudentStatus(s.student_id, 'dropped_off')} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #bfdbfe', background: '#dbeafe', color: '#1e40af', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Drop Off</button>
+                                        ) : status === 'dropped_off' ? (
+                                           <div style={{ padding: '8px 12px', borderRadius: 8, background: 'transparent', color: '#64748b', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}><CheckCircle size={14} /> Completed</div>
+                                        ) : (
+                                           <div style={{ padding: '8px 12px', borderRadius: 8, background: 'transparent', color: '#991b1b', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}><XCircle size={14} /> Absent</div>
+                                        )}
+                                     </div>
+                                  </div>
+                               )
+                            })}
+                         </div>
+                      )}
+                   </div>
+                )}
               </div>
-            </div>
-          ))
+            )
+          })
         )}
       </div>
 

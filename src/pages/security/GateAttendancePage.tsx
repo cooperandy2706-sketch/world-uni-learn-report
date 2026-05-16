@@ -27,6 +27,7 @@ export default function GateAttendancePage() {
   const [filter, setFilter] = useState<'all' | 'student' | 'teacher' | 'late'>('all')
   const today = new Date().toISOString().split('T')[0]
   const qc = useQueryClient()
+  const [latestScan, setLatestScan] = useState<any>(null)
 
   const { data: scans = [], isLoading } = useQuery({
     queryKey: ['gate-scans', schoolId, today],
@@ -44,7 +45,12 @@ export default function GateAttendancePage() {
     if (!schoolId) return
     const channel = supabase.channel('gate-attendance-log-rt')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'gate_scans', filter: `school_id=eq.${schoolId}` },
-        () => { qc.invalidateQueries({ queryKey: ['gate-scans', schoolId, today] }) })
+        (payload) => { 
+          qc.invalidateQueries({ queryKey: ['gate-scans', schoolId, today] }) 
+          setLatestScan(payload.new)
+          // auto clear the flash after 3 seconds
+          setTimeout(() => setLatestScan(null), 3000)
+        })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [schoolId, today, qc])
@@ -89,6 +95,28 @@ export default function GateAttendancePage() {
           {format(new Date(), 'EEE, MMM d yyyy')} · {scans.length} total scans
         </p>
       </div>
+
+      {latestScan && (
+        <div style={{ 
+          background: latestScan.direction === 'in' ? '#dcfce7' : '#f3e8ff',
+          border: `2px solid ${latestScan.direction === 'in' ? '#10b981' : '#a855f7'}`,
+          borderRadius: 16, padding: '16px 20px', marginBottom: 20,
+          display: 'flex', alignItems: 'center', gap: 16,
+          boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
+          animation: '_slideIn 0.3s cubic-bezier(0.16,1,0.3,1)'
+        }}>
+          <div style={{ width: 50, height: 50, borderRadius: '50%', background: latestScan.direction === 'in' ? '#10b981' : '#a855f7', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>
+            {latestScan.direction === 'in' ? <LogIn size={24} /> : <LogOut size={24} />}
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: latestScan.direction === 'in' ? '#065f46' : '#581c87', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              JUST SCANNED {latestScan.direction === 'in' ? 'IN' : 'OUT'}
+            </div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: '#0f172a' }}>{latestScan.person_name}</div>
+            <div style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>{format(new Date(latestScan.scan_time), 'hh:mm:ss a')}</div>
+          </div>
+        </div>
+      )}
 
       {/* Stats — 2-col on mobile */}
       <div className="ga-stat-grid" style={{ marginBottom: 20 }}>

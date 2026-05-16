@@ -1,6 +1,7 @@
 // src/store/authStore.ts
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { queryClient } from '../lib/queryClient'
 import type { AuthState } from '../types'
 import type { User } from '../types/database.types'
 
@@ -17,6 +18,28 @@ interface AuthStore extends AuthState {
 
 // Module-level handle — ensures we never register the listener more than once
 let _authUnsubscribe: (() => void) | null = null
+
+// ── Helper: fetch profile + school for a given user ──────────────────────────
+async function fetchProfile(userId: string): Promise<User | null> {
+  const { data: profile, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .single()
+
+  if (error || !profile) return null
+
+  if (profile.school_id) {
+    const { data: school } = await supabase
+      .from('schools')
+      .select('*')
+      .eq('id', profile.school_id)
+      .single()
+    if (school) profile.school = school
+  }
+
+  return profile as User
+}
 
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
@@ -35,72 +58,52 @@ export const useAuthStore = create<AuthStore>((set) => ({
     _authUnsubscribe?.()
     _authUnsubscribe = null
 
+    // ── 1. Bootstrap: load existing session from localStorage ────────
     const { data } = await supabase.auth.getSession()
     const session = data.session
 
     if (session?.user) {
-      // Fetch profile first
-      const { data: profile } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', session.user.id)
-        .single()
-
-      if (profile) {
-        // Fetch school separately to avoid 406 errors if relationship is missing
-        if (profile.school_id) {
-          const { data: school } = await supabase
-            .from('schools')
-            .select('*')
-            .eq('id', profile.school_id)
-            .single()
-          if (school) profile.school = school
-        }
-      }
-
-      set({
-        user: profile as User ?? null,
-        session,
-        loading: false,
-        initialized: true,
-      })
+      const profile = await fetchProfile(session.user.id)
+      set({ user: profile, session, loading: false, initialized: true })
     } else {
-      set({
-        user: null,
-        session: null,
-        loading: false,
-        initialized: true,
-      })
+      set({ user: null, session: null, loading: false, initialized: true })
     }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
+    // ── 2. Listen for ALL auth state changes going forward ───────────
+    //
+    // CRITICAL events and what they mean:
+    //  INITIAL_SESSION    - Session loaded from storage on startup
+    //  SIGNED_IN          - User signed in (including token refresh sign-in)
+    //  SIGNED_OUT         - Token expired with no refresh possible, or manual sign-out
+    //  TOKEN_REFRESHED    - JWT was successfully refreshed — re-fetch profile so
+    //                       new session data propagates to all queries
+    //  USER_UPDATED       - Profile changed (email/password update)
+    //  PASSWORD_RECOVERY  - Magic link / reset flow
+    //
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.debug('[WULA Auth]', event, session?.user?.id ?? 'no-user')
 
-        if (profile) {
-          if (profile.school_id) {
-            const { data: school } = await supabase
-              .from('schools')
-              .select('*')
-              .eq('id', profile.school_id)
-              .single()
-            if (school) profile.school = school
-          }
+      if (event === 'SIGNED_OUT' || !session?.user) {
+        // Clear all cached data so the next user gets a clean slate
+        queryClient.clear()
+        set({ user: null, session: null })
+        return
+      }
+
+      if (
+        event === 'SIGNED_IN' ||
+        event === 'TOKEN_REFRESHED' ||
+        event === 'USER_UPDATED' ||
+        event === 'INITIAL_SESSION'
+      ) {
+        const profile = await fetchProfile(session.user.id)
+        set({ user: profile, session })
+
+        // When the token is refreshed, invalidate ALL queries so they
+        // re-run with the fresh Authorization header automatically.
+        if (event === 'TOKEN_REFRESHED') {
+          queryClient.invalidateQueries()
         }
-
-        set({
-          user: profile as User ?? null,
-          session,
-        })
-      } else {
-        set({
-          user: null,
-          session: null,
-        })
       }
     })
 
@@ -109,17 +112,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
   signIn: async (email, password) => {
     set({ loading: true })
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
     set({ loading: false })
     return { error: error?.message ?? null }
   },
 
   signOut: async () => {
+    queryClient.clear()
     await supabase.auth.signOut()
     set({ user: null, session: null })
   },

@@ -29,9 +29,18 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>
 )
+
+// ── CRITICAL: DO NOT destroy the React root when offline ──────────────────────
+// The previous code called `createRoot` a second time on 'offline', which
+// permanently destroyed the React tree including all Zustand auth state,
+// React Query cache, and all Supabase Realtime subscriptions.
+// They could NEVER recover automatically — only a manual page refresh helped.
+//
+// Fix: dispatch a custom event that the App can listen to in order to show
+// a gentle "You are offline" banner WITHOUT unmounting the app.
 window.addEventListener('offline', () => {
-  document.getElementById('root')!.innerHTML = ''
-  import('./pages/ErrorPages').then(({ OfflinePage }) => {
-    createRoot(document.getElementById('root')!).render(<OfflinePage />)
-  })
+  window.dispatchEvent(new CustomEvent('wula:offline'))
+})
+window.addEventListener('online', () => {
+  window.dispatchEvent(new CustomEvent('wula:online'))
 })

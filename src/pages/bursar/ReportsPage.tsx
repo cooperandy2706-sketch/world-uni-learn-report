@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import { format } from 'date-fns'
 
-const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
+import { formatCurrency } from '../../utils/currency'
 
 type Period = 'term' | 'month' | 'year' | 'custom'
 
@@ -21,6 +21,8 @@ export default function ReportsPage() {
   const { data: term } = useCurrentTerm()
   const { data: settings } = useSettings()
   const school = settings?.school
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
   
   const [period, setPeriod] = useState<Period>('term')
   const [month, setMonth] = useState(format(new Date(), 'yyyy-MM'))
@@ -266,13 +268,13 @@ export default function ReportsPage() {
                   {Object.entries(metrics.incomeByCategory).map(([cat, val]) => (
                     <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 24px', borderBottom: '1px solid #fafafa' }}>
                       <span style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>{cat}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{GHS(val)}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{CUR(val)}</span>
                     </div>
                   ))}
                 </div>
                 <div style={{ padding: '20px 24px', background: '#fafafa', borderTop: '2.5px solid #10b981', display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 14, fontWeight: 800, color: '#065f46' }}>Total Gross Revenue</span>
-                  <span style={{ fontSize: 16, fontWeight: 900, color: '#047857' }}>{GHS(metrics.totalRevenue)}</span>
+                  <span style={{ fontSize: 16, fontWeight: 900, color: '#047857' }}>{CUR(metrics.totalRevenue)}</span>
                 </div>
               </div>
 
@@ -286,13 +288,13 @@ export default function ReportsPage() {
                   {Object.entries(metrics.expenseByCategory).map(([cat, val]) => (
                     <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 24px', borderBottom: '1px solid #fafafa' }}>
                       <span style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>{cat}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{GHS(val)}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{CUR(val)}</span>
                     </div>
                   ))}
                 </div>
                 <div style={{ padding: '20px 24px', background: '#fafafa', borderTop: '2.5px solid #ef4444', display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 14, fontWeight: 800, color: '#991b1b' }}>Total Expenditures</span>
-                  <span style={{ fontSize: 16, fontWeight: 900, color: '#b91c1c' }}>{GHS(metrics.totalExpenditure)}</span>
+                  <span style={{ fontSize: 16, fontWeight: 900, color: '#b91c1c' }}>{CUR(metrics.totalExpenditure)}</span>
                 </div>
               </div>
             </div>
@@ -305,7 +307,7 @@ export default function ReportsPage() {
             }}>
               <div>
                 <h4 style={{ fontSize: 13, opacity: 0.9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>Net Financial Standing</h4>
-                <p style={{ fontSize: 32, fontWeight: 900, margin: '8px 0 0', letterSpacing: '-0.02em' }}>{GHS(metrics.netSurplus)}</p>
+                <p style={{ fontSize: 32, fontWeight: 900, margin: '8px 0 0', letterSpacing: '-0.02em' }}>{CUR(metrics.netSurplus)}</p>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ background: 'rgba(255,255,255,0.15)', padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 800 }}>
@@ -343,7 +345,7 @@ export default function ReportsPage() {
                         </td>
                         <td style={{ padding: '14px 24px', fontSize: 13, color: '#6b7280' }}>{l.cat}</td>
                         <td style={{ padding: '14px 24px', fontSize: 14, fontWeight: 800, color: l.type === 'Revenue' ? '#059669' : '#dc2626' }}>
-                          {l.type === 'Revenue' ? '+' : '-'}{GHS(l.amount)}
+                          {l.type === 'Revenue' ? '+' : '-'}{CUR(l.amount)}
                         </td>
                         <td style={{ padding: '14px 24px', fontSize: 12, color: '#9ca3af', textTransform: 'capitalize' }}>{(l.method || '').replace('_', ' ')}</td>
                       </tr>

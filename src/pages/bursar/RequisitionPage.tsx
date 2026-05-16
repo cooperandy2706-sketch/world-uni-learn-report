@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../hooks/useAuth'
 import { requisitionService, Requisition } from '../../services/requisition.service'
 import { vendorService } from '../../services/vendors.service'
+import { incomeService } from '../../services/bursar.service'
+import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 import { 
   Plus, ClipboardList, CheckCircle, XCircle, 
@@ -12,14 +14,14 @@ import {
 } from 'lucide-react'
 import Modal from '../../components/ui/Modal'
 
-const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
+import { formatCurrency } from '../../utils/currency'
 const CATS = ['Utilities', 'Salaries & Wages', 'Teaching Materials', 'Maintenance', 'School Events', 'Stationery', 'Catering', 'ICT', 'Other']
 
 export default function RequisitionPage() {
   const { user } = useAuth()
   const qc = useQueryClient()
   const schoolId = user?.school_id ?? ''
-  const isBursarOrAdmin = user?.role === 'bursar' || user?.role === 'admin' || user?.role === 'global_admin'
+  const isBursarOrAdmin = user?.role === 'bursar' || user?.role === 'admin' || (user?.role as string) === 'global_admin'
   
   const [tab, setTab] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'paid'>(isBursarOrAdmin ? 'pending' : 'all')
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -43,6 +45,16 @@ export default function RequisitionPage() {
     },
     enabled: !!schoolId
   })
+
+  // School context for currency
+  const { data: school } = useQuery({
+    queryKey: ['school-currency', schoolId],
+    queryFn: async () => { const { data } = await supabase.from('schools').select('currency_code').eq('id', schoolId).single(); return data },
+    enabled: !!schoolId,
+  })
+
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
 
   const submitMutation = useMutation({
     mutationFn: (data: any) => requisitionService.create({ ...data, school_id: schoolId, requested_by: user?.id, status: 'pending' }),
@@ -157,7 +169,7 @@ export default function RequisitionPage() {
               </div>
 
               <div style={{ textAlign: 'right', marginRight: 40 }}>
-                <div style={{ fontSize: 20, fontWeight: 900, color: '#0f172a' }}>{GHS(r.amount)}</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#0f172a' }}>{CUR(r.amount)}</div>
                 <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>Requested Amount</div>
               </div>
 
@@ -236,7 +248,7 @@ export default function RequisitionPage() {
             <div style={{ background: '#f8fafc', padding: 20, borderRadius: 16, marginBottom: 24 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: 8 }}>Paying To</div>
               <div style={{ fontSize: 18, fontWeight: 800, color: '#0f172a' }}>{(selectedReq as any).requested_user?.full_name}</div>
-              <div style={{ fontSize: 24, fontWeight: 900, color: '#6d28d9', marginTop: 12 }}>{GHS(selectedReq.amount)}</div>
+              <div style={{ fontSize: 24, fontWeight: 900, color: '#6d28d9', marginTop: 12 }}>{CUR(selectedReq.amount)}</div>
               <div style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>{selectedReq.description}</div>
             </div>
 
@@ -250,7 +262,7 @@ export default function RequisitionPage() {
             </div>
 
             <button onClick={() => payMutation.mutate({ req: selectedReq, method: paymentMethod })} disabled={payMutation.isPending} style={{ width: '100%', background: '#059669', color: '#fff', border: 'none', padding: '16px', borderRadius: 14, fontWeight: 800, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-              <CreditCard size={20} /> {payMutation.isPending ? 'Processing...' : `Confirm & Pay ${GHS(selectedReq.amount)}`}
+              <CreditCard size={20} /> {payMutation.isPending ? 'Processing...' : `Confirm & Pay ${CUR(selectedReq.amount)}`}
             </button>
           </div>
         </Modal>

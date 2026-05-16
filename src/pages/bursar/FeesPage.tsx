@@ -11,8 +11,8 @@ import { supabase } from '../../lib/supabase'
 import Modal from '../../components/ui/Modal'
 import toast from 'react-hot-toast'
 import { Plus, Trash2, Printer, CreditCard, Settings, GraduationCap, MessageCircle, Mail, Smartphone, AlertTriangle, CheckCircle2, Send, Loader2, Download, Bell, ShoppingCart, History, Trash, Minus, Search, Users } from 'lucide-react'
+import { formatCurrency } from '../../utils/currency'
 
-const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
 const METHODS = ['cash', 'momo', 'bank', 'cheque'] as const
 
 const CREST_SVG = `
@@ -102,6 +102,9 @@ export default function FeesPage() {
     staleTime: 0,
   })
 
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
+
   // Inventory items
   const { data: inventoryItems = [] } = useQuery({
     queryKey: ['inv-items-fees', schoolId],
@@ -168,7 +171,7 @@ export default function FeesPage() {
   const [sf, setSf] = useState({ class_id: '', fee_name: '', amount: '', currency_code: 'GHS', description: '', is_discountable: true })
   const createStructure = useMutation({
     mutationFn: (d: any) => feeStructuresService.create(d),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['fee-structures'] }); setStructureModal(false); setSf({ class_id: '', fee_name: '', amount: '', currency_code: 'GHS', description: '', is_discountable: true }); toast.success('Fee structure created') },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['fee-structures'] }); setStructureModal(false); setSf({ class_id: '', fee_name: '', amount: '', currency_code: schoolCurrency, description: '', is_discountable: true }); toast.success('Fee structure created') },
     onError: (e: any) => toast.error(e.message),
   })
 
@@ -209,7 +212,7 @@ export default function FeesPage() {
   }
 
   // ── Payment form ───────────────────────────────────────────────
-  const [pf, setPf] = useState({ student_id: '', fee_structure_id: '', selected_fee_ids: [] as string[], amount_paid: '', currency_code: 'GHS', payment_method: 'cash' as typeof METHODS[number], reference_number: '', notes: '', payment_date: new Date().toISOString().split('T')[0] })
+  const [pf, setPf] = useState({ student_id: '', fee_structure_id: '', selected_fee_ids: [] as string[], amount_paid: '', currency_code: schoolCurrency, payment_method: 'cash' as typeof METHODS[number], reference_number: '', notes: '', payment_date: new Date().toISOString().split('T')[0] })
   const recordPayment = useMutation({
     mutationFn: (d: any) => feePaymentsService.createWithAllocation(d),
     onSuccess: (res) => {
@@ -222,7 +225,7 @@ export default function FeesPage() {
       if (res.allocation.arrearsCleared) {
         toast.success('🎉 Payment recorded — ALL ARREARS CLEARED!')
       } else if (res.allocation.arrearsPaid > 0) {
-        toast.success(`Payment recorded — ${GHS(res.allocation.arrearsPaid)} applied to arrears`)
+        toast.success(`Payment recorded — ${CUR(res.allocation.arrearsPaid)} applied to arrears`)
       } else {
         toast.success('Payment recorded successfully')
       }
@@ -328,7 +331,7 @@ export default function FeesPage() {
 
     for (let i = 0; i < debtors.length; i++) {
       const s = debtors[i];
-      const message = `Dear Parent, an amount of ${GHS(s.balance)} is outstanding for ${s.full_name}. Please settle at your earliest convenience. Thank you. - ${school?.name || 'Bursar'}`;
+      const message = `Dear Parent, an amount of ${CUR(s.balance)} is outstanding for ${s.full_name}. Please settle at your earliest convenience. Thank you. - ${school?.name || 'Bursar'}`;
       
       try {
         const { data, error } = await supabase.functions.invoke('send-sms', {
@@ -401,15 +404,15 @@ export default function FeesPage() {
     const arrRemain = Number(payment.arrears_balance_after || 0)
     const currentPaid = Number(payment.amount_paid) - arrPaid
     
-    let text = `🏫 SCHOOL FEE RECEIPT\n\nStudent: ${stu?.full_name ?? 'Unknown'}\nClass: ${(stu?.class as any)?.name ?? 'Unknown'}\n\nAmount Paid: ${GHS(payment.amount_paid)}\nMethod: ${payment.payment_method.toUpperCase()}\nDate: ${new Date(payment.payment_date).toLocaleDateString('en-GB')}`
+    let text = `🏫 SCHOOL FEE RECEIPT\n\nStudent: ${stu?.full_name ?? 'Unknown'}\nClass: ${(stu?.class as any)?.name ?? 'Unknown'}\n\nAmount Paid: ${CUR(payment.amount_paid)}\nMethod: ${payment.payment_method.toUpperCase()}\nDate: ${new Date(payment.payment_date).toLocaleDateString('en-GB')}`
     
     if (payment.notes) {
       text += `\n\n📝 NOTES:\n${payment.notes}`
     }
     
     if (arrPaid > 0) {
-      text += `\n\n📋 PAYMENT ALLOCATION:\n→ Applied to Arrears: ${GHS(arrPaid)}\n→ Applied to Current Term: ${GHS(currentPaid)}`
-      if (arrRemain > 0) text += `\n⚠️ Remaining Arrears: ${GHS(arrRemain)}`
+      text += `\n\n📋 PAYMENT ALLOCATION:\n→ Applied to Arrears: ${CUR(arrPaid)}\n→ Applied to Current Term: ${CUR(currentPaid)}`
+      if (arrRemain > 0) text += `\n⚠️ Remaining Arrears: ${CUR(arrRemain)}`
       else text += `\n✅ ALL ARREARS CLEARED!`
     }
     
@@ -497,8 +500,8 @@ export default function FeesPage() {
                     <div style="font-size: 11px; color: #64748b;">Category: ${item.category}</div>
                   </td>
                   <td>${item.qty}</td>
-                  <td style="text-align: right;">${GHS(item.selling_price)}</td>
-                  <td style="text-align: right; font-weight: 600;">${GHS(item.qty * item.selling_price)}</td>
+                  <td style="text-align: right;">${CUR(item.selling_price)}</td>
+                  <td style="text-align: right; font-weight: 600;">${CUR(item.qty * item.selling_price)}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -506,7 +509,7 @@ export default function FeesPage() {
           <div class="total-section">
             <div class="total-row">
               <span class="total-label">Grand Total Paid</span>
-              <span class="total-value">${GHS(data.total)}</span>
+              <span class="total-value">${CUR(data.total)}</span>
             </div>
           </div>
           <div style="margin-top: 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px;">
@@ -594,11 +597,11 @@ export default function FeesPage() {
           <div style="background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 8px; padding: 10px 18px; color: #ffffff; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
             <div>
               <div style="font-size:10px; font-weight:700; opacity: 0.8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom: 2px;">Total Amount Paid</div>
-              <div style="font-size:20px; font-weight:900; letter-spacing: -0.01em;">${GHS(payment.amount_paid)}</div>
+              <div style="font-size:20px; font-weight:900; letter-spacing: -0.01em;">${CUR(payment.amount_paid)}</div>
             </div>
             <div style="text-align: right;">
               <div style="font-size:10px; font-weight:700; opacity: 0.8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom: 2px;">${finalBalance < 0 ? 'Credit Balance' : 'Remaining Balance'}</div>
-              <div style="font-size:15px; font-weight:900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'};">${finalBalance > 0 ? GHS(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + GHS(Math.abs(finalBalance)) : 'CLEARED ✓')}</div>
+              <div style="font-size:15px; font-weight:900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'};">${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}</div>
             </div>
           </div>
 
@@ -619,25 +622,25 @@ export default function FeesPage() {
               ${openingArrears !== 0 ? `
               <tr>
                 <td style="padding: 3px 0; font-size: 11px; color: ${openingArrears > 0 ? '#64748b' : '#16a34a'};">${openingArrears > 0 ? 'Previous Arrears (B/F)' : 'Credit / Prepayment (B/F)'}</td>
-                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 600; color: ${openingArrears > 0 ? '#64748b' : '#16a34a'};">${openingArrears > 0 ? GHS(openingArrears) : '-' + GHS(Math.abs(openingArrears))}</td>
+                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 600; color: ${openingArrears > 0 ? '#64748b' : '#16a34a'};">${openingArrears > 0 ? CUR(openingArrears) : '-' + CUR(Math.abs(openingArrears))}</td>
               </tr>` : ''}
               ${classStructures.map((s: any) => `
               <tr>
                 <td style="padding: 3px 0; font-size: 11px; color: #1e293b;">${s.fee_name}</td>
-                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 600; color: #1e293b;">${GHS(s.amount)}</td>
+                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 600; color: #1e293b;">${CUR(s.amount)}</td>
               </tr>`).join('')}
               ${pct > 0 ? `
               <tr>
                 <td style="padding: 3px 0; font-size: 11px; color: #16a34a; font-weight: 700;">Scholarship Discount (${pct}%)</td>
-                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 700; color: #16a34a;">-${GHS(termCharges - netTermCharges)}</td>
+                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 700; color: #16a34a;">-${CUR(termCharges - netTermCharges)}</td>
               </tr>` : ''}
               <tr style="border-top: 1.5px solid #e5e7eb;">
                 <td style="padding: 3px 0; font-size: 11px; font-weight: 800; color: #1e0646;">Gross Bill</td>
-                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 800; color: #1e0646;">${GHS(totalBill)}</td>
+                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 800; color: #1e0646;">${CUR(totalBill)}</td>
               </tr>
               <tr style="border-top: 1.5px solid #4c1d95; background: #f8fafc;">
                 <td style="padding: 10px 4px; font-size: 12px; font-weight: 800; color: #1e0646; text-transform: uppercase;">${finalBalance < 0 ? 'Credit Balance' : 'Remaining Balance'}</td>
-                <td style="padding: 10px 4px; text-align: right; font-size: 14px; font-weight: 900; color: ${finalBalance > 0 ? '#dc2626' : '#16a34a'};">${finalBalance > 0 ? GHS(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + GHS(Math.abs(finalBalance)) : 'CLEARED ✓')}</td>
+                <td style="padding: 10px 4px; text-align: right; font-size: 14px; font-weight: 900; color: ${finalBalance > 0 ? '#dc2626' : '#16a34a'};">${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}</td>
               </tr>
             </tbody>
           </table>
@@ -779,7 +782,7 @@ export default function FeesPage() {
                             </div>
                             <div style={{ fontSize: 11, color: '#15803d', marginTop: 2 }}>
                               {currentBal < 0 
-                                ? `This student has overpaid by ${GHS(Math.abs(currentBal))}.` 
+                                ? `This student has overpaid by ${CUR(Math.abs(currentBal))}.` 
                                 : 'All term charges and arrears have been fully paid.'}
                             </div>
                           </div>
@@ -794,7 +797,7 @@ export default function FeesPage() {
                             <AlertTriangle size={18} color="#dc2626" style={{ marginTop: 1, flexShrink: 0 }} />
                             <div style={{ flex: 1 }}>
                               <div style={{ fontSize: 12, fontWeight: 800, color: '#dc2626' }}>
-                                ⚠️ Outstanding Arrears: {GHS(arrears)}
+                                ⚠️ Outstanding Arrears: {CUR(arrears)}
                               </div>
                               <div style={{ fontSize: 11, color: '#991b1b', marginTop: 3, lineHeight: 1.5 }}>
                                 This student owes from previous terms. Payment will be applied to arrears first.
@@ -811,7 +814,7 @@ export default function FeesPage() {
                               </div>
                               {gross > 0 && (
                                 <div style={{ fontSize: 11, color: '#15803d', marginTop: 2 }}>
-                                  Fee: {GHS(gross)} − Discount: {GHS(discount)} = <strong>Net: {GHS(net)}</strong>
+                                  Fee: {CUR(gross)} − Discount: {CUR(discount)} = <strong>Net: {CUR(net)}</strong>
                                 </div>
                               )}
                             </div>
@@ -839,7 +842,7 @@ export default function FeesPage() {
                       {filteredStudents.map((s: any) => (
                         <option key={s.id} value={s.id}>
                           {s.full_name} {s.student_id ? `(${s.student_id})` : ''} — {(s.class as any)?.name ?? 'No class'} 
-                          {Number(s.fees_arrears) > 0 ? ` (⚠️ Arrears: ${GHS(Number(s.fees_arrears))})` : ''}
+                          {Number(s.fees_arrears) > 0 ? ` (⚠️ Arrears: ${CUR(Number(s.fees_arrears))})` : ''}
                         </option>
                       ))}
                     </select>
@@ -895,7 +898,7 @@ export default function FeesPage() {
                               />
                               <div style={{ flex: 1 }}>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: '#991b1b' }}>⚠️ Outstanding Arrears</div>
-                                <div style={{ fontSize: 11, color: '#b91c1c' }}>{GHS(Number(selStu.fees_arrears))}</div>
+                                <div style={{ fontSize: 11, color: '#b91c1c' }}>{CUR(Number(selStu.fees_arrears))}</div>
                               </div>
                             </label>
                           )}
@@ -939,7 +942,7 @@ export default function FeesPage() {
                               />
                               <div style={{ flex: 1 }}>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{s.fee_name}</div>
-                                <div style={{ fontSize: 11, color: '#6b7280' }}>{GHS(s.amount)} {s.is_discountable === false && <span style={{ color: '#ef4444', fontWeight: 700, marginLeft: 4 }}>[NO DISCOUNT]</span>}</div>
+                                <div style={{ fontSize: 11, color: '#6b7280' }}>{CUR(s.amount)} {s.is_discountable === false && <span style={{ color: '#ef4444', fontWeight: 700, marginLeft: 4 }}>[NO DISCOUNT]</span>}</div>
                               </div>
                             </label>
                           ))}
@@ -1042,7 +1045,7 @@ export default function FeesPage() {
                         <div style={{ fontSize: 10, color: '#9ca3af', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>{item.category}</div>
                         <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 12 }}>{item.name}</div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div style={{ fontSize: 14, fontWeight: 900, color: '#059669' }}>{GHS(item.selling_price)}</div>
+                          <div style={{ fontSize: 14, fontWeight: 900, color: '#059669' }}>{CUR(item.selling_price)}</div>
                           <button 
                             onClick={() => {
                               if (inCart) {
@@ -1086,7 +1089,7 @@ export default function FeesPage() {
                     <div key={item.id} style={{ display: 'flex', gap: 12, marginBottom: 14, paddingBottom: 12, borderBottom: '1px solid #f3f4f6' }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{item.name}</div>
-                        <div style={{ fontSize: 11, color: '#059669', fontWeight: 800 }}>{GHS(item.selling_price)} × {item.qty}</div>
+                        <div style={{ fontSize: 11, color: '#059669', fontWeight: 800 }}>{CUR(item.selling_price)} × {item.qty}</div>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                         <button onClick={() => setStoreCart(prev => prev.map(x => x.id === item.id ? { ...x, qty: Math.max(0, x.qty - 1) } : x).filter(x => x.qty > 0))} style={{ width: 24, height: 24, borderRadius: 6, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={12}/></button>
@@ -1099,7 +1102,7 @@ export default function FeesPage() {
                 <div style={{ padding: 20, background: '#fcfaff' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                     <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 700 }}>Total Payable</span>
-                    <span style={{ fontSize: 22, fontWeight: 900, color: '#059669' }}>{GHS(storeCart.reduce((acc, i) => acc + (i.qty * i.selling_price), 0))}</span>
+                    <span style={{ fontSize: 22, fontWeight: 900, color: '#059669' }}>{CUR(storeCart.reduce((acc, i) => acc + (i.qty * i.selling_price), 0))}</span>
                   </div>
 
                   <div style={{ marginBottom: 16 }}>
@@ -1151,7 +1154,7 @@ export default function FeesPage() {
                     <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.8 }}>Total Collection Today</span>
                     <div style={{ background: 'rgba(255,255,255,0.1)', padding: 8, borderRadius: 12 }}><CreditCard size={18} /></div>
                   </div>
-                  <div style={{ fontSize: 32, fontWeight: 900, marginBottom: 4 }}>{GHS(grandTotal)}</div>
+                  <div style={{ fontSize: 32, fontWeight: 900, marginBottom: 4 }}>{CUR(grandTotal)}</div>
                   <div style={{ fontSize: 12, opacity: 0.7 }}>Combined Tuition & Store Sales</div>
                 </div>
 
@@ -1160,7 +1163,7 @@ export default function FeesPage() {
                     <span style={{ fontSize: 13, fontWeight: 700, color: '#64748b' }}>Tuition Payments</span>
                     <div style={{ background: '#f5f3ff', padding: 8, borderRadius: 12, color: '#6d28d9' }}><Users size={18} /></div>
                   </div>
-                  <div style={{ fontSize: 24, fontWeight: 900, color: '#1e0646' }}>{GHS(totalTuition)}</div>
+                  <div style={{ fontSize: 24, fontWeight: 900, color: '#1e0646' }}>{CUR(totalTuition)}</div>
                   <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
                      <div style={{ fontSize: 11, color: '#059669', fontWeight: 700 }}>{todayPayments.length} transactions</div>
                   </div>
@@ -1171,7 +1174,7 @@ export default function FeesPage() {
                     <span style={{ fontSize: 13, fontWeight: 700, color: '#64748b' }}>Store Sales</span>
                     <div style={{ background: '#ecfdf5', padding: 8, borderRadius: 12, color: '#059669' }}><ShoppingCart size={18} /></div>
                   </div>
-                  <div style={{ fontSize: 24, fontWeight: 900, color: '#1e0646' }}>{GHS(totalStore)}</div>
+                  <div style={{ fontSize: 24, fontWeight: 900, color: '#1e0646' }}>{CUR(totalStore)}</div>
                   <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
                      <div style={{ fontSize: 11, color: '#059669', fontWeight: 700 }}>{todaySales.length} orders</div>
                   </div>
@@ -1185,7 +1188,7 @@ export default function FeesPage() {
                   {Object.entries(byMethod).map(([m, val]) => (
                     <div key={m} style={{ padding: '16px', borderRadius: 16, background: '#f8fafc', border: '1px solid #e2e8f0' }}>
                       <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: 4 }}>{m}</div>
-                      <div style={{ fontSize: 18, fontWeight: 900, color: '#1e293b' }}>{GHS(val)}</div>
+                      <div style={{ fontSize: 18, fontWeight: 900, color: '#1e293b' }}>{CUR(val)}</div>
                     </div>
                   ))}
                 </div>
@@ -1219,7 +1222,7 @@ export default function FeesPage() {
                           </td>
                           <td style={{ padding: '14px', fontSize: 13, color: '#1e293b' }}>{t._name}</td>
                           <td style={{ padding: '14px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#64748b' }}>{t.payment_method}</td>
-                          <td style={{ padding: '14px', fontSize: 14, fontWeight: 800, color: '#111827' }}>{GHS(t._amt)}</td>
+                          <td style={{ padding: '14px', fontSize: 14, fontWeight: 800, color: '#111827' }}>{CUR(t._amt)}</td>
                         </tr>
                       ))}
                       {todayPayments.length === 0 && todaySales.length === 0 && (
@@ -1298,10 +1301,10 @@ export default function FeesPage() {
                           {s.scholarship_percentage > 0 && <div style={{ fontSize: 9, color: '#16a34a', fontWeight: 800 }}>🎓 {s.scholarship_percentage}% Scholar</div>}
                         </td>
                         <td style={{ padding: '12px 14px' }}><span style={{ fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: 99 }}>{(s.class as any)?.name || '—'}</span></td>
-                        <td style={{ padding: '12px 14px', fontSize: 13, color: '#6b7280' }}>{GHS(openingArrears)}</td>
-                        <td style={{ padding: '12px 14px', fontSize: 13, color: '#6b7280' }}>{GHS(netTermCharges)}</td>
-                        <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#1e0646' }}>{GHS(totalBill)}</td>
-                        <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#16a34a' }}>{GHS(totalPaid)}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 13, color: '#6b7280' }}>{CUR(openingArrears)}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 13, color: '#6b7280' }}>{CUR(netTermCharges)}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#1e0646' }}>{CUR(totalBill)}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#16a34a' }}>{CUR(totalPaid)}</td>
                         <td style={{ padding: '12px 14px' }}>
                           <span style={{ 
                             fontSize: 13, 
@@ -1311,7 +1314,7 @@ export default function FeesPage() {
                             padding: '4px 10px',
                             borderRadius: 8
                           }}>
-                            {currentBal > 0 ? GHS(currentBal) : (currentBal < 0 ? 'CREDIT: ' + GHS(Math.abs(currentBal)) : 'PAID')}
+                            {currentBal > 0 ? CUR(currentBal) : (currentBal < 0 ? 'CREDIT: ' + CUR(Math.abs(currentBal)) : 'PAID')}
                           </span>
                         </td>
                         <td style={{ padding: '12px 14px' }}>
@@ -1331,7 +1334,7 @@ export default function FeesPage() {
           <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
             <div style={{ padding: '16px 22px', borderBottom: '1px solid #faf5ff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{(payments as any[]).length} payments recorded {term ? `· ${term.name}` : ''}</span>
-              <span style={{ fontSize: 13, fontWeight: 800, color: '#16a34a' }}>Total: {GHS((payments as any[]).reduce((s: number, p: any) => s + (p.amount_paid || 0), 0))}</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: '#16a34a' }}>Total: {CUR((payments as any[]).reduce((s: number, p: any) => s + (p.amount_paid || 0), 0))}</span>
             </div>
             {loadingPayments ? <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>Loading…</div> : (payments as any[]).length === 0 ? <div style={{ padding: '60px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No payments for this term yet</div> : (
               <div style={{ overflowX: 'auto' }}>
@@ -1349,7 +1352,7 @@ export default function FeesPage() {
                         <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: '#111827' }}>{p.student?.full_name}</td>
                         <td style={{ padding: '11px 14px' }}><span style={{ fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: 99 }}>{(p.student as any)?.class?.name ?? '—'}</span></td>
                         <td style={{ padding: '11px 14px', fontSize: 12, color: '#6b7280' }}>{p.fee_structure?.fee_name ?? 'General'}</td>
-                        <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 800, color: '#16a34a' }}>{GHS(p.amount_paid)}</td>
+                        <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 800, color: '#16a34a' }}>{CUR(p.amount_paid)}</td>
                         <td style={{ padding: '11px 14px' }}>
                           <span style={{ 
                             fontSize: 11, 
@@ -1425,7 +1428,7 @@ export default function FeesPage() {
                             <Trash2 size={13} />
                           </button>
                         </div>
-                        <div style={{ fontSize: 24, fontWeight: 900, color: '#16a34a', fontFamily: '"Playfair Display",serif', position: 'relative', zIndex: 1 }}>{GHS(s.amount)}</div>
+                        <div style={{ fontSize: 24, fontWeight: 900, color: '#16a34a', fontFamily: '"Playfair Display",serif', position: 'relative', zIndex: 1 }}>{CUR(s.amount)}</div>
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
                           {s.is_discountable !== false ? (
                             <div style={{ fontSize: 10, fontWeight: 800, color: '#6d28d9', background: '#f5f3ff', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>✨ DISCOUNTABLE</div>
@@ -1481,7 +1484,7 @@ export default function FeesPage() {
               <div style={{ fontSize: 13, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.08em', fontWeight: 700, marginBottom: 8 }}>
                 {allocationResult ? 'Transaction Successfully Recorded' : 'Official Payment Record'}
               </div>
-              <div style={{ fontSize: 36, fontWeight: 900, color: '#16a34a', fontFamily: '"Playfair Display",serif' }}>{GHS(printReceipt.amount_paid)}</div>
+              <div style={{ fontSize: 36, fontWeight: 900, color: '#16a34a', fontFamily: '"Playfair Display",serif' }}>{CUR(printReceipt.amount_paid)}</div>
               <div style={{ fontSize: 14, color: '#374151', marginTop: 8, fontWeight: 600 }}>{(students as any[]).find(s => s.id === printReceipt.student_id)?.full_name ?? 'Student'}</div>
               <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>Receipt ID: {printReceipt.id?.slice(0,8).toUpperCase()}</div>
             </div>
@@ -1500,16 +1503,16 @@ export default function FeesPage() {
                   <tbody>
                     <tr style={{ borderBottom: '1px solid rgba(0,0,0,.06)' }}>
                       <td style={{ padding: '7px 0', fontSize: 12, color: '#dc2626', fontWeight: 600 }}>Applied to Previous Arrears</td>
-                      <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 800, color: '#dc2626', textAlign: 'right' }}>{GHS(allocationResult.arrearsPaid)}</td>
+                      <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 800, color: '#dc2626', textAlign: 'right' }}>{CUR(allocationResult.arrearsPaid)}</td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid rgba(0,0,0,.06)' }}>
                       <td style={{ padding: '7px 0', fontSize: 12, color: '#16a34a', fontWeight: 600 }}>Applied to Current Term Fees</td>
-                      <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 800, color: '#16a34a', textAlign: 'right' }}>{GHS(allocationResult.currentTermPaid)}</td>
+                      <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 800, color: '#16a34a', textAlign: 'right' }}>{CUR(allocationResult.currentTermPaid)}</td>
                     </tr>
                     {!allocationResult.arrearsCleared && (
                       <tr>
                         <td style={{ padding: '7px 0', fontSize: 12, color: '#d97706', fontWeight: 700 }}>Remaining Arrears Balance</td>
-                        <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 900, color: '#d97706', textAlign: 'right' }}>{GHS(allocationResult.remainingArrears)}</td>
+                        <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 900, color: '#d97706', textAlign: 'right' }}>{CUR(allocationResult.remainingArrears)}</td>
                       </tr>
                     )}
                   </tbody>
