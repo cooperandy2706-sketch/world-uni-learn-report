@@ -101,8 +101,9 @@ export const router = createBrowserRouter([
           { path: 'exeats', element: lazyPage(() => import('./pages/admin/ExeatPage')) },
           { path: 'audit-logs', element: lazyPage(() => import('./pages/admin/AdminAuditPage')) },
           { path: 'pastoral', element: lazyPage(() => import('./pages/admin/PastoralCarePage')) },
+          { path: 'pending-users', element: lazyPage(() => import('./pages/admin/PendingUsersPage')) },
 
-           { path: 'staff-leave', element: lazyPage(() => import('./pages/admin/StaffLeavePage')) },
+           { path: 'staff-leave', element: lazyPage(() => import('./pages/staff/StaffLeavePage')) },
            { path: 'staff-operations', element: lazyPage(() => import('./pages/admin/StaffOperationsPage')) },
           { path: 'fees', element: lazyPage(() => import('./pages/bursar/FeesPage')) },
           { path: 'vendors', element: lazyPage(() => import('./pages/bursar/VendorsPage')) },

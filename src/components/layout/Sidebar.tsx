@@ -64,10 +64,12 @@ const adminLinks = [
   { to: ROUTES.ADMIN_FLEET_LIVE, label: 'Live Tracking', icon: Navigation },
 
   { header: 'Insights & Setup' },
-  { to: ROUTES.ADMIN_ANALYTICS, label: 'School Analytics', icon: BarChart3 },
   { to: '/admin/audit-logs', label: 'Audit Logs', icon: ShieldCheck },
   { to: ROUTES.ADMIN_ACADEMIC_YEARS, label: 'Academic Years', icon: Calendar },
   { to: ROUTES.ADMIN_TERMS, label: 'Academic Periods', icon: Calendar },
+  { to: ROUTES.ADMIN_ANALYTICS, label: 'School Analytics', icon: BarChart3 },
+  { to: ROUTES.ADMIN_PERFORMANCE, label: 'Performance Tracker', icon: BarChart3 },
+  { to: ROUTES.ADMIN_ANNOUNCEMENTS, label: 'Announcements', icon: Megaphone },
   { to: ROUTES.ADMIN_SETTINGS, label: 'System Settings', icon: Settings },
 ]
 
@@ -97,6 +99,7 @@ const teacherLinks = [
   { to: '/teacher/daily-fees', label: 'Daily Collections', icon: CreditCard },
 
   { header: 'Extras' },
+  { to: '/teacher/requisition', label: 'My Requisitions', icon: ClipboardList },
   { to: '/teacher/agenda', label: 'Term Agenda', icon: ClipboardList },
   { to: '/teacher/pastoral', label: 'Pastoral Care', icon: ShieldCheck },
   { to: '/teacher/elections-hub', label: 'Elections (PEC)', icon: Vote },
@@ -135,6 +138,7 @@ const studentLinks = [
   { to: '/student/exeats', label: 'My Exeats', icon: MapPin },
   { to: ROUTES.STUDENT_ELECTIONS, label: 'PEC Elections', icon: Vote },
   { to: ROUTES.STUDENT_TYPING_GAME, label: 'Typing Nitro', icon: Gamepad2 },
+  { to: '/student/notifications', label: 'Notifications', icon: Bell },
 ]
 
 const bursarLinks = [
@@ -158,6 +162,8 @@ const bursarLinks = [
 
   { header: 'Tools' },
   { to: ROUTES.BURSAR_SMS, label: 'SMS Reminders', icon: Smartphone },
+  { to: ROUTES.BURSAR_VENDORS, label: 'Vendors', icon: Package },
+  { to: ROUTES.BURSAR_REQUISITIONS, label: 'Requisitions', icon: ClipboardList },
 ]
 
 const staffLinks = [

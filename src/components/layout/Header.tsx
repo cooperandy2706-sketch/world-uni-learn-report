@@ -51,6 +51,7 @@ const ADMIN_NAV = [
   {
     label: 'Operations', items: [
       { label: 'Admin Tasks', to: '/admin/tasks' },
+      { label: 'Announcements', to: ROUTES.ADMIN_ANNOUNCEMENTS },
       { label: 'Calendar', to: ROUTES.ADMIN_CALENDAR },
       { label: 'Messages', to: ROUTES.ADMIN_MESSAGES },
       { label: 'Staff Operations', to: '/admin/staff-operations' },
@@ -65,7 +66,9 @@ const ADMIN_NAV = [
   {
     label: 'Insights', items: [
       { label: 'Analytics', to: ROUTES.ADMIN_ANALYTICS },
+      { label: 'Performance Tracker', to: ROUTES.ADMIN_PERFORMANCE },
       { label: 'Academic Calendar', to: '/admin/academic-calendar' },
+      { label: 'Audit Logs', to: '/admin/audit-logs' },
       { label: 'Settings', to: ROUTES.ADMIN_SETTINGS },
     ]
   },
@@ -94,6 +97,8 @@ const TEACHER_NAV = [
       { label: 'Syllabus', to: ROUTES.TEACHER_SYLLABUS },
       { label: 'Self Service', to: '/teacher/self-service' },
       { label: 'My Leave', to: '/teacher/leave' },
+      { label: 'My Requisitions', to: '/teacher/requisition' },
+      { label: 'Payslips', to: '/teacher/payslips' },
       { label: 'Messages', to: ROUTES.TEACHER_MESSAGES },
       { label: 'Notifications', to: ROUTES.TEACHER_NOTIFICATIONS },
       { label: 'Daily Collections', to: '/teacher/daily-fees' },
@@ -125,6 +130,7 @@ const STUDENT_NAV = [
       { label: 'Notice Board', to: ROUTES.STUDENT_ANNOUNCEMENTS },
       { label: 'Calendar', to: ROUTES.STUDENT_CALENDAR },
       { label: 'My Exeats', to: '/student/exeats' },
+      { label: 'Notifications', to: '/student/notifications' },
     ]
   },
   {
@@ -152,6 +158,8 @@ const BURSAR_NAV = [
     label: 'Tools', items: [
       { label: 'Students', to: ROUTES.BURSAR_STUDENTS },
       { label: 'School Store', to: ROUTES.BURSAR_INVENTORY },
+      { label: 'Vendors', to: ROUTES.BURSAR_VENDORS },
+      { label: 'Requisitions', to: ROUTES.BURSAR_REQUISITIONS },
       { label: 'Analytics', to: ROUTES.BURSAR_ANALYTICS },
       { label: 'SMS Reminders', to: ROUTES.BURSAR_SMS },
       { label: 'Reports', to: ROUTES.BURSAR_REPORTS },
@@ -193,6 +201,7 @@ const STAFF_NAV = [
   { label: 'Dashboard', to: '/staff/dashboard', single: true },
   { label: 'Self Service', to: '/staff/self-service', single: true },
   { label: 'My Leave', to: '/staff/leave', single: true },
+  { label: 'Payslips', to: '/staff/payslips', single: true },
   { label: 'Messages', to: '/staff/messages', single: true },
   { label: 'Elections (PEC)', to: '/staff/elections', single: true },
 ]
@@ -222,6 +231,7 @@ const NURSE_NAV = [
     label: 'Clinic', items: [
       { label: '📋 Visits Log', to: '/nurse/visits' },
       { label: '💊 Medication Tracker', to: '/nurse/medication' },
+      { label: '🩺 Health Records', to: '/nurse/records' },
     ]
   },
 ]
