@@ -181,7 +181,7 @@ export default function TeacherStudentsPage() {
         .eq('teacher_id', teacher.id)
       
       const classIds = Array.from(new Set((assignments ?? []).map(a => a.class_id)))
-      const uniqueClasses = Array.from(new Map((assignments ?? []).map(a => [a.class?.id, a.class])).values()).filter(Boolean) as any[]
+      const uniqueClasses = Array.from(new Map((assignments ?? []).map((a: any) => [a.class?.id, a.class])).values()).filter(Boolean) as any[]
       setClasses(uniqueClasses)
 
       if (classIds.length === 0) {
