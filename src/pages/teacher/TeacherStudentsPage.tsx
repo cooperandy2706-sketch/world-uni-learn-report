@@ -303,13 +303,15 @@ export default function TeacherStudentsPage() {
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_fadeIn 0.4s ease' }}>
         
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>My Students</h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage portal logins and profiles for students in your classes</p>
+        <div className="t-header" style={{ marginBottom: 24 }}>
+          <div>
+            <h1 className="t-title">My Students</h1>
+            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage portal logins and profiles for students in your classes</p>
+          </div>
         </div>
 
         {/* ── Filters bar ── */}
-        <div style={{ background: '#fff', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+        <div className="t-filter-bar">
           <div style={{ position: 'relative', flex: '1 1 220px' }}>
             <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 15, pointerEvents: 'none' }}>🔍</span>
             <input
@@ -357,8 +359,8 @@ export default function TeacherStudentsPage() {
             <p style={{ fontSize: 13, color: '#9ca3af' }}>Ask your administrator to assign classes to you.</p>
           </div>
         ) : (
-          <div className="resp-table-wrap" style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
-            <table className="resp-table-min" style={{ borderCollapse: 'collapse' }}>
+          <div className="t-table-scroll t-table-card" style={{ background: '#fff', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom: '1.5px solid #ede9fe' }}>
                   {['Student', 'ID', 'Class', 'Gender', 'Status', 'Actions'].map(h => (
@@ -370,7 +372,7 @@ export default function TeacherStudentsPage() {
                 {filtered.map((s, i) => (
                   <tr key={s.id} className="std-row"
                     style={{ borderBottom: i < filtered.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background 0.12s', animation: `_fadeUp 0.3s ease ${i * 0.03}s both` }}>
-                    <td style={{ padding: '12px 16px' }}>
+                    <td data-label="Student" style={{ padding: '12px 16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         {s.photo_url ? (
                           <img src={s.photo_url} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
@@ -380,26 +382,26 @@ export default function TeacherStudentsPage() {
                         <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{s.full_name}</div>
                       </div>
                     </td>
-                    <td style={{ padding: '12px 16px' }}>
+                    <td data-label="ID" style={{ padding: '12px 16px' }}>
                       <span style={{ fontSize: 12, fontFamily: 'monospace', background: '#f5f3ff', color: '#6d28d9', padding: '2px 7px', borderRadius: 5 }}>{s.student_id ?? '—'}</span>
                     </td>
-                    <td style={{ padding: '12px 16px' }}>
+                    <td data-label="Class" style={{ padding: '12px 16px' }}>
                       <span style={{ fontSize: 12, fontWeight: 600, background: '#ede9fe', color: '#5b21b6', padding: '3px 9px', borderRadius: 99 }}>{s.class?.name ?? 'Unassigned'}</span>
                     </td>
-                    <td style={{ padding: '12px 16px' }}>
+                    <td data-label="Gender" style={{ padding: '12px 16px' }}>
                       <span style={{ fontSize: 12, fontWeight: 600, background: s.gender === 'male' ? '#eff6ff' : s.gender === 'female' ? '#fdf2f8' : '#f3f4f6', color: s.gender === 'male' ? '#2563eb' : s.gender === 'female' ? '#db2777' : '#6b7280', padding: '3px 9px', borderRadius: 99 }}>
                         {s.gender === 'male' ? '♂ Male' : s.gender === 'female' ? '♀ Female' : '—'}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 16px' }}>
+                    <td data-label="Status" style={{ padding: '12px 16px' }}>
                       {s.user_id ? (
                         <span style={{ fontSize: 12, color: '#10b981', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>✅ Account Ready</span>
                       ) : (
                         <span style={{ fontSize: 12, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>⏳ No Login</span>
                       )}
                     </td>
-                    <td style={{ padding: '12px 16px' }}>
-                      <div style={{ display: 'flex', gap: 6 }}>
+                    <td data-label="Actions" style={{ padding: '12px 16px' }}>
+                      <div className="t-btn-group" style={{ display: 'flex', gap: 6 }}>
                         <button className="action-btn" onClick={() => { setViewingStudent(s); setViewModal(true) }}
                           style={{ padding: '6px 12px', borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', fontSize: 12, fontWeight: 600, transition: 'all 0.15s' }}>Profile</button>
                         

@@ -349,9 +349,8 @@ export default function AssignmentsPage() {
         @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         .q-card { background: #fff; border: 1.5px solid #f0eefe; border-radius: 14px; padding: 18px; margin-bottom: 16px; position: relative; }
         .q-card:hover { border-color: #7c3aed; }
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
           .resp-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
-          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 16px !important; }
           .resp-view-switch { flex-direction: column !important; width: 100% !important; max-width: none !important; }
           .resp-gap-sm { gap: 8px !important; }
           .assign-card { padding: 16px !important; }
@@ -363,9 +362,9 @@ export default function AssignmentsPage() {
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
         
-        <div className="resp-header" style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="t-header" style={{ marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Assignments</h1>
+            <h1 className="t-title">Assignments</h1>
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage digital quizzes and tasks for your students</p>
           </div>
           <Btn onClick={() => setModalOpen(true)} style={{ whiteSpace: 'nowrap' }}>➕ Create Assignment</Btn>

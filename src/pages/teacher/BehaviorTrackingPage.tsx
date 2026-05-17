@@ -134,9 +134,11 @@ export default function BehaviorTrackingPage() {
                 @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr !important; } }
             `}</style>
 
-            <div style={{ marginBottom: 32 }}>
-                <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 32, fontWeight: 700, color: '#111827', margin: 0 }}>Behavior & Discipline</h1>
-                <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Log student merits, demerits, and private counseling sessions.</p>
+            <div className="t-header" style={{ marginBottom: 32 }}>
+                <div>
+                    <h1 className="t-title">Behavior & Discipline</h1>
+                    <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Log student merits, demerits, and private counseling sessions.</p>
+                </div>
             </div>
 
             <div className="main-grid" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: 24 }}>

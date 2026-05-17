@@ -601,11 +601,13 @@ export default function LessonTrackerPage() {
             <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_lt_fi .4s ease' }}>
 
                 {/* Header */}
-                <div className="resp-header" style={{ marginBottom: 20 }}>
-                  <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Lesson Tracker</h1>
-                  <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
-                    {DAYS[todayDay]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                  </p>
+                <div className="t-header" style={{ marginBottom: 20 }}>
+                  <div>
+                    <h1 className="t-title">Lesson Tracker</h1>
+                    <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
+                      {DAYS[todayDay]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Active lesson banner */}

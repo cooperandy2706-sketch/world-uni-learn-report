@@ -530,6 +530,15 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
         .sticky-std{position:sticky;left:0;background:#fff;z-index:4;border-right:2px solid #ddd6fe !important}
         .sub-header{background:linear-gradient(135deg,#ede9fe,#ddd6fe) !important;color:#5b21b6 !important}
         .grade-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;font-size:11px;font-weight:800}
+        /* Score entry mobile card */
+        .se-mobile-card{display:none}
+        .se-desktop-table{display:block}
+        @media(max-width:639px){
+          .se-mobile-card{display:block}
+          .se-desktop-table{display:none}
+          .se-action-row{flex-direction:column !important;align-items:stretch !important;}
+          .se-action-row>*{width:100% !important;justify-content:center !important;}
+        }
       `}</style>
 
       {!isAdminView && (
@@ -710,6 +719,71 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
         </div>
         )
       })()}
+
+      {/* Mobile card view: per-student score entry (shown only below 640px) */}
+      {!loading && selectedClass && students.length > 0 && subjects.length > 0 && (
+        <div className="se-mobile-card">
+          {(() => {
+            const subjectsToRender = selectedSubjectId === 'all' ? subjects : subjects.filter(s => s.id === selectedSubjectId)
+            return students.map(stu => (
+              <div key={stu.id} className="t-student-card">
+                <div className="t-student-card-header">
+                  <div className="t-student-avatar" style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)' }}>
+                    {stu.full_name.charAt(0)}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{stu.full_name}</div>
+                    {stu.student_id && <div style={{ fontSize: 11, color: '#9ca3af' }}>{stu.student_id}</div>}
+                  </div>
+                  {(() => { const avg = getStudentAvg(stu.id); const g = avg > 0 ? getGrade(avg) : null; return g ? <span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 800, background: g.color + '18', color: g.color, padding: '3px 8px', borderRadius: 6 }}>{g.grade} {avg.toFixed(1)}%</span> : null })()}
+                </div>
+                {subjectsToRender.map(sub => {
+                  const sc = scoreMap[stu.id]?.[sub.id]
+                  const total = getTotal(stu.id, sub.id)
+                  const g = total > 0 ? getGrade(total) : null
+                  return (
+                    <div key={sub.id} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f0eefe' }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.06em' }}>{sub.name}</div>
+                      <div className="t-score-card-grid">
+                        {gradingCategories.map(c => (
+                          <div key={c.id}>
+                            <div style={{ fontSize: 10, color: '#9ca3af', marginBottom: 4, fontWeight: 600 }}>{c.name} <span style={{ color: '#d1d5db' }}>/{c.max_score}</span></div>
+                            <TinyInput value={sc?.scores[c.id] ?? ''} max={c.max_score} disabled={isLocked} onChange={v => updateScore(stu.id, sub.id, c.id, v)} />
+                          </div>
+                        ))}
+                        {total > 0 && (
+                          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                            <div style={{ fontSize: 10, color: '#9ca3af', marginBottom: 4, fontWeight: 600 }}>Total</div>
+                            <div style={{ fontSize: 16, fontWeight: 800, color: g?.color ?? '#111827' }}>{total.toFixed(1)}{g && <span style={{ fontSize: 11, marginLeft: 4 }}>{g.grade}</span>}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ))
+          })()}
+          {/* Sticky save bar for mobile */}
+          {!isLocked && students.length > 0 && (
+            <div className="t-sticky-bar">
+              <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 600 }}>
+                {dirty ? '● Unsaved changes' : '✓ All saved'}
+              </span>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={() => handleSave(true)} disabled={saving || !dirty}
+                  style={{ flex: 1, padding: '12px', borderRadius: 10, background: '#fff', border: '1.5px solid #e5e7eb', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+                  {saving ? 'Saving…' : '💾 Save'}
+                </button>
+                <button onClick={handleSubmit} disabled={submitting || enteredCount === 0}
+                  style={{ flex: 2, padding: '12px', borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+                  📤 Submit to Admin
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

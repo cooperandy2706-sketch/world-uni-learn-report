@@ -325,32 +325,26 @@ export default function TeacherReportsPage() {
         @keyframes _rp_fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         .rp-row:hover{background:#faf5ff !important}
         .rp-std:hover{background:#ede9fe !important}
-        @media (max-width: 768px) {
-          .resp-grid-stack { grid-template-columns: 1fr !important; gap: 12px !important; }
-          .resp-main-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
-          .resp-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
-          .resp-table-min { min-width: 700px; display: table; width: 100%; }
-          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 16px !important; }
-          .resp-btn-group { flex-direction: column !important; align-items: stretch !important; width: 100% !important; }
+        @media (max-width: 640px) {
           .resp-pills { flex-wrap: nowrap !important; overflow-x: auto !important; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
           .rp-std { flex-shrink: 0 !important; }
-          .resp-remarks-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .t-grid-stack { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_rp_fi .4s ease' }}>
 
         {/* ── Header ───────────────────────────────────────────────────── */}
-        <div className="resp-header" style={{ marginBottom: 22, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        <div className="t-header" style={{ marginBottom: 22 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Report Cards</h1>
+            <h1 className="t-title">Report Cards</h1>
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
               {(term as any)?.name ?? '—'} · {(year as any)?.name ?? '—'}
             </p>
           </div>
 
           {fakeReport && (
-            <div className="resp-btn-group" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div className="t-btn-group" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {remarksDirty && (
                 <Btn variant="success" onClick={saveRemarks} loading={savingRemarks}>
                   💾 Save Remarks
@@ -383,7 +377,7 @@ export default function TeacherReportsPage() {
         </div>
 
         {/* ── Selectors ────────────────────────────────────────────────── */}
-        <div className="resp-grid-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
+        <div className="t-grid t-grid-stack" style={{ gap: 14, marginBottom: 18 }}>
           {/* Class */}
           <div style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.05)' }}>
             <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 6 }}>
@@ -438,7 +432,7 @@ export default function TeacherReportsPage() {
         {!selectedClass && (
           <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>📄</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>Select a class to begin</h3>
+            <h3 className="t-title" style={{ fontSize: 18, marginBottom: 6 }}>Select a class to begin</h3>
             <p style={{ fontSize: 13, color: '#9ca3af' }}>Choose a class, then a student — their scores and report details fill in automatically.</p>
           </div>
         )}
@@ -453,7 +447,7 @@ export default function TeacherReportsPage() {
 
         {/* ── Main report panel ────────────────────────────────────────── */}
         {!loadingReport && selectedStudent && (
-          <div className="resp-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, animation: '_rp_fu .4s ease' }}>
+          <div className="t-grid" style={{ animation: '_rp_fu .4s ease' }}>
 
             {/* ── LEFT ──────────────────────────────────────────────── */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -466,7 +460,7 @@ export default function TeacherReportsPage() {
                     {selectedStudent.full_name.charAt(0)}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 19, fontWeight: 700, color: '#fff', margin: 0 }}>{selectedStudent.full_name}</h2>
+                    <h2 className="t-title" style={{ fontSize: 19, color: '#fff', margin: 0 }}>{selectedStudent.full_name}</h2>
                     <div style={{ display: 'flex', gap: 12, marginTop: 4, flexWrap: 'wrap', fontSize: 11 }}>
                       {selectedStudent.student_id && <span style={{ color: 'rgba(255,255,255,.6)' }}>ID: {selectedStudent.student_id}</span>}
                       {selectedStudent.gender && <span style={{ color: 'rgba(255,255,255,.6)' }}>{selectedStudent.gender === 'male' ? '♂ Male' : '♀ Female'}</span>}
@@ -512,11 +506,11 @@ export default function TeacherReportsPage() {
                 <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ padding: '13px 18px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 16 }}>📊</span>
-                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>Subject Scores</h3>
+                    <h3 className="t-title" style={{ fontSize: 15, margin: 0 }}>Subject Scores</h3>
                     <span style={{ fontSize: 11, fontWeight: 700, background: '#f5f3ff', color: '#6d28d9', padding: '2px 8px', borderRadius: 99 }}>{scores.length} subjects</span>
                   </div>
-                  <div className="resp-table-wrap">
-                  <table className="resp-table-min" style={{ borderCollapse: 'collapse' }}>
+                  <div className="t-table-scroll">
+                  <table className="t-table-card" style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)' }}>
                         {/* Subject column always first */}
@@ -543,7 +537,7 @@ export default function TeacherReportsPage() {
                         const g = getGrade(sc.total_score ?? 0)
                         return (
                           <tr key={sc.id} className="rp-row" style={{ borderBottom: i < scores.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background .12s' }}>
-                            <td style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: '#111827' }}>{sc.subject?.name}</td>
+                            <td data-label="Subject" style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: '#111827' }}>{sc.subject?.name}</td>
                             {/* Dynamic category score columns */}
                             {(gradingCategories.length > 0
                               ? gradingCategories
@@ -558,17 +552,17 @@ export default function TeacherReportsPage() {
                                 val = sc.exam_score.toFixed(1)
                               }
                               return (
-                                <td key={cat.id} style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: '#6d28d9', textAlign: 'center' }}>{val}</td>
+                                <td key={cat.id} data-label={cat.name} style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: '#6d28d9', textAlign: 'center' }}>{val}</td>
                               )
                             })}
-                            <td style={{ padding: '9px 13px', textAlign: 'center' }}>
+                            <td data-label="Total" style={{ padding: '9px 13px', textAlign: 'center' }}>
                               <span style={{ fontSize: 14, fontWeight: 800, color: (sc.total_score ?? 0) >= 50 ? '#16a34a' : '#dc2626' }}>{sc.total_score?.toFixed(1) ?? '—'}</span>
                             </td>
-                            <td style={{ padding: '9px 13px', textAlign: 'center' }}>
+                            <td data-label="Grade" style={{ padding: '9px 13px', textAlign: 'center' }}>
                               <span style={{ width: 28, height: 28, borderRadius: 8, background: g.color + '18', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: g.color }}>{g.grade}</span>
                             </td>
-                            <td style={{ padding: '9px 13px', textAlign: 'center', fontSize: 12, color: '#374151', fontWeight: 500 }}>{sc.position ? ordinalFn(sc.position) : '—'}</td>
-                            <td style={{ padding: '9px 13px', fontSize: 11, color: '#6b7280' }}>{sc.teacher_remarks ?? '—'}</td>
+                            <td data-label="Position" style={{ padding: '9px 13px', textAlign: 'center', fontSize: 12, color: '#374151', fontWeight: 500 }}>{sc.position ? ordinalFn(sc.position) : '—'}</td>
+                            <td data-label="Remark" style={{ padding: '9px 13px', fontSize: 11, color: '#6b7280' }}>{sc.teacher_remarks ?? '—'}</td>
                           </tr>
                         )
                       })}
@@ -603,7 +597,7 @@ export default function TeacherReportsPage() {
                 <div style={{ padding: '13px 18px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 16 }}>💬</span>
-                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>Remarks</h3>
+                    <h3 className="t-title" style={{ fontSize: 15, margin: 0 }}>Remarks</h3>
                     {remarksDirty && <span style={{ fontSize: 11, color: '#d97706', fontWeight: 600 }}>● Unsaved changes</span>}
                     {!remarksDirty && (teacherRemark || htRemark) && <span style={{ fontSize: 11, color: '#16a34a', fontWeight: 600 }}>✓ Saved</span>}
                   </div>
@@ -614,7 +608,7 @@ export default function TeacherReportsPage() {
                   )}
                 </div>
 
-                <div className="resp-remarks-grid" style={{ padding: '16px 18px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div className="t-grid" style={{ padding: '16px 18px', gap: 14 }}>
                   <div>
                     <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>
                       Class Teacher's Remarks
@@ -641,7 +635,7 @@ export default function TeacherReportsPage() {
                 </div>
 
                 {/* Action bar */}
-                <div style={{ padding: '0 18px 16px', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <div className="t-btn-group" style={{ padding: '0 18px 16px', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <Btn variant="success" onClick={saveRemarks} loading={savingRemarks} disabled={!reportCard?.id} style={{ flex: 1, justifyContent: 'center' }}>
                     💾 Save Remarks
                   </Btn>
@@ -708,7 +702,7 @@ export default function TeacherReportsPage() {
                       { l: 'Absent',  v: attendance.days_absent,  color: '#dc2626', bg: '#fef2f2' },
                     ].map(s => (
                       <div key={s.l} style={{ background: s.bg, borderRadius: 9, padding: '9px', textAlign: 'center' }}>
-                        <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: s.color }}>{s.v}</div>
+                        <div className="t-title" style={{ fontSize: 18, color: s.color }}>{s.v}</div>
                         <div style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }}>{s.l}</div>
                       </div>
                     ))}

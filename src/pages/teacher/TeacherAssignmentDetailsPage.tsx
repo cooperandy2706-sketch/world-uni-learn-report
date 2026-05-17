@@ -122,12 +122,12 @@ export default function TeacherAssignmentDetailsPage() {
           ← Back to Assignments
         </button>
 
-        <div className="resp-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
+        <div className="t-header" style={{ marginBottom: 32 }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
               {assignment.subject?.name} • {assignment.class?.name}
             </div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
+            <h1 className="t-title">
               {assignment.title}
             </h1>
             <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>{assignment.description || 'No description provided.'}</p>
@@ -139,7 +139,7 @@ export default function TeacherAssignmentDetailsPage() {
         </div>
 
         {/* ── Submissions Table ── */}
-        <div className="resp-table-overflow" style={{ background: '#fff', borderRadius: 20, border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
+        <div className="t-table-scroll" style={{ background: '#fff', borderRadius: 20, border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
           <div className="resp-table-min">
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 120px 140px 120px 160px', padding: '16px 24px', background: '#f8fafc', borderBottom: '1px solid #f1f5f9', fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
              <div>Student Name</div>

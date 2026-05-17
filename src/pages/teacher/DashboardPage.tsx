@@ -293,9 +293,9 @@ export default function TeacherDashboardPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', opacity: mounted ? 1 : 0, transition: 'opacity .4s ease' }}>
 
         {/* ── Header ── */}
-        <div className="resp-header" style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, animation: '_fu .5s ease both' }}>
+        <div className="t-header" style={{ animation: '_fu .5s ease both' }}>
           <div>
-            <h1 className="td-header-title" style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
+            <h1 className="t-title">
               {timeGreeting}, {user?.full_name?.split(' ')[0]} 👋
             </h1>
             <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4, fontWeight: 500 }}>{roleMessage}</p>
@@ -303,7 +303,7 @@ export default function TeacherDashboardPage() {
               {DAYS[now.getDay()]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit' })} · {(year as any)?.name} · {(term as any)?.name ?? 'No active term'}
             </p>
           </div>
-          <div className="resp-btn-group" style={{ display: 'flex', gap: 8 }}>
+          <div className="t-btn-group">
             <button onClick={() => setMsgOpen(true)}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 14px', borderRadius: 9, fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', border: '1.5px solid #e5e7eb', cursor: 'pointer', transition: 'all .15s' }}
               onMouseEnter={e => { e.currentTarget.style.background = '#f5f3ff'; e.currentTarget.style.borderColor = '#ddd6fe' }}
@@ -359,7 +359,7 @@ export default function TeacherDashboardPage() {
         ) : (
           <>
             {/* ── KPIs ── */}
-            <div className="resp-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 13, marginBottom: 20, animation: '_fu .5s ease .1s both' }}>
+            <div className="t-kpi-grid" style={{ marginBottom: 20, animation: '_fu .5s ease .1s both' }}>
               {[
                 { label: 'My Classes', value: uniqueClasses.length, icon: '🏫', color: '#6d28d9', bg: '#f5f3ff' },
                 { label: 'My Subjects', value: uniqueSubjects.length, icon: '📚', color: '#0891b2', bg: '#ecfeff' },
@@ -391,7 +391,7 @@ export default function TeacherDashboardPage() {
             </div>
 
             {/* ── Main grid ── */}
-            <div className="resp-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, animation: '_fu .5s ease .2s both' }}>
+            <div className="t-grid" style={{ animation: '_fu .5s ease .2s both' }}>
 
               {/* ── LEFT ── */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -557,7 +557,7 @@ export default function TeacherDashboardPage() {
                     {teacherRecord?.qualification && (
                       <div style={{ background: 'rgba(255,255,255,.08)', borderRadius: 8, padding: '6px 11px', marginBottom: 11, fontSize: 11, color: 'rgba(255,255,255,.7)' }}>🎓 {teacherRecord.qualification}</div>
                     )}
-                    <div className="resp-prof-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+                    <div className="t-prof-grid" style={{ marginTop: 12 }}>
                       {[{ label: 'Classes', value: uniqueClasses.length }, { label: 'Subjects', value: uniqueSubjects.length }, { label: 'Quizzes', value: myQuizCount }].map(s => (
                         <div key={s.label} style={{ background: 'rgba(255,255,255,.08)', borderRadius: 8, padding: '8px', textAlign: 'center' }}>
                           <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#fff' }}>{s.value}</div>
@@ -620,7 +620,7 @@ export default function TeacherDashboardPage() {
                     <span>⚡</span>
                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>Quick Actions</h3>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 }}>
+                  <div className="t-quick-grid">
                     {[
                       { icon: '✏️', label: 'Enter Scores', to: ROUTES.TEACHER_SCORE_ENTRY },
                       { icon: '📋', label: 'Attendance', to: ROUTES.TEACHER_ATTENDANCE },
@@ -652,9 +652,9 @@ export default function TeacherDashboardPage() {
         )}
       </div>
 
-      {/* Message modal */}
-      <div className={`overlay2 ${msgOpen ? 'open' : ''}`} onClick={e => { if (e.target === e.currentTarget) setMsgOpen(false) }}>
-        <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 500, boxShadow: '0 24px 64px rgba(0,0,0,.18)', overflow: 'hidden' }}>
+      {/* Message modal — full-screen sheet on mobile */}
+      <div className={`t-modal-overlay ${msgOpen ? 'open' : ''}`} onClick={e => { if (e.target === e.currentTarget) setMsgOpen(false) }}>
+        <div className="t-modal-box">
           <div style={{ padding: '16px 20px', borderBottom: '1px solid #f5f3ff', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>Message Admin</h3>

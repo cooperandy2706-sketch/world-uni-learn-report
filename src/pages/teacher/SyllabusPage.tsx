@@ -76,13 +76,15 @@ export default function TeacherSyllabusPage() {
       `}</style>
             <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_syl_fi .4s ease' }}>
 
-                <div style={{ marginBottom: 22 }}>
-                    <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Syllabus</h1>
+                <div className="t-header" style={{ marginBottom: 22 }}>
+                  <div>
+                    <h1 className="t-title">Syllabus</h1>
                     <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Teaching materials uploaded by admin for your classes</p>
+                  </div>
                 </div>
 
                 {/* Filters */}
-                <div style={{ background: '#fff', borderRadius: 14, padding: '12px 16px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+                <div className="t-filter-bar">
                     <div style={{ position: 'relative', flex: '1 1 200px' }}>
                         <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14 }}>🔍</span>
                         <input placeholder="Search syllabus…" value={search} onChange={e => setSearch(e.target.value)}

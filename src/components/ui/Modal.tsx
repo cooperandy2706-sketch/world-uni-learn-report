@@ -23,7 +23,7 @@ export default function Modal({ open, onClose, title, subtitle, children, size='
       <div
         onClick={e => { if(e.target===e.currentTarget) onClose() }}
         style={{
-          position:'fixed', inset:0, zIndex:999,
+          position:'fixed', inset:0, zIndex:2000,
           display:'flex', alignItems:'center', justifyContent:'center', padding:16,
           background:'rgba(17,24,39,0.55)', backdropFilter:'blur(4px)',
           animation:'_mfi 0.15s ease', fontFamily:'"DM Sans",sans-serif',

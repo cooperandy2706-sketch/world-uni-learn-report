@@ -123,13 +123,13 @@ export default function TeacherSelfServicePage() {
             `}</style>
 
             {/* Header Area */}
-            <div className="header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24, gap: 16 }}>
+            <div className="t-header" style={{ marginBottom: 24 }}>
                 <div>
-                    <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 32, fontWeight: 700, color: '#111827', margin: 0 }}>Self Service</h1>
+                    <h1 className="t-title">Self Service</h1>
                     <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Manage your profile, payroll, and leave applications.</p>
                 </div>
-                <div style={{ display: 'flex', gap: 12 }}>
-                    <button onClick={() => setShowLeaveModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 10px rgba(124, 58, 237, 0.3)' }}>
+                <div className="t-btn-group">
+                    <button onClick={() => setShowLeaveModal(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 10px rgba(124, 58, 237, 0.3)' }}>
                         <Plus size={18} /> Apply for Leave
                     </button>
                 </div>
@@ -217,7 +217,7 @@ export default function TeacherSelfServicePage() {
                 )}
 
                 {activeTab === 'payroll' && (
-                    <div className="card" style={{ overflow: 'hidden' }}>
+                    <div className="card t-table-scroll t-table-card" style={{ overflow: 'hidden' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                             <thead style={{ background: '#f9fafb', borderBottom: '1.5px solid #f0eefe' }}>
                                 <tr>
@@ -236,16 +236,16 @@ export default function TeacherSelfServicePage() {
                                     </tr>
                                 ) : payroll.map((p, i) => (
                                     <tr key={i} style={{ borderBottom: '1px solid #f0eefe' }}>
-                                        <td style={{ padding: '16px', fontWeight: 600 }}>{p.month}</td>
-                                        <td style={{ padding: '16px' }}>GH₵ {(p.basic_salary + p.allowances).toFixed(2)}</td>
-                                        <td style={{ padding: '16px', color: '#dc2626' }}>- GH₵ {p.deductions.toFixed(2)}</td>
-                                        <td style={{ padding: '16px', fontWeight: 700, color: '#7c3aed' }}>GH₵ {p.net_salary.toFixed(2)}</td>
-                                        <td style={{ padding: '16px' }}>
+                                        <td data-label="MONTH" style={{ padding: '16px', fontWeight: 600 }}>{p.month}</td>
+                                        <td data-label="GROSS PAY" style={{ padding: '16px' }}>GH₵ {(p.basic_salary + p.allowances).toFixed(2)}</td>
+                                        <td data-label="DEDUCTIONS" style={{ padding: '16px', color: '#dc2626' }}>- GH₵ {p.deductions.toFixed(2)}</td>
+                                        <td data-label="NET SALARY" style={{ padding: '16px', fontWeight: 700, color: '#7c3aed' }}>GH₵ {p.net_salary.toFixed(2)}</td>
+                                        <td data-label="STATUS" style={{ padding: '16px' }}>
                                             <span className={`status-badge ${p.is_paid ? 'status-approved' : 'status-pending'}`}>
                                                 {p.is_paid ? 'PAID' : 'PENDING'}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '16px' }}>
+                                        <td data-label="ACTION" style={{ padding: '16px' }}>
                                             <button style={{ background: 'none', border: 'none', color: '#7c3aed', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 600 }}>
                                                 <Download size={14} /> Payslip
                                             </button>
@@ -258,7 +258,7 @@ export default function TeacherSelfServicePage() {
                 )}
 
                 {activeTab === 'leave' && (
-                    <div className="card" style={{ overflow: 'hidden' }}>
+                    <div className="card t-table-scroll t-table-card" style={{ overflow: 'hidden' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                             <thead style={{ background: '#f9fafb', borderBottom: '1.5px solid #f0eefe' }}>
                                 <tr>
@@ -276,11 +276,11 @@ export default function TeacherSelfServicePage() {
                                     </tr>
                                 ) : leaves.map((l, i) => (
                                     <tr key={i} style={{ borderBottom: '1px solid #f0eefe' }}>
-                                        <td style={{ padding: '16px', fontWeight: 600, textTransform: 'capitalize' }}>{l.leave_type}</td>
-                                        <td style={{ padding: '16px' }}>{format(new Date(l.start_date), 'MMM dd, yyyy')}</td>
-                                        <td style={{ padding: '16px' }}>{format(new Date(l.end_date), 'MMM dd, yyyy')}</td>
-                                        <td style={{ padding: '16px', fontSize: 13, color: '#6b7280' }}>{l.reason || '—'}</td>
-                                        <td style={{ padding: '16px' }}>
+                                        <td data-label="TYPE" style={{ padding: '16px', fontWeight: 600, textTransform: 'capitalize' }}>{l.leave_type}</td>
+                                        <td data-label="START DATE" style={{ padding: '16px' }}>{format(new Date(l.start_date), 'MMM dd, yyyy')}</td>
+                                        <td data-label="END DATE" style={{ padding: '16px' }}>{format(new Date(l.end_date), 'MMM dd, yyyy')}</td>
+                                        <td data-label="REASON" style={{ padding: '16px', fontSize: 13, color: '#6b7280' }}>{l.reason || '—'}</td>
+                                        <td data-label="STATUS" style={{ padding: '16px' }}>
                                             <span className={`status-badge status-${l.status}`}>
                                                 {l.status}
                                             </span>

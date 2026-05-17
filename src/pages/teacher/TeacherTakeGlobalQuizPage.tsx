@@ -147,7 +147,7 @@ export default function TeacherTakeGlobalQuizPage() {
       <div style={{ maxWidth: 640, margin: '60px auto', background: '#fff', borderRadius: 24, padding: 40, border: '1.5px solid #f0eefe', textAlign: 'center', boxShadow: '0 20px 50px rgba(109,40,217,0.1)' }}>
         <div style={{ fontSize: 13, fontWeight: 800, color: '#f59e0b', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>🌏 Teacher Preview</div>
         <div style={{ fontSize: 54, marginBottom: 20 }}>👁️</div>
-        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 700, color: '#111827', marginBottom: 12 }}>{quiz.title}</h1>
+        <h1 className="t-title">{quiz.title}</h1>
         <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 32, lineHeight: 1.6 }}>{quiz.description || 'Preview this global interactive quiz.'} <br/> <strong style={{color: '#7c3aed'}}>Note:</strong> Preview submissions are not recorded to the database.</p>
         
         <div className="resp-2col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
@@ -180,7 +180,7 @@ export default function TeacherTakeGlobalQuizPage() {
       <div style={{ maxWidth: 700, margin: '40px auto 100px', fontFamily: '"DM Sans",sans-serif' }}>
         {/* Results Banner */}
         <div style={{ background: feedback.bg, borderRadius: 24, padding: '40px 30px', textAlign: 'center', marginBottom: 40, border: `2px solid ${feedback.color}30` }}>
-          <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 800, color: feedback.color, marginBottom: 12, marginTop: 0 }}>{feedback.title}</h1>
+          <h1 className="t-title" style={{ color: feedback.color, marginBottom: 12, marginTop: 0 }}>{feedback.title}</h1>
           <p style={{ fontSize: 15, color: `${feedback.color}cc`, marginBottom: 32, maxWidth: 500, margin: '0 auto 32px' }}>{feedback.msg}</p>
           
           <div style={{ display: 'inline-flex', alignItems: 'center', background: '#fff', borderRadius: 20, padding: '20px 40px', boxShadow: `0 12px 30px ${feedback.color}20` }}>
@@ -260,7 +260,7 @@ export default function TeacherTakeGlobalQuizPage() {
       `}</style>
 
       <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderBottom: '1.5px solid #f0eefe', padding: '14px 0' }}>
-        <div className="resp-flex-header" style={{ maxWidth: 800, margin: '0 auto', padding: '0 20px', display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="t-header" style={{ maxWidth: 800, margin: '0 auto', padding: '0 20px' }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>🌍 Teacher Preview</div>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>{quiz.title}</h2>
@@ -292,7 +292,7 @@ export default function TeacherTakeGlobalQuizPage() {
           <div style={{ fontSize: 13, fontWeight: 700, color: '#9ca3af' }}>{q.points} Points</div>
         </div>
 
-        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 26, fontWeight: 700, color: '#111827', marginBottom: 36, lineHeight: 1.4 }}>{q.text}</h1>
+        <h1 className="t-title" style={{ marginBottom: 36, lineHeight: 1.4 }}>{q.text}</h1>
 
         <div style={{ marginBottom: 44 }}>
            {q.type === 'mcq' && q.options.map((opt: string, i: number) => (

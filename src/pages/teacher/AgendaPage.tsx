@@ -117,9 +117,11 @@ export default function TeacherAgendaPage() {
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",sans-serif', animation: 'tap_fi .4s ease' }}>
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>School Roadmap</h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Track your progress through the term's key milestones and sync with admin guidance.</p>
+        <div className="t-header" style={{ marginBottom: 24 }}>
+          <div>
+            <h1 className="t-title">School Roadmap</h1>
+            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Track your progress through the term's key milestones and sync with admin guidance.</p>
+          </div>
         </div>
 
         {!term ? (

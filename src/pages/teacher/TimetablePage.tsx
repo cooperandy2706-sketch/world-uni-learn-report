@@ -83,9 +83,11 @@ export default function TeacherTimetablePage(){
         @keyframes _tt_fi{from{opacity:0}to{opacity:1}}
       `}</style>
       <div style={{fontFamily:'"DM Sans",system-ui,sans-serif',animation:'_tt_fi .4s ease'}}>
-        <div style={{marginBottom:22}}>
-          <h1 style={{fontFamily:'"Playfair Display",serif',fontSize:26,fontWeight:700,color:'#111827',margin:0}}>My Timetable</h1>
-          <p style={{fontSize:13,color:'#6b7280',marginTop:3}}>{(term as any)?.name} Schedule</p>
+        <div className="t-header" style={{marginBottom:22}}>
+          <div>
+            <h1 className="t-title">My Timetable</h1>
+            <p style={{fontSize:13,color:'#6b7280',marginTop:3}}>{(term as any)?.name} Schedule</p>
+          </div>
         </div>
 
         {/* Today's classes */}
@@ -114,7 +116,7 @@ export default function TeacherTimetablePage(){
         </div>
 
         {/* Full week grid */}
-        <div style={{background:'#fff',borderRadius:16,border:'1.5px solid #f0eefe',overflow:'auto',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
+        <div className="t-table-scroll" style={{background:'#fff',borderRadius:16,border:'1.5px solid #f0eefe',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
           <table style={{width:'100%',borderCollapse:'collapse',minWidth:600}}>
             <thead>
               <tr style={{background:'linear-gradient(135deg,#1e3a8a,#1e40af)'}}>

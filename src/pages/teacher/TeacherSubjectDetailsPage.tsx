@@ -94,11 +94,12 @@ export default function TeacherSubjectDetailsPage() {
           ← Back to Library
         </button>
 
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Curriculum Resources</div>
-          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 36, fontWeight: 700, color: '#111827', margin: 0 }}>
-            {subject ? subject.name : 'Loading Subject...'}
-          </h1>
+        <div className="t-header" style={{ marginBottom: 40 }}>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Curriculum Resources</div>
+            <h1 className="t-title">
+              {subject ? subject.name : 'Loading Subject...'}
+            </h1>
           {subject?.code && <span style={{ fontSize: 13, fontWeight: 700, fontFamily: 'monospace', color: '#6d28d9', background: '#f5f3ff', padding: '4px 10px', borderRadius: 6, display: 'inline-block', marginTop: 12 }}>{subject.code}</span>}
         </div>
 
@@ -111,7 +112,7 @@ export default function TeacherSubjectDetailsPage() {
         ) : resources.length === 0 ? (
           <div style={{ background: '#fff', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📂</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No Resources Available</h3>
+            <h3 className="t-title" style={{ fontSize: 18, marginBottom: 6 }}>No Resources Available</h3>
             <p style={{ fontSize: 13, color: '#9ca3af' }}>There are currently no published study materials for this subject.</p>
           </div>
         ) : (

@@ -140,14 +140,14 @@ export default function TeacherDailyFeesPage() {
         @keyframes _fadeIn { from{opacity:0} to{opacity:1} }
       `}</style>
       
-      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="t-header" style={{ marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, margin: 0, color: '#111827' }}>Daily Collections</h1>
+          <h1 className="t-title">Daily Collections</h1>
           <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Record daily school fees directly from your device</p>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap', background: '#fff', padding: '16px 20px', borderRadius: 16, border: '1.5px solid #f0eefe', boxShadow: '0 2px 8px rgba(109,40,217,.04)' }}>
+      <div className="t-filter-bar" style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 100%' }}>
           <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Date</label>
           <input type="date" value={date} onChange={e => setDate(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid #e5e7eb', outline: 'none', background: '#faf5ff', fontSize: 14 }} />

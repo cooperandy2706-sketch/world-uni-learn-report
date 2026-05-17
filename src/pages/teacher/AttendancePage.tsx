@@ -384,13 +384,13 @@ export default function TeacherAttendancePage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_att_fi .4s ease' }}>
 
         {/* Header */}
-        <div style={{ marginBottom: 22 }}>
-          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
-            Morning Register
-          </h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
-            {DAYS[todayDay]} · {new Date().toLocaleDateString('en-GH', { day: 'numeric', month: 'long', year: 'numeric' })}
-          </p>
+        <div className="t-header" style={{ marginBottom: 22 }}>
+          <div>
+            <h1 className="t-title">Morning Register</h1>
+            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
+              {DAYS[todayDay]} · {new Date().toLocaleDateString('en-GH', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+          </div>
         </div>
 
         {/* Loading */}

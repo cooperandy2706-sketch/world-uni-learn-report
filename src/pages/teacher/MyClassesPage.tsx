@@ -92,20 +92,25 @@ export default function MyClassesPage() {
         @keyframes _fi{from{opacity:0}to{opacity:1}}
         @keyframes _fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         .std-row:hover{background:#faf5ff !important}
-        @media (max-width: 768px) {
-          .resp-grid { grid-template-columns: 1fr !important; }
+        @media (max-width: 640px) {
+          .resp-grid { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; }
           .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
+          .resp-header > div:last-child { display: flex !important; flex-direction: column !important; gap: 8px !important; }
+          .resp-header > div:last-child a,
+          .resp-header > div:last-child button { width: 100% !important; justify-content: center !important; text-align: center !important; }
           .resp-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
-          .resp-table-min { min-width: 700px; }
-          .resp-stat-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
+          .resp-table-min { min-width: 560px; }
+          .resp-stat-grid { grid-template-columns: 1fr !important; gap: 4px !important; }
         }
       `}</style>
 
-      <div style={{ fontFamily:'"DM Sans",system-ui,sans-serif', animation:'_fi .4s ease' }}>
+      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_fi .4s ease' }}>
 
-        <div style={{ marginBottom:24 }}>
-          <h1 style={{ fontFamily:'"Playfair Display",serif', fontSize:26, fontWeight:700, color:'#111827', margin:0 }}>My Classes</h1>
-          <p style={{ fontSize:13, color:'#6b7280', marginTop:3 }}>{(term as any)?.name} · {(year as any)?.name} · {classData.length} class{classData.length !== 1 ? 'es' : ''} assigned</p>
+        <div className="t-header" style={{ marginBottom: 24 }}>
+          <div>
+            <h1 className="t-title">My Classes</h1>
+            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>{(term as any)?.name} · {(year as any)?.name} · {classData.length} class{classData.length !== 1 ? 'es' : ''} assigned</p>
+          </div>
         </div>
 
         {classData.length === 0 ? (
@@ -142,13 +147,13 @@ export default function MyClassesPage() {
                       </div>
                     </div>
 
-                    <div style={{ display:'flex', gap:8, flexShrink:0, alignItems:'flex-start' }}>
+                    <div className="t-btn-group" style={{ flexShrink: 0 }}>
                       <Link to={`${ROUTES.TEACHER_SCORE_ENTRY}?class=${cls.classId}`}
-                        style={{ padding:'8px 16px', borderRadius:9, background:'linear-gradient(135deg,#7c3aed,#6d28d9)', color:'#fff', fontSize:12, fontWeight:600, textDecoration:'none' }}>
+                        style={{ padding: '8px 16px', borderRadius: 9, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', fontSize: 12, fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}>
                         ✏️ Enter Scores
                       </Link>
                       <button onClick={() => setExpandedClass(isExpanded ? null : cls.classId)}
-                        style={{ padding:'8px 14px', borderRadius:9, border:'1.5px solid #ddd6fe', background:'#fff', color:'#6d28d9', fontSize:12, fontWeight:600, cursor:'pointer' }}>
+                        style={{ padding: '8px 14px', borderRadius: 9, border: '1.5px solid #ddd6fe', background: '#fff', color: '#6d28d9', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44 }}>
                         {isExpanded ? '▲ Hide' : '▼ Students'}
                       </button>
                     </div>
