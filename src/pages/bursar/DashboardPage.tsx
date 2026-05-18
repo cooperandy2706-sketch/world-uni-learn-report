@@ -28,7 +28,6 @@ export default function BursarDashboard() {
   const [recentPayments, setRecentPayments] = useState<any[]>([])
   const [expenseByCategory, setExpenseByCategory] = useState<any[]>([])
   const [schoolCurrency, setSchoolCurrency] = useState('GHS')
-  const [displayCurrency, setDisplayCurrency] = useState('NATIVE') // 'NATIVE' or 'USD'
   const [loading, setLoading] = useState(true)
   const [flippedCards, setFlippedCards] = useState<number[]>([])
 
@@ -38,18 +37,11 @@ export default function BursarDashboard() {
     )
   }
 
-  // Mock exchange rates to USD for demonstration
-  const EXCHANGE_RATES: Record<string, number> = {
-    'GHS': 0.071, // 1 GHS = 0.071 USD
-    'EUR': 1.08,  // 1 EUR = 1.08 USD
-    'GBP': 1.25,  // 1 GBP = 1.25 USD
-    'USD': 1.0,
-  }
+  const [exchangeRate, setExchangeRate] = useState<number>(1)
 
-  // Helper to get the correct numeric value based on toggle
+  // Helper to get the correct numeric value in USD
   const getDisplayValue = (val: number) => {
-    const rate = EXCHANGE_RATES[schoolCurrency] || 1
-    return val * rate
+    return val * exchangeRate
   }
 
   useEffect(() => {
@@ -78,8 +70,21 @@ export default function BursarDashboard() {
 
       const [paymentsRes, incomeRes, expensesRes, payrollRes, recentRes, studentsRes, structRes, dailyConfRes, dailyCollRes, termPaymentsRes, dailyCollFullYearRes, attendanceRes, schoolRes] = resData as any
 
+      let currencyCode = 'GHS'
       if (schoolRes?.data?.currency_code) {
-        setSchoolCurrency(schoolRes.data.currency_code)
+        currencyCode = schoolRes.data.currency_code
+        setSchoolCurrency(currencyCode)
+      }
+
+      // Fetch live exchange rate to USD
+      try {
+        const rateRes = await fetch(`https://open.er-api.com/v6/latest/${currencyCode}`)
+        const rateData = await rateRes.json()
+        if (rateData?.rates?.USD) {
+          setExchangeRate(rateData.rates.USD)
+        }
+      } catch (err) {
+        console.error("Failed to fetch exchange rate", err)
       }
 
       const dailyTotalFullYear = (dailyCollFullYearRes?.data ?? []).reduce((s: number, r: any) => s + Number(r.amount), 0)
@@ -135,10 +140,27 @@ export default function BursarDashboard() {
       const overallDebt = lastArrears + currentArrears
       const schCount = studentsAll.filter(s => s.scholarship_type && s.scholarship_type !== 'none').length
 
+      // Count students who have any outstanding balance
+      let outstandingCount = 0
+      for (const s of studentsAll) {
+        const classFee = structsByClass[s.class_id] || 0
+        const schPct = s.scholarship_percentage || 0
+        const netTuition = classFee - (classFee * (schPct / 100))
+        const studentTuitionOwed = Math.max(0, netTuition - (paidByStudent[s.id] || 0))
+        const classRates = dailyRatesByClass[s.class_id] || { f: 0, s: 0 }
+        const feeMode = s.daily_fee_mode || 'all'
+        const feedingRate = feeMode === 'none' ? 0 : classRates.f
+        const studiesRate = (feeMode === 'none' || feeMode === 'feeding') ? 0 : classRates.s
+        const daysPresent = attMap[s.id] || 0
+        const { f, s: s_pid } = dailyPaid[s.id] || { f: 0, s: 0 }
+        const studentDailyOwed = Math.max(0, feedingRate * daysPresent - f) + Math.max(0, studiesRate * daysPresent - s_pid)
+        if (Number(s.fees_arrears || 0) > 0 || studentTuitionOwed > 0 || studentDailyOwed > 0) outstandingCount++
+      }
+
       setStats({ 
         totalCollected: feeTotal, tuitionCollected: tuitionTotal, dailyCollected: dailyTotalFullYear,
         totalIncome: incomeTotal + feeTotal, totalExpenses: expenseTotal + payrollTotal, 
-        payrollPaid: payrollTotal, outstandingStudents: 0, 
+        payrollPaid: payrollTotal, outstandingStudents: outstandingCount, 
         scholarshipCount: schCount, lastTermArrears: lastArrears, currentTermArrears: currentArrears, overallDebt
       })
       setRecentPayments(recentRes?.data ?? [])
@@ -178,7 +200,7 @@ export default function BursarDashboard() {
     { label: 'Daily Fees Collected', nativeValue: formatCurrency(stats.dailyCollected, schoolCurrency), usdValue: formatCurrency(getDisplayValue(stats.dailyCollected), 'USD'), icon: PiggyBank, color: '#f59e0b', bg: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' },
     { label: 'Net Bank Balance', nativeValue: formatCurrency(net, schoolCurrency), usdValue: formatCurrency(getDisplayValue(net), 'USD'), icon: DollarSign, color: net >= 0 ? '#10b981' : '#6366f1', bg: net >= 0 ? 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' : 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)' },
     { label: 'Overall Total Debt', nativeValue: formatCurrency(stats.overallDebt, schoolCurrency), usdValue: formatCurrency(getDisplayValue(stats.overallDebt), 'USD'), icon: AlertCircle, color: '#ef4444', bg: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)' },
-    { label: 'Scholarship Students', nativeValue: String(stats.scholarshipCount), usdValue: String(stats.scholarshipCount), icon: GraduationCap, color: '#8b5cf6', bg: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)' },
+    { label: 'Students In Arrears', nativeValue: String(stats.outstandingStudents), usdValue: String(stats.outstandingStudents), icon: Users, color: '#f97316', bg: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)' },
   ]
 
   const quickLinks = [

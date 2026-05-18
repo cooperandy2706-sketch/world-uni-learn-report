@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, UserCheck, School, BookOpen, Building2,
   Calendar, FileSpreadsheet, BarChart3, Settings, Megaphone,
   Target, ClipboardCheck, PencilLine, Bell, Timer, ClipboardList,
-  MessageSquare, Trophy, ShieldCheck, LogOut, Book,
+  MessageSquare, Trophy, ShieldCheck, Shield, LogOut, Book,
   ChevronLeft, ChevronRight, Wallet, Banknote, Receipt, TrendingDown,
   TrendingUp, AlertCircle, CreditCard, FileText, ShoppingBag, ChevronDown,
   Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap,
@@ -121,7 +121,7 @@ export const bursarLinks = [
   { header: 'Operations' },
   { to: ROUTES.BURSAR_STUDENTS, label: 'Students', icon: Users },
   { to: ROUTES.BURSAR_FEES, label: 'School Fees', icon: CreditCard },
-  { to: '/bursar/daily-fees', label: 'Daily Fees', icon: Wallet },
+  { to: ROUTES.BURSAR_DAILY_FEES, label: 'Daily Fees', icon: Wallet },
   { to: ROUTES.BURSAR_INVENTORY, label: 'School Store', icon: ShoppingBag },
   { to: ROUTES.BURSAR_VENDORS, label: 'Vendors Directory', icon: Truck },
 

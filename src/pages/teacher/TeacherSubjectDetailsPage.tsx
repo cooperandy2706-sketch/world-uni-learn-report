@@ -100,7 +100,8 @@ export default function TeacherSubjectDetailsPage() {
             <h1 className="t-title">
               {subject ? subject.name : 'Loading Subject...'}
             </h1>
-          {subject?.code && <span style={{ fontSize: 13, fontWeight: 700, fontFamily: 'monospace', color: '#6d28d9', background: '#f5f3ff', padding: '4px 10px', borderRadius: 6, display: 'inline-block', marginTop: 12 }}>{subject.code}</span>}
+            {subject?.code && <span style={{ fontSize: 13, fontWeight: 700, fontFamily: 'monospace', color: '#6d28d9', background: '#f5f3ff', padding: '4px 10px', borderRadius: 6, display: 'inline-block', marginTop: 12 }}>{subject.code}</span>}
+          </div>
         </div>
 
         {/* ── Content Area ── */}

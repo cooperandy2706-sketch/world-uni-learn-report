@@ -34,6 +34,31 @@ export default function ManageAccountPage() {
   const [passwordLoading, setPasswordLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const [transactionPin, setTransactionPin] = useState('')
+  const [pinSaved, setPinSaved] = useState(false)
+
+  useEffect(() => {
+    if (user?.id) {
+      const savedPin = localStorage.getItem(`bursar_pin_${user.id}`)
+      if (savedPin) {
+        setTransactionPin(savedPin)
+        setPinSaved(true)
+      }
+    }
+  }, [user])
+
+  function handleSavePin(e: React.FormEvent) {
+    e.preventDefault()
+    if (!user) return
+    if (transactionPin.length < 4) {
+      toast.error('PIN must be at least 4 characters')
+      return
+    }
+    localStorage.setItem(`bursar_pin_${user.id}`, transactionPin)
+    setPinSaved(true)
+    toast.success('Transaction PIN saved successfully!')
+  }
+
   const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty } } = useForm<FormData>({ resolver: zodResolver(schema) })
   const { register: regPwd, handleSubmit: handlePwdSubmit, reset: resetPwd, formState: { errors: pwdErrors } } = useForm<PasswordData>({ resolver: zodResolver(passwordSchema) })
 
@@ -245,6 +270,44 @@ export default function ManageAccountPage() {
               </form>
             </div>
           </div>
+
+          {/* Transaction PIN (For Bursars/Admins) */}
+          {(user?.role === 'bursar' || user?.role === 'admin' || user?.role === 'proprietor' || user?.role === 'super_admin') && (
+            <div className="acc-card">
+              <div className="acc-header">
+                <Lock size={20} color="#f59e0b" />
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0 }}>Transaction PIN Lock</h3>
+              </div>
+              <div className="acc-body">
+                <p style={{ fontSize: 13, color: '#64748b', marginBottom: 16, lineHeight: 1.5 }}>
+                  Set a secure PIN to authorize checkouts and receipt generation in the Fees portal. This protects against unauthorized payments.
+                </p>
+                <form onSubmit={handleSavePin}>
+                  <div className="input-group" style={{ maxWidth: 200 }}>
+                    <label className="input-label">4-Digit PIN</label>
+                    <input 
+                      type="password" 
+                      maxLength={6}
+                      value={transactionPin}
+                      onChange={(e) => {
+                        setTransactionPin(e.target.value)
+                        setPinSaved(false)
+                      }}
+                      className="acc-input" 
+                      style={{ letterSpacing: '0.2em', fontSize: 18, fontWeight: 700 }} 
+                      placeholder="••••" 
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 12 }}>
+                    <button type="submit" disabled={pinSaved || transactionPin.length < 4} className="acc-btn acc-btn-primary" style={{ background: pinSaved ? '#e2e8f0' : 'linear-gradient(135deg, #f59e0b, #d97706)', color: pinSaved ? '#94a3b8' : '#fff', boxShadow: pinSaved ? 'none' : '0 4px 12px rgba(245,158,11,0.2)' }}>
+                      {pinSaved ? '✓ PIN Saved' : 'Save PIN'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
         </div>
       </div>

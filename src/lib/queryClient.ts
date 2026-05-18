@@ -1,5 +1,6 @@
 // src/lib/queryClient.ts
 import { QueryClient } from '@tanstack/react-query'
+import { hydrateQueryClient, persistQueryCache } from './networkCache'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,25 +14,41 @@ export const queryClient = new QueryClient({
       gcTime: 1000 * 60 * 15,
 
       // Retry failed requests up to 3 times with exponential back-off
-      // (1 s, 2 s, 4 s) — essential for flaky mobile/Ghanaian networks.
+      // (1 s, 2 s, 4 s) — essential for flaky mobile networks.
       retry: 3,
       retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
 
-      // ── THE KEY FIXES ──────────────────────────────────────────────
-      // Re-fetch when the browser tab regains focus (catches stale data
-      // after the user switches tabs or wakes the screen).
+      // Re-fetch parameters to keep the client updated
       refetchOnWindowFocus: true,
-
-      // Re-fetch when the device comes back online after being offline.
       refetchOnReconnect: true,
-
-      // Re-fetch when the component remounts (catches navigation-related
-      // data loss when moving between pages).
       refetchOnMount: true,
     },
     mutations: {
-      retry: 1,
-      retryDelay: 1000,
+      // Retry failed mutations up to 3 times with exponential backoff
+      retry: 3,
+      retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
     },
   },
+})
+
+// ── CACHE HYDRATION & DEBOUNCED PERSISTENCE ─────────────────────────────────
+
+// Hydrate cached data stored in localStorage immediately on startup
+hydrateQueryClient(queryClient)
+
+// Track debounce timers to avoid excessive writing to disk
+let saveTimeoutId: any = null
+
+// Subscribe to QueryCache updates to automatically sync changes
+queryClient.getQueryCache().subscribe((event) => {
+  // Only persist when queries succeed or are updated
+  if (
+    event?.type === 'updated' &&
+    event.query?.state?.status === 'success'
+  ) {
+    if (saveTimeoutId) clearTimeout(saveTimeoutId)
+    saveTimeoutId = setTimeout(() => {
+      persistQueryCache(queryClient)
+    }, 1500) // Debounce by 1.5 seconds
+  }
 })

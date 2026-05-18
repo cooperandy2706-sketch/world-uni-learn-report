@@ -11,7 +11,7 @@ import toast from 'react-hot-toast'
 function BookQR({ barcode, title, size = 70 }: { barcode: string; title: string; size?: number }) {
   const encoded = encodeURIComponent(barcode)
   return (
-    <div style={{ textAlign: 'center', break: 'avoid' as any }}>
+    <div style={{ textAlign: 'center', breakInside: 'avoid' }}>
       <img
         src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}&margin=2`}
         width={size} height={size}

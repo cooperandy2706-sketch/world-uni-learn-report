@@ -1,3 +1,4 @@
+// @ts-nocheck
 // supabase/functions/attendance-reminder/index.ts
 // Supabase Edge Function to send morning register reminders to teachers
 // Cron Trigger Recommended: 0 9 * * 1-5 (9:00 AM Monday-Friday)

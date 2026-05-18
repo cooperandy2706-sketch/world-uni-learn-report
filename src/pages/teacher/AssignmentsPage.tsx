@@ -3,7 +3,6 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
-import Modal from '../../components/ui/Modal'
 import { formatDate } from '../../lib/utils'
 import toast from 'react-hot-toast'
 
@@ -356,300 +355,308 @@ export default function AssignmentsPage() {
           .assign-card { padding: 16px !important; }
           .q-card { padding: 14px !important; }
           .modal-content-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
-          .modal-sidebar { border-left: none !important; padding-left: 0 !important; border-top: 1.5px solid #f5f3ff !important; padding-top: 20px !important; }
         }
       `}</style>
 
-      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
-        
-        <div className="t-header" style={{ marginBottom: 24 }}>
-          <div>
-            <h1 className="t-title">Assignments</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage digital quizzes and tasks for your students</p>
-          </div>
-          <Btn onClick={() => setModalOpen(true)} style={{ whiteSpace: 'nowrap' }}>➕ Create Assignment</Btn>
-        </div>
+      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', maxWidth: 900, margin: '0 auto', padding: '10px 4px' }}>
+        {modalOpen ? (
+          /* ── INLINE ASSIGNMENT BUILDER VIEW ── */
+          <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #e5e7eb', padding: 20, animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid #f3f4f6', paddingBottom: 16 }}>
+              <div>
+                <button onClick={() => setModalOpen(false)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Assignments</button>
+                <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#1e293b' }}>Create New Assignment</h2>
+                <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6b7280' }}>Build a digital quiz with auto-grading features</p>
+              </div>
+              <button onClick={() => setModalOpen(false)} style={{ background: '#f3f4f6', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            </div>
 
-        {/* ── Main View Switcher ── */}
-        <div className="resp-view-switch" style={{ background: '#f5f3ff', padding: 8, borderRadius: 18, display: 'flex', gap: 8, marginBottom: 24, maxWidth: 500 }}>
-          <div onClick={() => setViewMode('class')} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'class' ? { background: '#fff', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: '#6b7280' }) }}>
-            🏫 My Class Assignments
-          </div>
-          <div onClick={() => { setViewMode('global'); setSelectedGlobalSubject(null); }} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'global' ? { background: '#fff', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: '#6b7280' }) }}>
-            🌍 Global Challenges
-          </div>
-        </div>
+            <div className="modal-content-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 24 }}>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>📋 Assignment Settings</p>
+                
+                <Field label="Assignment Title *">
+                  <StyledInput value={form.title} onChange={e => setForm(prev => ({ ...prev, title: e.target.value }))} placeholder="e.g. Mid-Term Science Quiz" style={{ fontSize: 15 }} />
+                </Field>
+                
+                <Field label="Instructions / Description">
+                  <textarea 
+                    value={form.description}
+                    onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Tell students what to expect..."
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: 9, fontSize: 14, border: '1.5px solid #e5e7eb', height: 90, fontFamily: 'inherit', resize: 'none', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </Field>
 
-        {viewMode === 'global' && selectedGlobalSubject && (
-           <button onClick={() => setSelectedGlobalSubject(null)} style={{ background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: '#374151', cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-             ← Back to Subjects
-           </button>
-        )}
-
-        {/* ── List ── */}
-        {isLoading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading assignments…</p>
-          </div>
-        ) : viewMode === 'global' && !selectedGlobalSubject ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
-            {globalSubjects.length === 0 ? (
-               <div style={{ background: '#fff', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
-                 <div style={{ fontSize: 48, marginBottom: 12 }}>🌍</div>
-                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No challenges yet!</h3>
-                 <p style={{ fontSize: 13, color: '#9ca3af' }}>The school hasn't published any global quizzes.</p>
-               </div>
-            ) : globalSubjects.map(sub => (
-              <div key={sub.id} className="assign-card" onClick={() => setSelectedGlobalSubject(sub.id)} style={{ 
-                background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
-                boxShadow: '0 2px 8px rgba(109,40,217,0.05)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.2s'
-              }}>
-                <div style={{ width: 48, height: 48, borderRadius: 14, background: '#f5f3ff', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
-                  📚
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  <Field label="Target Class *">
+                    <StyledSelect value={form.class_id} onChange={e => setForm(prev => ({ ...prev, class_id: e.target.value }))} style={{ fontSize: 15 }}>
+                      <option value="">Select class...</option>
+                      {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </StyledSelect>
+                  </Field>
+                  <Field label="Subject *">
+                    <StyledSelect value={form.subject_id} onChange={e => setForm(prev => ({ ...prev, subject_id: e.target.value }))} style={{ fontSize: 15 }}>
+                      <option value="">Select subject...</option>
+                      {availableSubjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </StyledSelect>
+                  </Field>
                 </div>
-                <div>
-                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{sub.name}</h3>
-                  <p style={{ fontSize: 13, color: '#6b7280', margin: 0, fontWeight: 600 }}>{sub.count} Quizzes Available</p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  <Field label="Due Date">
+                    <StyledInput type="datetime-local" value={form.due_date} onChange={e => setForm(prev => ({ ...prev, due_date: e.target.value }))} style={{ fontSize: 15 }} />
+                  </Field>
+                  <Field label="Timer (Minutes)">
+                    <StyledInput type="number" value={form.duration_minutes} onChange={e => setForm(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) || 0 }))} placeholder="0 = No limit" style={{ fontSize: 15 }} />
+                  </Field>
+                </div>
+
+                <div style={{ background: '#f5f3ff', padding: '14px 16px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
+                  <input type="checkbox" checked={form.shuffle_questions} onChange={e => setForm(prev => ({ ...prev, shuffle_questions: e.target.checked }))} id="shuffle" style={{ width: 18, height: 18, cursor: 'pointer' }} />
+                  <label htmlFor="shuffle" style={{ fontSize: 13, fontWeight: 700, color: '#4c1d95', cursor: 'pointer' }}>Randomize question order 🔀</label>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : viewMode === 'global' && selectedGlobalSubject ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
-             {filteredGlobal.length === 0 ? (
-               <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1/-1' }}>No quizzes here.</div>
-             ) : filteredGlobal.map((g, i) => (
-               <div key={g.id} style={{ 
-                 background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
-                 boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.3s ease ${i * 0.05}s both`,
-                 position: 'relative'
-               }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-                    <span style={{ fontSize: 10, fontWeight: 800, background: '#f5f3ff', color: '#7c3aed', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                      {g.subject?.name || 'General'}
-                    </span>
-                  </div>
-                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{g.title}</h3>
-                  <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{g.description}</p>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
-                    <div style={{ background: '#faf5ff', borderRadius: 12, padding: '10px 12px' }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{g.content?.questions?.length || 0} items</div>
-                    </div>
-                    <div style={{ background: '#f0fdf4', borderRadius: 12, padding: '10px 12px' }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>School Wide</div>
-                      <div style={{ fontSize: 13, fontWeight: 800, color: '#059669' }}>{g.total_submissions || 0} Taking</div>
-                    </div>
-                  </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', borderTop: '1px solid #f5f3ff', paddingTop: 14, gap: 10 }}>
-                     <button onClick={() => navigate(`/teacher/global-quizzes/${g.id}/take`)} style={{ padding: '6px 12px', background: '#fff', color: '#4c1d95', border: '1.5px solid #e0e7ff', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Preview Quiz</button>
-                     <button onClick={() => navigate(`/teacher/global-quizzes/${g.id}`)} style={{ padding: '6px 12px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>See My Students →</button>
+              <div style={{ maxHeight: '600px', overflowY: 'auto', paddingRight: 4 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottom: '1px solid #f3f4f6', paddingBottom: 10 }}>
+                  <p style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>❓ Questions ({form.content.questions.length})</p>
+                  <button onClick={addQuestion} style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: '#7c3aed', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer' }}>+ Add Question</button>
+                </div>
+
+                {form.content.questions.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af', background: '#f9fafb', borderRadius: 14, border: '1.5px dashed #e5e7eb' }}>
+                    <div style={{ fontSize: 32, marginBottom: 8 }}>💡</div>
+                    <p style={{ fontSize: 13, fontWeight: 600 }}>No questions added yet</p>
+                    <p style={{ fontSize: 11, color: '#9ca3af', margin: '4px 0 0' }}>Click "+ Add Question" to start building</p>
                   </div>
-               </div>
-             ))}
-          </div>
-        ) : assignments.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>📝</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No assignments created</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>Start by creating your first digital quiz for your students.</p>
-            <Btn onClick={() => setModalOpen(true)}>➕ Create First Assignment</Btn>
+                ) : (
+                  form.content.questions.map((q, qIndex) => (
+                    <div key={q.id} className="q-card" style={{ background: '#faf5ff', border: '1.5px solid #eedcff' }}>
+                      <button onClick={() => removeQuestion(q.id)} style={{ position: 'absolute', top: 12, right: 12, border: 'none', background: '#fee2e2', color: '#ef4444', width: 24, height: 24, borderRadius: '50%', cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                      
+                      <div style={{ fontSize: 10, fontWeight: 800, color: '#7c3aed', marginBottom: 8 }}>QUESTION {qIndex + 1}</div>
+                      
+                      <Field label="Question Text">
+                        <StyledInput value={q.text} onChange={e => updateQuestion(q.id, { text: e.target.value })} placeholder="Enter your question..." style={{ fontSize: 15 }} />
+                      </Field>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 10, marginBottom: 12 }}>
+                        <Field label="Type">
+                          <StyledSelect value={q.type} onChange={e => updateQuestion(q.id, { type: e.target.value as any })}>
+                            <option value="mcq">Multiple Choice</option>
+                            <option value="tf">True / False</option>
+                            <option value="short">Short Answer</option>
+                          </StyledSelect>
+                        </Field>
+                        <Field label="Points">
+                          <StyledInput type="number" value={q.points} onChange={e => updateQuestion(q.id, { points: parseInt(e.target.value) || 1 })} style={{ fontSize: 15 }} />
+                        </Field>
+                      </div>
+
+                      {q.type === 'mcq' && (
+                        <div style={{ marginTop: 10 }}>
+                          <FieldLabel>Options & Correct Answer</FieldLabel>
+                          {q.options.map((opt, oIndex) => (
+                            <div key={oIndex} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                              <input 
+                                type="radio" 
+                                name={`correct-${q.id}`} 
+                                checked={q.correctAnswer === opt && opt !== ''} 
+                                onChange={() => updateQuestion(q.id, { correctAnswer: opt })}
+                                style={{ width: 16, height: 16, cursor: 'pointer' }}
+                              />
+                              <StyledInput 
+                                value={opt} 
+                                onChange={e => {
+                                  const newOpts = [...q.options]
+                                  newOpts[oIndex] = e.target.value
+                                  updateQuestion(q.id, { options: newOpts })
+                                }} 
+                                placeholder={`Option ${String.fromCharCode(65 + oIndex)}`}
+                                style={{ padding: '8px 10px', fontSize: 14 }}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {q.type === 'tf' && (
+                        <div>
+                          <FieldLabel>Correct Answer</FieldLabel>
+                          <StyledSelect value={q.correctAnswer} onChange={e => updateQuestion(q.id, { correctAnswer: e.target.value })}>
+                            <option value="">Select...</option>
+                            <option value="True">True</option>
+                            <option value="False">False</option>
+                          </StyledSelect>
+                        </div>
+                      )}
+
+                      {q.type === 'short' && (
+                        <Field label="Correct Keyword (Auto-grade)">
+                          <StyledInput value={q.correctAnswer} onChange={e => updateQuestion(q.id, { correctAnswer: e.target.value })} placeholder="The exact answer students must type" style={{ fontSize: 14 }} />
+                        </Field>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', borderTop: '1px solid #f3f4f6', paddingTop: 16, marginTop: 24 }}>
+              <Btn variant="secondary" onClick={() => setModalOpen(false)}>Cancel & Go Back</Btn>
+              <Btn onClick={handleSubmit} loading={isSubmitting}>Publish Assignment 📤</Btn>
+            </div>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
-            {assignments.map((a, i) => (
-              <div key={a.id} style={{ 
-                background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
-                boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.3s ease ${i * 0.05}s both`,
-                position: 'relative'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-                  <span style={{ fontSize: 10, fontWeight: 800, background: '#f5f3ff', color: '#7c3aed', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                    {a.subject?.name}
-                  </span>
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={() => handleDelete(a.id)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, color: '#f87171' }}>🗑️</button>
-                  </div>
-                </div>
-                
-                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{a.title}</h3>
-                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 16 }}>Class: <span style={{ fontWeight: 700, color: '#4c1d95' }}>{a.class?.name}</span></div>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
-                  <div style={{ background: '#faf5ff', borderRadius: 12, padding: '10px 12px' }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Submissions</div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{a.submission_count} Submitted</div>
-                  </div>
-                  <div style={{ background: '#f0fdf4', borderRadius: 12, padding: '10px 12px' }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: '#059669' }}>{a.content?.questions?.length || 0} items</div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f5f3ff', paddingTop: 14 }}>
-                  <div style={{ fontSize: 11, color: '#9ca3af' }}>
-                    {a.due_date ? `Due: ${formatDate(a.due_date)}` : 'No due date'}
-                  </div>
-                  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    {a.duration_minutes > 0 && (
-                      <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 4 }}>
-                         ⏱️ {a.duration_minutes}m limit
-                      </div>
-                    )}
-                    <button onClick={() => navigate(`/teacher/assignments/${a.id}`)} style={{ padding: '6px 12px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#6d28d9'} onMouseLeave={e => e.currentTarget.style.background = '#7c3aed'}>View Submissions →</button>
-                  </div>
-                </div>
+          /* ── REGULAR ASSIGNMENT LIST VIEW ── */
+          <>
+            <div className="t-header" style={{ marginBottom: 24 }}>
+              <div>
+                <h1 className="t-title">Assignments</h1>
+                <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage digital quizzes and tasks for your students</p>
               </div>
-            ))}
-          </div>
-        )}
+              <Btn onClick={() => setModalOpen(true)} style={{ whiteSpace: 'nowrap' }}>➕ Create Assignment</Btn>
+            </div>
 
-        {/* ── CREATE MODAL ── */}
-        <Modal 
-          open={modalOpen} 
-          onClose={() => setModalOpen(false)} 
-          title="Create New Assignment" 
-          subtitle="Build a digital quiz with auto-grading features"
-          size="lg"
-          footer={<>
-            <Btn variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Btn>
-            <Btn onClick={handleSubmit} loading={isSubmitting}>Publish Assignment</Btn>
-          </>}
-        >
-          <div className="modal-content-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 24 }}>
-            <div>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>📋 Assignment Details</p>
-              
-              <Field label="Assignment Title *">
-                <StyledInput value={form.title} onChange={e => setForm(prev => ({ ...prev, title: e.target.value }))} placeholder="e.g. Mid-Term Science Quiz" />
-              </Field>
-              
-              <Field label="Instructions / Description">
-                <textarea 
-                  value={form.description}
-                  onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Tell students what to expect..."
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', height: 80, fontFamily: 'inherit', resize: 'none' }}
-                />
-              </Field>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <Field label="Target Class *">
-                  <StyledSelect value={form.class_id} onChange={e => setForm(prev => ({ ...prev, class_id: e.target.value }))}>
-                    <option value="">Select class...</option>
-                    {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </StyledSelect>
-                </Field>
-                <Field label="Subject *">
-                  <StyledSelect value={form.subject_id} onChange={e => setForm(prev => ({ ...prev, subject_id: e.target.value }))}>
-                    <option value="">Select subject...</option>
-                    {availableSubjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                  </StyledSelect>
-                </Field>
+            {/* ── Main View Switcher ── */}
+            <div className="resp-view-switch" style={{ background: '#f5f3ff', padding: 8, borderRadius: 18, display: 'flex', gap: 8, marginBottom: 24, maxWidth: 500 }}>
+              <div onClick={() => setViewMode('class')} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'class' ? { background: '#fff', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: '#6b7280' }) }}>
+                🏫 My Class Assignments
               </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <Field label="Due Date">
-                  <StyledInput type="datetime-local" value={form.due_date} onChange={e => setForm(prev => ({ ...prev, due_date: e.target.value }))} />
-                </Field>
-                <Field label="Timer (Minutes)">
-                  <StyledInput type="number" value={form.duration_minutes} onChange={e => setForm(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) || 0 }))} placeholder="0 = No limit" />
-                </Field>
-              </div>
-
-              <div style={{ background: '#f5f3ff', padding: '12px 16px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <input type="checkbox" checked={form.shuffle_questions} onChange={e => setForm(prev => ({ ...prev, shuffle_questions: e.target.checked }))} id="shuffle" />
-                <label htmlFor="shuffle" style={{ fontSize: 13, fontWeight: 600, color: '#4c1d95', cursor: 'pointer' }}>Randomize question order for each student 🔀</label>
+              <div onClick={() => { setViewMode('global'); setSelectedGlobalSubject(null); }} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'global' ? { background: '#fff', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: '#6b7280' }) }}>
+                🌍 Global Challenges
               </div>
             </div>
 
-            <div className="modal-sidebar" style={{ borderLeft: '1.5px solid #f5f3ff', paddingLeft: 24, maxHeight: '600px', overflowY: 'auto' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>❓ Questions ({form.content.questions.length})</p>
-                <button onClick={addQuestion} style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: '#7c3aed', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer' }}>+ Add</button>
+            {viewMode === 'global' && selectedGlobalSubject && (
+               <button onClick={() => setSelectedGlobalSubject(null)} style={{ background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: '#374151', cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                 ← Back to Subjects
+               </button>
+            )}
+
+            {/* ── List ── */}
+            {isLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
+                <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading assignments…</p>
               </div>
-
-              {form.content.questions.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: '#9ca3af' }}>
-                  <div style={{ fontSize: 24, marginBottom: 8 }}>💡</div>
-                  <p style={{ fontSize: 12 }}>Click "+ Add" to create your first question</p>
-                </div>
-              ) : (
-                form.content.questions.map((q, qIndex) => (
-                  <div key={q.id} className="q-card">
-                    <button onClick={() => removeQuestion(q.id)} style={{ position: 'absolute', top: 12, right: 12, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 12 }}>❌</button>
-                    
-                    <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', marginBottom: 8 }}>QUESTION {qIndex + 1}</div>
-                    
-                    <Field label="Question Text">
-                      <StyledInput value={q.text} onChange={e => updateQuestion(q.id, { text: e.target.value })} placeholder="Enter your question..." />
-                    </Field>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 10, marginBottom: 12 }}>
-                      <Field label="Type">
-                        <StyledSelect value={q.type} onChange={e => updateQuestion(q.id, { type: e.target.value as any })}>
-                          <option value="mcq">Multiple Choice</option>
-                          <option value="tf">True / False</option>
-                          <option value="short">Short Answer</option>
-                        </StyledSelect>
-                      </Field>
-                      <Field label="Points">
-                        <StyledInput type="number" value={q.points} onChange={e => updateQuestion(q.id, { points: parseInt(e.target.value) || 1 })} />
-                      </Field>
+            ) : viewMode === 'global' && !selectedGlobalSubject ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+                {globalSubjects.length === 0 ? (
+                   <div style={{ background: '#fff', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
+                     <div style={{ fontSize: 48, marginBottom: 12 }}>🌍</div>
+                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No challenges yet!</h3>
+                     <p style={{ fontSize: 13, color: '#9ca3af' }}>The school hasn't published any global quizzes.</p>
+                   </div>
+                ) : globalSubjects.map(sub => (
+                  <div key={sub.id} className="assign-card" onClick={() => setSelectedGlobalSubject(sub.id)} style={{ 
+                    background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
+                    boxShadow: '0 2px 8px rgba(109,40,217,0.05)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.2s'
+                  }}>
+                    <div style={{ width: 48, height: 48, borderRadius: 14, background: '#f5f3ff', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+                      📚
                     </div>
-
-                    {q.type === 'mcq' && (
-                      <div style={{ marginTop: 10 }}>
-                        <FieldLabel>Options & Correct Answer</FieldLabel>
-                        {q.options.map((opt, oIndex) => (
-                          <div key={oIndex} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                            <input 
-                              type="radio" 
-                              name={`correct-${q.id}`} 
-                              checked={q.correctAnswer === opt && opt !== ''} 
-                              onChange={() => updateQuestion(q.id, { correctAnswer: opt })}
-                            />
-                            <StyledInput 
-                              value={opt} 
-                              onChange={e => {
-                                const newOpts = [...q.options]
-                                newOpts[oIndex] = e.target.value
-                                updateQuestion(q.id, { options: newOpts })
-                              }} 
-                              placeholder={`Option ${String.fromCharCode(65 + oIndex)}`}
-                              style={{ padding: '6px 10px' }}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {q.type === 'tf' && (
-                      <div>
-                        <FieldLabel>Correct Answer</FieldLabel>
-                        <StyledSelect value={q.correctAnswer} onChange={e => updateQuestion(q.id, { correctAnswer: e.target.value })}>
-                          <option value="">Select...</option>
-                          <option value="True">True</option>
-                          <option value="False">False</option>
-                        </StyledSelect>
-                      </div>
-                    )}
-
-                    {q.type === 'short' && (
-                      <Field label="Correct Keyword (Auto-grade)">
-                        <StyledInput value={q.correctAnswer} onChange={e => updateQuestion(q.id, { correctAnswer: e.target.value })} placeholder="The exact answer students must type" />
-                      </Field>
-                    )}
+                    <div>
+                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{sub.name}</h3>
+                      <p style={{ fontSize: 13, color: '#6b7280', margin: 0, fontWeight: 600 }}>{sub.count} Quizzes Available</p>
+                    </div>
                   </div>
-                ))
-              )}
-            </div>
-          </div>
-        </Modal>
-
+                ))}
+              </div>
+            ) : viewMode === 'global' && selectedGlobalSubject ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
+                 {filteredGlobal.length === 0 ? (
+                   <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1/-1' }}>No quizzes here.</div>
+                 ) : filteredGlobal.map((g, i) => (
+                   <div key={g.id} style={{ 
+                     background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
+                     boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.3s ease ${i * 0.05}s both`,
+                     position: 'relative'
+                   }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+                        <span style={{ fontSize: 10, fontWeight: 800, background: '#f5f3ff', color: '#7c3aed', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                          {g.subject?.name || 'General'}
+                        </span>
+                      </div>
+                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{g.title}</h3>
+                      <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{g.description}</p>
+                      
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
+                        <div style={{ background: '#faf5ff', borderRadius: 12, padding: '10px 12px' }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{g.content?.questions?.length || 0} items</div>
+                        </div>
+                        <div style={{ background: '#f0fdf4', borderRadius: 12, padding: '10px 12px' }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>School Wide</div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: '#059669' }}>{g.total_submissions || 0} Taking</div>
+                        </div>
+                      </div>
+ 
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', borderTop: '1px solid #f5f3ff', paddingTop: 14, gap: 10 }}>
+                         <button onClick={() => navigate(`/teacher/global-quizzes/${g.id}/take`)} style={{ padding: '6px 12px', background: '#fff', color: '#4c1d95', border: '1.5px solid #e0e7ff', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Preview Quiz</button>
+                         <button onClick={() => navigate(`/teacher/global-quizzes/${g.id}`)} style={{ padding: '6px 12px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>See My Students →</button>
+                      </div>
+                   </div>
+                 ))}
+              </div>
+            ) : assignments.length === 0 ? (
+              <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+                <div style={{ fontSize: 48, marginBottom: 12 }}>📝</div>
+                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No assignments created</h3>
+                <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>Start by creating your first digital quiz for your students.</p>
+                <Btn onClick={() => setModalOpen(true)}>➕ Create First Assignment</Btn>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
+                {assignments.map((a, i) => (
+                  <div key={a.id} style={{ 
+                    background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
+                    boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.3s ease ${i * 0.05}s both`,
+                    position: 'relative'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, background: '#f5f3ff', color: '#7c3aed', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        {a.subject?.name}
+                      </span>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <button onClick={() => handleDelete(a.id)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, color: '#f87171' }}>🗑️</button>
+                      </div>
+                    </div>
+                    
+                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{a.title}</h3>
+                    <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 16 }}>Class: <span style={{ fontWeight: 700, color: '#4c1d95' }}>{a.class?.name}</span></div>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
+                      <div style={{ background: '#faf5ff', borderRadius: 12, padding: '10px 12px' }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Submissions</div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{a.submission_count} Submitted</div>
+                      </div>
+                      <div style={{ background: '#f0fdf4', borderRadius: 12, padding: '10px 12px' }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: '#059669' }}>{a.content?.questions?.length || 0} items</div>
+                      </div>
+                    </div>
+ 
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f5f3ff', paddingTop: 14 }}>
+                      <div style={{ fontSize: 11, color: '#9ca3af' }}>
+                        {a.due_date ? `Due: ${formatDate(a.due_date)}` : 'No due date'}
+                      </div>
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        {a.duration_minutes > 0 && (
+                          <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 4 }}>
+                             ⏱️ {a.duration_minutes}m limit
+                          </div>
+                        )}
+                        <button onClick={() => navigate(`/teacher/assignments/${a.id}`)} style={{ padding: '6px 12px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#6d28d9'} onMouseLeave={e => e.currentTarget.style.background = '#7c3aed'}>View Submissions →</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </div>
     </>
   )

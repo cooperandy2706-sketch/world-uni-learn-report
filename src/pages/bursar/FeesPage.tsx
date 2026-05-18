@@ -10,7 +10,7 @@ import { inventoryService } from '../../services/inventory.service'
 import { supabase } from '../../lib/supabase'
 import Modal from '../../components/ui/Modal'
 import toast from 'react-hot-toast'
-import { Plus, Trash2, Printer, CreditCard, Settings, GraduationCap, MessageCircle, Mail, Smartphone, AlertTriangle, CheckCircle2, Send, Loader2, Download, Bell, ShoppingCart, History, Trash, Minus, Search, Users } from 'lucide-react'
+import { Plus, Trash2, Printer, CreditCard, Settings, GraduationCap, MessageCircle, Mail, Smartphone, AlertTriangle, CheckCircle2, Send, Loader2, Download, Bell, ShoppingCart, History, Trash, Minus, Search, Users, Check, Lock, Shield, X, Coins } from 'lucide-react'
 import { formatCurrency } from '../../utils/currency'
 
 const METHODS = ['cash', 'momo', 'bank', 'cheque'] as const
@@ -63,15 +63,7 @@ export default function FeesPage() {
   const [storeSearch, setStoreSearch] = useState('')
   const [searchParams] = useSearchParams()
 
-  // ── Deep-link: ?student=desmond pre-populates search & auto-selects ──────────
-  useEffect(() => {
-    const hint = searchParams.get('student')
-    if (hint) {
-      setStudentSearch(hint)
-      setTab('record')
-    }
-  }, [searchParams])
-
+  // ── 1. Foundational Supabase & React Query Data Fetching ────────────────
   // Fee structures
   const { data: structures = [], isLoading: loadingStructures } = useQuery({
     queryKey: ['fee-structures', schoolId, term?.id],
@@ -102,8 +94,139 @@ export default function FeesPage() {
     staleTime: 0,
   })
 
+  // ── 2. Payment Form state declared early to avoid TDZ reference errors ──
+  const [pf, setPf] = useState({ 
+    student_id: '', 
+    fee_structure_id: '', 
+    selected_fee_ids: [] as string[], 
+    amount_paid: '', 
+    currency_code: 'GHS', 
+    payment_method: 'cash' as typeof METHODS[number], 
+    reference_number: '', 
+    notes: '', 
+    payment_date: new Date().toISOString().split('T')[0] 
+  })
+
   const schoolCurrency = school?.currency_code || 'GHS'
   const CUR = (n: number) => formatCurrency(n, schoolCurrency)
+
+  useEffect(() => {
+    if (schoolCurrency) {
+      setPf(p => ({ ...p, currency_code: schoolCurrency }))
+    }
+  }, [schoolCurrency])
+
+  // ── 3. FX rates & Currency Auto-conversion ───────────────────────────
+  const [fxRates, setFxRates] = useState<Record<string, number>>({})
+  const [fxLoading, setFxLoading] = useState(false)
+
+  useEffect(() => {
+    async function fetchRates() {
+      setFxLoading(true)
+      try {
+        const res = await fetch('https://open.er-api.com/v6/latest/USD')
+        const data = await res.json()
+        if (data && data.rates) {
+          setFxRates(data.rates)
+        }
+      } catch (err) {
+        console.error('Failed to fetch FX rates, using fallback', err)
+        setFxRates({ GHS: 15.0, USD: 1.0, EUR: 0.92, GBP: 0.79, NGN: 1500 })
+      } finally {
+        setFxLoading(false)
+      }
+    }
+    fetchRates()
+  }, [])
+
+  function convertCurrencyAmount(amountStr: string, fromCode: string, toCode: string) {
+    const amount = parseFloat(amountStr)
+    if (isNaN(amount) || amount <= 0) return ''
+    if (fromCode === toCode) return amountStr
+    if (!fxRates[fromCode] || !fxRates[toCode]) return amountStr
+    const amountInUSD = amount / fxRates[fromCode]
+    const convertedAmount = amountInUSD * fxRates[toCode]
+    return convertedAmount.toFixed(2)
+  }
+
+  // ── 4. Transaction PIN Lock States ───────────────────────────────────
+  const [showPinModal, setShowPinModal] = useState(false)
+  const [pinInput, setPinInput] = useState('')
+  const pinInputRef = useState<any>(null) // We will use a standard callback or input reference
+
+  // ── 5. Dynamic Fee Item Status & Allocation Calculator ───────────────
+  const feeStatusInfo = useMemo(() => {
+    if (!pf.student_id) return {}
+    const sel = (students as any[]).find((s: any) => s.id === pf.student_id)
+    if (!sel) return {}
+
+    const classStrs = structures.filter((x: any) => x.class_id === sel.class?.id)
+    const stuPayments = (payments as any[]).filter((p: any) => p.student_id === sel.id)
+    
+    // Total paid that went to current term charges (amount_paid - arrears_paid)
+    const totalPaidCurrentTerm = stuPayments.reduce((acc, p: any) => {
+      const arrPaid = Number(p.arrears_paid || 0)
+      return acc + (Number(p.amount_paid) - arrPaid)
+    }, 0)
+
+    // Distribute the totalPaidCurrentTerm across the term's class structures sequentially
+    let remainingPool = totalPaidCurrentTerm
+    const allocations: Record<string, { paid: number; status: 'cleared' | 'partial' | 'unpaid'; net: number }> = {}
+
+    classStrs.forEach((s: any) => {
+      const pct = sel.scholarship_percentage || 0
+      const isDiscountable = s.is_discountable !== false
+      const net = isDiscountable ? (s.amount || 0) * (1 - pct / 100) : (s.amount || 0)
+
+      if (remainingPool >= net) {
+        allocations[s.id] = { paid: net, status: 'cleared', net }
+        remainingPool -= net
+      } else if (remainingPool > 0) {
+        allocations[s.id] = { paid: remainingPool, status: 'partial', net }
+        remainingPool = 0
+      } else {
+        allocations[s.id] = { paid: 0, status: 'unpaid', net }
+      }
+    })
+
+    return allocations
+  }, [pf.student_id, students, structures, payments])
+
+  const selectedFeesSum = useMemo(() => {
+    let sum = 0
+    const sel = (students as any[]).find((s: any) => s.id === pf.student_id)
+    if (!sel) return 0
+
+    pf.selected_fee_ids.forEach(id => {
+      if (id === 'arrears') {
+        sum += Number(sel.fees_arrears || 0)
+      } else {
+        const info = feeStatusInfo[id]
+        if (info) {
+          sum += (info.net - info.paid)
+        }
+      }
+    })
+    return sum
+  }, [pf.selected_fee_ids, pf.student_id, students, feeStatusInfo])
+
+  // Automatically update the amount field when selected fee checkboxes change
+  useEffect(() => {
+    if (selectedFeesSum > 0) {
+      setPf(p => ({ ...p, amount_paid: selectedFeesSum.toFixed(2) }))
+    } else {
+      setPf(p => ({ ...p, amount_paid: '' }))
+    }
+  }, [selectedFeesSum])
+
+  // ── Deep-link: ?student=desmond pre-populates search & auto-selects ──────────
+  useEffect(() => {
+    const hint = searchParams.get('student')
+    if (hint) {
+      setStudentSearch(hint)
+      setTab('record')
+    }
+  }, [searchParams])
 
   // Inventory items
   const { data: inventoryItems = [] } = useQuery({
@@ -211,8 +334,7 @@ export default function FeesPage() {
     }
   }
 
-  // ── Payment form ───────────────────────────────────────────────
-  const [pf, setPf] = useState({ student_id: '', fee_structure_id: '', selected_fee_ids: [] as string[], amount_paid: '', currency_code: schoolCurrency, payment_method: 'cash' as typeof METHODS[number], reference_number: '', notes: '', payment_date: new Date().toISOString().split('T')[0] })
+  // ── Payment form (state declared at the top of rendering context) ──
   const recordPayment = useMutation({
     mutationFn: (d: any) => feePaymentsService.createWithAllocation(d),
     onSuccess: (res) => {
@@ -275,6 +397,31 @@ export default function FeesPage() {
     
     // Reset selection state after mutation (onSuccess handles the rest)
     setPf(p => ({ ...p, selected_fee_ids: [] }))
+  }
+
+  function initiatePayment() {
+    if (!pf.student_id || !pf.amount_paid) { toast.error('Select student and enter amount'); return }
+    const savedPin = localStorage.getItem(`bursar_pin_${user?.id}`)
+    if (savedPin) {
+      setShowPinModal(true)
+      setPinInput('')
+    } else {
+      handleRecordPayment()
+    }
+  }
+
+  function confirmPinPayment(e: React.FormEvent) {
+    e.preventDefault()
+    if (!user) return
+    const savedPin = localStorage.getItem(`bursar_pin_${user.id}`)
+    if (pinInput === savedPin) {
+      setShowPinModal(false)
+      setPinInput('')
+      handleRecordPayment()
+    } else {
+      toast.error('❌ Invalid Transaction PIN. Please try again.')
+      setPinInput('')
+    }
   }
 
   async function sendReceiptSMS(payment: any) {
@@ -690,6 +837,150 @@ export default function FeesPage() {
     win.document.close()
   }
 
+  function handlePrintSimplified(payment: any) {
+    const stu = students.find((s: any) => s.id === payment.student_id) as any
+    const win = window.open('', '_blank', 'width=800,height=900')
+    if (!win) return
+
+    const arrPaid = Number(payment.arrears_paid || 0)
+    const arrRemain = Number(payment.arrears_balance_after || 0)
+    const currentPaid = Number(payment.amount_paid) - arrPaid
+
+    // Financial Summary
+    const classStructures = structures.filter((s: any) => s.class_id === stu?.class?.id)
+    const termCharges = classStructures.reduce((acc, s: any) => acc + (s.amount || 0), 0)
+    const prevPayments = (payments as any[]).filter((p: any) => p.student_id === stu?.id && p.id !== payment.id)
+    const totalPaidBeforeCurrent = prevPayments.reduce((acc, p: any) => acc + (p.amount_paid || 0), 0)
+    const totalArrearsPaidBefore = prevPayments.reduce((acc, p: any) => acc + (p.arrears_paid || 0), 0)
+    
+    const totalPaidToDate = totalPaidBeforeCurrent + Number(payment.amount_paid)
+    const totalArrearsPaidToDate = totalArrearsPaidBefore + arrPaid
+    
+    // Scholarship effect
+    const pct = stu?.scholarship_percentage || 0
+    const netTermCharges = termCharges * (1 - (pct / 100))
+    
+    const openingArrears = Number(stu?.fees_arrears || 0) + totalArrearsPaidToDate
+    const totalBill = openingArrears + netTermCharges
+    const finalBalance = totalBill - totalPaidToDate
+
+    const logoHtml = school?.logo_url 
+      ? `<img src="${school.logo_url}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #ffffff; padding: 2px; border: 1px solid #ede9fe;" />`
+      : CREST_SVG
+
+    const buildReceiptHTML = (type: string) => `
+      <div style="padding: 24px; max-width: 420px; margin: 0 auto; background: #ffffff; box-sizing: border-box; border: 1.5px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); position: relative; overflow: hidden; height: 130mm; display: flex; flex-direction: column; justify-content: space-between;">
+        <!-- Watermark -->
+        <div style="position: absolute; top: 10%; left: 50%; transform: translate(-50%, -10%) rotate(-10deg); font-size: 60px; font-weight: 900; color: rgba(76, 29, 149, 0.02); white-space: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
+
+        <div style="position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="font-size: 8px; font-weight: 800; color: #6d28d9; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 12px; text-align: center; background: #f5f3ff; padding: 4px 0; border-radius: 6px;">${type}</div>
+            
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px; border-bottom: 1.5px solid #ede9fe; padding-bottom: 14px;">
+              <div style="flex-shrink: 0;">${logoHtml}</div>
+              <div style="flex: 1;">
+                <div style="font-size: 17px; font-weight: 900; color: #1e0646; line-height: 1.2; font-family:'Playfair Display',serif;">${school?.name || 'School Fee Receipt'}</div>
+                ${school?.phone ? `<div style="font-size: 9px; color: #6b7280; margin-top: 3px; display: flex; align-items: center; gap: 4px;"><span>📞</span> ${school.phone}</div>` : ''}
+              </div>
+            </div>
+
+            <div style="margin-bottom: 18px; font-size: 11px; color: #374151; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; background: #f8fafc; padding: 12px; border-radius: 10px;">
+              <div>
+                <span style="color: #6b7280; font-size: 8px; text-transform: uppercase; display: block; font-weight: 800; letter-spacing: 0.05em; margin-bottom: 2px;">Student</span>
+                <strong style="font-size: 12px; color: #111827;">${stu?.full_name ?? '—'}</strong>
+                <span style="color: #6d28d9; font-weight: 700; font-size: 9px; display: block; margin-top: 1px;">${(stu?.class as any)?.name ?? '—'} &middot; ${stu?.student_id || 'N/A'}</span>
+              </div>
+              <div style="text-align: right;">
+                <span style="color: #6b7280; font-size: 8px; text-transform: uppercase; display: block; font-weight: 800; letter-spacing: 0.05em; margin-bottom: 2px;">Receipt Info</span>
+                <strong style="color: #111827; font-size: 11px;">#${payment.id?.slice(0, 8).toUpperCase()}</strong>
+                <span style="color: #6b7280; display: block; font-size: 9px; margin-top: 1px;">${new Date(payment.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+              </div>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 12px; padding: 14px 18px; color: #ffffff; margin-bottom: 18px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 10px; margin-bottom: 10px;">
+                <div>
+                  <div style="font-size: 9px; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Amount Paid</div>
+                  <div style="font-size: 20px; font-weight: 900;">${CUR(payment.amount_paid)}</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 9px; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">${finalBalance < 0 ? 'Credit Balance' : 'Outstanding Balance'}</div>
+                  <div style="font-size: 16px; font-weight: 900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'};">${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}</div>
+                </div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 10px; opacity: 0.9;">
+                <span>Method: <strong style="text-transform: uppercase;">${payment.payment_method}</strong></span>
+                ${payment.reference_number ? `<span>Ref: <strong>${payment.reference_number}</strong></span>` : ''}
+              </div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1.5px solid #ede9fe; border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; font-size: 11px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #475569;">
+                <span>Current Term Bill:</span>
+                <strong style="color: #1e293b;">${CUR(netTermCharges)}</strong>
+              </div>
+              ${arrPaid > 0 ? `
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #dc2626; font-weight: 600;">
+                <span>Arrears Paid:</span>
+                <span>-${CUR(arrPaid)}</span>
+              </div>` : ''}
+              <div style="display: flex; justify-content: space-between; color: #16a34a; font-weight: 700; border-top: 1.5px dashed #ede9fe; padding-top: 6px; margin-top: 4px;">
+                <span>Total Credited:</span>
+                <span>${CUR(payment.amount_paid)}</span>
+              </div>
+            </div>
+
+            ${payment.notes ? `
+            <div style="background: #fdfbf7; border: 1.5px solid #fef3c7; border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; font-size: 10px; color: #78350f;">
+              <span style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px;">Payment Notes</span>
+              <div style="line-height: 1.4; font-weight: 500;">${payment.notes}</div>
+            </div>` : ''}
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; margin-top: 12px; padding: 0 10px; border-top: 1px dashed #cbd5e1; padding-top: 14px; margin-bottom: 8px;">
+              <div style="text-align: center; width: 140px;">
+                <div style="font-size: 10px; color: #94a3b8; margin-bottom: 2px;">...........................</div>
+                <div style="font-size: 9px; font-weight: 800; color: #475569; text-transform: uppercase;">Bursar Signature</div>
+              </div>
+              <div style="text-align: center; width: 140px;">
+                <div style="font-size: 10px; color: #94a3b8; margin-bottom: 2px;">...........................</div>
+                <div style="font-size: 9px; font-weight: 800; color: #475569; text-transform: uppercase;">Payer Signature</div>
+              </div>
+            </div>
+
+            <div style="text-align: center; font-size: 8.5px; color: #94a3b8;">
+              Electronically generated receipt. Thank you.
+            </div>
+          </div>
+        </div>
+      </div>
+    `
+
+    win.document.write(`<!DOCTYPE html><html><head><title>Receipt - ${stu?.full_name ?? ''}</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+      <style>
+        @page { size: A4; margin: 0; }
+        body{font-family:'DM Sans',sans-serif;margin:0;padding:0;background:#fff; width: 210mm; height: 297mm;} 
+        @media print{
+          body{padding:0;background:#fff;}
+          button{display:none;}
+        }
+        .container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; }
+      </style>
+      </head><body onload="setTimeout(() => window.print(), 500)">
+        <div class="container">
+          ${buildReceiptHTML('Original \u2014 Simplified Parent Copy')}
+          <div style="border-top:1px dashed #cbd5e1; width:420px; margin: 15px 0; position:relative;"></div>
+          ${buildReceiptHTML('Duplicate \u2014 Simplified School Copy')}
+        </div>
+      </body></html>`)
+    win.document.close()
+  }
+
   function handlePrintBatch() {
     // ...
   }
@@ -743,246 +1034,584 @@ export default function FeesPage() {
 
         {/* ── RECORD PAYMENT TAB ── */}
         {tab === 'record' && (
-          <div style={{ background: '#fff', borderRadius: 18, padding: 28, border: '1.5px solid #f0eefe', maxWidth: 560, boxShadow: '0 2px 12px rgba(109,40,217,.07)' }}>
-            <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 20px' }}>Record a Fee Payment</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr 360px', gap: 24, alignItems: 'start', position: 'relative', minHeight: '680px' }}>
+            
+            {/* COLUMN 1: STUDENT FINDER */}
+            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 20, boxShadow: '0 2px 12px rgba(109,40,217,.04)', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ background: '#f5f3ff', borderRadius: 8, padding: 8, color: '#6d28d9' }}>
+                  <Users size={18} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 14, fontWeight: 800, color: '#111827', margin: 0 }}>Student Finder</h3>
+                  <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>Select student to allocate fees</p>
+                </div>
+              </div>
 
-            {/* Student financial info banners */}
-            {(() => {
-              const sel = (students as any[]).find((s: any) => s.id === pf.student_id)
-              if (!sel) return null
-              const arrears = Number(sel.fees_arrears || 0)
-              const hasScholarship = sel.scholarship_type && sel.scholarship_type !== 'none'
-              const pct = sel.scholarship_percentage || 0
-              const feeStruct = pf.fee_structure_id ? (structures as any[]).find((s: any) => s.id === pf.fee_structure_id) : null
-              const gross = feeStruct?.amount || 0
-              const discount = gross * (pct / 100)
-              const net = gross - discount
-              const payAmt = Number(pf.amount_paid || 0)
-              const arrearsWillPay = Math.min(payAmt, arrears)
-              const currentWillPay = payAmt - arrearsWillPay
-              return (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+              <div style={{ position: 'relative' }}>
+                <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+                <input
+                  placeholder="Type student name or ID..."
+                  value={studentSearch}
+                  onChange={e => setStudentSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px 10px 36px',
+                    borderRadius: 10,
+                    border: '1.5px solid #e5e7eb',
+                    fontSize: 13,
+                    outline: 'none',
+                    fontFamily: '"DM Sans",sans-serif',
+                    boxSizing: 'border-box',
+                    transition: 'all 0.15s',
+                    background: '#f9fafb'
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#7c3aed'}
+                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                />
+              </div>
+
+              <div style={{ maxHeight: 520, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 4 }}>
+                {filteredStudents.map((s: any) => {
+                  const isSelected = pf.student_id === s.id;
+                  
+                  // Calculate student balance
+                  const classStrs = structures.filter((x: any) => x.class_id === s.class?.id);
+                  const netTermCharges = classStrs.reduce((a, b: any) => {
+                    const discount = b.is_discountable !== false ? (s.scholarship_percentage || 0) / 100 : 0;
+                    return a + (b.amount || 0) * (1 - discount);
+                  }, 0);
+                  const stuPayments = (payments as any[]).filter((p: any) => p.student_id === s.id);
+                  const totalPaid = stuPayments.reduce((a, b: any) => a + (b.amount_paid || 0), 0);
+                  const arrearsPaid = stuPayments.reduce((a, b: any) => a + (b.arrears_paid || 0), 0);
+                  const openingArrears = Number(s.fees_arrears || 0) + arrearsPaid;
+                  const totalBill = openingArrears + netTermCharges;
+                  const balance = totalBill - totalPaid;
+
+                  return (
+                    <div
+                      key={s.id}
+                      onClick={() => setPf(prev => ({ ...prev, student_id: s.id, selected_fee_ids: [] }))}
+                      style={{
+                        padding: '12px 14px',
+                        borderRadius: 12,
+                        border: isSelected ? '2px solid #7c3aed' : '1.5px solid #f3f4f6',
+                        background: isSelected ? '#f5f3ff' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                        position: 'relative',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 4
+                      }}
+                    >
+                      {isSelected && (
+                        <div style={{ position: 'absolute', top: 12, right: 12, background: '#7c3aed', borderRadius: '50%', padding: 2, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Check size={10} strokeWidth={3} />
+                        </div>
+                      )}
+                      <div style={{ fontSize: 13, fontWeight: 700, color: isSelected ? '#6d28d9' : '#1f2937', paddingRight: 18 }}>
+                        {s.full_name}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#9ca3af' }}>
+                        {(s.class as any)?.name ?? 'No Class'} &middot; {s.student_id || 'No ID'}
+                      </div>
+                      
+                      <div style={{ marginTop: 4 }}>
+                        {balance <= 0 ? (
+                          <span style={{ fontSize: 10, fontWeight: 700, color: '#16a34a', background: '#f0fdf4', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>
+                            ✓ CLEARED
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: 10, fontWeight: 700, color: '#dc2626', background: '#fef2f2', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>
+                            ⚠️ Balance: {CUR(balance)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+                {filteredStudents.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '30px 10px', fontSize: 12, color: '#9ca3af' }}>
+                    No students matched your search
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* COLUMN 2: FEE ALLOCATION CHECKLIST */}
+            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 2px 12px rgba(109,40,217,.04)', minHeight: '520px' }}>
+              {!pf.student_id ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: '400px', color: '#9ca3af', textAlign: 'center', gap: 16, padding: '0 20px' }}>
+                  <div style={{ background: '#f5f3ff', borderRadius: '50%', padding: 20, color: '#6d28d9' }}>
+                    <Coins size={36} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: 16, fontWeight: 800, color: '#1f2937', margin: '0 0 6px' }}>Fee Allocation Sheet</h3>
+                    <p style={{ fontSize: 12, color: '#6b7280', maxWidth: 320, margin: '0 auto', lineHeight: 1.5 }}>
+                      Please select a student from the finder panel on the left to allocate payments and view itemized term details.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                (() => {
+                  const selStu = students.find((s: any) => s.id === pf.student_id) as any;
+                  if (!selStu) return null;
+
+                  const classStrs = structures.filter((x: any) => x.class_id === selStu.class?.id);
+                  const hasArrears = Number(selStu.fees_arrears) > 0;
+                  const hasScholarship = selStu.scholarship_type && selStu.scholarship_type !== 'none';
+                  const pct = selStu.scholarship_percentage || 0;
+
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                      
+                      {/* Active student summary banner */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#faf5ff', border: '1.5px solid #ede9fe', borderRadius: 14, padding: '16px 20px' }}>
+                        <div>
+                          <div style={{ fontSize: 15, fontWeight: 900, color: '#1e0646' }}>{selStu.full_name}</div>
+                          <div style={{ fontSize: 11, color: '#6d28d9', fontWeight: 600, marginTop: 2 }}>
+                            Class: {(selStu.class as any)?.name ?? '—'} &middot; ID: {selStu.student_id || '—'}
+                          </div>
+                        </div>
+                        {hasScholarship && (
+                          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <GraduationCap size={14} color="#16a34a" />
+                            <span style={{ fontSize: 11, fontWeight: 700, color: '#15803d' }}>
+                              {selStu.scholarship_type === 'full' ? 'Full Scholarship' : `${pct}% Discount`}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Allocation checklist block */}
+                      <div>
+                        <h4 style={{ fontSize: 12, fontWeight: 800, color: '#4b5563', textTransform: 'uppercase', letterSpacing: '.06em', margin: '0 0 12px' }}>
+                          Billing Allocation Checklist
+                        </h4>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          
+                          {/* Arrears allocation row */}
+                          {hasArrears && (
+                            <label
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 12,
+                                padding: '12px 16px',
+                                background: pf.selected_fee_ids.includes('arrears') ? '#fef2f2' : '#fff',
+                                borderRadius: 12,
+                                border: `1.5px solid ${pf.selected_fee_ids.includes('arrears') ? '#fecaca' : '#f3f4f6'}`,
+                                cursor: 'pointer',
+                                transition: 'all 0.15s'
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={pf.selected_fee_ids.includes('arrears')}
+                                onChange={e => {
+                                  setPf(p => {
+                                    const checked = e.target.checked;
+                                    const nextIds = checked 
+                                      ? [...p.selected_fee_ids, 'arrears']
+                                      : p.selected_fee_ids.filter(id => id !== 'arrears');
+                                    return { ...p, selected_fee_ids: nextIds };
+                                  });
+                                }}
+                                style={{ accentColor: '#dc2626', width: 16, height: 16 }}
+                              />
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#991b1b', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                  ⚠️ Outstanding Arrears
+                                </div>
+                                <div style={{ fontSize: 11, color: '#b91c1c', marginTop: 1 }}>Balance carried forward from prior terms</div>
+                              </div>
+                              <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontSize: 13, fontWeight: 800, color: '#dc2626' }}>{CUR(Number(selStu.fees_arrears))}</div>
+                                <span style={{ fontSize: 9, fontWeight: 700, background: '#fef2f2', color: '#b91c1c', padding: '1px 6px', borderRadius: 4, display: 'inline-block', marginTop: 3 }}>
+                                  ARREARS
+                                </span>
+                              </div>
+                            </label>
+                          )}
+
+                          {/* Term charges allocation rows */}
+                          {classStrs.map((s: any) => {
+                            const isDiscountable = s.is_discountable !== false;
+                            const original = s.amount || 0;
+                            const net = isDiscountable ? original * (1 - pct / 100) : original;
+                            
+                            // Get state from dynamic calculator
+                            const allocation = feeStatusInfo[s.id] || { paid: 0, status: 'unpaid', net };
+                            const isCleared = allocation.status === 'cleared';
+                            const isPartial = allocation.status === 'partial';
+                            const isSelected = pf.selected_fee_ids.includes(s.id);
+
+                            return (
+                              <label
+                                key={s.id}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 12,
+                                  padding: '12px 16px',
+                                  background: isCleared ? '#fafafa' : (isSelected ? '#f5f3ff' : '#fff'),
+                                  borderRadius: 12,
+                                  border: `1.5px solid ${isCleared ? '#e5e7eb' : (isSelected ? '#7c3aed' : '#f3f4f6')}`,
+                                  cursor: isCleared ? 'not-allowed' : 'pointer',
+                                  transition: 'all 0.15s',
+                                  opacity: isCleared ? 0.6 : 1
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  disabled={isCleared}
+                                  checked={isCleared || isSelected}
+                                  onChange={e => {
+                                    setPf(p => {
+                                      const checked = e.target.checked;
+                                      const nextIds = checked
+                                        ? [...p.selected_fee_ids, s.id]
+                                        : p.selected_fee_ids.filter(id => id !== s.id);
+                                      return { ...p, selected_fee_ids: nextIds };
+                                    });
+                                  }}
+                                  style={{ accentColor: '#6d28d9', width: 16, height: 16, cursor: isCleared ? 'not-allowed' : 'pointer' }}
+                                />
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: isCleared ? '#6b7280' : '#1f2937', textDecoration: isCleared ? 'line-through' : 'none' }}>
+                                    {s.fee_name}
+                                  </div>
+                                  <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>
+                                    {s.description || 'Current term fee item'}
+                                  </div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end' }}>
+                                    {pct > 0 && isDiscountable && (
+                                      <span style={{ fontSize: 11, color: '#9ca3af', textDecoration: 'line-through' }}>{CUR(original)}</span>
+                                    )}
+                                    <strong style={{ fontSize: 13, fontWeight: 800, color: isCleared ? '#6b7280' : '#6d28d9' }}>{CUR(net)}</strong>
+                                  </div>
+                                  
+                                  <div style={{ marginTop: 4 }}>
+                                    {isCleared && (
+                                      <span style={{ fontSize: 9, fontWeight: 800, background: '#e8f5e9', color: '#2e7d32', padding: '1px 6px', borderRadius: 4, display: 'inline-block' }}>
+                                        ✓ CLEARED
+                                      </span>
+                                    )}
+                                    {isPartial && (
+                                      <span style={{ fontSize: 9, fontWeight: 800, background: '#fff3e0', color: '#ef6c00', padding: '1px 6px', borderRadius: 4, display: 'inline-block' }}>
+                                        Paid: {CUR(allocation.paid)} / {CUR(net)}
+                                      </span>
+                                    )}
+                                    {allocation.status === 'unpaid' && (
+                                      <span style={{ fontSize: 9, fontWeight: 800, background: '#f5f5f5', color: '#616161', padding: '1px 6px', borderRadius: 4, display: 'inline-block' }}>
+                                        UNPAID
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </label>
+                            );
+                          })}
+
+                          {classStrs.length === 0 && !hasArrears && (
+                            <div style={{ textAlign: 'center', padding: '24px', fontSize: 12, color: '#9ca3af', background: '#fafafa', borderRadius: 12 }}>
+                              No fee structures defined for this student's class.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()
+              )}
+            </div>
+
+            {/* COLUMN 3: CHECKOUT SUMMARY SLIP */}
+            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 4px 20px rgba(109,40,217,.06)', display: 'flex', flexDirection: 'column', gap: 18, position: 'sticky', top: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1.5px solid #f5f3ff', paddingBottom: 14 }}>
+                <div style={{ background: '#faf5ff', borderRadius: 8, padding: 8, color: '#6d28d9' }}>
+                  <CreditCard size={18} />
+                </div>
+                <h3 style={{ fontSize: 14, fontWeight: 800, color: '#111827', margin: 0 }}>Checkout Slip</h3>
+              </div>
+
+              {/* Amount Input Block */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#4b5563' }}>
+                  Amount to Pay
+                </label>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <select
+                    value={pf.currency_code}
+                    onChange={e => {
+                      const newCode = e.target.value;
+                      const oldCode = pf.currency_code;
+                      const converted = convertCurrencyAmount(pf.amount_paid, oldCode, newCode);
+                      setPf(p => ({ ...p, currency_code: newCode, amount_paid: converted }));
+                    }}
+                    style={{
+                      padding: '10px 12px',
+                      borderRadius: 10,
+                      border: '1.5px solid #e5e7eb',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      background: '#f9fafb',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="GHS">GHS</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                  </select>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={pf.amount_paid}
+                    onChange={e => setPf(p => ({ ...p, amount_paid: e.target.value }))}
+                    style={{
+                      flex: 1,
+                      padding: '10px 12px',
+                      borderRadius: 10,
+                      border: '1.5px solid #e5e7eb',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      outline: 'none',
+                      fontFamily: '"DM Sans",sans-serif',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Amount Presets */}
+              {pf.student_id && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {(() => {
+                    const sel = students.find((s: any) => s.id === pf.student_id) as any;
+                    if (!sel) return null;
+
+                    // Calculate student balance
                     const classStrs = structures.filter((x: any) => x.class_id === sel.class?.id);
-                    const netTermCharges = classStrs.reduce((a, b: any) => a + (b.amount || 0), 0) * (1 - (sel.scholarship_percentage || 0) / 100);
+                    const netTermCharges = classStrs.reduce((a, b: any) => {
+                      const discount = b.is_discountable !== false ? (sel.scholarship_percentage || 0) / 100 : 0;
+                      return a + (b.amount || 0) * (1 - discount);
+                    }, 0);
                     const stuPayments = (payments as any[]).filter((p: any) => p.student_id === sel.id);
                     const totalPaid = stuPayments.reduce((a, b: any) => a + (b.amount_paid || 0), 0);
                     const arrearsPaid = stuPayments.reduce((a, b: any) => a + (b.arrears_paid || 0), 0);
                     const openingArrears = Number(sel.fees_arrears || 0) + arrearsPaid;
                     const totalBill = openingArrears + netTermCharges;
-                    const currentBal = totalBill - totalPaid;
+                    const balance = totalBill - totalPaid;
 
-                    if (currentBal <= 0) {
-                      return (
-                        <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <CheckCircle2 size={18} color="#16a34a" />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 13, fontWeight: 800, color: '#16a34a' }}>
-                              {currentBal < 0 ? 'Credit Balance' : 'Fees Cleared'}
-                            </div>
-                            <div style={{ fontSize: 11, color: '#15803d', marginTop: 2 }}>
-                              {currentBal < 0 
-                                ? `This student has overpaid by ${CUR(Math.abs(currentBal))}.` 
-                                : 'All term charges and arrears have been fully paid.'}
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    }
+                    if (balance <= 0) return null;
 
                     return (
-                      <>
-                        {arrears > 0 && (
-                          <div style={{ background: '#fef2f2', border: '1.5px solid #fecaca', borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                            <AlertTriangle size={18} color="#dc2626" style={{ marginTop: 1, flexShrink: 0 }} />
-                            <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: 12, fontWeight: 800, color: '#dc2626' }}>
-                                ⚠️ Outstanding Arrears: {CUR(arrears)}
-                              </div>
-                              <div style={{ fontSize: 11, color: '#991b1b', marginTop: 3, lineHeight: 1.5 }}>
-                                This student owes from previous terms. Payment will be applied to arrears first.
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        {hasScholarship && (
-                          <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <GraduationCap size={18} color="#16a34a" />
-                            <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: 12, fontWeight: 700, color: '#16a34a' }}>
-                                🎓 {sel.scholarship_type === 'full' ? 'Full Scholarship' : `${pct}% Scholarship`} Student
-                              </div>
-                              {gross > 0 && (
-                                <div style={{ fontSize: 11, color: '#15803d', marginTop: 2 }}>
-                                  Fee: {CUR(gross)} − Discount: {CUR(discount)} = <strong>Net: {CUR(net)}</strong>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )
+                      <button
+                        type="button"
+                        onClick={() => setPf(p => ({ ...p, amount_paid: balance.toFixed(2) }))}
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: '#6d28d9',
+                          background: '#f5f3ff',
+                          border: '1.5px solid #ede9fe',
+                          padding: '6px 10px',
+                          borderRadius: 8,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s',
+                          width: '100%',
+                          textAlign: 'center'
+                        }}
+                      >
+                        Match Outstanding Balance ({CUR(balance)})
+                      </button>
+                    );
                   })()}
                 </div>
-              )
-            })()}
+              )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {[
-                { label: 'Search & Select Student', children: (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <input 
-                      placeholder="Type name or ID to search..." 
-                      value={studentSearch} 
-                      onChange={e => setStudentSearch(e.target.value)} 
-                      style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }}
-                    />
-                    <select value={pf.student_id} onChange={e => setPf(p => ({ ...p, student_id: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }}>
-                      <option value="">— Select from {filteredStudents.length} {filteredStudents.length === 1 ? 'student' : 'students'} —</option>
-                      {filteredStudents.map((s: any) => (
-                        <option key={s.id} value={s.id}>
-                          {s.full_name} {s.student_id ? `(${s.student_id})` : ''} — {(s.class as any)?.name ?? 'No class'} 
-                          {Number(s.fees_arrears) > 0 ? ` (⚠️ Arrears: ${CUR(Number(s.fees_arrears))})` : ''}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )},
-                { label: 'Select Fees to Pay', children: (
-                  <div style={{ background: '#f8fafc', border: '1.5px solid #e5e7eb', borderRadius: 12, padding: '12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {(() => {
-                      const selStu = (students as any[]).find((s: any) => s.id === pf.student_id);
-                      if (!selStu) return <p style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', margin: '4px 0' }}>Please select a student first</p>;
-                      
-                      const filtered = (structures as any[]).filter((s: any) => s.class_id === selStu.class?.id);
-                      const hasArrears = Number(selStu.fees_arrears) > 0;
-
-                      return (
-                        <>
-                          {hasArrears && (
-                            <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: pf.selected_fee_ids.includes('arrears') ? '#fee2e2' : '#fff', borderRadius: 8, border: `1.5px solid ${pf.selected_fee_ids.includes('arrears') ? '#f87171' : '#e5e7eb'}`, cursor: 'pointer', transition: 'all .15s' }}>
-                              <input 
-                                type="checkbox" 
-                                checked={pf.selected_fee_ids.includes('arrears')} 
-                                onChange={e => {
-                                  let newIds = e.target.checked 
-                                    ? [...pf.selected_fee_ids, 'arrears'] 
-                                    : pf.selected_fee_ids.filter(id => id !== 'arrears');
-                                  
-                                  // Recalculate total
-                                  let total = 0;
-                                  newIds.forEach(id => {
-                                    if (id === 'arrears') total += Number(selStu.fees_arrears);
-                                    else {
-                                      const s = (structures as any[]).find(x => x.id === id);
-                                      if (s) total += Number(s.amount);
-                                    }
-                                  });
-                                  // Adjust for scholarship percentage for current term fees
-                                  const scholarshipPct = selStu.scholarship_percentage || 0;
-                                  if (scholarshipPct > 0) {
-                                    let currentFeesTotal = 0;
-                                    newIds.forEach(id => {
-                                      if (id !== 'arrears') {
-                                        const s = (structures as any[]).find(x => x.id === id);
-                                        if (s && s.is_discountable !== false) currentFeesTotal += Number(s.amount);
-                                      }
-                                    });
-                                    const discount = currentFeesTotal * (scholarshipPct / 100);
-                                    total -= discount;
-                                  }
-
-                                  setPf(p => ({ ...p, selected_fee_ids: newIds, amount_paid: total > 0 ? total.toFixed(2) : '' }));
-                                }} 
-                                style={{ accentColor: '#dc2626' }}
-                              />
-                              <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: '#991b1b' }}>⚠️ Outstanding Arrears</div>
-                                <div style={{ fontSize: 11, color: '#b91c1c' }}>{CUR(Number(selStu.fees_arrears))}</div>
-                              </div>
-                            </label>
-                          )}
-
-                          {filtered.map((s: any) => (
-                            <label key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: pf.selected_fee_ids.includes(s.id) ? '#f5f3ff' : '#fff', borderRadius: 8, border: `1.5px solid ${pf.selected_fee_ids.includes(s.id) ? '#7c3aed' : '#e5e7eb'}`, cursor: 'pointer', transition: 'all .15s' }}>
-                              <input 
-                                type="checkbox" 
-                                checked={pf.selected_fee_ids.includes(s.id)} 
-                                onChange={e => {
-                                  let newIds = e.target.checked 
-                                    ? [...pf.selected_fee_ids, s.id] 
-                                    : pf.selected_fee_ids.filter(id => id !== s.id);
-                                  
-                                  // Recalculate total
-                                  let total = 0;
-                                  newIds.forEach(id => {
-                                    if (id === 'arrears') total += Number(selStu.fees_arrears);
-                                    else {
-                                      const struct = (structures as any[]).find(x => x.id === id);
-                                      if (struct) total += Number(struct.amount);
-                                    }
-                                  });
-                                  // Adjust for scholarship
-                                  const scholarshipPct = selStu.scholarship_percentage || 0;
-                                  if (scholarshipPct > 0) {
-                                    let currentFeesTotal = 0;
-                                    newIds.forEach(id => {
-                                      if (id !== 'arrears') {
-                                        const struct = (structures as any[]).find(x => x.id === id);
-                                        if (struct && struct.is_discountable !== false) currentFeesTotal += Number(struct.amount);
-                                      }
-                                    });
-                                    const discount = currentFeesTotal * (scholarshipPct / 100);
-                                    total -= discount;
-                                  }
-
-                                  setPf(p => ({ ...p, selected_fee_ids: newIds, amount_paid: total > 0 ? total.toFixed(2) : '' }));
-                                }} 
-                                style={{ accentColor: '#6d28d9' }}
-                              />
-                              <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{s.fee_name}</div>
-                                <div style={{ fontSize: 11, color: '#6b7280' }}>{CUR(s.amount)} {s.is_discountable === false && <span style={{ color: '#ef4444', fontWeight: 700, marginLeft: 4 }}>[NO DISCOUNT]</span>}</div>
-                              </div>
-                            </label>
-                          ))}
-                          
-                          {filtered.length === 0 && !hasArrears && (
-                            <p style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center' }}>No specific fees found for this class</p>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </div>
-                )},
-                { label: 'Amount Paid', children: <div style={{ display: 'flex', gap: 8 }}><select value={pf.currency_code} onChange={e => setPf(p => ({ ...p, currency_code: e.target.value }))} style={{ padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', background: '#f8fafc' }}><option value="GHS">GHS</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select><input type="number" min="0" step="0.01" value={pf.amount_paid} onChange={e => setPf(p => ({ ...p, amount_paid: e.target.value }))} placeholder="0.00" style={{ flex: 1, padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} /></div> },
-              ].map(f => (
-                <div key={f.label}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{f.label}</label>
-                  {f.children}
-                </div>
-              ))}
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {/* Payment Details form elements */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>Payment Method</label>
-                  <select value={pf.payment_method} onChange={e => setPf(p => ({ ...p, payment_method: e.target.value as any }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}>
-                    {METHODS.map(m => <option key={m} value={m} style={{ textTransform: 'capitalize' }}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>)}
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#4b5563', marginBottom: 5 }}>
+                    Method
+                  </label>
+                  <select
+                    value={pf.payment_method}
+                    onChange={e => setPf(p => ({ ...p, payment_method: e.target.value as any }))}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: 10,
+                      border: '1.5px solid #e5e7eb',
+                      fontSize: 13,
+                      outline: 'none',
+                      background: '#fff',
+                      fontFamily: '"DM Sans",sans-serif'
+                    }}
+                  >
+                    {METHODS.map(m => (
+                      <option key={m} value={m}>
+                        {m.toUpperCase()}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>Date</label>
-                  <input type="date" value={pf.payment_date} onChange={e => setPf(p => ({ ...p, payment_date: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#4b5563', marginBottom: 5 }}>
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    value={pf.payment_date}
+                    onChange={e => setPf(p => ({ ...p, payment_date: e.target.value }))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 10px',
+                      borderRadius: 10,
+                      border: '1.5px solid #e5e7eb',
+                      fontSize: 13,
+                      outline: 'none',
+                      fontFamily: '"DM Sans",sans-serif',
+                      boxSizing: 'border-box'
+                    }}
+                  />
                 </div>
               </div>
+
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>Reference / Receipt No.</label>
-                <input value={pf.reference_number} onChange={e => setPf(p => ({ ...p, reference_number: e.target.value }))} placeholder="Optional" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#4b5563', marginBottom: 5 }}>
+                  Reference No.
+                </label>
+                <input
+                  placeholder="Reference, Momo ID, Cheque No..."
+                  value={pf.reference_number}
+                  onChange={e => setPf(p => ({ ...p, reference_number: e.target.value }))}
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    borderRadius: 10,
+                    border: '1.5px solid #e5e7eb',
+                    fontSize: 13,
+                    outline: 'none',
+                    fontFamily: '"DM Sans",sans-serif',
+                    boxSizing: 'border-box'
+                  }}
+                />
               </div>
-              <Btn variant="success" onClick={handleRecordPayment} loading={recordPayment.isPending} style={{ width: '100%', justifyContent: 'center', padding: '12px' }}>
-                <CreditCard size={16} /> Record & Print Receipt
-              </Btn>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#4b5563', marginBottom: 5 }}>
+                  Internal Memo / Notes
+                </label>
+                <textarea
+                  placeholder="Special instructions or billing notes..."
+                  value={pf.notes}
+                  onChange={e => setPf(p => ({ ...p, notes: e.target.value }))}
+                  rows={2}
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    borderRadius: 10,
+                    border: '1.5px solid #e5e7eb',
+                    fontSize: 13,
+                    outline: 'none',
+                    fontFamily: '"DM Sans",sans-serif',
+                    boxSizing: 'border-box',
+                    resize: 'none'
+                  }}
+                />
+              </div>
+
+              {/* Security PIN Lock Status Indicator */}
+              {(() => {
+                const savedPin = localStorage.getItem(`bursar_pin_${user?.id}`);
+                return savedPin ? (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '10px 14px',
+                    borderRadius: 12,
+                    background: 'linear-gradient(135deg, #ecfdf5, #d1fae5)',
+                    border: '1px solid #a7f3d0',
+                    color: '#065f46',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    marginTop: 6
+                  }}>
+                    <Shield size={14} style={{ color: '#059669', flexShrink: 0 }} />
+                    <span style={{ flexGrow: 1 }}>🔒 Transaction PIN Active</span>
+                    <span style={{ fontSize: 10, background: '#10b981', color: '#fff', padding: '2px 6px', borderRadius: 20, fontWeight: 700, textTransform: 'uppercase' }}>SECURE</span>
+                  </div>
+                ) : (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '10px 14px',
+                    borderRadius: 12,
+                    background: '#fffbeb',
+                    border: '1px solid #fef3c7',
+                    color: '#92400e',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    marginTop: 6
+                  }}>
+                    <AlertTriangle size={14} style={{ color: '#d97706', flexShrink: 0 }} />
+                    <span style={{ flexGrow: 1 }}>⚠️ PIN Lock Bypassed</span>
+                    <span style={{ fontSize: 10, background: '#f59e0b', color: '#fff', padding: '2px 6px', borderRadius: 20, fontWeight: 700, textTransform: 'uppercase' }}>BYPASS</span>
+                  </div>
+                );
+              })()}
+
+              <div style={{ marginTop: 12 }}>
+                <button
+                  type="button"
+                  onClick={initiatePayment}
+                  disabled={!pf.student_id || !pf.amount_paid || recordPayment.isPending}
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    borderRadius: 12,
+                    border: 'none',
+                    background: (!pf.student_id || !pf.amount_paid) ? '#e5e7eb' : 'linear-gradient(135deg,#7c3aed,#6d28d9)',
+                    color: (!pf.student_id || !pf.amount_paid) ? '#9ca3af' : '#fff',
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: (!pf.student_id || !pf.amount_paid || recordPayment.isPending) ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    boxShadow: (!pf.student_id || !pf.amount_paid) ? 'none' : '0 4px 14px rgba(109,40,217,.25)',
+                    transition: 'all 0.15s'
+                  }}
+                >
+                  {recordPayment.isPending ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Processing Checkout…
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard size={16} />
+                      Process Checkout & Print
+                    </>
+                  )}
+                </button>
+              </div>
+
             </div>
+
           </div>
         )}
 
@@ -1523,8 +2152,11 @@ export default function FeesPage() {
             <div>
               <p style={{ fontSize: 13, color: '#374151', fontWeight: 600, marginBottom: 12, textAlign: 'center' }}>How would you like to share this receipt?</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <button onClick={() => handlePrint(printReceipt)} style={{ padding: '14px', borderRadius: 12, border: 'none', background: '#1e0646', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, gridColumn: 'span 2' }}>
-                  <Printer size={18} /> Print A4 Receipt (Duplex)
+                <button onClick={() => handlePrint(printReceipt)} style={{ padding: '13px', borderRadius: 12, border: 'none', background: '#1e0646', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <Printer size={16} /> Print Detailed (Duplex)
+                </button>
+                <button onClick={() => handlePrintSimplified(printReceipt)} style={{ padding: '13px', borderRadius: 12, border: 'none', background: '#6d28d9', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <Printer size={16} /> Print Simplified
                 </button>
                 <button onClick={() => { window.open(`https://wa.me/?text=${encodeURIComponent(generateTextReceipt(printReceipt))}`, '_blank') }} style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#ecfdf5', color: '#059669', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                   <MessageCircle size={16} /> WhatsApp
@@ -1548,6 +2180,86 @@ export default function FeesPage() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Transaction PIN Lock Modal */}
+      <Modal open={showPinModal} onClose={() => setShowPinModal(false)} title="Security Authentication Required" size="sm">
+        <form onSubmit={confirmPinPayment} style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '8px 0' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ background: '#fef2f2', border: '1.5px solid #fecaca', borderRadius: 12, padding: 12, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+              <Lock size={24} color="#dc2626" />
+            </div>
+            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#111827', margin: '0 0 6px' }}>Verify Transaction PIN</h3>
+            <p style={{ fontSize: 12, color: '#6b7280', margin: 0 }}>This transaction requires your 4-digit security PIN to authorize checkout.</p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
+            <input
+              type="password"
+              placeholder="••••"
+              maxLength={6}
+              value={pinInput}
+              onChange={e => setPinInput(e.target.value.replace(/\D/g, ''))}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: 10,
+                border: '2px solid #e5e7eb',
+                fontSize: 20,
+                letterSpacing: '0.5em',
+                textAlign: 'center',
+                outline: 'none',
+                fontFamily: '"DM Sans", sans-serif',
+                boxSizing: 'border-box',
+                transition: 'all 0.15s',
+                borderColor: pinInput.length >= 4 ? '#7c3aed' : '#e5e7eb',
+              }}
+              autoFocus
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+            <button
+              type="button"
+              onClick={() => setShowPinModal(false)}
+              style={{
+                flex: 1,
+                padding: '10px 16px',
+                borderRadius: 10,
+                border: '1.5px solid #e5e7eb',
+                background: '#fff',
+                color: '#374151',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={pinInput.length < 4}
+              style={{
+                flex: 1,
+                padding: '10px 16px',
+                borderRadius: 10,
+                border: 'none',
+                background: pinInput.length >= 4 ? 'linear-gradient(135deg,#7c3aed,#6d28d9)' : '#e5e7eb',
+                color: pinInput.length >= 4 ? '#fff' : '#9ca3af',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: pinInput.length >= 4 ? 'pointer' : 'not-allowed',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                boxShadow: pinInput.length >= 4 ? '0 2px 8px rgba(109,40,217,.24)' : 'none',
+              }}
+            >
+              <Check size={14} /> Authorize
+            </button>
+          </div>
+        </form>
       </Modal>
 
     </>

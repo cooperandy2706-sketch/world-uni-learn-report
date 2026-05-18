@@ -1,6 +1,7 @@
 // src/pages/admin/TermsPage.tsx
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import type { SubmitHandler } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -18,7 +19,8 @@ const schema = z.object({
   start_date:       z.string().optional(),
   end_date:         z.string().optional(),
 })
-type FormData = z.infer<typeof schema>
+type FormInput = z.input<typeof schema>
+type FormData = z.output<typeof schema>
 
 const PERIOD_OPTIONS = {
   term:     ['Term 1', 'Term 2', 'Term 3'],
@@ -125,7 +127,7 @@ export default function TermsPage() {
     onError: () => toast.error('Failed to change term. Could not compute rollovers.'),
   })
 
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm<FormInput, unknown, FormData>({
     resolver: zodResolver(schema),
     defaultValues: { period_type: 'term' },
   })
@@ -134,7 +136,7 @@ export default function TermsPage() {
   const nameOptions = PERIOD_OPTIONS[periodType] ?? []
   const periodLabel = PERIOD_LABELS[periodType] ?? 'Period'
 
-  async function onSubmit(data: FormData) {
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     // strip period_type — it's UI-only, not a DB column
     const { period_type, ...payload } = data
     await create.mutateAsync(payload)

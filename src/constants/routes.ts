@@ -93,6 +93,7 @@ export const ROUTES = {
   BURSAR_SMS:        '/bursar/sms',
   BURSAR_VENDORS:    '/bursar/vendors',
   BURSAR_REQUISITIONS: '/bursar/requisitions',
+  BURSAR_DAILY_FEES:  '/bursar/daily-fees',
   BURSAR_ACCOUNT:    '/bursar/account',
   // Teacher Requisition link
   TEACHER_REQUISITION: '/teacher/requisition',

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // supabase/functions/send-push/index.ts
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import webpush from "npm:web-push@3.6.7"

@@ -194,141 +194,32 @@ export default function ClassTestsPage() {
         @media (min-width: 768px) { .test-grid { grid-template-columns: 1fr 1fr; } }
       `}</style>
 
-      {/* Header */}
-      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1e293b', margin: 0 }}>Class Tests</h1>
-          <p style={{ color: '#64748b', fontSize: 13, margin: '4px 0 0' }}>Manage continuous assessments</p>
-        </div>
-        {selectedClass && selectedSubject && (
-          <button onClick={() => setShowCreate(true)} className="btn btn-primary" style={{ height: 40, width: 40, borderRadius: '50%', justifyContent: 'center', padding: 0 }}>
-            <span>+</span>
-          </button>
-        )}
-      </div>
-
-      {/* Selector Area */}
-      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div>
-          <label style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Class</label>
-          <select value={selectedClass} onChange={e => { setSelectedClass(e.target.value); setSelectedSubject(''); setParams({ class: e.target.value }) }} className="input">
-            <option value="">Select Class</option>
-            {classOptions.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </div>
-        {selectedClass && (
-          <div>
-            <label style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Subject</label>
-            <select value={selectedSubject} onChange={e => { setSelectedSubject(e.target.value); setParams({ class: selectedClass, subject: e.target.value }) }} className="input">
-              <option value="">Select Subject</option>
-              {subjectOptions.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
-          </div>
-        )}
-      </div>
-
-      {/* Stats & Sync */}
-      {selectedClass && selectedSubject && tests.length > 0 && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, padding: '0 4px' }}>
-          <div style={{ color: '#64748b', fontSize: 13, fontWeight: 600 }}>{tests.length} tests recorded</div>
-          <button onClick={handleSync} className="btn btn-outline" style={{ border: '1.5px solid #7c3aed', color: '#7c3aed', background: '#f5f3ff' }}>
-             🪄 Sync to Report
-          </button>
-        </div>
-      )}
-
-      {/* Test List */}
-      {!activeTest && !showCreate && (
-        <div className="test-grid">
-          {!selectedClass || !selectedSubject ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8', gridColumn: '1 / -1' }}>
-               <div style={{ fontSize: 40, marginBottom: 12 }}>📝</div>
-               <p>Select a class and subject to view tests</p>
-            </div>
-          ) : tests.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8' }}>
-               <p>No tests recorded yet for this subject.</p>
-               <button onClick={() => setShowCreate(true)} className="btn btn-primary" style={{ marginTop: 12 }}>
-                 Create Your First Test
-               </button>
-            </div>
-          ) : (
-            tests.map(t => (
-              <div key={t.id} className="card" style={{ borderLeft: '4px solid #7c3aed' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1e293b' }}>{t.title}</h3>
-                    <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
-                      {new Date(t.test_date).toLocaleDateString()} · Max: <b>{t.max_score}</b>
-                    </p>
-                  </div>
-                  <button onClick={() => handleDeleteTest(t.id)} style={{ padding: 4, background: 'none', border: 'none', color: '#f87171', cursor: 'pointer' }}>
-                    🗑️
-                  </button>
-                </div>
-                <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
-                  <button onClick={() => openScoreEntry(t)} className="btn btn-primary" style={{ flex: 1, justifyContent: 'center' }}>
-                    Enter Scores
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {/* Create Modal (Full Screen Overlay on Mobile) */}
-      {showCreate && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: '#fff', zIndex: 100, padding: 20 }}>
-           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-             <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800 }}>New Class Test</h2>
-             <button onClick={() => setShowCreate(false)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer' }}>×</button>
-           </div>
-           <form onSubmit={handleCreateTest} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-             <div>
-               <label style={{ fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6, display: 'block' }}>Test Title</label>
-               <input type="text" required placeholder="e.g. Week 1 Quiz" className="input" value={newTest.title} onChange={e => setNewTest({ ...newTest, title: e.target.value })} />
-             </div>
-             <div>
-               <label style={{ fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6, display: 'block' }}>Max Marks</label>
-               <input type="number" required placeholder="e.g. 20" className="input" value={newTest.max_score} onChange={e => setNewTest({ ...newTest, max_score: e.target.value })} />
-             </div>
-             <div>
-               <label style={{ fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6, display: 'block' }}>Test Date</label>
-               <input type="date" required className="input" value={newTest.test_date} onChange={e => setNewTest({ ...newTest, test_date: e.target.value })} />
-             </div>
-             <button type="submit" disabled={creating} className="btn btn-primary" style={{ marginTop: 12, justifyContent: 'center' }}>
-               {creating ? 'Creating...' : 'Create Test'}
-             </button>
-           </form>
-        </div>
-      )}
-
-      {/* Score Entry View (Full Screen) */}
-      {activeTest && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: '#f8fafc', zIndex: 100, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ background: '#fff', padding: '16px 20px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* ── SCORE ENTRY INLINE VIEW ── */}
+      {activeTest ? (
+        <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #e2e8f0', padding: 20, animation: '_fi 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+          <div style={{ paddingBottom: 16, borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <div>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{activeTest.title}</h2>
+              <button onClick={() => setActiveTest(null)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Tests</button>
+              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#1e293b' }}>{activeTest.title}</h2>
               <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>Score out of {activeTest.max_score}</p>
             </div>
-            <button onClick={() => setActiveTest(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer' }}>×</button>
+            <button onClick={() => setActiveTest(null)} style={{ background: '#f1f5f9', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
           </div>
 
-          <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
+          <div style={{ maxHeight: 450, overflowY: 'auto', paddingRight: 4, marginBottom: 16 }}>
             {students.map(s => (
-              <div key={s.id} style={{ background: '#fff', borderRadius: 12, padding: 12, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12, border: '1.5px solid #f1f5f9' }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#7c3aed', fontSize: 12 }}>
+              <div key={s.id} style={{ background: '#f8fafc', borderRadius: 12, padding: 12, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12, border: '1px solid #f1f5f9' }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#7c3aed', fontSize: 13 }}>
                   {s.full_name.charAt(0)}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>{s.full_name}</div>
-                  <div style={{ fontSize: 11, color: '#94a3b8' }}>ID: {s.student_id || 'N/A'}</div>
+                  <div style={{ fontSize: 11, color: '#64748b' }}>ID: {s.student_id || 'N/A'}</div>
                 </div>
                 <input 
                   type="number" 
                   placeholder="0"
-                  style={{ width: 60, textAlign: 'center', padding: '8px 4px', borderRadius: 8, border: '1.5px solid #e2e8f0', fontWeight: 800, fontSize: 16 }}
+                  style={{ width: 70, textAlign: 'center', padding: '10px 6px', borderRadius: 8, border: '1.5px solid #cbd5e1', fontWeight: 800, fontSize: 15, outline: 'none' }}
                   value={scores[s.id] || ''}
                   onChange={e => {
                     const v = e.target.value
@@ -342,12 +233,132 @@ export default function ClassTestsPage() {
             ))}
           </div>
 
-          <div style={{ background: '#fff', padding: 16, borderTop: '1px solid #e2e8f0' }}>
-             <button onClick={handleSaveScores} disabled={savingScores} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', height: 48 }}>
+          <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: 16, display: 'flex', gap: 10 }}>
+             <button onClick={() => setActiveTest(null)} className="btn btn-outline" style={{ flex: 1, justifyContent: 'center' }}>
+               Cancel
+             </button>
+             <button onClick={handleSaveScores} disabled={savingScores} className="btn btn-primary" style={{ flex: 2, justifyContent: 'center' }}>
                {savingScores ? 'Submitting...' : '📤 Submit Scores'}
              </button>
           </div>
         </div>
+      ) : (
+        <>
+          {/* Header */}
+          <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1e293b', margin: 0 }}>Class Tests</h1>
+              <p style={{ color: '#64748b', fontSize: 13, margin: '4px 0 0' }}>Manage continuous assessments</p>
+            </div>
+            {selectedClass && selectedSubject && !showCreate && (
+              <button onClick={() => setShowCreate(true)} className="btn btn-primary" style={{ height: 40, width: 40, borderRadius: '50%', justifyContent: 'center', padding: 0 }}>
+                <span>+</span>
+              </button>
+            )}
+          </div>
+
+          {/* ── CREATE INLINE CARD ── */}
+          {showCreate && (
+            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #e2e8f0', padding: 20, animation: '_fi 0.3s ease', marginBottom: 20, boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid #f1f5f9', paddingBottom: 10 }}>
+                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1e293b' }}>New Class Test</h2>
+                 <button onClick={() => setShowCreate(false)} style={{ background: '#f1f5f9', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+               </div>
+               <form onSubmit={handleCreateTest} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                 <div>
+                   <label style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>Test Title</label>
+                   <input type="text" required placeholder="e.g. Week 1 Quiz" className="input" style={{ fontSize: 15 }} value={newTest.title} onChange={e => setNewTest({ ...newTest, title: e.target.value })} />
+                 </div>
+                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                   <div>
+                     <label style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>Max Marks</label>
+                     <input type="number" required placeholder="e.g. 20" className="input" style={{ fontSize: 15 }} value={newTest.max_score} onChange={e => setNewTest({ ...newTest, max_score: e.target.value })} />
+                   </div>
+                   <div>
+                     <label style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>Test Date</label>
+                     <input type="date" required className="input" style={{ fontSize: 15 }} value={newTest.test_date} onChange={e => setNewTest({ ...newTest, test_date: e.target.value })} />
+                   </div>
+                 </div>
+                 <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+                   <button type="button" onClick={() => setShowCreate(false)} className="btn btn-outline" style={{ flex: 1, justifyContent: 'center' }}>Cancel</button>
+                   <button type="submit" disabled={creating} className="btn btn-primary" style={{ flex: 2, justifyContent: 'center' }}>
+                     {creating ? 'Creating...' : 'Create Test'}
+                   </button>
+                 </div>
+               </form>
+            </div>
+          )}
+
+          {/* Selector Area */}
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Class</label>
+              <select value={selectedClass} onChange={e => { setSelectedClass(e.target.value); setSelectedSubject(''); setParams({ class: e.target.value }) }} className="input" style={{ fontSize: 15 }}>
+                <option value="">Select Class</option>
+                {classOptions.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            {selectedClass && (
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Subject</label>
+                <select value={selectedSubject} onChange={e => { setSelectedSubject(e.target.value); setParams({ class: selectedClass, subject: e.target.value }) }} className="input" style={{ fontSize: 15 }}>
+                  <option value="">Select Subject</option>
+                  {subjectOptions.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Stats & Sync */}
+          {selectedClass && selectedSubject && tests.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, padding: '0 4px' }}>
+              <div style={{ color: '#64748b', fontSize: 13, fontWeight: 600 }}>{tests.length} tests recorded</div>
+              <button onClick={handleSync} className="btn btn-outline" style={{ border: '1.5px solid #7c3aed', color: '#7c3aed', background: '#f5f3ff' }}>
+                 🪄 Sync to Report
+              </button>
+            </div>
+          )}
+
+          {/* Test List */}
+          <div className="test-grid">
+            {!selectedClass || !selectedSubject ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8', gridColumn: '1 / -1' }}>
+                 <div style={{ fontSize: 40, marginBottom: 12 }}>📝</div>
+                 <p>Select a class and subject to view tests</p>
+              </div>
+            ) : tests.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8', gridColumn: '1 / -1' }}>
+                 <p>No tests recorded yet for this subject.</p>
+                 {!showCreate && (
+                   <button onClick={() => setShowCreate(true)} className="btn btn-primary" style={{ marginTop: 12 }}>
+                     Create Your First Test
+                   </button>
+                 )}
+              </div>
+            ) : (
+              tests.map(t => (
+                <div key={t.id} className="card" style={{ borderLeft: '4px solid #7c3aed' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1e293b' }}>{t.title}</h3>
+                      <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                        {new Date(t.test_date).toLocaleDateString()} · Max: <b>{t.max_score}</b>
+                      </p>
+                    </div>
+                    <button onClick={() => handleDeleteTest(t.id)} style={{ padding: 4, background: 'none', border: 'none', color: '#f87171', cursor: 'pointer' }}>
+                      🗑️
+                    </button>
+                  </div>
+                  <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
+                    <button onClick={() => openScoreEntry(t)} className="btn btn-primary" style={{ flex: 1, justifyContent: 'center' }}>
+                      Enter Scores
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </>
       )}
     </div>
   )

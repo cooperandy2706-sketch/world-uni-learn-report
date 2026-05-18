@@ -12,6 +12,7 @@ import { DailyInsightNotification } from '../ui/DailyInsightNotification'
 import { NewsTicker } from '../ui/NewsTicker'
 import FloatingClock from '../shared/FloatingClock'
 import FlaskLoader from '../ui/FlaskLoader'
+import NetworkStatusHUD from '../ui/NetworkStatusHUD'
 import { ROUTES } from '../../constants/routes'
 
 interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'proprietor' | 'teacher' | 'student' | 'bursar' | 'staff' | 'parent' | 'security' | 'driver' | 'nurse' | 'librarian' }
@@ -119,6 +120,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
       <AnnouncementPopup />
       <DailyInsightNotification />
       <FloatingClock />
+      <NetworkStatusHUD />
     </>
   )
 }
