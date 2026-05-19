@@ -17,8 +17,8 @@ export default function ParentWardPage() {
     return (
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', textAlign: 'center', padding: '60px 20px' }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>Ward not found</h2>
-        <p style={{ fontSize: 13, color: '#6b7280' }}>This child may no longer be linked to your account.</p>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>Ward not found</h2>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>This child may no longer be linked to your account.</p>
         <button onClick={() => navigate('/parent/dashboard')}
           style={{ marginTop: 16, padding: '10px 22px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>
           ← Back to Dashboard
@@ -48,7 +48,7 @@ export default function ParentWardPage() {
 
       {/* Back */}
       <button onClick={() => navigate('/parent/dashboard')}
-        style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', fontSize: 13, fontWeight: 600, color: '#6b7280', cursor: 'pointer', marginBottom: 24, padding: 0 }}>
+        style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer', marginBottom: 24, padding: 0 }}>
         ← All Children
       </button>
 
@@ -68,22 +68,22 @@ export default function ParentWardPage() {
       {(ward.gender || ward.class?.name) && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
           {ward.gender && (
-            <div style={{ background: '#fff', border: '1.5px solid #f0eefe', borderRadius: 14, padding: 16 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#9ca3af', marginBottom: 4 }}>Gender</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', textTransform: 'capitalize' }}>{ward.gender}</div>
+            <div style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 14, padding: 16 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-subtle)', marginBottom: 4 }}>Gender</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', textTransform: 'capitalize' }}>{ward.gender}</div>
             </div>
           )}
           {ward.class?.name && (
-            <div style={{ background: '#fff', border: '1.5px solid #f0eefe', borderRadius: 14, padding: 16 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#9ca3af', marginBottom: 4 }}>Class</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{ward.class.name}</div>
+            <div style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 14, padding: 16 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-subtle)', marginBottom: 4 }}>Class</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{ward.class.name}</div>
             </div>
           )}
         </div>
       )}
 
       {/* Quick actions */}
-      <h2 style={{ fontSize: 14, fontWeight: 700, color: '#4b5563', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>Quick Actions</h2>
+      <h2 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>Quick Actions</h2>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         {actions.map(a => (
           <div key={a.label} className="action-card" onClick={() => navigate(a.path)}

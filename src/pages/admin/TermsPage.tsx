@@ -37,7 +37,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   const [hov, setHov] = useState(false)
   const v: Record<string, React.CSSProperties> = {
     primary:   { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger:    { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
     success:   { background: hov ? '#15803d' : '#16a34a', color: '#fff', border: 'none' },
     warning:   { background: hov ? '#b45309' : '#d97706', color: '#fff', border: 'none' },
@@ -56,9 +56,9 @@ function StyledInput({ error, label, ...props }: React.InputHTMLAttributes<HTMLI
   const [f, setF] = useState(false)
   return (
     <div>
-      {label && <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{label}</label>}
+      {label && <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{label}</label>}
       <input {...props} onFocus={e => { setF(true); props.onFocus?.(e) }} onBlur={e => { setF(false); props.onBlur?.(e) }}
-        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
+        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
       {error && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 3 }}>⚠ {error}</p>}
     </div>
   )
@@ -68,9 +68,9 @@ function StyledSelect({ label, error, children, ...props }: React.SelectHTMLAttr
   const [f, setF] = useState(false)
   return (
     <div>
-      {label && <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{label}</label>}
+      {label && <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{label}</label>}
       <select {...props} onFocus={e => { setF(true); props.onFocus?.(e) }} onBlur={e => { setF(false); props.onBlur?.(e) }}
-        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', boxSizing: 'border-box' as const }}>
+        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', boxSizing: 'border-box' as const }}>
         {children}
       </select>
       {error && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 3 }}>⚠ {error}</p>}
@@ -172,22 +172,22 @@ export default function TermsPage() {
             { label: 'Locked Terms', value: lockedCount, icon: '🔒', color: '#dc2626', bg: '#fef2f2' },
             { label: 'Open Terms', value: terms.length - lockedCount, icon: '🟢', color: '#16a34a', bg: '#f0fdf4' },
           ].map((s, i) => (
-            <div key={i} style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_tfadeUp 0.4s ease ${i * 0.07}s both` }}>
+            <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_tfadeUp 0.4s ease ${i * 0.07}s both` }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, marginBottom: 8 }}>{s.icon}</div>
-              <div style={{ fontFamily: (s as any).isText ? '"DM Sans",sans-serif' : '"Playfair Display",serif', fontSize: (s as any).isText ? 14 : 26, fontWeight: 700, color: '#111827', lineHeight: 1.2 }}>{s.value}</div>
-              <div style={{ fontSize: 12, color: '#6b7280', marginTop: 3 }}>{s.label}</div>
+              <div style={{ fontFamily: (s as any).isText ? '"DM Sans",sans-serif' : '"Playfair Display",serif', fontSize: (s as any).isText ? 14 : 26, fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.2 }}>{s.value}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>{s.label}</div>
             </div>
           ))}
         </div>
 
         {/* Year selector */}
         {years.length > 0 && (
-          <div style={{ background: '#fff', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 14 }}>📅</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#374151', whiteSpace: 'nowrap' }}>Academic Year:</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)', whiteSpace: 'nowrap' }}>Academic Year:</span>
             <select value={selectedYearId || currentYear?.id || ''}
               onChange={e => setSelectedYearId(e.target.value)}
-              style={{ flex: 1, maxWidth: 260, padding: '7px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, color: '#111827', outline: 'none', background: '#faf5ff', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
+              style={{ flex: 1, maxWidth: 260, padding: '7px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, color: 'var(--text-main)', outline: 'none', background: '#faf5ff', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
               {(years as any[]).map((y: any) => <option key={y.id} value={y.id}>{y.name}{y.is_current ? ' (Current)' : ''}</option>)}
             </select>
           </div>
@@ -202,10 +202,10 @@ export default function TermsPage() {
 
         {/* Empty */}
         {!isLoading && terms.length === 0 && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>📆</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No terms yet</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>Add terms for the selected academic year.</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No terms yet</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>Add terms for the selected academic year.</p>
           <Btn onClick={() => { reset({ academic_year_id: effectiveYearId, period_type: 'term' }); setModalOpen(true) }}>➕ Add First Term / Semester</Btn>
           </div>
         )}
@@ -217,7 +217,7 @@ export default function TermsPage() {
               const tc = getTermColor(t.name)
               return (
                 <div key={t.id} className="term-card"
-                  style={{ background: '#fff', borderRadius: 18, border: `1.5px solid ${t.is_current ? tc.color + '50' : '#f0eefe'}`, overflow: 'hidden', boxShadow: t.is_current ? `0 4px 20px ${tc.color}18` : '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.22s', animation: `_tfadeUp 0.4s ease ${i * 0.08}s both` }}>
+                  style={{ background: 'var(--bg-card)', borderRadius: 18, border: `1.5px solid ${t.is_current ? tc.color + '50' : '#f0eefe'}`, overflow: 'hidden', boxShadow: t.is_current ? `0 4px 20px ${tc.color}18` : '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.22s', animation: `_tfadeUp 0.4s ease ${i * 0.08}s both` }}>
 
                   {/* Coloured header */}
                   <div style={{ background: `linear-gradient(135deg,${tc.bg},${tc.light})`, padding: '18px 20px', borderBottom: `1px solid ${tc.color}20`, position: 'relative', overflow: 'hidden' }}>
@@ -252,12 +252,12 @@ export default function TermsPage() {
                     {/* Dates */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
                       <div style={{ background: '#faf5ff', borderRadius: 9, padding: '9px 12px' }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Starts</div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{t.start_date ? formatDate(t.start_date) : 'Not set'}</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Starts</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{t.start_date ? formatDate(t.start_date) : 'Not set'}</div>
                       </div>
                       <div style={{ background: '#faf5ff', borderRadius: 9, padding: '9px 12px' }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Ends</div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{t.end_date ? formatDate(t.end_date) : 'Not set'}</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Ends</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{t.end_date ? formatDate(t.end_date) : 'Not set'}</div>
                       </div>
                     </div>
 
@@ -314,7 +314,7 @@ export default function TermsPage() {
               
               {/* Period type toggle */}
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 8 }}>Period Type *</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Period Type *</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
                   {(['term', 'semester', 'quarter', 'custom'] as const).map(pt => (
                     <button

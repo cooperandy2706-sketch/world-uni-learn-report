@@ -25,7 +25,7 @@ function Avatar({ name, size = 36 }: { name: string; size?: number }) {
 }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{children}</label>
+  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{children}</label>
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -49,7 +49,7 @@ function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputEle
           width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13,
           border: `1.5px solid ${error ? '#f87171' : focused ? '#7c3aed' : '#e5e7eb'}`,
           boxShadow: focused ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none',
-          outline: 'none', background: '#fff', color: '#111827',
+          outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)',
           fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s',
           boxSizing: 'border-box',
         }}
@@ -72,7 +72,7 @@ function StyledSelect({ error, children, ...props }: React.SelectHTMLAttributes<
         width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13,
         border: `1.5px solid ${focused ? '#7c3aed' : '#e5e7eb'}`,
         boxShadow: focused ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none',
-        outline: 'none', background: '#fff', color: '#111827',
+        outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)',
         fontFamily: '"DM Sans",sans-serif', cursor: 'pointer',
         boxSizing: 'border-box',
       }}
@@ -94,9 +94,9 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   }
   const variants: Record<string, React.CSSProperties> = {
     primary: { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger: { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', boxShadow: '0 2px 6px rgba(220,38,38,0.22)' },
-    ghost: { background: hov ? '#f5f3ff' : 'transparent', color: '#6b7280' },
+    ghost: { background: hov ? '#f5f3ff' : 'transparent', color: 'var(--text-muted)' },
   }
   return (
     <button type={type} onClick={onClick} disabled={disabled}
@@ -306,7 +306,7 @@ export default function TeacherStudentsPage() {
         <div className="t-header" style={{ marginBottom: 24 }}>
           <div>
             <h1 className="t-title">My Students</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage portal logins and profiles for students in your classes</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Manage portal logins and profiles for students in your classes</p>
           </div>
         </div>
 
@@ -324,7 +324,7 @@ export default function TeacherStudentsPage() {
                 width: '100%', padding: '9px 12px 9px 36px', borderRadius: 9, fontSize: 13,
                 border: `1.5px solid ${searchFocused ? '#7c3aed' : '#e5e7eb'}`,
                 boxShadow: searchFocused ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none',
-                outline: 'none', background: '#faf5ff', color: '#111827',
+                outline: 'none', background: '#faf5ff', color: 'var(--text-main)',
                 fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s',
               }}
             />
@@ -341,7 +341,7 @@ export default function TeacherStudentsPage() {
             <option value="female">♀ Female</option>
           </StyledSelect>
 
-          <span style={{ fontSize: 12, color: '#9ca3af', whiteSpace: 'nowrap', marginLeft: 'auto' }}>
+          <span style={{ fontSize: 12, color: 'var(--text-subtle)', whiteSpace: 'nowrap', marginLeft: 'auto' }}>
             {filtered.length} result{filtered.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -350,16 +350,16 @@ export default function TeacherStudentsPage() {
         {isLoading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading your students…</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading your students…</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>🎓</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No students found</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Ask your administrator to assign classes to you.</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No students found</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Ask your administrator to assign classes to you.</p>
           </div>
         ) : (
-          <div className="t-table-scroll t-table-card" style={{ background: '#fff', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
+          <div className="t-table-scroll t-table-card" style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom: '1.5px solid #ede9fe' }}>
@@ -379,7 +379,7 @@ export default function TeacherStudentsPage() {
                         ) : (
                           <Avatar name={s.full_name} size={34} />
                         )}
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{s.full_name}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{s.full_name}</div>
                       </div>
                     </td>
                     <td data-label="ID" style={{ padding: '12px 16px' }}>
@@ -434,7 +434,7 @@ export default function TeacherStudentsPage() {
                   <button 
                     onClick={() => photoInputRef.current?.click()}
                     disabled={photoUploading}
-                    style={{ position: 'absolute', bottom: -4, right: -4, width: 24, height: 24, borderRadius: '50%', background: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 12 }}
+                    style={{ position: 'absolute', bottom: -4, right: -4, width: 24, height: 24, borderRadius: '50%', background: 'var(--bg-card)', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 12 }}
                     title="Upload Photo"
                   >
                     {photoUploading ? '⏳' : '📷'}
@@ -442,8 +442,8 @@ export default function TeacherStudentsPage() {
                   <input ref={photoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e, viewingStudent)} />
                 </div>
                 <div>
-                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 }}>{viewingStudent.full_name}</h3>
-                  <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{viewingStudent.class?.name ?? 'No class assigned'}</div>
+                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{viewingStudent.full_name}</h3>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{viewingStudent.class?.name ?? 'No class assigned'}</div>
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -455,8 +455,8 @@ export default function TeacherStudentsPage() {
                   { label: 'Address', value: viewingStudent.address },
                 ].map(({ label, value }) => value && (
                   <div key={label} style={{ background: '#faf5ff', borderRadius: 10, padding: '10px 12px' }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</div>
-                    <div style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>{value}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>{value}</div>
                   </div>
                 ))}
               </div>

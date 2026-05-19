@@ -497,8 +497,8 @@ export default function AdminElectionsPage() {
 
   const styles = {
     btn: { padding: '10px 20px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(109,40,217,0.2)' },
-    btnOutline: { padding: '10px 20px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' },
-    card: { background: '#fff', borderRadius: 16, padding: 28, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #f3f4f6', transition: 'all 0.3s' },
+    btnOutline: { padding: '10px 20px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' },
+    card: { background: 'var(--bg-card)', borderRadius: 16, padding: 28, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid var(--border-light)', transition: 'all 0.3s' },
     tabBtn: (active: boolean) => ({ padding: '10px 20px', borderRadius: 12, border: 'none', background: active ? '#f5f3ff' : 'transparent', color: active ? '#6d28d9' : '#6b7280', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' })
   }
 
@@ -514,8 +514,8 @@ export default function AdminElectionsPage() {
       `}</style>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111827', margin: 0 }}>Prefectorial Electoral Commission</h1>
-          <p style={{ color: '#6b7280', marginTop: 4, fontSize: 14 }}>Manage student elections, positions, and vetting</p>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Prefectorial Electoral Commission</h1>
+          <p style={{ color: 'var(--text-muted)', marginTop: 4, fontSize: 14 }}>Manage student elections, positions, and vetting</p>
         </div>
         <select 
           value={selectedElectionId} 
@@ -529,7 +529,7 @@ export default function AdminElectionsPage() {
         </select>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24, background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #f3f4f6', width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24, background: 'var(--bg-card)', padding: 8, borderRadius: 12, border: '1px solid var(--border-light)', width: 'fit-content' }}>
         <button style={styles.tabBtn(tab === 'overview')} onClick={() => setTab('overview')}>Overview</button>
         <button style={styles.tabBtn(tab === 'elections')} onClick={() => setTab('elections')}>Manage Elections</button>
         <button style={styles.tabBtn(tab === 'candidates')} onClick={() => setTab('candidates')}>Candidates & Vetting</button>
@@ -544,26 +544,26 @@ export default function AdminElectionsPage() {
           {selectedElection ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
               <div style={styles.card}>
-                <div style={{ fontSize: 13, color: '#6b7280', textTransform: 'uppercase', fontWeight: 700 }}>Total Positions</div>
-                <div style={{ fontSize: 28, fontWeight: 700, color: '#111827', marginTop: 8 }}>{currentPositions.length}</div>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Total Positions</div>
+                <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-main)', marginTop: 8 }}>{currentPositions.length}</div>
               </div>
               <div style={styles.card}>
-                <div style={{ fontSize: 13, color: '#6b7280', textTransform: 'uppercase', fontWeight: 700 }}>Total Candidates</div>
-                <div style={{ fontSize: 28, fontWeight: 700, color: '#111827', marginTop: 8 }}>{currentCandidates.length}</div>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Total Candidates</div>
+                <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-main)', marginTop: 8 }}>{currentCandidates.length}</div>
               </div>
               <div style={styles.card}>
-                <div style={{ fontSize: 13, color: '#6b7280', textTransform: 'uppercase', fontWeight: 700 }}>Approved Candidates</div>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Approved Candidates</div>
                 <div style={{ fontSize: 28, fontWeight: 700, color: '#16a34a', marginTop: 8 }}>{currentCandidates.filter(c => c.status === 'approved').length}</div>
               </div>
               <div style={styles.card}>
-                <div style={{ fontSize: 13, color: '#6b7280', textTransform: 'uppercase', fontWeight: 700 }}>Total Votes Cast</div>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Total Votes Cast</div>
                 <div style={{ fontSize: 28, fontWeight: 700, color: '#6d28d9', marginTop: 8 }}>{currentVotes.length}</div>
               </div>
             </div>
           ) : (
             <div style={{ ...styles.card, textAlign: 'center', padding: 40 }}>
               <h3 style={{ fontSize: 18, fontWeight: 600 }}>No Elections Yet</h3>
-              <p style={{ color: '#6b7280', marginBottom: 20 }}>Create an election to get started.</p>
+              <p style={{ color: 'var(--text-muted)', marginBottom: 20 }}>Create an election to get started.</p>
               <button style={styles.btn} onClick={() => setShowElectionModal(true)}>Create First Election</button>
             </div>
           )}
@@ -591,9 +591,9 @@ export default function AdminElectionsPage() {
             <div style={styles.card}>
               <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>{selectedElection.title}</h3>
               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                <div style={{ flex: 1, minWidth: 250, padding: 16, background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+                <div style={{ flex: 1, minWidth: 250, padding: 16, background: 'var(--bg-input)', borderRadius: 8, border: '1px solid var(--border-color)' }}>
                   <div style={{ fontWeight: 600, marginBottom: 8 }}>Nomination Phase</div>
-                  <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>Allow students to submit their candidacy.</p>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>Allow students to submit their candidacy.</p>
                   <button 
                     style={{ ...styles.btn, background: selectedElection.nomination_open ? '#ef4444' : '#16a34a', width: '100%' }}
                     onClick={() => toggleElectionState(selectedElection.id, 'nomination_open', selectedElection.nomination_open)}
@@ -601,9 +601,9 @@ export default function AdminElectionsPage() {
                     {selectedElection.nomination_open ? 'Close Nominations' : 'Open Nominations'}
                   </button>
                 </div>
-                <div style={{ flex: 1, minWidth: 250, padding: 16, background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+                <div style={{ flex: 1, minWidth: 250, padding: 16, background: 'var(--bg-input)', borderRadius: 8, border: '1px solid var(--border-color)' }}>
                   <div style={{ fontWeight: 600, marginBottom: 8 }}>Voting Phase</div>
-                  <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>Allow students to cast their votes.</p>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>Allow students to cast their votes.</p>
                   <button 
                     style={{ ...styles.btn, background: selectedElection.voting_open ? '#ef4444' : '#16a34a', width: '100%' }}
                     onClick={() => toggleElectionState(selectedElection.id, 'voting_open', selectedElection.voting_open)}
@@ -624,7 +624,7 @@ export default function AdminElectionsPage() {
               {currentPositions.length > 0 ? (
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
                   <thead>
-                    <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb', textAlign: 'left' }}>
+                    <tr style={{ background: 'var(--bg-input)', borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
                       <th style={{ padding: '12px 16px', fontWeight: 600 }}>Position Title</th>
                       <th style={{ padding: '12px 16px', fontWeight: 600 }}>Max Winners</th>
                       <th style={{ padding: '12px 16px', fontWeight: 600 }}>Candidates</th>
@@ -632,7 +632,7 @@ export default function AdminElectionsPage() {
                   </thead>
                   <tbody>
                     {currentPositions.map(pos => (
-                      <tr key={pos.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                      <tr key={pos.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
                         <td style={{ padding: '12px 16px', fontWeight: 500 }}>{pos.title}</td>
                         <td style={{ padding: '12px 16px' }}>{pos.max_winners}</td>
                         <td style={{ padding: '12px 16px' }}>
@@ -645,7 +645,7 @@ export default function AdminElectionsPage() {
                   </tbody>
                 </table>
               ) : (
-                <p style={{ fontSize: 14, color: '#6b7280' }}>No positions added yet.</p>
+                <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>No positions added yet.</p>
               )}
             </div>
           )}
@@ -665,16 +665,16 @@ export default function AdminElectionsPage() {
               {currentCandidates.map(cand => {
                 const pos = currentPositions.find(p => p.id === cand.position_id)
                 return (
-                  <div key={cand.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, border: '1px solid #e5e7eb', borderRadius: 8 }}>
+                  <div key={cand.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, border: '1px solid var(--border-color)', borderRadius: 8 }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 15, color: '#111827' }}>
+                      <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text-main)' }}>
                         {cand.teacher?.full_name || cand.student?.full_name} 
-                        <span style={{ fontWeight: 400, color: '#6b7280', marginLeft: 6 }}>
+                        <span style={{ fontWeight: 400, color: 'var(--text-muted)', marginLeft: 6 }}>
                           ({cand.teacher_id ? 'Teacher' : 'Student'})
                         </span>
                       </div>
-                      <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Position: <span style={{ fontWeight: 600 }}>{pos?.title}</span></div>
-                      <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>
+                      <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Position: <span style={{ fontWeight: 600 }}>{pos?.title}</span></div>
+                      <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
                         Status: 
                         <span style={{ 
                           marginLeft: 6, fontWeight: 600, textTransform: 'uppercase', fontSize: 11, padding: '2px 6px', borderRadius: 4,
@@ -699,7 +699,7 @@ export default function AdminElectionsPage() {
               })}
             </div>
           ) : (
-            <p style={{ fontSize: 14, color: '#6b7280' }}>No candidates have applied yet.</p>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>No candidates have applied yet.</p>
           )}
         </div>
       )}
@@ -725,7 +725,7 @@ export default function AdminElectionsPage() {
 
             return (
               <div key={pos.id} style={styles.card}>
-                <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: '1px solid #f3f4f6', paddingBottom: 8 }}>{pos.title}</h3>
+                <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, borderBottom: '1px solid var(--border-light)', paddingBottom: 8 }}>{pos.title}</h3>
                 {tallies.length > 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {tallies.map((t, idx) => {
@@ -739,7 +739,7 @@ export default function AdminElectionsPage() {
                             </span>
                             <span style={{ fontWeight: 600 }}>{t.count} votes ({percentage}%)</span>
                           </div>
-                          <div style={{ width: '100%', height: 8, background: '#f3f4f6', borderRadius: 4, overflow: 'hidden' }}>
+                          <div style={{ width: '100%', height: 8, background: 'var(--bg-hover)', borderRadius: 4, overflow: 'hidden' }}>
                             <div style={{ width: `${percentage}%`, height: '100%', background: isWinner ? '#6d28d9' : '#9ca3af', borderRadius: 4 }} />
                           </div>
                         </div>
@@ -747,12 +747,12 @@ export default function AdminElectionsPage() {
                     })}
                   </div>
                 ) : (
-                  <p style={{ fontSize: 13, color: '#6b7280' }}>No approved candidates or votes yet.</p>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>No approved candidates or votes yet.</p>
                 )}
               </div>
             )
           })}
-          {currentPositions.length === 0 && <p style={{ fontSize: 14, color: '#6b7280', padding: 20 }}>No positions created yet.</p>}
+          {currentPositions.length === 0 && <p style={{ fontSize: 14, color: 'var(--text-muted)', padding: 20 }}>No positions created yet.</p>}
           </div>
         </div>
       )}
@@ -761,8 +761,8 @@ export default function AdminElectionsPage() {
         <div style={{ animation: '_slideUp 0.4s ease' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
             <div>
-              <h2 style={{ fontSize: 24, fontWeight: 700, color: '#111827' }}>Official Appointments</h2>
-              <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>Manually appoint candidates to positions regardless of vote counts.</p>
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)' }}>Official Appointments</h2>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Manually appoint candidates to positions regardless of vote counts.</p>
             </div>
             <button onClick={printAppointments} style={{ ...styles.btn, background: 'linear-gradient(135deg, #059669, #10b981)' }}>
               🖨️ Print Appointment List
@@ -777,8 +777,8 @@ export default function AdminElectionsPage() {
               
               return (
                 <div key={pos.id} style={{ ...styles.card, border: appointees.length > 0 ? '2px solid #10b981' : '1px solid #f3f4f6' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid #f3f4f6', paddingBottom: 12 }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>{pos.title}</h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid var(--border-light)', paddingBottom: 12 }}>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>{pos.title}</h3>
                     <span style={{ fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 99, background: '#f0fdf4', color: '#16a34a' }}>
                       {appointees.length} / {pos.max_winners} Appointed
                     </span>
@@ -797,7 +797,7 @@ export default function AdminElectionsPage() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <div>
                                 <div style={{ fontWeight: 700, fontSize: 15 }}>{cand.teacher?.full_name || cand.student?.full_name}</div>
-                                <div style={{ fontSize: 12, color: '#6b7280' }}>
+                                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                                   {voteCount} votes · {cand.teacher_id ? 'Teacher' : 'Student'}
                                 </div>
                               </div>
@@ -817,7 +817,7 @@ export default function AdminElectionsPage() {
                       })}
                     </div>
                   ) : (
-                    <p style={{ color: '#9ca3af', fontSize: 14, textAlign: 'center', padding: '20px 0' }}>No approved candidates.</p>
+                    <p style={{ color: 'var(--text-subtle)', fontSize: 14, textAlign: 'center', padding: '20px 0' }}>No approved candidates.</p>
                   )}
                 </div>
               )
@@ -834,7 +834,7 @@ export default function AdminElectionsPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <div>
                     <h2 style={{ fontSize: 18, fontWeight: 600 }}>Proxy Nomination</h2>
-                    <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Nominate a student or teacher for a position on their behalf.</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Nominate a student or teacher for a position on their behalf.</p>
                   </div>
                   <button style={styles.btn} onClick={() => setShowAdminNominateModal(true)}>Nominate Candidate</button>
                 </div>
@@ -842,7 +842,7 @@ export default function AdminElectionsPage() {
               <div style={styles.card}>
                 <div style={{ marginBottom: 16 }}>
                   <h2 style={{ fontSize: 18, fontWeight: 600 }}>Proxy Voting</h2>
-                  <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Select a voter (student or teacher) below to cast votes on their behalf.</p>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Select a voter (student or teacher) below to cast votes on their behalf.</p>
                 </div>
                 
                 <div style={{ marginBottom: 24, maxWidth: 450 }}>
@@ -871,11 +871,11 @@ export default function AdminElectionsPage() {
                 </div>
 
                 {adminVoteForm.voter_id && (
-                  <div style={{ marginTop: 24, borderTop: '1px solid #f3f4f6', paddingTop: 24 }}>
+                  <div style={{ marginTop: 24, borderTop: '1px solid var(--border-light)', paddingTop: 24 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                       <div>
                         <h3 style={{ fontSize: 16, fontWeight: 700 }}>Ballot Selections</h3>
-                        <p style={{ fontSize: 12, color: '#6b7280' }}>{Object.keys(ballotSelections).length} positions marked</p>
+                        <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{Object.keys(ballotSelections).length} positions marked</p>
                       </div>
                       <button 
                         style={{ ...styles.btn, background: Object.keys(ballotSelections).length > 0 ? 'linear-gradient(135deg, #059669, #10b981)' : '#9ca3af' }}
@@ -896,8 +896,8 @@ export default function AdminElectionsPage() {
                         const currentSelection = ballotSelections[pos.id]
 
                         return (
-                          <div key={pos.id} style={{ padding: 16, borderRadius: 12, border: myVoteForPos ? '2px solid #16a34a' : (currentSelection ? '2px solid #6d28d9' : '1px solid #e5e7eb'), background: '#fff' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, borderBottom: '1px solid #f3f4f6', paddingBottom: 8, alignItems: 'center' }}>
+                          <div key={pos.id} style={{ padding: 16, borderRadius: 12, border: myVoteForPos ? '2px solid #16a34a' : (currentSelection ? '2px solid #6d28d9' : '1px solid #e5e7eb'), background: 'var(--bg-card)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, borderBottom: '1px solid var(--border-light)', paddingBottom: 8, alignItems: 'center' }}>
                               <h3 style={{ fontSize: 15, fontWeight: 600 }}>{pos.title}</h3>
                               {myVoteForPos && (
                                 <button 
@@ -940,7 +940,7 @@ export default function AdminElectionsPage() {
                                 })}
                               </div>
                             ) : (
-                              <p style={{ fontSize: 13, color: '#6b7280' }}>No candidates available.</p>
+                              <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>No candidates available.</p>
                             )}
                           </div>
                         )
@@ -951,7 +951,7 @@ export default function AdminElectionsPage() {
               </div>
             </>
           ) : (
-            <p style={{ fontSize: 14, color: '#6b7280' }}>Please select an election from the dropdown above.</p>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Please select an election from the dropdown above.</p>
           )}
         </div>
       )}
@@ -960,7 +960,7 @@ export default function AdminElectionsPage() {
       {/* Modals */}
       {showElectionModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 400 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, width: '100%', maxWidth: 400 }}>
             <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Create New Election</h3>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Election Title</label>
@@ -980,7 +980,7 @@ export default function AdminElectionsPage() {
 
       {showPositionModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 400 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, width: '100%', maxWidth: 400 }}>
             <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Add Position</h3>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Position Title</label>
@@ -1008,16 +1008,16 @@ export default function AdminElectionsPage() {
 
       {vettingCandidate && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Vet Candidate</h3>
-            <p style={{ fontSize: 14, color: '#374151', marginBottom: 16, fontWeight: 600 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-main)', marginBottom: 16, fontWeight: 600 }}>
               {vettingCandidate.teacher?.full_name || vettingCandidate.student?.full_name} — {currentPositions.find(p => p.id === vettingCandidate.position_id)?.title}
             </p>
             
             {vettingCandidate.manifesto && (
-              <div style={{ background: '#f9fafb', padding: 16, borderRadius: 8, marginBottom: 16, border: '1px solid #e5e7eb' }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', marginBottom: 8 }}>Manifesto</div>
-                <p style={{ fontSize: 14, color: '#374151', whiteSpace: 'pre-wrap', margin: 0 }}>{vettingCandidate.manifesto}</p>
+              <div style={{ background: 'var(--bg-input)', padding: 16, borderRadius: 8, marginBottom: 16, border: '1px solid var(--border-color)' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>Manifesto</div>
+                <p style={{ fontSize: 14, color: 'var(--text-main)', whiteSpace: 'pre-wrap', margin: 0 }}>{vettingCandidate.manifesto}</p>
               </div>
             )}
 
@@ -1060,7 +1060,7 @@ export default function AdminElectionsPage() {
 
       {showAdminNominateModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 450 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, width: '100%', maxWidth: 450 }}>
             <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Proxy Nomination</h3>
             
             <div style={{ marginBottom: 16 }}>

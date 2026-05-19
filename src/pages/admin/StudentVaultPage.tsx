@@ -124,7 +124,7 @@ export default function StudentVaultPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '350px 1fr', gap: 24 }}>
                 {/* Student Selector */}
                 <div className="card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', height: 'fit-content', position: 'sticky', top: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#f9fafb', padding: '10px 14px', borderRadius: '10px', marginBottom: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-input)', padding: '10px 14px', borderRadius: '10px', marginBottom: 16 }}>
                         <Search size={18} color="#9ca3af" />
                         <input 
                             type="text" 
@@ -151,7 +151,7 @@ export default function StudentVaultPage() {
                                 </div>
                                 <div style={{ minWidth: 0 }}>
                                     <div style={{ fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.full_name}</div>
-                                    <div style={{ fontSize: 11, color: '#6b7280' }}>{s.class?.name} · {s.student_id}</div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.class?.name} · {s.student_id}</div>
                                 </div>
                             </div>
                         ))}
@@ -169,7 +169,7 @@ export default function StudentVaultPage() {
                                     </div>
                                     <div>
                                         <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{selectedStudent.full_name}</h2>
-                                        <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>Vault Repository · {documents.length} Files</p>
+                                        <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Vault Repository · {documents.length} Files</p>
                                     </div>
                                 </div>
                                 <button onClick={() => setShowUploadModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#7c3aed', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
@@ -179,9 +179,9 @@ export default function StudentVaultPage() {
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
                                 {documents.length === 0 ? (
-                                    <div className="card" style={{ gridColumn: '1/-1', padding: '100px', textAlign: 'center', borderStyle: 'dashed', background: '#f9fafb' }}>
+                                    <div className="card" style={{ gridColumn: '1/-1', padding: '100px', textAlign: 'center', borderStyle: 'dashed', background: 'var(--bg-input)' }}>
                                         <FileText size={48} color="#e5e7eb" style={{ marginBottom: 16 }} />
-                                        <p style={{ color: '#9ca3af', fontWeight: 500 }}>No documents in this student's vault yet.</p>
+                                        <p style={{ color: 'var(--text-subtle)', fontWeight: 500 }}>No documents in this student's vault yet.</p>
                                     </div>
                                 ) : documents.map((d, i) => (
                                     <div key={i} className="card doc-card" style={{ padding: '20px' }}>
@@ -189,7 +189,7 @@ export default function StudentVaultPage() {
                                             {getDocIcon(d.document_type)}
                                         </div>
                                         <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px', textTransform: 'capitalize' }}>{d.title}</h3>
-                                        <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 16px' }}>{d.document_type.replace('_', ' ')} · {format(new Date(d.created_at), 'MMM dd, yyyy')}</p>
+                                        <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 16px' }}>{d.document_type.replace('_', ' ')} · {format(new Date(d.created_at), 'MMM dd, yyyy')}</p>
                                         <div style={{ display: 'flex', gap: 8 }}>
                                             <a href={d.file_url} target="_blank" rel="noreferrer" style={{ flex: 1, textAlign: 'center', padding: '8px', borderRadius: 8, background: '#f5f3ff', color: '#7c3aed', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
                                                 View
@@ -203,12 +203,12 @@ export default function StudentVaultPage() {
                             </div>
                         </>
                     ) : (
-                        <div className="card" style={{ padding: '120px 40px', textAlign: 'center', borderStyle: 'dashed', background: '#f9fafb' }}>
+                        <div className="card" style={{ padding: '120px 40px', textAlign: 'center', borderStyle: 'dashed', background: 'var(--bg-input)' }}>
                             <div style={{ background: '#ede9fe', color: '#7c3aed', width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                                 <User size={32} />
                             </div>
-                            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>Select a Student</h3>
-                            <p style={{ color: '#6b7280', fontSize: 14, maxWidth: '300px', margin: '0 auto' }}>Choose a student from the directory to access their secure document vault.</p>
+                            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' }}>Select a Student</h3>
+                            <p style={{ color: 'var(--text-muted)', fontSize: 14, maxWidth: '300px', margin: '0 auto' }}>Choose a student from the directory to access their secure document vault.</p>
                         </div>
                     )}
                 </div>
@@ -220,17 +220,17 @@ export default function StudentVaultPage() {
                     <div className="card" style={{ width: '100%', maxWidth: '500px', padding: '32px', animation: 'fadeIn 0.3s ease' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
                             <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Add to Student Vault</h2>
-                            <button onClick={() => setShowUploadModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: 24 }}>✕</button>
+                            <button onClick={() => setShowUploadModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', fontSize: 24 }}>✕</button>
                         </div>
 
                         <form onSubmit={handleUpload} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                             <div>
                                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Document Title</label>
-                                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Birth Certificate" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }} required />
+                                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Birth Certificate" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }} required />
                             </div>
                             <div>
                                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Document Type</label>
-                                <select value={docType} onChange={(e) => setDocType(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }}>
+                                <select value={docType} onChange={(e) => setDocType(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }}>
                                     <option value="birth_certificate">Birth Certificate</option>
                                     <option value="report_card">Academic Report Card</option>
                                     <option value="medical_record">Medical Record</option>
@@ -240,15 +240,15 @@ export default function StudentVaultPage() {
                             </div>
                             <div>
                                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>File URL (Link to Cloud Storage)</label>
-                                <input type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="https://cloud.storage.com/file..." style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }} required />
+                                <input type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="https://cloud.storage.com/file..." style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }} required />
                             </div>
                             <div>
                                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Estimated File Size (MB)</label>
-                                <input type="number" step="0.1" value={fileSizeMB} onChange={(e) => setFileSizeMB(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }} required />
+                                <input type="number" step="0.1" value={fileSizeMB} onChange={(e) => setFileSizeMB(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }} required />
                             </div>
 
                             <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-                                <button type="button" onClick={() => setShowUploadModal(false)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                                <button type="button" onClick={() => setShowUploadModal(false)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                                 <button type="submit" disabled={submitting} style={{ flex: 2, padding: '12px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', fontWeight: 700, cursor: 'pointer' }}>
                                     {submitting ? 'Adding...' : 'Store in Vault'}
                                 </button>

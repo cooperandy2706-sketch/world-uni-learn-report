@@ -511,7 +511,7 @@ export default function ReportCard({
               🔒
             </div>
             <h2 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 800, color: '#1e1b4b', margin: '0 0 12px' }}>Financial Hold</h2>
-            <p style={{ fontSize: 15, color: '#4b5563', maxWidth: 400, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 15, color: 'var(--text-muted)', maxWidth: 400, lineHeight: 1.6 }}>
               Academic results for this term are currently locked due to an outstanding balance. Please contact the school accounts office or pay online via the Billing portal to view your report card.
             </p>
             <div style={{ marginTop: 24, display: 'flex', gap: 12 }}>

@@ -243,7 +243,7 @@ export default function BECEProcessorPage() {
             disabled={processedData.length === 0}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12, 
-              background: '#fff', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer',
+              background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer',
               opacity: processedData.length === 0 ? 0.5 : 1
             }}>
             <Download size={18} /> Export Excel
@@ -252,7 +252,7 @@ export default function BECEProcessorPage() {
       </div>
 
       {/* Selection Panel */}
-      <div style={{ background: '#fff', borderRadius: 20, padding: 24, border: `1.5px solid ${T.border}`, marginBottom: 24 }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, border: `1.5px solid ${T.border}`, marginBottom: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, alignItems: 'flex-end' }}>
           <div>
             <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: T.muted, textTransform: 'uppercase', marginBottom: 8 }}>Class</label>
@@ -283,7 +283,7 @@ export default function BECEProcessorPage() {
 
       {/* Results Table */}
       {processedData.length > 0 ? (
-        <div style={{ background: '#fff', borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
           {/* ... table ... */}
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -336,14 +336,14 @@ export default function BECEProcessorPage() {
               onClick={handleLockScores}
               style={{ 
                 display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 10, 
-                background: '#fff', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer' 
+                background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer' 
               }}>
               <CheckCircle2 size={16} color={T.success} /> Approve & Lock All
             </button>
           </div>
         </div>
       ) : (
-        <div style={{ height: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#fff', borderRadius: 24, border: `1.5px solid ${T.border}` }}>
+        <div style={{ height: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', borderRadius: 24, border: `1.5px solid ${T.border}` }}>
           {selectedClass && students.length > 0 ? (
             <>
               <Users size={48} color={T.primary} style={{ marginBottom: 16, opacity: 0.8 }} />
@@ -388,7 +388,7 @@ export default function BECEProcessorPage() {
             </button>
             <button 
               onClick={() => setIsExportModalOpen(false)}
-              style={{ flex: 1, padding: '12px', borderRadius: 10, background: '#fff', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer' }}>
+              style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer' }}>
               Cancel
             </button>
           </div>

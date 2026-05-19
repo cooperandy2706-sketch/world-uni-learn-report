@@ -9,13 +9,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({ label, error, hint, id
   const inputId = id ?? label?.toLowerCase().replace(/\s+/g,'-')
   return (
     <div style={{ width:'100%', fontFamily:'"DM Sans",sans-serif' }}>
-      {label && <label htmlFor={inputId} style={{ display:'block', fontSize:11, fontWeight:700, letterSpacing:'0.05em', textTransform:'uppercase', color:'#6b7280', marginBottom:5 }}>{label}</label>}
+      {label && <label htmlFor={inputId} style={{ display:'block', fontSize:11, fontWeight:700, letterSpacing:'0.05em', textTransform:'uppercase', color: 'var(--text-muted)', marginBottom:5 }}>{label}</label>}
       <input
         ref={ref} id={inputId}
         className={className}
         style={{
           width:'100%', borderRadius:9, border: error ? '1.5px solid #f87171' : '1.5px solid #e5e7eb',
-          background:'#fff', padding:'9px 12px', fontSize:13, color:'#111827',
+          background: 'var(--bg-card)', padding:'9px 12px', fontSize:13, color: 'var(--text-main)',
           outline:'none', transition:'border-color 0.15s, box-shadow 0.15s',
           fontFamily:'"DM Sans",sans-serif', boxSizing:'border-box', ...style,
         }}
@@ -24,7 +24,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({ label, error, hint, id
         {...props}
       />
       {error && <p style={{ fontSize:11, color:'#ef4444', marginTop:4 }}>⚠ {error}</p>}
-      {hint && !error && <p style={{ fontSize:11, color:'#9ca3af', marginTop:4 }}>{hint}</p>}
+      {hint && !error && <p style={{ fontSize:11, color: 'var(--text-subtle)', marginTop:4 }}>{hint}</p>}
     </div>
   )
 })

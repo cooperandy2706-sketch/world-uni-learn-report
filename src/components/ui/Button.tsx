@@ -10,9 +10,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const vs: Record<string, CSSProperties> = {
   primary:   { background:'linear-gradient(135deg,#7c3aed,#6d28d9)', color:'#fff', border:'none', boxShadow:'0 2px 8px rgba(109,40,217,0.3)' },
-  secondary: { background:'#fff', color:'#374151', border:'1px solid #e5e7eb', boxShadow:'0 1px 3px rgba(0,0,0,0.07)' },
+  secondary: { background: 'var(--bg-card)', color: 'var(--text-main)', border: '1px solid var(--border-color)', boxShadow:'0 1px 3px rgba(0,0,0,0.07)' },
   danger:    { background:'#dc2626', color:'#fff', border:'none', boxShadow:'0 2px 6px rgba(220,38,38,0.25)' },
-  ghost:     { background:'transparent', color:'#6b7280', border:'none', boxShadow:'none' },
+  ghost:     { background:'transparent', color: 'var(--text-muted)', border:'none', boxShadow:'none' },
 }
 
 const ss: Record<string, CSSProperties> = {

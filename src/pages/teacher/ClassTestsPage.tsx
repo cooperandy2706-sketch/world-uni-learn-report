@@ -196,7 +196,7 @@ export default function ClassTestsPage() {
 
       {/* ── SCORE ENTRY INLINE VIEW ── */}
       {activeTest ? (
-        <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #e2e8f0', padding: 20, animation: '_fi 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #e2e8f0', padding: 20, animation: '_fi 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
           <div style={{ paddingBottom: 16, borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <div>
               <button onClick={() => setActiveTest(null)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Tests</button>
@@ -259,7 +259,7 @@ export default function ClassTestsPage() {
 
           {/* ── CREATE INLINE CARD ── */}
           {showCreate && (
-            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #e2e8f0', padding: 20, animation: '_fi 0.3s ease', marginBottom: 20, boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #e2e8f0', padding: 20, animation: '_fi 0.3s ease', marginBottom: 20, boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid #f1f5f9', paddingBottom: 10 }}>
                  <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1e293b' }}>New Class Test</h2>
                  <button onClick={() => setShowCreate(false)} style={{ background: '#f1f5f9', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>

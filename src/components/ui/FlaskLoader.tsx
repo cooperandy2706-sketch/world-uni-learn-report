@@ -8,7 +8,7 @@ interface FlaskLoaderProps {
 
 export default function FlaskLoader({ fullScreen = true, label }: FlaskLoaderProps) {
   const wrapper: React.CSSProperties = fullScreen
-    ? { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#f8f7ff', gap: 24 }
+    ? { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg-app)', gap: 24 }
     : { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: 20 };
 
   return (

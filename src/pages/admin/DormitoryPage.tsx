@@ -180,7 +180,7 @@ export default function DormitoryPage() {
       {activeTab === 'dorms' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
           {dorms.map((d: any) => (
-            <div key={d.id} style={{ background: '#fff', borderRadius: 18, padding: 22, border: '1.5px solid #f0eefe', boxShadow: '0 2px 8px rgba(109,40,217,.04)' }}>
+            <div key={d.id} style={{ background: 'var(--bg-card)', borderRadius: 18, padding: 22, border: '1.5px solid #f0eefe', boxShadow: '0 2px 8px rgba(109,40,217,.04)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                   <div style={{ background: '#f5f3ff', padding: 10, borderRadius: 12, color: '#6d28d9' }}><Home size={20} /></div>
@@ -193,7 +193,7 @@ export default function DormitoryPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 4 }}>
                   <button onClick={() => { setEditingDorm(d); setDormForm({ name: d.name, capacity: d.capacity?.toString() || '', gender_restriction: d.gender_restriction || 'mixed', house_parent_id: d.house_parent_id || '' }); setDormModal(true) }}
-                    style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 }}><Edit size={14} /></button>
+                    style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-subtle)', padding: 4 }}><Edit size={14} /></button>
                   <button onClick={() => { if (confirm('Delete this dormitory?')) deleteDorm.mutate(d.id) }}
                     style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444', padding: 4 }}><Trash2 size={14} /></button>
                 </div>
@@ -205,23 +205,23 @@ export default function DormitoryPage() {
               </div>
             </div>
           ))}
-          {dorms.length === 0 && <p style={{ color: '#9ca3af', fontSize: 14, gridColumn: '1/-1' }}>No dormitories yet. Add one to get started.</p>}
+          {dorms.length === 0 && <p style={{ color: 'var(--text-subtle)', fontSize: 14, gridColumn: '1/-1' }}>No dormitories yet. Add one to get started.</p>}
         </div>
       )}
 
       {/* ── ROOMS TAB ── */}
       {activeTab === 'rooms' && (
         dorms.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 18, padding: '40px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '40px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🏠</div>
-            <p style={{ color: '#9ca3af', fontSize: 14 }}>Create dormitories first before adding rooms.</p>
+            <p style={{ color: 'var(--text-subtle)', fontSize: 14 }}>Create dormitories first before adding rooms.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {dorms.map((d: any) => {
               const dormRooms = roomsByDorm[d.id] || []
               return (
-                <div key={d.id} style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+                <div key={d.id} style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
                   <div style={{ padding: '16px 20px', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom: '1px solid #f0eefe', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <Home size={16} color="#6d28d9" />
@@ -254,7 +254,7 @@ export default function DormitoryPage() {
                       )
                     })}
                     {dormRooms.length === 0 && (
-                      <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '20px', color: '#9ca3af', fontSize: 13 }}>
+                      <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '20px', color: 'var(--text-subtle)', fontSize: 13 }}>
                         No rooms yet — click "Add Room" above.
                       </div>
                     )}
@@ -268,7 +268,7 @@ export default function DormitoryPage() {
 
       {/* ── ASSIGNMENTS TAB ── */}
       {activeTab === 'assignments' && (
-        <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#fcfaff', borderBottom: '1.5px solid #f0eefe' }}>
@@ -284,7 +284,7 @@ export default function DormitoryPage() {
                 return (
                   <tr key={a.id} style={{ borderBottom: '1px solid #f8fafc' }}>
                     <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 600, color: '#1e0646' }}>
-                      {a.student?.full_name} <span style={{ color: '#9ca3af', fontSize: 11, fontWeight: 400 }}>({a.student?.student_id})</span>
+                      {a.student?.full_name} <span style={{ color: 'var(--text-subtle)', fontSize: 11, fontWeight: 400 }}>({a.student?.student_id})</span>
                     </td>
                     <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>{dorm?.name || '—'}</td>
                     <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>Room {room?.room_number || '—'}</td>
@@ -299,7 +299,7 @@ export default function DormitoryPage() {
                 )
               })}
               {assignments.length === 0 && (
-                <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: '#9ca3af', fontSize: 14 }}>No students assigned to dorms yet.</td></tr>
+                <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)', fontSize: 14 }}>No students assigned to dorms yet.</td></tr>
               )}
             </tbody>
           </table>

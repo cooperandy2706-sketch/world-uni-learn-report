@@ -177,7 +177,7 @@ export default function NurseMedicationPage() {
       {/* Add Modal */}
       {modal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: '#fff', width: '100%', maxWidth: 520, borderRadius: 20, overflow: 'hidden', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 520, borderRadius: 20, overflow: 'hidden', maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ padding: '20px 24px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Add Medication Schedule</h3>
               <button onClick={() => setModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.muted }}><X size={20} /></button>
@@ -187,7 +187,7 @@ export default function NurseMedicationPage() {
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: T.muted, marginBottom: 6, textTransform: 'uppercase' }}>Student *</label>
                 <select value={form.student_id} onChange={e => setForm(p => ({ ...p, student_id: e.target.value }))}
-                  style={{ width: '100%', padding: 10, borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontSize: 14, background: '#fff' }}>
+                  style={{ width: '100%', padding: 10, borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontSize: 14, background: 'var(--bg-card)' }}>
                   <option value="">-- Select Student --</option>
                   {(students as any[]).map((s: any) => (
                     <option key={s.id} value={s.id}>{s.full_name} ({s.class?.name})</option>
@@ -211,7 +211,7 @@ export default function NurseMedicationPage() {
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: T.muted, marginBottom: 6, textTransform: 'uppercase' }}>Frequency</label>
                 <select value={form.frequency} onChange={e => setForm(p => ({ ...p, frequency: e.target.value }))}
-                  style={{ width: '100%', padding: 10, borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontSize: 14, background: '#fff' }}>
+                  style={{ width: '100%', padding: 10, borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontSize: 14, background: 'var(--bg-card)' }}>
                   {FREQUENCIES.map(f => <option key={f}>{f}</option>)}
                 </select>
               </div>

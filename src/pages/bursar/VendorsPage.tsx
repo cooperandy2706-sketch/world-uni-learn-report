@@ -122,7 +122,7 @@ export default function VendorsPage() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 32 }}>
-        <div style={{ background: '#fff', padding: 24, borderRadius: 20, border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 20, border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ width: 48, height: 48, borderRadius: 14, background: '#f5f3ff', color: '#6d28d9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Truck size={24} />
           </div>
@@ -131,7 +131,7 @@ export default function VendorsPage() {
             <div style={{ fontSize: 24, fontWeight: 900, color: '#0f172a' }}>{vendors.length}</div>
           </div>
         </div>
-        <div style={{ background: '#fff', padding: 24, borderRadius: 20, border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 20, border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ width: 48, height: 48, borderRadius: 14, background: '#ecfdf5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <ShoppingBag size={24} />
           </div>
@@ -140,7 +140,7 @@ export default function VendorsPage() {
             <div style={{ fontSize: 24, fontWeight: 900, color: '#0f172a' }}>—</div>
           </div>
         </div>
-        <div style={{ background: '#fff', padding: 24, borderRadius: 20, border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 20, border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ width: 48, height: 48, borderRadius: 14, background: '#fff7ed', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <TrendingUp size={24} />
           </div>
@@ -152,7 +152,7 @@ export default function VendorsPage() {
       </div>
 
       {/* Search & Filter */}
-      <div style={{ background: '#fff', padding: '12px 20px', borderRadius: 16, border: '1.5px solid #f1f5f9', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: 'var(--bg-card)', padding: '12px 20px', borderRadius: 16, border: '1.5px solid #f1f5f9', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
         <Search size={20} color="#94a3b8" />
         <input 
           type="text" 
@@ -167,7 +167,7 @@ export default function VendorsPage() {
       {isLoading ? (
         <div style={{ padding: 100, textAlign: 'center', color: '#94a3b8' }}>Loading directory...</div>
       ) : filtered.length === 0 ? (
-        <div style={{ padding: 100, textAlign: 'center', background: '#fff', borderRadius: 24, border: '1.5px dashed #e2e8f0' }}>
+        <div style={{ padding: 100, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 24, border: '1.5px dashed #e2e8f0' }}>
           <Truck size={48} color="#cbd5e1" style={{ marginBottom: 16 }} />
           <h3 style={{ fontSize: 18, fontWeight: 700, color: '#475569', margin: 0 }}>No Vendors Found</h3>
           <p style={{ color: '#94a3b8', fontSize: 14, marginTop: 8 }}>Try adjusting your search or add a new vendor to your directory.</p>
@@ -175,7 +175,7 @@ export default function VendorsPage() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
           {filtered.map(v => (
-            <div key={v.id} className="v-card" style={{ background: '#fff', borderRadius: 24, padding: 24, position: 'relative', overflow: 'hidden' }}>
+            <div key={v.id} className="v-card" style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 24, position: 'relative', overflow: 'hidden' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
                 <div style={{ width: 56, height: 56, borderRadius: 16, background: '#f8fafc', border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
                   🏢
@@ -209,7 +209,7 @@ export default function VendorsPage() {
                   <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Total Spend</div>
                   <div style={{ fontSize: 16, fontWeight: 900, color: '#0f172a' }}>{GHS(spending[v.id] || 0)}</div>
                 </div>
-                <button style={{ padding: '8px 12px', borderRadius: 10, border: '1.5px solid #e2e8f0', background: '#fff', color: '#64748b', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <button style={{ padding: '8px 12px', borderRadius: 10, border: '1.5px solid #e2e8f0', background: 'var(--bg-card)', color: '#64748b', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                   History <ExternalLink size={12} />
                 </button>
               </div>

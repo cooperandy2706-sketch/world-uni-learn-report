@@ -141,8 +141,8 @@ export default function StudentAssignmentsPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
         
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>My Assignments</h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>View and complete your digital quizzes</p>
+          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>My Assignments</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>View and complete your digital quizzes</p>
         </div>
 
         {/* ── Main View Switcher ── */}
@@ -156,13 +156,13 @@ export default function StudentAssignmentsPage() {
         </div>
 
         {viewMode === 'global' && selectedGlobalSubject && (
-           <button onClick={() => setSelectedGlobalSubject(null)} style={{ background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: '#374151', cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+           <button onClick={() => setSelectedGlobalSubject(null)} style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: 'var(--text-main)', cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
              ← Back to Subjects
            </button>
         )}
 
         {/* ── Status Filter Tabs ── */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 24, background: '#fff', padding: 6, borderRadius: 12, border: '1.5px solid #f0eefe', width: 'fit-content' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 24, background: 'var(--bg-card)', padding: 6, borderRadius: 12, border: '1.5px solid #f0eefe', width: 'fit-content' }}>
           {(['all', 'pending', 'completed'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: '8px 20px', borderRadius: 9, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
@@ -177,42 +177,42 @@ export default function StudentAssignmentsPage() {
         {/* ── List ── */}
         {isLoading ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
-             <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading your tasks...</p>
+             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading your tasks...</p>
           </div>
         ) : viewMode === 'global' && !selectedGlobalSubject ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
             {globalSubjects.length === 0 ? (
-               <div style={{ background: '#fff', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
                  <div style={{ fontSize: 48, marginBottom: 12 }}>🌍</div>
-                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No challenges yet!</h3>
-                 <p style={{ fontSize: 13, color: '#9ca3af' }}>The school hasn't published any global quizzes.</p>
+                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No challenges yet!</h3>
+                 <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>The school hasn't published any global quizzes.</p>
                </div>
             ) : globalSubjects.map(sub => (
               <div key={sub.id} className="assign-card" onClick={() => setSelectedGlobalSubject(sub.id)} style={{ 
-                background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
+                background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
                 boxShadow: '0 2px 8px rgba(109,40,217,0.05)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16
               }}>
                 <div style={{ width: 48, height: 48, borderRadius: 14, background: '#f5f3ff', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
                   📚
                 </div>
                 <div>
-                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{sub.name}</h3>
-                  <p style={{ fontSize: 13, color: '#6b7280', margin: 0, fontWeight: 600 }}>{sub.count} Quizzes Available</p>
+                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px 0' }}>{sub.name}</h3>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, fontWeight: 600 }}>{sub.count} Quizzes Available</p>
                 </div>
               </div>
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>{viewMode === 'global' ? '🌍' : '🎉'}</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>All caught up!</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>You have no {filter !== 'all' ? filter : ''} {viewMode === 'global' ? 'global quizzes in this subject' : 'assignments'} at the moment.</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>All caught up!</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>You have no {filter !== 'all' ? filter : ''} {viewMode === 'global' ? 'global quizzes in this subject' : 'assignments'} at the moment.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
             {filtered.map((a, i) => (
               <div key={a.id} className="assign-card" style={{ 
-                background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
+                background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
                 boxShadow: '0 2px 8px rgba(109,40,217,0.05)', transition: 'all 0.3s ease',
                 animation: `_fadeUp 0.4s ease ${i * 0.05}s both`,
                 cursor: a.status === 'completed' ? 'default' : 'pointer'
@@ -237,8 +237,8 @@ export default function StudentAssignmentsPage() {
                   )}
                 </div>
 
-                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: '#111827', margin: '0 0 6px 0' }}>{a.title}</h3>
-                <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 20, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 6px 0' }}>{a.title}</h3>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {a.description || 'No instructions provided.'}
                 </p>
 
@@ -251,7 +251,7 @@ export default function StudentAssignmentsPage() {
                     </div>
                 ) : (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f5f3ff', paddingTop: 16 }}>
-                    <div style={{ fontSize: 12, color: '#9ca3af' }}>
+                    <div style={{ fontSize: 12, color: 'var(--text-subtle)' }}>
                       {a.due_date ? `Due ${formatDate(a.due_date)}` : (a.type === 'global' ? 'Global Challenge' : 'No deadline')}
                     </div>
                     <button style={{ 

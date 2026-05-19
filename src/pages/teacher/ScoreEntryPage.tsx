@@ -545,7 +545,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
         <div style={{ marginBottom:20, display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
           <div>
             <h1 style={{ fontFamily:'"Playfair Display",serif', fontSize:24, fontWeight:700, margin:0 }}>Flexible Score Entry</h1>
-            <p style={{ fontSize:13, color:'#6b7280', marginTop:3 }}>
+            <p style={{ fontSize:13, color: 'var(--text-muted)', marginTop:3 }}>
               {dirty && !saving && <span style={{ color:'#d97706' }}>● Unsaved changes</span>}
               {saving && <span style={{ color:'#6d28d9' }}>Saving…</span>}
             </p>
@@ -556,11 +556,11 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
               {selectedSubjectId !== 'all' && (
                 <>
                   <div style={{ display:'flex', flexDirection:'column', gap:3 }}>
-                    <label style={{ fontSize:9, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.06em' }}>Sync into</label>
+                    <label style={{ fontSize:9, fontWeight:700, color: 'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.06em' }}>Sync into</label>
                     <select
                       value={syncTargetCatId}
                       onChange={e => setSyncTargetCatId(e.target.value)}
-                      style={{ padding:'5px 8px', borderRadius:7, border:'1.5px solid #ddd6fe', fontSize:11, fontWeight:600, color:'#4b5563', background:'#faf5ff', outline:'none', cursor:'pointer' }}
+                      style={{ padding:'5px 8px', borderRadius:7, border:'1.5px solid #ddd6fe', fontSize:11, fontWeight:600, color: 'var(--text-muted)', background:'#faf5ff', outline:'none', cursor:'pointer' }}
                     >
                       <option value="">Auto-detect</option>
                       {gradingCategories.map(c => <option key={c.id} value={c.id}>{c.name} (max {c.max_score})</option>)}
@@ -574,7 +574,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
                   </button>
                 </>
               )}
-              <button onClick={() => handleSave(true)} disabled={saving || !dirty} style={{ padding:'10px 16px', borderRadius:9, background:'#fff', border:'1px solid #e5e7eb', cursor:'pointer' }}>💾 Save</button>
+              <button onClick={() => handleSave(true)} disabled={saving || !dirty} style={{ padding:'10px 16px', borderRadius:9, background: 'var(--bg-card)', border: '1px solid var(--border-color)', cursor:'pointer' }}>💾 Save</button>
               <button onClick={handleSubmit} disabled={submitting || enteredCount === 0} style={{ padding:'10px 16px', borderRadius:9, background:'#6d28d9', color:'#fff', border:'none', cursor:'pointer' }}>📤 Submit</button>
             </div>
           )}
@@ -586,11 +586,11 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
             {selectedSubjectId !== 'all' && (
               <>
                 <div style={{ display:'flex', flexDirection:'column', gap:3 }}>
-                  <label style={{ fontSize:9, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.06em' }}>Sync into</label>
+                  <label style={{ fontSize:9, fontWeight:700, color: 'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.06em' }}>Sync into</label>
                   <select
                     value={syncTargetCatId}
                     onChange={e => setSyncTargetCatId(e.target.value)}
-                    style={{ padding:'5px 8px', borderRadius:7, border:'1.5px solid #ddd6fe', fontSize:11, fontWeight:600, color:'#4b5563', background:'#faf5ff', outline:'none', cursor:'pointer' }}
+                    style={{ padding:'5px 8px', borderRadius:7, border:'1.5px solid #ddd6fe', fontSize:11, fontWeight:600, color: 'var(--text-muted)', background:'#faf5ff', outline:'none', cursor:'pointer' }}
                   >
                     <option value="">Auto-detect</option>
                     {gradingCategories.map(c => <option key={c.id} value={c.id}>{c.name} (max {c.max_score})</option>)}
@@ -604,24 +604,24 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
                 </button>
               </>
             )}
-            <button onClick={() => handleSave(true)} disabled={saving || !dirty} style={{ padding:'10px 16px', borderRadius:9, background:'#fff', border:'1px solid #e5e7eb', cursor:'pointer' }}>💾 Save</button>
+            <button onClick={() => handleSave(true)} disabled={saving || !dirty} style={{ padding:'10px 16px', borderRadius:9, background: 'var(--bg-card)', border: '1px solid var(--border-color)', cursor:'pointer' }}>💾 Save</button>
             <button onClick={handleSubmit} disabled={submitting || enteredCount === 0} style={{ padding:'10px 16px', borderRadius:9, background:'#6d28d9', color:'#fff', border:'none', cursor:'pointer' }}>📤 Submit</button>
         </div>
       )}
 
 
-      <div style={{ background:'#fff', borderRadius:14, padding:'16px 20px', border:'1px solid #e5e7eb', marginBottom:18, display:'flex', gap:16, flexWrap: 'wrap' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius:14, padding:'16px 20px', border: '1px solid var(--border-color)', marginBottom:18, display:'flex', gap:16, flexWrap: 'wrap' }}>
         <div style={{ flex:'1 1 200px' }}>
-          <label style={{ display:'block', fontSize:11, fontWeight:700, color:'#6b7280', marginBottom:5 }}>Class</label>
-          <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)} style={{ width:'100%', padding:'9px 12px', borderRadius:9, border:'1px solid #e5e7eb', outline:'none' }}>
+          <label style={{ display:'block', fontSize:11, fontWeight:700, color: 'var(--text-muted)', marginBottom:5 }}>Class</label>
+          <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)} style={{ width:'100%', padding:'9px 12px', borderRadius:9, border: '1px solid var(--border-color)', outline:'none' }}>
             <option value="">Select class…</option>
             {(classOptions as any[]).map((c:any) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
         {selectedClass && subjects.length > 0 && (
           <div style={{ flex:'1 1 200px' }}>
-            <label style={{ display:'block', fontSize:11, fontWeight:700, color:'#6b7280', marginBottom:5 }}>Subject View (Mobile Friendly)</label>
-            <select value={selectedSubjectId} onChange={e => setSelectedSubjectId(e.target.value)} style={{ width:'100%', padding:'9px 12px', borderRadius:9, border:'1px solid #e5e7eb', outline:'none' }}>
+            <label style={{ display:'block', fontSize:11, fontWeight:700, color: 'var(--text-muted)', marginBottom:5 }}>Subject View (Mobile Friendly)</label>
+            <select value={selectedSubjectId} onChange={e => setSelectedSubjectId(e.target.value)} style={{ width:'100%', padding:'9px 12px', borderRadius:9, border: '1px solid var(--border-color)', outline:'none' }}>
               <option value="all">All Subjects (Wide Grid)</option>
               {subjects.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
             </select>
@@ -629,7 +629,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
         )}
         {gradingScaleLevels.length > 0 && (
            <div style={{ flex:'2 1 300px' }}>
-              <label style={{ display:'block', fontSize:11, fontWeight:700, color:'#6b7280', marginBottom:5 }}>Grading Scale Applied</label>
+              <label style={{ display:'block', fontSize:11, fontWeight:700, color: 'var(--text-muted)', marginBottom:5 }}>Grading Scale Applied</label>
               <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
                 {gradingScaleLevels.map(l => (
                    <span key={l.id} style={{ fontSize:10, fontWeight:700, color:l.color_code, background:`${l.color_code}15`, padding:'3px 6px', borderRadius:6 }}>{l.label} ({l.min_score}+)</span>
@@ -644,7 +644,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
       {!loading && selectedClass && students.length > 0 && subjects.length > 0 && (() => {
         const subjectsToRender = selectedSubjectId === 'all' ? subjects : subjects.filter(s => s.id === selectedSubjectId)
         return (
-          <div style={{ overflowX: 'auto', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14 }}>
+          <div style={{ overflowX: 'auto', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 14 }}>
              <table className="sba-table" style={{ minWidth: COL_STUDENT + subjectsToRender.length * COL_SUBJECT + (selectedSubjectId === 'all' ? 160 : 0) }}>
                 <thead style={{ position:'sticky', top:0, zIndex:10 }}>
                   <tr>
@@ -686,7 +686,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
                   return (
                     <tr key={stu.id} className="sba-row">
                       <td className="sticky-std" style={{ background: rowIdx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                         <div style={{ fontSize:12, fontWeight:700, color:'#111827', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', maxWidth: 160 }}>{stu.full_name}</div>
+                         <div style={{ fontSize:12, fontWeight:700, color: 'var(--text-main)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', maxWidth: 160 }}>{stu.full_name}</div>
                       </td>
                       {subjectsToRender.map(sub => {
                         const sc = scoreMap[stu.id]?.[sub.id]
@@ -732,8 +732,8 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
                     {stu.full_name.charAt(0)}
                   </div>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{stu.full_name}</div>
-                    {stu.student_id && <div style={{ fontSize: 11, color: '#9ca3af' }}>{stu.student_id}</div>}
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{stu.full_name}</div>
+                    {stu.student_id && <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{stu.student_id}</div>}
                   </div>
                   {(() => { const avg = getStudentAvg(stu.id); const g = avg > 0 ? getGrade(avg) : null; return g ? <span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 800, background: g.color + '18', color: g.color, padding: '3px 8px', borderRadius: 6 }}>{g.grade} {avg.toFixed(1)}%</span> : null })()}
                 </div>
@@ -747,13 +747,13 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
                       <div className="t-score-card-grid">
                         {gradingCategories.map(c => (
                           <div key={c.id}>
-                            <div style={{ fontSize: 10, color: '#9ca3af', marginBottom: 4, fontWeight: 600 }}>{c.name} <span style={{ color: '#d1d5db' }}>/{c.max_score}</span></div>
+                            <div style={{ fontSize: 10, color: 'var(--text-subtle)', marginBottom: 4, fontWeight: 600 }}>{c.name} <span style={{ color: '#d1d5db' }}>/{c.max_score}</span></div>
                             <TinyInput value={sc?.scores[c.id] ?? ''} max={c.max_score} disabled={isLocked} onChange={v => updateScore(stu.id, sub.id, c.id, v)} />
                           </div>
                         ))}
                         {total > 0 && (
                           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                            <div style={{ fontSize: 10, color: '#9ca3af', marginBottom: 4, fontWeight: 600 }}>Total</div>
+                            <div style={{ fontSize: 10, color: 'var(--text-subtle)', marginBottom: 4, fontWeight: 600 }}>Total</div>
                             <div style={{ fontSize: 16, fontWeight: 800, color: g?.color ?? '#111827' }}>{total.toFixed(1)}{g && <span style={{ fontSize: 11, marginLeft: 4 }}>{g.grade}</span>}</div>
                           </div>
                         )}
@@ -767,12 +767,12 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
           {/* Sticky save bar for mobile */}
           {!isLocked && students.length > 0 && (
             <div className="t-sticky-bar">
-              <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 600 }}>
+              <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>
                 {dirty ? '● Unsaved changes' : '✓ All saved'}
               </span>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={() => handleSave(true)} disabled={saving || !dirty}
-                  style={{ flex: 1, padding: '12px', borderRadius: 10, background: '#fff', border: '1.5px solid #e5e7eb', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+                  style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
                   {saving ? 'Saving…' : '💾 Save'}
                 </button>
                 <button onClick={handleSubmit} disabled={submitting || enteredCount === 0}

@@ -130,12 +130,12 @@ export default function AdminStaffLeavePage() {
 
         {/* List */}
         {filtered.length === 0 ? (
-          <div style={{ background: '#fff', border: '1.5px dashed #e5e7eb', borderRadius: 24, padding: '60px 20px', textAlign: 'center', animation: 'fadeUp 0.4s ease 0.2s both' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1.5px dashed var(--border-color)', borderRadius: 24, padding: '60px 20px', textAlign: 'center', animation: 'fadeUp 0.4s ease 0.2s both' }}>
             <div style={{ width: 64, height: 64, background: '#f8fafc', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <Calendar size={32} color="#94a3b8" />
             </div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>No requests found</h3>
-            <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>There are no leave requests matching your current filters.</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' }}>No requests found</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>There are no leave requests matching your current filters.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gap: 16 }}>
@@ -143,12 +143,12 @@ export default function AdminStaffLeavePage() {
               const statusInfo = getStatusDisplay(req.status)
               
               return (
-                <div key={req.id} className="req-card" style={{ background: '#fff', borderRadius: 20, border: '1px solid #f0eefe', padding: 24, display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'space-between', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', animation: `fadeUp 0.4s ease ${0.15 + i * 0.05}s both` }}>
+                <div key={req.id} className="req-card" style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1px solid #f0eefe', padding: 24, display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'space-between', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', animation: `fadeUp 0.4s ease ${0.15 + i * 0.05}s both` }}>
                   
                   <div style={{ display: 'flex', gap: 20, flex: 1, minWidth: 300 }}>
                     <div style={{ flexShrink: 0 }}>
                       {req.user?.avatar_url ? (
-                        <img src={req.user.avatar_url} alt="" style={{ width: 56, height: 56, borderRadius: 16, objectFit: 'cover', background: '#f3f4f6' }} />
+                        <img src={req.user.avatar_url} alt="" style={{ width: 56, height: 56, borderRadius: 16, objectFit: 'cover', background: 'var(--bg-hover)' }} />
                       ) : (
                         <div style={{ width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, color: '#4f46e5' }}>
                           {req.user?.full_name?.charAt(0) || 'S'}
@@ -156,7 +156,7 @@ export default function AdminStaffLeavePage() {
                       )}
                     </div>
                     <div>
-                      <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 6px' }}>{req.user?.full_name}</h3>
+                      <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 6px' }}>{req.user?.full_name}</h3>
                       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                         <span style={{ fontSize: 13, fontWeight: 700, color: '#7c3aed', textTransform: 'capitalize', background: '#f5f3ff', padding: '4px 10px', borderRadius: 8 }}>
                           {req.leave_type} Leave
@@ -164,22 +164,22 @@ export default function AdminStaffLeavePage() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 8, background: statusInfo.bg, color: statusInfo.color, fontSize: 12, fontWeight: 700 }}>
                           {statusInfo.icon} {statusInfo.label}
                         </div>
-                        <div style={{ fontSize: 13, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}>
+                        <div style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}>
                           <Calendar size={14} />
                           {new Date(req.start_date).toLocaleDateString('en-GB', { dateStyle: 'medium' })} → {new Date(req.end_date).toLocaleDateString('en-GB', { dateStyle: 'medium' })}
                         </div>
                       </div>
                       
                       {req.reason && (
-                        <div style={{ background: '#f9fafb', border: '1px solid #f3f4f6', borderRadius: 12, padding: '12px 16px' }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9ca3af', display: 'block', marginBottom: 4 }}>Reason</span>
-                          <p style={{ fontSize: 13, color: '#4b5563', margin: 0, lineHeight: 1.5 }}>{req.reason}</p>
+                        <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border-light)', borderRadius: 12, padding: '12px 16px' }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-subtle)', display: 'block', marginBottom: 4 }}>Reason</span>
+                          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>{req.reason}</p>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 220, borderLeft: '1px solid #f3f4f6', paddingLeft: 24 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 220, borderLeft: '1px solid var(--border-light)', paddingLeft: 24 }}>
                     {req.status === 'pending' ? (
                       <button
                         onClick={() => { setActionReq(req); setSubstituteId(''); setAdminNotes('') }}
@@ -221,10 +221,10 @@ export default function AdminStaffLeavePage() {
         {/* Review Modal */}
         {actionReq && (
           <div className="modal-overlay">
-            <div style={{ background: '#fff', borderRadius: 24, width: '100%', maxWidth: 540, boxShadow: '0 24px 48px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 540, boxShadow: '0 24px 48px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
               
-              <div style={{ padding: '24px 32px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc' }}>
-                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111827', margin: 0, fontFamily: '"Playfair Display", serif' }}>Review Leave Request</h2>
+              <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc' }}>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: 0, fontFamily: '"Playfair Display", serif' }}>Review Leave Request</h2>
                 <button onClick={() => setActionReq(null)} style={{ background: '#e2e8f0', border: 'none', width: 32, height: 32, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}>
                   <X size={18} />
                 </button>
@@ -239,7 +239,7 @@ export default function AdminStaffLeavePage() {
 
                 <div style={{ display: 'grid', gap: 24 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', marginBottom: 8 }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', marginBottom: 8 }}>
                       Assign Substitute Teacher (Optional)
                     </label>
                     <select className="input-field" value={substituteId} onChange={e => setSubstituteId(e.target.value)}>
@@ -248,13 +248,13 @@ export default function AdminStaffLeavePage() {
                         <option key={t.id} value={t.id}>{t.full_name}</option>
                       ))}
                     </select>
-                    <p style={{ fontSize: 12, color: '#9ca3af', margin: '6px 0 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <p style={{ fontSize: 12, color: 'var(--text-subtle)', margin: '6px 0 0', display: 'flex', alignItems: 'center', gap: 6 }}>
                       <Clock size={12} /> The substitute will temporarily gain access to the absent teacher's timetable and lesson plans.
                     </p>
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', marginBottom: 8 }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', marginBottom: 8 }}>
                       Admin Notes / Remarks (Optional)
                     </label>
                     <textarea 
@@ -269,12 +269,12 @@ export default function AdminStaffLeavePage() {
                 </div>
               </div>
 
-              <div style={{ padding: '20px 32px', background: '#f8fafc', borderTop: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12 }}>
+              <div style={{ padding: '20px 32px', background: '#f8fafc', borderTop: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12 }}>
                 <button
                   onClick={() => handleAction('rejected')}
                   disabled={processing}
                   className="action-btn"
-                  style={{ background: '#fff', color: '#dc2626', border: '1.5px solid #fecaca', opacity: processing ? 0.5 : 1 }}
+                  style={{ background: 'var(--bg-card)', color: '#dc2626', border: '1.5px solid #fecaca', opacity: processing ? 0.5 : 1 }}
                 >
                   Reject Request
                 </button>

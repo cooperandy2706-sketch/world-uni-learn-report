@@ -122,7 +122,7 @@ export default function ProprietorFinances() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
           <h1 style={{ fontSize: 32, fontWeight: 800, margin: 0, color: '#0f172a' }}>Financial Health</h1>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: '#fff', padding: '6px 12px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: 'var(--bg-card)', padding: '6px 12px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
               <Calendar size={14} color="#64748b" />
               <input type="date" value={dateRange.start} onChange={e => setDateRange({...dateRange, start: e.target.value})} style={{ border: 'none', fontSize: 13, fontWeight: 600, outline: 'none' }} />
               <span style={{ color: '#94a3b8' }}>→</span>

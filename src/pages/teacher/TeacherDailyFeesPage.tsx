@@ -121,12 +121,12 @@ export default function TeacherDailyFeesPage() {
     onError: (e: any) => toast.error(e.message)
   })
 
-  if (loadingAuth || !term) return <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading...</div>
+  if (loadingAuth || !term) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>Loading...</div>
   if (!collectorAuth) return (
     <div style={{ padding: 60, textAlign: 'center' }}>
       <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
-      <h2 style={{ fontSize: 20, color: '#111827', margin: '0 0 8px' }}>Not Authorized</h2>
-      <p style={{ color: '#6b7280' }}>You have not been assigned to collect daily fees.</p>
+      <h2 style={{ fontSize: 20, color: 'var(--text-main)', margin: '0 0 8px' }}>Not Authorized</h2>
+      <p style={{ color: 'var(--text-muted)' }}>You have not been assigned to collect daily fees.</p>
     </div>
   )
 
@@ -143,25 +143,25 @@ export default function TeacherDailyFeesPage() {
       <div className="t-header" style={{ marginBottom: 24 }}>
         <div>
           <h1 className="t-title">Daily Collections</h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Record daily school fees directly from your device</p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Record daily school fees directly from your device</p>
         </div>
       </div>
 
       <div className="t-filter-bar" style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 100%' }}>
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Date</label>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid #e5e7eb', outline: 'none', background: '#faf5ff', fontSize: 14 }} />
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Date</label>
+          <input type="date" value={date} onChange={e => setDate(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid var(--border-color)', outline: 'none', background: '#faf5ff', fontSize: 14 }} />
         </div>
         <div style={{ flex: '1 1 100%' }}>
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Class</label>
-          <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid #e5e7eb', outline: 'none', fontSize: 14, background: '#fff' }}>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Class</label>
+          <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)' }}>
             <option value="">Select a class...</option>
             {classes.map((c:any) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
         <div style={{ flex: '1 1 100%' }}>
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Fee Type</label>
-          <select value={feeType} onChange={e => setFeeType(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid #e5e7eb', outline: 'none', fontSize: 14, background: '#fff' }}>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Fee Type</label>
+          <select value={feeType} onChange={e => setFeeType(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)' }}>
             {(allowedTypes === 'both' || allowedTypes === 'feeding') && <option value="feeding">Feeding Fee (GH₵ {selectedClassConfig?.expected_feeding_fee || '0'})</option>}
             {(allowedTypes === 'both' || allowedTypes === 'studies') && <option value="studies">Studies Fee (GH₵ {selectedClassConfig?.expected_studies_fee || '0'})</option>}
           </select>
@@ -169,15 +169,15 @@ export default function TeacherDailyFeesPage() {
       </div>
 
       {!selectedClass ? (
-        <div style={{ padding: '60px 20px', textAlign: 'center', background: '#fff', borderRadius: 16, border: '1.5px dashed #e5e7eb' }}>
+        <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: 16, border: '1.5px dashed var(--border-color)' }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>📋</div>
-          <h3 style={{ fontSize: 18, margin: 0, color: '#111827' }}>Select a Class</h3>
-          <p style={{ color: '#9ca3af', fontSize: 14 }}>Choose a class above to begin recording daily fees.</p>
+          <h3 style={{ fontSize: 18, margin: 0, color: 'var(--text-main)' }}>Select a Class</h3>
+          <p style={{ color: 'var(--text-subtle)', fontSize: 14 }}>Choose a class above to begin recording daily fees.</p>
         </div>
       ) : loadingStudents ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>Loading students...</div>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-subtle)' }}>Loading students...</div>
       ) : (
-        <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
           <div style={{ background: '#faf5ff', padding: '14px 20px', borderBottom: '1px solid #f0eefe', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, color: '#5b21b6', fontSize: 14 }}>Record {feeType === 'feeding' ? 'Feeding' : 'Studies'} Fee — {date}</span>
             <button onClick={() => {
@@ -193,11 +193,11 @@ export default function TeacherDailyFeesPage() {
               return (
                 <div key={stu.id} style={{ borderBottom: '1px solid #f8fafc', padding: '16px 20px', display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ flex: '1 1 150px' }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#374151' }}>{stu.full_name}</div>
-                    {stu.student_id && <div style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500, marginTop: 4 }}>{stu.student_id}</div>}
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{stu.full_name}</div>
+                    {stu.student_id && <div style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 500, marginTop: 4 }}>{stu.student_id}</div>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 700 }}>GH₵</span>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700 }}>GH₵</span>
                     <input 
                       type="number" 
                       step="0.5" 

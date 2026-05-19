@@ -83,7 +83,7 @@ export default function ProprietorStaff() {
           ))}
         </div>
 
-        <div style={{ background: '#fff', borderRadius: 24, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9' }}>
             <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>Staff Roster</h3>
           </div>

@@ -36,8 +36,8 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   const [hov, setHov] = useState(false)
   const v: Record<string, React.CSSProperties> = {
     primary: { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
-    ghost: { background: hov ? '#f5f3ff' : 'transparent', color: '#6b7280', border: 'none' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
+    ghost: { background: hov ? '#f5f3ff' : 'transparent', color: 'var(--text-muted)', border: 'none' },
   }
   return (
     <button type={type} form={form} onClick={onClick} disabled={disabled}
@@ -51,10 +51,10 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
 
 function FieldGroup({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
       <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 18 }}>{icon}</span>
-        <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>{title}</h3>
+        <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{title}</h3>
       </div>
       <div style={{ padding: '20px' }}>{children}</div>
     </div>
@@ -64,9 +64,9 @@ function FieldGroup({ title, icon, children }: { title: string; icon: string; ch
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{label}</label>
+      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{label}</label>
       {children}
-      {hint && <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>{hint}</p>}
+      {hint && <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 3 }}>{hint}</p>}
     </div>
   )
 }
@@ -76,7 +76,7 @@ function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputEle
   return (
     <div>
       <input {...props} onFocus={e => { setF(true); props.onFocus?.(e) }} onBlur={e => { setF(false); props.onBlur?.(e) }}
-        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
+        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
       {error && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 3 }}>⚠ {error}</p>}
     </div>
   )
@@ -86,7 +86,7 @@ function StyledTextarea({ ...props }: React.TextareaHTMLAttributes<HTMLTextAreaE
   const [f, setF] = useState(false)
   return (
     <textarea {...props} onFocus={e => { setF(true); props.onFocus?.(e) }} onBlur={e => { setF(false); props.onBlur?.(e) }}
-      style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', resize: 'vertical', minHeight: 80, boxSizing: 'border-box' as const }} />
+      style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', resize: 'vertical', minHeight: 80, boxSizing: 'border-box' as const }} />
   )
 }
 
@@ -132,13 +132,13 @@ function PasswordChangePanel() {
 
   const inputStyle: React.CSSProperties = {
     flex: 1, padding: '9px 12px', borderRadius: 9, fontSize: 13,
-    border: '1.5px solid #e5e7eb', background: '#fff', color: '#111827',
+    border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)',
     fontFamily: '"DM Sans",sans-serif', outline: 'none', boxSizing: 'border-box',
   }
 
   return (
     <FieldGroup title="Change Password" icon="🔐">
-      <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 16 }}>
+      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
         Choose a strong password with at least 8 characters.
       </p>
       <form onSubmit={handleChange}>
@@ -155,7 +155,7 @@ function PasswordChangePanel() {
                 onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
               />
               <button type="button" onClick={() => setShowNew(p => !p)}
-                style={{ position: 'absolute', right: 10, background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex', padding: 0 }}>
+                style={{ position: 'absolute', right: 10, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', display: 'flex', padding: 0 }}>
                 {showNew ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
@@ -176,7 +176,7 @@ function PasswordChangePanel() {
                 onBlur={e => (e.currentTarget.style.borderColor = confirmPw && confirmPw !== newPw ? '#f87171' : '#e5e7eb')}
               />
               <button type="button" onClick={() => setShowConfirm(p => !p)}
-                style={{ position: 'absolute', right: 10, background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex', padding: 0 }}>
+                style={{ position: 'absolute', right: 10, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', display: 'flex', padding: 0 }}>
                 {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
@@ -194,7 +194,7 @@ function PasswordChangePanel() {
                   background: newPw.length >= i * 3 ? (newPw.length >= 12 ? '#16a34a' : newPw.length >= 8 ? '#f59e0b' : '#ef4444') : '#e5e7eb',
                 }} />
               ))}
-              <span style={{ fontSize: 10, color: '#6b7280', marginLeft: 6, whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 6, whiteSpace: 'nowrap' }}>
                 {newPw.length < 8 ? 'Too short' : newPw.length < 12 ? 'Fair' : 'Strong'}
               </span>
             </div>
@@ -343,7 +343,7 @@ export default function SettingsPage() {
       <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
         <style>{`@keyframes _sspn { to{transform:rotate(360deg)} }`}</style>
         <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_sspn 0.8s linear infinite' }} />
-        <p style={{ fontSize: 13, color: '#9ca3af', fontFamily: '"DM Sans",sans-serif' }}>Loading settings…</p>
+        <p style={{ fontSize: 13, color: 'var(--text-subtle)', fontFamily: '"DM Sans",sans-serif' }}>Loading settings…</p>
       </div>
     )
   }
@@ -365,8 +365,8 @@ export default function SettingsPage() {
         {/* Header */}
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>School Settings</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Configure your school information and report card settings</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>School Settings</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Configure your school information and report card settings</p>
           </div>
         </div>
 
@@ -470,7 +470,7 @@ export default function SettingsPage() {
                         <StyledInput {...register('paystack_public_key')} placeholder="pk_test_..." />
                       </Field>
                       <Field label="School Currency" hint="Default currency for all billing displays">
-                        <select {...register('currency_code')} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }}>
+                        <select {...register('currency_code')} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid var(--border-color)', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }}>
                           <option value="GHS">GHS - Ghana Cedi</option>
                           <option value="USD">USD - US Dollar</option>
                           <option value="EUR">EUR - Euro</option>
@@ -490,7 +490,7 @@ export default function SettingsPage() {
             {activeTab === 'report' && (
               <>
                 <FieldGroup title="Report Card Footer" icon="📄">
-                  <p style={{ fontSize: 12, color: '#9ca3af', marginBottom: 16 }}>This information appears at the bottom of every generated report card.</p>
+                  <p style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 16 }}>This information appears at the bottom of every generated report card.</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <Field label="Next Term Reopening Date" hint="Shown on report card footer">
                       <StyledInput {...register('next_term_date')} type="date" />
@@ -521,8 +521,8 @@ export default function SettingsPage() {
                                         onMouseEnter={e => { if (selectedTheme !== t.id) e.currentTarget.style.borderColor = '#7c3aed' }}
                                         onMouseLeave={e => { if (selectedTheme !== t.id) e.currentTarget.style.borderColor = '#e5e7eb' }}>
                                          <div style={{ fontSize: 24, marginBottom: 4 }}>{t.icon}</div>
-                                         <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{t.name}</div>
-                                         <div style={{ fontSize: 10, color: '#9ca3af' }}>{t.desc}</div>
+                                         <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{t.name}</div>
+                                         <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{t.desc}</div>
                                       </div>
                                    </label>
                                 ))}
@@ -531,7 +531,7 @@ export default function SettingsPage() {
 
                           <Field label="Background Watermark" hint="Faint image shown behind the report content (e.g. school crest)">
                              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
-                                <div style={{ width: 60, height: 60, borderRadius: 10, border: '1.5px solid #e5e7eb', background: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                <div style={{ width: 60, height: 60, borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-input)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                                    {watermarkUrl ? <img src={watermarkUrl} style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: 0.5 }} /> : <span style={{ fontSize: 20 }}>📜</span>}
                                 </div>
                                 <div style={{ flex: 1 }}>
@@ -556,11 +556,11 @@ export default function SettingsPage() {
 
                   {/* LIVE PREVIEW PANEL */}
                   <div style={{ position: 'sticky', top: 20, height: 'fit-content' }}>
-                    <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(109,40,217,0.1)' }}>
+                    <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(109,40,217,0.1)' }}>
                       <div style={{ padding: '12px 20px', borderBottom: '1px solid #faf5ff', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontSize: 16 }}>👁️</span>
-                          <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>Live Preview</h3>
+                          <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Live Preview</h3>
                         </div>
                         <span style={{ fontSize: 10, fontWeight: 800, color: '#7c3aed', background: '#ede9fe', padding: '2px 8px', borderRadius: 99 }}>REAL-TIME</span>
                       </div>
@@ -591,8 +591,8 @@ export default function SettingsPage() {
                           />
                         </div>
                       </div>
-                      <div style={{ padding: '10px 20px', background: '#fff', borderTop: '1px solid #f0eefe', textAlign: 'center' }}>
-                        <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>Showing a simulated JHS 2 student report</p>
+                      <div style={{ padding: '10px 20px', background: 'var(--bg-card)', borderTop: '1px solid #f0eefe', textAlign: 'center' }}>
+                        <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0 }}>Showing a simulated JHS 2 student report</p>
                       </div>
                     </div>
                   </div>
@@ -624,8 +624,8 @@ export default function SettingsPage() {
                     </div>
 
                     <div style={{ padding: '0 10px' }}>
-                      <h4 style={{ fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 12 }}>Usage Information</h4>
-                      <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: '#4b5563', lineHeight: 1.6 }}>
+                      <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>Usage Information</h4>
+                      <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
                         <li>All messages are sent via the Arkesel SMS gateway. The Sender ID is dynamically generated from your <strong>School Name</strong> (up to 11 characters).</li>
                         <li>Each message is automatically prefixed with your <strong>School Name</strong> for sender identification.</li>
                         <li>Bulk sends are batched at 50 recipients per request to respect rate limits.</li>
@@ -655,7 +655,7 @@ export default function SettingsPage() {
             {activeTab === 'security' && (
               <>
                 <FieldGroup title="Gate Scanner Rules" icon="🛡️">
-                  <p style={{ fontSize: 12, color: '#9ca3af', marginBottom: 20 }}>Configure how the gate attendance scanner marks students and staff as late or handles duplicate scans.</p>
+                  <p style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 20 }}>Configure how the gate attendance scanner marks students and staff as late or handles duplicate scans.</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
 
                     {/* Late Arrival Time */}
@@ -743,8 +743,8 @@ export default function SettingsPage() {
                       {user?.full_name?.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{user?.full_name}</div>
-                      <div style={{ fontSize: 12, color: '#6b7280' }}>{user?.email}</div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{user?.full_name}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{user?.email}</div>
                       <span style={{ fontSize: 11, fontWeight: 700, background: '#f5f3ff', color: '#6d28d9', padding: '2px 8px', borderRadius: 99, marginTop: 4, display: 'inline-block' }}>Administrator</span>
                     </div>
                   </div>

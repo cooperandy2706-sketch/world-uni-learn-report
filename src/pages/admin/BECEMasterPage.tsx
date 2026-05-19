@@ -272,7 +272,7 @@ export default function BECEMasterPage() {
           scale: 2,
           useCORS: true,
           logging: false,
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--bg-card)',
         })
         const imgData = canvas.toDataURL('image/png')
         const pdfWidth = pdf.internal.pageSize.getWidth()
@@ -309,7 +309,7 @@ export default function BECEMasterPage() {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff',
+        backgroundColor: 'var(--bg-card)',
       })
       
       const imgData = canvas.toDataURL('image/png')
@@ -473,7 +473,7 @@ export default function BECEMasterPage() {
             disabled={students.length === 0}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12, 
-              background: '#fff', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: students.length === 0 ? 'not-allowed' : 'pointer',
+              background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: students.length === 0 ? 'not-allowed' : 'pointer',
               opacity: students.length === 0 ? 0.5 : 1
             }}>
             <FileSpreadsheet size={18} /> Master Summary
@@ -493,7 +493,7 @@ export default function BECEMasterPage() {
             disabled={students.length === 0}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12, 
-              background: '#fff', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer',
+              background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer',
               opacity: students.length === 0 ? 0.5 : 1
             }}>
             <Printer size={18} /> Result Slips / PDF
@@ -521,7 +521,7 @@ export default function BECEMasterPage() {
       </div>
 
       {/* Selectors & Search */}
-      <div style={{ background: '#fff', borderRadius: 20, padding: 20, border: `1.5px solid ${T.border}`, marginBottom: 24, display: 'flex', gap: 20, alignItems: 'center' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 20, border: `1.5px solid ${T.border}`, marginBottom: 24, display: 'flex', gap: 20, alignItems: 'center' }}>
         <div style={{ flex: 1 }}>
           <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: T.muted, textTransform: 'uppercase', marginBottom: 6 }}>Class</label>
           <select 
@@ -668,7 +668,7 @@ export default function BECEMasterPage() {
           </table>
         </div>
       ) : (
-        <div style={{ height: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#fff', borderRadius: 20, border: `1.5px solid ${T.border}` }}>
+        <div style={{ height: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', borderRadius: 20, border: `1.5px solid ${T.border}` }}>
           <Grid size={48} color={T.muted} style={{ marginBottom: 16, opacity: 0.5 }} />
           <h3 style={{ fontSize: 18, fontWeight: 700, color: T.slate, margin: '0 0 8px' }}>Select a Class</h3>
           <p style={{ color: T.muted, fontSize: 14 }}>Pick a class to load the master entry grid.</p>
@@ -745,7 +745,7 @@ export default function BECEMasterPage() {
             </button>
             <button 
               onClick={handlePrint}
-              style={{ flex: 1, padding: '12px', borderRadius: 10, background: '#fff', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
               <Printer size={16} /> Print Slips
             </button>
           </div>

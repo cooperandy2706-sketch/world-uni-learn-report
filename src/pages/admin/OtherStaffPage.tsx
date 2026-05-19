@@ -135,7 +135,7 @@ export default function OtherStaffPage() {
         {isLoading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>Loading…</div>
         ) : (staffList as any[]).length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 18, padding: '60px', textAlign: 'center', border: '1.5px solid #f1f5f9' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '60px', textAlign: 'center', border: '1.5px solid #f1f5f9' }}>
             <Users size={48} color="#cbd5e1" style={{ marginBottom: 16 }} />
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#1e293b', marginBottom: 8 }}>No Staff Added Yet</h3>
             <p style={{ fontSize: 13, color: '#64748b', marginBottom: 20 }}>Add your non-teaching staff here to manage their payments and records.</p>
@@ -144,7 +144,7 @@ export default function OtherStaffPage() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(320px,1fr))', gap: 16 }}>
             {(staffList as any[]).map((s: any) => (
-              <div key={s.id} className="osp-card" style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f1f5f9', padding: '22px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', position: 'relative', overflow: 'hidden' }}>
+              <div key={s.id} className="osp-card" style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f1f5f9', padding: '22px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg,#f8fafc,#f1f5f9)', pointerEvents: 'none' }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16, position: 'relative' }}>
                   <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#6366f1,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 900, color: '#fff', flexShrink: 0 }}>
@@ -181,7 +181,7 @@ export default function OtherStaffPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
             <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#64748b', marginBottom: 5 }}>System Role *</label>
-            <select value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e2e8f0', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif', background: '#fff' }}>
+            <select value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e2e8f0', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif', background: 'var(--bg-card)' }}>
               <option value="staff">General Staff (Cooks, Cleaners, etc.)</option>
               <option value="nurse">School Nurse (Clinic Access)</option>
               <option value="librarian">Librarian (Library Access)</option>

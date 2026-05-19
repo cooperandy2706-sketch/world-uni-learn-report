@@ -11,7 +11,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
   const [h, setH] = useState(false)
   const v: any = {
     primary: { background: h ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none' },
-    secondary: { background: h ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: h ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger: { background: h ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
     success: { background: h ? '#15803d' : '#16a34a', color: '#fff', border: 'none' },
   }
@@ -122,8 +122,8 @@ export default function VisitorsPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_vst_fi .4s ease' }}>
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Visitors Record</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Track all visitors entering and leaving the school premises</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Visitors Record</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Track all visitors entering and leaving the school premises</p>
           </div>
           <Btn onClick={() => setCreateModal(true)}><Plus size={14} /> New Visitor</Btn>
         </div>
@@ -136,32 +136,32 @@ export default function VisitorsPage() {
               placeholder="Search by name or person to see..." 
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ width: '100%', padding: '10px 12px 10px 38px', borderRadius: 12, border: '1.5px solid #e5e7eb', fontSize: 14, outline: 'none' }}
+              style={{ width: '100%', padding: '10px 12px 10px 38px', borderRadius: 12, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none' }}
             />
           </div>
         </div>
 
         {isLoading ? (
-          <div style={{ padding: '60px', textAlign: 'center', color: '#9ca3af' }}>Loading records...</div>
+          <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>Loading records...</div>
         ) : filteredVisitors.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 18, padding: '60px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '60px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <UserPlus size={48} color="#d1d5db" style={{ marginBottom: 16 }} />
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>No Visitors Found</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 20 }}>{search ? 'Try a different search term' : 'Start by recording your first visitor today.'}</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>No Visitors Found</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 20 }}>{search ? 'Try a different search term' : 'Start by recording your first visitor today.'}</p>
             {!search && <Btn onClick={() => setCreateModal(true)}><Plus size={14} /> Record Visitor</Btn>}
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(340px,1fr))', gap: 16 }}>
             {filteredVisitors.map((v: any) => (
-              <div key={v.id} className="vst-card" style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', position: 'relative' }}>
+              <div key={v.id} className="vst-card" style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', position: 'relative' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg,#f5f3ff,#ede9fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7c3aed' }}>
                       <User size={22} />
                     </div>
                     <div>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{v.full_name}</div>
-                      <div style={{ fontSize: 12, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{v.full_name}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
                         <Phone size={11} /> {v.phone || 'No phone'}
                       </div>
                     </div>
@@ -175,19 +175,19 @@ export default function VisitorsPage() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, padding: '12px 0', borderTop: '1px solid #f9fafb', borderBottom: '1px solid #f9fafb', marginBottom: 12 }}>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>To See</div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{v.person_to_see || 'N/A'}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>To See</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)' }}>{v.person_to_see || 'N/A'}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Purpose</div>
-                    <div style={{ fontSize: 12, color: '#374151' }}>{v.purpose || 'N/A'}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Purpose</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-main)' }}>{v.purpose || 'N/A'}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Time In</div>
-                    <div style={{ fontSize: 12, color: '#374151' }}>{format(new Date(v.time_in), 'HH:mm')} · {format(new Date(v.time_in), 'MMM d')}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Time In</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-main)' }}>{format(new Date(v.time_in), 'HH:mm')} · {format(new Date(v.time_in), 'MMM d')}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Time Out</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Time Out</div>
                     <div style={{ fontSize: 12, color: v.time_out ? '#374151' : '#9ca3af' }}>
                       {v.time_out ? format(new Date(v.time_out), 'HH:mm') : '--:--'}
                     </div>
@@ -231,7 +231,7 @@ export default function VisitorsPage() {
             { label: 'ID Number (Optional)', key: 'id_number', placeholder: 'Ghana Card / License', type: 'text', icon: Info },
           ].map(f => (
             <div key={f.key}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{f.label}</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{f.label}</label>
               <div style={{ position: 'relative' }}>
                 <f.icon size={14} color="#9ca3af" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }} />
                 <input 
@@ -239,7 +239,7 @@ export default function VisitorsPage() {
                   placeholder={f.placeholder} 
                   value={(form as any)[f.key]} 
                   onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                  style={{ width: '100%', padding: '9px 12px 9px 32px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif' }} 
+                  style={{ width: '100%', padding: '9px 12px 9px 32px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif' }} 
                 />
               </div>
             </div>

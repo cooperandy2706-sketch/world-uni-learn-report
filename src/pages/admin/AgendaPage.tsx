@@ -12,10 +12,10 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
   const [hov, setHov] = useState(false)
   const v: any = {
     primary: { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     success: { background: hov ? '#15803d' : '#16a34a', color: '#fff', border: 'none' },
     danger: { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
-    ghost: { background: hov ? '#f9fafb' : 'transparent', color: '#6b7280', border: 'none' },
+    ghost: { background: hov ? '#f9fafb' : 'transparent', color: 'var(--text-muted)', border: 'none' },
   }
   return (
     <button onClick={onClick} disabled={disabled}
@@ -130,8 +130,8 @@ export default function AdminAgendaPage() {
       <div style={{ fontFamily: '"DM Sans",sans-serif', animation: 'ap_fi .4s ease' }}>
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>Term Agenda</h1>
-            <p style={{ fontSize: 13.5, color: '#6b7280', marginTop: 4 }}>Set the academic roadmap and monitor teacher feedback</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Term Agenda</h1>
+            <p style={{ fontSize: 13.5, color: 'var(--text-muted)', marginTop: 4 }}>Set the academic roadmap and monitor teacher feedback</p>
           </div>
           <Btn onClick={() => { setEditingItem(null); setForm({ title: '', description: '', week_number: 1 }); setModalOpen(true) }}>
             <Plus size={16} /> Create Agenda Item
@@ -139,11 +139,11 @@ export default function AdminAgendaPage() {
         </div>
 
         {/* Term Selector */}
-        <div style={{ background: '#fff', borderRadius: 16, padding: '16px 20px', border: '1.5px solid #f0eefe', marginBottom: 22, display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 8px rgba(109,40,217,0.03)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '16px 20px', border: '1.5px solid #f0eefe', marginBottom: 22, display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 8px rgba(109,40,217,0.03)' }}>
           <Layout size={18} color="#7c3aed" />
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#374151' }}>Select Term:</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>Select Term:</span>
           <select value={selectedTermId} onChange={e => setSelectedTermId(e.target.value)}
-            style={{ padding: '8px 12px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, color: '#111827', outline: 'none', background: '#faf5ff', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', maxWidth: 260 }}>
+            style={{ padding: '8px 12px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 13, color: 'var(--text-main)', outline: 'none', background: '#faf5ff', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', maxWidth: 260 }}>
             {terms.map((t: any) => <option key={t.id} value={t.id}>{t.name} {t.is_current ? '(Current)' : ''}</option>)}
           </select>
         </div>
@@ -153,17 +153,17 @@ export default function AdminAgendaPage() {
             <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: 'ap_spin .8s linear infinite' }} />
           </div>
         ) : agendas.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 20, padding: '80px 40px', textAlign: 'center', border: '1.5px solid #f0eefe', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: '80px 40px', textAlign: 'center', border: '1.5px solid #f0eefe', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
             <div style={{ fontSize: 56, marginBottom: 16 }}>🗓️</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: '#111827', marginBottom: 8 }}>No agenda items yet</h3>
-            <p style={{ fontSize: 14, color: '#9ca3af', marginBottom: 24, maxWidth: 320, marginInline: 'auto' }}>Create your first agenda item to start building the term roadmap for your teachers.</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>No agenda items yet</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-subtle)', marginBottom: 24, maxWidth: 320, marginInline: 'auto' }}>Create your first agenda item to start building the term roadmap for your teachers.</p>
             <Btn onClick={() => setModalOpen(true)}>🎯 Get Started</Btn>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {agendas.map((item, idx) => (
               <div key={item.id} className="agenda-card" style={{ 
-                background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '20px 24px', 
+                background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '20px 24px', 
                 boxShadow: '0 2px 10px rgba(109,40,217,0.04)', transition: 'all .25s ease',
                 display: 'flex', gap: 20, position: 'relative', overflow: 'hidden'
               }}>
@@ -179,7 +179,7 @@ export default function AdminAgendaPage() {
 
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 }}>{item.title}</h3>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{item.title}</h3>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <span style={{ 
                         fontSize: 10, fontWeight: 800, padding: '3px 10px', borderRadius: 99, 
@@ -192,7 +192,7 @@ export default function AdminAgendaPage() {
                       </span>
                     </div>
                   </div>
-                  <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.6, margin: '0 0 16px' }}>{item.description}</p>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, margin: '0 0 16px' }}>{item.description}</p>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                     <Btn variant="secondary" style={{ padding: '6px 12px', fontSize: 12 }} onClick={() => openStruggleMonitor(item)}>
@@ -225,23 +225,23 @@ export default function AdminAgendaPage() {
         <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingItem ? "Edit Agenda Item" : "Create Agenda Item"}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 10 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Title *</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Title *</label>
               <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} 
                 placeholder="e.g. Mid-Term Assessments & Review"
-                style={{ width: '100%', padding: '11px 14px', borderRadius: 11, border: '1.5px solid #e5e7eb', fontSize: 14, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '11px 14px', borderRadius: 11, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Week Number *</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Week Number *</label>
                 <input type="number" min={1} max={15} value={form.week_number} onChange={e => setForm({ ...form, week_number: parseInt(e.target.value) })}
-                  style={{ width: '100%', padding: '11px 14px', borderRadius: 11, border: '1.5px solid #e5e7eb', fontSize: 14, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
+                  style={{ width: '100%', padding: '11px 14px', borderRadius: 11, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
               </div>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Agenda Details / Description *</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Agenda Details / Description *</label>
               <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={5}
                 placeholder="Detail what teachers should focus on during this week..."
-                style={{ width: '100%', padding: '11px 14px', borderRadius: 11, border: '1.5px solid #e5e7eb', fontSize: 14, outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', minHeight: 100, boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '11px 14px', borderRadius: 11, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', minHeight: 100, boxSizing: 'border-box' }} />
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
               <Btn variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Btn>
@@ -261,7 +261,7 @@ export default function AdminAgendaPage() {
             )}
 
             {responses.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9ca3af' }}>
+              <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-subtle)' }}>
                 <Layout size={32} color="#e5e7eb" style={{ marginBottom: 12 }} />
                 <div style={{ fontSize: 14 }}>No teacher responses yet.</div>
               </div>
@@ -269,7 +269,7 @@ export default function AdminAgendaPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxHeight: 450, overflowY: 'auto', paddingRight: 6 }}>
                 {responses.map(res => (
                   <div key={res.id} style={{ 
-                    background: '#fff', borderRadius: 15, border: '1.5px solid #f1f5f9', padding: '16px',
+                    background: 'var(--bg-card)', borderRadius: 15, border: '1.5px solid #f1f5f9', padding: '16px',
                     boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>

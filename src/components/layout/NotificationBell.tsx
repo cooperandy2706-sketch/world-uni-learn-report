@@ -68,22 +68,22 @@ export default function NotificationBell(){
       </button>
 
       {open&&(
-        <div style={{position:'absolute',top:46,right:0,width:320,background:'#fff',borderRadius:14,boxShadow:'0 8px 32px rgba(0,0,0,.15)',border:'1.5px solid #f0eefe',zIndex:999,fontFamily:'"DM Sans",sans-serif',overflow:'hidden'}}>
+        <div style={{position:'absolute',top:46,right:0,width:320,background: 'var(--bg-card)',borderRadius:14,boxShadow:'0 8px 32px rgba(0,0,0,.15)',border:'1.5px solid #f0eefe',zIndex:999,fontFamily:'"DM Sans",sans-serif',overflow:'hidden'}}>
           <div style={{padding:'12px 16px',borderBottom:'1px solid #f0eefe',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-            <span style={{fontSize:13,fontWeight:700,color:'#111827'}}>
+            <span style={{fontSize:13,fontWeight:700,color: 'var(--text-main)'}}>
               Notifications {count>0&&<span style={{fontSize:11,background:'#dc2626',color:'#fff',borderRadius:99,padding:'1px 6px',marginLeft:4}}>{count}</span>}
             </span>
             {count>0&&<button onClick={markAllRead} style={{fontSize:11,color:'#6d28d9',fontWeight:600,background:'none',border:'none',cursor:'pointer',fontFamily:'"DM Sans",sans-serif'}}>Mark all read</button>}
           </div>
           <div style={{maxHeight:280,overflowY:'auto'}}>
             {preview.length===0
-              ? <div style={{padding:'24px 16px',textAlign:'center',color:'#9ca3af',fontSize:13}}>No unread notifications</div>
+              ? <div style={{padding:'24px 16px',textAlign:'center',color: 'var(--text-subtle)',fontSize:13}}>No unread notifications</div>
               : preview.map((n,i)=>(
                 <div key={n.id} style={{padding:'10px 16px',borderBottom:i<preview.length-1?'1px solid #f9fafb':'none',background:'#faf5ff',display:'flex',gap:10,alignItems:'flex-start'}}>
                   <div style={{width:32,height:32,borderRadius:9,background:'linear-gradient(135deg,#7c3aed,#6d28d9)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,flexShrink:0,color:'#fff'}}>🔔</div>
                   <div style={{flex:1,minWidth:0}}>
-                    <p style={{fontSize:12,fontWeight:700,color:'#111827',margin:'0 0 2px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{n.title}</p>
-                    {n.body&&<p style={{fontSize:11,color:'#6b7280',margin:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{n.body}</p>}
+                    <p style={{fontSize:12,fontWeight:700,color: 'var(--text-main)',margin:'0 0 2px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{n.title}</p>
+                    {n.body&&<p style={{fontSize:11,color: 'var(--text-muted)',margin:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{n.body}</p>}
                   </div>
                 </div>
               ))

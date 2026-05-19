@@ -32,7 +32,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   const [hov, setHov] = useState(false)
   const v: Record<string, React.CSSProperties> = {
     primary:   { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger:    { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
     success:   { background: hov ? '#059669' : '#10b981', color: '#fff', border: 'none' },
   }
@@ -193,16 +193,16 @@ export default function DepartmentsPage() {
             { label: 'Teachers Assigned', value: totalTeachersAssigned, total: (allTeachers as any[]).length, icon: '👨‍🏫', color: '#16a34a', bg: '#f0fdf4' },
             { label: 'Unassigned Subjects', value: (allSubjects as any[]).length - totalSubjectsAssigned, icon: '⚠️', color: '#d97706', bg: '#fffbeb' },
           ].map((s, i) => (
-            <div key={i} style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_dfadeUp .4s ease ${i * .07}s both` }}>
+            <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_dfadeUp .4s ease ${i * .07}s both` }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, marginBottom: 8 }}>{s.icon}</div>
-              <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', lineHeight: 1 }}>{s.value}{(s as any).total ? <span style={{ fontSize: 14, color: '#9ca3af', fontFamily: '"DM Sans",sans-serif' }}> / {(s as any).total}</span> : ''}</div>
-              <div style={{ fontSize: 12, color: '#6b7280', marginTop: 3 }}>{s.label}</div>
+              <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', lineHeight: 1 }}>{s.value}{(s as any).total ? <span style={{ fontSize: 14, color: 'var(--text-subtle)', fontFamily: '"DM Sans",sans-serif' }}> / {(s as any).total}</span> : ''}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>{s.label}</div>
             </div>
           ))}
         </div>
 
         {/* Search */}
-        <div style={{ background: '#fff', borderRadius: 12, padding: '10px 16px', border: '1.5px solid #f0eefe', marginBottom: 20 }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '10px 16px', border: '1.5px solid #f0eefe', marginBottom: 20 }}>
           <div style={{ position: 'relative', maxWidth: 340 }}>
             <span style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', fontSize: 14 }}>🔍</span>
             <input placeholder="Search departments…" value={search} onChange={e => setSearch(e.target.value)}
@@ -220,10 +220,10 @@ export default function DepartmentsPage() {
 
         {/* Empty */}
         {!isLoading && filtered.length === 0 && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>🏛️</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>{search ? 'No departments found' : 'No departments yet'}</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>{search ? 'Try a different search.' : 'Create departments to organise your school structure.'}</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>{search ? 'No departments found' : 'No departments yet'}</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>{search ? 'Try a different search.' : 'Create departments to organise your school structure.'}</p>
             {!search && <Btn onClick={openCreate}>➕ Add First Department</Btn>}
           </div>
         )}
@@ -239,7 +239,7 @@ export default function DepartmentsPage() {
 
               return (
                 <div key={d.id} className="dept-card"
-                  style={{ background: '#fff', borderRadius: 20, border: `1.5px solid ${palette.color}22`, overflow: 'hidden', boxShadow: '0 2px 8px rgba(109,40,217,0.07)', animation: `_dfadeUp 0.35s ease ${i * 0.06}s both` }}>
+                  style={{ background: 'var(--bg-card)', borderRadius: 20, border: `1.5px solid ${palette.color}22`, overflow: 'hidden', boxShadow: '0 2px 8px rgba(109,40,217,0.07)', animation: `_dfadeUp 0.35s ease ${i * 0.06}s both` }}>
 
                   {/* Header band */}
                   <div style={{ background: `linear-gradient(135deg,${palette.bg},${palette.light})`, padding: '18px 20px 14px', borderBottom: `1px solid ${palette.color}18`, position: 'relative', overflow: 'hidden' }}>
@@ -276,7 +276,7 @@ export default function DepartmentsPage() {
                     ].map((s, si) => (
                       <div key={s.label} style={{ padding: '12px 18px', borderRight: si === 0 ? `1px solid ${palette.color}12` : 'none', textAlign: 'center' }}>
                         <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 22, fontWeight: 700, color: palette.color }}>{s.value}</div>
-                        <div style={{ fontSize: 11, color: '#6b7280' }}>{s.label}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.label}</div>
                       </div>
                     ))}
                   </div>
@@ -288,7 +288,7 @@ export default function DepartmentsPage() {
                         {dSubs.slice(0, 5).map((s: any) => (
                           <span key={s.id} style={{ fontSize: 10, fontWeight: 700, background: palette.light, color: palette.color, padding: '3px 9px', borderRadius: 99 }}>{s.name}</span>
                         ))}
-                        {dSubs.length > 5 && <span style={{ fontSize: 10, color: '#9ca3af', alignSelf: 'center' }}>+{dSubs.length - 5} more</span>}
+                        {dSubs.length > 5 && <span style={{ fontSize: 10, color: 'var(--text-subtle)', alignSelf: 'center' }}>+{dSubs.length - 5} more</span>}
                       </div>
                     ) : (
                       <p style={{ fontSize: 12, color: '#d1d5db', margin: 0, fontStyle: 'italic' }}>No subjects assigned yet</p>
@@ -323,15 +323,15 @@ export default function DepartmentsPage() {
         </>}>
         <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>Department Name *</label>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>Department Name *</label>
             <input {...register('name')} placeholder="e.g. Sciences Department, Languages…"
               style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${errors.name ? '#f87171' : '#e5e7eb'}`, outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
             {errors.name && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 3 }}>⚠ {errors.name.message}</p>}
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>Description (optional)</label>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>Description (optional)</label>
             <textarea {...register('description')} placeholder="Brief description of this department…" rows={3}
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', boxSizing: 'border-box' }} />
+              style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid var(--border-color)', outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', boxSizing: 'border-box' }} />
           </div>
         </form>
       </Modal>
@@ -354,15 +354,15 @@ export default function DepartmentsPage() {
                     ? <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: '#fff' }}>{deptHead.user?.full_name?.charAt(0)}</div>
                         <div>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{deptHead.user?.full_name}</div>
-                          <div style={{ fontSize: 11, color: '#6b7280' }}>{deptHead.user?.email}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{deptHead.user?.full_name}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{deptHead.user?.email}</div>
                         </div>
                       </div>
-                    : <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>No department head assigned</p>}
+                    : <p style={{ fontSize: 12, color: 'var(--text-subtle)', margin: 0 }}>No department head assigned</p>}
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <select onChange={e => setDeptHead(e.target.value || null)} value={manageModal.head_teacher_id ?? ''}
-                    style={{ padding: '7px 10px', borderRadius: 8, fontSize: 12, border: '1.5px solid #ddd6fe', background: '#fff', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
+                    style={{ padding: '7px 10px', borderRadius: 8, fontSize: 12, border: '1.5px solid #ddd6fe', background: 'var(--bg-card)', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
                     <option value="">— Set Head —</option>
                     {deptTeachers.map((t: any) => (
                       <option key={t.id} value={t.id}>{t.user?.full_name}</option>
@@ -390,13 +390,13 @@ export default function DepartmentsPage() {
                   <h4 style={{ fontSize: 12, fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>✅ In This Department ({deptSubjects.length})</h4>
                   <div style={{ border: '1.5px solid #dcfce7', borderRadius: 12, overflow: 'hidden', maxHeight: 280, overflowY: 'auto' }}>
                     {deptSubjects.length === 0 ? (
-                      <div style={{ padding: '24px 16px', textAlign: 'center', color: '#9ca3af', fontSize: 12 }}>No subjects assigned</div>
+                      <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 12 }}>No subjects assigned</div>
                     ) : deptSubjects.map((s: any) => (
                       <div key={s.id} className="assign-row"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid #f0fdf4', background: '#fff' }}>
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid #f0fdf4', background: 'var(--bg-card)' }}>
                         <div>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{s.name}</div>
-                          {s.code && <div style={{ fontSize: 10, color: '#9ca3af' }}>{s.code}</div>}
+                          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{s.name}</div>
+                          {s.code && <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{s.code}</div>}
                         </div>
                         <button onClick={() => unassignSubject(s.id)} disabled={savingManage}
                           style={{ padding: '3px 10px', borderRadius: 7, border: 'none', background: '#fef2f2', color: '#dc2626', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Remove</button>
@@ -406,16 +406,16 @@ export default function DepartmentsPage() {
                 </div>
                 {/* Unassigned */}
                 <div>
-                  <h4 style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>➕ Available to Assign</h4>
-                  <div style={{ border: '1.5px solid #e5e7eb', borderRadius: 12, overflow: 'hidden', maxHeight: 280, overflowY: 'auto' }}>
+                  <h4 style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>➕ Available to Assign</h4>
+                  <div style={{ border: '1.5px solid var(--border-color)', borderRadius: 12, overflow: 'hidden', maxHeight: 280, overflowY: 'auto' }}>
                     {unassignedSubjects.filter((s: any) => s.department_id !== manageModal.id).length === 0 ? (
-                      <div style={{ padding: '24px 16px', textAlign: 'center', color: '#9ca3af', fontSize: 12 }}>All subjects assigned</div>
+                      <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 12 }}>All subjects assigned</div>
                     ) : unassignedSubjects.filter((s: any) => s.department_id !== manageModal.id).map((s: any) => (
                       <div key={s.id} className="assign-row"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid #f9fafb', background: '#fff' }}>
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid #f9fafb', background: 'var(--bg-card)' }}>
                         <div>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{s.name}</div>
-                          {s.code && <div style={{ fontSize: 10, color: '#9ca3af' }}>{s.code}</div>}
+                          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{s.name}</div>
+                          {s.code && <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{s.code}</div>}
                         </div>
                         <button onClick={() => assignSubject(s.id)} disabled={savingManage}
                           style={{ padding: '3px 10px', borderRadius: 7, border: 'none', background: '#f0fdf4', color: '#16a34a', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Assign</button>
@@ -433,14 +433,14 @@ export default function DepartmentsPage() {
                   <h4 style={{ fontSize: 12, fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>✅ In This Department ({deptTeachers.length})</h4>
                   <div style={{ border: '1.5px solid #dcfce7', borderRadius: 12, overflow: 'hidden', maxHeight: 280, overflowY: 'auto' }}>
                     {deptTeachers.length === 0 ? (
-                      <div style={{ padding: '24px 16px', textAlign: 'center', color: '#9ca3af', fontSize: 12 }}>No teachers assigned</div>
+                      <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 12 }}>No teachers assigned</div>
                     ) : deptTeachers.map((t: any) => (
                       <div key={t.id} className="assign-row"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid #f0fdf4', background: '#fff' }}>
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid #f0fdf4', background: 'var(--bg-card)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#fff' }}>{t.user?.full_name?.charAt(0)}</div>
                           <div>
-                            <div style={{ fontSize: 12, fontWeight: 600, color: '#111827' }}>{t.user?.full_name}</div>
+                            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)' }}>{t.user?.full_name}</div>
                             {t.id === manageModal.head_teacher_id && <div style={{ fontSize: 10, color: '#f59e0b', fontWeight: 700 }}>👑 Head</div>}
                           </div>
                         </div>
@@ -452,16 +452,16 @@ export default function DepartmentsPage() {
                 </div>
                 {/* Unassigned teachers */}
                 <div>
-                  <h4 style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>➕ Available Teachers</h4>
-                  <div style={{ border: '1.5px solid #e5e7eb', borderRadius: 12, overflow: 'hidden', maxHeight: 280, overflowY: 'auto' }}>
+                  <h4 style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>➕ Available Teachers</h4>
+                  <div style={{ border: '1.5px solid var(--border-color)', borderRadius: 12, overflow: 'hidden', maxHeight: 280, overflowY: 'auto' }}>
                     {unassignedTeachers.filter((t: any) => t.department_id !== manageModal.id).length === 0 ? (
-                      <div style={{ padding: '24px 16px', textAlign: 'center', color: '#9ca3af', fontSize: 12 }}>All teachers assigned</div>
+                      <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 12 }}>All teachers assigned</div>
                     ) : unassignedTeachers.filter((t: any) => t.department_id !== manageModal.id).map((t: any) => (
                       <div key={t.id} className="assign-row"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid #f9fafb', background: '#fff' }}>
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid #f9fafb', background: 'var(--bg-card)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#6d28d9' }}>{t.user?.full_name?.charAt(0)}</div>
-                          <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{t.user?.full_name}</div>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)' }}>{t.user?.full_name}</div>
                         </div>
                         <button onClick={() => assignTeacher(t.id)} disabled={savingManage}
                           style={{ padding: '3px 10px', borderRadius: 7, border: 'none', background: '#f0fdf4', color: '#16a34a', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Assign</button>

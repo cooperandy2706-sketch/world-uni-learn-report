@@ -69,13 +69,13 @@ export const DailyInsightNotification: React.FC = () => {
             <div style={{ display: 'flex', gap: '8px' }}>
               <button 
                 onClick={(e) => { e.stopPropagation(); toggleExpand() }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
               >
                 {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
               </button>
               <button 
                 onClick={(e) => { e.stopPropagation(); handleClose(true) }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
               >
                 <X size={18} />
               </button>
@@ -84,7 +84,7 @@ export const DailyInsightNotification: React.FC = () => {
 
           {!isExpanded && (
             <div style={{ marginTop: '8px' }}>
-              <p style={{ fontSize: '13px', color: '#4b5563', margin: 0, fontWeight: 500 }}>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, fontWeight: 500 }}>
                 "{insight.quote.text.slice(0, 40)}..."
               </p>
               <span style={{ fontSize: '11px', color: '#7c3aed', fontWeight: 600 }}>Click to read more</span>
@@ -106,7 +106,7 @@ export const DailyInsightNotification: React.FC = () => {
                 <p style={{ fontSize: '14px', color: '#1e1b4b', fontWeight: 600, fontStyle: 'italic', margin: '0 0 4px', lineHeight: 1.4 }}>
                   "{insight.quote.text}"
                 </p>
-                <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, textAlign: 'right' }}>— {insight.quote.author}</p>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0, textAlign: 'right' }}>— {insight.quote.author}</p>
               </div>
 
               {/* Word Section */}
@@ -116,10 +116,10 @@ export const DailyInsightNotification: React.FC = () => {
                   <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Word of the Day</span>
                 </div>
                 <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#1e1b4b', margin: '0 0 4px' }}>{insight.word.term}</h4>
-                <p style={{ fontSize: '13px', color: '#374151', margin: '0 0 8px', lineHeight: 1.4 }}>
+                <p style={{ fontSize: '13px', color: 'var(--text-main)', margin: '0 0 8px', lineHeight: 1.4 }}>
                   <span style={{ fontWeight: 700, color: '#0891b2' }}>Def:</span> {insight.word.definition}
                 </p>
-                <p style={{ fontSize: '12px', color: '#6b7280', fontStyle: 'italic', margin: 0 }}>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
                   <span style={{ fontWeight: 700 }}>Example:</span> "{insight.word.example}"
                 </p>
               </div>

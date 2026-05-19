@@ -85,7 +85,7 @@ export default function PastoralCarePage() {
 
       {viewMode === 'create' ? (
         /* ── INLINE NEW/EDIT LOG CARD FORM ── */
-        <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '24px 20px', animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '24px 20px', animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid #f1f5f9', paddingBottom: 16 }}>
             <div>
               <button onClick={() => setViewMode('list')} style={{ background: 'none', border: 'none', color: '#6d28d9', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Logs</button>
@@ -98,7 +98,7 @@ export default function PastoralCarePage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div>
               <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 6, letterSpacing: '0.05em' }}>Student *</label>
-              <select value={form.student_id} onChange={e => setForm(p => ({ ...p, student_id: e.target.value }))} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', background: '#fff', boxSizing: 'border-box' }} disabled={!!editingLog}>
+              <select value={form.student_id} onChange={e => setForm(p => ({ ...p, student_id: e.target.value }))} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', background: 'var(--bg-card)', boxSizing: 'border-box' }} disabled={!!editingLog}>
                 <option value="">Select Student...</option>
                 {students.map(s => <option key={s.id} value={s.id}>{s.full_name} ({s.student_id || 'No ID'})</option>)}
               </select>
@@ -106,7 +106,7 @@ export default function PastoralCarePage() {
             
             <div>
               <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 6, letterSpacing: '0.05em' }}>Category</label>
-              <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', background: '#fff', boxSizing: 'border-box' }}>
+              <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', background: 'var(--bg-card)', boxSizing: 'border-box' }}>
                 <option value="academic">Academic / Learning</option>
                 <option value="behavioral">Behavioral / Disciplinary</option>
                 <option value="emotional">Emotional / Psychological</option>
@@ -167,7 +167,7 @@ export default function PastoralCarePage() {
                 const canViewDetails = !log.is_private || log.counselor_id === user?.id || user?.role === 'admin'
                 
                 return (
-                  <div key={log.id} style={{ background: '#fff', borderRadius: 16, padding: 20, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 200, animation: '_fadeUp 0.3s ease' }}>
+                  <div key={log.id} style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 20, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 200, animation: '_fadeUp 0.3s ease' }}>
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
                         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -181,7 +181,7 @@ export default function PastoralCarePage() {
                       </div>
                       
                       <div style={{ fontSize: 13, color: '#475569', background: '#f8fafc', padding: 14, borderRadius: 10, marginTop: 12, minHeight: 60, whiteSpace: 'pre-wrap', border: '1px solid #f1f5f9', lineHeight: 1.5 }}>
-                        {canViewDetails ? log.notes : <em style={{ color: '#9ca3af' }}>This log is marked private and can only be viewed by the counselor who created it.</em>}
+                        {canViewDetails ? log.notes : <em style={{ color: 'var(--text-subtle)' }}>This log is marked private and can only be viewed by the counselor who created it.</em>}
                       </div>
 
                       {log.follow_up_date && (
@@ -195,7 +195,7 @@ export default function PastoralCarePage() {
                       <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>Counselor: {log.counselor?.full_name}</div>
                       {(log.counselor_id === user?.id || user?.role === 'admin') && (
                         <div style={{ display: 'flex', gap: 12 }}>
-                          <button onClick={() => { setEditingLog(log); setForm({ student_id: log.student_id, category: log.category, notes: log.notes, follow_up_date: log.follow_up_date || '', is_private: log.is_private }); setViewMode('create') }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex', alignItems: 'center', padding: 4 }}><Edit size={14} /></button>
+                          <button onClick={() => { setEditingLog(log); setForm({ student_id: log.student_id, category: log.category, notes: log.notes, follow_up_date: log.follow_up_date || '', is_private: log.is_private }); setViewMode('create') }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-subtle)', display: 'flex', alignItems: 'center', padding: 4 }}><Edit size={14} /></button>
                           <button onClick={() => { if(confirm('Are you sure you want to delete this pastoral care log?')) deleteLog.mutate(log.id) }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444', display: 'flex', alignItems: 'center', padding: 4 }}><Trash2 size={14} /></button>
                         </div>
                       )}
@@ -207,7 +207,7 @@ export default function PastoralCarePage() {
           )}
 
           {!isLoading && logs.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '80px 0', background: '#fff', borderRadius: 20, border: '1.5px dashed #f0eefe', color: '#9ca3af', marginTop: 20 }}>
+            <div style={{ textAlign: 'center', padding: '80px 0', background: 'var(--bg-card)', borderRadius: 20, border: '1.5px dashed #f0eefe', color: 'var(--text-subtle)', marginTop: 20 }}>
               <div style={{ fontSize: 40, marginBottom: 12 }}>🌿</div>
               <p style={{ fontSize: 15, fontWeight: 700, color: '#1e0646', margin: 0 }}>No counseling logs found</p>
               <p style={{ fontSize: 12, color: '#64748b', margin: '4px 0 16px' }}>Start logging social-emotional progress tracking sessions.</p>

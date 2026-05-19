@@ -38,7 +38,7 @@ function StatCard({ icon: Icon, label, value, sub, color, bg, onClick }: any) {
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: '#fff', borderRadius: 18, padding: '16px', border: '1.5px solid #f1f5f9',
+        background: 'var(--bg-card)', borderRadius: 18, padding: '16px', border: '1.5px solid #f1f5f9',
         display: 'flex', flexDirection: 'column', gap: 8,
         boxShadow: hov ? '0 8px 32px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.04)',
         transform: hov ? 'translateY(-2px)' : 'none',
@@ -221,7 +221,7 @@ export default function SecurityDashboard() {
         <div className="sec-main-grid">
 
           {/* Recent Scan Feed */}
-          <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f1f5f9', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
             <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: 0 }}>Live Scan Feed</h2>
@@ -262,7 +262,7 @@ export default function SecurityDashboard() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
             {/* Quick Actions */}
-            <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
               <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>Quick Actions</h3>
               <div className="sec-quick-grid" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
@@ -304,7 +304,7 @@ export default function SecurityDashboard() {
             </div>
 
             {/* Emergency Contacts */}
-            <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
               <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 7 }}>
                 <Phone size={14} color="#dc2626" /> Emergency Contacts
               </h3>

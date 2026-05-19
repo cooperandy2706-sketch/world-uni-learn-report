@@ -109,15 +109,15 @@ export default function MyClassesPage() {
         <div className="t-header" style={{ marginBottom: 24 }}>
           <div>
             <h1 className="t-title">My Classes</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>{(term as any)?.name} · {(year as any)?.name} · {classData.length} class{classData.length !== 1 ? 'es' : ''} assigned</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>{(term as any)?.name} · {(year as any)?.name} · {classData.length} class{classData.length !== 1 ? 'es' : ''} assigned</p>
           </div>
         </div>
 
         {classData.length === 0 ? (
-          <div style={{ background:'#fff', borderRadius:16, padding:'60px 20px', textAlign:'center', border:'1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius:16, padding:'60px 20px', textAlign:'center', border:'1.5px solid #f0eefe' }}>
             <div style={{ fontSize:52, marginBottom:12 }}>🏫</div>
-            <h3 style={{ fontFamily:'"Playfair Display",serif', fontSize:18, fontWeight:700, color:'#111827', marginBottom:6 }}>No classes assigned</h3>
-            <p style={{ fontSize:13, color:'#9ca3af' }}>Ask your admin to assign classes to you for this term.</p>
+            <h3 style={{ fontFamily:'"Playfair Display",serif', fontSize:18, fontWeight:700, color: 'var(--text-main)', marginBottom:6 }}>No classes assigned</h3>
+            <p style={{ fontSize:13, color: 'var(--text-subtle)' }}>Ask your admin to assign classes to you for this term.</p>
           </div>
         ) : (
           <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
@@ -126,7 +126,7 @@ export default function MyClassesPage() {
               const isExpanded = expandedClass === cls.classId
 
               return (
-                <div key={cls.classId} style={{ background:'#fff', borderRadius:18, border:'1.5px solid #f0eefe', overflow:'hidden', boxShadow:'0 1px 4px rgba(109,40,217,.07)', animation:`_fu .4s ease ${i*.08}s both` }}>
+                <div key={cls.classId} style={{ background: 'var(--bg-card)', borderRadius:18, border:'1.5px solid #f0eefe', overflow:'hidden', boxShadow:'0 1px 4px rgba(109,40,217,.07)', animation:`_fu .4s ease ${i*.08}s both` }}>
 
                   {/* Class header */}
                   <div className="resp-header" style={{ background:'linear-gradient(135deg,#faf5ff,#f5f3ff)', padding:'20px', borderBottom:'1px solid #ede9fe', display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
@@ -134,14 +134,14 @@ export default function MyClassesPage() {
                       <div style={{ width:52, height:52, borderRadius:14, background:'linear-gradient(135deg,#7c3aed,#6d28d9)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, flexShrink:0 }}>🏫</div>
                       <div>
                         <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gap: 10, animation: '_fu .5s ease both', alignItems: 'center' }}>
-                          <h2 style={{ fontFamily:'"Playfair Display",serif', fontSize:20, fontWeight:700, color:'#111827', margin:0 }}>{cls.className}</h2>
-                          {cls.level && <span style={{ fontSize:11, color:'#6b7280', background:'#fff', padding:'2px 8px', borderRadius:99, border:'1px solid #e5e7eb' }}>{cls.level}</span>}
+                          <h2 style={{ fontFamily:'"Playfair Display",serif', fontSize:20, fontWeight:700, color: 'var(--text-main)', margin:0 }}>{cls.className}</h2>
+                          {cls.level && <span style={{ fontSize:11, color: 'var(--text-muted)', background: 'var(--bg-card)', padding:'2px 8px', borderRadius:99, border: '1px solid var(--border-color)' }}>{cls.level}</span>}
                           {cls.isClassTeacher && <span style={{ fontSize:11, fontWeight:700, background:'#f0fdf4', color:'#16a34a', padding:'2px 8px', borderRadius:99 }}>👨‍🏫 Class Teacher</span>}
                         </div>
                         <div style={{ display:'flex', gap:14, marginTop:6, flexWrap:'wrap' }}>
-                          <span style={{ fontSize:12, color:'#6b7280' }}>👥 {cls.studentCount} students</span>
-                          <span style={{ fontSize:12, color:'#6b7280' }}>📚 {cls.subjects.length} subject{cls.subjects.length !== 1 ? 's' : ''}</span>
-                          <span style={{ fontSize:12, color:'#6b7280' }}>♂ {cls.maleCount} · ♀ {cls.femaleCount}</span>
+                          <span style={{ fontSize:12, color: 'var(--text-muted)' }}>👥 {cls.studentCount} students</span>
+                          <span style={{ fontSize:12, color: 'var(--text-muted)' }}>📚 {cls.subjects.length} subject{cls.subjects.length !== 1 ? 's' : ''}</span>
+                          <span style={{ fontSize:12, color: 'var(--text-muted)' }}>♂ {cls.maleCount} · ♀ {cls.femaleCount}</span>
                           {cls.avg > 0 && <span style={{ fontSize:12, fontWeight:700, color: cls.gradeInfo.color }}>Avg: {cls.avg.toFixed(1)}%</span>}
                         </div>
                       </div>
@@ -153,7 +153,7 @@ export default function MyClassesPage() {
                         ✏️ Enter Scores
                       </Link>
                       <button onClick={() => setExpandedClass(isExpanded ? null : cls.classId)}
-                        style={{ padding: '8px 14px', borderRadius: 9, border: '1.5px solid #ddd6fe', background: '#fff', color: '#6d28d9', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44 }}>
+                        style={{ padding: '8px 14px', borderRadius: 9, border: '1.5px solid #ddd6fe', background: 'var(--bg-card)', color: '#6d28d9', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44 }}>
                         {isExpanded ? '▲ Hide' : '▼ Students'}
                       </button>
                     </div>
@@ -164,18 +164,18 @@ export default function MyClassesPage() {
                     {/* Completion */}
                     <div style={{ flex:'1 1 200px', minWidth:0 }}>
                       <div className="resp-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 8 }}>
-                        <span style={{ fontSize: 12, color:'#6b7280' }}>Score Completion</span>
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Score Completion</span>
                         <span style={{ fontSize: 12, textAlign: 'right', fontWeight:700, color: completionPct === 100 ? '#16a34a' : '#6d28d9' }}>{completionPct}%</span>
                       </div>
                       <div style={{ height:7, background:'#f0eefe', borderRadius:99, overflow:'hidden' }}>
                         <div style={{ height:'100%', width:completionPct+'%', background: completionPct === 100 ? 'linear-gradient(90deg,#16a34a,#22c55e)' : 'linear-gradient(90deg,#7c3aed,#a78bfa)', borderRadius:99, transition:'width 1s ease' }} />
                       </div>
-                      <div style={{ fontSize:11, color:'#9ca3af', marginTop:3 }}>{cls.submitted} of {cls.totalExpected} entries submitted</div>
+                      <div style={{ fontSize:11, color: 'var(--text-subtle)', marginTop:3 }}>{cls.submitted} of {cls.totalExpected} entries submitted</div>
                     </div>
 
                     {/* Subjects */}
                     <div style={{ flex:'2 1 300px' }}>
-                      <div style={{ fontSize:11, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.05em', marginBottom:6 }}>Assigned Subjects</div>
+                      <div style={{ fontSize:11, fontWeight:700, color: 'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.05em', marginBottom:6 }}>Assigned Subjects</div>
                       <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
                         {cls.subjects.map((s: any) => (
                           <div key={s.id} style={{ display:'flex', alignItems:'center', gap:4 }}>
@@ -187,7 +187,7 @@ export default function MyClassesPage() {
                             </Link>
                             <Link to={`/teacher/class-tests?class=${cls.classId}&subject=${s.id}`} 
                               title="Manage Class Tests"
-                              style={{ textDecoration:'none', fontSize:14, padding:'4px', background:'#fff', borderRadius:6, border:'1px solid #e2e8f0', display:'flex', alignItems:'center' }}>
+                              style={{ textDecoration:'none', fontSize:14, padding:'4px', background: 'var(--bg-card)', borderRadius:6, border:'1px solid #e2e8f0', display:'flex', alignItems:'center' }}>
                               📝
                             </Link>
                           </div>
@@ -199,7 +199,7 @@ export default function MyClassesPage() {
                   {/* Expanded student list */}
                   {isExpanded && cls.studentSummaries.length > 0 && (
                     <div style={{ animation:'_fi .3s ease' }}>
-                      <div style={{ padding:'12px 20px', background:'#fafafa', borderBottom:'1px solid #f0eefe', fontSize:11, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.06em' }}>
+                      <div style={{ padding:'12px 20px', background:'#fafafa', borderBottom:'1px solid #f0eefe', fontSize:11, fontWeight:700, color: 'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.06em' }}>
                         Student Rankings
                       </div>
                       <div className="resp-table-wrap">
@@ -207,7 +207,7 @@ export default function MyClassesPage() {
                         <thead>
                           <tr style={{ background:'#f9f9ff' }}>
                             {['Rank','Student','ID','Gender','Avg Score','Grade','Progress'].map(h => (
-                              <th key={h} style={{ padding:'9px 14px', textAlign:'left', fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'.05em', borderBottom:'1px solid #f0eefe' }}>{h}</th>
+                              <th key={h} style={{ padding:'9px 14px', textAlign:'left', fontSize:10, fontWeight:700, color: 'var(--text-subtle)', textTransform:'uppercase', letterSpacing:'.05em', borderBottom:'1px solid #f0eefe' }}>{h}</th>
                             ))}
                           </tr>
                         </thead>
@@ -222,10 +222,10 @@ export default function MyClassesPage() {
                                   <div style={{ width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg,#7c3aed,#6d28d9)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800,color:'#fff',flexShrink:0 }}>
                                     {s.full_name.charAt(0)}
                                   </div>
-                                  <span style={{ fontSize:13, fontWeight:600, color:'#111827' }}>{s.full_name}</span>
+                                  <span style={{ fontSize:13, fontWeight:600, color: 'var(--text-main)' }}>{s.full_name}</span>
                                 </div>
                               </td>
-                              <td style={{ padding:'9px 14px', fontSize:11, fontFamily:'monospace', color:'#9ca3af' }}>{s.student_id ?? '—'}</td>
+                              <td style={{ padding:'9px 14px', fontSize:11, fontFamily:'monospace', color: 'var(--text-subtle)' }}>{s.student_id ?? '—'}</td>
                               <td style={{ padding:'9px 14px' }}>
                                 <span style={{ fontSize:11, fontWeight:700, background: s.gender === 'male' ? '#eff6ff' : s.gender === 'female' ? '#fdf2f8' : '#f3f4f6', color: s.gender === 'male' ? '#2563eb' : s.gender === 'female' ? '#db2777' : '#6b7280', padding:'2px 7px', borderRadius:99 }}>
                                   {s.gender === 'male' ? '♂' : s.gender === 'female' ? '♀' : '—'}

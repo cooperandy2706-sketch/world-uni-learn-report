@@ -387,7 +387,7 @@ export default function TeacherAttendancePage() {
         <div className="t-header" style={{ marginBottom: 22 }}>
           <div>
             <h1 className="t-title">Morning Register</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>
               {DAYS[todayDay]} · {new Date().toLocaleDateString('en-GH', { day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
           </div>
@@ -423,12 +423,12 @@ export default function TeacherAttendancePage() {
 
         {/* No home class assigned */}
         {!loading && !myClass && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>🏫</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
               No class assigned
             </h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', maxWidth: 360, margin: '0 auto' }}>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', maxWidth: 360, margin: '0 auto' }}>
               You haven't been assigned as a class teacher yet. Ask the admin to set your home class in the Classes section.
             </p>
           </div>
@@ -495,7 +495,7 @@ export default function TeacherAttendancePage() {
             {/* Quick-mark buttons */}
             {!submittedToday && (
               <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 12, color: '#6b7280', alignSelf: 'center', fontWeight: 600 }}>Mark all as:</span>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)', alignSelf: 'center', fontWeight: 600 }}>Mark all as:</span>
                 {(['present', 'absent', 'late'] as Mark[]).map(m => (
                   <button
                     key={m}
@@ -528,7 +528,7 @@ export default function TeacherAttendancePage() {
             )}
 
             {/* Students list */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 6px rgba(109,40,217,.06)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 6px rgba(109,40,217,.06)' }}>
               {/* Table header */}
               <div className="att-grid-header" style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom: '1.5px solid #ede9fe', padding: '10px 18px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.08em', flex: 1 }}>Student</span>
@@ -549,7 +549,7 @@ export default function TeacherAttendancePage() {
 
                   return (
                     <div key={s.id} className="att-row"
-                      style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: i < students.length - 1 ? '1px solid #fafafa' : 'none', background: '#fff', transition: 'background .12s', animation: `_att_up .3s ease ${i * .03}s both` }}>
+                      style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: i < students.length - 1 ? '1px solid #fafafa' : 'none', background: 'var(--bg-card)', transition: 'background .12s', animation: `_att_up .3s ease ${i * .03}s both` }}>
 
                       {/* Avatar + name */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
@@ -561,21 +561,21 @@ export default function TeacherAttendancePage() {
                           {s.full_name.charAt(0)}
                         </div>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {s.full_name}
                             {dbMarks[s.id] && <span style={{ marginLeft: 8, fontSize: 10, background: '#f0fdf4', color: '#16a34a', padding: '2px 6px', borderRadius: 6 }}>QR SCAN</span>}
                           </div>
-                          <div style={{ fontSize: 11, color: '#9ca3af' }}>{s.student_id ?? (s.gender ? (s.gender === 'male' ? '♂' : '♀') : '')}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{s.student_id ?? (s.gender ? (s.gender === 'male' ? '♂' : '♀') : '')}</div>
                         </div>
                       </div>
 
                       {/* Term attendance % */}
                       <div className="att-row-stats" style={{ width: 60, textAlign: 'center', display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ fontSize: 10, color: '#9ca3af', textTransform: 'uppercase', fontWeight: 700, minWidth: 60 }} className="show-on-mobile">Attendance:</div>
+                        <div style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', fontWeight: 700, minWidth: 60 }} className="show-on-mobile">Attendance:</div>
                         {pct !== null ? (
                           <div style={{ textAlign: 'left' }}>
                             <div style={{ fontSize: 14, fontWeight: 800, color: pct >= 75 ? '#16a34a' : pct >= 50 ? '#d97706' : '#dc2626' }}>{pct}%</div>
-                            <div style={{ fontSize: 9, color: '#9ca3af' }}>{totals!.present}/{totals!.total} days</div>
+                            <div style={{ fontSize: 9, color: 'var(--text-subtle)' }}>{totals!.present}/{totals!.total} days</div>
                           </div>
                         ) : (
                           <span style={{ fontSize: 11, color: '#d1d5db' }}>No records yet</span>
@@ -634,7 +634,7 @@ export default function TeacherAttendancePage() {
             {/* Submit button */}
             {!submittedToday && students.length > 0 && (
               <div className="att-submit-bar">
-                <div style={{ fontSize: 13, color: '#6b7280', textAlign: 'center', fontWeight: 600 }}>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', fontWeight: 600 }}>
                   Today: {presentCount} Present · {absentCount} Absent
                 </div>
                 <button

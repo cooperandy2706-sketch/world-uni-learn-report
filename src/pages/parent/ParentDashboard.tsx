@@ -39,24 +39,24 @@ export default function ParentDashboard() {
       `}</style>
 
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>
+        <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
           Welcome back, {firstName} 👋
         </h1>
-        <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>
+        <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>
           Track your children's academic progress and fees.
         </p>
       </div>
 
       <div style={{ marginBottom: 30 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: '#4b5563', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>
           Your Children
         </h2>
         
         {wards.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: 30, textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 30, textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>👨‍👩‍👦</div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No children linked yet</h3>
-            <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No children linked yet</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
               Please contact the school administration to link your children to this account.
             </p>
           </div>
@@ -64,11 +64,11 @@ export default function ParentDashboard() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {wards.map((ward) => (
               <div key={ward.id} className="ward-card" onClick={() => navigate(`/parent/ward/${ward.id}`)}
-                style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 18, display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 2px 8px rgba(109,40,217,0.04)', cursor: 'pointer', transition: 'all 0.15s' }}>
+                style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 18, display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 2px 8px rgba(109,40,217,0.04)', cursor: 'pointer', transition: 'all 0.15s' }}>
                 <Avatar name={ward.full_name} size={54} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ward.full_name}</div>
-                  <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>{ward.class?.name || 'No Class'} {ward.student_id ? `· ${ward.student_id}` : ''}</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ward.full_name}</div>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>{ward.class?.name || 'No Class'} {ward.student_id ? `· ${ward.student_id}` : ''}</div>
                 </div>
                 <div style={{ color: '#d1d5db', fontSize: 20 }}>›</div>
               </div>
@@ -78,7 +78,7 @@ export default function ParentDashboard() {
       </div>
 
       <div style={{ marginBottom: 30 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: '#4b5563', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>
           Quick Actions
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>

@@ -182,10 +182,10 @@ export default function GradingSetupTab() {
         const hasConfig = !!config?.scale || (config?.categories && config.categories.length > 0)
 
         return (
-          <div key={dept.id} style={{ background: '#fff', borderRadius: 16, border: '1px solid #e5e7eb', padding: '20px', display: 'flex', gap: 20, flexDirection: 'column' }}>
+          <div key={dept.id} style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid var(--border-color)', padding: '20px', display: 'flex', gap: 20, flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h4 style={{ margin: 0, fontSize: 18, color: '#111827' }}>{dept.name}</h4>
+                <h4 style={{ margin: 0, fontSize: 18, color: 'var(--text-main)' }}>{dept.name}</h4>
                 {hasConfig ? (
                   <span style={{ display: 'inline-block', marginTop: 4, padding: '2px 8px', background: '#dcfce7', color: '#166534', fontSize: 11, fontWeight: 700, borderRadius: 10 }}>Configured</span>
                 ) : (
@@ -201,7 +201,7 @@ export default function GradingSetupTab() {
                     disabled={applying === dept.id}
                     style={{
                       padding: '8px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                      background: '#fff', border: '1px solid #d1d5db', color: '#374151', transition: 'all 0.15s'
+                      background: 'var(--bg-card)', border: '1px solid #d1d5db', color: 'var(--text-main)', transition: 'all 0.15s'
                     }}
                     onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
                     onMouseLeave={e => e.currentTarget.style.background = '#fff'}
@@ -213,19 +213,19 @@ export default function GradingSetupTab() {
             </div>
 
             {hasConfig && (
-              <div style={{ display: 'flex', gap: 20, borderTop: '1px solid #f3f4f6', paddingTop: 16 }}>
+              <div style={{ display: 'flex', gap: 20, borderTop: '1px solid var(--border-light)', paddingTop: 16 }}>
                 <div style={{ flex: 1 }}>
-                  <h5 style={{ margin: '0 0 10px', fontSize: 12, color: '#6b7280', textTransform: 'uppercase' }}>Score Categories</h5>
+                  <h5 style={{ margin: '0 0 10px', fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Score Categories</h5>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {config.categories?.map((c: any) => (
-                      <div key={c.id} style={{ background: '#f3f4f6', padding: '6px 12px', borderRadius: 6, fontSize: 13, color: '#374151', fontWeight: 500 }}>
+                      <div key={c.id} style={{ background: 'var(--bg-hover)', padding: '6px 12px', borderRadius: 6, fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>
                         {c.name} <span style={{ color: '#6d28d9', fontWeight: 700 }}>({c.weight_percentage}%)</span>
                       </div>
                     ))}
                   </div>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <h5 style={{ margin: '0 0 10px', fontSize: 12, color: '#6b7280', textTransform: 'uppercase' }}>Grading Scale: {config.scale?.name}</h5>
+                  <h5 style={{ margin: '0 0 10px', fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Grading Scale: {config.scale?.name}</h5>
                   <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                     {config.scale?.levels?.sort((a: any, b: any) => b.min_score - a.min_score).map((l: any) => (
                       <div key={l.id} style={{ background: `${l.color_code}15`, color: l.color_code, border: `1px solid ${l.color_code}40`, padding: '4px 8px', borderRadius: 6, fontSize: 12, fontWeight: 700 }}>

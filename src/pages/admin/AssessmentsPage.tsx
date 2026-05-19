@@ -258,7 +258,7 @@ export default function AssessmentsPage() {
             onClick={() => setIsExportModalOpen(true)}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 12, 
-              background: '#fff', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer' 
+              background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer' 
             }}>
             <Download size={18} /> Export for Portal
           </button>
@@ -276,7 +276,7 @@ export default function AssessmentsPage() {
       </div>
 
       {/* Controls Card */}
-      <div style={{ background: '#fff', borderRadius: 20, padding: 24, border: `1.5px solid ${T.border}`, marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, border: `1.5px solid ${T.border}`, marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, alignItems: 'flex-end' }}>
           <div>
             <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: T.muted, textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>
@@ -339,7 +339,7 @@ export default function AssessmentsPage() {
 
       {/* Main Entry Table */}
       {!selectedClass || !selectedSubject ? (
-        <div style={{ height: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#fff', borderRadius: 24, border: `1.5px solid ${T.border}` }}>
+        <div style={{ height: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', borderRadius: 24, border: `1.5px solid ${T.border}` }}>
           <div style={{ width: 64, height: 64, borderRadius: '50%', background: T.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
             <Filter size={32} color={T.primary} />
           </div>
@@ -347,7 +347,7 @@ export default function AssessmentsPage() {
           <p style={{ color: T.muted, fontSize: 14 }}>Please select a class and subject to load the student list.</p>
         </div>
       ) : (
-        <div style={{ background: '#fff', borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', animation: '_slideUp 0.4s ease' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', animation: '_slideUp 0.4s ease' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: T.bg, borderBottom: `1.5px solid ${T.border}` }}>
@@ -437,7 +437,7 @@ export default function AssessmentsPage() {
           <div 
             onClick={() => exportForPortal('BECE')}
             className="style-card"
-            style={{ padding: 20, background: '#fff', border: `1.5px solid ${T.border}`, borderRadius: 16, textAlign: 'center' }}>
+            style={{ padding: 20, background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, borderRadius: 16, textAlign: 'center' }}>
             <FileSpreadsheet size={32} color={T.success} style={{ marginBottom: 12 }} />
             <h4 style={{ margin: '0 0 4px', fontSize: 15 }}>WAEC / BECE</h4>
             <p style={{ fontSize: 11, color: T.muted, margin: 0 }}>Form 3 Continuous Assessment Export</p>
@@ -445,7 +445,7 @@ export default function AssessmentsPage() {
           <div 
             onClick={() => exportForPortal('CAMBRIDGE')}
             className="style-card"
-            style={{ padding: 20, background: '#fff', border: `1.5px solid ${T.border}`, borderRadius: 16, textAlign: 'center' }}>
+            style={{ padding: 20, background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, borderRadius: 16, textAlign: 'center' }}>
             <ClipboardCheck size={32} color={T.primary} style={{ marginBottom: 12 }} />
             <h4 style={{ margin: '0 0 4px', fontSize: 15 }}>Cambridge IGCSE</h4>
             <p style={{ fontSize: 11, color: T.muted, margin: 0 }}>Official Grade Tracking Export</p>

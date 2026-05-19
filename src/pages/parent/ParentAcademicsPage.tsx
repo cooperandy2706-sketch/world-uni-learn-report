@@ -92,17 +92,17 @@ export default function ParentAcademicsPage() {
 
       <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Academic Results</h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Monitor the performance and grades of your children.</p>
+          <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Academic Results</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Monitor the performance and grades of your children.</p>
         </div>
 
         {/* Term Selector */}
-        <div style={{ background: '#fff', borderRadius: 12, border: '1.5px solid #f0eefe', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <Calendar size={16} color="#6d28d9" />
           <select 
             value={selectedTermId} 
             onChange={(e) => setSelectedTermId(e.target.value)}
-            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer' }}
+            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer' }}
           >
             {allTerms.map(t => (
               <option key={t.id} value={t.id}>
@@ -131,7 +131,7 @@ export default function ParentAcademicsPage() {
           const isFinancialHold = totalOutstanding > 0
 
           return (
-            <div key={ward.id} style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 16px rgba(109,40,217,0.03)' }}>
+            <div key={ward.id} style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 16px rgba(109,40,217,0.03)' }}>
               
               <div 
                 onClick={() => setExpandedWard(isExpanded ? null : ward.id)}
@@ -142,8 +142,8 @@ export default function ParentAcademicsPage() {
                     <BarChart3 size={22} />
                   </div>
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>{ward.full_name}</div>
-                    <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{ward.class?.name || 'No Class'}</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>{ward.full_name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{ward.class?.name || 'No Class'}</div>
                   </div>
                 </div>
 
@@ -165,14 +165,14 @@ export default function ParentAcademicsPage() {
                   
                   {/* Summary Cards */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 20 }}>
-                    <div style={{ background: '#fff', padding: 14, borderRadius: 12, border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ background: 'var(--bg-card)', padding: 14, borderRadius: 12, border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 10 }}>
                       <Trophy size={18} color="#f59e0b" />
                       <div>
                         <div style={{ fontSize: 10, color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Position</div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: '#1e293b' }}>{data.report?.overall_position || '—'}</div>
                       </div>
                     </div>
-                    <div style={{ background: '#fff', padding: 14, borderRadius: 12, border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ background: 'var(--bg-card)', padding: 14, borderRadius: 12, border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 10 }}>
                       <BookOpen size={18} color="#6d28d9" />
                       <div>
                         <div style={{ fontSize: 10, color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Subjects</div>
@@ -190,7 +190,7 @@ export default function ParentAcademicsPage() {
                         data.scores.map((s: any, idx: number) => {
                           const g = getGradeInfo(s.total_score || 0)
                           return (
-                             <div key={idx} style={{ background: '#fff', padding: '12px 16px', borderRadius: 12, border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                             <div key={idx} style={{ background: 'var(--bg-card)', padding: '12px 16px', borderRadius: 12, border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: '#334155' }}>{s.subject?.name}</div>
                                 <div style={{ fontSize: 11, color: '#94a3b8' }}>{g.label}</div>
@@ -241,8 +241,8 @@ export default function ParentAcademicsPage() {
         {wards.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>👨‍👩‍👦</div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>No children linked</h3>
-            <p style={{ fontSize: 13, color: '#6b7280' }}>Contact school administration to link your children.</p>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>No children linked</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Contact school administration to link your children.</p>
           </div>
         )}
       </div>

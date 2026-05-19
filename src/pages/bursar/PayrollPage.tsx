@@ -25,7 +25,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, style }: any) {
   const [h, setH] = useState(false)
   const v: any = {
     primary: { background: h ? '#1e0646' : '#2d0a63', color: '#fff', border: 'none' },
-    secondary: { background: h ? '#f9fafb' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: h ? '#f9fafb' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     success: { background: h ? '#059669' : '#10b981', color: '#fff', border: 'none' },
     danger: { background: h ? '#dc2626' : '#ef4444', color: '#fff', border: 'none' },
   }
@@ -264,19 +264,19 @@ export default function PayrollPage() {
       <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 900, color: '#1e0646', margin: 0 }}>Staff Payroll</h1>
-          <p style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>Manage monthly salaries, daily pay, and allowances.</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>Manage monthly salaries, daily pay, and allowances.</p>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <div style={{ background: '#fff', padding: '10px 18px', borderRadius: 12, border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ background: 'var(--bg-card)', padding: '10px 18px', borderRadius: 12, border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 12 }}>
             <Calendar size={18} color="#6d28d9" />
-            <input type="month" value={month} onChange={e => setMonth(e.target.value)} style={{ border: 'none', background: 'none', outline: 'none', color: '#111827', fontWeight: 800, fontSize: 14 }} />
+            <input type="month" value={month} onChange={e => setMonth(e.target.value)} style={{ border: 'none', background: 'none', outline: 'none', color: 'var(--text-main)', fontWeight: 800, fontSize: 14 }} />
           </div>
           {activeTab === 'monthly' && <Btn onClick={() => setAddModal(true)}><Plus size={16} /> Setup Staff</Btn>}
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24, background: '#f9fafb', padding: 6, borderRadius: 16, width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24, background: 'var(--bg-input)', padding: 6, borderRadius: 16, width: 'fit-content' }}>
         {[
           { id: 'monthly', icon: Users, label: 'Monthly Pay' },
           { id: 'weekly', icon: Calendar, label: 'Weekly Allowances' },
@@ -291,7 +291,7 @@ export default function PayrollPage() {
 
       {/* TAB: MONTHLY */}
       {activeTab === 'monthly' && (
-        <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#fcfaff', borderBottom: '1.5px solid #f0eefe' }}>
@@ -310,7 +310,7 @@ export default function PayrollPage() {
                 <tr key={row.id} style={{ borderBottom: '1px solid #f9fafb' }}>
                   <td style={{ padding: '14px 20px' }}>
                     <div style={{ fontSize: 15, fontWeight: 800 }}>{row.user?.full_name}</div>
-                    <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600, textTransform: 'capitalize' }}>{row.user?.designation || row.user?.role}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'capitalize' }}>{row.user?.designation || row.user?.role}</div>
                   </td>
                   <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 700 }}>{CUR(row.basic_salary)}</td>
                   <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 700, color: '#059669' }}>+{CUR(row.allowances)}</td>
@@ -330,7 +330,7 @@ export default function PayrollPage() {
                   </td>
                 </tr>
               )})}
-              {payroll.length === 0 && <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>No payroll data for this month.</td></tr>}
+              {payroll.length === 0 && <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>No payroll data for this month.</td></tr>}
             </tbody>
           </table>
         </div>
@@ -341,39 +341,39 @@ export default function PayrollPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 300px', gap: 24 }}>
           <div>
             <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-              <select value={selectedWeek} onChange={e => setSelectedWeek(Number(e.target.value))} style={{ padding: '10px 16px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: '#fff', fontWeight: 700 }}>
+              <select value={selectedWeek} onChange={e => setSelectedWeek(Number(e.target.value))} style={{ padding: '10px 16px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', fontWeight: 700 }}>
                  {[...Array(5)].map((_, i) => <option key={i} value={currentWeekInfo - i}>Week {currentWeekInfo - i}</option>)}
               </select>
             </div>
-            <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, marginBottom: 24 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, marginBottom: 24 }}>
               <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 16 }}>Record Weekly Top-up</h3>
               <div style={{ display: 'flex', gap: 12 }}>
-                <select value={weeklyConfigForm.user_id} onChange={e => setWeeklyConfigForm({...weeklyConfigForm, user_id: e.target.value})} style={{ flex: 1, padding: 12, borderRadius: 12, border: '1.5px solid #e5e7eb' }}>
+                <select value={weeklyConfigForm.user_id} onChange={e => setWeeklyConfigForm({...weeklyConfigForm, user_id: e.target.value})} style={{ flex: 1, padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)' }}>
                   <option value="">Select Staff...</option>
                   {staff.map((s:any) => <option key={s.id} value={s.id}>{s.full_name} {s.designation ? `(${s.designation})` : ''}</option>)}
                 </select>
-                <input type="number" placeholder="Amount (GH₵)" value={weeklyConfigForm.amount} onChange={e => setWeeklyConfigForm({...weeklyConfigForm, amount: e.target.value})} style={{ width: 150, padding: 12, borderRadius: 12, border: '1.5px solid #e5e7eb' }} />
+                <input type="number" placeholder="Amount (GH₵)" value={weeklyConfigForm.amount} onChange={e => setWeeklyConfigForm({...weeklyConfigForm, amount: e.target.value})} style={{ width: 150, padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)' }} />
                 <Btn onClick={() => {
                    if(!weeklyConfigForm.user_id) return toast.error('Select staff')
                    saveWeekly.mutate({ school_id: schoolId, user_id: weeklyConfigForm.user_id, month, type: 'weekly_pay', amount: Number(weeklyConfigForm.amount), description: `Week ${selectedWeek} Top-up`, week_number: selectedWeek, recorded_at: format(new Date(), 'yyyy-MM-dd') })
                 }}>Add</Btn>
               </div>
             </div>
-            <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ background: '#f9fafb' }}>
-                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: '#6b7280' }}>Staff</th>
-                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: '#6b7280' }}>Amount</th>
-                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: '#6b7280' }}>Status</th>
+                  <tr style={{ background: 'var(--bg-input)' }}>
+                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: 'var(--text-muted)' }}>Staff</th>
+                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: 'var(--text-muted)' }}>Amount</th>
+                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: 'var(--text-muted)' }}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {weeklyData.map((row:any) => (
-                    <tr key={row.id} style={{ borderTop: '1px solid #f3f4f6' }}>
+                    <tr key={row.id} style={{ borderTop: '1px solid var(--border-light)' }}>
                       <td style={{ padding: '14px 20px' }}>
                         <div style={{ fontWeight: 800 }}>{row.user?.full_name}</div>
-                        <div style={{ fontSize: 10, color: '#6b7280', fontWeight: 600, textTransform: 'capitalize' }}>{row.user?.designation || row.user?.role}</div>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'capitalize' }}>{row.user?.designation || row.user?.role}</div>
                       </td>
                       <td style={{ padding: '14px 20px', fontWeight: 800 }}>{CUR(row.amount)}</td>
                       <td style={{ padding: '14px 20px' }}>
@@ -386,12 +386,12 @@ export default function PayrollPage() {
                       </td>
                     </tr>
                   ))}
-                  {weeklyData.length === 0 && <tr><td colSpan={3} style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>No weekly records found.</td></tr>}
+                  {weeklyData.length === 0 && <tr><td colSpan={3} style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>No weekly records found.</td></tr>}
                 </tbody>
               </table>
             </div>
           </div>
-          <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, height: 'fit-content' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, height: 'fit-content' }}>
             <h3 style={{ fontSize: 15, fontWeight: 800, marginBottom: 20 }}>Weekly Payout Trends</h3>
             <div style={{ height: 200 }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -407,40 +407,40 @@ export default function PayrollPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 300px', gap: 24 }}>
           <div>
             <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-              <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} style={{ padding: '10px 16px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: '#fff', fontWeight: 700 }} />
+              <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} style={{ padding: '10px 16px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', fontWeight: 700 }} />
             </div>
-            <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, marginBottom: 24 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, marginBottom: 24 }}>
               <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 16 }}>Record Daily Cash/Allowance</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <select value={dailyForm.user_id} onChange={e => setDailyForm({...dailyForm, user_id: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid #e5e7eb' }}>
+                <select value={dailyForm.user_id} onChange={e => setDailyForm({...dailyForm, user_id: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)' }}>
                   <option value="">Select Staff...</option>
                   {staff.map((s:any) => <option key={s.id} value={s.id}>{s.full_name} {s.designation ? `(${s.designation})` : ''}</option>)}
                 </select>
-                <input type="number" placeholder="Amount (GH₵)" value={dailyForm.amount} onChange={e => setDailyForm({...dailyForm, amount: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid #e5e7eb' }} />
-                <input placeholder="Reason (e.g. Lunch)" value={dailyForm.description} onChange={e => setDailyForm({...dailyForm, description: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid #e5e7eb', gridColumn: 'span 2' }} />
+                <input type="number" placeholder="Amount (GH₵)" value={dailyForm.amount} onChange={e => setDailyForm({...dailyForm, amount: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)' }} />
+                <input placeholder="Reason (e.g. Lunch)" value={dailyForm.description} onChange={e => setDailyForm({...dailyForm, description: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)', gridColumn: 'span 2' }} />
                 <Btn style={{ gridColumn: 'span 2' }} onClick={() => {
                    if(!dailyForm.user_id) return toast.error('Select staff')
                    saveDaily.mutate({ school_id: schoolId, user_id: dailyForm.user_id, month, type: 'daily_pay', amount: Number(dailyForm.amount), description: dailyForm.description, recorded_at: selectedDate, is_paid: true, paid_date: selectedDate, payment_method: 'cash' })
                 }}>Save & Auto-Pay Cash</Btn>
               </div>
             </div>
-            <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ background: '#f9fafb' }}>
-                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: '#6b7280' }}>Staff</th>
-                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: '#6b7280' }}>Reason</th>
-                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: '#6b7280' }}>Amount</th>
+                  <tr style={{ background: 'var(--bg-input)' }}>
+                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: 'var(--text-muted)' }}>Staff</th>
+                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: 'var(--text-muted)' }}>Reason</th>
+                    <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: 12, color: 'var(--text-muted)' }}>Amount</th>
                   </tr>
                 </thead>
                 <tbody>
                   {dailyData.map((row:any) => (
-                    <tr key={row.id} style={{ borderTop: '1px solid #f3f4f6' }}>
+                    <tr key={row.id} style={{ borderTop: '1px solid var(--border-light)' }}>
                       <td style={{ padding: '14px 20px' }}>
                         <div style={{ fontWeight: 800 }}>{row.user?.full_name}</div>
-                        <div style={{ fontSize: 10, color: '#6b7280', fontWeight: 600, textTransform: 'capitalize' }}>{row.user?.designation || row.user?.role}</div>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'capitalize' }}>{row.user?.designation || row.user?.role}</div>
                       </td>
-                      <td style={{ padding: '14px 20px', color: '#6b7280', fontSize: 13 }}>{row.description}</td>
+                      <td style={{ padding: '14px 20px', color: 'var(--text-muted)', fontSize: 13 }}>{row.description}</td>
                       <td style={{ padding: '14px 20px' }}>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                           <span style={{ fontWeight: 800, color: '#059669' }}>{CUR(row.amount)}</span>
@@ -451,12 +451,12 @@ export default function PayrollPage() {
                       </td>
                     </tr>
                   ))}
-                  {dailyData.length === 0 && <tr><td colSpan={3} style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>No daily records for this date.</td></tr>}
+                  {dailyData.length === 0 && <tr><td colSpan={3} style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>No daily records for this date.</td></tr>}
                 </tbody>
               </table>
             </div>
           </div>
-          <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, height: 'fit-content' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, height: 'fit-content' }}>
              <h3 style={{ fontSize: 15, fontWeight: 800, marginBottom: 20 }}>Today's Total Cashout</h3>
              <div style={{ fontSize: 32, fontWeight: 900, color: '#6d28d9' }}>{CUR(dailyData.reduce((s:any, x:any) => s + Number(x.amount), 0))}</div>
           </div>
@@ -467,20 +467,20 @@ export default function PayrollPage() {
       {activeTab === 'analytics' && (
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 20, marginBottom: 30 }}>
-             <div style={{ background: '#fff', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
-               <div style={{ color: '#6b7280', fontSize: 13, fontWeight: 700 }}>Total Month Gross</div>
+             <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
+               <div style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 700 }}>Total Month Gross</div>
                <div style={{ fontSize: 28, fontWeight: 900, color: '#1e0646', marginTop: 8 }}>{CUR(payroll.reduce((s,x) => s + x.basic_salary + x.allowances, 0))}</div>
              </div>
-             <div style={{ background: '#fff', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
-               <div style={{ color: '#6b7280', fontSize: 13, fontWeight: 700 }}>Total Paid to Date</div>
+             <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
+               <div style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 700 }}>Total Paid to Date</div>
                <div style={{ fontSize: 28, fontWeight: 900, color: '#059669', marginTop: 8 }}>{CUR(payroll.filter(p=>p.is_paid).reduce((s,x) => s + x.net_salary, 0))}</div>
              </div>
-             <div style={{ background: '#fff', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
-               <div style={{ color: '#6b7280', fontSize: 13, fontWeight: 700 }}>Outstanding Month Balance</div>
+             <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
+               <div style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 700 }}>Outstanding Month Balance</div>
                <div style={{ fontSize: 28, fontWeight: 900, color: '#dc2626', marginTop: 8 }}>{CUR(payroll.filter(p=>!p.is_paid).reduce((s,x) => s + (x.net_salary - (x.adjustments_paid_total||0)), 0))}</div>
              </div>
           </div>
-          <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24 }}>
             <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 30 }}>Staff Pay Breakdown</h3>
             <div style={{ height: 350 }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -502,11 +502,11 @@ export default function PayrollPage() {
 
       <Modal open={addModal} onClose={() => setAddModal(false)} title="Add Staff to Monthly Roll">
         <div style={{ display: 'grid', gap: 16 }}>
-          <select value={form.user_id} onChange={e => setForm({...form, user_id: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid #e5e7eb', width: '100%' }}>
+          <select value={form.user_id} onChange={e => setForm({...form, user_id: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)', width: '100%' }}>
             <option value="">Select Staff...</option>
             {staff.map((s:any) => <option key={s.id} value={s.id}>{s.full_name} {s.designation ? `(${s.designation})` : ''}</option>)}
           </select>
-          <input type="number" placeholder="Monthly Basic Salary" value={form.basic_salary} onChange={e => setForm({...form, basic_salary: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid #e5e7eb', width: '100%' }} />
+          <input type="number" placeholder="Monthly Basic Salary" value={form.basic_salary} onChange={e => setForm({...form, basic_salary: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)', width: '100%' }} />
           <Btn onClick={() => upsertMonthly.mutate({ school_id: schoolId, user_id: form.user_id, month, basic_salary: Number(form.basic_salary) })}>Save Staff Payroll</Btn>
         </div>
       </Modal>
@@ -524,22 +524,22 @@ export default function PayrollPage() {
                <CheckCircle2 size={32} color="#10b981" />
             </div>
             <h3 style={{ fontSize: 20, fontWeight: 900 }}>{CUR(shareModal.type === 'monthly' ? shareModal.data.net_salary : shareModal.data.amount)} Paid</h3>
-            <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 24, marginTop: 4 }}>To {shareModal.staff?.full_name} via {shareModal.data.payment_method?.toUpperCase() || 'CASH'}</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 24, marginTop: 4 }}>To {shareModal.staff?.full_name} via {shareModal.data.payment_method?.toUpperCase() || 'CASH'}</p>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-               <button onClick={() => printA4(shareModal.data, shareModal.type)} style={{ padding: 14, borderRadius: 16, border: '1.5px solid #e5e7eb', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+               <button onClick={() => printA4(shareModal.data, shareModal.type)} style={{ padding: 14, borderRadius: 16, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <FileText size={24} color="#0284c7" /> <span style={{ fontSize: 12, fontWeight: 700 }}>A4 Payslip</span>
                </button>
-               <button onClick={() => printThermal(shareModal.data, shareModal.type)} style={{ padding: 14, borderRadius: 16, border: '1.5px solid #e5e7eb', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+               <button onClick={() => printThermal(shareModal.data, shareModal.type)} style={{ padding: 14, borderRadius: 16, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <Receipt size={24} color="#a21caf" /> <span style={{ fontSize: 12, fontWeight: 700 }}>Thermal Rec.</span>
                </button>
                <button onClick={() => {
                    const txt = `Hello ${shareModal.staff.full_name}, your ${shareModal.type} pay of ${CUR(shareModal.type === 'monthly' ? shareModal.data.net_salary : shareModal.data.amount)} has been paid via ${(shareModal.data.payment_method||'Cash').toUpperCase()}. Ref: ${shareModal.data.bank_reference||'None'}.`
                    window.open(`https://wa.me/${shareModal.staff?.phone?.replace(/\D/g, '') || ''}?text=${encodeURIComponent(txt)}`, '_blank')
-               }} style={{ padding: 14, borderRadius: 16, border: '1.5px solid #e5e7eb', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+               }} style={{ padding: 14, borderRadius: 16, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <MessageSquare size={24} color="#25d366" /> <span style={{ fontSize: 12, fontWeight: 700 }}>WhatsApp</span>
                </button>
-               <button onClick={() => toast.success('SMS Queued')} style={{ padding: 14, borderRadius: 16, border: '1.5px solid #e5e7eb', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+               <button onClick={() => toast.success('SMS Queued')} style={{ padding: 14, borderRadius: 16, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <MessageSquare size={24} color="#2563eb" /> <span style={{ fontSize: 12, fontWeight: 700 }}>Send SMS</span>
                </button>
             </div>
@@ -573,14 +573,14 @@ function PaymentMethodForm({ onConfirm }: any) {
        </div>
        {md === 'bank' && (
          <div style={{ display: 'grid', gap: 12, marginBottom: 20 }}>
-           <input placeholder="Bank Name" value={bank} onChange={e => setBank(e.target.value)} style={{ padding: 12, borderRadius: 12, border: '1.5px solid #e5e7eb', width: '100%' }} />
-           <input placeholder="Ref / Cheque No" value={ref} onChange={e => setRef(e.target.value)} style={{ padding: 12, borderRadius: 12, border: '1.5px solid #e5e7eb', width: '100%' }} />
+           <input placeholder="Bank Name" value={bank} onChange={e => setBank(e.target.value)} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)', width: '100%' }} />
+           <input placeholder="Ref / Cheque No" value={ref} onChange={e => setRef(e.target.value)} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)', width: '100%' }} />
          </div>
        )}
        {md === 'momo' && (
          <div style={{ display: 'grid', gap: 12, marginBottom: 20 }}>
-           <select value={bank} onChange={e => setBank(e.target.value)} style={{ padding: 12, borderRadius: 12, border: '1.5px solid #e5e7eb', width: '100%' }}><option value="">Network...</option><option value="mtn">MTN</option><option value="voda">Vodafone</option><option value="airtel">AirtelTigo</option></select>
-           <input placeholder="Phone / Ref No" value={ref} onChange={e => setRef(e.target.value)} style={{ padding: 12, borderRadius: 12, border: '1.5px solid #e5e7eb', width: '100%' }} />
+           <select value={bank} onChange={e => setBank(e.target.value)} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)', width: '100%' }}><option value="">Network...</option><option value="mtn">MTN</option><option value="voda">Vodafone</option><option value="airtel">AirtelTigo</option></select>
+           <input placeholder="Phone / Ref No" value={ref} onChange={e => setRef(e.target.value)} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)', width: '100%' }} />
          </div>
        )}
        <Btn onClick={() => onConfirm({ payment_method: md, bank_name: bank, bank_reference: ref })} style={{ width: '100%', justifyContent: 'center' }}>Confirm & Record Payment</Btn>

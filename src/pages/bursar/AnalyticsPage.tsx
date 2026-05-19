@@ -117,14 +117,14 @@ export default function AnalyticsPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_an_fi .4s ease' }}>
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Financial Analytics</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Full financial overview and trends · {year}</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Financial Analytics</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Full financial overview and trends · {year}</p>
           </div>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
             <button onClick={exportCSV} className="analytics-export-btn">
               📥 Export CSV
             </button>
-            <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ padding: '9px 14px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', fontWeight: 600 }}>
+            <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ padding: '9px 14px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', fontWeight: 600 }}>
               {[currentYear, currentYear - 1, currentYear - 2].map(y => <option key={y} value={y}>{y}</option>)}
             </select>
           </div>
@@ -133,17 +133,17 @@ export default function AnalyticsPage() {
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_an_spin .8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Crunching numbers…</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Crunching numbers…</p>
           </div>
         ) : (
           <>
             {/* KPI Row */}
             <div className="analytics-kpis">
               {kpis.map((k) => (
-                <div key={k.label} style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>{k.label}</div>
+                <div key={k.label} style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>{k.label}</div>
                   <div style={{ fontSize: 20, fontWeight: 900, color: k.color, fontFamily: '"Playfair Display",serif', marginBottom: 4 }}>{k.value}</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-subtle)', display: 'flex', alignItems: 'center', gap: 4 }}>
                     <span style={{ width: 6, height: 6, borderRadius: '50%', background: k.color, display: 'inline-block' }} />
                     {k.note}
                   </div>
@@ -152,9 +152,9 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Monthly Area Chart */}
-            <div style={{ background: '#fff', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', marginBottom: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>Monthly Cash Flow — {year}</h3>
-              <p style={{ fontSize: 12, color: '#9ca3af', margin: '0 0 20px' }}>Income vs Expenses by month</p>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', marginBottom: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px' }}>Monthly Cash Flow — {year}</h3>
+              <p style={{ fontSize: 12, color: 'var(--text-subtle)', margin: '0 0 20px' }}>Income vs Expenses by month</p>
               <ResponsiveContainer width="100%" height={240}>
                 <AreaChart data={monthly}>
                   <defs>
@@ -176,8 +176,8 @@ export default function AnalyticsPage() {
             <div className="analytics-3col">
 
               {/* Net Line */}
-              <div style={{ background: '#fff', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: '0 0 16px' }}>Net Balance by Month</h3>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 16px' }}>Net Balance by Month</h3>
                 <ResponsiveContainer width="100%" height={180}>
                   <LineChart data={monthly}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -190,27 +190,27 @@ export default function AnalyticsPage() {
               </div>
 
               {/* Expense Pie */}
-              <div style={{ background: '#fff', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: '0 0 16px' }}>Expense Breakdown</h3>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 16px' }}>Expense Breakdown</h3>
                 {expByCat.length > 0 ? (
                   <ResponsiveContainer width="100%" height={180}>
                     <PieChart><Pie data={expByCat} cx="50%" cy="50%" outerRadius={65} dataKey="value" nameKey="name">
                       {expByCat.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie><Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize: 10 }} /><Tooltip formatter={(v: any) => CUR(v)} contentStyle={{ borderRadius: 10, border: 'none', fontSize: 11 }} /></PieChart>
                   </ResponsiveContainer>
-                ) : <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>No data</div>}
+                ) : <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 12 }}>No data</div>}
               </div>
 
               {/* Income Pie */}
-              <div style={{ background: '#fff', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: '0 0 16px' }}>Income Sources</h3>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 16px' }}>Income Sources</h3>
                 {incByCat.length > 0 ? (
                   <ResponsiveContainer width="100%" height={180}>
                     <PieChart><Pie data={incByCat} cx="50%" cy="50%" outerRadius={65} dataKey="value" nameKey="name">
                       {incByCat.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie><Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize: 10 }} /><Tooltip formatter={(v: any) => CUR(v)} contentStyle={{ borderRadius: 10, border: 'none', fontSize: 11 }} /></PieChart>
                   </ResponsiveContainer>
-                ) : <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>No data</div>}
+                ) : <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 12 }}>No data</div>}
               </div>
             </div>
 
@@ -241,8 +241,8 @@ export default function AnalyticsPage() {
             })()}
 
             {/* Monthly breakdown bar */}
-            <div style={{ background: '#fff', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: '0 0 20px' }}>Monthly Bar Summary</h3>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '22px 24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 20px' }}>Monthly Bar Summary</h3>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={monthly} barSize={12}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

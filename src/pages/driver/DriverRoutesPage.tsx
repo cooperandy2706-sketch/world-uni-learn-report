@@ -198,7 +198,7 @@ export default function DriverRoutesPage() {
       `}</style>
       
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: '#111827' }}>Assigned Routes</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Assigned Routes</h1>
         <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: 14 }}>Manage your routes and live student manifests.</p>
       </div>
 
@@ -241,7 +241,7 @@ export default function DriverRoutesPage() {
           routes.map((route) => {
              const isActive = activeRouteId === route.id
              return (
-              <div key={route.id} style={{ background: '#fff', borderRadius: 16, border: isActive ? '2px solid #6d28d9' : '1px solid #e2e8f0', overflow: 'hidden', boxShadow: isActive ? '0 8px 24px rgba(109,40,217,0.1)' : '0 2px 8px rgba(0,0,0,0.02)', transition: 'all 0.2s' }}>
+              <div key={route.id} style={{ background: 'var(--bg-card)', borderRadius: 16, border: isActive ? '2px solid #6d28d9' : '1px solid #e2e8f0', overflow: 'hidden', boxShadow: isActive ? '0 8px 24px rgba(109,40,217,0.1)' : '0 2px 8px rgba(0,0,0,0.02)', transition: 'all 0.2s' }}>
                 <div style={{ padding: 20, display: 'flex', gap: 16, background: isActive ? '#faf5ff' : '#fff' }}>
                   <div style={{ width: 40, height: 40, background: isActive ? '#ede9fe' : '#f1f5f9', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isActive ? '#6d28d9' : '#475569', flexShrink: 0 }}>
                     <MapPin size={20} />
@@ -266,14 +266,14 @@ export default function DriverRoutesPage() {
 
                 {/* Manifest View */}
                 {isActive && (
-                   <div style={{ padding: 20, borderTop: '1.5px solid #f0eefe', background: '#fff' }}>
+                   <div style={{ padding: 20, borderTop: '1.5px solid #f0eefe', background: 'var(--bg-card)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
                          <Users size={18} color="#6d28d9" />
                          <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1e0646', margin: 0 }}>Live Student Manifest</h3>
                       </div>
                       
                       {students.length === 0 ? (
-                         <div style={{ padding: 20, textAlign: 'center', color: '#6b7280', fontSize: 13, background: '#f8fafc', borderRadius: 12, border: '1px dashed #e2e8f0' }}>
+                         <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, background: '#f8fafc', borderRadius: 12, border: '1px dashed #e2e8f0' }}>
                             No students assigned to this route.
                          </div>
                       ) : (
@@ -284,8 +284,8 @@ export default function DriverRoutesPage() {
                                return (
                                   <div key={s.student_id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 14, borderRadius: 12, border: '1px solid #e2e8f0', background: status === 'boarded' ? '#f0fdf4' : status === 'dropped_off' ? '#eff6ff' : status === 'absent' ? '#fef2f2' : '#fff' }}>
                                      <div>
-                                        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{s.student?.full_name}</div>
-                                        <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{s.student?.class?.name} • Stop: {s.pickup_stop || 'Any'}</div>
+                                        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{s.student?.full_name}</div>
+                                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{s.student?.class?.name} • Stop: {s.pickup_stop || 'Any'}</div>
                                      </div>
                                      <div style={{ display: 'flex', gap: 6 }}>
                                         {status === 'pending' ? (

@@ -79,15 +79,15 @@ export default function StaffElectionsPage() {
 
   const styles = {
     btn: { padding: '8px 16px', borderRadius: 8, border: 'none', background: '#6d28d9', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 13 },
-    btnOutline: { padding: '8px 16px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', color: '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13 },
-    card: { background: '#fff', borderRadius: 12, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #f3f4f6' },
+    btnOutline: { padding: '8px 16px', borderRadius: 8, border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 600, fontSize: 13 },
+    card: { background: 'var(--bg-card)', borderRadius: 12, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid var(--border-light)' },
   }
 
   if (!activeElection) {
     return (
-      <div style={{ padding: 40, textAlign: 'center', background: '#fff', borderRadius: 12, border: '1px solid #f3f4f6' }}>
+      <div style={{ padding: 40, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-light)' }}>
         <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>No Active Elections</h2>
-        <p style={{ color: '#6b7280' }}>There are currently no active prefectorial elections to vet candidates for.</p>
+        <p style={{ color: 'var(--text-muted)' }}>There are currently no active prefectorial elections to vet candidates for.</p>
       </div>
     )
   }
@@ -95,15 +95,15 @@ export default function StaffElectionsPage() {
   return (
     <div style={{ paddingBottom: 60 }}>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111827', margin: 0 }}>Candidate Vetting</h1>
-        <p style={{ color: '#6b7280', marginTop: 4, fontSize: 14 }}>{activeElection.title} — Review and score student candidates</p>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Candidate Vetting</h1>
+        <p style={{ color: 'var(--text-muted)', marginTop: 4, fontSize: 14 }}>{activeElection.title} — Review and score student candidates</p>
       </div>
 
       <div style={styles.card}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h2 style={{ fontSize: 18, fontWeight: 600 }}>All Candidates</h2>
-          <div style={{ fontSize: 13, color: '#6b7280' }}>
-            <span style={{ fontWeight: 600, color: '#111827' }}>{candidates.filter(c => c.status === 'pending').length}</span> pending vetting
+          <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+            <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{candidates.filter(c => c.status === 'pending').length}</span> pending vetting
           </div>
         </div>
 
@@ -112,16 +112,16 @@ export default function StaffElectionsPage() {
             {candidates.map(cand => {
               const pos = positions.find(p => p.id === cand.position_id)
               return (
-                <div key={cand.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, border: '1px solid #e5e7eb', borderRadius: 8 }}>
+                <div key={cand.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, border: '1px solid var(--border-color)', borderRadius: 8 }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: 15, color: '#111827' }}>
+                    <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text-main)' }}>
                       {cand.teacher?.full_name || cand.student?.full_name}
-                      <span style={{ fontWeight: 400, color: '#6b7280', marginLeft: 6 }}>
+                      <span style={{ fontWeight: 400, color: 'var(--text-muted)', marginLeft: 6 }}>
                         ({cand.teacher_id ? 'Teacher' : 'Student'})
                       </span>
                     </div>
-                    <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Position: <span style={{ fontWeight: 600 }}>{pos?.title}</span></div>
-                    <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4, display: 'flex', gap: 12 }}>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Position: <span style={{ fontWeight: 600 }}>{pos?.title}</span></div>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4, display: 'flex', gap: 12 }}>
                       <span>
                         Status: 
                         <span style={{ 
@@ -151,23 +151,23 @@ export default function StaffElectionsPage() {
             })}
           </div>
         ) : (
-          <p style={{ fontSize: 14, color: '#6b7280' }}>No candidates have applied yet.</p>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>No candidates have applied yet.</p>
         )}
       </div>
 
       {/* Vetting Modal */}
       {vettingCandidate && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Vet Candidate</h3>
-            <p style={{ fontSize: 14, color: '#374151', marginBottom: 16, fontWeight: 600 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-main)', marginBottom: 16, fontWeight: 600 }}>
               {vettingCandidate.teacher?.full_name || vettingCandidate.student?.full_name} — {positions.find(p => p.id === vettingCandidate.position_id)?.title}
             </p>
             
             {vettingCandidate.manifesto && (
-              <div style={{ background: '#f9fafb', padding: 16, borderRadius: 8, marginBottom: 16, border: '1px solid #e5e7eb' }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', marginBottom: 8 }}>Manifesto</div>
-                <p style={{ fontSize: 14, color: '#374151', whiteSpace: 'pre-wrap', margin: 0 }}>{vettingCandidate.manifesto}</p>
+              <div style={{ background: 'var(--bg-input)', padding: 16, borderRadius: 8, marginBottom: 16, border: '1px solid var(--border-color)' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>Manifesto</div>
+                <p style={{ fontSize: 14, color: 'var(--text-main)', whiteSpace: 'pre-wrap', margin: 0 }}>{vettingCandidate.manifesto}</p>
               </div>
             )}
 

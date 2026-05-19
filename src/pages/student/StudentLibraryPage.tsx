@@ -55,7 +55,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
       padding: '24px 16px', overflowY: 'auto',
     }} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div style={{
-        background: '#fff', borderRadius: 24, width: '100%', maxWidth: 820,
+        background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 820,
         boxShadow: '0 40px 80px rgba(0,0,0,0.3)', overflow: 'hidden',
         animation: '_libIn 0.3s cubic-bezier(0.16,1,0.3,1)',
         marginBottom: 40,
@@ -91,7 +91,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
         {/* Body */}
         <div className="lib-reader-content" style={{ padding: '28px 32px' }}>
           {resource.description && (
-            <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, marginBottom: 24, borderBottom: '1px solid #f5f3ff', paddingBottom: 20 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 24, borderBottom: '1px solid #f5f3ff', paddingBottom: 20 }}>
               {resource.description}
             </p>
           )}
@@ -158,7 +158,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
               border: '1.5px solid #f0eefe', lineHeight: 1.8,
               fontFamily: 'Georgia, "Times New Roman", serif',
             }}>
-              <div className="lib-markdown" style={{ fontSize: 16, color: '#1f2937' }}>
+              <div className="lib-markdown" style={{ fontSize: 16, color: 'var(--text-main)' }}>
                 <ReactMarkdown rehypePlugins={[rehypeRaw]}>{resource.content || '*No content available.*'}</ReactMarkdown>
               </div>
             </div>
@@ -294,7 +294,7 @@ export default function StudentLibraryPage() {
         <div className="lib-controls" style={{ display: 'flex', gap: 12, marginBottom: 22, flexWrap: 'wrap', animation: '_libFu .5s ease .1s both' }}>
           {/* Search */}
           <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
-            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 15, color: '#9ca3af' }}>🔍</span>
+            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 15, color: 'var(--text-subtle)' }}>🔍</span>
             <input
               type="text"
               placeholder="Search materials, topics, subjects…"
@@ -302,8 +302,8 @@ export default function StudentLibraryPage() {
               onChange={e => setSearch(e.target.value)}
               style={{
                 width: '100%', padding: '10px 14px 10px 38px', borderRadius: 12,
-                border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none',
-                fontFamily: '"DM Sans",sans-serif', background: '#fff', color: '#111827',
+                border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none',
+                fontFamily: '"DM Sans",sans-serif', background: 'var(--bg-card)', color: 'var(--text-main)',
                 boxSizing: 'border-box', transition: 'border-color 0.15s',
               }}
               onFocus={e => e.target.style.borderColor = '#7c3aed'}
@@ -315,7 +315,7 @@ export default function StudentLibraryPage() {
           <select
             value={filterType}
             onChange={e => setFilterType(e.target.value)}
-            style={{ padding: '10px 14px', borderRadius: 12, border: '1.5px solid #e5e7eb', fontSize: 13, fontFamily: '"DM Sans",sans-serif', background: '#fff', color: '#374151', cursor: 'pointer', outline: 'none' }}
+            style={{ padding: '10px 14px', borderRadius: 12, border: '1.5px solid var(--border-color)', fontSize: 13, fontFamily: '"DM Sans",sans-serif', background: 'var(--bg-card)', color: 'var(--text-main)', cursor: 'pointer', outline: 'none' }}
           >
             <option value="all">All Types</option>
             <option value="passage">📖 Reading</option>
@@ -329,7 +329,7 @@ export default function StudentLibraryPage() {
             <select
               value={filterSubject}
               onChange={e => setFilterSubject(e.target.value)}
-              style={{ padding: '10px 14px', borderRadius: 12, border: '1.5px solid #e5e7eb', fontSize: 13, fontFamily: '"DM Sans",sans-serif', background: '#fff', color: '#374151', cursor: 'pointer', outline: 'none' }}
+              style={{ padding: '10px 14px', borderRadius: 12, border: '1.5px solid var(--border-color)', fontSize: 13, fontFamily: '"DM Sans",sans-serif', background: 'var(--bg-card)', color: 'var(--text-main)', cursor: 'pointer', outline: 'none' }}
             >
               <option value="all">All Subjects</option>
               {subjects.map(s => <option key={s} value={s}>{s}</option>)}
@@ -339,7 +339,7 @@ export default function StudentLibraryPage() {
 
         {/* ── Results count ── */}
         {!loading && (
-          <div style={{ fontSize: 12, color: '#9ca3af', fontWeight: 600, marginBottom: 16 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-subtle)', fontWeight: 600, marginBottom: 16 }}>
             {filtered.length} material{filtered.length !== 1 ? 's' : ''} found
             {search && <> for "<strong style={{ color: '#6d28d9' }}>{search}</strong>"</>}
           </div>
@@ -349,15 +349,15 @@ export default function StudentLibraryPage() {
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
             <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#7c3aed', animation: '_libFu 0s, _spin 0.8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af', animation: '_libFu 0.5s ease .2s both' }}>Loading your library…</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', animation: '_libFu 0.5s ease .2s both' }}>Loading your library…</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 20px', background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', animation: '_libFu .5s ease both' }}>
+          <div style={{ textAlign: 'center', padding: '80px 20px', background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', animation: '_libFu .5s ease both' }}>
             <div style={{ fontSize: 56, marginBottom: 14 }}>📭</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
               {search || filterType !== 'all' || filterSubject !== 'all' ? 'No matching materials' : 'Library is empty'}
             </h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', maxWidth: 360, margin: '0 auto' }}>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', maxWidth: 360, margin: '0 auto' }}>
               {search || filterType !== 'all' || filterSubject !== 'all'
                 ? 'Try adjusting your search or filters.'
                 : 'Your teachers haven\'t published any learning materials yet. Check back soon!'}
@@ -377,7 +377,7 @@ export default function StudentLibraryPage() {
                 className="lib-card"
                 onClick={() => setSelectedResource(res)}
                 style={{
-                  background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe',
+                  background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe',
                   overflow: 'hidden', boxShadow: '0 2px 8px rgba(109,40,217,0.06)',
                   display: 'flex', flexDirection: 'column',
                   animation: `_libFu 0.4s ease ${i * 0.05}s both`,
@@ -415,22 +415,22 @@ export default function StudentLibraryPage() {
                       </span>
                     )}
                     {res.topic && (
-                      <span style={{ fontSize: 10, color: '#9ca3af', fontWeight: 600 }}>• {res.topic}</span>
+                      <span style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 600 }}>• {res.topic}</span>
                     )}
                   </div>
-                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 8px', lineHeight: 1.3 }}>
+                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px', lineHeight: 1.3 }}>
                     {res.title}
                   </h3>
                   {res.description && (
                     <p style={{
-                      fontSize: 12, color: '#6b7280', flex: 1, lineHeight: 1.6, margin: '0 0 16px',
+                      fontSize: 12, color: 'var(--text-muted)', flex: 1, lineHeight: 1.6, margin: '0 0 16px',
                       display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                     } as any}>
                       {res.description}
                     </p>
                   )}
                   <div style={{ borderTop: '1px solid #f5f3ff', paddingTop: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 11, color: '#9ca3af' }}>
+                    <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
                       {new Date(res.created_at).toLocaleDateString('en-GH', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
                     <span style={{ fontSize: 13, fontWeight: 700, color: '#7c3aed' }}>

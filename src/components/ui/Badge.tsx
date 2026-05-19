@@ -4,7 +4,7 @@ import type { ReactNode, CSSProperties } from 'react'
 type Variant = 'default' | 'success' | 'warning' | 'danger' | 'info' | 'purple'
 
 const vstyle: Record<Variant, CSSProperties> = {
-  default: { background:'#f3f4f6', color:'#4b5563' },
+  default: { background: 'var(--bg-hover)', color: 'var(--text-muted)' },
   success: { background:'#f0fdf4', color:'#15803d' },
   warning: { background:'#fffbeb', color:'#b45309' },
   danger:  { background:'#fef2f2', color:'#dc2626' },

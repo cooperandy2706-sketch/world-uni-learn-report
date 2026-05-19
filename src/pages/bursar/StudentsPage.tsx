@@ -195,8 +195,8 @@ export default function BursarStudentsPage() {
         {/* Header */}
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Student Financial Management</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage scholarships, arrears, and student financial records</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Student Financial Management</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Manage scholarships, arrears, and student financial records</p>
           </div>
         </div>
 
@@ -208,22 +208,22 @@ export default function BursarStudentsPage() {
             { label: 'Students with Arrears', value: String(arrearsCount), icon: AlertTriangle, color: '#dc2626', bg: '#fef2f2' },
             { label: 'Total Outstanding Arrears', value: GHS(totalArrears), icon: AlertTriangle, color: '#b91c1c', bg: '#fef2f2' },
           ].map((c, i) => (
-            <div key={c.label} style={{ background: '#fff', borderRadius: 16, padding: '18px 20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', animation: `_bst_fu .35s ease ${i * 0.06}s both` }}>
+            <div key={c.label} style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '18px 20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', animation: `_bst_fu .35s ease ${i * 0.06}s both` }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                 <div style={{ width: 38, height: 38, borderRadius: 12, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <c.icon size={18} color={c.color} strokeWidth={2.5} />
                 </div>
               </div>
               <div style={{ fontSize: 20, fontWeight: 800, color: c.color, fontFamily: '"Playfair Display",serif' }}>{c.value}</div>
-              <div style={{ fontSize: 11, color: '#6b7280', marginTop: 4, fontWeight: 600 }}>{c.label}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, fontWeight: 600 }}>{c.label}</div>
             </div>
           ))}
         </div>
 
         {/* Filters */}
-        <div style={{ background: '#fff', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#6b7280', fontSize: 13 }}><Filter size={14} /> Filters:</div>
-          <select value={classFilter} onChange={e => setClassFilter(e.target.value)} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-muted)', fontSize: 13 }}><Filter size={14} /> Filters:</div>
+          <select value={classFilter} onChange={e => setClassFilter(e.target.value)} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}>
             <option value="">All Classes</option>
             {(classes as any[]).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
@@ -234,18 +234,18 @@ export default function BursarStudentsPage() {
               </button>
             ))}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: '#fafafa', marginLeft: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, border: '1.5px solid var(--border-color)', background: '#fafafa', marginLeft: 'auto' }}>
             <Search size={12} color="#9ca3af" />
             <input placeholder="Search student..." value={searchQ} onChange={e => setSearchQ(e.target.value)} style={{ border: 'none', outline: 'none', fontSize: 12, background: 'transparent', fontFamily: '"DM Sans",sans-serif', width: 150 }} />
           </div>
         </div>
 
         {/* Table */}
-        <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
           {isLoading ? (
-            <div style={{ padding: '60px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>Loading students…</div>
+            <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>Loading students…</div>
           ) : filtered.length === 0 ? (
-            <div style={{ padding: '60px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>
+            <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>
               {(students as any[]).length === 0 ? 'No students found' : 'No students match this filter'}
             </div>
           ) : (
@@ -275,7 +275,7 @@ export default function BursarStudentsPage() {
                     return (
                       <tr key={s.id} className="bst-row" style={{ borderBottom: '1px solid #faf5ff' }}>
                         <td style={{ padding: '11px 14px' }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{s.full_name}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{s.full_name}</div>
                         </td>
                         <td style={{ padding: '11px 14px' }}>
                           <span style={{ fontSize: 11, fontFamily: 'monospace', background: '#f5f3ff', color: '#6d28d9', padding: '2px 7px', borderRadius: 5 }}>{s.student_id ?? '—'}</span>
@@ -283,9 +283,9 @@ export default function BursarStudentsPage() {
                         <td style={{ padding: '11px 14px' }}>
                           <span style={{ fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: 99, fontWeight: 600 }}>{(s.class as any)?.name ?? '—'}</span>
                         </td>
-                        <td style={{ padding: '11px 14px', fontSize: 12, color: '#6b7280' }}>
+                        <td style={{ padding: '11px 14px', fontSize: 12, color: 'var(--text-muted)' }}>
                           {s.guardian_name ?? '—'}
-                          {s.guardian_phone && <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 1 }}>{s.guardian_phone}</div>}
+                          {s.guardian_phone && <div style={{ fontSize: 10, color: 'var(--text-subtle)', marginTop: 1 }}>{s.guardian_phone}</div>}
                         </td>
                         <td style={{ padding: '11px 14px' }}>
                           {hasScholarship ? (
@@ -294,7 +294,7 @@ export default function BursarStudentsPage() {
                               {s.scholarship_type === 'full' ? 'Full (100%)' : `${s.scholarship_percentage}%`}
                             </span>
                           ) : (
-                            <span style={{ fontSize: 11, color: '#9ca3af' }}>None</span>
+                            <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>None</span>
                           )}
                         </td>
                         <td style={{ padding: '11px 14px', textAlign: 'right' }}>
@@ -345,12 +345,12 @@ export default function BursarStudentsPage() {
         {selectedStudent && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ background: '#f8fafc', borderRadius: 12, padding: '14px 16px', border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>{selectedStudent.full_name}</div>
-              <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{(selectedStudent.class as any)?.name ?? '—'} · {selectedStudent.student_id ?? 'No ID'}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>{selectedStudent.full_name}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{(selectedStudent.class as any)?.name ?? '—'} · {selectedStudent.student_id ?? 'No ID'}</div>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Scholarship Type</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Scholarship Type</label>
               <div style={{ display: 'flex', gap: 10 }}>
                 {(['none', 'partial', 'full'] as const).map(t => (
                   <button key={t} onClick={() => setSchType(t)} style={{ flex: 1, padding: '12px', borderRadius: 10, border: schType === t ? '2px solid #16a34a' : '1.5px solid #e5e7eb', background: schType === t ? '#f0fdf4' : '#fff', color: schType === t ? '#16a34a' : '#374151', fontWeight: 700, fontSize: 14, cursor: 'pointer', textTransform: 'capitalize', fontFamily: '"DM Sans",sans-serif', transition: 'all .15s' }}>
@@ -362,13 +362,13 @@ export default function BursarStudentsPage() {
 
             {schType === 'partial' && (
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 6 }}>Discount Percentage (%)</label>
-                <input type="number" min="1" max="99" value={schPct} onChange={e => setSchPct(e.target.value)} placeholder="e.g. 50" style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 15, fontWeight: 600, outline: 'none', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>Discount Percentage (%)</label>
+                <input type="number" min="1" max="99" value={schPct} onChange={e => setSchPct(e.target.value)} placeholder="e.g. 50" style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 15, fontWeight: 600, outline: 'none', boxSizing: 'border-box' }} />
               </div>
             )}
 
             <div style={{ marginTop: 8, paddingTop: 16, borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
-              <button onClick={closeSchModal} style={{ padding: '10px 20px', borderRadius: 10, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, fontSize: 14, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>Cancel</button>
+              <button onClick={closeSchModal} style={{ padding: '10px 20px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontWeight: 600, fontSize: 14, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>Cancel</button>
               <button
                 onClick={() => awardMutation.mutate()}
                 disabled={awardMutation.isPending || (schType === 'partial' && !schPct)}
@@ -386,8 +386,8 @@ export default function BursarStudentsPage() {
         {selectedStudent && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ background: '#f8fafc', borderRadius: 12, padding: '14px 16px', border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>{selectedStudent.full_name}</div>
-              <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{(selectedStudent.class as any)?.name ?? '—'} · {selectedStudent.student_id ?? 'No ID'}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>{selectedStudent.full_name}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{(selectedStudent.class as any)?.name ?? '—'} · {selectedStudent.student_id ?? 'No ID'}</div>
               <div style={{ marginTop: 10, padding: '8px 12px', borderRadius: 8, background: Number(selectedStudent.fees_arrears || 0) > 0 ? '#fef2f2' : '#f0fdf4', border: `1px solid ${Number(selectedStudent.fees_arrears || 0) > 0 ? '#fecaca' : '#bbf7d0'}` }}>
                 <span style={{ fontSize: 12, fontWeight: 700, color: Number(selectedStudent.fees_arrears || 0) > 0 ? '#dc2626' : '#16a34a' }}>
                   Current Arrears: {GHS(Number(selectedStudent.fees_arrears || 0))}
@@ -396,7 +396,7 @@ export default function BursarStudentsPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Action</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Action</label>
               <div style={{ display: 'flex', gap: 10 }}>
                 <button onClick={() => setArrAction('add')} style={{ flex: 1, padding: '12px', borderRadius: 10, border: arrAction === 'add' ? '2px solid #dc2626' : '1.5px solid #e5e7eb', background: arrAction === 'add' ? '#fef2f2' : '#fff', color: arrAction === 'add' ? '#dc2626' : '#374151', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'all .15s' }}>
                   <Plus size={14} /> Add Additional Arrears
@@ -408,27 +408,27 @@ export default function BursarStudentsPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 6 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>
                 {arrAction === 'add' ? 'Amount to Add (GH₵)' : 'New Arrears Amount (GH₵)'}
               </label>
-              <input type="number" min="0" step="0.01" value={arrAmt} onChange={e => setArrAmt(e.target.value)} placeholder="0.00" style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 15, fontWeight: 600, outline: 'none', boxSizing: 'border-box' }} />
+              <input type="number" min="0" step="0.01" value={arrAmt} onChange={e => setArrAmt(e.target.value)} placeholder="0.00" style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 15, fontWeight: 600, outline: 'none', boxSizing: 'border-box' }} />
               {arrAction === 'add' && arrAmt && (
-                <div style={{ marginTop: 8, fontSize: 12, color: '#374151', fontWeight: 600, padding: '8px 12px', background: '#fef2f2', borderRadius: 8 }}>
+                <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-main)', fontWeight: 600, padding: '8px 12px', background: '#fef2f2', borderRadius: 8 }}>
                   New total: {GHS(Number(selectedStudent.fees_arrears || 0) + Number(arrAmt))}
                 </div>
               )}
               {arrAction === 'set' && (
-                <p style={{ fontSize: 11, color: '#6b7280', marginTop: 6 }}>This will replace the current arrears balance. Set to 0 to clear all arrears.</p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>This will replace the current arrears balance. Set to 0 to clear all arrears.</p>
               )}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 6 }}>Reason (optional)</label>
-              <input value={arrReason} onChange={e => setArrReason(e.target.value)} placeholder="e.g. Carried forward from 2024 Term 2" style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>Reason (optional)</label>
+              <input value={arrReason} onChange={e => setArrReason(e.target.value)} placeholder="e.g. Carried forward from 2024 Term 2" style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
             </div>
 
             <div style={{ marginTop: 8, paddingTop: 16, borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
-              <button onClick={closeArrModal} style={{ padding: '10px 20px', borderRadius: 10, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, fontSize: 14, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>Cancel</button>
+              <button onClick={closeArrModal} style={{ padding: '10px 20px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontWeight: 600, fontSize: 14, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>Cancel</button>
               <button
                 onClick={() => arrearsMutation.mutate()}
                 disabled={arrearsMutation.isPending || !arrAmt}
@@ -445,12 +445,12 @@ export default function BursarStudentsPage() {
         {selectedStudent && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ background: '#f8fafc', borderRadius: 12, padding: '14px 16px', border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>{selectedStudent.full_name}</div>
-              <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{(selectedStudent.class as any)?.name ?? '—'}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>{selectedStudent.full_name}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{(selectedStudent.class as any)?.name ?? '—'}</div>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Daily Fee Charging Mode</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Daily Fee Charging Mode</label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {(['all', 'feeding', 'none'] as const).map(t => (
                   <button key={t} onClick={() => setDailyFeeMode(t)} style={{ padding: '12px 16px', textAlign: 'left', borderRadius: 10, border: dailyFeeMode === t ? '2px solid #d97706' : '1.5px solid #e5e7eb', background: dailyFeeMode === t ? '#fffbeb' : '#fff', color: dailyFeeMode === t ? '#b45309' : '#374151', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif', transition: 'all .15s' }}>
@@ -467,7 +467,7 @@ export default function BursarStudentsPage() {
             </div>
 
             <div style={{ marginTop: 8, paddingTop: 16, borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
-              <button onClick={closeDailyFeeModal} style={{ padding: '10px 20px', borderRadius: 10, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, fontSize: 14, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>Cancel</button>
+              <button onClick={closeDailyFeeModal} style={{ padding: '10px 20px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontWeight: 600, fontSize: 14, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>Cancel</button>
               <button
                 onClick={() => dailyFeeMutation.mutate()}
                 disabled={dailyFeeMutation.isPending}

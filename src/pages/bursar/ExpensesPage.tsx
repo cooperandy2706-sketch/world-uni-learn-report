@@ -16,7 +16,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
   const [h, setH] = useState(false)
   const v: any = {
     primary: { background: h ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none' },
-    secondary: { background: h ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: h ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger: { background: h ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
   }
   return (
@@ -104,36 +104,36 @@ export default function ExpensesPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_exp_fi .4s ease' }}>
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Expense Records</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Total expenditure — {CUR(totalExpenses)}</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Expense Records</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Total expenditure — {CUR(totalExpenses)}</p>
           </div>
           <Btn variant="danger" onClick={() => setShowForm(v => !v)}><Plus size={14} /> {showForm ? 'Hide Form' : 'Record Expense'}</Btn>
         </div>
 
         {/* Add form */}
         {showForm && (
-          <div style={{ background: '#fff', borderRadius: 18, padding: 24, border: '1.5px solid #fecaca', marginBottom: 24, boxShadow: '0 2px 12px rgba(220,38,38,.08)' }}>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 16px' }}>Record New Expense</h3>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: 24, border: '1.5px solid #fecaca', marginBottom: 24, boxShadow: '0 2px 12px rgba(220,38,38,.08)' }}>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 16px' }}>Record New Expense</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               {[
-                { label: 'Category', content: <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}>{CATS.map(c => <option key={c}>{c}</option>)}</select> },
-                { label: `Amount (${schoolCurrency}) *`, content: <input type="number" min="0" step="0.01" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))} placeholder="0.00" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
-                { label: 'Date', content: <input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
+                { label: 'Category', content: <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }}>{CATS.map(c => <option key={c}>{c}</option>)}</select> },
+                { label: `Amount (${schoolCurrency}) *`, content: <input type="number" min="0" step="0.01" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))} placeholder="0.00" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
+                { label: 'Date', content: <input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
                 { label: 'Vendor / Payee', content: (
                   <select 
                     value={form.vendor_id} 
                     onChange={e => setForm(p => ({ ...p, vendor_id: e.target.value, vendor: e.target.value === '' ? '' : p.vendor }))} 
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }}
                   >
                     <option value="">-- Select Vendor or Type Below --</option>
                     {vendors.map((v: any) => <option key={v.id} value={v.id}>{v.name}</option>)}
                   </select>
                 )},
-                { label: 'Manual Vendor Name', content: <input value={form.vendor} disabled={!!form.vendor_id} onChange={e => setForm(p => ({ ...p, vendor: e.target.value }))} placeholder="Only if not in directory" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box', opacity: form.vendor_id ? 0.5 : 1 }} /> },
-                { label: 'Description *', content: <input value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="What was this for?" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />, span: true },
+                { label: 'Manual Vendor Name', content: <input value={form.vendor} disabled={!!form.vendor_id} onChange={e => setForm(p => ({ ...p, vendor: e.target.value }))} placeholder="Only if not in directory" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box', opacity: form.vendor_id ? 0.5 : 1 }} /> },
+                { label: 'Description *', content: <input value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="What was this for?" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />, span: true },
               ].map(f => (
                 <div key={f.label} style={{ gridColumn: (f as any).span ? '1/-1' : undefined }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{f.label}</label>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{f.label}</label>
                   {f.content}
                 </div>
               ))}
@@ -159,20 +159,20 @@ export default function ExpensesPage() {
 
         {/* Year filter */}
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 18 }}>
-          <label style={{ fontSize: 12, fontWeight: 600, color: '#6b7280' }}>Year:</label>
-          <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}>
+          <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)' }}>Year:</label>
+          <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }}>
             {[currentYear, currentYear - 1, currentYear - 2].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
           {filterCat && <span style={{ fontSize: 12, color: '#dc2626', fontWeight: 700 }}>Showing: {CUR(filteredTotal)}</span>}
         </div>
 
         {/* Table */}
-        <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-          {isLoading ? <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>Loading…</div>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+          {isLoading ? <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-subtle)' }}>Loading…</div>
             : filtered.length === 0 ? (
               <div style={{ padding: '60px', textAlign: 'center' }}>
                 <TrendingDown size={40} color="#d1d5db" style={{ marginBottom: 12 }} />
-                <p style={{ fontSize: 13, color: '#9ca3af' }}>No expenses for {year}{filterCat ? ` · ${filterCat}` : ''}</p>
+                <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>No expenses for {year}{filterCat ? ` · ${filterCat}` : ''}</p>
               </div>
             ) : (
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -186,10 +186,10 @@ export default function ExpensesPage() {
                 <tbody>
                   {filtered.map((r: any) => (
                     <tr key={r.id} className="exp-row" style={{ borderBottom: '1px solid #fef2f2', transition: 'background .12s' }}>
-                      <td style={{ padding: '11px 16px', fontSize: 12, color: '#6b7280' }}>{new Date(r.date).toLocaleDateString('en-GB')}</td>
+                      <td style={{ padding: '11px 16px', fontSize: 12, color: 'var(--text-muted)' }}>{new Date(r.date).toLocaleDateString('en-GB')}</td>
                       <td style={{ padding: '11px 16px' }}><span style={{ fontSize: 10, background: '#fee2e2', color: '#b91c1c', padding: '2px 8px', borderRadius: 99, fontWeight: 700 }}>{r.category.split('(')[0].trim()}</span></td>
-                      <td style={{ padding: '11px 16px', fontSize: 13, color: '#374151', fontWeight: 600 }}>{r.description}</td>
-                      <td style={{ padding: '11px 16px', fontSize: 12, color: '#9ca3af' }}>{r.vendor ?? '—'}</td>
+                      <td style={{ padding: '11px 16px', fontSize: 13, color: 'var(--text-main)', fontWeight: 600 }}>{r.description}</td>
+                      <td style={{ padding: '11px 16px', fontSize: 12, color: 'var(--text-subtle)' }}>{r.vendor ?? '—'}</td>
                       <td style={{ padding: '11px 16px', fontSize: 14, fontWeight: 800, color: '#dc2626' }}>{CUR(r.amount)}</td>
                       <td style={{ padding: '11px 16px' }}>
                         <button onClick={() => { if (confirm('Delete this expense?')) delRecord.mutate(r.id) }} style={{ width: 28, height: 28, borderRadius: 7, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trash2 size={12} /></button>

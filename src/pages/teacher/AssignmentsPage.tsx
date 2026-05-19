@@ -31,7 +31,7 @@ interface AssignmentData {
 
 // ── Helpers ───────────────────────────────────────────────
 function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{children}</label>
+  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{children}</label>
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -55,7 +55,7 @@ function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputEle
           width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13,
           border: `1.5px solid ${error ? '#f87171' : focused ? '#7c3aed' : '#e5e7eb'}`,
           boxShadow: focused ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none',
-          outline: 'none', background: '#fff', color: '#111827',
+          outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)',
           fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s',
           boxSizing: 'border-box',
           ...props.style
@@ -77,7 +77,7 @@ function StyledSelect({ children, ...props }: React.SelectHTMLAttributes<HTMLSel
         width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13,
         border: `1.5px solid ${focused ? '#7c3aed' : '#e5e7eb'}`,
         boxShadow: focused ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none',
-        outline: 'none', background: '#fff', color: '#111827',
+        outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)',
         fontFamily: '"DM Sans",sans-serif', cursor: 'pointer',
         boxSizing: 'border-box',
         ...props.style
@@ -100,9 +100,9 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   }
   const variants: Record<string, React.CSSProperties> = {
     primary: { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger: { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', boxShadow: '0 2px 6px rgba(220,38,38,0.22)' },
-    ghost: { background: hov ? '#f5f3ff' : 'transparent', color: '#6b7280' },
+    ghost: { background: hov ? '#f5f3ff' : 'transparent', color: 'var(--text-muted)' },
     success: { background: hov ? '#059669' : '#10b981', color: '#fff' },
   }
   return (
@@ -361,14 +361,14 @@ export default function AssignmentsPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', maxWidth: 900, margin: '0 auto', padding: '10px 4px' }}>
         {modalOpen ? (
           /* ── INLINE ASSIGNMENT BUILDER VIEW ── */
-          <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #e5e7eb', padding: 20, animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid #f3f4f6', paddingBottom: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid var(--border-color)', padding: 20, animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid var(--border-light)', paddingBottom: 16 }}>
               <div>
                 <button onClick={() => setModalOpen(false)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Assignments</button>
                 <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#1e293b' }}>Create New Assignment</h2>
-                <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6b7280' }}>Build a digital quiz with auto-grading features</p>
+                <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>Build a digital quiz with auto-grading features</p>
               </div>
-              <button onClick={() => setModalOpen(false)} style={{ background: '#f3f4f6', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+              <button onClick={() => setModalOpen(false)} style={{ background: 'var(--bg-hover)', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
             </div>
 
             <div className="modal-content-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 24 }}>
@@ -384,7 +384,7 @@ export default function AssignmentsPage() {
                     value={form.description}
                     onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="Tell students what to expect..."
-                    style={{ width: '100%', padding: '12px 14px', borderRadius: 9, fontSize: 14, border: '1.5px solid #e5e7eb', height: 90, fontFamily: 'inherit', resize: 'none', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: 9, fontSize: 14, border: '1.5px solid var(--border-color)', height: 90, fontFamily: 'inherit', resize: 'none', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </Field>
 
@@ -419,16 +419,16 @@ export default function AssignmentsPage() {
               </div>
 
               <div style={{ maxHeight: '600px', overflowY: 'auto', paddingRight: 4 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottom: '1px solid #f3f4f6', paddingBottom: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottom: '1px solid var(--border-light)', paddingBottom: 10 }}>
                   <p style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>❓ Questions ({form.content.questions.length})</p>
                   <button onClick={addQuestion} style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: '#7c3aed', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer' }}>+ Add Question</button>
                 </div>
 
                 {form.content.questions.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af', background: '#f9fafb', borderRadius: 14, border: '1.5px dashed #e5e7eb' }}>
+                  <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-subtle)', background: 'var(--bg-input)', borderRadius: 14, border: '1.5px dashed var(--border-color)' }}>
                     <div style={{ fontSize: 32, marginBottom: 8 }}>💡</div>
                     <p style={{ fontSize: 13, fontWeight: 600 }}>No questions added yet</p>
-                    <p style={{ fontSize: 11, color: '#9ca3af', margin: '4px 0 0' }}>Click "+ Add Question" to start building</p>
+                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: '4px 0 0' }}>Click "+ Add Question" to start building</p>
                   </div>
                 ) : (
                   form.content.questions.map((q, qIndex) => (
@@ -503,7 +503,7 @@ export default function AssignmentsPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', borderTop: '1px solid #f3f4f6', paddingTop: 16, marginTop: 24 }}>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', borderTop: '1px solid var(--border-light)', paddingTop: 16, marginTop: 24 }}>
               <Btn variant="secondary" onClick={() => setModalOpen(false)}>Cancel & Go Back</Btn>
               <Btn onClick={handleSubmit} loading={isSubmitting}>Publish Assignment 📤</Btn>
             </div>
@@ -514,23 +514,23 @@ export default function AssignmentsPage() {
             <div className="t-header" style={{ marginBottom: 24 }}>
               <div>
                 <h1 className="t-title">Assignments</h1>
-                <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage digital quizzes and tasks for your students</p>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Manage digital quizzes and tasks for your students</p>
               </div>
               <Btn onClick={() => setModalOpen(true)} style={{ whiteSpace: 'nowrap' }}>➕ Create Assignment</Btn>
             </div>
 
             {/* ── Main View Switcher ── */}
             <div className="resp-view-switch" style={{ background: '#f5f3ff', padding: 8, borderRadius: 18, display: 'flex', gap: 8, marginBottom: 24, maxWidth: 500 }}>
-              <div onClick={() => setViewMode('class')} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'class' ? { background: '#fff', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: '#6b7280' }) }}>
+              <div onClick={() => setViewMode('class')} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'class' ? { background: 'var(--bg-card)', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: 'var(--text-muted)' }) }}>
                 🏫 My Class Assignments
               </div>
-              <div onClick={() => { setViewMode('global'); setSelectedGlobalSubject(null); }} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'global' ? { background: '#fff', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: '#6b7280' }) }}>
+              <div onClick={() => { setViewMode('global'); setSelectedGlobalSubject(null); }} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'global' ? { background: 'var(--bg-card)', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: 'var(--text-muted)' }) }}>
                 🌍 Global Challenges
               </div>
             </div>
 
             {viewMode === 'global' && selectedGlobalSubject && (
-               <button onClick={() => setSelectedGlobalSubject(null)} style={{ background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: '#374151', cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+               <button onClick={() => setSelectedGlobalSubject(null)} style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: 'var(--text-main)', cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                  ← Back to Subjects
                </button>
             )}
@@ -539,27 +539,27 @@ export default function AssignmentsPage() {
             {isLoading ? (
               <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
-                <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading assignments…</p>
+                <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading assignments…</p>
               </div>
             ) : viewMode === 'global' && !selectedGlobalSubject ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
                 {globalSubjects.length === 0 ? (
-                   <div style={{ background: '#fff', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
+                   <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
                      <div style={{ fontSize: 48, marginBottom: 12 }}>🌍</div>
-                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No challenges yet!</h3>
-                     <p style={{ fontSize: 13, color: '#9ca3af' }}>The school hasn't published any global quizzes.</p>
+                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No challenges yet!</h3>
+                     <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>The school hasn't published any global quizzes.</p>
                    </div>
                 ) : globalSubjects.map(sub => (
                   <div key={sub.id} className="assign-card" onClick={() => setSelectedGlobalSubject(sub.id)} style={{ 
-                    background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
+                    background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
                     boxShadow: '0 2px 8px rgba(109,40,217,0.05)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.2s'
                   }}>
                     <div style={{ width: 48, height: 48, borderRadius: 14, background: '#f5f3ff', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
                       📚
                     </div>
                     <div>
-                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{sub.name}</h3>
-                      <p style={{ fontSize: 13, color: '#6b7280', margin: 0, fontWeight: 600 }}>{sub.count} Quizzes Available</p>
+                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px 0' }}>{sub.name}</h3>
+                      <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, fontWeight: 600 }}>{sub.count} Quizzes Available</p>
                     </div>
                   </div>
                 ))}
@@ -567,10 +567,10 @@ export default function AssignmentsPage() {
             ) : viewMode === 'global' && selectedGlobalSubject ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
                  {filteredGlobal.length === 0 ? (
-                   <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1/-1' }}>No quizzes here.</div>
+                   <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1/-1' }}>No quizzes here.</div>
                  ) : filteredGlobal.map((g, i) => (
                    <div key={g.id} style={{ 
-                     background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
+                     background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
                      boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.3s ease ${i * 0.05}s both`,
                      position: 'relative'
                    }}>
@@ -579,39 +579,39 @@ export default function AssignmentsPage() {
                           {g.subject?.name || 'General'}
                         </span>
                       </div>
-                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{g.title}</h3>
-                      <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{g.description}</p>
+                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px 0' }}>{g.title}</h3>
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{g.description}</p>
                       
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
                         <div style={{ background: '#faf5ff', borderRadius: 12, padding: '10px 12px' }}>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
                           <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{g.content?.questions?.length || 0} items</div>
                         </div>
                         <div style={{ background: '#f0fdf4', borderRadius: 12, padding: '10px 12px' }}>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>School Wide</div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>School Wide</div>
                           <div style={{ fontSize: 13, fontWeight: 800, color: '#059669' }}>{g.total_submissions || 0} Taking</div>
                         </div>
                       </div>
  
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', borderTop: '1px solid #f5f3ff', paddingTop: 14, gap: 10 }}>
-                         <button onClick={() => navigate(`/teacher/global-quizzes/${g.id}/take`)} style={{ padding: '6px 12px', background: '#fff', color: '#4c1d95', border: '1.5px solid #e0e7ff', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Preview Quiz</button>
+                         <button onClick={() => navigate(`/teacher/global-quizzes/${g.id}/take`)} style={{ padding: '6px 12px', background: 'var(--bg-card)', color: '#4c1d95', border: '1.5px solid #e0e7ff', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Preview Quiz</button>
                          <button onClick={() => navigate(`/teacher/global-quizzes/${g.id}`)} style={{ padding: '6px 12px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>See My Students →</button>
                       </div>
                    </div>
                  ))}
               </div>
             ) : assignments.length === 0 ? (
-              <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>📝</div>
-                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No assignments created</h3>
-                <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>Start by creating your first digital quiz for your students.</p>
+                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No assignments created</h3>
+                <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>Start by creating your first digital quiz for your students.</p>
                 <Btn onClick={() => setModalOpen(true)}>➕ Create First Assignment</Btn>
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
                 {assignments.map((a, i) => (
                   <div key={a.id} style={{ 
-                    background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
+                    background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
                     boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.3s ease ${i * 0.05}s both`,
                     position: 'relative'
                   }}>
@@ -624,22 +624,22 @@ export default function AssignmentsPage() {
                       </div>
                     </div>
                     
-                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{a.title}</h3>
-                    <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 16 }}>Class: <span style={{ fontWeight: 700, color: '#4c1d95' }}>{a.class?.name}</span></div>
+                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px 0' }}>{a.title}</h3>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>Class: <span style={{ fontWeight: 700, color: '#4c1d95' }}>{a.class?.name}</span></div>
                     
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
                       <div style={{ background: '#faf5ff', borderRadius: 12, padding: '10px 12px' }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Submissions</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Submissions</div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{a.submission_count} Submitted</div>
                       </div>
                       <div style={{ background: '#f0fdf4', borderRadius: 12, padding: '10px 12px' }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: '#059669' }}>{a.content?.questions?.length || 0} items</div>
                       </div>
                     </div>
  
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f5f3ff', paddingTop: 14 }}>
-                      <div style={{ fontSize: 11, color: '#9ca3af' }}>
+                      <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
                         {a.due_date ? `Due: ${formatDate(a.due_date)}` : 'No due date'}
                       </div>
                       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>

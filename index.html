@@ -5,7 +5,24 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/icon-192.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Nexora | Ghana's Premium School Management System</title>
+  <title>Nexora — Next-Gen School Platform</title>
+
+  <script>
+    // Prevent theme flashing on load
+    try {
+      const storage = localStorage.getItem('nexora-theme');
+      if (storage) {
+        const parsed = JSON.parse(storage);
+        const state = parsed.state || {};
+        const theme = state.theme || 'system';
+        if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+    } catch (e) { }
+  </script>
 
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json?v=1.0.2" />
@@ -20,14 +37,14 @@
   <meta name="description"
     content="Nexora — The leading GES-compliant School Management System in Ghana. Manage students, automated report cards, attendance, school fees, real-time fleet tracking, and medical records." />
   <meta name="keywords"
-    content="Nexora, Report Gem, reportgem, Report Gem Ghana, School Management System Ghana, GES Report Card Software, Student Information System Africa, Nexora, Education Technology West Africa, Ghana Education App, School Admin Software Accra, School ERP Kumasi, E-Learning Platform Ghana, Bursar Software West Africa, Student Portal Ghana, Teacher Portal Accra, School Bus Tracking Ghana, Digital Attendance Accra, Grading Software GES, School Software Nigeria, Private School Management Ghana, Nursery School App Accra, Primary School ERP Ghana, JHS Report Card System, SHS Management Software Ghana, Cloud School Software Africa, Best School Management System Ghana 2025, School Fees Management Ghana, Accra Schools App" />
+    content="Nexora, nexora, nexoraplatform, platform, nex platform, Report Gem, reportgem, Report Gem Ghana, School Management System Ghana, GES Report Card Software, Student Information System Africa, Nexora, Education Technology West Africa, Ghana Education App, School Admin Software Accra, School ERP Kumasi, E-Learning Platform Ghana, Bursar Software West Africa, Student Portal Ghana, Teacher Portal Accra, School Bus Tracking Ghana, Digital Attendance Accra, Grading Software GES, School Software Nigeria, Private School Management Ghana, Nursery School App Accra, Primary School ERP Ghana, JHS Report Card System, SHS Management Software Ghana, Cloud School Software Africa, Best School Management System Ghana 2025, School Fees Management Ghana, Accra Schools App" />
   <meta name="author" content="Nexora" />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-  <link rel="canonical" href="https://reportgem.vercel.app/" />
+  <link rel="canonical" href="https://nexxora.pages.dev/" />
 
   <!-- Open Graph (Facebook, LinkedIn) -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://reportgem.vercel.app/" />
+  <meta property="og:url" content="https://nexxora.pages.dev/" />
   <meta property="og:title" content="Nexora | Ghana's Premium School Management System" />
   <meta property="og:description"
     content="Streamline your school with Nexora. Automated GES report cards, real-time transport tracking, and comprehensive admin tools." />
@@ -62,11 +79,11 @@
         "reviewCount": "1250"
       },
       "description": "The most comprehensive GES School Management System for grading, attendance, transport tracking, medical records, and financial administration in Ghana.",
-      "url": "https://reportgem.vercel.app",
+      "url": "https://nexxora.pages.dev",
       "publisher": {
         "@type": "Organization",
         "name": "Nexora",
-        "logo": "https://reportgem.vercel.app/icon-512.png",
+        "logo": "https://nexxora.pages.dev/icon-512.png",
         "sameAs": [
           "https://facebook.com/nexoraplatform",
           "https://twitter.com/nexoraplatform",

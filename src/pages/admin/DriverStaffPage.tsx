@@ -170,7 +170,7 @@ export default function DriverStaffPage() {
         {isLoading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>Loading…</div>
         ) : (driverStaff as any[]).length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 18, padding: '60px', textAlign: 'center', border: '1.5px solid #f1f5f9' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '60px', textAlign: 'center', border: '1.5px solid #f1f5f9' }}>
             <Shield size={48} color="#cbd5e1" style={{ marginBottom: 16 }} />
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#1e293b', marginBottom: 8 }}>No driver staff</h3>
             <p style={{ fontSize: 13, color: '#64748b', marginBottom: 20 }}>Create a driver account to enable gate and visitor management features.</p>
@@ -179,7 +179,7 @@ export default function DriverStaffPage() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 16 }}>
             {(driverStaff as any[]).map((s: any) => (
-              <div key={s.id} className="sec-card" style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f1f5f9', padding: '22px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', position: 'relative', overflow: 'hidden' }}>
+              <div key={s.id} className="sec-card" style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f1f5f9', padding: '22px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg,#f8fafc,#f1f5f9)', pointerEvents: 'none' }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16, position: 'relative' }}>
                   <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#334155,#0f172a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 900, color: '#fff', flexShrink: 0 }}>

@@ -108,7 +108,7 @@ export default function NotificationsModal({ open, onClose, onRead }: Notificati
             style={{
               position: 'fixed', bottom: 20, left: 20, right: 20,
               zIndex: 10002, margin: '0 auto', maxWidth: 480,
-              background: '#fff', borderRadius: 24, overflow: 'hidden',
+              background: 'var(--bg-card)', borderRadius: 24, overflow: 'hidden',
               boxShadow: '0 40px 100px rgba(0,0,0,0.4)',
               fontFamily: '"DM Sans", sans-serif',
               display: 'flex', flexDirection: 'column',
@@ -188,7 +188,7 @@ export default function NotificationsModal({ open, onClose, onRead }: Notificati
             <div style={{ 
               flex: 1, overflowY: 'auto', padding: '16px',
               display: 'flex', flexDirection: 'column', gap: 12,
-              background: '#f8f7ff'
+              background: 'var(--bg-app)'
             }}>
               {loading ? (
                 <div style={{ padding: '40px 0', textAlign: 'center' }}>
@@ -202,7 +202,7 @@ export default function NotificationsModal({ open, onClose, onRead }: Notificati
               ) : notifications.length === 0 ? (
                 <div style={{ padding: '60px 20px', textAlign: 'center' }}>
                   <div style={{ 
-                    width: 64, height: 64, borderRadius: '50%', background: '#fff',
+                    width: 64, height: 64, borderRadius: '50%', background: 'var(--bg-card)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     margin: '0 auto 16px', boxShadow: '0 8px 30px rgba(0,0,0,0.05)'
                   }}>
@@ -223,7 +223,7 @@ export default function NotificationsModal({ open, onClose, onRead }: Notificati
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
                     style={{
-                      background: '#fff', borderRadius: 16, padding: '16px',
+                      background: 'var(--bg-card)', borderRadius: 16, padding: '16px',
                       boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
                       border: '1px solid #f1f0fb',
                       display: 'flex', gap: 14, position: 'relative'
@@ -286,7 +286,7 @@ export default function NotificationsModal({ open, onClose, onRead }: Notificati
             {activeTab === 'unread' && notifications.length > 0 && (
               <div style={{ 
                 padding: '16px 20px', borderTop: '1px solid #f1f0fb',
-                background: '#fff'
+                background: 'var(--bg-card)'
               }}>
                 <button
                   onClick={markAllRead}

@@ -106,7 +106,7 @@ export default function LibrarianHistoryPage() {
             <p style={{ fontSize: 13, color: T.muted, margin: '2px 0 0' }}>Full record of all book loans</p>
           </div>
         </div>
-        <button onClick={exportCSV} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, border: `1px solid ${T.border}`, background: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: T.text }}>
+        <button onClick={exportCSV} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, border: `1px solid ${T.border}`, background: 'var(--bg-card)', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: T.text }}>
           <Download size={15} /> Export CSV
         </button>
       </div>
@@ -136,11 +136,11 @@ export default function LibrarianHistoryPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Filter size={15} color={T.muted} />
           <select value={period} onChange={e => setPeriod(e.target.value)}
-            style={{ padding: '9px 12px', borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontSize: 13, background: '#fff' }}>
+            style={{ padding: '9px 12px', borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontSize: 13, background: 'var(--bg-card)' }}>
             {PERIODS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
           </select>
           <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-            style={{ padding: '9px 12px', borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontSize: 13, background: '#fff' }}>
+            style={{ padding: '9px 12px', borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontSize: 13, background: 'var(--bg-card)' }}>
             <option value="all">All Statuses</option>
             <option value="active">Active</option>
             <option value="returned">Returned</option>

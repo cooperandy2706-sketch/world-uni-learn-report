@@ -328,7 +328,7 @@ export default function BursarDashboard() {
                 >
                   <div className="card-inner">
                     {/* Front */}
-                    <div className="card-front bursar-card" style={{ background: '#fff' }}>
+                    <div className="card-front bursar-card" style={{ background: 'var(--bg-card)' }}>
                       <div className="stat-icon-wrap" style={{ width: 40, height: 40, borderRadius: 12, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
                         <c.icon size={20} color={c.color} strokeWidth={2.5} />
                       </div>
@@ -364,7 +364,7 @@ export default function BursarDashboard() {
                 {quickLinks.map((q, i) => (
                   <Link key={q.to} to={q.to} style={{ textDecoration: 'none', flexShrink: 0 }}>
                     <div className="ql-btn" style={{ 
-                      background: '#fff', 
+                      background: 'var(--bg-card)', 
                       borderRadius: 16, 
                       padding: '14px 20px', 
                       border: '1px solid #e2e8f0', 
@@ -387,7 +387,7 @@ export default function BursarDashboard() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, marginBottom: 32 }}>
               
               {/* Income vs Expenses Bar Chart */}
-              <div style={{ background: '#fff', borderRadius: 24, padding: '28px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '28px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
                 <div style={{ marginBottom: 24 }}>
                   <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Income vs Expenses</h3>
                   <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Monthly financial flow for {currentYear}</p>
@@ -420,7 +420,7 @@ export default function BursarDashboard() {
               </div>
 
               {/* Expenses by category */}
-              <div style={{ background: '#fff', borderRadius: 24, padding: '28px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '28px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
                 <div style={{ marginBottom: 24 }}>
                   <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Expense Distribution</h3>
                   <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Where is the money going?</p>
@@ -445,7 +445,7 @@ export default function BursarDashboard() {
             </div>
 
             {/* Recent payments Data Table */}
-            <div style={{ background: '#fff', borderRadius: 24, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
               <div style={{ padding: '24px 28px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0, fontFamily: '"Outfit", sans-serif' }}>Recent Transactions</h3>
                 <Link to={ROUTES.BURSAR_FEES} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#6366f1', textDecoration: 'none', padding: '6px 12px', background: '#eef2ff', borderRadius: 99 }}>

@@ -137,7 +137,7 @@ export default function BehaviorTrackingPage() {
             <div className="t-header" style={{ marginBottom: 32 }}>
                 <div>
                     <h1 className="t-title">Behavior & Discipline</h1>
-                    <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Log student merits, demerits, and private counseling sessions.</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 4 }}>Log student merits, demerits, and private counseling sessions.</p>
                 </div>
             </div>
 
@@ -145,7 +145,7 @@ export default function BehaviorTrackingPage() {
                 {/* Left Column: Student Selector */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                     <div className="card" style={{ padding: '20px', position: 'sticky', top: 20 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, background: '#f9fafb', padding: '10px 14px', borderRadius: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, background: 'var(--bg-input)', padding: '10px 14px', borderRadius: '10px' }}>
                             <Search size={18} color="#9ca3af" />
                             <input 
                                 type="text" 
@@ -173,7 +173,7 @@ export default function BehaviorTrackingPage() {
                                     </div>
                                     <div style={{ minWidth: 0 }}>
                                         <div style={{ fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.full_name}</div>
-                                        <div style={{ fontSize: 11, color: '#6b7280' }}>{s.class?.name} · {s.student_id}</div>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.class?.name} · {s.student_id}</div>
                                     </div>
                                 </div>
                             ))}
@@ -184,7 +184,7 @@ export default function BehaviorTrackingPage() {
                 {/* Right Column: Form or History */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                     {/* Tabs */}
-                    <div style={{ display: 'flex', gap: 24, borderBottom: '1px solid #e5e7eb' }}>
+                    <div style={{ display: 'flex', gap: 24, borderBottom: '1px solid var(--border-color)' }}>
                         <button onClick={() => setActiveTab('log')} style={{ padding: '12px 4px', background: 'none', border: 'none', fontSize: 15, fontWeight: activeTab === 'log' ? 700 : 500, color: activeTab === 'log' ? '#7c3aed' : '#6b7280', borderBottom: activeTab === 'log' ? '2px solid #7c3aed' : '2px solid transparent', cursor: 'pointer' }}>
                             Log Incident
                         </button>
@@ -202,7 +202,7 @@ export default function BehaviorTrackingPage() {
                                     </div>
                                     <div>
                                         <div style={{ fontSize: 20, fontWeight: 700 }}>{selectedStudent.full_name}</div>
-                                        <div style={{ fontSize: 14, color: '#6b7280' }}>Logging behavior for {selectedStudent.class?.name}</div>
+                                        <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>Logging behavior for {selectedStudent.class?.name}</div>
                                     </div>
                                 </div>
 
@@ -231,7 +231,7 @@ export default function BehaviorTrackingPage() {
                                             <select 
                                                 value={category}
                                                 onChange={(e) => setCategory(e.target.value)}
-                                                style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }}
+                                                style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }}
                                             >
                                                 <option value="">Select Category</option>
                                                 {categories[logType].map(c => <option key={c} value={c}>{c}</option>)}
@@ -244,7 +244,7 @@ export default function BehaviorTrackingPage() {
                                                 type="button"
                                                 onClick={() => setIsPrivate(!isPrivate)}
                                                 style={{ 
-                                                    width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', 
+                                                    width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', 
                                                     background: isPrivate ? '#fef2f2' : '#f0fdf4', color: isPrivate ? '#dc2626' : '#16a34a',
                                                     fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
                                                 }}
@@ -261,12 +261,12 @@ export default function BehaviorTrackingPage() {
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
                                             placeholder={`Describe the ${logType} details...`}
-                                            style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e5e7eb', outline: 'none', resize: 'none' }}
+                                            style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid var(--border-color)', outline: 'none', resize: 'none' }}
                                         />
                                     </div>
 
                                     <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 12 }}>
-                                        <button type="button" onClick={() => setSelectedStudent(null)} style={{ padding: '12px 24px', borderRadius: '12px', border: '1.5px solid #e5e7eb', background: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                                        <button type="button" onClick={() => setSelectedStudent(null)} style={{ padding: '12px 24px', borderRadius: '12px', border: '1.5px solid var(--border-color)', background: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                                         <button type="submit" disabled={submitting} style={{ padding: '12px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(109,40,217,0.3)' }}>
                                             {submitting ? 'Saving...' : `Record ${logType.charAt(0).toUpperCase() + logType.slice(1)}`}
                                         </button>
@@ -274,18 +274,18 @@ export default function BehaviorTrackingPage() {
                                 </form>
                             </div>
                         ) : (
-                            <div className="card" style={{ padding: '80px 40px', textAlign: 'center', borderStyle: 'dashed', background: '#f9fafb' }}>
+                            <div className="card" style={{ padding: '80px 40px', textAlign: 'center', borderStyle: 'dashed', background: 'var(--bg-input)' }}>
                                 <div style={{ background: '#ede9fe', color: '#7c3aed', width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                                     <User size={32} />
                                 </div>
-                                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>Select a Student</h3>
-                                <p style={{ color: '#6b7280', fontSize: 14, maxWidth: '300px', margin: '0 auto' }}>Choose a student from the list on the left to start logging behavior or counseling notes.</p>
+                                <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' }}>Select a Student</h3>
+                                <p style={{ color: 'var(--text-muted)', fontSize: 14, maxWidth: '300px', margin: '0 auto' }}>Choose a student from the list on the left to start logging behavior or counseling notes.</p>
                             </div>
                         )
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                             {logs.length === 0 ? (
-                                <div className="card" style={{ padding: '60px', textAlign: 'center', color: '#9ca3af' }}>No logs recorded yet.</div>
+                                <div className="card" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>No logs recorded yet.</div>
                             ) : logs.map((l, i) => (
                                 <div key={i} className="card" style={{ padding: '20px', display: 'flex', gap: 16 }}>
                                     <div style={{ 
@@ -299,7 +299,7 @@ export default function BehaviorTrackingPage() {
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                             <div>
                                                 <div style={{ fontSize: 15, fontWeight: 700 }}>{l.student?.full_name}</div>
-                                                <div style={{ fontSize: 12, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
                                                     {l.category} · {format(new Date(l.created_at), 'MMM dd, h:mm a')}
                                                     {l.is_private && <span title="Private Note"><Lock size={10} /></span>}
                                                 </div>
@@ -308,7 +308,7 @@ export default function BehaviorTrackingPage() {
                                                 {l.points > 0 ? `+${l.points}` : l.points < 0 ? l.points : 'Note'}
                                             </div>
                                         </div>
-                                        <p style={{ fontSize: 13, color: '#4b5563', marginTop: 8, lineHeight: 1.5 }}>{l.description}</p>
+                                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.5 }}>{l.description}</p>
                                     </div>
                                 </div>
                             ))}

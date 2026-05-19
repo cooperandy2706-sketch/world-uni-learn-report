@@ -29,7 +29,7 @@ interface GlobalQuizData {
 
 // ── Helpers ───────────────────────────────────────────────
 function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{children}</label>
+  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{children}</label>
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -53,7 +53,7 @@ function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputEle
           width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13,
           border: `1.5px solid ${error ? '#f87171' : focused ? '#7c3aed' : '#e5e7eb'}`,
           boxShadow: focused ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none',
-          outline: 'none', background: '#fff', color: '#111827',
+          outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)',
           fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s',
           boxSizing: 'border-box',
           ...props.style
@@ -75,7 +75,7 @@ function StyledSelect({ children, ...props }: React.SelectHTMLAttributes<HTMLSel
         width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13,
         border: `1.5px solid ${focused ? '#7c3aed' : '#e5e7eb'}`,
         boxShadow: focused ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none',
-        outline: 'none', background: '#fff', color: '#111827',
+        outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)',
         fontFamily: '"DM Sans",sans-serif', cursor: 'pointer',
         boxSizing: 'border-box',
         ...props.style
@@ -98,9 +98,9 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   }
   const variants: Record<string, React.CSSProperties> = {
     primary: { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger: { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', boxShadow: '0 2px 6px rgba(220,38,38,0.22)' },
-    ghost: { background: hov ? '#f5f3ff' : 'transparent', color: '#6b7280' },
+    ghost: { background: hov ? '#f5f3ff' : 'transparent', color: 'var(--text-muted)' },
     success: { background: hov ? '#059669' : '#10b981', color: '#fff' },
   }
   return (
@@ -351,8 +351,8 @@ export default function AdminGlobalQuizzesPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
         <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>🌍 Global Quizzes</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Create and manage school-wide challenges and assessments</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>🌍 Global Quizzes</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Create and manage school-wide challenges and assessments</p>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             {user?.role === 'super_admin' && (
@@ -366,20 +366,20 @@ export default function AdminGlobalQuizzesPage() {
         {isLoading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading global quizzes…</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading global quizzes…</p>
           </div>
         ) : quizzes.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>🌍</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No global quizzes created</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>Publish your first school-wide interactive assessment.</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No global quizzes created</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>Publish your first school-wide interactive assessment.</p>
             <Btn onClick={() => setModalOpen(true)}>➕ Create First Quiz</Btn>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
             {quizzes.map((q, i) => (
               <div key={q.id} style={{ 
-                background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
+                background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
                 boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.3s ease ${i * 0.05}s both`,
                 position: 'relative'
               }}>
@@ -392,7 +392,7 @@ export default function AdminGlobalQuizzesPage() {
                   </div>
                 </div>
                 
-                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{q.title}</h3>
+                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px 0' }}>{q.title}</h3>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18, marginTop: 16 }}>
                   <button
@@ -401,11 +401,11 @@ export default function AdminGlobalQuizzesPage() {
                     onMouseOver={e => (e.currentTarget.style.background = '#ede9fe')}
                     onMouseOut={e => (e.currentTarget.style.background = '#faf5ff')}
                   >
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Submissions</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Submissions</div>
                     <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{q.submission_count} Students 👁</div>
                   </button>
                   <div style={{ background: '#f0fdf4', borderRadius: 12, padding: '10px 12px' }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
                     <div style={{ fontSize: 14, fontWeight: 800, color: '#059669' }}>{q.content?.questions?.length || 0} items</div>
                   </div>
                 </div>
@@ -432,17 +432,17 @@ export default function AdminGlobalQuizzesPage() {
         {/* ── SUBMISSIONS DRAWER ── */}
         {submissionsQuiz && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', justifyContent: 'flex-end' }} onClick={(e) => { if (e.target === e.currentTarget) setSubmissionsQuiz(null) }}>
-            <div style={{ width: '100%', maxWidth: 620, background: '#fff', boxShadow: '-20px 0 60px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', animation: '_slideIn .3s cubic-bezier(0.16,1,0.3,1)', overflowY: 'auto' }}>
+            <div style={{ width: '100%', maxWidth: 620, background: 'var(--bg-card)', boxShadow: '-20px 0 60px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', animation: '_slideIn .3s cubic-bezier(0.16,1,0.3,1)', overflowY: 'auto' }}>
               
               {/* Header */}
-              <div style={{ padding: '24px 28px 20px', borderBottom: '1.5px solid #f0eefe', position: 'sticky', top: 0, background: '#fff', zIndex: 10 }}>
+              <div style={{ padding: '24px 28px 20px', borderBottom: '1.5px solid #f0eefe', position: 'sticky', top: 0, background: 'var(--bg-card)', zIndex: 10 }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
                   <div>
                     <div style={{ fontSize: 10, fontWeight: 800, color: '#7c3aed', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>📊 Quiz Submissions</div>
-                    <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: '#111827', margin: 0 }}>{submissionsQuiz.title}</h2>
-                    <p style={{ fontSize: 12, color: '#9ca3af', margin: '4px 0 0' }}>Subject: {submissionsQuiz.subject?.name || 'General'} · {submissionsQuiz.content?.questions?.length || 0} Questions</p>
+                    <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{submissionsQuiz.title}</h2>
+                    <p style={{ fontSize: 12, color: 'var(--text-subtle)', margin: '4px 0 0' }}>Subject: {submissionsQuiz.subject?.name || 'General'} · {submissionsQuiz.content?.questions?.length || 0} Questions</p>
                   </div>
-                  <button onClick={() => setSubmissionsQuiz(null)} style={{ border: '1.5px solid #e5e7eb', background: '#fff', borderRadius: 10, width: 36, height: 36, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>×</button>
+                  <button onClick={() => setSubmissionsQuiz(null)} style={{ border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', borderRadius: 10, width: 36, height: 36, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>×</button>
                 </div>
 
                 {/* Stats bar */}
@@ -454,7 +454,7 @@ export default function AdminGlobalQuizzesPage() {
                       { label: 'Pass Rate', value: `${Math.round((passCount / submissions.length) * 100)}%`, color: '#f59e0b', bg: '#fffbeb' },
                     ].map(s => (
                       <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '10px 14px' }}>
-                        <div style={{ fontSize: 9, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>{s.label}</div>
+                        <div style={{ fontSize: 9, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>{s.label}</div>
                         <div style={{ fontSize: 18, fontWeight: 900, color: s.color }}>{s.value}</div>
                       </div>
                     ))}
@@ -466,7 +466,7 @@ export default function AdminGlobalQuizzesPage() {
                   <input
                     type="text" value={subsSearch} onChange={e => setSubsSearch(e.target.value)}
                     placeholder="Search by name, school, class…"
-                    style={{ width: '100%', boxSizing: 'border-box', marginTop: 12, padding: '9px 14px', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: 13, fontFamily: '"DM Sans",sans-serif', outline: 'none' }}
+                    style={{ width: '100%', boxSizing: 'border-box', marginTop: 12, padding: '9px 14px', border: '1.5px solid var(--border-color)', borderRadius: 10, fontSize: 13, fontFamily: '"DM Sans",sans-serif', outline: 'none' }}
                     onFocus={e => e.target.style.borderColor = '#7c3aed'} onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                   />
                 )}
@@ -477,21 +477,21 @@ export default function AdminGlobalQuizzesPage() {
                 {subsLoading ? (
                   <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#7c3aed', animation: '_spin .8s linear infinite' }} />
-                    <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading student results…</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading student results…</p>
                   </div>
                 ) : filteredSubs.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '60px 0' }}>
                     <div style={{ fontSize: 40, marginBottom: 10 }}>📭</div>
-                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 17, fontWeight: 700, color: '#111827', marginBottom: 6 }}>
+                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 17, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>
                       {submissions.length === 0 ? 'No submissions yet' : 'No matching students'}
                     </h3>
-                    <p style={{ fontSize: 13, color: '#9ca3af' }}>
+                    <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>
                       {submissions.length === 0 ? "Students haven't taken this quiz yet." : 'Try a different search.'}
                     </p>
                   </div>
                 ) : (
                   <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', marginBottom: 12 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', marginBottom: 12 }}>
                       Showing {filteredSubs.length} of {submissions.length} submission{submissions.length !== 1 ? 's' : ''}
                     </div>
                     {filteredSubs.map((sub, idx) => {
@@ -511,10 +511,10 @@ export default function AdminGlobalQuizzesPage() {
                           </div>
                           {/* Info */}
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {sub.student?.user?.full_name || 'Unknown Student'}
                             </div>
-                            <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>
+                            <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 1 }}>
                               {[sub.student?.school?.name, sub.student?.class?.name, sub.student?.student_id].filter(Boolean).join(' · ')}
                             </div>
                             <div style={{ fontSize: 10, color: '#d1d5db', marginTop: 2 }}>
@@ -525,7 +525,7 @@ export default function AdminGlobalQuizzesPage() {
                           {/* Score */}
                           <div style={{ textAlign: 'right', flexShrink: 0 }}>
                             <div style={{ fontSize: 16, fontWeight: 900, color: passed ? '#059669' : '#dc2626' }}>{pct}%</div>
-                            <div style={{ fontSize: 10, color: '#9ca3af', fontWeight: 600 }}>{sub.score}/{sub.total_possible} pts</div>
+                            <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 600 }}>{sub.score}/{sub.total_possible} pts</div>
                             <div style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 99, background: passed ? '#f0fdf4' : '#fef2f2', color: passed ? '#059669' : '#dc2626', marginTop: 3 }}>
                               {passed ? '✓ Pass' : '✗ Fail'}
                             </div>
@@ -565,7 +565,7 @@ export default function AdminGlobalQuizzesPage() {
                   value={form.description}
                   onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Tell students what to expect..."
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', height: 80, fontFamily: 'inherit', resize: 'none' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid var(--border-color)', height: 80, fontFamily: 'inherit', resize: 'none' }}
                 />
               </Field>
 
@@ -594,7 +594,7 @@ export default function AdminGlobalQuizzesPage() {
               </div>
 
               {form.content.questions.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: '#9ca3af' }}>
+                <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-subtle)' }}>
                   <div style={{ fontSize: 24, marginBottom: 8 }}>💡</div>
                   <p style={{ fontSize: 12 }}>Click "+ Add" to create your first question</p>
                 </div>
@@ -603,7 +603,7 @@ export default function AdminGlobalQuizzesPage() {
                   <div key={q.id} className="q-card">
                     <button onClick={() => removeQuestion(q.id)} style={{ position: 'absolute', top: 12, right: 12, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 12 }}>❌</button>
                     
-                    <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', marginBottom: 8 }}>QUESTION {qIndex + 1}</div>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-subtle)', marginBottom: 8 }}>QUESTION {qIndex + 1}</div>
                     
                     <Field label="Question Text">
                       <StyledInput value={q.text} onChange={e => updateQuestion(q.id, { text: e.target.value })} placeholder="Enter your question..." />

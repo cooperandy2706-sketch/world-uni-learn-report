@@ -241,7 +241,7 @@ export default function GlobalAnalyticsPage() {
           { label: 'Library Assets', value: stats.counts.resources, icon: '📚', color: '#10b981' },
           { label: 'Platform Messages', value: stats.counts.messages, icon: '💬', color: '#f59e0b' }
         ].map(card => (
-          <div key={card.label} style={{ background: '#fff', padding: 24, borderRadius: 20, border: '1px solid #f1f5f9', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
+          <div key={card.label} style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 20, border: '1px solid #f1f5f9', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
             <div style={{ fontSize: 24, marginBottom: 12 }}>{card.icon}</div>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{card.label}</div>
             <div style={{ fontSize: 28, fontWeight: 800, color: card.color }}>{card.value}</div>
@@ -251,7 +251,7 @@ export default function GlobalAnalyticsPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 24 }}>
         {/* Growth Chart */}
-        <div style={{ background: '#fff', padding: 24, borderRadius: 24, border: '1px solid #f1f5f9' }}>
+        <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, border: '1px solid #f1f5f9' }}>
            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', marginBottom: 24 }}>Platform Growth Trend</h3>
            <div style={{ height: 350 }}>
              <ResponsiveContainer width="100%" height="100%">
@@ -275,7 +275,7 @@ export default function GlobalAnalyticsPage() {
         </div>
 
         {/* Resource Distribution */}
-        <div style={{ background: '#fff', padding: 24, borderRadius: 24, border: '1px solid #f1f5f9' }}>
+        <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, border: '1px solid #f1f5f9' }}>
            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', marginBottom: 24 }}>Library Distribution</h3>
            <div style={{ height: 350, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
              <ResponsiveContainer width="100%" height={250}>
@@ -319,7 +319,7 @@ export default function GlobalAnalyticsPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
           {/* Top Students */}
-          <div style={{ background: '#fff', padding: 24, borderRadius: 24, border: '1.5px solid #f1f5f9' }}>
+          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, border: '1.5px solid #f1f5f9' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0 }}>🏆 Top 10 Students</h3>
               <span style={{ fontSize: 10, fontWeight: 800, color: '#10b981', background: '#f0fdf4', padding: '4px 8px', borderRadius: 99, textTransform: 'uppercase' }}>Live Updates</span>
@@ -349,7 +349,7 @@ export default function GlobalAnalyticsPage() {
           </div>
 
           {/* Top Schools */}
-          <div style={{ background: '#fff', padding: 24, borderRadius: 24, border: '1.5px solid #f1f5f9' }}>
+          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, border: '1.5px solid #f1f5f9' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0 }}>🏛️ Top 10 Schools</h3>
               <span style={{ fontSize: 10, fontWeight: 800, color: '#10b981', background: '#f0fdf4', padding: '4px 8px', borderRadius: 99, textTransform: 'uppercase' }}>Live Updates</span>

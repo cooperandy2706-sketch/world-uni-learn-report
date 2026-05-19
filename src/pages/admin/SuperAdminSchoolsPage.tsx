@@ -135,7 +135,7 @@ export default function SuperAdminSchoolsPage() {
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {invoices.map((inv: any) => (
-              <div key={inv.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '14px 20px', border: '1px solid #fde68a' }}>
+              <div key={inv.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-card)', borderRadius: 12, padding: '14px 20px', border: '1px solid #fde68a' }}>
                 <div>
                   <div style={{ fontWeight: 700, color: '#1e293b' }}>{inv.school?.name ?? 'Unknown School'}</div>
                   <div style={{ fontSize: 12, color: '#92400e', marginTop: 2 }}>
@@ -163,13 +163,13 @@ export default function SuperAdminSchoolsPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search schools by name or email…"
-            style={{ width: '100%', padding: '11px 14px 11px 38px', borderRadius: 12, border: '1px solid #e5e7eb', background: '#f9fafb', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '11px 14px 11px 38px', borderRadius: 12, border: '1px solid var(--border-color)', background: 'var(--bg-input)', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
           />
         </div>
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          style={{ padding: '11px 16px', borderRadius: 12, border: '1px solid #e5e7eb', background: '#f9fafb', fontSize: 14, outline: 'none' }}
+          style={{ padding: '11px 16px', borderRadius: 12, border: '1px solid var(--border-color)', background: 'var(--bg-input)', fontSize: 14, outline: 'none' }}
         >
           <option value="all">All Statuses</option>
           <option value="active">Active</option>
@@ -178,14 +178,14 @@ export default function SuperAdminSchoolsPage() {
         </select>
         <button
           onClick={() => refetch()}
-          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 18px', borderRadius: 12, border: '1px solid #e5e7eb', background: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: '#374151' }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 18px', borderRadius: 12, border: '1px solid var(--border-color)', background: 'var(--bg-card)', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)' }}
         >
           <RefreshCw size={15} /> Refresh
         </button>
       </div>
 
       {/* Schools Table */}
-      <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', overflow: 'hidden', border: '1px solid #f1f5f9' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 20, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', overflow: 'hidden', border: '1px solid #f1f5f9' }}>
         {isLoading ? (
           <div style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>Loading schools…</div>
         ) : filtered.length === 0 ? (
@@ -225,7 +225,7 @@ export default function SuperAdminSchoolsPage() {
                             <input
                               value={editForm!.email}
                               onChange={e => setEditForm(f => f ? { ...f, email: e.target.value } : f)}
-                              style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 12, outline: 'none', width: '100%', boxSizing: 'border-box' }}
+                              style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 12, outline: 'none', width: '100%', boxSizing: 'border-box' }}
                             />
                           </div>
                         ) : (
@@ -241,7 +241,7 @@ export default function SuperAdminSchoolsPage() {
                           <select
                             value={editForm!.status}
                             onChange={e => setEditForm(f => f ? { ...f, status: e.target.value } : f)}
-                            style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}
+                            style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }}
                           >
                             <option value="active">Active</option>
                             <option value="pending">Pending</option>
@@ -259,11 +259,11 @@ export default function SuperAdminSchoolsPage() {
                           <input
                             value={editForm!.currency_code}
                             onChange={e => setEditForm(f => f ? { ...f, currency_code: e.target.value } : f)}
-                            style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', width: 80, textTransform: 'uppercase' }}
+                            style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', width: 80, textTransform: 'uppercase' }}
                             maxLength={4}
                           />
                         ) : (
-                          <span style={{ fontSize: 13, fontWeight: 600, color: '#374151', background: '#f1f5f9', padding: '3px 9px', borderRadius: 8 }}>{s.currency_code ?? 'GHS'}</span>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)', background: '#f1f5f9', padding: '3px 9px', borderRadius: 8 }}>{s.currency_code ?? 'GHS'}</span>
                         )}
                       </td>
                       {/* Storage */}
@@ -274,7 +274,7 @@ export default function SuperAdminSchoolsPage() {
                               type="number"
                               value={editForm!.storage_limit_gb}
                               onChange={e => setEditForm(f => f ? { ...f, storage_limit_gb: Number(e.target.value) } : f)}
-                              style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', width: 70 }}
+                              style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', width: 70 }}
                               min={1} max={1000}
                             />
                             <span style={{ fontSize: 12, color: '#64748b' }}>GB limit</span>
@@ -305,7 +305,7 @@ export default function SuperAdminSchoolsPage() {
                             </button>
                             <button
                               onClick={() => { setEditingId(null); setEditForm(null) }}
-                              style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px', borderRadius: 9, background: '#f1f5f9', color: '#374151', border: 'none', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+                              style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px', borderRadius: 9, background: '#f1f5f9', color: 'var(--text-main)', border: 'none', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
                             >
                               <X size={13} /> Cancel
                             </button>

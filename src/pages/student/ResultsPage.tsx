@@ -183,21 +183,21 @@ export default function StudentResultsPage() {
         <div className="rr-header" style={{ marginBottom: 22, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, animation: '_rfade .5s ease both' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>My Academic Results</h1>
+              <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>My Academic Results</h1>
               {isProvisional && (
                  <span style={{ fontSize: 10, fontWeight: 800, background: '#fef2f2', color: '#dc2626', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '.05em', border: '1px solid #fecaca' }}>
                    Real-time / Provisional
                  </span>
               )}
             </div>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>{studentData?.class?.name ?? '—'} · {studentData?.school?.name ?? '—'}</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>{studentData?.class?.name ?? '—'} · {studentData?.school?.name ?? '—'}</p>
           </div>
-          <Link to={ROUTES.STUDENT_DASHBOARD} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', textDecoration: 'none', border: '1.5px solid #e5e7eb' }}>← Dashboard</Link>
+          <Link to={ROUTES.STUDENT_DASHBOARD} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'var(--bg-card)', color: 'var(--text-main)', textDecoration: 'none', border: '1.5px solid var(--border-color)' }}>← Dashboard</Link>
         </div>
 
         {/* Term selector */}
-        <div style={{ background: '#fff', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 20, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', animation: '_rfade .5s ease .05s both' }}>
-          <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em' }}>View Term:</label>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 20, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', animation: '_rfade .5s ease .05s both' }}>
+          <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em' }}>View Term:</label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {allTerms.map((t: any) => (
               <button key={t.id} onClick={() => setSelectedTermId(t.id)}
@@ -211,12 +211,12 @@ export default function StudentResultsPage() {
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_rspin .8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading results…</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading results…</p>
           </div>
         ) : !studentData ? (
-            <div style={{ padding: '80px 20px', textAlign: 'center', background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe' }}>
+            <div style={{ padding: '80px 20px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe' }}>
                <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-               <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>Student record not found</h3>
+               <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>Student record not found</h3>
             </div>
         ) : (
           <>
@@ -252,15 +252,15 @@ export default function StudentResultsPage() {
                   sub: 'Term presence rate'
                 },
               ].map(stat => (
-                <div key={stat.label} style={{ background: '#fff', padding: '20px', borderRadius: 20, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div key={stat.label} style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: 20, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column', gap: 12 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 40, height: 40, borderRadius: 12, background: stat.color + '12', color: stat.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
                       {stat.icon}
                     </div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '.05em' }}>{stat.label}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '.05em' }}>{stat.label}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 22, fontWeight: 800, color: '#111827' }}>{stat.value}</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>{stat.value}</div>
                     <div style={{ fontSize: 11, color: '#64748b', marginTop: 4, fontWeight: 500 }}>{stat.sub}</div>
                   </div>
                 </div>
@@ -271,11 +271,11 @@ export default function StudentResultsPage() {
               
               {/* Left Column: Subject Analysis */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(109,40,217,.04)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(109,40,217,.04)' }}>
                   <div style={{ padding: '20px 24px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <span style={{ fontSize: 18 }}>📊</span>
-                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 }}>Subject Mastery</h3>
+                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Subject Mastery</h3>
                     </div>
                     <span style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', background: '#f5f3ff', padding: '4px 12px', borderRadius: 99 }}>{scores.length} Subjects Analyzed</span>
                   </div>
@@ -283,8 +283,8 @@ export default function StudentResultsPage() {
                   {scores.length === 0 ? (
                     <div style={{ padding: '60px 20px', textAlign: 'center' }}>
                       <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
-                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No Data Recorded</h3>
-                      <p style={{ fontSize: 13, color: '#9ca3af' }}>Scores for this term haven't been synchronized yet.</p>
+                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No Data Recorded</h3>
+                      <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Scores for this term haven't been synchronized yet.</p>
                     </div>
                   ) : (
                   <div style={{ padding: '12px', filter: isFinancialHold ? 'blur(15px)' : 'none', pointerEvents: isFinancialHold ? 'none' : 'auto', transition: 'all 0.3s' }}>
@@ -308,7 +308,7 @@ export default function StudentResultsPage() {
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                                 <div>
                                   <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>{s.subject?.name}</div>
-                                  <div style={{ fontSize: 10, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '.05em', marginTop: 2 }}>Analysis Category</div>
+                                  <div style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '.05em', marginTop: 2 }}>Analysis Category</div>
                                 </div>
                                 <div style={{ width: 36, height: 36, borderRadius: 10, background: g.color + '12', color: g.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800 }}>
                                   {g.grade}
@@ -324,11 +324,11 @@ export default function StudentResultsPage() {
 
                               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                                 <div style={{ background: '#f8fafc', padding: '6px 10px', borderRadius: 8 }}>
-                                  <div style={{ fontSize: 9, color: '#9ca3af', textTransform: 'uppercase' }}>Class Score</div>
+                                  <div style={{ fontSize: 9, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Class Score</div>
                                   <div style={{ fontSize: 11, fontWeight: 700, color: '#475569' }}>{s.class_score != null ? `${s.class_score.toFixed(1)}%` : '—'}</div>
                                 </div>
                                 <div style={{ background: '#f8fafc', padding: '6px 10px', borderRadius: 8 }}>
-                                  <div style={{ fontSize: 9, color: '#9ca3af', textTransform: 'uppercase' }}>Exam Score</div>
+                                  <div style={{ fontSize: 9, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Exam Score</div>
                                   <div style={{ fontSize: 11, fontWeight: 700, color: '#475569' }}>{s.exam_score != null ? `${s.exam_score.toFixed(1)}%` : '—'}</div>
                                 </div>
                               </div>
@@ -339,7 +339,7 @@ export default function StudentResultsPage() {
                                     <span>📑</span> INDIVIDUAL TASK PERFORMANCE
                                   </div>
                                   {subjectSubmissions.length === 0 ? (
-                                    <div style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic' }}>No activity data for this term.</div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-subtle)', fontStyle: 'italic' }}>No activity data for this term.</div>
                                   ) : (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                       {subjectSubmissions.map((sub: any, idx: number) => (
@@ -361,10 +361,10 @@ export default function StudentResultsPage() {
                 </div>
 
                 {/* Grade scale legend */}
-                <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_rfade .5s ease .3s both' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_rfade .5s ease .3s both' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <span>📖</span>
-                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>Grade Scale</h3>
+                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Grade Scale</h3>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {[
@@ -378,8 +378,8 @@ export default function StudentResultsPage() {
                       <div key={g.grade} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{ width: 28, height: 28, borderRadius: 7, background: g.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: g.color, flexShrink: 0 }}>{g.grade}</div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 11, fontWeight: 600, color: '#374151' }}>{g.label}</div>
-                          <div style={{ fontSize: 10, color: '#9ca3af' }}>{g.range}</div>
+                          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-main)' }}>{g.label}</div>
+                          <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{g.range}</div>
                         </div>
                       </div>
                     ))}
@@ -404,15 +404,15 @@ export default function StudentResultsPage() {
                     />
                   </div>
                 ) : (
-                  <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, textAlign: 'center' }}>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, textAlign: 'center' }}>
                     <div style={{ fontSize: 32, marginBottom: 12 }}>📄</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>Report Card Pending</div>
-                    <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>Official positions will be released soon.</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 4 }}>Official positions will be released soon.</div>
                   </div>
                 )}
 
                 {/* Recommendations Section */}
-                <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
                     <span style={{ fontSize: 20 }}>💡</span>
                     <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0 }}>Action Plan</h3>
@@ -420,7 +420,7 @@ export default function StudentResultsPage() {
                   
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {actionPlans.length === 0 ? (
-                      <div style={{ fontSize: 12, color: '#9ca3af' }}>Analysis steps will appear here.</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-subtle)' }}>Analysis steps will appear here.</div>
                     ) : actionPlans.map((plan, i) => (
                       <div key={i} style={{ background: plan.color + '05', padding: '16px', borderRadius: 16, border: `1.5px solid ${plan.color}20` }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>

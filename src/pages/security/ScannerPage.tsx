@@ -542,7 +542,7 @@ export default function ScannerPage() {
                 <AlertTriangle size={48} style={{ marginBottom: 12, opacity: 0.5 }} />
                 <div style={{ fontSize: 16, fontWeight: 800 }}>Camera Error</div>
                 <div style={{ fontSize: 13, marginTop: 4 }}>{cameraError}</div>
-                <button onClick={() => window.location.reload()} style={{ marginTop: 16, padding: '8px 16px', borderRadius: 8, background: '#fff', color: '#dc2626', border: 'none', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Retry</button>
+                <button onClick={() => window.location.reload()} style={{ marginTop: 16, padding: '8px 16px', borderRadius: 8, background: 'var(--bg-card)', color: '#dc2626', border: 'none', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Retry</button>
               </div>
             ) : (
               <div style={{ position: 'relative' }}>
@@ -561,7 +561,7 @@ export default function ScannerPage() {
 
         {/* USB Mode */}
         {mode === 'usb' && (
-          <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f1f5f9', padding: '28px', marginBottom: 20, boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f1f5f9', padding: '28px', marginBottom: 20, boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
             <div style={{ textAlign: 'center', marginBottom: 24 }}>
               <div style={{ width: 72, height: 72, borderRadius: 20, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', fontSize: 36 }}>🔌</div>
               <div style={{ fontSize: 16, fontWeight: 800, color: '#0f172a' }}>USB / Bluetooth Scanner Ready</div>
@@ -687,7 +687,7 @@ export default function ScannerPage() {
       {visitorFormOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 9999 }}
           onClick={e => { if (e.target === e.currentTarget) setVisitorFormOpen(false) }}>
-          <div style={{ background: '#fff', borderRadius: '22px 22px 0 0', padding: '24px 20px 90px', width: '100%', maxWidth: 500, maxHeight: '92vh', overflowY: 'auto', boxSizing: 'border-box', animation: 'ss_pop .25s ease' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '22px 22px 0 0', padding: '24px 20px 90px', width: '100%', maxWidth: 500, maxHeight: '92vh', overflowY: 'auto', boxSizing: 'border-box', animation: 'ss_pop .25s ease' }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: '#e2e8f0', margin: '0 auto 20px' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <div>
@@ -738,7 +738,7 @@ export default function ScannerPage() {
       {printingVisitor && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}
           onClick={e => { if (e.target === e.currentTarget) setPrintingVisitor(null) }}>
-          <div style={{ background: '#fff', borderRadius: 24, maxWidth: 360, width: '100%', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.3)', animation: 'ss_pop .2s ease' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, maxWidth: 360, width: '100%', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.3)', animation: 'ss_pop .2s ease' }}>
             <div style={{ background: '#0f172a', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,.5)', letterSpacing: '.08em', textTransform: 'uppercase' }}>Badge Preview</div>
@@ -781,7 +781,7 @@ export default function ScannerPage() {
             </div>
 
             <div style={{ padding: '16px 24px', display: 'flex', gap: 8 }}>
-              <button onClick={() => setPrintingVisitor(null)} style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1.5px solid #e2e8f0', background: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', color: '#334155' }}>Close</button>
+              <button onClick={() => setPrintingVisitor(null)} style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1.5px solid #e2e8f0', background: 'var(--bg-card)', fontSize: 13, fontWeight: 700, cursor: 'pointer', color: '#334155' }}>Close</button>
               <button onClick={printBadge} style={{ flex: 2, padding: '11px', borderRadius: 12, border: 'none', background: '#0f172a', fontSize: 13, fontWeight: 800, cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
                 <Printer size={15} /> Print Badge
               </button>
@@ -810,7 +810,7 @@ function TodayStats({ schoolId }: { schoolId: string }) {
   }, [schoolId])
 
   return (
-    <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: '16px 20px' }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: '16px 20px' }}>
       <div style={{ fontSize: 12, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 12 }}>Today's Stats</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
         {[

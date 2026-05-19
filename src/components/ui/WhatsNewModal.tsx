@@ -143,7 +143,7 @@ export default function WhatsNewModal() {
       `}</style>
 
             <div style={{
-                background: '#fff',
+                background: 'var(--bg-card)',
                 borderRadius: 24,
                 width: '100%',
                 maxWidth: 480,
@@ -262,7 +262,7 @@ export default function WhatsNewModal() {
                             </div>
                             <div style={{ flex: 1 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                                    <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>{feature.title}</h2>
+                                    <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{feature.title}</h2>
                                     {feature.badge && (
                                         <span style={{
                                             fontSize: 9,
@@ -277,7 +277,7 @@ export default function WhatsNewModal() {
                                         </span>
                                     )}
                                 </div>
-                                <p style={{ fontSize: 13, color: '#4b5563', lineHeight: 1.65, margin: 0 }}>
+                                <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65, margin: 0 }}>
                                     {feature.description}
                                 </p>
                             </div>
@@ -313,7 +313,7 @@ export default function WhatsNewModal() {
                                             {/* show number only for non-emoji step labels */}
                                             {/^\d/.test(step) ? '' : i + 1}
                                         </div>
-                                        <span style={{ fontSize: 12, color: '#374151', lineHeight: 1.6 }}>{step}</span>
+                                        <span style={{ fontSize: 12, color: 'var(--text-main)', lineHeight: 1.6 }}>{step}</span>
                                     </div>
                                 ))}
                             </div>
@@ -321,10 +321,10 @@ export default function WhatsNewModal() {
 
                         {/* Progress indicator + skip */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
-                            <span style={{ fontSize: 11, color: '#9ca3af' }}>{activeIdx + 1} of {FEATURES.length}</span>
+                            <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{activeIdx + 1} of {FEATURES.length}</span>
                             {!isLast && (
                                 <button onClick={dismiss} className="wn-btn"
-                                    style={{ fontSize: 11, color: '#9ca3af', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif', textDecoration: 'underline' }}>
+                                    style={{ fontSize: 11, color: 'var(--text-subtle)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif', textDecoration: 'underline' }}>
                                     Skip all
                                 </button>
                             )}
@@ -342,11 +342,11 @@ export default function WhatsNewModal() {
                                 flex: 1,
                                 padding: '11px 0',
                                 borderRadius: 12,
-                                border: '1.5px solid #e5e7eb',
-                                background: '#fff',
+                                border: '1.5px solid var(--border-color)',
+                                background: 'var(--bg-card)',
                                 fontSize: 13,
                                 fontWeight: 600,
-                                color: '#374151',
+                                color: 'var(--text-main)',
                                 fontFamily: '"DM Sans",sans-serif',
                             }}
                         >

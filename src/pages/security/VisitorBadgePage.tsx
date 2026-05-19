@@ -192,7 +192,7 @@ export default function VisitorBadgePage() {
         </div>
 
         {/* Visitor List */}
-        <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f1f5f9', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', overflow: 'hidden' }}>
           {isLoading ? (
             <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>Loading…</div>
           ) : filtered.length === 0 ? (
@@ -219,7 +219,7 @@ export default function VisitorBadgePage() {
               {/* Status + Actions */}
               <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'center' }}>
                 <button onClick={() => setPrinting(v)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 9, border: '1.5px solid #e2e8f0', background: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', color: '#334155' }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 9, border: '1.5px solid #e2e8f0', background: 'var(--bg-card)', fontSize: 12, fontWeight: 700, cursor: 'pointer', color: '#334155' }}>
                   <Printer size={13} /> Badge
                 </button>
                 {!v.time_out && (
@@ -243,7 +243,7 @@ export default function VisitorBadgePage() {
       {addOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 9999 }}
           onClick={e => { if (e.target === e.currentTarget) setAddOpen(false) }}>
-          <div style={{ background: '#fff', borderRadius: '22px 22px 0 0', padding: '24px 20px 90px', width: '100%', maxWidth: 500, maxHeight: '92vh', overflowY: 'auto', boxSizing: 'border-box' as const, animation: 'vb_pop .25s ease' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '22px 22px 0 0', padding: '24px 20px 90px', width: '100%', maxWidth: 500, maxHeight: '92vh', overflowY: 'auto', boxSizing: 'border-box' as const, animation: 'vb_pop .25s ease' }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: '#e2e8f0', margin: '0 auto 20px' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <div>
@@ -294,7 +294,7 @@ export default function VisitorBadgePage() {
       {printing && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}
           onClick={e => { if (e.target === e.currentTarget) setPrinting(null) }}>
-          <div style={{ background: '#fff', borderRadius: 24, maxWidth: 360, width: '100%', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.3)', animation: 'vb_pop .2s ease' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, maxWidth: 360, width: '100%', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.3)', animation: 'vb_pop .2s ease' }}>
             {/* Preview Header */}
             <div style={{ background: '#0f172a', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
@@ -340,7 +340,7 @@ export default function VisitorBadgePage() {
 
             {/* Print Button */}
             <div style={{ padding: '16px 24px', display: 'flex', gap: 8 }}>
-              <button onClick={() => setPrinting(null)} style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1.5px solid #e2e8f0', background: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', color: '#334155' }}>Close</button>
+              <button onClick={() => setPrinting(null)} style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1.5px solid #e2e8f0', background: 'var(--bg-card)', fontSize: 13, fontWeight: 700, cursor: 'pointer', color: '#334155' }}>Close</button>
               <button onClick={printBadge} style={{ flex: 2, padding: '11px', borderRadius: 12, border: 'none', background: '#0f172a', fontSize: 13, fontWeight: 800, cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
                 <Printer size={15} /> Print Badge
               </button>

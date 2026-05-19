@@ -81,7 +81,7 @@ export default function LessonPlansPage() {
           <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1e0646', margin: '0 0 8px' }}>Lesson Plan Approvals</h1>
           <p style={{ color: '#64748b', margin: 0, fontSize: 15 }}>Review and approve weekly lesson plans submitted by teachers.</p>
         </div>
-        <div style={{ display: 'flex', gap: 8, background: '#fff', padding: 4, borderRadius: 12, border: '1px solid #e2e8f0' }}>
+        <div style={{ display: 'flex', gap: 8, background: 'var(--bg-card)', padding: 4, borderRadius: 12, border: '1px solid #e2e8f0' }}>
           {(['pending', 'approved', 'rejected', 'all'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
               style={{
@@ -104,7 +104,7 @@ export default function LessonPlansPage() {
       {loading ? (
         <div style={{ padding: 40, textAlign: 'center' }}>Loading submissions...</div>
       ) : filteredPlans.length === 0 ? (
-        <div style={{ background: '#fff', borderRadius: 16, padding: 60, textAlign: 'center', border: '1px solid #e2e8f0' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 60, textAlign: 'center', border: '1px solid #e2e8f0' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
           <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e0646', marginBottom: 8 }}>No plans found</h3>
           <p style={{ color: '#64748b' }}>There are no {filter !== 'all' ? filter : ''} lesson plans at the moment.</p>
@@ -114,7 +114,7 @@ export default function LessonPlansPage() {
           {filteredPlans.map(plan => (
             <div key={plan.id} onClick={() => setActivePlan(plan)}
               style={{
-                background: '#fff', borderRadius: 16, padding: 20, border: '1px solid #e2e8f0', cursor: 'pointer',
+                background: 'var(--bg-card)', borderRadius: 16, padding: 20, border: '1px solid #e2e8f0', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'all 0.2s',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
               }}
@@ -174,7 +174,7 @@ function ReviewModal({ plan, onClose, onUpdate }: { plan: LessonPlan, onClose: (
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div style={{ background: '#fff', width: '100%', maxWidth: 900, height: '90vh', borderRadius: 24, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.2)' }}>
+      <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 900, height: '90vh', borderRadius: 24, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.2)' }}>
         
         {/* Header */}
         <div style={{ padding: '24px 32px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', background: '#f8fafc' }}>

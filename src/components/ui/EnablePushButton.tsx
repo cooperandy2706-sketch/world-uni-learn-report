@@ -64,14 +64,14 @@ export default function EnablePushButton({ compact = false }: { compact?: boolea
         fontFamily: '"DM Sans", sans-serif', animation: '_pb_fade 0.3s ease forwards'
       }}>
         <div style={{
-          background: '#ffffff', borderRadius: 24, padding: '32px 24px', width: '100%', maxWidth: 380,
+          background: 'var(--bg-card)', borderRadius: 24, padding: '32px 24px', width: '100%', maxWidth: 380,
           boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', position: 'relative', textAlign: 'center',
           animation: '_pb_slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards'
         }}>
           
           <button onClick={() => setDismissed(true)} style={{
             position: 'absolute', top: 16, right: 16, width: 32, height: 32, borderRadius: '50%',
-            background: '#f3f4f6', border: 'none', color: '#6b7280', fontSize: 16, cursor: 'pointer',
+            background: 'var(--bg-hover)', border: 'none', color: 'var(--text-muted)', fontSize: 16, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s'
           }} onMouseEnter={e=>e.currentTarget.style.background='#e5e7eb'} onMouseLeave={e=>e.currentTarget.style.background='#f3f4f6'}>
             ✕
@@ -81,11 +81,11 @@ export default function EnablePushButton({ compact = false }: { compact?: boolea
             🔔
           </div>
           
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#111827', marginBottom: 10, letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', marginBottom: 10, letterSpacing: '-0.02em' }}>
             Turn on Notifications?
           </h2>
           
-          <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 28, lineHeight: 1.5, padding: '0 10px' }}>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 28, lineHeight: 1.5, padding: '0 10px' }}>
             Get instant WhatsApp-style alerts for announcements and urgent meetings — even when the app is completely closed.
           </p>
 
@@ -103,7 +103,7 @@ export default function EnablePushButton({ compact = false }: { compact?: boolea
           <button onClick={() => setDismissed(true)} 
             style={{ 
               width: '100%', padding: '12px', borderRadius: 12, border: 'none', 
-              background: 'transparent', color: '#6b7280', fontSize: 14, fontWeight: 600, cursor: 'pointer' 
+              background: 'transparent', color: 'var(--text-muted)', fontSize: 14, fontWeight: 600, cursor: 'pointer' 
             }}>
             Maybe later
           </button>

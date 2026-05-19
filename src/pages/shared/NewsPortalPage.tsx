@@ -356,7 +356,7 @@ const formatDate = (str: string) => {
 
 function SkeletonCard() {
   return (
-    <div style={{ background: '#fff', border: '1px solid #e4e3de', borderRadius: 20, overflow: 'hidden', animation: 'np-shimmer 1.8s ease-in-out infinite' }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid #e4e3de', borderRadius: 20, overflow: 'hidden', animation: 'np-shimmer 1.8s ease-in-out infinite' }}>
       <div style={{ height: 176, background: '#f1f0ec' }} />
       <div style={{ padding: 18 }}>
         {[85, 65, 75, 55, 40].map((w, i) => (
@@ -433,7 +433,7 @@ function BreakingTicker({ headlines }: { headlines: string[] }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', background: '#c0392b', borderRadius: 12, height: 34, overflow: 'hidden', marginBottom: 22 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '0 14px', flexShrink: 0, fontSize: 9, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#fff', borderRight: '1px solid rgba(255,255,255,0.3)' }}>
-        <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#fff', animation: 'np-pulse 1.2s ease-in-out infinite' }} />
+        <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: 'var(--bg-card)', animation: 'np-pulse 1.2s ease-in-out infinite' }} />
         Breaking
       </div>
       <div style={{ flex: 1, overflow: 'hidden' }}>
@@ -461,7 +461,7 @@ function LivePlayer({ channel, theaterMode, onEnterTheater, onExitTheater }: {
     <div style={{ background: '#1e1e5c', borderRadius: theaterMode ? 12 : 20, overflow: 'hidden', boxShadow: '0 16px 48px rgba(16,16,58,0.3)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '3px 8px', borderRadius: 4, background: '#c0392b', fontSize: 9, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase', color: '#fff', flexShrink: 0 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', animation: 'np-pulse 1.4s ease-in-out infinite', display: 'inline-block' }} />
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--bg-card)', animation: 'np-pulse 1.4s ease-in-out infinite', display: 'inline-block' }} />
           LIVE
         </div>
         <span style={{ flex: 1, fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.65)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

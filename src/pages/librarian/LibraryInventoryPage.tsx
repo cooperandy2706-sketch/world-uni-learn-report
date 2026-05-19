@@ -245,7 +245,7 @@ export default function LibraryInventoryPage() {
                   style={{ width: '100%', padding: '10px 12px 10px 34px', borderRadius: 12, border: '1.5px solid #e2e8f0', fontSize: 13, outline: 'none', boxSizing: 'border-box' as const }} />
               </div>
               <button onClick={toggleAll}
-                style={{ padding: '10px 16px', borderRadius: 12, border: '1.5px solid #e2e8f0', background: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', color: '#334155', whiteSpace: 'nowrap' }}>
+                style={{ padding: '10px 16px', borderRadius: 12, border: '1.5px solid #e2e8f0', background: 'var(--bg-card)', fontSize: 12, fontWeight: 700, cursor: 'pointer', color: '#334155', whiteSpace: 'nowrap' }}>
                 {allSelected ? 'Deselect All' : `Select All (${filtered.length})`}
               </button>
               {selected.size > 0 && (
@@ -281,7 +281,7 @@ export default function LibraryInventoryPage() {
                   const onLoan = (b.copies_total ?? 0) - (b.copies_available ?? 0)
                   return (
                     <div key={b.id} onClick={() => toggleBook(b.id)}
-                      style={{ background: '#fff', borderRadius: 16, border: `2px solid ${isSelected ? '#7c3aed' : '#f1f5f9'}`, padding: '14px', cursor: 'pointer', display: 'flex', gap: 12, alignItems: 'center', transition: 'all .15s', boxShadow: isSelected ? '0 0 0 3px rgba(124,58,237,.15)' : 'none' }}>
+                      style={{ background: 'var(--bg-card)', borderRadius: 16, border: `2px solid ${isSelected ? '#7c3aed' : '#f1f5f9'}`, padding: '14px', cursor: 'pointer', display: 'flex', gap: 12, alignItems: 'center', transition: 'all .15s', boxShadow: isSelected ? '0 0 0 3px rgba(124,58,237,.15)' : 'none' }}>
                       {/* QR preview */}
                       <div style={{ flexShrink: 0 }}>
                         <BookQR barcode={b.barcode} title={b.title} size={64} />
@@ -314,7 +314,7 @@ export default function LibraryInventoryPage() {
         {/* ── SCAN INVENTORY MODE ── */}
         {mode === 'scan' && (
           <div style={{ maxWidth: 520, margin: '0 auto' }}>
-            <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 16 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 16 }}>
               <div style={{ padding: '14px 20px', borderBottom: '1px solid #f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Camera size={16} color="#7c3aed" />
                 <div>
@@ -361,7 +361,7 @@ export default function LibraryInventoryPage() {
 
             {/* Running count */}
             {scannedBooks.length > 0 && (
-              <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 14 }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 14 }}>
                 <div style={{ padding: '12px 18px', borderBottom: '1px solid #f8fafc', fontSize: 13, fontWeight: 800, color: '#0f172a' }}>
                   📊 Running Count ({scannedBooks.length} book{scannedBooks.length > 1 ? 's' : ''} scanned)
                 </div>
@@ -384,7 +384,7 @@ export default function LibraryInventoryPage() {
                     ✅ Commit Inventory to Database
                   </button>
                   <button onClick={() => { setScanCount({}); setLastScanned(null) }}
-                    style={{ width: '100%', padding: '10px', borderRadius: 12, border: '1.5px solid #e2e8f0', background: '#fff', color: '#64748b', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif', marginTop: 8 }}>
+                    style={{ width: '100%', padding: '10px', borderRadius: 12, border: '1.5px solid #e2e8f0', background: 'var(--bg-card)', color: '#64748b', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif', marginTop: 8 }}>
                     Clear & Start Over
                   </button>
                 </div>

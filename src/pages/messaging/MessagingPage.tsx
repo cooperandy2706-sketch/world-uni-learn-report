@@ -523,7 +523,7 @@ export default function MessagingPage() {
         {/* Chat Header */}
         <div style={{
           padding: isMobile ? '12px 14px' : '14px 20px',
-          background: '#fff', borderBottom: '1px solid #e8eaf0',
+          background: 'var(--bg-card)', borderBottom: '1px solid #e8eaf0',
           display: 'flex', alignItems: 'center', gap: 12,
           boxShadow: '0 1px 6px rgba(0,0,0,0.05)', flexShrink: 0,
         }}>
@@ -619,7 +619,7 @@ export default function MessagingPage() {
         {/* Input */}
         <div style={{
           padding: isMobile ? '10px 12px' : '12px 16px',
-          background: '#fff', borderTop: '1px solid #e8eaf0',
+          background: 'var(--bg-card)', borderTop: '1px solid #e8eaf0',
           display: 'flex', alignItems: 'flex-end', gap: 10, flexShrink: 0,
           // On mobile: give extra padding so it sits above system UI
           paddingBottom: isMobile ? 'max(10px, env(safe-area-inset-bottom))' : '12px',
@@ -668,7 +668,7 @@ export default function MessagingPage() {
       }} onClick={() => setShowNewDM(false)}>
         <div onClick={e => e.stopPropagation()} style={{
           width: '100%', maxWidth: isMobile ? '100%' : 420,
-          background: '#fff', overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.2)',
+          background: 'var(--bg-card)', overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.2)',
           borderRadius: isMobile ? '20px 20px 0 0' : 20,
           maxHeight: isMobile ? '85vh' : '70vh',
           display: 'flex', flexDirection: 'column',

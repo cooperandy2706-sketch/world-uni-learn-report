@@ -34,7 +34,7 @@ function MarkdownToolbar({ onClick, onUpload }: { onClick: (type: string) => voi
   ]
 
   return (
-    <div style={{ display: 'flex', gap: 6, marginBottom: 12, background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #e2e8f0', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', gap: 6, marginBottom: 12, background: 'var(--bg-card)', padding: 8, borderRadius: 12, border: '1px solid #e2e8f0', flexWrap: 'wrap' }}>
       {tools.map(t => (
         <button key={t.type} onClick={() => onClick(t.type)} title={t.title} style={{ 
           background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8,
@@ -58,7 +58,7 @@ function MarkdownToolbar({ onClick, onUpload }: { onClick: (type: string) => voi
 
 // ── Helpers ───────────────────────────────────────────────
 function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{children}</label>
+  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{children}</label>
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -82,7 +82,7 @@ function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputEle
           width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13,
           border: `1.5px solid ${error ? '#f87171' : focused ? '#059669' : '#e5e7eb'}`,
           boxShadow: focused ? '0 0 0 3px rgba(16,185,129,0.1)' : 'none',
-          outline: 'none', background: '#fff', color: '#111827',
+          outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)',
           fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s',
           boxSizing: 'border-box',
           ...props.style
@@ -104,7 +104,7 @@ function StyledSelect({ children, ...props }: React.SelectHTMLAttributes<HTMLSel
         width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13,
         border: `1.5px solid ${focused ? '#059669' : '#e5e7eb'}`,
         boxShadow: focused ? '0 0 0 3px rgba(16,185,129,0.1)' : 'none',
-        outline: 'none', background: '#fff', color: '#111827',
+        outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)',
         fontFamily: '"DM Sans",sans-serif', cursor: 'pointer',
         boxSizing: 'border-box',
         ...props.style
@@ -127,7 +127,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   }
   const variants: Record<string, React.CSSProperties> = {
     primary: { background: hov ? '#047857' : 'linear-gradient(135deg,#059669,#10b981)', color: '#fff', boxShadow: '0 2px 8px rgba(16,185,129,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger: { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', boxShadow: '0 2px 6px rgba(220,38,38,0.22)' },
   }
   return (
@@ -511,7 +511,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             
             {/* Sec 1: Identity */}
-            <div style={{ background: '#fff', padding: 32, borderRadius: 24, border: '1.5px solid #f1f5f9', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
+            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 24, border: '1.5px solid #f1f5f9', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
                <h2 style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
                  Core Identity & Mapping
@@ -537,7 +537,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
             </div>
 
             {/* Sec 2: Cover Image */}
-            <div style={{ background: '#fff', padding: 32, borderRadius: 24, border: '1.5px solid #f1f5f9' }}>
+            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 24, border: '1.5px solid #f1f5f9' }}>
                <h2 style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 20 }}>Visual Branding (Cover Page)</h2>
                
                <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
@@ -566,7 +566,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
             </div>
 
             {/* Sec 3: Content Builder */}
-            <div style={{ background: '#fff', padding: 32, borderRadius: 24, border: '1.5px solid #f1f5f9' }}>
+            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 24, border: '1.5px solid #f1f5f9' }}>
                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                  <h2 style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', margin: 0 }}>Immersive Content Builder</h2>
                  <StyledSelect style={{ width: 200 }} value={form.content_type} onChange={e => setForm(prev => ({ ...prev, content_type: e.target.value as any, content: '' }))}>
@@ -614,7 +614,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <span style={{ fontSize: 12, fontWeight: 700, color: form.is_published ? '#059669' : '#64748b' }}>{form.is_published ? 'LIVE' : 'DRAFT'}</span>
                   <div onClick={() => setForm(p => ({ ...p, is_published: !p.is_published }))} style={{ width: 50, height: 26, background: form.is_published ? '#10b981' : '#cbd5e1', borderRadius: 30, padding: 3, cursor: 'pointer', transition: 'all 0.3s' }}>
-                     <div style={{ width: 20, height: 20, background: '#fff', borderRadius: '50%', transform: form.is_published ? 'translateX(24px)' : 'translateX(0)', transition: 'all 0.3s' }} />
+                     <div style={{ width: 20, height: 20, background: 'var(--bg-card)', borderRadius: '50%', transform: form.is_published ? 'translateX(24px)' : 'translateX(0)', transition: 'all 0.3s' }} />
                   </div>
                </div>
             </div>
@@ -625,7 +625,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
              <h2 style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 20 }}>Live Formatted Preview</h2>
              
              <div style={{ 
-                background: '#fff', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden', 
+                background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden', 
                 boxShadow: '0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.02)' 
              }}>
                 <div style={{ height: 180, background: '#f8fafc', position: 'relative' }}>
@@ -672,8 +672,8 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
         <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>📚 Global Learning Library</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Distribute standard learning materials mapped to the global curriculum.</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>📚 Global Learning Library</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Distribute standard learning materials mapped to the global curriculum.</p>
           </div>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <Btn variant="secondary" onClick={() => setAiModalOpen(true)}>✨ AI Generate Textbook</Btn>
@@ -697,13 +697,13 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
         {isLoading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ecfdf5', borderTopColor: '#10b981', animation: '_spin 0.8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading global resources…</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading global resources…</p>
           </div>
         ) : resources.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📚</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No learning materials available</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>Publish your first video tutorial or study guide for students.</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No learning materials available</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>Publish your first video tutorial or study guide for students.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <Btn variant="secondary" onClick={() => setAiModalOpen(true)}>✨ Auto-Generate Topic</Btn>
               <Btn onClick={() => setEditorMode(true)}>➕ Upload First Material</Btn>
@@ -713,7 +713,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 18 }}>
             {resources.map((res, i) => (
               <div key={res.id} style={{ 
-                background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden',
+                background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden',
                 boxShadow: '0 1px 4px rgba(16,185,129,0.06)', animation: `_fadeUp 0.3s ease ${i * 0.05}s both`,
                 display: 'flex', flexDirection: 'column'
               }}>
@@ -764,7 +764,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
                     }}>
                       {res.is_published ? '✅ Live' : '🔒 Draft'}
                     </button>
-                    <span style={{ fontSize: 11, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase' }}>
+                    <span style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 600, textTransform: 'uppercase' }}>
                        {res.content_type}
                     </span>
                   </div>
@@ -794,21 +794,21 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
             </p>
           </div>
           <div className="field-group">
-            <label style={{ fontSize: 12, fontWeight: 700, color: '#4b5563', marginBottom: 6, display: 'block' }}>Topic / Chapter Name *</label>
+            <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>Topic / Chapter Name *</label>
             <input
               type="text"
               value={aiTopic}
               onChange={e => setAiTopic(e.target.value)}
               placeholder="e.g. The Solar System for Grade 6"
-              style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }}
             />
           </div>
           <div className="field-group">
-            <label style={{ fontSize: 12, fontWeight: 700, color: '#4b5563', marginBottom: 6, display: 'block' }}>Depth / Length</label>
+            <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>Depth / Length</label>
             <select
               value={aiLength}
               onChange={e => setAiLength(e.target.value)}
-              style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', background: '#fff' }}
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', background: 'var(--bg-card)' }}
             >
               <option value="Short Overview (500 words)">Short Overview</option>
               <option value="Standard Chapter (1000 words)">Standard Chapter</option>

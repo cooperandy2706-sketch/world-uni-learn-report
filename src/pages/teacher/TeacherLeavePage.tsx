@@ -94,10 +94,10 @@ export default function TeacherLeavePage() {
         {/* Header */}
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 32, animation: 'fadeUp 0.4s ease both' }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>
+            <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px' }}>
               My Leave Requests
             </h1>
-            <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>Request time off and track approval status</p>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>Request time off and track approval status</p>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
@@ -109,13 +109,13 @@ export default function TeacherLeavePage() {
 
         {/* Form */}
         {showForm && (
-          <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '24px 32px', marginBottom: 32, boxShadow: '0 8px 32px rgba(0,0,0,0.04)', animation: 'fadeUp 0.3s ease both' }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 24, borderBottom: '1px solid #f3f4f6', paddingBottom: 16 }}>New Leave Request</h2>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '24px 32px', marginBottom: 32, boxShadow: '0 8px 32px rgba(0,0,0,0.04)', animation: 'fadeUp 0.3s ease both' }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24, borderBottom: '1px solid var(--border-light)', paddingBottom: 16 }}>New Leave Request</h2>
             <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 24 }}>
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', marginBottom: 8 }}>Leave Type</label>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', marginBottom: 8 }}>Leave Type</label>
                   <select className="input-field" value={leaveType} onChange={e => setLeaveType(e.target.value)}>
                     <option value="sick">Sick Leave</option>
                     <option value="personal">Personal Leave</option>
@@ -125,22 +125,22 @@ export default function TeacherLeavePage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', marginBottom: 8 }}>Start Date</label>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', marginBottom: 8 }}>Start Date</label>
                   <input type="date" required className="input-field" value={startDate} onChange={e => setStartDate(e.target.value)} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', marginBottom: 8 }}>End Date</label>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', marginBottom: 8 }}>End Date</label>
                   <input type="date" required className="input-field" value={endDate} onChange={e => setEndDate(e.target.value)} min={startDate} />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', marginBottom: 8 }}>Reason (Optional)</label>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', marginBottom: 8 }}>Reason (Optional)</label>
                 <textarea rows={3} className="input-field" value={reason} onChange={e => setReason(e.target.value)} placeholder="Briefly explain your reason for leave..." style={{ resize: 'vertical' }} />
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 8, paddingTop: 20, borderTop: '1px solid #f3f4f6' }}>
-                <button type="button" onClick={() => setShowForm(false)} style={{ padding: '10px 20px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 8, paddingTop: 20, borderTop: '1px solid var(--border-light)' }}>
+                <button type="button" onClick={() => setShowForm(false)} style={{ padding: '10px 20px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
                   Cancel
                 </button>
                 <button type="submit" disabled={submitting} style={{ padding: '10px 24px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #7c3aed, #4f46e5)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.7 : 1, boxShadow: '0 4px 12px rgba(109,40,217,0.2)' }}>
@@ -153,19 +153,19 @@ export default function TeacherLeavePage() {
 
         {/* Requests List */}
         {requests.length === 0 ? (
-          <div style={{ background: '#fff', border: '1.5px dashed #e5e7eb', borderRadius: 24, padding: '60px 20px', textAlign: 'center', animation: 'fadeUp 0.4s ease 0.1s both' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1.5px dashed var(--border-color)', borderRadius: 24, padding: '60px 20px', textAlign: 'center', animation: 'fadeUp 0.4s ease 0.1s both' }}>
             <div style={{ width: 64, height: 64, background: '#f5f3ff', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <Calendar size={32} color="#7c3aed" />
             </div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>No Leave Requests</h3>
-            <p style={{ fontSize: 14, color: '#6b7280', margin: 0, maxWidth: 300, marginLeft: 'auto', marginRight: 'auto' }}>You haven't requested any time off yet. When you do, it will appear here.</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' }}>No Leave Requests</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0, maxWidth: 300, marginLeft: 'auto', marginRight: 'auto' }}>You haven't requested any time off yet. When you do, it will appear here.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gap: 16 }}>
             {requests.map((req, i) => {
               const statusInfo = getStatusDisplay(req.status)
               return (
-                <div key={req.id} className="req-card" style={{ background: '#fff', borderRadius: 20, border: '1px solid #f0eefe', padding: 20, display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'space-between', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', animation: `fadeUp 0.4s ease ${0.1 + i * 0.05}s both` }}>
+                <div key={req.id} className="req-card" style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1px solid #f0eefe', padding: 20, display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'space-between', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', animation: `fadeUp 0.4s ease ${0.1 + i * 0.05}s both` }}>
                   
                   <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
                     <div style={{ width: 48, height: 48, borderRadius: 14, background: statusInfo.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: statusInfo.color, flexShrink: 0 }}>
@@ -173,18 +173,18 @@ export default function TeacherLeavePage() {
                     </div>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
-                        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0, textTransform: 'capitalize' }}>{req.leave_type} Leave</h3>
+                        <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0, textTransform: 'capitalize' }}>{req.leave_type} Leave</h3>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 99, background: statusInfo.bg, color: statusInfo.color, fontSize: 12, fontWeight: 700 }}>
                           {statusInfo.icon} {statusInfo.label}
                         </div>
                       </div>
-                      <div style={{ fontSize: 13, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                        <span style={{ fontWeight: 600, color: '#374151' }}>{new Date(req.start_date).toLocaleDateString('en-GB', { dateStyle: 'medium' })}</span>
+                      <div style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                        <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{new Date(req.start_date).toLocaleDateString('en-GB', { dateStyle: 'medium' })}</span>
                         <span>→</span>
-                        <span style={{ fontWeight: 600, color: '#374151' }}>{new Date(req.end_date).toLocaleDateString('en-GB', { dateStyle: 'medium' })}</span>
+                        <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{new Date(req.end_date).toLocaleDateString('en-GB', { dateStyle: 'medium' })}</span>
                       </div>
                       {req.reason && (
-                        <p style={{ fontSize: 13, color: '#4b5563', margin: 0, lineHeight: 1.5, maxWidth: 500 }}>{req.reason}</p>
+                        <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, lineHeight: 1.5, maxWidth: 500 }}>{req.reason}</p>
                       )}
                     </div>
                   </div>
@@ -206,7 +206,7 @@ export default function TeacherLeavePage() {
                       {req.admin_notes && (
                         <div>
                           <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8', marginBottom: 4 }}>Admin Notes</div>
-                          <div style={{ fontSize: 13, color: '#475569', fontStyle: 'italic', background: '#fff', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0' }}>"{req.admin_notes}"</div>
+                          <div style={{ fontSize: 13, color: '#475569', fontStyle: 'italic', background: 'var(--bg-card)', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0' }}>"{req.admin_notes}"</div>
                         </div>
                       )}
                     </div>

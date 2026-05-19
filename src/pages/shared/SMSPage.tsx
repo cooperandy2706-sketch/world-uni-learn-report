@@ -314,17 +314,17 @@ export default function SMSPage() {
         
         {/* Header */}
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>
+          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
             {activeTab === 'fee_reminders' ? 'Fee Payment Reminders' : 'SMS Messaging Hub'}
           </h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
             Broadcast messages and reminders to parents and staff via Arkesel SMS.
           </p>
         </div>
 
         {/* Tab switcher for Bursars */}
         {isBursar && (
-          <div style={{ display: 'flex', gap: 4, background: '#f3f4f6', borderRadius: 12, padding: 4, marginBottom: 22, width: 'fit-content' }}>
+          <div style={{ display: 'flex', gap: 4, background: 'var(--bg-hover)', borderRadius: 12, padding: 4, marginBottom: 22, width: 'fit-content' }}>
             <button onClick={() => { setActiveTab('fee_reminders'); setSelectedIds(new Set()) }} 
               style={{ padding: '8px 18px', borderRadius: 9, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', background: activeTab === 'fee_reminders' ? '#fff' : 'transparent', color: activeTab === 'fee_reminders' ? '#111827' : '#6b7280', boxShadow: activeTab === 'fee_reminders' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
               💰 Fee Reminders
@@ -339,17 +339,17 @@ export default function SMSPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 24, alignItems: 'start' }}>
           
           {/* Main Area: Recipient Selection */}
-          <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
             
             {/* Toolbar */}
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
               <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
-                <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+                <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-subtle)' }} />
                 <input 
                   placeholder="Search name, phone..." 
                   value={searchQ}
                   onChange={e => setSearchQ(e.target.value)}
-                  style={{ width: '100%', padding: '9px 12px 9px 36px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}
+                  style={{ width: '100%', padding: '9px 12px 9px 36px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }}
                 />
               </div>
               
@@ -357,7 +357,7 @@ export default function SMSPage() {
                 <select 
                   value={selectedClass} 
                   onChange={e => { setSelectedClass(e.target.value); setSelectedIds(new Set()) }}
-                  style={{ padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', background: '#fff' }}
+                  style={{ padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', background: 'var(--bg-card)' }}
                 >
                   <option value="">All Community (Incl. Staff)</option>
                   {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name} Parents</option>)}
@@ -366,7 +366,7 @@ export default function SMSPage() {
 
               <button 
                 onClick={toggleSelectAll}
-                style={{ padding: '8px 14px', borderRadius: 9, border: '1.5px solid #e5e7eb', background: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+                style={{ padding: '8px 14px', borderRadius: 9, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
               >
                 {selectedIds.size === filteredRecipients.length ? 'Deselect All' : `Select All (${filteredRecipients.length})`}
               </button>
@@ -377,18 +377,18 @@ export default function SMSPage() {
               {loadingStudents ? (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}><Loader2 className="animate-spin" color="#7c3aed" /></div>
               ) : filteredRecipients.length === 0 ? (
-                <div style={{ padding: 60, textAlign: 'center', color: '#9ca3af' }}>
+                <div style={{ padding: 60, textAlign: 'center', color: 'var(--text-subtle)' }}>
                   <Info style={{ margin: '0 auto 10px', display: 'block' }} />
                   <p style={{ fontSize: 13 }}>No matching recipients with phone numbers found.</p>
                 </div>
               ) : (
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead style={{ position: 'sticky', top: 0, background: '#f9fafb', zIndex: 1, borderBottom: '1px solid #f3f4f6' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: 'var(--bg-input)', zIndex: 1, borderBottom: '1px solid var(--border-light)' }}>
                     <tr>
                       <th style={{ width: 44, padding: '12px' }}></th>
-                      <th style={{ textAlign: 'left', padding: '12px', fontSize: 11, color: '#6b7280', textTransform: 'uppercase' }}>Recipient Info</th>
-                      <th style={{ textAlign: 'left', padding: '12px', fontSize: 11, color: '#6b7280', textTransform: 'uppercase' }}>Phone Number</th>
-                      {activeTab === 'fee_reminders' && <th style={{ textAlign: 'left', padding: '12px', fontSize: 11, color: '#6b7280', textTransform: 'uppercase' }}>Debt</th>}
+                      <th style={{ textAlign: 'left', padding: '12px', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Recipient Info</th>
+                      <th style={{ textAlign: 'left', padding: '12px', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Phone Number</th>
+                      {activeTab === 'fee_reminders' && <th style={{ textAlign: 'left', padding: '12px', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Debt</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -398,10 +398,10 @@ export default function SMSPage() {
                           <input type="checkbox" checked={selectedIds.has(r.id)} readOnly style={{ width: 16, height: 16, accentColor: '#7c3aed' }} />
                         </td>
                         <td style={{ padding: '12px' }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{r.name}</div>
-                          <div style={{ fontSize: 11, color: '#6b7280' }}>{r.subtitle}</div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{r.name}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{r.subtitle}</div>
                         </td>
-                        <td style={{ padding: '12px', fontSize: 13, color: '#4b5563', fontFamily: 'monospace' }}>{r.phone}</td>
+                        <td style={{ padding: '12px', fontSize: 13, color: 'var(--text-muted)', fontFamily: 'monospace' }}>{r.phone}</td>
                         {activeTab === 'fee_reminders' && (
                           <td style={{ padding: '12px', fontSize: 13, fontWeight: 700, color: '#dc2626' }}>{GHS(r.amountDue || 0)}</td>
                         )}
@@ -413,11 +413,11 @@ export default function SMSPage() {
             </div>
 
             {/* Selection info footer */}
-            <div style={{ padding: '12px 20px', background: '#f9fafb', borderTop: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 12, color: '#6b7280' }}>
+            <div style={{ padding: '12px 20px', background: 'var(--bg-input)', borderTop: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                 <span style={{ fontWeight: 700, color: '#7c3aed' }}>{selectedIds.size}</span> recipients selected
               </span>
-              <span style={{ fontSize: 10, color: '#9ca3af', fontStyle: 'italic' }}>Only contacts with valid phone numbers are listed.</span>
+              <span style={{ fontSize: 10, color: 'var(--text-subtle)', fontStyle: 'italic' }}>Only contacts with valid phone numbers are listed.</span>
             </div>
           </div>
 
@@ -446,20 +446,20 @@ export default function SMSPage() {
             </div>
 
             {/* Composer */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '18px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
-              <label style={{ fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Compose Message</label>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '18px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
+              <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Compose Message</label>
               <textarea 
                 value={message}
                 onChange={e => setMessage(e.target.value)}
                 placeholder="Type your message here..."
                 rows={6}
-                style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'none' }}
+                style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'none' }}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
                 <div style={{ fontSize: 11, color: charCount > 160 ? '#f59e0b' : '#6b7280' }}>
                   {charCount} chars · <strong>{smsSegments} SMS</strong>
                 </div>
-                <button onClick={() => setMessage('')} style={{ color: '#9ca3af', background: 'none', border: 'none', fontSize: 11, cursor: 'pointer' }}>Clear</button>
+                <button onClick={() => setMessage('')} style={{ color: 'var(--text-subtle)', background: 'none', border: 'none', fontSize: 11, cursor: 'pointer' }}>Clear</button>
               </div>
             </div>
 
@@ -468,13 +468,13 @@ export default function SMSPage() {
               <div style={{ fontSize: 11, fontWeight: 800, color: '#6d28d9', textTransform: 'uppercase', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
                 <Loader2 size={12} /> Personalized Preview
               </div>
-              <div style={{ background: '#fff', borderRadius: 10, padding: '12px', border: '1px solid #e9d5ff', minHeight: 60 }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: '12px', border: '1px solid #e9d5ff', minHeight: 60 }}>
                 {selectedIds.size > 0 && message.trim() ? (
-                  <p style={{ fontSize: 12, color: '#374151', margin: 0, whiteSpace: 'pre-wrap' }}>
+                  <p style={{ fontSize: 12, color: 'var(--text-main)', margin: 0, whiteSpace: 'pre-wrap' }}>
                     {resolveMessage(message, filteredRecipients.find(r => selectedIds.has(r.id))!)}
                   </p>
                 ) : (
-                  <p style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic', margin: 0 }}>
+                  <p style={{ fontSize: 11, color: 'var(--text-subtle)', fontStyle: 'italic', margin: 0 }}>
                     Select a recipient and type a message to see the preview.
                   </p>
                 )}
@@ -483,12 +483,12 @@ export default function SMSPage() {
 
             {/* Progress / Send Button */}
             {isSending ? (
-              <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '18px', textAlign: 'center' }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 10 }}>Sending Messages...</div>
-                <div style={{ height: 6, background: '#f3f4f6', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '18px', textAlign: 'center' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 10 }}>Sending Messages...</div>
+                <div style={{ height: 6, background: 'var(--bg-hover)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
                   <div style={{ height: '100%', background: '#7c3aed', width: `${(progress.current / progress.total) * 100}%`, transition: 'width 0.3s ease' }} />
                 </div>
-                <div style={{ fontSize: 11, color: '#6b7280' }}>{progress.current} of {progress.total} sent</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{progress.current} of {progress.total} sent</div>
               </div>
             ) : (
               <button 

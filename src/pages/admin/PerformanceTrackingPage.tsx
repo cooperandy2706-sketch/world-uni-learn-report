@@ -32,7 +32,7 @@ const COLORS = ['#6d28d9', '#0891b2', '#16a34a', '#d97706', '#dc2626', '#db2777'
 // ── Components ──────────────────────────────────────────────
 function MetricCard({ label, value, icon: Icon, color, subValue }: any) {
   return (
-    <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: `1.5px solid ${T.border}`, boxShadow: '0 1px 4px rgba(109,40,217,0.06)', flex: 1 }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: `1.5px solid ${T.border}`, boxShadow: '0 1px 4px rgba(109,40,217,0.06)', flex: 1 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: `${color}15`, color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Icon size={20} />
@@ -283,7 +283,7 @@ export default function PerformanceTrackingPage() {
 
           <div style={{ display: 'flex', gap: 12 }}>
             {/* Mode Toggle */}
-            <div style={{ background: '#fff', padding: 4, borderRadius: 14, border: `1.5px solid ${T.border}`, display: 'flex', gap: 4 }}>
+            <div style={{ background: 'var(--bg-card)', padding: 4, borderRadius: 14, border: `1.5px solid ${T.border}`, display: 'flex', gap: 4 }}>
               <button onClick={() => { setViewMode('student'); setSearchQuery(''); setSelectedStudentId(''); }} 
                 className="mode-btn"
                 style={{ 
@@ -316,12 +316,12 @@ export default function PerformanceTrackingPage() {
                   placeholder={viewMode === 'student' ? "Search student..." : "Search class..."}
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  style={{ width: '100%', padding: '10px 14px 10px 40px', borderRadius: 12, border: `1.5px solid ${T.border}`, outline: 'none', background: '#fff', fontSize: 13 }}
+                  style={{ width: '100%', padding: '10px 14px 10px 40px', borderRadius: 12, border: `1.5px solid ${T.border}`, outline: 'none', background: 'var(--bg-card)', fontSize: 13 }}
                />
                
                {/* Search Results */}
                {searchQuery && (
-                 <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: '#fff', borderRadius: 12, border: `1.5px solid ${T.border}`, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 100, padding: 6 }}>
+                 <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'var(--bg-card)', borderRadius: 12, border: `1.5px solid ${T.border}`, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 100, padding: 6 }}>
                     {viewMode === 'student' ? filteredStudents.map(s => (
                       <div key={s.id} className="std-item" onClick={() => { setSelectedStudentId(s.id); setSearchQuery(''); }}
                         style={{ padding: '8px 12px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, transition: 'all .15s' }}>
@@ -349,7 +349,7 @@ export default function PerformanceTrackingPage() {
 
         {/* ── Empty State ── */}
         {((viewMode === 'student' && !selectedStudent) || (viewMode === 'class' && !selectedClass)) && !loadingHistory && (
-          <div style={{ height: '54vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#fff', borderRadius: 28, border: `1.5px solid ${T.border}` }} className="no-print">
+          <div style={{ height: '54vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', borderRadius: 28, border: `1.5px solid ${T.border}` }} className="no-print">
             <div style={{ width: 80, height: 80, borderRadius: '50%', background: T.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                {viewMode === 'student' ? <User size={40} color={T.primary} /> : <Users size={40} color={T.primary} />}
             </div>
@@ -404,7 +404,7 @@ export default function PerformanceTrackingPage() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 24, marginBottom: 24 }}>
-               <div style={{ background: '#fff', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, marginBottom: 24 }}>Academic Growth Curve</h3>
                   <div style={{ height: 320 }}>
                      <ResponsiveContainer width="100%" height="100%">
@@ -419,7 +419,7 @@ export default function PerformanceTrackingPage() {
                      </ResponsiveContainer>
                   </div>
                </div>
-               <div style={{ background: '#fff', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, marginBottom: 24 }}>Ranking History</h3>
                   <div style={{ height: 320 }}>
                      <ResponsiveContainer width="100%" height="100%">
@@ -435,7 +435,7 @@ export default function PerformanceTrackingPage() {
                </div>
             </div>
 
-            <div style={{ background: '#fff', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
                <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, marginBottom: 20 }}>Transcript Summary</h3>
                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
@@ -506,7 +506,7 @@ export default function PerformanceTrackingPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
                {/* Class Growth Curve */}
-               <div style={{ background: '#fff', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, marginBottom: 24 }}>Collective Class Growth</h3>
                   <div style={{ height: 320 }}>
                      <ResponsiveContainer width="100%" height="100%">
@@ -523,7 +523,7 @@ export default function PerformanceTrackingPage() {
                </div>
 
                {/* Top Performers Bar Chart */}
-               <div style={{ background: '#fff', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, marginBottom: 24 }}>Top Performers (Latest Term)</h3>
                   <div style={{ height: 320 }}>
                      <ResponsiveContainer width="100%" height="100%">
@@ -543,7 +543,7 @@ export default function PerformanceTrackingPage() {
 
             {/* Least Performing & Struggle Subjects */}
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 24, marginBottom: 24 }}>
-                <div style={{ background: '#fff', borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
                     <div style={{ padding: '20px 24px', borderBottom: `1.5px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, margin: 0 }}>Students Requiring Academic Support</h3>
                         <span style={{ fontSize: 11, fontWeight: 800, color: T.danger, background: '#fef2f2', padding: '4px 10px', borderRadius: 99 }}>Least Performing</span>
@@ -574,7 +574,7 @@ export default function PerformanceTrackingPage() {
                                         </div>
                                         <button 
                                             onClick={(e) => { e.stopPropagation(); setChallengeStudent(p.student); setChallengeForm(f => ({...f, subject_name: p.worstSubject})); setIsRecordChallengeOpen(true); }}
-                                            style={{ padding: '6px 12px', borderRadius: 8, background: '#fff', color: T.danger, border: `1.5px solid ${T.danger}`, fontSize: 11, fontWeight: 800, cursor: 'pointer' }}>
+                                            style={{ padding: '6px 12px', borderRadius: 8, background: 'var(--bg-card)', color: T.danger, border: `1.5px solid ${T.danger}`, fontSize: 11, fontWeight: 800, cursor: 'pointer' }}>
                                             Record Challenge
                                         </button>
                                     </div>
@@ -584,7 +584,7 @@ export default function PerformanceTrackingPage() {
                     </div>
                 </div>
 
-                <div style={{ background: '#fff', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}`, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}`, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
                     <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#fff1f2', color: T.danger, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                         <Percent size={32} />
                     </div>
@@ -599,14 +599,14 @@ export default function PerformanceTrackingPage() {
                     </button>
                     <button 
                         onClick={() => setIsChallengesReportOpen(true)}
-                        style={{ marginTop: 12, width: '100%', padding: '12px', borderRadius: 12, background: '#fff', color: T.slate, border: `1.5px solid ${T.slate}`, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                        style={{ marginTop: 12, width: '100%', padding: '12px', borderRadius: 12, background: 'var(--bg-card)', color: T.slate, border: `1.5px solid ${T.slate}`, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                         Class Challenges Report
                     </button>
                 </div>
             </div>
 
             {/* Class History Table */}
-            <div style={{ background: '#fff', borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
                <div style={{ padding: '20px 24px', borderBottom: `1.5px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, margin: 0 }}>Class Temporal History</h3>
                </div>
@@ -656,7 +656,7 @@ export default function PerformanceTrackingPage() {
             size="lg"
             footer={
                 <>
-                    <button style={{ padding: '8px 16px', borderRadius: 10, border: '1.5px solid #f0eefe', background: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }} onClick={() => setIsSupportPlanOpen(false)}>Close</button>
+                    <button style={{ padding: '8px 16px', borderRadius: 10, border: '1.5px solid #f0eefe', background: 'var(--bg-card)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }} onClick={() => setIsSupportPlanOpen(false)}>Close</button>
                     <button 
                         onClick={() => window.print()}
                         style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: T.primary, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -765,7 +765,7 @@ export default function PerformanceTrackingPage() {
                     />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 8 }}>
-                    <button style={{ padding: '10px 16px', borderRadius: 8, border: `1.5px solid ${T.border}`, background: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }} onClick={() => setIsRecordChallengeOpen(false)}>Cancel</button>
+                    <button style={{ padding: '10px 16px', borderRadius: 8, border: `1.5px solid ${T.border}`, background: 'var(--bg-card)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }} onClick={() => setIsRecordChallengeOpen(false)}>Cancel</button>
                     <button 
                         onClick={handleRecordChallengeSubmit}
                         disabled={createChallenge.isPending || !challengeForm.description}
@@ -785,7 +785,7 @@ export default function PerformanceTrackingPage() {
             size="lg"
             footer={
                 <>
-                    <button style={{ padding: '8px 16px', borderRadius: 10, border: '1.5px solid #f0eefe', background: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }} onClick={() => setIsChallengesReportOpen(false)}>Close</button>
+                    <button style={{ padding: '8px 16px', borderRadius: 10, border: '1.5px solid #f0eefe', background: 'var(--bg-card)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }} onClick={() => setIsChallengesReportOpen(false)}>Close</button>
                     <button 
                         onClick={() => window.print()}
                         style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: T.primary, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>

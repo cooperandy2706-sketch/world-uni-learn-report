@@ -137,7 +137,7 @@ export default function LiveFleetTrackingPage() {
       <div style={{ padding: '24px', maxWidth: 1100, margin: '0 auto', fontFamily: '"DM Sans", sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0, color: '#111827', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 12 }}>
             <Navigation color="#3b82f6" /> Live Fleet Tracking
           </h1>
           <p style={{ margin: '8px 0 0', color: '#64748b', fontSize: 15 }}>Monitor active trips and real-time passenger manifests.</p>
@@ -158,7 +158,7 @@ export default function LiveFleetTrackingPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 24, height: 'calc(100vh - 200px)', minHeight: 600 }}>
           
           {/* Left: Map */}
-          <div style={{ background: '#fff', borderRadius: 24, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', position: 'relative' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', position: 'relative' }}>
             <MapContainer 
               center={[activeTrips[0]?.latitude || 5.6037, activeTrips[0]?.longitude || -0.1870]} 
               zoom={13} 
@@ -202,7 +202,7 @@ export default function LiveFleetTrackingPage() {
                   key={trip.id} 
                   onClick={() => setSelectedTripId(trip.id)}
                   style={{ 
-                    background: '#fff', 
+                    background: 'var(--bg-card)', 
                     borderRadius: 20, 
                     overflow: 'hidden', 
                     boxShadow: isSelected ? '0 8px 24px rgba(59,130,246,0.15)' : '0 2px 8px rgba(0,0,0,0.04)', 

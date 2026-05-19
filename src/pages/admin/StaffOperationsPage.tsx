@@ -10,10 +10,10 @@ export default function StaffOperationsPage() {
     <div style={{ padding: '32px 40px', maxWidth: 1200, margin: '0 auto', fontFamily: '"DM Sans", sans-serif' }}>
       
       <div style={{ marginBottom: 32, animation: 'fadeUp 0.4s ease both' }}>
-        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>
+        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px' }}>
           Staff Operations
         </h1>
-        <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>Review leave requests, assign substitutes, and manage professional documents.</p>
+        <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>Review leave requests, assign substitutes, and manage professional documents.</p>
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 24, borderBottom: '1px solid #e2e8f0' }}>

@@ -785,10 +785,10 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
   const [hov, setHov] = useState(false)
   const v: any = {
     primary: { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger: { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
     success: { background: hov ? '#15803d' : '#16a34a', color: '#fff', border: 'none' },
-    ghost: { background: hov ? '#f5f3ff' : 'transparent', color: '#6b7280', border: 'none' },
+    ghost: { background: hov ? '#f5f3ff' : 'transparent', color: 'var(--text-muted)', border: 'none' },
     outline: { background: 'transparent', color: '#6d28d9', border: '1.5px solid #c4b5fd' },
   }
   return (
@@ -804,7 +804,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
 function Field({ label, children }: any) {
   return (
     <div>
-      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{label}</label>
+      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{label}</label>
       {children}
     </div>
   )
@@ -815,7 +815,7 @@ function Input({ error, ...props }: any) {
   return (
     <div>
       <input {...props} onFocus={e => { setF(true); props.onFocus?.(e) }} onBlur={e => { setF(false); props.onBlur?.(e) }}
-        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
+        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
       {error && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 3 }}>⚠ {error}</p>}
     </div>
   )
@@ -824,7 +824,7 @@ function Input({ error, ...props }: any) {
 function Textarea({ value, onChange, placeholder, rows = 4 }: any) {
   return (
     <textarea value={value} onChange={onChange} placeholder={placeholder} rows={rows}
-      style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box', resize: 'vertical' }} />
+      style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid var(--border-color)', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box', resize: 'vertical' }} />
   )
 }
 
@@ -1289,8 +1289,8 @@ export default function TeachersPage() {
         {/* ── Header ── */}
         <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Teachers</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>{totalStaff} staff members · {activeCount} active</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Teachers</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>{totalStaff} staff members · {activeCount} active</p>
           </div>
           <Btn onClick={openCreate}>➕ Add Teacher</Btn>
         </div>
@@ -1304,10 +1304,10 @@ export default function TeachersPage() {
             { icon: '🏫', label: 'Class Teachers', value: classTeacherCount, color: '#0891b2', bg: '#eff6ff' },
             { icon: '📗', label: 'Subjects', value: Object.values(loadMap).reduce((s, v) => s + v.subjects, 0) || '—', color: '#6d28d9', bg: '#faf5ff' },
           ].map(s => (
-            <div key={s.label} style={{ background: '#fff', borderRadius: 14, padding: '14px 16px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+            <div key={s.label} style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 16px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>{s.icon}</div>
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', lineHeight: 1.2 }}>{s.label}</span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', lineHeight: 1.2 }}>{s.label}</span>
               </div>
               <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 22, fontWeight: 700, color: s.color }}>{s.value}</div>
             </div>
@@ -1315,7 +1315,7 @@ export default function TeachersPage() {
         </div>
 
         {/* ── Tabs ── */}
-        <div style={{ display: 'flex', gap: 4, background: '#f8f7ff', borderRadius: 13, padding: 5, marginBottom: 20, width: 'fit-content' }}>
+        <div style={{ display: 'flex', gap: 4, background: 'var(--bg-app)', borderRadius: 13, padding: 5, marginBottom: 20, width: 'fit-content' }}>
           <button style={TAB_STYLE(activeTab === 'directory')} onClick={() => setActiveTab('directory')}>📋 Staff Directory</button>
           <button style={TAB_STYLE(activeTab === 'hr')} onClick={() => setActiveTab('hr')}>📄 HR Documents</button>
           <button style={TAB_STYLE(activeTab === 'bulk')} onClick={() => setActiveTab('bulk')}>⚡ Bulk Actions</button>
@@ -1327,16 +1327,16 @@ export default function TeachersPage() {
         {activeTab === 'directory' && (
           <>
             {/* Filter bar */}
-            <div style={{ background: '#fff', borderRadius: 12, padding: '12px 14px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '12px 14px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
               {/* Search */}
               <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 180 }}>
                 <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14 }}>🔍</span>
                 <input placeholder="Search name, email or staff ID…" value={search} onChange={e => setSearch(e.target.value)}
-                  style={{ width: '100%', padding: '8px 12px 8px 32px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', outline: 'none', background: '#faf5ff', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
+                  style={{ width: '100%', padding: '8px 12px 8px 32px', borderRadius: 9, fontSize: 13, border: '1.5px solid var(--border-color)', outline: 'none', background: '#faf5ff', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }} />
               </div>
 
               {/* Status toggle */}
-              <div style={{ display: 'flex', gap: 4, background: '#f3f4f6', borderRadius: 8, padding: 3 }}>
+              <div style={{ display: 'flex', gap: 4, background: 'var(--bg-hover)', borderRadius: 8, padding: 3 }}>
                 {(['all', 'active', 'inactive'] as const).map(s => (
                   <button key={s} onClick={() => setStatusFilter(s)}
                     style={{ padding: '5px 12px', borderRadius: 6, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all .12s', fontFamily: '"DM Sans",sans-serif', background: statusFilter === s ? '#7c3aed' : 'transparent', color: statusFilter === s ? '#fff' : '#6b7280' }}>
@@ -1353,7 +1353,7 @@ export default function TeachersPage() {
 
               {/* Sort */}
               <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
-                style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 12, fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', color: '#374151', background: '#fff' }}>
+                style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 12, fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', color: 'var(--text-main)', background: 'var(--bg-card)' }}>
                 <option value="name">Sort: Name A–Z</option>
                 <option value="joined">Sort: Date Joined</option>
                 <option value="classes">Sort: # Classes</option>
@@ -1370,9 +1370,9 @@ export default function TeachersPage() {
             )}
 
             {!isLoading && filtered.length === 0 && (
-              <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                 <div style={{ fontSize: 52, marginBottom: 12 }}>👨‍🏫</div>
-                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>
+                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>
                   {search || statusFilter !== 'all' || unassignedOnly ? 'No teachers match your filters' : 'No teachers yet'}
                 </h3>
                 {!search && statusFilter === 'all' && !unassignedOnly && <Btn onClick={openCreate} style={{ marginTop: 10 }}>➕ Add First Teacher</Btn>}
@@ -1385,15 +1385,15 @@ export default function TeachersPage() {
                   const load = loadMap[t.id]
                   return (
                     <div key={t.id} className="tp-card"
-                      style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: '20px', boxShadow: '0 1px 4px rgba(109,40,217,.07)', position: 'relative', overflow: 'hidden', animation: `_tp_fu .35s ease ${i * .04}s both` }}>
+                      style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: '20px', boxShadow: '0 1px 4px rgba(109,40,217,.07)', position: 'relative', overflow: 'hidden', animation: `_tp_fu .35s ease ${i * .04}s both` }}>
 
                       <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg,#f5f3ff,#ede9fe)', pointerEvents: 'none' }} />
 
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 12, position: 'relative' }}>
                         <Avatar name={t.user?.full_name ?? '?'} size={52} />
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.user?.full_name}</div>
-                          <div style={{ fontSize: 12, color: '#6b7280', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.user?.email}</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.user?.full_name}</div>
+                          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.user?.email}</div>
                           <div style={{ marginTop: 5, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                             {t.staff_id && <span style={{ fontSize: 10, fontWeight: 700, background: '#f5f3ff', color: '#6d28d9', padding: '2px 7px', borderRadius: 99, border: '1px solid #ede9fe' }}>{t.staff_id}</span>}
                             {t.qualification && <span style={{ fontSize: 10, fontWeight: 600, background: '#f0fdf4', color: '#16a34a', padding: '2px 7px', borderRadius: 99 }}>🎓 {t.qualification}</span>}
@@ -1411,14 +1411,14 @@ export default function TeachersPage() {
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: 14 }}>
                         {t.user?.phone && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: '#faf5ff', borderRadius: 8, fontSize: 12, color: '#374151' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: '#faf5ff', borderRadius: 8, fontSize: 12, color: 'var(--text-main)' }}>
                             <span>📱</span>{t.user.phone}
                           </div>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: '#faf5ff', borderRadius: 8, fontSize: 12, color: '#374151' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: '#faf5ff', borderRadius: 8, fontSize: 12, color: 'var(--text-main)' }}>
                           <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.user?.is_active !== false ? '#16a34a' : '#9ca3af', flexShrink: 0, display: 'block' }} />
                           {t.user?.is_active !== false ? 'Active' : 'Inactive'}
-                          {t.user?.created_at && <span style={{ color: '#9ca3af', marginLeft: 'auto', fontSize: 11 }}>Since {new Date(t.user.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}</span>}
+                          {t.user?.created_at && <span style={{ color: 'var(--text-subtle)', marginLeft: 'auto', fontSize: 11 }}>Since {new Date(t.user.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}</span>}
                         </div>
                       </div>
 
@@ -1454,14 +1454,14 @@ export default function TeachersPage() {
 
             {/* Left — Letter picker */}
             <div>
-              <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px', marginBottom: 16 }}>
-                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 14px' }}>📄 HR Documents Centre</h3>
-                <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 18px', lineHeight: 1.6 }}>Select a teacher and a letter type, fill in the details, then click <strong>Print / Preview</strong> to generate a clean printable document — no downloads, no backends.</p>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px', marginBottom: 16 }}>
+                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 14px' }}>📄 HR Documents Centre</h3>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '0 0 18px', lineHeight: 1.6 }}>Select a teacher and a letter type, fill in the details, then click <strong>Print / Preview</strong> to generate a clean printable document — no downloads, no backends.</p>
 
                 {/* Teacher select */}
                 <Field label="Select Teacher">
                   <select value={hrTeacher?.id ?? ''} onChange={e => { const t = (teachers as any[]).find(x => x.id === e.target.value); setHrTeacher(t ?? null); setHrFields({}) }}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', color: '#111827', background: '#fff' }}>
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', color: 'var(--text-main)', background: 'var(--bg-card)' }}>
                     <option value="">— Choose a staff member —</option>
                     {(teachers as any[]).map(t => <option key={t.id} value={t.id}>{t.user?.full_name} {t.staff_id ? `(${t.staff_id})` : ''}</option>)}
                   </select>
@@ -1471,23 +1471,23 @@ export default function TeachersPage() {
                   <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10, background: '#f5f3ff', borderRadius: 10, padding: '10px 14px' }}>
                     <Avatar name={hrTeacher.user?.full_name ?? '?'} size={38} />
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{hrTeacher.user?.full_name}</div>
-                      <div style={{ fontSize: 11, color: '#6b7280' }}>{hrTeacher.user?.email} {hrTeacher.staff_id ? `· ${hrTeacher.staff_id}` : ''}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{hrTeacher.user?.full_name}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{hrTeacher.user?.email} {hrTeacher.staff_id ? `· ${hrTeacher.staff_id}` : ''}</div>
                     </div>
                   </div>
                 )}
               </div>
 
               {/* Letter type grid */}
-              <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px' }}>
-                <h4 style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 14 }}>Choose Letter Type</h4>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px' }}>
+                <h4 style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 14 }}>Choose Letter Type</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(170px,1fr))', gap: 8 }}>
                   {LETTER_TYPES.map(lt => (
                     <div key={lt.id} className={`lt-card ${hrLetterType === lt.id ? 'selected' : ''}`}
                       onClick={() => { setHrLetterType(lt.id as LetterTypeId); setHrFields({}) }}
-                      style={{ border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px', background: '#fafafa' }}>
+                      style={{ border: '1.5px solid var(--border-color)', borderRadius: 10, padding: '12px', background: '#fafafa' }}>
                       <div style={{ fontSize: 20, marginBottom: 6 }}>{lt.icon}</div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#111827', lineHeight: 1.3 }}>{lt.label}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)', lineHeight: 1.3 }}>{lt.label}</div>
                     </div>
                   ))}
                 </div>
@@ -1496,14 +1496,14 @@ export default function TeachersPage() {
 
             {/* Right — Form + Print */}
             <div style={{ position: 'sticky', top: 20 }}>
-              <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px' }}>
                 {!hrLetterType
-                  ? <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9ca3af' }}>
+                  ? <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-subtle)' }}>
                     <div style={{ fontSize: 40, marginBottom: 10 }}>📝</div>
                     <p style={{ fontSize: 13 }}>Select a letter type to continue</p>
                   </div>
                   : <>
-                    <h4 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 16px' }}>
+                    <h4 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 16px' }}>
                       {LETTER_TYPES.find(l => l.id === hrLetterType)?.icon} {LETTER_TYPES.find(l => l.id === hrLetterType)?.label}
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
@@ -1511,7 +1511,7 @@ export default function TeachersPage() {
                         <Field key={field.key} label={field.label}>
                           {field.type === 'date'
                             ? <input type="date" value={hrFields[field.key] ?? ''} onChange={e => setHrFields(p => ({ ...p, [field.key]: e.target.value }))}
-                              style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', outline: 'none', fontFamily: '"DM Sans",sans-serif', color: '#111827', boxSizing: 'border-box' }} />
+                              style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid var(--border-color)', outline: 'none', fontFamily: '"DM Sans",sans-serif', color: 'var(--text-main)', boxSizing: 'border-box' }} />
                             : field.key === 'incident' || field.key === 'grounds' || field.key === 'reason' || field.key === 'achievement'
                               ? <Textarea value={hrFields[field.key] ?? ''} onChange={(e: any) => setHrFields(p => ({ ...p, [field.key]: e.target.value }))} placeholder={field.placeholder} rows={3} />
                               : <Input value={hrFields[field.key] ?? ''} onChange={(e: any) => setHrFields(p => ({ ...p, [field.key]: e.target.value }))} placeholder={field.placeholder} />
@@ -1524,22 +1524,22 @@ export default function TeachersPage() {
                       <Btn onClick={handlePrint} style={{ flex: 1, justifyContent: 'center' }}>🖨️ Print / Preview</Btn>
                       <Btn variant="secondary" onClick={handleSaveLetter} disabled={saveLetterMut.isPending} loading={saveLetterMut.isPending} style={{ flex: 1, justifyContent: 'center' }}>💾 Save to History</Btn>
                     </div>
-                    <p style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center', marginTop: 8 }}>Opens a print-ready preview in a new tab. Save to History for tracking.</p>
+                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', textAlign: 'center', marginTop: 8 }}>Opens a print-ready preview in a new tab. Save to History for tracking.</p>
                   </>
                 }
               </div>
 
               {hrTeacher && (
-                <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px', marginTop: 16 }}>
-                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 14px' }}>📜 Letter History</h3>
-                  {loadingLetters ? <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading history...</p> :
-                   (!lettersHistory || lettersHistory.length === 0) ? <p style={{ fontSize: 13, color: '#9ca3af' }}>No saved letters found.</p> :
+                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px', marginTop: 16 }}>
+                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 14px' }}>📜 Letter History</h3>
+                  {loadingLetters ? <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading history...</p> :
+                   (!lettersHistory || lettersHistory.length === 0) ? <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>No saved letters found.</p> :
                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                      {lettersHistory.map(l => (
-                       <div key={l.id} style={{ padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fafafa' }}>
+                       <div key={l.id} style={{ padding: '10px 12px', border: '1px solid var(--border-color)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fafafa' }}>
                          <div>
-                           <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{LETTER_TYPES.find(x => x.id === l.type)?.label || l.type}</div>
-                           <div style={{ fontSize: 11, color: '#6b7280' }}>
+                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{LETTER_TYPES.find(x => x.id === l.type)?.label || l.type}</div>
+                           <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                              {new Date(l.created_at).toLocaleDateString()} · By {l.author?.full_name || 'System'}
                            </div>
                          </div>
@@ -1566,9 +1566,9 @@ export default function TeachersPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(340px,1fr))', gap: 18 }}>
 
             {/* Bulk SMS */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px' }}>
-              <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 17, fontWeight: 700, color: '#111827', margin: '0 0 6px' }}>📱 Send SMS to All Active Teachers</h3>
-              <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 14px' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px' }}>
+              <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 17, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 6px' }}>📱 Send SMS to All Active Teachers</h3>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 14px' }}>
                 {(teachers as any[]).filter(t => t.user?.is_active !== false && t.user?.phone).length} teachers with phone numbers will receive this message.
               </p>
               <Textarea value={bulkSmsText} onChange={(e: any) => setBulkSmsText(e.target.value)} placeholder="Type your message here…" rows={5} />
@@ -1580,22 +1580,22 @@ export default function TeachersPage() {
             </div>
 
             {/* Export staff list */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px' }}>
-              <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 17, fontWeight: 700, color: '#111827', margin: '0 0 6px' }}>📊 Export Staff Reports</h3>
-              <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 18px' }}>Download staff data as CSV files for records or reporting.</p>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px' }}>
+              <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 17, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 6px' }}>📊 Export Staff Reports</h3>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 18px' }}>Download staff data as CSV files for records or reporting.</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc', borderRadius: 10, padding: '12px 14px', border: '.5px solid #e2e8f0' }}>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>Active Staff List</div>
-                    <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>Name, email, phone, staff ID, status</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>Active Staff List</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Name, email, phone, staff ID, status</div>
                   </div>
                   <Btn variant="outline" onClick={exportStaffCSV} style={{ padding: '7px 14px', fontSize: 12 }}>⬇️ CSV</Btn>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc', borderRadius: 10, padding: '12px 14px', border: '.5px solid #e2e8f0' }}>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>Teaching Load Report</div>
-                    <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>Teacher → classes → subjects count</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>Teaching Load Report</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Teacher → classes → subjects count</div>
                   </div>
                   <Btn variant="outline" onClick={() => {
                     const rows = [['Name', 'Staff ID', 'Email', 'Classes', 'Subjects', 'Status']]
@@ -1611,15 +1611,15 @@ export default function TeachersPage() {
             </div>
 
             {/* Quick HR */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px' }}>
-              <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 17, fontWeight: 700, color: '#111827', margin: '0 0 6px' }}>📄 Quick HR Letters</h3>
-              <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 14px' }}>Jump directly to the HR Documents Centre for common letters.</p>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px' }}>
+              <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 17, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 6px' }}>📄 Quick HR Letters</h3>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 14px' }}>Jump directly to the HR Documents Centre for common letters.</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {(['appointment', 'promotion', 'warning1', 'commendation', 'reference'] as LetterTypeId[]).map(id => {
                   const lt = LETTER_TYPES.find(l => l.id === id)!
                   return (
                     <button key={id} onClick={() => { setHrLetterType(id); setHrFields({}); setActiveTab('hr') }}
-                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, border: '1px solid #e5e7eb', background: '#fafafa', cursor: 'pointer', textAlign: 'left', fontFamily: '"DM Sans",sans-serif', fontSize: 13, color: '#111827', fontWeight: 500, transition: 'all .12s' }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, border: '1px solid var(--border-color)', background: '#fafafa', cursor: 'pointer', textAlign: 'left', fontFamily: '"DM Sans",sans-serif', fontSize: 13, color: 'var(--text-main)', fontWeight: 500, transition: 'all .12s' }}
                       onMouseEnter={e => { (e.currentTarget as any).style.background = '#f5f3ff'; (e.currentTarget as any).style.borderColor = '#c4b5fd' }}
                       onMouseLeave={e => { (e.currentTarget as any).style.background = '#fafafa'; (e.currentTarget as any).style.borderColor = '#e5e7eb' }}>
                       <span style={{ fontSize: 18 }}>{lt.icon}</span>
@@ -1640,14 +1640,14 @@ export default function TeachersPage() {
       {smsTarget && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.35)', zIndex: 1000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
           onClick={e => { if (e.target === e.currentTarget) setSmsTarget(null) }}>
-          <div style={{ background: '#fff', borderRadius: '20px 20px 0 0', padding: '24px 24px 32px', width: '100%', maxWidth: 480, animation: '_tp_fu .25s ease' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '20px 20px 0 0', padding: '24px 24px 32px', width: '100%', maxWidth: 480, animation: '_tp_fu .25s ease' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
               <Avatar name={smsTarget.user?.full_name ?? '?'} size={40} />
               <div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{smsTarget.user?.full_name}</div>
-                <div style={{ fontSize: 12, color: '#6b7280' }}>{smsTarget.user?.phone || 'No phone on file'}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{smsTarget.user?.full_name}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{smsTarget.user?.phone || 'No phone on file'}</div>
               </div>
-              <button onClick={() => setSmsTarget(null)} style={{ marginLeft: 'auto', border: 'none', background: 'none', fontSize: 18, cursor: 'pointer', color: '#9ca3af' }}>✕</button>
+              <button onClick={() => setSmsTarget(null)} style={{ marginLeft: 'auto', border: 'none', background: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text-subtle)' }}>✕</button>
             </div>
             <Textarea value={smsText} onChange={(e: any) => setSmsText(e.target.value)} placeholder="Type your message…" rows={4} />
             <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
@@ -1690,7 +1690,7 @@ export default function TeachersPage() {
             </div>
 
             <div>
-              <h4 style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Contact Information</h4>
+              <h4 style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Contact Information</h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 {[
                   { icon: '✉️', label: 'Email', value: viewingTeacher.user?.email },
@@ -1702,18 +1702,18 @@ export default function TeachersPage() {
                 ].map(({ icon, label, value }) => (
                   <div key={label} style={{ background: '#f8fafc', borderRadius: 10, padding: '10px 12px', border: '.5px solid #e2e8f0' }}>
                     <div style={{ fontSize: 10, color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 3 }}>{icon} {label}</div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{value}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{value}</div>
                   </div>
                 ))}
               </div>
             </div>
 
             <div>
-              <h4 style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>
-                Class Assignments {viewingTeacher._assignments?.length > 0 && <span style={{ fontWeight: 400, textTransform: 'none', color: '#9ca3af' }}>— {viewingTeacher._assignments?.length} subject{viewingTeacher._assignments?.length !== 1 ? 's' : ''}</span>}
+              <h4 style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>
+                Class Assignments {viewingTeacher._assignments?.length > 0 && <span style={{ fontWeight: 400, textTransform: 'none', color: 'var(--text-subtle)' }}>— {viewingTeacher._assignments?.length} subject{viewingTeacher._assignments?.length !== 1 ? 's' : ''}</span>}
               </h4>
               {!viewingTeacher._assignments ? (
-                <div style={{ textAlign: 'center', padding: '12px 0', color: '#9ca3af', fontSize: 12 }}>Loading…</div>
+                <div style={{ textAlign: 'center', padding: '12px 0', color: 'var(--text-subtle)', fontSize: 12 }}>Loading…</div>
               ) : viewingTeacher._assignments.length === 0 ? (
                 <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '12px 14px', fontSize: 12, color: '#92400e' }}>No assignments yet</div>
               ) : (
@@ -1722,10 +1722,10 @@ export default function TeachersPage() {
                     <div key={i} style={{ background: '#f5f3ff', borderRadius: 10, padding: '10px 14px', border: '1px solid #ede9fe' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                         <span style={{ fontSize: 12, fontWeight: 700, color: '#5b21b6' }}>🏫 {g.class?.name}</span>
-                        <span style={{ fontSize: 10, color: '#9ca3af' }}>· {g.term?.name}</span>
+                        <span style={{ fontSize: 10, color: 'var(--text-subtle)' }}>· {g.term?.name}</span>
                       </div>
                       <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-                        {g.subjects.map((s: string, j: number) => <span key={j} style={{ fontSize: 11, background: '#fff', color: '#6d28d9', padding: '2px 8px', borderRadius: 99, border: '1px solid #ddd6fe' }}>{s}</span>)}
+                        {g.subjects.map((s: string, j: number) => <span key={j} style={{ fontSize: 11, background: 'var(--bg-card)', color: '#6d28d9', padding: '2px 8px', borderRadius: 99, border: '1px solid #ddd6fe' }}>{s}</span>)}
                       </div>
                     </div>
                   ))}
@@ -1735,14 +1735,14 @@ export default function TeachersPage() {
 
             {viewingTeacher._goals?.length > 0 && (
               <div>
-                <h4 style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Recent Weekly Goals</h4>
+                <h4 style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Recent Weekly Goals</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {viewingTeacher._goals.slice(0, 4).map((g: any) => (
                     <div key={g.id} style={{ background: g.is_completed ? '#f0fdf4' : '#fffbeb', borderRadius: 10, padding: '10px 12px', border: `1px solid ${g.is_completed ? '#bbf7d0' : '#fde68a'}`, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                       <span style={{ fontSize: 14, flexShrink: 0 }}>{g.is_completed ? '✅' : '⏳'}</span>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', marginBottom: 2 }}>Week {g.week_number} · {g.class?.name} · {g.subject?.name}</div>
-                        <div style={{ fontSize: 12, color: '#6b7280' }}>{g.goal}</div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-main)', marginBottom: 2 }}>Week {g.week_number} · {g.class?.name} · {g.subject?.name}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{g.goal}</div>
                       </div>
                     </div>
                   ))}
@@ -1773,7 +1773,7 @@ export default function TeachersPage() {
             {!editingTeacher && (
               <Field label="Password">
                 <Input {...register('password')} type="password" placeholder="Default: teacher123" />
-                <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>Leave blank to use "teacher123"</p>
+                <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 3 }}>Leave blank to use "teacher123"</p>
               </Field>
             )}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -1794,16 +1794,16 @@ export default function TeachersPage() {
         {assigningTeacher && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ background: '#f8fafc', borderRadius: 12, padding: '14px 16px', border: '.5px solid #e2e8f0' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Add Assignment</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Add Assignment</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
                 <div style={{ gridColumn: 'span 2' }}>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: '#374151', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                     <span>Classes</span>
                     <button onClick={() => { if (newClassIds.length === (classes as any[]).length) setNewClassIds([]); else setNewClassIds((classes as any[]).map((c: any) => c.id)) }} style={{ fontSize: 10, color: '#6d28d9', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontWeight: 700 }}>
                       {newClassIds.length === (classes as any[]).length ? 'Select None' : 'Select All'}
                     </button>
                   </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 6, maxHeight: 110, overflowY: 'auto', background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 8, padding: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 6, maxHeight: 110, overflowY: 'auto', background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 8, padding: 8 }}>
                     {(classes as any[]).map((c: any) => (
                       <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
                         <input type="checkbox" checked={newClassIds.includes(c.id)} onChange={e => { if (e.target.checked) setNewClassIds(p => [...p, c.id]); else setNewClassIds(p => p.filter(id => id !== c.id)) }} />
@@ -1813,13 +1813,13 @@ export default function TeachersPage() {
                   </div>
                 </div>
                 <div style={{ gridColumn: 'span 2', marginTop: 6 }}>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: '#374151', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                     <span>Subjects</span>
                     <button onClick={() => { if (newSubjectIds.length === (subjects as any[]).length) setNewSubjectIds([]); else setNewSubjectIds((subjects as any[]).map((s: any) => s.id)) }} style={{ fontSize: 10, color: '#6d28d9', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontWeight: 700 }}>
                       {newSubjectIds.length === (subjects as any[]).length ? 'Select None' : 'Select All'}
                     </button>
                   </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 6, maxHeight: 110, overflowY: 'auto', background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 8, padding: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 6, maxHeight: 110, overflowY: 'auto', background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 8, padding: 8 }}>
                     {(subjects as any[]).map((s: any) => (
                       <label key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
                         <input type="checkbox" checked={newSubjectIds.includes(s.id)} onChange={e => { if (e.target.checked) setNewSubjectIds(p => [...p, s.id]); else setNewSubjectIds(p => p.filter(id => id !== s.id)) }} />
@@ -1831,7 +1831,7 @@ export default function TeachersPage() {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginTop: 6 }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-                  <label style={{ fontSize: 12, color: '#374151', fontWeight: 600 }}>Assign as Class Teacher for:</label>
+                  <label style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>Assign as Class Teacher for:</label>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {(classes as any[]).filter((c: any) => newClassIds.includes(c.id)).map((c: any) => (
                       <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer', background: classTeacherClassIds.includes(c.id) ? '#dcfce7' : '#fff', padding: '4px 10px', borderRadius: 8, border: `1.5px solid ${classTeacherClassIds.includes(c.id) ? '#16a34a' : '#e5e7eb'}`, transition: 'all .15s' }}>
@@ -1841,7 +1841,7 @@ export default function TeachersPage() {
                         </span>
                       </label>
                     ))}
-                    {newClassIds.length === 0 && <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>Select classes above first</span>}
+                    {newClassIds.length === 0 && <span style={{ fontSize: 12, color: 'var(--text-subtle)', fontStyle: 'italic' }}>Select classes above first</span>}
                   </div>
                 </div>
                 <Btn onClick={addAssignment} style={{ padding: '7px 14px', fontSize: 12 }}>➕ Add</Btn>
@@ -1849,15 +1849,15 @@ export default function TeachersPage() {
             </div>
 
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>Current Assignments ({assignments.length})</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>Current Assignments ({assignments.length})</p>
               {assignments.length === 0
-                ? <p style={{ fontSize: 13, color: '#9ca3af', textAlign: 'center', padding: '16px 0' }}>No assignments yet</p>
+                ? <p style={{ fontSize: 13, color: 'var(--text-subtle)', textAlign: 'center', padding: '16px 0' }}>No assignments yet</p>
                 : <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 300, overflowY: 'auto' }}>
                   {assignments.map(a => (
                     <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', background: '#f5f3ff', borderRadius: 9, border: '1px solid #ede9fe' }}>
                       <span style={{ fontSize: 12, fontWeight: 700, color: '#5b21b6', flex: 1 }}>🏫 {a.class?.name}</span>
                       <span style={{ fontSize: 12, color: '#6d28d9', flex: 1 }}>📗 {a.subject?.name}</span>
-                      <span style={{ fontSize: 10, color: '#9ca3af' }}>{a.term?.name}</span>
+                      <span style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{a.term?.name}</span>
                       <button 
                         onClick={() => toggleCT(a)} 
                         style={{ 
@@ -1925,25 +1925,25 @@ export default function TeachersPage() {
           {removingAssignments.length > 0 ? (
             <>
               <div>
-                <h4 style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 10 }}>📚 Active Assignments ({removingAssignments.length})</h4>
+                <h4 style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 10 }}>📚 Active Assignments ({removingAssignments.length})</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 180, overflowY: 'auto' }}>
                   {removingAssignments.map((a: any) => (
                     <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
                       <span style={{ fontSize: 12, fontWeight: 700, color: '#dc2626', flex: 1 }}>🏫 {a.class?.name}</span>
                       <span style={{ fontSize: 12, color: '#b91c1c' }}>📗 {a.subject?.name}</span>
-                      <span style={{ fontSize: 10, color: '#9ca3af' }}>{a.term?.name}</span>
+                      <span style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{a.term?.name}</span>
                     </div>
                   ))}
                 </div>
               </div>
               <div>
-                <h4 style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 8 }}>🔄 Transfer Classes To</h4>
+                <h4 style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>🔄 Transfer Classes To</h4>
                 <select value={replacementTeacherId} onChange={e => setReplacementTeacherId(e.target.value)}
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 13, fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
                   <option value="">— Select replacement teacher —</option>
                   {(teachers as any[]).filter(t => t.id !== removingTeacher?.id && t.user?.is_active !== false).map(t => <option key={t.id} value={t.id}>{t.user?.full_name} {t.staff_id ? `(${t.staff_id})` : ''}</option>)}
                 </select>
-                <p style={{ fontSize: 11, color: '#6b7280', marginTop: 6 }}>All {removingAssignments.length} assignment(s) and class teacher roles will be transferred.</p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>All {removingAssignments.length} assignment(s) and class teacher roles will be transferred.</p>
               </div>
             </>
           ) : (

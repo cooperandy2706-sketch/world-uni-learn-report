@@ -103,15 +103,15 @@ export default function ParentCalendarPage() {
   const renderHeader = () => (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
       <div>
-        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 24, fontWeight: 700, color: '#111827', margin: 0 }}>School Calendar</h1>
-        <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Track holidays and school milestones.</p>
+        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 24, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>School Calendar</h1>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Track holidays and school milestones.</p>
       </div>
-      <div style={{ display: 'flex', background: '#fff', borderRadius: 12, padding: 4, border: '1.5px solid #f1f5f9' }}>
-        <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer', color: '#4b5563' }}><ChevronLeft size={18} /></button>
-        <div style={{ padding: '0 12px', display: 'flex', alignItems: 'center', fontSize: 14, fontWeight: 700, color: '#111827', minWidth: 120, justifyContent: 'center' }}>
+      <div style={{ display: 'flex', background: 'var(--bg-card)', borderRadius: 12, padding: 4, border: '1.5px solid #f1f5f9' }}>
+        <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><ChevronLeft size={18} /></button>
+        <div style={{ padding: '0 12px', display: 'flex', alignItems: 'center', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', minWidth: 120, justifyContent: 'center' }}>
           {format(currentMonth, 'MMM yyyy')}
         </div>
-        <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer', color: '#4b5563' }}><ChevronRight size={18} /></button>
+        <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><ChevronRight size={18} /></button>
       </div>
     </div>
   )
@@ -121,7 +121,7 @@ export default function ParentCalendarPage() {
     return (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: 4 }}>
         {days.map((d, i) => (
-          <div key={i} style={{ textAlign: 'center', fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', padding: '8px 0' }}>{d}</div>
+          <div key={i} style={{ textAlign: 'center', fontSize: 10, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', padding: '8px 0' }}>{d}</div>
         ))}
       </div>
     )
@@ -165,7 +165,7 @@ export default function ParentCalendarPage() {
       rows.push(<div key={day.toString()} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>{days}</div>)
       days = []
     }
-    return <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: '1.5px solid #f1f5f9' }}>{rows}</div>
+    return <div style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden', border: '1.5px solid #f1f5f9' }}>{rows}</div>
   }
 
   return (
@@ -184,13 +184,13 @@ export default function ParentCalendarPage() {
           
           {/* Legend: Mobile Friendly */}
           <div style={{ marginTop: 20, display: 'flex', flexWrap: 'wrap', gap: 16, padding: '0 8px' }}>
-             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#4b5563' }}>
+             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#059669' }} /> Term Dates
              </div>
-             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#4b5563' }}>
+             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> Holidays
              </div>
-             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#4b5563' }}>
+             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#8b5cf6' }} /> Events
              </div>
           </div>
@@ -203,8 +203,8 @@ export default function ParentCalendarPage() {
             <div style={{ fontSize: 12, color: '#a5b4fc', marginTop: 4 }}>{format(time, 'EEEE, do MMMM')}</div>
           </div>
 
-          <div style={{ background: '#fff', borderRadius: 24, padding: 20, border: '1.5px solid #f1f5f9' }}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 20, border: '1.5px solid #f1f5f9' }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <PartyPopper size={16} color="#f59e0b" /> Upcoming
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -219,12 +219,12 @@ export default function ParentCalendarPage() {
                       <span style={{ fontSize: 8, fontWeight: 700, color: e.color, textTransform: 'uppercase' }}>{format(parseISO(e.start_date), 'MMM')}</span>
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</div>
-                      <div style={{ fontSize: 11, color: '#9ca3af' }}>{format(parseISO(e.start_date), 'EEEE')}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{format(parseISO(e.start_date), 'EEEE')}</div>
                     </div>
                   </div>
                 ))}
-              {events.filter(e => parseISO(e.start_date) >= new Date()).length === 0 && <p style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center' }}>No upcoming events.</p>}
+              {events.filter(e => parseISO(e.start_date) >= new Date()).length === 0 && <p style={{ fontSize: 12, color: 'var(--text-subtle)', textAlign: 'center' }}>No upcoming events.</p>}
             </div>
           </div>
         </div>

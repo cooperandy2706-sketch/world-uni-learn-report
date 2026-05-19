@@ -25,25 +25,25 @@ const CATEGORY_META: Record<BillCategory, { label: string; color: string; icon: 
   uniform: { label: 'Uniform', color: '#8b5cf6', icon: ShoppingBag },
   admission_fee: { label: 'Admission Fee', color: '#f59e0b', icon: GraduationCap },
   scholarship: { label: 'Scholarship', color: '#10b981', icon: Gift },
-  other: { label: 'Other', color: '#6b7280', icon: MoreHorizontal },
+  other: { label: 'Other', color: 'var(--text-muted)', icon: MoreHorizontal },
 }
 
 const SUPPLY_CATEGORY_META: Record<string, { label: string; color: string; icon: React.ComponentType<any> }> = {
   textbook: { label: 'Textbooks', color: '#3b82f6', icon: BookOpen },
   stationery: { label: 'Stationery', color: '#8b5cf6', icon: ShoppingBag },
   uniform: { label: 'Uniform / Kits', color: '#f59e0b', icon: GraduationCap },
-  other: { label: 'Other Supplies', color: '#6b7280', icon: MoreHorizontal },
+  other: { label: 'Other Supplies', color: 'var(--text-muted)', icon: MoreHorizontal },
 }
 
 const STATUS_META: Record<string, { label: string; color: string; bg: string }> = {
-  enquiry: { label: 'Enquiry', color: '#6b7280', bg: 'rgba(107,114,128,0.12)' },
+  enquiry: { label: 'Enquiry', color: 'var(--text-muted)', bg: 'rgba(107,114,128,0.12)' },
   applied: { label: 'Applied', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
   admitted: { label: 'Admitted', color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
   rejected: { label: 'Rejected', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' },
   waitlisted: { label: 'Waitlisted', color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
   pending: { label: 'Pending', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
   reviewing: { label: 'Reviewing', color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
-  deferred: { label: 'Deferred', color: '#6b7280', bg: 'rgba(107,114,128,0.12)' },
+  deferred: { label: 'Deferred', color: 'var(--text-muted)', bg: 'rgba(107,114,128,0.12)' },
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -108,14 +108,14 @@ function Modal({ title, onClose, children, wide }: any) {
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24
     }}>
       <div style={{
-        background: '#fff', borderRadius: 20, width: '100%',
+        background: 'var(--bg-card)', borderRadius: 20, width: '100%',
         maxWidth: wide ? 860 : 560, maxHeight: '90vh', overflow: 'hidden',
         display: 'flex', flexDirection: 'column',
         boxShadow: '0 25px 60px rgba(0,0,0,0.25)'
       }}>
         <div style={{ padding: '20px 24px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#1e0646' }}>{title}</h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}><X size={20} /></button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={20} /></button>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: 24 }}>{children}</div>
       </div>
@@ -128,7 +128,7 @@ function Modal({ title, onClose, children, wide }: any) {
 function Field({ label, children, required }: any) {
   return (
     <div style={{ marginBottom: 16 }}>
-      <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+      <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>
         {label}{required && <span style={{ color: '#ef4444' }}> *</span>}
       </label>
       {children}
@@ -137,7 +137,7 @@ function Field({ label, children, required }: any) {
 }
 
 const inputStyle: React.CSSProperties = {
-  width: '100%', padding: '9px 12px', borderRadius: 10, border: '1.5px solid #e5e7eb',
+  width: '100%', padding: '9px 12px', borderRadius: 10, border: '1.5px solid var(--border-color)',
   fontSize: 14, outline: 'none', fontFamily: 'inherit', background: '#fafafa',
   boxSizing: 'border-box', transition: 'border-color 0.2s'
 }
@@ -158,7 +158,7 @@ function Toast({ message, type, onClose }: { message: string, type: 'success' | 
 
   return (
     <div style={{
-      padding: '12px 20px', borderRadius: 12, background: '#fff',
+      padding: '12px 20px', borderRadius: 12, background: 'var(--bg-card)',
       boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
       display: 'flex', alignItems: 'center', gap: 12,
       border: `1.5px solid ${type === 'success' ? '#10b981' : '#ef4444'}`,
@@ -169,7 +169,7 @@ function Toast({ message, type, onClose }: { message: string, type: 'success' | 
         width: 10, height: 10, borderRadius: '50%',
         background: type === 'success' ? '#10b981' : '#ef4444'
       }} />
-      <span style={{ fontSize: 13, fontWeight: 700, color: '#1f2937' }}>{message}</span>
+      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{message}</span>
     </div>
   )
 }
@@ -205,7 +205,7 @@ function CrossTabBanner({ mode, otherTotal, otherCount, selClass, classes, onSwi
             ? `${otherCount} textbook/stationery item${otherCount !== 1 ? 's' : ''} linked to ${className}`
             : `Fee schedule for ${className} totals ${otherTotal !== null ? GHS(otherTotal) : '—'} (compulsory)`}
         </span>
-        <span style={{ fontSize: 12, color: '#6b7280', marginLeft: 8 }}>
+        <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 8 }}>
           {isBills
             ? otherTotal !== null && otherTotal > 0 ? `— est. supplies cost ${GHS(otherTotal)}` : ''
             : ` · ${otherCount} bill item${otherCount !== 1 ? 's' : ''}`}
@@ -354,8 +354,8 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
           { label: 'Total Bill Items', value: items.length, color: '#10b981' },
           { label: 'Est. Supplies Cost', value: suppliesEstimate > 0 ? GHS(suppliesEstimate) : '—', color: '#3b82f6' },
         ].map(s => (
-          <div key={s.label} style={{ flex: 1, minWidth: 140, background: '#fafafa', border: '1.5px solid #e5e7eb', borderRadius: 14, padding: '14px 18px' }}>
-            <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>{s.label}</div>
+          <div key={s.label} style={{ flex: 1, minWidth: 140, background: '#fafafa', border: '1.5px solid var(--border-color)', borderRadius: 14, padding: '14px 18px' }}>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{s.label}</div>
             <div style={{ fontSize: 20, fontWeight: 800, color: s.color, marginTop: 4 }}>{s.value}</div>
           </div>
         ))}
@@ -368,13 +368,13 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
             <DollarSign size={16} color="#3b82f6" />
             <span style={{ fontWeight: 700, fontSize: 14, color: '#1d4ed8' }}>School Fee Structure</span>
             <span style={{ fontSize: 11, color: '#2563eb', background: '#dbeafe', padding: '2px 10px', borderRadius: 99, fontWeight: 700 }}>⟳ Synced from Bursar System</span>
-            <span style={{ marginLeft: 'auto', fontSize: 12, color: '#374151', fontWeight: 600 }}>{(feeStructures as any[]).length} fee{(feeStructures as any[]).length !== 1 ? 's' : ''}</span>
+            <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>{(feeStructures as any[]).length} fee{(feeStructures as any[]).length !== 1 ? 's' : ''}</span>
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#f9fafb' }}>
+              <tr style={{ background: 'var(--bg-input)' }}>
                 {['Fee Name', 'Term', 'Class Scope', 'Amount'].map(h => (
-                  <th key={h} style={{ padding: '9px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>{h}</th>
+                  <th key={h} style={{ padding: '9px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -382,11 +382,11 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
               {(feeStructures as any[]).map((f: any) => (
                 <tr key={f.id} style={{ borderTop: '1px solid #f0f0f0' }}>
                   <td style={{ padding: '11px 16px', fontWeight: 600, fontSize: 14 }}>{f.fee_name}</td>
-                  <td style={{ padding: '11px 16px', fontSize: 13, color: '#6b7280' }}>{f.term?.name || '—'}</td>
+                  <td style={{ padding: '11px 16px', fontSize: 13, color: 'var(--text-muted)' }}>{f.term?.name || '—'}</td>
                   <td style={{ padding: '11px 16px' }}>
                     {f.class_id
                       ? <span style={{ background: '#eff6ff', color: '#2563eb', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 99 }}>{f.class?.name || f.class?.name || classes.find((c: any) => c.id === f.class_id)?.name || 'Class'}</span>
-                      : <span style={{ color: '#9ca3af', fontSize: 12 }}>All Classes</span>}
+                      : <span style={{ color: 'var(--text-subtle)', fontSize: 12 }}>All Classes</span>}
                   </td>
                   <td style={{ padding: '11px 16px', fontWeight: 700, color: '#1e0646', fontSize: 14 }}>{GHS(f.amount)}</td>
                 </tr>
@@ -407,19 +407,19 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
         const Icon = meta.icon
         const subtotal = catItems.reduce((s, i) => !i.is_optional ? s + Number(i.amount) : s, 0)
         return (
-          <div key={cat} style={{ marginBottom: 20, border: '1.5px solid #e5e7eb', borderRadius: 16, overflow: 'hidden' }}>
-            <div style={{ padding: '12px 18px', background: `${meta.color}0f`, borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div key={cat} style={{ marginBottom: 20, border: '1.5px solid var(--border-color)', borderRadius: 16, overflow: 'hidden' }}>
+            <div style={{ padding: '12px 18px', background: `${meta.color}0f`, borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: 10 }}>
               <Icon size={16} color={meta.color} />
               <span style={{ fontWeight: 700, fontSize: 14, color: meta.color }}>{meta.label}</span>
-              <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 700, color: '#374151' }}>
+              <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>
                 {GHS(subtotal)} (compulsory)
               </span>
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: '#f9fafb' }}>
+                <tr style={{ background: 'var(--bg-input)' }}>
                   {['Item Name', 'Description', 'Amount', 'Optional', ''].map(h => (
-                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>{h}</th>
+                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -427,7 +427,7 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
                 {catItems.map((item: any) => (
                   <tr key={item.id} style={{ borderTop: '1px solid #f0f0f0' }}>
                     <td style={{ padding: '12px 16px', fontWeight: 600, fontSize: 14 }}>{item.item_name}</td>
-                    <td style={{ padding: '12px 16px', fontSize: 13, color: '#6b7280' }}>{item.description || '—'}</td>
+                    <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-muted)' }}>{item.description || '—'}</td>
                     <td style={{ padding: '12px 16px', fontWeight: 700, color: '#1e0646', fontSize: 14 }}>{GHS(item.amount)}</td>
                     <td style={{ padding: '12px 16px' }}>
                       {item.is_optional
@@ -449,7 +449,7 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
       })}
 
       {!items.length && (
-        <div style={{ textAlign: 'center', padding: 60, color: '#6b7280' }}>
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>
           <DollarSign size={40} style={{ opacity: 0.3, marginBottom: 12 }} />
           <p style={{ fontSize: 15, fontWeight: 600 }}>No bill items yet. Add items to build the fee schedule.</p>
         </div>
@@ -475,7 +475,7 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
           </Field>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
             <input type="checkbox" id="opt" checked={!!form.is_optional} onChange={e => setForm(p => ({ ...p, is_optional: e.target.checked }))} style={{ width: 16, height: 16 }} />
-            <label htmlFor="opt" style={{ fontSize: 14, fontWeight: 600, color: '#374151', cursor: 'pointer' }}>Mark as Optional</label>
+            <label htmlFor="opt" style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer' }}>Mark as Optional</label>
           </div>
           <button
             onClick={() => saveMutation.mutate(form as BillItem)}
@@ -520,12 +520,12 @@ function ScholarshipsSection({ schoolId }: { schoolId: string }) {
           <Plus size={14} /> Add
         </button>
       </div>
-      {scholarships.length === 0 && <div style={{ padding: 32, textAlign: 'center', color: '#6b7280', fontSize: 14 }}>No scholarships configured</div>}
+      {scholarships.length === 0 && <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>No scholarships configured</div>}
       {scholarships.map((s: any) => (
         <div key={s.id} style={{ padding: '14px 18px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 14 }}>{s.name}</div>
-            <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{s.description}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{s.description}</div>
           </div>
           <span style={{ padding: '3px 12px', borderRadius: 99, fontSize: 11, fontWeight: 700, background: s.type === 'full' ? '#d1fae5' : '#fef3c7', color: s.type === 'full' ? '#059669' : '#d97706' }}>
             {s.type === 'full' ? 'Full' : `${s.discount_pct}% Off`}
@@ -611,7 +611,7 @@ function EnquiriesTab({ schoolId, classes, academicYears }: any) {
       <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
         {[
           { status: '', label: 'All', count: enquiries.length, color: '#1e0646' },
-          { status: 'enquiry', label: 'Enquiries', count: enquiries.filter((e: any) => e.status === 'enquiry').length, color: '#6b7280' },
+          { status: 'enquiry', label: 'Enquiries', count: enquiries.filter((e: any) => e.status === 'enquiry').length, color: 'var(--text-muted)' },
           { status: 'applied', label: 'Applied', count: enquiries.filter((e: any) => e.status === 'applied').length, color: '#f59e0b' },
           { status: 'admitted', label: 'Admitted', count: enquiries.filter((e: any) => e.status === 'admitted').length, color: '#10b981' },
           { status: 'rejected', label: 'Rejected', count: enquiries.filter((e: any) => e.status === 'rejected').length, color: '#ef4444' },
@@ -619,14 +619,14 @@ function EnquiriesTab({ schoolId, classes, academicYears }: any) {
           <button key={s.status} onClick={() => setStatusFilter(s.status as any)}
             style={{ flex: 1, minWidth: 110, padding: '12px 10px', borderRadius: 14, border: `2px solid ${statusFilter === s.status ? s.color : '#e5e7eb'}`, background: statusFilter === s.status ? `${s.color}11` : '#fff', cursor: 'pointer', textAlign: 'center' }}>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.count}</div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', marginTop: 2 }}>{s.label}</div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginTop: 2 }}>{s.label}</div>
           </button>
         ))}
       </div>
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
         <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+          <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-subtle)' }} />
           <input style={{ ...inputStyle, paddingLeft: 36 }} value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, parent or phone…" />
         </div>
         <button onClick={() => { setEditing(null); setForm({ status: 'enquiry', dismissed_from_prev: false }); setShowForm(true) }}
@@ -635,12 +635,12 @@ function EnquiriesTab({ schoolId, classes, academicYears }: any) {
         </button>
       </div>
 
-      <div style={{ border: '1.5px solid #e5e7eb', borderRadius: 14, overflow: 'hidden' }}>
+      <div style={{ border: '1.5px solid var(--border-color)', borderRadius: 14, overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ background: '#f9fafb' }}>
+            <tr style={{ background: 'var(--bg-input)' }}>
               {['Student', 'Parent / Contact', 'Class Applied', 'Source Info', 'Status', ''].map(h => (
-                <th key={h} style={{ padding: '11px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>{h}</th>
+                <th key={h} style={{ padding: '11px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -649,16 +649,16 @@ function EnquiriesTab({ schoolId, classes, academicYears }: any) {
               <tr key={e.id} style={{ borderTop: '1px solid #f0f0f0' }}>
                 <td style={{ padding: '13px 14px' }}>
                   <div style={{ fontWeight: 700, fontSize: 14 }}>{e.student_name}</div>
-                  {e.date_of_birth && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{e.date_of_birth}</div>}
+                  {e.date_of_birth && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{e.date_of_birth}</div>}
                   {e.dismissed_from_prev && <span style={{ fontSize: 10, color: '#ef4444', fontWeight: 700, background: '#fef2f2', padding: '1px 6px', borderRadius: 99, marginTop: 3, display: 'inline-block' }}>⚠ Dismissed</span>}
                 </td>
                 <td style={{ padding: '13px 14px' }}>
                   <div style={{ fontWeight: 600, fontSize: 13 }}>{e.parent_name}</div>
                   <div style={{ fontSize: 12, color: '#3b82f6', marginTop: 2 }}>{e.parent_phone}</div>
-                  {e.parent_email && <div style={{ fontSize: 11, color: '#6b7280' }}>{e.parent_email}</div>}
+                  {e.parent_email && <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{e.parent_email}</div>}
                 </td>
                 <td style={{ padding: '13px 14px', fontSize: 13, fontWeight: 600 }}>{e.classes?.name || '—'}</td>
-                <td style={{ padding: '13px 14px', fontSize: 12, color: '#6b7280' }}>
+                <td style={{ padding: '13px 14px', fontSize: 12, color: 'var(--text-muted)' }}>
                   {e.previous_school ? <div>Prev: {e.previous_school}</div> : null}
                   {e.scholarships?.name ? <div style={{ color: '#10b981', fontWeight: 600 }}>🎓 {e.scholarships.name}</div> : null}
                 </td>
@@ -673,7 +673,7 @@ function EnquiriesTab({ schoolId, classes, academicYears }: any) {
             ))}
           </tbody>
         </table>
-        {!filtered.length && <div style={{ padding: 48, textAlign: 'center', color: '#6b7280' }}>No records match your search.</div>}
+        {!filtered.length && <div style={{ padding: 48, textAlign: 'center', color: 'var(--text-muted)' }}>No records match your search.</div>}
       </div>
 
       {showForm && (
@@ -693,15 +693,15 @@ function EnquiriesTab({ schoolId, classes, academicYears }: any) {
                 {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </Field></div>
-            <div style={{ gridColumn: '1/-1', borderTop: '1.5px dashed #e5e7eb', paddingTop: 16, marginTop: 4 }}>
-              <p style={{ margin: '0 0 12px', fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Parent / Guardian</p>
+            <div style={{ gridColumn: '1/-1', borderTop: '1.5px dashed var(--border-color)', paddingTop: 16, marginTop: 4 }}>
+              <p style={{ margin: '0 0 12px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Parent / Guardian</p>
             </div>
             <div><Field label="Parent/Guardian Name" required><input style={inputStyle} value={form.parent_name || ''} onChange={e => setForm(p => ({ ...p, parent_name: e.target.value }))} /></Field></div>
             <div><Field label="Phone Number" required><input style={inputStyle} value={form.parent_phone || ''} onChange={e => setForm(p => ({ ...p, parent_phone: e.target.value }))} /></Field></div>
             <div><Field label="Email"><input style={inputStyle} value={form.parent_email || ''} onChange={e => setForm(p => ({ ...p, parent_email: e.target.value }))} /></Field></div>
             <div><Field label="Address"><input style={inputStyle} value={form.parent_address || ''} onChange={e => setForm(p => ({ ...p, parent_address: e.target.value }))} /></Field></div>
-            <div style={{ gridColumn: '1/-1', borderTop: '1.5px dashed #e5e7eb', paddingTop: 16, marginTop: 4 }}>
-              <p style={{ margin: '0 0 12px', fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Previous School</p>
+            <div style={{ gridColumn: '1/-1', borderTop: '1.5px dashed var(--border-color)', paddingTop: 16, marginTop: 4 }}>
+              <p style={{ margin: '0 0 12px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Previous School</p>
             </div>
             <div><Field label="Previous School Name"><input style={inputStyle} value={form.previous_school || ''} onChange={e => setForm(p => ({ ...p, previous_school: e.target.value }))} /></Field></div>
             <div><Field label="Reason for Leaving"><input style={inputStyle} value={form.reason_for_leaving || ''} onChange={e => setForm(p => ({ ...p, reason_for_leaving: e.target.value }))} /></Field></div>
@@ -788,12 +788,12 @@ function AdmissionFormTab({ schoolId, classes, academicYears, school }: any) {
         </button>
       </div>
 
-      <div style={{ border: '1.5px solid #e5e7eb', borderRadius: 14, overflow: 'hidden' }}>
+      <div style={{ border: '1.5px solid var(--border-color)', borderRadius: 14, overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ background: '#f9fafb' }}>
+            <tr style={{ background: 'var(--bg-input)' }}>
               {['App No', 'Student Name', 'Class', 'Status', 'Date', 'Actions'].map(h => (
-                <th key={h} style={{ padding: '11px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>{h}</th>
+                <th key={h} style={{ padding: '11px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -803,11 +803,11 @@ function AdmissionFormTab({ schoolId, classes, academicYears, school }: any) {
                 <td style={{ padding: '12px 14px', fontWeight: 700, fontSize: 13, color: '#1e0646' }}>{a.application_no}</td>
                 <td style={{ padding: '12px 14px' }}>
                   <div style={{ fontWeight: 700, fontSize: 14 }}>{a.student_first_name} {a.student_last_name}</div>
-                  <div style={{ fontSize: 11, color: '#6b7280' }}>{a.gender}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{a.gender}</div>
                 </td>
                 <td style={{ padding: '12px 14px', fontSize: 13 }}>{a.classes?.name || '—'}</td>
                 <td style={{ padding: '12px 14px' }}><StatusBadge status={a.status} /></td>
-                <td style={{ padding: '12px 14px', fontSize: 12, color: '#6b7280' }}>{new Date(a.created_at).toLocaleDateString()}</td>
+                <td style={{ padding: '12px 14px', fontSize: 12, color: 'var(--text-muted)' }}>{new Date(a.created_at).toLocaleDateString()}</td>
                 <td style={{ padding: '12px 14px' }}>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button onClick={() => setViewApp(a)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#10b981' }}><Eye size={15} /></button>
@@ -820,7 +820,7 @@ function AdmissionFormTab({ schoolId, classes, academicYears, school }: any) {
             ))}
           </tbody>
         </table>
-        {!applications.length && <div style={{ padding: 48, textAlign: 'center', color: '#6b7280' }}>No applications recorded yet.</div>}
+        {!applications.length && <div style={{ padding: 48, textAlign: 'center', color: 'var(--text-muted)' }}>No applications recorded yet.</div>}
       </div>
 
       {showForm && (
@@ -900,8 +900,8 @@ function AdmissionFormTab({ schoolId, classes, academicYears, school }: any) {
               ['Scholarship', viewApp.scholarships?.name || 'None'],
               ['Status', viewApp.status],
             ].map(([k, v]) => (
-              <div key={k} style={{ background: '#f9fafb', borderRadius: 10, padding: '10px 14px' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 4 }}>{k}</div>
+              <div key={k} style={{ background: 'var(--bg-input)', borderRadius: 10, padding: '10px 14px' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>{k}</div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{v}</div>
               </div>
             ))}
@@ -917,8 +917,8 @@ function AdmissionFormTab({ schoolId, classes, academicYears, school }: any) {
 
 function SectionHeader({ children }: any) {
   return (
-    <div style={{ gridColumn: '1/-1', borderTop: '1.5px dashed #e5e7eb', paddingTop: 16, marginTop: 8, marginBottom: 4 }}>
-      <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>{children}</p>
+    <div style={{ gridColumn: '1/-1', borderTop: '1.5px dashed var(--border-color)', paddingTop: 16, marginTop: 8, marginBottom: 4 }}>
+      <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>{children}</p>
     </div>
   )
 }
@@ -1083,8 +1083,8 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
           { label: 'Optional', value: allSupplies.filter((i: any) => !i.is_required).length, color: '#f59e0b' },
           { label: 'Est. Supplies Cost', value: estimatedTotal > 0 ? GHS(estimatedTotal) : '—', color: '#3b82f6' },
         ].map(s => (
-          <div key={s.label} style={{ flex: 1, minWidth: 140, background: '#fafafa', border: '1.5px solid #e5e7eb', borderRadius: 14, padding: '14px 18px' }}>
-            <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>{s.label}</div>
+          <div key={s.label} style={{ flex: 1, minWidth: 140, background: '#fafafa', border: '1.5px solid var(--border-color)', borderRadius: 14, padding: '14px 18px' }}>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{s.label}</div>
             <div style={{ fontSize: 20, fontWeight: 800, color: s.color, marginTop: 4 }}>{s.value}</div>
           </div>
         ))}
@@ -1097,7 +1097,7 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
             <button
               key={c.id}
               onClick={() => onClassChange(c.id)}
-              style={{ padding: '6px 14px', borderRadius: 99, border: '1.5px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#374151' }}
+              style={{ padding: '6px 14px', borderRadius: 99, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--text-main)' }}
             >
               {c.name} <span style={{ color: '#3b82f6', marginLeft: 4 }}>{c.count}</span>
             </button>
@@ -1110,19 +1110,19 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
         const meta = SUPPLY_CATEGORY_META[cat]
         const Icon = meta.icon
         return (
-          <div key={cat} style={{ marginBottom: 20, border: '1.5px solid #e5e7eb', borderRadius: 16, overflow: 'hidden' }}>
-            <div style={{ padding: '12px 18px', background: `${meta.color}0f`, borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div key={cat} style={{ marginBottom: 20, border: '1.5px solid var(--border-color)', borderRadius: 16, overflow: 'hidden' }}>
+            <div style={{ padding: '12px 18px', background: `${meta.color}0f`, borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: 10 }}>
               <Icon size={16} color={meta.color} />
               <span style={{ fontWeight: 700, fontSize: 14, color: meta.color }}>{meta.label}</span>
-              <span style={{ marginLeft: 'auto', fontSize: 12, color: '#6b7280', fontWeight: 600 }}>
+              <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>
                 {catItems.length} item{catItems.length !== 1 ? 's' : ''}
               </span>
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: '#f9fafb' }}>
+                <tr style={{ background: 'var(--bg-input)' }}>
                   {['Item', 'Class', 'Qty & Unit', 'Est. Price', 'Notes', 'Required', ''].map(h => (
-                    <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>{h}</th>
+                    <th key={h} style={{ padding: '9px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -1131,18 +1131,18 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
                   <tr key={item.id} style={{ borderTop: '1px solid #f0f0f0' }}>
                     <td style={{ padding: '12px 14px' }}>
                       <div style={{ fontWeight: 700, fontSize: 14 }}>{item.item_name}</div>
-                      {item.description && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{item.description}</div>}
+                      {item.description && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{item.description}</div>}
                     </td>
                     <td style={{ padding: '12px 14px', fontSize: 13 }}>
                       {item.classes?.name
                         ? <span style={{ background: '#eff6ff', color: '#2563eb', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 99 }}>{item.classes.name}</span>
-                        : <span style={{ color: '#9ca3af', fontSize: 12 }}>All classes</span>}
+                        : <span style={{ color: 'var(--text-subtle)', fontSize: 12 }}>All classes</span>}
                     </td>
                     <td style={{ padding: '12px 14px', fontSize: 14, fontWeight: 600 }}>{item.quantity} {item.unit}</td>
                     <td style={{ padding: '12px 14px', fontSize: 13 }}>
                       {(item.unit_price !== null && item.unit_price !== undefined) ? GHS(item.unit_price) : <span style={{ color: '#d1d5db' }}>—</span>}
                     </td>
-                    <td style={{ padding: '12px 14px', fontSize: 12, color: '#6b7280', maxWidth: 180 }}>{item.supplier_note || '—'}</td>
+                    <td style={{ padding: '12px 14px', fontSize: 12, color: 'var(--text-muted)', maxWidth: 180 }}>{item.supplier_note || '—'}</td>
                     <td style={{ padding: '12px 14px' }}>
                       {item.is_required
                         ? <span style={{ fontSize: 11, color: '#10b981', fontWeight: 700, background: '#d1fae5', padding: '2px 8px', borderRadius: 99 }}>Required</span>
@@ -1165,10 +1165,10 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
       })}
 
       {!allSupplies.length && (
-        <div style={{ textAlign: 'center', padding: 60, color: '#6b7280' }}>
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>
           <BookOpen size={40} style={{ opacity: 0.3, marginBottom: 12 }} />
           <p style={{ fontSize: 15, fontWeight: 600 }}>No items yet. Add textbooks and stationery for each class.</p>
-          <p style={{ fontSize: 13, marginTop: 6, color: '#9ca3af' }}>Select a class above and start adding items to generate a parent packing list.</p>
+          <p style={{ fontSize: 13, marginTop: 6, color: 'var(--text-subtle)' }}>Select a class above and start adding items to generate a parent packing list.</p>
         </div>
       )}
 
@@ -1233,7 +1233,7 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, marginTop: 4 }}>
             <input type="checkbox" id="required-supply" checked={!!form.is_required} onChange={e => setForm(p => ({ ...p, is_required: e.target.checked }))} style={{ width: 16, height: 16 }} />
-            <label htmlFor="required-supply" style={{ fontSize: 14, fontWeight: 600, color: '#374151', cursor: 'pointer' }}>Mark as Required (bold on parent list)</label>
+            <label htmlFor="required-supply" style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer' }}>Mark as Required (bold on parent list)</label>
           </div>
           <button onClick={() => saveMutation.mutate(form as SchoolSupply)} disabled={saveMutation.isPending || !form.item_name || !form.quantity}
             style={{ width: '100%', padding: '12px', background: '#1e0646', color: '#fff', border: 'none', borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
@@ -1928,7 +1928,7 @@ export default function AdminAdmissions() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 4, background: '#f3f4f6', padding: 5, borderRadius: 14, marginBottom: 28, width: 'fit-content', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 4, background: 'var(--bg-hover)', padding: 5, borderRadius: 14, marginBottom: 28, width: 'fit-content', flexWrap: 'wrap' }}>
         {TABS.map(({ id, label, icon: Icon }) => (
           <button key={id} onClick={() => setActiveTab(id)}
             style={{

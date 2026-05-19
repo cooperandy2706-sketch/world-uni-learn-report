@@ -134,11 +134,11 @@ export default function DataPrivacyPage() {
 
       <div style={{ display: 'grid', gap: 24 }}>
         {/* Core Processing */}
-        <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
             <div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 4 }}>Core Data Processing</h3>
-              <p style={{ fontSize: 14, color: '#6b7280', maxWidth: 500 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>Core Data Processing</h3>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', maxWidth: 500 }}>
                 Consent to process your basic personal data required for educational and administrative purposes (e.g., grades, attendance, billing).
               </p>
             </div>
@@ -158,11 +158,11 @@ export default function DataPrivacyPage() {
         </div>
 
         {/* Media & Photos */}
-        <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 4 }}>Media & Photography</h3>
-              <p style={{ fontSize: 14, color: '#6b7280', maxWidth: 500 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>Media & Photography</h3>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', maxWidth: 500 }}>
                 Consent to use your (or your ward's) image/video in internal school news, Nexora TV, and marketing materials.
               </p>
             </div>
@@ -177,11 +177,11 @@ export default function DataPrivacyPage() {
         </div>
 
         {/* Marketing */}
-        <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 4 }}>Marketing Communications</h3>
-              <p style={{ fontSize: 14, color: '#6b7280', maxWidth: 500 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>Marketing Communications</h3>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', maxWidth: 500 }}>
                 Receive promotional emails, alumni newsletters, and updates not directly related to academic requirements.
               </p>
             </div>
@@ -196,14 +196,14 @@ export default function DataPrivacyPage() {
         </div>
 
         {/* Right to be Forgotten */}
-        <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #fee2e2' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #fee2e2' }}>
           <div style={{ display: 'flex', gap: 16 }}>
             <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Trash2 size={24} color="#dc2626" />
             </div>
             <div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: '#991b1b', marginBottom: 4 }}>Right to be Forgotten</h3>
-              <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 16 }}>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
                 Under GDPR and POPIA, you have the right to request the deletion or anonymization of your personal data. Requesting this will notify school administrators to process the removal of your personal identifiers from the system.
               </p>
               

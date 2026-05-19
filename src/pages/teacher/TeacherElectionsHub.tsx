@@ -114,17 +114,17 @@ export default function TeacherElectionsHub() {
 
   const styles = {
     btn: { padding: '10px 20px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(109,40,217,0.2)' },
-    btnOutline: { padding: '10px 20px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' },
-    card: { background: '#fff', borderRadius: 16, padding: 28, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #f3f4f6', transition: 'all 0.3s' },
+    btnOutline: { padding: '10px 20px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' },
+    card: { background: 'var(--bg-card)', borderRadius: 16, padding: 28, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid var(--border-light)', transition: 'all 0.3s' },
     tabBtn: (active: boolean) => ({ padding: '10px 20px', borderRadius: 12, border: 'none', background: active ? '#f5f3ff' : 'transparent', color: active ? '#6d28d9' : '#6b7280', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' })
   }
 
   if (!activeElection) {
     return (
-      <div style={{ padding: 60, textAlign: 'center', background: '#fff', borderRadius: 16, border: '1px solid #f3f4f6', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', animation: '_fadeIn 0.4s ease' }}>
+      <div style={{ padding: 60, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 16, border: '1px solid var(--border-light)', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', animation: '_fadeIn 0.4s ease' }}>
         <style>{`@keyframes _fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
-        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: '#111827' }}>No Active Elections</h2>
-        <p style={{ color: '#6b7280', fontSize: 16 }}>There are currently no active elections running.</p>
+        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: 'var(--text-main)' }}>No Active Elections</h2>
+        <p style={{ color: 'var(--text-muted)', fontSize: 16 }}>There are currently no active elections running.</p>
       </div>
     )
   }
@@ -144,11 +144,11 @@ export default function TeacherElectionsHub() {
         .tab-content { animation: _slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
       `}</style>
       <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111827', margin: 0 }}>Election Hub</h1>
-        <p style={{ color: '#6b7280', marginTop: 4, fontSize: 14 }}>{activeElection.title} — Teacher Access</p>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Election Hub</h1>
+        <p style={{ color: 'var(--text-muted)', marginTop: 4, fontSize: 14 }}>{activeElection.title} — Teacher Access</p>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 32, background: '#fff', padding: 8, borderRadius: 12, border: '1px solid #f3f4f6', width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 32, background: 'var(--bg-card)', padding: 8, borderRadius: 12, border: '1px solid var(--border-light)', width: 'fit-content' }}>
         <button style={styles.tabBtn(tab === 'nominate')} onClick={() => setTab('nominate')}>Stand for Position</button>
         <button style={styles.tabBtn(tab === 'vote')} onClick={() => setTab('vote')}>Cast Vote</button>
       </div>
@@ -170,7 +170,7 @@ export default function TeacherElectionsHub() {
               {myNominations.map(nom => {
                 const pos = elPositions.find(p => p.id === nom.position_id)
                 return (
-                  <div key={nom.id} style={{ padding: 16, border: '1px solid #e5e7eb', borderRadius: 8 }}>
+                  <div key={nom.id} style={{ padding: 16, border: '1px solid var(--border-color)', borderRadius: 8 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                       <div style={{ fontWeight: 600, fontSize: 15 }}>{pos?.title}</div>
                       <span style={{ 
@@ -181,10 +181,10 @@ export default function TeacherElectionsHub() {
                         {nom.status}
                       </span>
                     </div>
-                    <div style={{ fontSize: 13, color: '#374151' }}>{nom.manifesto}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-main)' }}>{nom.manifesto}</div>
                     {nom.vet_notes && (
-                      <div style={{ marginTop: 12, padding: 12, background: '#f9fafb', borderRadius: 6, fontSize: 13, border: '1px solid #f3f4f6' }}>
-                        <strong style={{ color: '#6b7280' }}>Staff Notes:</strong> {nom.vet_notes}
+                      <div style={{ marginTop: 12, padding: 12, background: 'var(--bg-input)', borderRadius: 6, fontSize: 13, border: '1px solid var(--border-light)' }}>
+                        <strong style={{ color: 'var(--text-muted)' }}>Staff Notes:</strong> {nom.vet_notes}
                       </div>
                     )}
                   </div>
@@ -192,7 +192,7 @@ export default function TeacherElectionsHub() {
               })}
             </div>
           ) : (
-            <p style={{ color: '#6b7280', fontSize: 14 }}>You have not submitted any nominations.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>You have not submitted any nominations.</p>
           )}
         </div>
       )}
@@ -208,7 +208,7 @@ export default function TeacherElectionsHub() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
             <div>
               <h2 style={{ fontSize: 18, fontWeight: 600 }}>Cast Your Vote</h2>
-              <p style={{ fontSize: 13, color: '#6b7280' }}>Mark your preferred candidates and click Submit Ballot.</p>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Mark your preferred candidates and click Submit Ballot.</p>
             </div>
             {activeElection.voting_open && (
               <button 
@@ -229,7 +229,7 @@ export default function TeacherElectionsHub() {
 
               return (
                 <div key={pos.id} style={{ ...styles.card, border: myVoteForPos ? '2px solid #16a34a' : (currentSelection ? '2px solid #6d28d9' : '1px solid #f3f4f6') }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, borderBottom: '1px solid #f3f4f6', paddingBottom: 8, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, borderBottom: '1px solid var(--border-light)', paddingBottom: 8, alignItems: 'center' }}>
                     <h3 style={{ fontSize: 16, fontWeight: 600 }}>{pos.title}</h3>
                     {myVoteForPos && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -272,8 +272,8 @@ export default function TeacherElectionsHub() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                               <div>
                                 <div style={{ fontWeight: 600, fontSize: 15 }}>{cand.teacher?.full_name || cand.student?.full_name}</div>
-                                <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>{cand.teacher_id ? 'Teacher Candidate' : 'Student Candidate'}</div>
-                                {cand.manifesto && <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4, lineHeight: 1.5 }}>{cand.manifesto.substring(0, 120)}...</div>}
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>{cand.teacher_id ? 'Teacher Candidate' : 'Student Candidate'}</div>
+                                {cand.manifesto && <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.5 }}>{cand.manifesto.substring(0, 120)}...</div>}
                               </div>
                               {(isVoted || isSelected) && <span style={{ color: isVoted ? '#16a34a' : '#6d28d9', fontSize: 12, fontWeight: 700 }}>{isVoted ? '✅' : '🎯'}</span>}
                             </div>
@@ -282,7 +282,7 @@ export default function TeacherElectionsHub() {
                       })}
                     </div>
                   ) : (
-                    <p style={{ fontSize: 14, color: '#6b7280' }}>No candidates available.</p>
+                    <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>No candidates available.</p>
                   )}
                 </div>
               )
@@ -295,7 +295,7 @@ export default function TeacherElectionsHub() {
       {/* Nominate Modal */}
       {showNominateModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 450 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, width: '100%', maxWidth: 450 }}>
             <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Nominate Yourself</h3>
             
             <div style={{ marginBottom: 16 }}>

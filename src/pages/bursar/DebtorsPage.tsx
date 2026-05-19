@@ -225,8 +225,8 @@ export default function DebtorsPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_dbt_fi .4s ease' }}>
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Debtors & Fee Status</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Consolidated debt tracking — tuition + daily fees · {term?.name ?? 'No active term'}</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Debtors & Fee Status</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Consolidated debt tracking — tuition + daily fees · {term?.name ?? 'No active term'}</p>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={() => navigate(ROUTES.BURSAR_STUDENTS)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', background: '#f5f3ff', color: '#6d28d9', fontSize: 13, fontWeight: 700, cursor: 'pointer', borderBottom: '2px solid #ddd6fe' }}>
@@ -248,18 +248,18 @@ export default function DebtorsPage() {
             { label: 'Total Collected', value: CUR(totalCollected), color: '#16a34a', icon: '💰' },
             { label: 'Outstanding Debt', value: CUR(totalOwed), color: '#dc2626', icon: '📉' },
           ].map(c => (
-            <div key={c.label} style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+            <div key={c.label} style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
               <div style={{ fontSize: 22, marginBottom: 8 }}>{c.icon}</div>
               <div style={{ fontSize: 19, fontWeight: 800, color: c.color, fontFamily: '"Playfair Display",serif' }}>{c.value}</div>
-              <div style={{ fontSize: 11, color: '#6b7280', marginTop: 3, fontWeight: 600 }}>{c.label}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 3, fontWeight: 600 }}>{c.label}</div>
             </div>
           ))}
         </div>
 
         {/* Filters */}
-        <div style={{ background: '#fff', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#6b7280', fontSize: 13 }}><Filter size={14} /> Filters:</div>
-          <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-muted)', fontSize: 13 }}><Filter size={14} /> Filters:</div>
+          <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}>
             <option value="">All Classes</option>
             {(classes as any[]).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
@@ -270,16 +270,16 @@ export default function DebtorsPage() {
               </button>
             ))}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: '#fafafa', marginLeft: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, border: '1.5px solid var(--border-color)', background: '#fafafa', marginLeft: 'auto' }}>
             <Search size={12} color="#9ca3af" />
             <input placeholder="Search student..." value={searchQ} onChange={e => setSearchQ(e.target.value)} style={{ border: 'none', outline: 'none', fontSize: 12, background: 'transparent', fontFamily: '"DM Sans",sans-serif', width: 120 }} />
           </div>
         </div>
 
         {/* Table */}
-        <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
           {filtered.length === 0 ? (
-            <div style={{ padding: '60px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>
+            <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>
               {rows.length === 0 ? 'Select a class or add students to see fee status' : 'No students match this filter'}
             </div>
           ) : (
@@ -303,7 +303,7 @@ export default function DebtorsPage() {
                               ? <CheckCircle2 size={15} color="#16a34a" />
                               : <AlertCircle size={15} color={r.status === 'partial' ? '#d97706' : '#dc2626'} />}
                             <div>
-                              <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', display: 'flex', alignItems: 'center', gap: 5 }}>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 5 }}>
                                 {r.full_name}
                                 {r.scholarship_type && r.scholarship_type !== 'none' && (
                                   <span style={{ fontSize: 9, fontWeight: 800, background: '#f0fdf4', color: '#16a34a', padding: '1px 5px', borderRadius: 99, display: 'inline-flex', alignItems: 'center', gap: 2 }}>

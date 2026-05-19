@@ -27,9 +27,9 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   const [hov, setHov] = useState(false)
   const variants: Record<string, React.CSSProperties> = {
     primary:   { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger:    { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
-    ghost:     { background: hov ? '#f5f3ff' : 'transparent', color: '#6b7280', border: 'none' },
+    ghost:     { background: hov ? '#f5f3ff' : 'transparent', color: 'var(--text-muted)', border: 'none' },
   }
   return (
     <button type={type} form={form} onClick={onClick} disabled={disabled}
@@ -42,7 +42,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
 }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{children}</label>
+  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{children}</label>
 }
 
 function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { error?: string }) {
@@ -52,7 +52,7 @@ function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputEle
       <input {...props}
         onFocus={e => { setF(true); props.onFocus?.(e) }}
         onBlur={e => { setF(false); props.onBlur?.(e) }}
-        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
+        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
       {error && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 3 }}>⚠ {error}</p>}
     </div>
   )
@@ -189,16 +189,16 @@ export default function ClassesPage() {
             { label: 'Avg per Class',   value: avgPerClass,     icon: '📊', color: '#16a34a', bg: '#f0fdf4' },
             { label: 'Total Subjects',  value: subjects.length, icon: '📚', color: '#d97706', bg: '#fffbeb' },
           ].map((s, i) => (
-            <div key={i} style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.4s ease ${i * 0.07}s both` }}>
+            <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.4s ease ${i * 0.07}s both` }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, marginBottom: 8 }}>{s.icon}</div>
-              <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', lineHeight: 1 }}>{s.value}</div>
-              <div style={{ fontSize: 12, color: '#6b7280', marginTop: 3 }}>{s.label}</div>
+              <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', lineHeight: 1 }}>{s.value}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>{s.label}</div>
             </div>
           ))}
         </div>
 
         {/* ── Search ── */}
-        <div style={{ background: '#fff', borderRadius: 14, padding: '12px 16px', border: '1.5px solid #f0eefe', marginBottom: 20 }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '12px 16px', border: '1.5px solid #f0eefe', marginBottom: 20 }}>
           <div style={{ position: 'relative', maxWidth: 340 }}>
             <span style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', fontSize: 15 }}>🔍</span>
             <input placeholder="Search classes…" value={search} onChange={e => setSearch(e.target.value)}
@@ -211,16 +211,16 @@ export default function ClassesPage() {
         {isLoading && (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading classes…</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading classes…</p>
           </div>
         )}
 
         {/* ── Empty ── */}
         {!isLoading && filtered.length === 0 && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>🏫</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>{search ? 'No classes found' : 'No classes yet'}</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>{search ? 'Try a different search.' : 'Create your first class to get started.'}</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>{search ? 'No classes found' : 'No classes yet'}</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>{search ? 'Try a different search.' : 'Create your first class to get started.'}</p>
             {!search && <Btn onClick={openCreate}>➕ Add First Class</Btn>}
           </div>
         )}
@@ -238,7 +238,7 @@ export default function ClassesPage() {
 
               return (
                 <div key={cls.id} className="cls-card"
-                  style={{ background: '#fff', borderRadius: 18, border: `1.5px solid ${palette.border}`, padding: 0, boxShadow: '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.22s', animation: `_fadeUp 0.35s ease ${i * 0.06}s both`, overflow: 'hidden', cursor: 'pointer' }}
+                  style={{ background: 'var(--bg-card)', borderRadius: 18, border: `1.5px solid ${palette.border}`, padding: 0, boxShadow: '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.22s', animation: `_fadeUp 0.35s ease ${i * 0.06}s both`, overflow: 'hidden', cursor: 'pointer' }}
                   onClick={() => openDetail(cls)}
                 >
                   {/* Coloured header */}
@@ -261,14 +261,14 @@ export default function ClassesPage() {
                   <div style={{ padding: '16px 20px' }}>
                     {/* Class Teacher */}
                     {classTeacherName ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f3f4f6' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid var(--border-light)' }}>
                         <span style={{ fontSize: 13 }}>👨‍🏫</span>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#374151', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{classTeacherName}</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{classTeacherName}</span>
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f3f4f6' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid var(--border-light)' }}>
                         <span style={{ fontSize: 13, opacity: 0.5 }}>👨‍🏫</span>
-                        <span style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>No Class Teacher</span>
+                        <span style={{ fontSize: 12, color: 'var(--text-subtle)', fontStyle: 'italic' }}>No Class Teacher</span>
                       </div>
                     )}
 
@@ -276,8 +276,8 @@ export default function ClassesPage() {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: fillPct !== null ? 10 : 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <span style={{ fontSize: 14 }}>👥</span>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{studentCount}</span>
-                        <span style={{ fontSize: 12, color: '#6b7280' }}>student{studentCount !== 1 ? 's' : ''}</span>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{studentCount}</span>
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>student{studentCount !== 1 ? 's' : ''}</span>
                       </div>
                       {cls.capacity && (
                         <span style={{ fontSize: 11, fontWeight: 700, color: fillPct! >= 90 ? '#dc2626' : fillPct! >= 70 ? '#d97706' : '#16a34a', background: fillPct! >= 90 ? '#fef2f2' : fillPct! >= 70 ? '#fffbeb' : '#f0fdf4', padding: '2px 8px', borderRadius: 99 }}>
@@ -338,29 +338,29 @@ export default function ClassesPage() {
               <div>
                 <FieldLabel>Department</FieldLabel>
                 <select {...register('department_id')} 
-                  style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid #e5e7eb`, outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', cursor: 'pointer' }}>
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid #e5e7eb`, outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', cursor: 'pointer' }}>
                   <option value="">-- No Department --</option>
                   {(departments as any[]).map((d: any) => (
                     <option key={d.id} value={d.id}>{d.name}</option>
                   ))}
                 </select>
-                <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>Group classes by department for curriculum and grading</p>
+                <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 3 }}>Group classes by department for curriculum and grading</p>
               </div>
               <div>
                 <FieldLabel>Capacity</FieldLabel>
                 <StyledInput {...register('capacity')} type="number" placeholder="e.g. 40" />
-                <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>Maximum number of students in this class</p>
+                <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 3 }}>Maximum number of students in this class</p>
               </div>
               <div style={{ marginTop: 2 }}>
                 <FieldLabel>Class Teacher</FieldLabel>
                 <select {...register('class_teacher_id')} 
-                  style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid #e5e7eb`, outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', cursor: 'pointer' }}>
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid #e5e7eb`, outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', cursor: 'pointer' }}>
                   <option value="">-- No Class Teacher --</option>
                   {(teachers as any[]).map((t: any) => (
                     <option key={t.id} value={t.id}>{t.user?.full_name} {t.staff_id ? `(${t.staff_id})` : ''}</option>
                   ))}
                 </select>
-                <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>The lead teacher for this class (Syncs with portal)</p>
+                <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 3 }}>The lead teacher for this class (Syncs with portal)</p>
               </div>
             </div>
           </form>
@@ -402,7 +402,7 @@ export default function ClassesPage() {
                     <div style={{ fontSize: 20 }}>👨‍🏫</div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Class Teacher</div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{classTeacherName}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{classTeacherName}</div>
                     </div>
                   </div>
                 )}
@@ -416,8 +416,8 @@ export default function ClassesPage() {
                   ].map(({ label, value, icon }) => (
                     <div key={label} style={{ background: '#faf5ff', borderRadius: 10, padding: '12px', textAlign: 'center' }}>
                       <div style={{ fontSize: 20, marginBottom: 4 }}>{icon}</div>
-                      <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 22, fontWeight: 700, color: '#111827' }}>{value}</div>
-                      <div style={{ fontSize: 11, color: '#6b7280' }}>{label}</div>
+                      <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 22, fontWeight: 700, color: 'var(--text-main)' }}>{value}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{label}</div>
                     </div>
                   ))}
                 </div>
@@ -435,7 +435,7 @@ export default function ClassesPage() {
                           <span style={{ fontSize: 11, fontWeight: 600, color: '#5b21b6' }}>{s.full_name.split(' ')[0]}</span>
                         </div>
                       ))}
-                      {studentCount > 8 && <span style={{ fontSize: 11, color: '#9ca3af', alignSelf: 'center' }}>+{studentCount - 8} more</span>}
+                      {studentCount > 8 && <span style={{ fontSize: 11, color: 'var(--text-subtle)', alignSelf: 'center' }}>+{studentCount - 8} more</span>}
                     </div>
                   </div>
                 )}

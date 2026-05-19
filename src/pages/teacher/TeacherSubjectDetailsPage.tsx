@@ -90,7 +90,7 @@ export default function TeacherSubjectDetailsPage() {
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', maxWidth: 1200, margin: '0 auto' }}>
 
-        <button onClick={() => navigate('/teacher/subjects')} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontWeight: 700, cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 99, transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#f3f4f6'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+        <button onClick={() => navigate('/teacher/subjects')} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontWeight: 700, cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 99, transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#f3f4f6'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
           ← Back to Library
         </button>
 
@@ -108,13 +108,13 @@ export default function TeacherSubjectDetailsPage() {
         {isLoading ? (
           <div style={{ padding: '80px', textAlign: 'center' }}>
             <div style={{ width: 40, height: 40, margin: '0 auto 16px', borderRadius: '50%', border: '4px solid #ede9fe', borderTopColor: '#7c3aed', animation: '_spin 1s linear infinite' }} />
-            <div style={{ color: '#9ca3af', fontSize: 14, fontWeight: 600 }}>Syncing Library...</div>
+            <div style={{ color: 'var(--text-subtle)', fontSize: 14, fontWeight: 600 }}>Syncing Library...</div>
           </div>
         ) : resources.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📂</div>
             <h3 className="t-title" style={{ fontSize: 18, marginBottom: 6 }}>No Resources Available</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>There are currently no published study materials for this subject.</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>There are currently no published study materials for this subject.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
@@ -203,7 +203,7 @@ export default function TeacherSubjectDetailsPage() {
         <Modal open={!!activePassage} onClose={() => setActivePassage(null)} title={activePassage?.title} size="lg">
           {activePassage && (
             <div style={{ background: '#f8fafc', padding: '24px 32px', borderRadius: 16, border: '1px solid #e2e8f0', minHeight: '300px', maxHeight: '65vh', overflowY: 'auto' }}>
-              <div style={{ fontSize: 12, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 12 }}>Curriculum Preview (Markdown)</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 12 }}>Curriculum Preview (Markdown)</div>
 
               <div className="markdown-content" style={{ fontFamily: 'Georgia, serif', fontSize: 17, lineHeight: 1.8, color: '#334155' }}>
                 <ReactMarkdown>{activePassage.content}</ReactMarkdown>

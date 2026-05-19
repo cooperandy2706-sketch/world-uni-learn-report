@@ -22,7 +22,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   const [hov, setHov] = useState(false)
   const v: Record<string, React.CSSProperties> = {
     primary:   { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     success:   { background: hov ? '#15803d' : '#16a34a', color: '#fff', border: 'none' },
     ghost:     { background: hov ? '#f5f3ff' : 'transparent', color: '#6d28d9', border: 'none' },
   }
@@ -40,9 +40,9 @@ function StyledInput({ error, label, ...props }: React.InputHTMLAttributes<HTMLI
   const [f, setF] = useState(false)
   return (
     <div>
-      {label && <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{label}</label>}
+      {label && <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{label}</label>}
       <input {...props} onFocus={e => { setF(true); props.onFocus?.(e) }} onBlur={e => { setF(false); props.onBlur?.(e) }}
-        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
+        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
       {error && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 3 }}>⚠ {error}</p>}
     </div>
   )
@@ -103,10 +103,10 @@ export default function AcademicYearsPage() {
             { label: 'Current Year', value: currentYear?.name ?? 'Not set', icon: '⭐', color: '#d97706', bg: '#fffbeb', isText: true },
             { label: 'Completed', value: years.filter((y: any) => !y.is_current).length, icon: '✅', color: '#16a34a', bg: '#f0fdf4' },
           ].map((s, i) => (
-            <div key={i} style={{ background: '#fff', borderRadius: 14, padding: '18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.4s ease ${i * 0.07}s both` }}>
+            <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.4s ease ${i * 0.07}s both` }}>
               <div style={{ width: 38, height: 38, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, marginBottom: 10 }}>{s.icon}</div>
-              <div style={{ fontFamily: (s as any).isText ? '"DM Sans",sans-serif' : '"Playfair Display",serif', fontSize: (s as any).isText ? 15 : 26, fontWeight: 700, color: '#111827', lineHeight: 1.2 }}>{s.value}</div>
-              <div style={{ fontSize: 12, color: '#6b7280', marginTop: 3 }}>{s.label}</div>
+              <div style={{ fontFamily: (s as any).isText ? '"DM Sans",sans-serif' : '"Playfair Display",serif', fontSize: (s as any).isText ? 15 : 26, fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.2 }}>{s.value}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -120,10 +120,10 @@ export default function AcademicYearsPage() {
 
         {/* Empty */}
         {!isLoading && years.length === 0 && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>📅</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No academic years yet</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>Set up your first academic year to get started.</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No academic years yet</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>Set up your first academic year to get started.</p>
             <Btn onClick={() => { reset({}); setModalOpen(true) }}>➕ Add First Year</Btn>
           </div>
         )}
@@ -145,21 +145,21 @@ export default function AcademicYearsPage() {
                   </div>
 
                   {/* Card */}
-                  <div style={{ flex: 1, marginLeft: 16, background: '#fff', borderRadius: 14, padding: '18px 20px', border: `1.5px solid ${y.is_current ? '#f59e0b40' : '#f0eefe'}`, boxShadow: y.is_current ? '0 4px 16px rgba(245,158,11,0.12)' : '0 1px 4px rgba(109,40,217,0.06)', transition: 'all 0.22s' }}>
+                  <div style={{ flex: 1, marginLeft: 16, background: 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: `1.5px solid ${y.is_current ? '#f59e0b40' : '#f0eefe'}`, boxShadow: y.is_current ? '0 4px 16px rgba(245,158,11,0.12)' : '0 1px 4px rgba(109,40,217,0.06)', transition: 'all 0.22s' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                            <span style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827' }}>{y.name}</span>
+                            <span style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>{y.name}</span>
                             {y.is_current && (
                               <span style={{ fontSize: 11, fontWeight: 800, background: 'linear-gradient(135deg,#f59e0b,#fbbf24)', color: '#fff', padding: '2px 9px', borderRadius: 99, boxShadow: '0 2px 6px rgba(245,158,11,0.3)' }}>
                                 CURRENT
                               </span>
                             )}
                           </div>
-                          <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#6b7280' }}>
-                            <span>📅 Start: <strong style={{ color: '#374151' }}>{y.start_date ? formatDate(y.start_date) : 'Not set'}</strong></span>
-                            <span>🏁 End: <strong style={{ color: '#374151' }}>{y.end_date ? formatDate(y.end_date) : 'Not set'}</strong></span>
+                          <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--text-muted)' }}>
+                            <span>📅 Start: <strong style={{ color: 'var(--text-main)' }}>{y.start_date ? formatDate(y.start_date) : 'Not set'}</strong></span>
+                            <span>🏁 End: <strong style={{ color: 'var(--text-main)' }}>{y.end_date ? formatDate(y.end_date) : 'Not set'}</strong></span>
                           </div>
                         </div>
                       </div>

@@ -95,8 +95,8 @@ export default function StudentResourcesPage() {
       `}</style>
 
       <div className="resources-header" style={{ marginBottom: 28 }}>
-        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>Homework & Resources</h1>
-        <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Access your study materials and track upcoming deadlines.</p>
+        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Homework & Resources</h1>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Access your study materials and track upcoming deadlines.</p>
       </div>
 
       <div className="resources-grid">
@@ -129,35 +129,35 @@ export default function StudentResourcesPage() {
                     </div>
                   ))}
                 </div>
-                <Link to={ROUTES.STUDENT_ASSIGNMENTS} style={{ display: 'inline-block', marginTop: 20, background: '#fff', color: '#7c3aed', padding: '12px 24px', borderRadius: 12, fontSize: 13, fontWeight: 800, textDecoration: 'none' }}>Go to Assignments →</Link>
+                <Link to={ROUTES.STUDENT_ASSIGNMENTS} style={{ display: 'inline-block', marginTop: 20, background: 'var(--bg-card)', color: '#7c3aed', padding: '12px 24px', borderRadius: 12, fontSize: 13, fontWeight: 800, textDecoration: 'none' }}>Go to Assignments →</Link>
               </div>
             </div>
           )}
 
           {/* Resources List */}
-          <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden' }}>
             <div className="resources-card-padding" style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 10 }}>
               <FileText size={20} color="#059669" />
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>Study Materials & Resources</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Study Materials & Resources</h3>
             </div>
             
             {resources.length === 0 ? (
               <div style={{ padding: 60, textAlign: 'center' }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>📔</div>
-                <p style={{ fontSize: 14, color: '#9ca3af', margin: 0 }}>No reading materials uploaded yet.</p>
+                <p style={{ fontSize: 14, color: 'var(--text-subtle)', margin: 0 }}>No reading materials uploaded yet.</p>
               </div>
             ) : (
               <div className="resources-card-padding material-grid" style={{ padding: 24, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
                 {resources.map(r => (
-                  <div key={r.id} style={{ border: '1px solid #f1f5f9', borderRadius: 16, padding: 16, transition: 'all 0.2s', background: '#fff' }}>
+                  <div key={r.id} style={{ border: '1px solid #f1f5f9', borderRadius: 16, padding: 16, transition: 'all 0.2s', background: 'var(--bg-card)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                       <div style={{ width: 40, height: 40, borderRadius: 10, background: '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📚</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.title}</div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.title}</div>
                         <div style={{ fontSize: 11, color: '#0891b2', fontWeight: 600 }}>{r.subject?.name}</div>
                       </div>
                     </div>
-                    <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 16px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.5 } as any}>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 16px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.5 } as any}>
                       {r.description || 'Reference material for your class.'}
                     </p>
                     <div style={{ display: 'flex', gap: 8 }}>
@@ -186,8 +186,8 @@ export default function StudentResourcesPage() {
 
         {/* Right Column: Deadlines */}
         <div className="resources-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div style={{ background: '#fff', borderRadius: 24, padding: 24, border: '1.5px solid #f1f5f9' }}>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 24, border: '1.5px solid #f1f5f9' }}>
+            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Clock size={16} color="#7c3aed" /> Upcoming Deadlines
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -201,12 +201,12 @@ export default function StudentResourcesPage() {
                       <span style={{ fontSize: 8, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase' }}>{new Date(a.due_date).toLocaleDateString('en-GH', { month: 'short' })}</span>
                     </div>
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.title}</div>
-                      <div style={{ fontSize: 11, color: '#6b7280' }}>{a.subject?.name}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.title}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{a.subject?.name}</div>
                     </div>
                   </div>
                 ))}
-              {assignments.length === 0 && <p style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', padding: '20px 0' }}>No upcoming deadlines.</p>}
+              {assignments.length === 0 && <p style={{ fontSize: 12, color: 'var(--text-subtle)', textAlign: 'center', padding: '20px 0' }}>No upcoming deadlines.</p>}
             </div>
           </div>
 

@@ -50,7 +50,7 @@ function StatCard({ icon, label, value, color, bg, pulse }: any) {
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: '#fff', borderRadius: 20, padding: 24, border: `1.5px solid ${hov ? color + '40' : '#f1f5f9'}`,
+        background: 'var(--bg-card)', borderRadius: 20, padding: 24, border: `1.5px solid ${hov ? color + '40' : '#f1f5f9'}`,
         boxShadow: hov ? `0 12px 30px ${color}15` : '0 2px 8px rgba(0,0,0,0.02)',
         transition: 'all 0.3s cubic-bezier(.4,0,.2,1)', transform: hov ? 'translateY(-4px)' : 'translateY(0)',
         display: 'flex', flexDirection: 'column', gap: 16, cursor: 'default'
@@ -300,7 +300,7 @@ export default function SuperAdminDashboard() {
             }} 
             style={{ 
               padding: '12px 24px', borderRadius: 14, border: '1.5px solid #e2e8f0', 
-              background: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+              background: 'var(--bg-card)', fontSize: 14, fontWeight: 700, cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 8, transition: 'all 0.2s'
             }}
             onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
@@ -327,7 +327,7 @@ export default function SuperAdminDashboard() {
 
       {/* Pending Billing Approvals */}
       {pendingInvoices.length > 0 && (
-        <div style={{ background: '#fff', borderRadius: 24, border: '1px solid #fde68a', boxShadow: '0 4px 24px rgba(245,158,11,0.05)', overflow: 'hidden', marginBottom: 48 }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1px solid #fde68a', boxShadow: '0 4px 24px rgba(245,158,11,0.05)', overflow: 'hidden', marginBottom: 48 }}>
           <div style={{ padding: '24px 32px', borderBottom: '1.5px solid #fef3c7', background: '#fffbeb', display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 24 }}>💳</span>
             <div>
@@ -361,7 +361,7 @@ export default function SuperAdminDashboard() {
       )}
 
       {/* Management Area */}
-      <div style={{ background: '#fff', borderRadius: 24, border: '1px solid #f1f5f9', boxShadow: '0 4px 24px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1px solid #f1f5f9', boxShadow: '0 4px 24px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
         {/* Filters & Search */}
         <div style={{ padding: '24px 32px', borderBottom: '1.5px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 20 }}>
           <div style={{ display: 'flex', background: '#f8fafc', padding: 4, borderRadius: 12, border: '1px solid #f1f5f9' }}>
@@ -412,7 +412,7 @@ export default function SuperAdminDashboard() {
                   key={school.id}
                   className="row-animate"
                   style={{
-                    background: '#fff', borderRadius: 20, border: '1px solid #e2e8f0', overflow: 'hidden',
+                    background: 'var(--bg-card)', borderRadius: 20, border: '1px solid #e2e8f0', overflow: 'hidden',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.02)', transition: 'all 0.3s cubic-bezier(.4,0,.2,1)',
                     animationDelay: `${i * 0.05}s`
                   }}
@@ -527,7 +527,7 @@ export default function SuperAdminDashboard() {
                        ) : school.status === 'active' ? (
                          <button
                            onClick={() => updateStatus(school.id, 'suspended')}
-                           style={{ padding: '8px 16px', borderRadius: 10, border: '1.5px solid #fee2e2', background: '#fff', color: '#dc2626', fontWeight: 800, fontSize: 12, cursor: 'pointer', transition: 'background 0.2s' }}
+                           style={{ padding: '8px 16px', borderRadius: 10, border: '1.5px solid #fee2e2', background: 'var(--bg-card)', color: '#dc2626', fontWeight: 800, fontSize: 12, cursor: 'pointer', transition: 'background 0.2s' }}
                            onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
                            onMouseLeave={e => e.currentTarget.style.background = '#fff'}
                          >Suspend</button>
@@ -668,7 +668,7 @@ function AiUsageSection() {
   }
 
   return (
-    <div style={{ background: '#fff', borderRadius: 24, border: '1px solid #f1f5f9', padding: '28px 32px', marginBottom: 48, boxShadow: '0 4px 24px rgba(0,0,0,0.02)' }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1px solid #f1f5f9', padding: '28px 32px', marginBottom: 48, boxShadow: '0 4px 24px rgba(0,0,0,0.02)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: '#1e0646', margin: 0 }}>🤖 AI Usage Analytics</h2>

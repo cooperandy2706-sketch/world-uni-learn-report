@@ -18,7 +18,7 @@ export default function Card({ children, padding = 'md', hover, style, onClick, 
       className={className}
       onClick={onClick}
       style={{
-        background: '#fff',
+        background: 'var(--bg-card)',
         borderRadius: 14,
         border: '1px solid #f0eefe',
         boxShadow: '0 1px 4px rgba(109,40,217,0.07)',

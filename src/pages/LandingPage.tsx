@@ -795,14 +795,14 @@ export default function LandingPage() {
             <div className="footer-col">
               <h5>Contact</h5>
               <ul className="footer-links">
-                <li><a href="mailto:hello@worldunilearn.com" className="footer-link">hello@worldunilearn.com</a></li>
+                <li><a href="mailto:hello@nexxora.com" className="footer-link">hello@nexxora.com</a></li>
                 <li><a href="tel:+233537996934" className="footer-link">+233 537 996 934</a></li>
-                <li><a href="https://worldunilearn.com" className="footer-link" target="_blank" rel="noreferrer">worldunilearn.com</a></li>
+                <li><a href="https://novaratech.com" className="footer-link" target="_blank" rel="noreferrer">nexxora.com</a></li>
               </ul>
             </div>
           </div>
           <div className="footer-bottom">
-            <p>© {new Date().getFullYear()} Nexora Platform. Built for Ghana.</p>
+            <p>© {new Date().getFullYear()} Nexora Platform. Built by NovaraTech for Africa.</p>
             <div style={{ display: 'flex', gap: '1.5rem' }}>
               <span>GES Compliant</span>
               <span>Secure Cloud Storage</span>

@@ -16,7 +16,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
   const [hov, setHov] = useState(false)
   const v: Record<string, React.CSSProperties> = {
     primary:   { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,.25)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     success:   { background: hov ? '#15803d' : '#16a34a', color: '#fff', border: 'none' },
     warning:   { background: hov ? '#b45309' : 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#fff', border: 'none' },
     info:      { background: hov ? '#0369a1' : 'linear-gradient(135deg,#0891b2,#0369a1)', color: '#fff', border: 'none' },
@@ -147,7 +147,7 @@ async function captureElement(originalEl: HTMLElement, html2canvas: any) {
       scale: 2,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: '#ffffff',
+      backgroundColor: 'var(--bg-card)',
       logging: false,
       windowWidth: 1024, // Use a wider window width to ensure responsive layouts don't squish
     })
@@ -520,7 +520,7 @@ export default function ReportsPage() {
               <h2 style={{ fontSize:26, fontWeight:800, color:'#1e1b4b', margin:0, letterSpacing:'-0.02em' }}>
                 📄 Report Cards
               </h2>
-              <p style={{ fontSize:13, color:'#6b7280', marginTop:4, fontWeight:500 }}>
+              <p style={{ fontSize:13, color: 'var(--text-muted)', marginTop:4, fontWeight:500 }}>
                 Generate, manage and print student report cards for the current academic period.
               </p>
             </div>
@@ -593,12 +593,12 @@ export default function ReportsPage() {
 
 
         {/* ── Controls ── */}
-        <div style={{ background:'#fff', borderRadius:16, padding:'18px 20px', border:'1.5px solid #f0eefe', marginBottom:20, boxShadow:'0 1px 4px rgba(109,40,217,.06)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius:16, padding:'18px 20px', border:'1.5px solid #f0eefe', marginBottom:20, boxShadow:'0 1px 4px rgba(109,40,217,.06)' }}>
           <div style={{ display:'flex', flexWrap:'wrap', gap:12, alignItems:'flex-end' }}>
             <div style={{ flex:'1 1 200px' }}>
-              <label style={{ display:'block', fontSize:11, fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', color:'#6b7280', marginBottom:5 }}>Select Class</label>
+              <label style={{ display:'block', fontSize:11, fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', color: 'var(--text-muted)', marginBottom:5 }}>Select Class</label>
               <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}
-                style={{ width:'100%', padding:'9px 12px', borderRadius:9, fontSize:13, border:'1.5px solid #e5e7eb', outline:'none', background:'#faf5ff', color:'#111827', fontFamily:'"DM Sans",sans-serif', cursor:'pointer' }}>
+                style={{ width:'100%', padding:'9px 12px', borderRadius:9, fontSize:13, border: '1.5px solid var(--border-color)', outline:'none', background:'#faf5ff', color: 'var(--text-main)', fontFamily:'"DM Sans",sans-serif', cursor:'pointer' }}>
                 <option value="">Choose a class…</option>
                 {(classes as any[]).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
@@ -617,8 +617,8 @@ export default function ReportsPage() {
             </div>
           </div>
           {(reports as any[]).length > 0 && (
-            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1.5px solid #f3f4f6', display: 'flex', gap: 20, alignItems: 'center' }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#4b5563' }}>Global Print Settings:</span>
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1.5px solid var(--border-light)', display: 'flex', gap: 20, alignItems: 'center' }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>Global Print Settings:</span>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
                 <input type="checkbox" checked={showOverallPosition} onChange={e => setShowOverallPosition(e.target.checked)} />
                 <span>Show Rank / Position</span>
@@ -633,10 +633,10 @@ export default function ReportsPage() {
 
         {/* ── Empty states ── */}
         {!selectedClass && (
-          <div style={{ background:'#fff', borderRadius:16, padding:'60px 20px', textAlign:'center', border:'1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius:16, padding:'60px 20px', textAlign:'center', border:'1.5px solid #f0eefe' }}>
             <div style={{ fontSize:52, marginBottom:12 }}>📄</div>
-            <h3 style={{ fontFamily:'"Playfair Display",serif', fontSize:18, fontWeight:700, color:'#111827', marginBottom:6 }}>Select a class to begin</h3>
-            <p style={{ fontSize:13, color:'#9ca3af' }}>Choose a class above to view and manage report cards.</p>
+            <h3 style={{ fontFamily:'"Playfair Display",serif', fontSize:18, fontWeight:700, color: 'var(--text-main)', marginBottom:6 }}>Select a class to begin</h3>
+            <p style={{ fontSize:13, color: 'var(--text-subtle)' }}>Choose a class above to view and manage report cards.</p>
           </div>
         )}
         {selectedClass && isLoading && (
@@ -645,9 +645,9 @@ export default function ReportsPage() {
           </div>
         )}
         {selectedClass && !isLoading && (reports as any[]).length === 0 && (
-          <div style={{ background:'#fff', borderRadius:16, padding:'60px 20px', textAlign:'center', border:'1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius:16, padding:'60px 20px', textAlign:'center', border:'1.5px solid #f0eefe' }}>
             <div style={{ fontSize:52, marginBottom:12 }}>📋</div>
-            <h3 style={{ fontFamily:'"Playfair Display",serif', fontSize:18, fontWeight:700, color:'#111827', marginBottom:6 }}>No reports for {selectedClassName}</h3>
+            <h3 style={{ fontFamily:'"Playfair Display",serif', fontSize:18, fontWeight:700, color: 'var(--text-main)', marginBottom:6 }}>No reports for {selectedClassName}</h3>
             <Btn onClick={handleGenerate} loading={generateReports.isPending}>⚡ Generate Now</Btn>
           </div>
         )}
@@ -656,28 +656,28 @@ export default function ReportsPage() {
         {selectedClass && !isLoading && (reports as any[]).length > 0 && (
           <div style={{ animation:'_rfadeIn .4s ease' }}>
             {/* Summary */}
-            <div style={{ background:'#fff', borderRadius:14, padding:'12px 18px', border:'1.5px solid #f0eefe', marginBottom:14, display:'flex', flexWrap:'wrap', gap:20, alignItems:'center' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius:14, padding:'12px 18px', border:'1.5px solid #f0eefe', marginBottom:14, display:'flex', flexWrap:'wrap', gap:20, alignItems:'center' }}>
               {[
                 { label:'Class', value: selectedClassName },
                 { label:'Students', value: reports.length },
                 { label:'Approved', value: `${approvedCount} / ${reports.length}` },
               ].map(s => (
                 <div key={s.label}>
-                  <div style={{ fontSize:10, color:'#9ca3af', fontWeight:700, textTransform:'uppercase', letterSpacing:'.06em' }}>{s.label}</div>
-                  <div style={{ fontSize:14, fontWeight:700, color:'#111827' }}>{s.value}</div>
+                  <div style={{ fontSize:10, color: 'var(--text-subtle)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.06em' }}>{s.label}</div>
+                  <div style={{ fontSize:14, fontWeight:700, color: 'var(--text-main)' }}>{s.value}</div>
                 </div>
               ))}
               <div style={{ flex:1, minWidth:140 }}>
-                <div style={{ fontSize:10, color:'#9ca3af', fontWeight:700, textTransform:'uppercase', letterSpacing:'.06em', marginBottom:4 }}>Progress</div>
+                <div style={{ fontSize:10, color: 'var(--text-subtle)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.06em', marginBottom:4 }}>Progress</div>
                 <div style={{ height:7, background:'#f0eefe', borderRadius:99, overflow:'hidden' }}>
                   <div style={{ height:'100%', width:approvalPct+'%', background: approvalPct===100?'linear-gradient(90deg,#16a34a,#22c55e)':'linear-gradient(90deg,#7c3aed,#a78bfa)', borderRadius:99, transition:'width .8s' }} />
                 </div>
-                <div style={{ fontSize:11, color:'#6b7280', marginTop:3 }}>{approvalPct}% approved</div>
+                <div style={{ fontSize:11, color: 'var(--text-muted)', marginTop:3 }}>{approvalPct}% approved</div>
               </div>
             </div>
 
             {/* Table */}
-            <div style={{ background:'#fff', borderRadius:16, border:'1.5px solid #f0eefe', overflow:'hidden', boxShadow:'0 1px 4px rgba(109,40,217,.06)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius:16, border:'1.5px solid #f0eefe', overflow:'hidden', boxShadow:'0 1px 4px rgba(109,40,217,.06)' }}>
               <table style={{ width:'100%', borderCollapse:'collapse' }}>
                 <thead>
                   <tr style={{ background:'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom:'1.5px solid #ede9fe' }}>
@@ -700,15 +700,15 @@ export default function ReportsPage() {
                               {r.student?.full_name?.charAt(0) || '?'}
                             </div>
                             <div>
-                              <div style={{ fontSize:13, fontWeight:700, color:'#111827' }}>{r.student?.full_name || 'Unknown Student'}</div>
-                              <div style={{ fontSize:11, color:'#9ca3af' }}>{r.student?.student_id ?? '—'}</div>
+                              <div style={{ fontSize:13, fontWeight:700, color: 'var(--text-main)' }}>{r.student?.full_name || 'Unknown Student'}</div>
+                              <div style={{ fontSize:11, color: 'var(--text-subtle)' }}>{r.student?.student_id ?? '—'}</div>
                             </div>
                           </div>
                         </td>
                         <td style={{ padding:'11px 14px' }}>
                           <span style={{ fontSize:15, fontWeight:800, color:g.color }}>{(r.average_score ?? 0).toFixed(1)}%</span>
                         </td>
-                        <td style={{ padding:'11px 14px', fontSize:13, color:'#374151', fontWeight:500 }}>
+                        <td style={{ padding:'11px 14px', fontSize:13, color: 'var(--text-main)', fontWeight:500 }}>
                           {ordinal(r.overall_position ?? 0)} / {r.total_students}
                         </td>
                         <td style={{ padding:'11px 14px' }}>
@@ -717,7 +717,7 @@ export default function ReportsPage() {
                         <td style={{ padding:'11px 14px' }}>
                           <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
                             <button className="rpt-act" onClick={() => { setAttModal(r); setAttData({ total_days:'', days_present:'' }) }}
-                              style={{ padding:'4px 8px', borderRadius:7, border:'1.5px solid #e5e7eb', background:'#f9fafb', fontSize:11, cursor:'pointer', transition:'all .15s', color:'#374151', fontWeight:500 }}>
+                              style={{ padding:'4px 8px', borderRadius:7, border: '1.5px solid var(--border-color)', background: 'var(--bg-input)', fontSize:11, cursor:'pointer', transition:'all .15s', color: 'var(--text-main)', fontWeight:500 }}>
                               📋 Att.
                             </button>
                             <button className="rpt-act" onClick={() => openFeesModal(r)}
@@ -805,7 +805,7 @@ export default function ReportsPage() {
                 { label:'Amount Paid (GH₵)', key:'fees_paid', placeholder:'e.g. 300' },
               ].map(({ label, key, placeholder }) => (
                 <div key={key}>
-                  <label style={{ display:'block', fontSize:11, fontWeight:700, color:'#374151', marginBottom:5, textTransform:'uppercase', letterSpacing:'.05em' }}>{label}</label>
+                  <label style={{ display:'block', fontSize:11, fontWeight:700, color: 'var(--text-main)', marginBottom:5, textTransform:'uppercase', letterSpacing:'.05em' }}>{label}</label>
                   <input type="number" placeholder={placeholder}
                     value={(feesData as any)[key]}
                     onChange={e => {
@@ -814,7 +814,7 @@ export default function ReportsPage() {
                       const arrears = Math.max(0, Number(newData.fees_amount||0) - Number(newData.fees_paid||0))
                       setFeesData({ ...newData, fees_arrears: arrears.toString() })
                     }}
-                    style={{ width:'100%', padding:'9px 12px', borderRadius:9, border:'1.5px solid #e5e7eb', fontSize:13, outline:'none', fontFamily:'"DM Sans",sans-serif', boxSizing:'border-box' as any }} />
+                    style={{ width:'100%', padding:'9px 12px', borderRadius:9, border: '1.5px solid var(--border-color)', fontSize:13, outline:'none', fontFamily:'"DM Sans",sans-serif', boxSizing:'border-box' as any }} />
                 </div>
               ))}
             </div>
@@ -832,7 +832,7 @@ export default function ReportsPage() {
             {/* Other fees */}
             <div>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
-                <label style={{ fontSize:11, fontWeight:700, color:'#374151', textTransform:'uppercase', letterSpacing:'.05em' }}>Other Fees (Bus, Uniform, etc.)</label>
+                <label style={{ fontSize:11, fontWeight:700, color: 'var(--text-main)', textTransform:'uppercase', letterSpacing:'.05em' }}>Other Fees (Bus, Uniform, etc.)</label>
                 <button onClick={() => setFeesData(f => ({ ...f, other_fees: [...f.other_fees, { label:'', amount:'', paid:'' }] }))}
                   style={{ padding:'4px 10px', borderRadius:7, border:'1.5px solid #ddd6fe', background:'#f5f3ff', color:'#6d28d9', fontSize:11, fontWeight:600, cursor:'pointer', fontFamily:'"DM Sans",sans-serif' }}>
                   + Add
@@ -842,13 +842,13 @@ export default function ReportsPage() {
                 <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px 28px', gap:6, marginBottom:6, alignItems:'center' }}>
                   <input placeholder="e.g. Bus Fee" value={f.label}
                     onChange={e => { const arr=[...feesData.other_fees]; arr[i]={...arr[i],label:e.target.value}; setFeesData(d=>({...d,other_fees:arr})) }}
-                    style={{ padding:'7px 10px', borderRadius:8, border:'1.5px solid #e5e7eb', fontSize:12, outline:'none', fontFamily:'"DM Sans",sans-serif' }}/>
+                    style={{ padding:'7px 10px', borderRadius:8, border: '1.5px solid var(--border-color)', fontSize:12, outline:'none', fontFamily:'"DM Sans",sans-serif' }}/>
                   <input type="number" placeholder="Amount" value={f.amount}
                     onChange={e => { const arr=[...feesData.other_fees]; arr[i]={...arr[i],amount:e.target.value}; setFeesData(d=>({...d,other_fees:arr})) }}
-                    style={{ padding:'7px 10px', borderRadius:8, border:'1.5px solid #e5e7eb', fontSize:12, outline:'none', fontFamily:'"DM Sans",sans-serif' }}/>
+                    style={{ padding:'7px 10px', borderRadius:8, border: '1.5px solid var(--border-color)', fontSize:12, outline:'none', fontFamily:'"DM Sans",sans-serif' }}/>
                   <input type="number" placeholder="Paid" value={f.paid}
                     onChange={e => { const arr=[...feesData.other_fees]; arr[i]={...arr[i],paid:e.target.value}; setFeesData(d=>({...d,other_fees:arr})) }}
-                    style={{ padding:'7px 10px', borderRadius:8, border:'1.5px solid #e5e7eb', fontSize:12, outline:'none', fontFamily:'"DM Sans",sans-serif' }}/>
+                    style={{ padding:'7px 10px', borderRadius:8, border: '1.5px solid var(--border-color)', fontSize:12, outline:'none', fontFamily:'"DM Sans",sans-serif' }}/>
                   <button onClick={() => setFeesData(d => ({ ...d, other_fees: d.other_fees.filter((_,j)=>j!==i) }))}
                     style={{ width:28, height:28, borderRadius:7, border:'none', background:'#fef2f2', color:'#dc2626', cursor:'pointer', fontSize:13 }}>🗑️</button>
                 </div>
@@ -879,7 +879,7 @@ export default function ReportsPage() {
               <button
                 onClick={syncFromRegister}
                 disabled={fetchingAtt}
-                style={{ background:'#fff', border:'1.5px solid #16a34a', color:'#16a34a', padding:'4px 10px', borderRadius:7, fontSize:11, fontWeight:700, cursor:'pointer', transition:'all .15s', display:'flex', alignItems:'center', gap:5 }}>
+                style={{ background: 'var(--bg-card)', border:'1.5px solid #16a34a', color:'#16a34a', padding:'4px 10px', borderRadius:7, fontSize:11, fontWeight:700, cursor:'pointer', transition:'all .15s', display:'flex', alignItems:'center', gap:5 }}>
                 {fetchingAtt ? '⏳...' : '🔄 Use Register'}
               </button>
             </div>
@@ -888,11 +888,11 @@ export default function ReportsPage() {
               { label:'Days Present', key:'days_present', placeholder:'e.g. 60' },
             ].map(({ label, key, placeholder }) => (
               <div key={key}>
-                <label style={{ display:'block', fontSize:11, fontWeight:700, color:'#374151', marginBottom:5, textTransform:'uppercase', letterSpacing:'.05em' }}>{label}</label>
+                <label style={{ display:'block', fontSize:11, fontWeight:700, color: 'var(--text-main)', marginBottom:5, textTransform:'uppercase', letterSpacing:'.05em' }}>{label}</label>
                 <input type="number" placeholder={placeholder}
                   value={(attData as any)[key]}
                   onChange={e => setAttData(a => ({ ...a, [key]: e.target.value }))}
-                  style={{ width:'100%', padding:'9px 12px', borderRadius:9, border:'1.5px solid #e5e7eb', fontSize:13, outline:'none', fontFamily:'"DM Sans",sans-serif', boxSizing:'border-box' }} />
+                  style={{ width:'100%', padding:'9px 12px', borderRadius:9, border: '1.5px solid var(--border-color)', fontSize:13, outline:'none', fontFamily:'"DM Sans",sans-serif', boxSizing:'border-box' }} />
               </div>
             ))}
             {attData.total_days && attData.days_present && (
@@ -942,8 +942,8 @@ export default function ReportsPage() {
         }
       >
         <div style={{ display:'flex', flexDirection:'column', gap:32 }}>
-          <div style={{ background: '#f9fafb', padding: '12px 18px', borderRadius: 12, border: '1px solid #e5e7eb', display: 'flex', gap: 20, alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#4b5563' }}>Bulk Settings:</span>
+          <div style={{ background: 'var(--bg-input)', padding: '12px 18px', borderRadius: 12, border: '1px solid var(--border-color)', display: 'flex', gap: 20, alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>Bulk Settings:</span>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
               <input type="checkbox" checked={showOverallPosition} onChange={e => setShowOverallPosition(e.target.checked)} />
               <span>Show Rank / Position</span>

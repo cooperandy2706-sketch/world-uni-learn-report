@@ -136,7 +136,7 @@ export default function AnnouncementPopup() {
         onClick={e => e.stopPropagation()}
         style={{
           width: '100%', maxWidth: 500,
-          background: '#fff', borderRadius: 24, overflow: 'hidden',
+          background: 'var(--bg-card)', borderRadius: 24, overflow: 'hidden',
           boxShadow: '0 40px 100px rgba(0,0,0,0.4)',
           fontFamily: '"DM Sans", sans-serif',
           animation: 'ann_card_in 0.35s cubic-bezier(0.16,1,0.3,1)',
@@ -226,7 +226,7 @@ export default function AnnouncementPopup() {
 
             {/* Message body */}
             <p style={{
-              fontSize:14, lineHeight:1.7, color:'#374151', margin:0,
+              fontSize:14, lineHeight:1.7, color: 'var(--text-main)', margin:0,
               whiteSpace:'pre-wrap',
             }}>{msg.body}</p>
 
@@ -279,7 +279,7 @@ export default function AnnouncementPopup() {
           <button className="ann-btn" onClick={() => dismiss(msg.id)}
             style={{
               flex:1, padding:'11px 0', borderRadius:12,
-              border:'1.5px solid #e2e8f0', background:'#fff',
+              border:'1.5px solid #e2e8f0', background: 'var(--bg-card)',
               fontSize:13, fontWeight:600, color:'#64748b',
               fontFamily:'"DM Sans",sans-serif',
             }}>

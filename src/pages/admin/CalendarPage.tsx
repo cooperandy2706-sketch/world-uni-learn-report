@@ -185,16 +185,16 @@ export default function CalendarPage() {
   const renderHeader = () => (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
       <div>
-        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>School Calendar</h1>
-        <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Manage school terms, holidays, and events.</p>
+        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>School Calendar</h1>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Manage school terms, holidays, and events.</p>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: 12, padding: 4 }}>
-          <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer', color: '#4b5563' }}><ChevronLeft size={18} /></button>
-          <div style={{ padding: '0 12px', display: 'flex', alignItems: 'center', fontSize: 14, fontWeight: 700, color: '#111827', minWidth: 140, justifyContent: 'center' }}>
+        <div style={{ display: 'flex', background: 'var(--bg-hover)', borderRadius: 12, padding: 4 }}>
+          <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><ChevronLeft size={18} /></button>
+          <div style={{ padding: '0 12px', display: 'flex', alignItems: 'center', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', minWidth: 140, justifyContent: 'center' }}>
             {format(currentMonth, 'MMMM yyyy')}
           </div>
-          <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer', color: '#4b5563' }}><ChevronRight size={18} /></button>
+          <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><ChevronRight size={18} /></button>
         </div>
         <button onClick={() => setShowAdd(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 12, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(109,40,217,0.25)' }}>
           <Plus size={16} /> Add Event
@@ -208,7 +208,7 @@ export default function CalendarPage() {
     return (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: 8 }}>
         {days.map(d => (
-          <div key={d} style={{ textAlign: 'center', fontSize: 11, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '12px 0' }}>{d}</div>
+          <div key={d} style={{ textAlign: 'center', fontSize: 11, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '12px 0' }}>{d}</div>
         ))}
       </div>
     )
@@ -304,7 +304,7 @@ export default function CalendarPage() {
       )
       days = []
     }
-    return <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: '1.5px solid #f1f5f9', boxShadow: '0 1px 4px rgba(0,0,0,0.02)' }}>{rows}</div>
+    return <div style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden', border: '1.5px solid #f1f5f9', boxShadow: '0 1px 4px rgba(0,0,0,0.02)' }}>{rows}</div>
   }
 
   return (
@@ -349,29 +349,29 @@ export default function CalendarPage() {
           </div>
 
           {/* Legend */}
-          <div style={{ background: '#fff', borderRadius: 20, padding: 20, border: '1.5px solid #f1f5f9' }}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 20, border: '1.5px solid #f1f5f9' }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Bookmark size={16} color="#7c3aed" /> Calendar Legend
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 12, height: 12, borderRadius: 4, background: '#7c3aed' }} />
-                <span style={{ fontSize: 13, color: '#4b5563', fontWeight: 500 }}>Academic Term</span>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>Academic Term</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 12, height: 12, borderRadius: 4, background: '#f59e0b' }} />
-                <span style={{ fontSize: 13, color: '#4b5563', fontWeight: 500 }}>Public Holiday</span>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>Public Holiday</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 12, height: 12, borderRadius: 4, background: '#f0fdf4', border: '1px solid #16a34a' }} />
-                <span style={{ fontSize: 13, color: '#4b5563', fontWeight: 500 }}>Current Day</span>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>Current Day</span>
               </div>
             </div>
           </div>
 
           {/* Upcoming Events */}
-          <div style={{ background: '#fff', borderRadius: 20, padding: 20, border: '1.5px solid #f1f5f9', flex: 1 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 20, border: '1.5px solid #f1f5f9', flex: 1 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <PartyPopper size={16} color="#f59e0b" /> Upcoming
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -396,12 +396,12 @@ export default function CalendarPage() {
                       <span style={{ fontSize: 9, fontWeight: 700, color: e.color, textTransform: 'uppercase' }}>{format(parseISO(e.start_date), 'MMM')}</span>
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{e.name}</div>
-                      <div style={{ fontSize: 11, color: '#9ca3af' }}>{format(parseISO(e.start_date), 'EEEE')}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{e.name}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{format(parseISO(e.start_date), 'EEEE')}</div>
                     </div>
                   </div>
                 ))}
-              {events.length === 0 && <p style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', padding: '20px 0' }}>No upcoming events.</p>}
+              {events.length === 0 && <p style={{ fontSize: 12, color: 'var(--text-subtle)', textAlign: 'center', padding: '20px 0' }}>No upcoming events.</p>}
             </div>
           </div>
         </div>
@@ -410,29 +410,29 @@ export default function CalendarPage() {
       {/* Add Event Modal */}
       {showAdd && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(17, 24, 39, 0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: '#fff', borderRadius: 24, width: '100%', maxWidth: 440, boxShadow: '0 20px 50px rgba(0,0,0,0.15)', overflow: 'hidden' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 440, boxShadow: '0 20px 50px rgba(0,0,0,0.15)', overflow: 'hidden' }}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#111827', margin: 0 }}>Add Holiday/Event</h2>
-              <button onClick={() => setShowAdd(false)} style={{ background: '#f3f4f6', border: 'none', width: 32, height: 32, borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={18} /></button>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Add Holiday/Event</h2>
+              <button onClick={() => setShowAdd(false)} style={{ background: 'var(--bg-hover)', border: 'none', width: 32, height: 32, borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={18} /></button>
             </div>
             <form onSubmit={handleAddHoliday} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Event Name</label>
-                <input required placeholder="e.g. Independence Day" value={newEvent.name} onChange={e => setNewEvent({ ...newEvent, name: e.target.value })} style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid #e5e7eb', fontSize: 14, outline: 'none' }} />
+                <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Event Name</label>
+                <input required placeholder="e.g. Independence Day" value={newEvent.name} onChange={e => setNewEvent({ ...newEvent, name: e.target.value })} style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none' }} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Start Date</label>
-                  <input type="date" required value={newEvent.start_date} onChange={e => setNewEvent({ ...newEvent, start_date: e.target.value })} style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid #e5e7eb', fontSize: 14, outline: 'none' }} />
+                  <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Start Date</label>
+                  <input type="date" required value={newEvent.start_date} onChange={e => setNewEvent({ ...newEvent, start_date: e.target.value })} style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none' }} />
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>End Date (Optional)</label>
-                  <input type="date" value={newEvent.end_date} onChange={e => setNewEvent({ ...newEvent, end_date: e.target.value })} style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid #e5e7eb', fontSize: 14, outline: 'none' }} />
+                  <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>End Date (Optional)</label>
+                  <input type="date" value={newEvent.end_date} onChange={e => setNewEvent({ ...newEvent, end_date: e.target.value })} style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none' }} />
                 </div>
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Category</label>
-                <select value={newEvent.type} onChange={e => setNewEvent({ ...newEvent, type: e.target.value })} style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid #e5e7eb', fontSize: 14, outline: 'none' }}>
+                <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Category</label>
+                <select value={newEvent.type} onChange={e => setNewEvent({ ...newEvent, type: e.target.value })} style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none' }}>
                   <option value="public">Public Holiday</option>
                   <option value="school">School Event</option>
                   <option value="other">Other</option>

@@ -29,7 +29,7 @@ function getSubjectMeta(name: string) {
   for (const [key, meta] of Object.entries(SUBJECT_META)) {
     if (lower.includes(key)) return meta
   }
-  return { icon: '📚', color: '#6b7280', bg: '#f9fafb', category: 'General' }
+  return { icon: '📚', color: 'var(--text-muted)', bg: '#f9fafb', category: 'General' }
 }
 
 // ── helpers ───────────────────────────────────────────────
@@ -37,7 +37,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   const [hov, setHov] = useState(false)
   const variants: Record<string, React.CSSProperties> = {
     primary:   { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger:    { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
   }
   return (
@@ -57,7 +57,7 @@ function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputEle
       <input {...props}
         onFocus={e => { setF(true); props.onFocus?.(e) }}
         onBlur={e => { setF(false); props.onBlur?.(e) }}
-        style={{ width: '100%', padding: '10px 14px', borderRadius: 10, fontSize: 14, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
+        style={{ width: '100%', padding: '10px 14px', borderRadius: 10, fontSize: 14, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
       {error && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 4 }}>⚠ {error}</p>}
     </div>
   )
@@ -151,7 +151,7 @@ export default function PlatformSubjectsPage() {
           <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#7c3aed', animation: '_spin 0.8s linear infinite' }} />
         </div>
       ) : subjects.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '80px 20px', background: '#fff', borderRadius: 16, border: '1.5px solid #f1f5f9' }}>
+        <div style={{ textAlign: 'center', padding: '80px 20px', background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f1f5f9' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>🌍</div>
           <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1e293b' }}>No Global Subjects Yet</h3>
           <p style={{ fontSize: 13, color: '#64748b', marginBottom: 20 }}>Define subjects here that will be standard for all schools on the platform.</p>
@@ -162,7 +162,7 @@ export default function PlatformSubjectsPage() {
           {subjects.map((s, i) => {
             const meta = getSubjectMeta(s.name)
             return (
-              <div key={s.id} style={{ background: '#fff', borderRadius: 18, border: '1px solid #e2e8f0', padding: 20, animation: `_fadeUp 0.3s ease ${i * 0.04}s both`, display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div key={s.id} style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1px solid #e2e8f0', padding: 20, animation: `_fadeUp 0.3s ease ${i * 0.04}s both`, display: 'flex', alignItems: 'center', gap: 14 }}>
                 <div style={{ width: 48, height: 48, borderRadius: 12, background: meta.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, border: '1px solid '+meta.color+'22' }}>
                   {meta.icon}
                 </div>

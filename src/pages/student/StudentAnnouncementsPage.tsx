@@ -70,7 +70,7 @@ export default function StudentAnnouncementsPage() {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '70vh', flexDirection: 'column', gap: 16 }}>
       <style>{`@keyframes _ssp{to{transform:rotate(360deg)}}`}</style>
       <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_ssp .8s linear infinite' }} />
-      <p style={{ fontSize: 13, color: '#6b7280', fontFamily: '"DM Sans",sans-serif' }}>Fetching announcements…</p>
+      <p style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: '"DM Sans",sans-serif' }}>Fetching announcements…</p>
     </div>
   )
 
@@ -95,10 +95,10 @@ export default function StudentAnnouncementsPage() {
         {/* Header */}
         <div className="header-row" style={{ marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', animation: '_sfu .5s ease both' }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>Notice Board</h1>
-            <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>Stay updated with the latest school news and events</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Notice Board</h1>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Stay updated with the latest school news and events</p>
           </div>
-          <Link to={ROUTES.STUDENT_DASHBOARD} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', textDecoration: 'none', border: '1.5px solid #e5e7eb', justifyContent: 'center' }}>← Dashboard</Link>
+          <Link to={ROUTES.STUDENT_DASHBOARD} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600, background: 'var(--bg-card)', color: 'var(--text-main)', textDecoration: 'none', border: '1.5px solid var(--border-color)', justifyContent: 'center' }}>← Dashboard</Link>
         </div>
 
         {/* Filters & Search */}
@@ -110,7 +110,7 @@ export default function StudentAnnouncementsPage() {
               placeholder="Search announcements..." 
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ width: '100%', padding: '14px 16px 14px 48px', borderRadius: 16, border: '1.5px solid #e5e7eb', fontSize: 14, outline: 'none', background: '#fff', boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '14px 16px 14px 48px', borderRadius: 16, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none', background: 'var(--bg-card)', boxSizing: 'border-box' }}
             />
           </div>
           <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
@@ -129,7 +129,7 @@ export default function StudentAnnouncementsPage() {
         {/* Announcements List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, animation: '_sfu .5s ease .15s both' }}>
           {filtered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '80px 20px', background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe' }}>
+            <div style={{ textAlign: 'center', padding: '80px 20px', background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe' }}>
               <Megaphone size={48} color="#ddd6fe" style={{ marginBottom: 16 }} />
               <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e293b' }}>No notices found</h3>
               <p style={{ fontSize: 14, color: '#64748b' }}>Try adjusting your search or filters to find what you're looking for.</p>
@@ -158,7 +158,7 @@ export default function StudentAnnouncementsPage() {
                       
                       {a.meeting_date && (
                         <div style={{ background: '#eff6ff', borderRadius: 16, padding: '16px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                          <div style={{ width: 40, height: 40, borderRadius: 12, background: '#fff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Calendar size={20} /></div>
+                          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-card)', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Calendar size={20} /></div>
                           <div>
                             <div style={{ fontSize: 11, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase' }}>Meeting Schedule</div>
                             <div style={{ fontSize: 14, fontWeight: 700, color: '#1e3a8a' }}>{new Date(a.meeting_date).toLocaleString('en-GB', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</div>

@@ -125,7 +125,7 @@ export function NotFoundPage() {
           </svg>
           <div style={{ fontSize: 64, fontWeight: 900, color: '#7c3aed', lineHeight: 1, fontFamily: 'Nunito, sans-serif' }}>404</div>
           <div className="ep-title">Lost in Space!</div>
-          <p className="ep-sub" style={{ color: '#6b7280' }}>This page drifted off into the void. Let's bring you back to Earth.</p>
+          <p className="ep-sub" style={{ color: 'var(--text-muted)' }}>This page drifted off into the void. Let's bring you back to Earth.</p>
           <div className="ep-btns">
             <Btn onClick={() => navigate('/')} primary>🏠 Go Home</Btn>
             <Btn onClick={() => navigate(-1)}>← Go Back</Btn>
@@ -263,7 +263,7 @@ export function LoadingPage() {
             <text x="50" y="56" textAnchor="middle" fontSize="28">🎓</text>
           </svg>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#1e1b4b', marginBottom: 8 }}>Nexora Reports</div>
-          <p style={{ fontSize: 14, color: '#6b7280', fontWeight: 700 }}>Loading your workspace…</p>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 700 }}>Loading your workspace…</p>
         </div>
       </div>
     </>

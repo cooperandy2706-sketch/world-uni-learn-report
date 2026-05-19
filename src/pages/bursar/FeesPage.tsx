@@ -27,10 +27,10 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
   const [h, setH] = useState(false)
   const v: any = {
     primary: { background: h ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none' },
-    secondary: { background: h ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: h ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     success: { background: h ? '#15803d' : '#16a34a', color: '#fff', border: 'none' },
     danger: { background: h ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
-    ghost: { background: h ? '#f5f3ff' : 'transparent', color: '#6b7280', border: 'none' },
+    ghost: { background: h ? '#f5f3ff' : 'transparent', color: 'var(--text-muted)', border: 'none' },
   }
   return (
     <button onClick={onClick} disabled={disabled} onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
@@ -1006,13 +1006,13 @@ export default function FeesPage() {
 
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>School Fees</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>{term ? `${term.name} — Active Term` : 'No active term set'}</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>School Fees</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>{term ? `${term.name} — Active Term` : 'No active term set'}</p>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             {tab === 'structures' && (
               <>
-                <button onClick={handleCopyPrevious} disabled={copying} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: 13, fontWeight: 600, cursor: copying ? 'not-allowed' : 'pointer' }}>
+                <button onClick={handleCopyPrevious} disabled={copying} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 13, fontWeight: 600, cursor: copying ? 'not-allowed' : 'pointer' }}>
                   {copying ? 'Copying...' : 'Pull from Previous Term'}
                 </button>
                 <Btn onClick={() => setStructureModal(true)}><Plus size={14} /> New Fee Type</Btn>
@@ -1037,19 +1037,19 @@ export default function FeesPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr 360px', gap: 24, alignItems: 'start', position: 'relative', minHeight: '680px' }}>
             
             {/* COLUMN 1: STUDENT FINDER */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 20, boxShadow: '0 2px 12px rgba(109,40,217,.04)', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 20, boxShadow: '0 2px 12px rgba(109,40,217,.04)', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ background: '#f5f3ff', borderRadius: 8, padding: 8, color: '#6d28d9' }}>
                   <Users size={18} />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: 14, fontWeight: 800, color: '#111827', margin: 0 }}>Student Finder</h3>
-                  <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>Select student to allocate fees</p>
+                  <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Student Finder</h3>
+                  <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0 }}>Select student to allocate fees</p>
                 </div>
               </div>
 
               <div style={{ position: 'relative' }}>
-                <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+                <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-subtle)' }} />
                 <input
                   placeholder="Type student name or ID..."
                   value={studentSearch}
@@ -1058,13 +1058,13 @@ export default function FeesPage() {
                     width: '100%',
                     padding: '10px 12px 10px 36px',
                     borderRadius: 10,
-                    border: '1.5px solid #e5e7eb',
+                    border: '1.5px solid var(--border-color)',
                     fontSize: 13,
                     outline: 'none',
                     fontFamily: '"DM Sans",sans-serif',
                     boxSizing: 'border-box',
                     transition: 'all 0.15s',
-                    background: '#f9fafb'
+                    background: 'var(--bg-input)'
                   }}
                   onFocus={e => e.target.style.borderColor = '#7c3aed'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
@@ -1113,7 +1113,7 @@ export default function FeesPage() {
                       <div style={{ fontSize: 13, fontWeight: 700, color: isSelected ? '#6d28d9' : '#1f2937', paddingRight: 18 }}>
                         {s.full_name}
                       </div>
-                      <div style={{ fontSize: 11, color: '#9ca3af' }}>
+                      <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
                         {(s.class as any)?.name ?? 'No Class'} &middot; {s.student_id || 'No ID'}
                       </div>
                       
@@ -1132,7 +1132,7 @@ export default function FeesPage() {
                   );
                 })}
                 {filteredStudents.length === 0 && (
-                  <div style={{ textAlign: 'center', padding: '30px 10px', fontSize: 12, color: '#9ca3af' }}>
+                  <div style={{ textAlign: 'center', padding: '30px 10px', fontSize: 12, color: 'var(--text-subtle)' }}>
                     No students matched your search
                   </div>
                 )}
@@ -1140,15 +1140,15 @@ export default function FeesPage() {
             </div>
 
             {/* COLUMN 2: FEE ALLOCATION CHECKLIST */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 2px 12px rgba(109,40,217,.04)', minHeight: '520px' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 2px 12px rgba(109,40,217,.04)', minHeight: '520px' }}>
               {!pf.student_id ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: '400px', color: '#9ca3af', textAlign: 'center', gap: 16, padding: '0 20px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: '400px', color: 'var(--text-subtle)', textAlign: 'center', gap: 16, padding: '0 20px' }}>
                   <div style={{ background: '#f5f3ff', borderRadius: '50%', padding: 20, color: '#6d28d9' }}>
                     <Coins size={36} />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: 16, fontWeight: 800, color: '#1f2937', margin: '0 0 6px' }}>Fee Allocation Sheet</h3>
-                    <p style={{ fontSize: 12, color: '#6b7280', maxWidth: 320, margin: '0 auto', lineHeight: 1.5 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 6px' }}>Fee Allocation Sheet</h3>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', maxWidth: 320, margin: '0 auto', lineHeight: 1.5 }}>
                       Please select a student from the finder panel on the left to allocate payments and view itemized term details.
                     </p>
                   </div>
@@ -1186,7 +1186,7 @@ export default function FeesPage() {
 
                       {/* Allocation checklist block */}
                       <div>
-                        <h4 style={{ fontSize: 12, fontWeight: 800, color: '#4b5563', textTransform: 'uppercase', letterSpacing: '.06em', margin: '0 0 12px' }}>
+                        <h4 style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', margin: '0 0 12px' }}>
                           Billing Allocation Checklist
                         </h4>
                         
@@ -1283,14 +1283,14 @@ export default function FeesPage() {
                                   <div style={{ fontSize: 13, fontWeight: 700, color: isCleared ? '#6b7280' : '#1f2937', textDecoration: isCleared ? 'line-through' : 'none' }}>
                                     {s.fee_name}
                                   </div>
-                                  <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>
+                                  <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 1 }}>
                                     {s.description || 'Current term fee item'}
                                   </div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end' }}>
                                     {pct > 0 && isDiscountable && (
-                                      <span style={{ fontSize: 11, color: '#9ca3af', textDecoration: 'line-through' }}>{CUR(original)}</span>
+                                      <span style={{ fontSize: 11, color: 'var(--text-subtle)', textDecoration: 'line-through' }}>{CUR(original)}</span>
                                     )}
                                     <strong style={{ fontSize: 13, fontWeight: 800, color: isCleared ? '#6b7280' : '#6d28d9' }}>{CUR(net)}</strong>
                                   </div>
@@ -1318,7 +1318,7 @@ export default function FeesPage() {
                           })}
 
                           {classStrs.length === 0 && !hasArrears && (
-                            <div style={{ textAlign: 'center', padding: '24px', fontSize: 12, color: '#9ca3af', background: '#fafafa', borderRadius: 12 }}>
+                            <div style={{ textAlign: 'center', padding: '24px', fontSize: 12, color: 'var(--text-subtle)', background: '#fafafa', borderRadius: 12 }}>
                               No fee structures defined for this student's class.
                             </div>
                           )}
@@ -1331,17 +1331,17 @@ export default function FeesPage() {
             </div>
 
             {/* COLUMN 3: CHECKOUT SUMMARY SLIP */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 4px 20px rgba(109,40,217,.06)', display: 'flex', flexDirection: 'column', gap: 18, position: 'sticky', top: 20 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 4px 20px rgba(109,40,217,.06)', display: 'flex', flexDirection: 'column', gap: 18, position: 'sticky', top: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1.5px solid #f5f3ff', paddingBottom: 14 }}>
                 <div style={{ background: '#faf5ff', borderRadius: 8, padding: 8, color: '#6d28d9' }}>
                   <CreditCard size={18} />
                 </div>
-                <h3 style={{ fontSize: 14, fontWeight: 800, color: '#111827', margin: 0 }}>Checkout Slip</h3>
+                <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Checkout Slip</h3>
               </div>
 
               {/* Amount Input Block */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#4b5563' }}>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)' }}>
                   Amount to Pay
                 </label>
                 <div style={{ display: 'flex', gap: 6 }}>
@@ -1356,10 +1356,10 @@ export default function FeesPage() {
                     style={{
                       padding: '10px 12px',
                       borderRadius: 10,
-                      border: '1.5px solid #e5e7eb',
+                      border: '1.5px solid var(--border-color)',
                       fontSize: 13,
                       fontWeight: 600,
-                      background: '#f9fafb',
+                      background: 'var(--bg-input)',
                       outline: 'none',
                       cursor: 'pointer'
                     }}
@@ -1380,7 +1380,7 @@ export default function FeesPage() {
                       flex: 1,
                       padding: '10px 12px',
                       borderRadius: 10,
-                      border: '1.5px solid #e5e7eb',
+                      border: '1.5px solid var(--border-color)',
                       fontSize: 13,
                       fontWeight: 600,
                       outline: 'none',
@@ -1441,7 +1441,7 @@ export default function FeesPage() {
               {/* Payment Details form elements */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#4b5563', marginBottom: 5 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)', marginBottom: 5 }}>
                     Method
                   </label>
                   <select
@@ -1451,10 +1451,10 @@ export default function FeesPage() {
                       width: '100%',
                       padding: '9px 12px',
                       borderRadius: 10,
-                      border: '1.5px solid #e5e7eb',
+                      border: '1.5px solid var(--border-color)',
                       fontSize: 13,
                       outline: 'none',
-                      background: '#fff',
+                      background: 'var(--bg-card)',
                       fontFamily: '"DM Sans",sans-serif'
                     }}
                   >
@@ -1466,7 +1466,7 @@ export default function FeesPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#4b5563', marginBottom: 5 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)', marginBottom: 5 }}>
                     Date
                   </label>
                   <input
@@ -1477,7 +1477,7 @@ export default function FeesPage() {
                       width: '100%',
                       padding: '8px 10px',
                       borderRadius: 10,
-                      border: '1.5px solid #e5e7eb',
+                      border: '1.5px solid var(--border-color)',
                       fontSize: 13,
                       outline: 'none',
                       fontFamily: '"DM Sans",sans-serif',
@@ -1488,7 +1488,7 @@ export default function FeesPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#4b5563', marginBottom: 5 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)', marginBottom: 5 }}>
                   Reference No.
                 </label>
                 <input
@@ -1499,7 +1499,7 @@ export default function FeesPage() {
                     width: '100%',
                     padding: '9px 12px',
                     borderRadius: 10,
-                    border: '1.5px solid #e5e7eb',
+                    border: '1.5px solid var(--border-color)',
                     fontSize: 13,
                     outline: 'none',
                     fontFamily: '"DM Sans",sans-serif',
@@ -1509,7 +1509,7 @@ export default function FeesPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#4b5563', marginBottom: 5 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)', marginBottom: 5 }}>
                   Internal Memo / Notes
                 </label>
                 <textarea
@@ -1521,7 +1521,7 @@ export default function FeesPage() {
                     width: '100%',
                     padding: '9px 12px',
                     borderRadius: 10,
-                    border: '1.5px solid #e5e7eb',
+                    border: '1.5px solid var(--border-color)',
                     fontSize: 13,
                     outline: 'none',
                     fontFamily: '"DM Sans",sans-serif',
@@ -1620,10 +1620,10 @@ export default function FeesPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: 20, position: 'relative' }}>
             {/* Left: Student Selector */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: '16px' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: '16px' }}>
                 <div style={{ position: 'relative', marginBottom: 12 }}>
-                  <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-                  <input placeholder="Student..." value={studentSearch} onChange={e => setStudentSearch(e.target.value)} style={{ width: '100%', padding: '8px 10px 8px 32px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 12, outline: 'none' }} />
+                  <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-subtle)' }} />
+                  <input placeholder="Student..." value={studentSearch} onChange={e => setStudentSearch(e.target.value)} style={{ width: '100%', padding: '8px 10px 8px 32px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 12, outline: 'none' }} />
                 </div>
                 <div style={{ height: 480, overflowY: 'auto', paddingRight: 4 }}>
                   {filteredStudents.map((s: any) => (
@@ -1633,7 +1633,7 @@ export default function FeesPage() {
                       border: pf.student_id === s.id ? '1.5px solid #ddd6fe' : '1px solid transparent'
                     }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: pf.student_id === s.id ? '#6d28d9' : '#111827' }}>{s.full_name}</div>
-                      <div style={{ fontSize: 10, color: '#6b7280' }}>{(s.class as any)?.name || 'No Class'}</div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{(s.class as any)?.name || 'No Class'}</div>
                     </div>
                   ))}
                 </div>
@@ -1641,7 +1641,7 @@ export default function FeesPage() {
             </div>
 
             {/* Main: Items Grid */}
-            <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: '24px', minHeight: 600 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: '24px', minHeight: 600 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                 <div>
                   <h3 style={{ fontSize: 16, fontWeight: 800, color: '#1e0646', margin: 0 }}>Available Items</h3>
@@ -1652,11 +1652,11 @@ export default function FeesPage() {
                   )}
                 </div>
                 <div style={{ position: 'relative' }}>
-                  <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+                  <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-subtle)' }} />
                   <input 
                     placeholder="Search store items..." 
                     value={storeSearch} onChange={e => setStoreSearch(e.target.value)} 
-                    style={{ padding: '8px 12px 8px 36px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 12, outline: 'none', width: 220 }} 
+                    style={{ padding: '8px 12px 8px 36px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 12, outline: 'none', width: 220 }} 
                   />
                 </div>
               </div>
@@ -1668,11 +1668,11 @@ export default function FeesPage() {
                     const inCart = storeCart.find(x => x.id === item.id)
                     return (
                       <div key={item.id} style={{ 
-                        padding: '16px', borderRadius: 16, border: '1.5px solid #f3f4f6', transition: 'all .2s',
+                        padding: '16px', borderRadius: 16, border: '1.5px solid var(--border-light)', transition: 'all .2s',
                         opacity: item.current_stock > 0 ? 1 : 0.6
                       }}>
-                        <div style={{ fontSize: 10, color: '#9ca3af', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>{item.category}</div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 12 }}>{item.name}</div>
+                        <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>{item.category}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>{item.name}</div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div style={{ fontSize: 14, fontWeight: 900, color: '#059669' }}>{CUR(item.selling_price)}</div>
                           <button 
@@ -1689,19 +1689,19 @@ export default function FeesPage() {
                             <Plus size={14} />
                           </button>
                         </div>
-                        <div style={{ fontSize: 10, color: '#6b7280', marginTop: 8 }}>In Stock: {item.current_stock}</div>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 8 }}>In Stock: {item.current_stock}</div>
                       </div>
                     )
                   })
                 }
-                {filteredStoreItems.length === 0 && <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 40, color: '#9ca3af' }}>No items found</div>}
+                {filteredStoreItems.length === 0 && <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 40, color: 'var(--text-subtle)' }}>No items found</div>}
               </div>
             </div>
 
             {/* Floating Cart Panel */}
             {storeCart.length > 0 && (
               <div style={{ 
-                position: 'fixed', bottom: 30, right: 30, width: 320, background: '#fff', borderRadius: 24, 
+                position: 'fixed', bottom: 30, right: 30, width: 320, background: 'var(--bg-card)', borderRadius: 24, 
                 boxShadow: '0 20px 50px rgba(0,0,0,0.15)', border: '1.5px solid #f0eefe', zIndex: 100,
                 display: 'flex', flexDirection: 'column', overflow: 'hidden', animation: '_an_fi .3s ease-out'
               }}>
@@ -1715,9 +1715,9 @@ export default function FeesPage() {
 
                 <div style={{ maxHeight: 300, overflowY: 'auto', padding: 16 }}>
                   {storeCart.map(item => (
-                    <div key={item.id} style={{ display: 'flex', gap: 12, marginBottom: 14, paddingBottom: 12, borderBottom: '1px solid #f3f4f6' }}>
+                    <div key={item.id} style={{ display: 'flex', gap: 12, marginBottom: 14, paddingBottom: 12, borderBottom: '1px solid var(--border-light)' }}>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{item.name}</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)' }}>{item.name}</div>
                         <div style={{ fontSize: 11, color: '#059669', fontWeight: 800 }}>{CUR(item.selling_price)} × {item.qty}</div>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -1730,7 +1730,7 @@ export default function FeesPage() {
 
                 <div style={{ padding: 20, background: '#fcfaff' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                    <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 700 }}>Total Payable</span>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700 }}>Total Payable</span>
                     <span style={{ fontSize: 22, fontWeight: 900, color: '#059669' }}>{CUR(storeCart.reduce((acc, i) => acc + (i.qty * i.selling_price), 0))}</span>
                   </div>
 
@@ -1787,7 +1787,7 @@ export default function FeesPage() {
                   <div style={{ fontSize: 12, opacity: 0.7 }}>Combined Tuition & Store Sales</div>
                 </div>
 
-                <div style={{ background: '#fff', borderRadius: 24, padding: 24, border: '1.5px solid #f0eefe' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 24, border: '1.5px solid #f0eefe' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: '#64748b' }}>Tuition Payments</span>
                     <div style={{ background: '#f5f3ff', padding: 8, borderRadius: 12, color: '#6d28d9' }}><Users size={18} /></div>
@@ -1798,7 +1798,7 @@ export default function FeesPage() {
                   </div>
                 </div>
 
-                <div style={{ background: '#fff', borderRadius: 24, padding: 24, border: '1.5px solid #f0eefe' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 24, border: '1.5px solid #f0eefe' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: '#64748b' }}>Store Sales</span>
                     <div style={{ background: '#ecfdf5', padding: 8, borderRadius: 12, color: '#059669' }}><ShoppingCart size={18} /></div>
@@ -1811,7 +1811,7 @@ export default function FeesPage() {
               </div>
 
               {/* Payment Methods */}
-              <div style={{ background: '#fff', borderRadius: 24, padding: 24, border: '1.5px solid #f0eefe' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 24, border: '1.5px solid #f0eefe' }}>
                 <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1e0646', marginBottom: 20 }}>Payment Method Distribution (Today)</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                   {Object.entries(byMethod).map(([m, val]) => (
@@ -1824,8 +1824,8 @@ export default function FeesPage() {
               </div>
 
               {/* Combined Transaction Log */}
-              <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
-                <div style={{ padding: '20px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+                <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1e0646', margin: 0 }}>Recent Transactions (All Channels)</h3>
                   <Btn variant="secondary" onClick={() => window.print()}><Printer size={14} /> Print Report</Btn>
                 </div>
@@ -1851,11 +1851,11 @@ export default function FeesPage() {
                           </td>
                           <td style={{ padding: '14px', fontSize: 13, color: '#1e293b' }}>{t._name}</td>
                           <td style={{ padding: '14px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#64748b' }}>{t.payment_method}</td>
-                          <td style={{ padding: '14px', fontSize: 14, fontWeight: 800, color: '#111827' }}>{CUR(t._amt)}</td>
+                          <td style={{ padding: '14px', fontSize: 14, fontWeight: 800, color: 'var(--text-main)' }}>{CUR(t._amt)}</td>
                         </tr>
                       ))}
                       {todayPayments.length === 0 && todaySales.length === 0 && (
-                        <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No transactions recorded today</td></tr>
+                        <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>No transactions recorded today</td></tr>
                       )}
                     </tbody>
                   </table>
@@ -1865,9 +1865,9 @@ export default function FeesPage() {
           )
         })()}
         {tab === 'balances' && (
-          <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
             <div style={{ padding: '16px 22px', borderBottom: '1px solid #faf5ff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fcfaff' }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>Financial Standing for All Students</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>Financial Standing for All Students</span>
               <Btn variant="secondary" onClick={() => {
                 const csvRows = [
                   ['Student Name', 'Class', 'Arrears', 'Term Fees', 'Total Payable', 'Paid to Date', 'Balance'].join(','),
@@ -1925,13 +1925,13 @@ export default function FeesPage() {
 
                     return (
                       <tr key={s.id} className="fp-row" style={{ borderBottom: '1px solid #faf5ff' }}>
-                        <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600, color: '#111827' }}>
+                        <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>
                           {s.full_name}
                           {s.scholarship_percentage > 0 && <div style={{ fontSize: 9, color: '#16a34a', fontWeight: 800 }}>🎓 {s.scholarship_percentage}% Scholar</div>}
                         </td>
                         <td style={{ padding: '12px 14px' }}><span style={{ fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: 99 }}>{(s.class as any)?.name || '—'}</span></td>
-                        <td style={{ padding: '12px 14px', fontSize: 13, color: '#6b7280' }}>{CUR(openingArrears)}</td>
-                        <td style={{ padding: '12px 14px', fontSize: 13, color: '#6b7280' }}>{CUR(netTermCharges)}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 13, color: 'var(--text-muted)' }}>{CUR(openingArrears)}</td>
+                        <td style={{ padding: '12px 14px', fontSize: 13, color: 'var(--text-muted)' }}>{CUR(netTermCharges)}</td>
                         <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#1e0646' }}>{CUR(totalBill)}</td>
                         <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#16a34a' }}>{CUR(totalPaid)}</td>
                         <td style={{ padding: '12px 14px' }}>
@@ -1960,12 +1960,12 @@ export default function FeesPage() {
 
         {/* ── HISTORY TAB ── */}
         {tab === 'history' && (
-          <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
             <div style={{ padding: '16px 22px', borderBottom: '1px solid #faf5ff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{(payments as any[]).length} payments recorded {term ? `· ${term.name}` : ''}</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{(payments as any[]).length} payments recorded {term ? `· ${term.name}` : ''}</span>
               <span style={{ fontSize: 13, fontWeight: 800, color: '#16a34a' }}>Total: {CUR((payments as any[]).reduce((s: number, p: any) => s + (p.amount_paid || 0), 0))}</span>
             </div>
-            {loadingPayments ? <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>Loading…</div> : (payments as any[]).length === 0 ? <div style={{ padding: '60px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No payments for this term yet</div> : (
+            {loadingPayments ? <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-subtle)' }}>Loading…</div> : (payments as any[]).length === 0 ? <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>No payments for this term yet</div> : (
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
                   <thead>
@@ -1978,9 +1978,9 @@ export default function FeesPage() {
                   <tbody>
                     {(payments as any[]).map((p: any, i) => (
                       <tr key={p.id} onClick={() => setPrintReceipt(p)} className="fp-row" style={{ borderBottom: '1px solid #faf5ff', transition: 'background .12s', cursor: 'pointer' }}>
-                        <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: '#111827' }}>{p.student?.full_name}</td>
+                        <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{p.student?.full_name}</td>
                         <td style={{ padding: '11px 14px' }}><span style={{ fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: 99 }}>{(p.student as any)?.class?.name ?? '—'}</span></td>
-                        <td style={{ padding: '11px 14px', fontSize: 12, color: '#6b7280' }}>{p.fee_structure?.fee_name ?? 'General'}</td>
+                        <td style={{ padding: '11px 14px', fontSize: 12, color: 'var(--text-muted)' }}>{p.fee_structure?.fee_name ?? 'General'}</td>
                         <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 800, color: '#16a34a' }}>{CUR(p.amount_paid)}</td>
                         <td style={{ padding: '11px 14px' }}>
                           <span style={{ 
@@ -1996,8 +1996,8 @@ export default function FeesPage() {
                             {p.payment_method === 'online' ? '🌐 Online' : p.payment_method}
                           </span>
                         </td>
-                        <td style={{ padding: '11px 14px', fontSize: 12, color: '#9ca3af', fontFamily: 'monospace' }}>{p.reference_number ?? '—'}</td>
-                        <td style={{ padding: '11px 14px', fontSize: 12, color: '#6b7280' }}>{new Date(p.payment_date).toLocaleDateString('en-GB')}</td>
+                        <td style={{ padding: '11px 14px', fontSize: 12, color: 'var(--text-subtle)', fontFamily: 'monospace' }}>{p.reference_number ?? '—'}</td>
+                        <td style={{ padding: '11px 14px', fontSize: 12, color: 'var(--text-muted)' }}>{new Date(p.payment_date).toLocaleDateString('en-GB')}</td>
                         <td style={{ padding: '11px 14px' }}>
                           <div style={{ display: 'flex', gap: 6 }}>
                             <button onClick={(e) => { e.stopPropagation(); setPrintReceipt(p) }} style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#eff6ff', color: '#2563eb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="View / Print Receipt"><Printer size={13} /></button>
@@ -2019,12 +2019,12 @@ export default function FeesPage() {
         {tab === 'structures' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             {loadingStructures ? (
-              <div style={{ padding: '40px', color: '#9ca3af', fontSize: 13, textAlign: 'center' }}>Loading…</div>
+              <div style={{ padding: '40px', color: 'var(--text-subtle)', fontSize: 13, textAlign: 'center' }}>Loading…</div>
             ) : (structures as any[]).length === 0 ? (
-              <div style={{ background: '#fff', borderRadius: 16, padding: '60px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                 <Settings size={40} color="#d1d5db" style={{ marginBottom: 12 }} />
-                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No fee structures yet</h3>
-                <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>Create fee types for each class and term</p>
+                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No fee structures yet</h3>
+                <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>Create fee types for each class and term</p>
                 <Btn onClick={() => setStructureModal(true)}><Plus size={14} /> Create First Fee Type</Btn>
               </div>
             ) : (() => {
@@ -2040,17 +2040,17 @@ export default function FeesPage() {
               return Object.entries(grouped).map(([cId, g]) => (
                 <div key={cId}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, padding: '0 4px' }}>
-                    <h3 style={{ fontSize: 14, fontWeight: 800, color: '#111827', margin: 0, textTransform: 'uppercase', letterSpacing: '.05em' }}>{g.name}</h3>
-                    <div style={{ height: 1, flex: 1, background: '#f3f4f6' }} />
+                    <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', margin: 0, textTransform: 'uppercase', letterSpacing: '.05em' }}>{g.name}</h3>
+                    <div style={{ height: 1, flex: 1, background: 'var(--bg-hover)' }} />
                     <span style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', background: '#f5f3ff', padding: '2px 10px', borderRadius: 99 }}>{g.items.length} types</span>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
                     {g.items.map((s: any) => (
-                      <div key={s.id} style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', position: 'relative', overflow: 'hidden' }}>
+                      <div key={s.id} style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, position: 'relative', zIndex: 1 }}>
                           <div>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{s.fee_name}</div>
-                            <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{s.term?.name}</div>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{s.fee_name}</div>
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{s.term?.name}</div>
                           </div>
                           <button onClick={() => { if (confirm('Delete this fee structure?')) feeStructuresService.delete(schoolId, s.id).then(() => qc.invalidateQueries({ queryKey: ['fee-structures'] })) }}
                             style={{ width: 28, height: 28, borderRadius: 7, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -2062,10 +2062,10 @@ export default function FeesPage() {
                           {s.is_discountable !== false ? (
                             <div style={{ fontSize: 10, fontWeight: 800, color: '#6d28d9', background: '#f5f3ff', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>✨ DISCOUNTABLE</div>
                           ) : (
-                            <div style={{ fontSize: 10, fontWeight: 800, color: '#6b7280', background: '#f1f5f9', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>🚫 NO DISCOUNT</div>
+                            <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', background: '#f1f5f9', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>🚫 NO DISCOUNT</div>
                           )}
                         </div>
-                        {s.description && <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 6, position: 'relative', zIndex: 1 }}>{s.description}</p>}
+                        {s.description && <p style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 6, position: 'relative', zIndex: 1 }}>{s.description}</p>}
                         {/* Subtle background decoration */}
                         <div style={{ position: 'absolute', bottom: -10, right: -10, fontSize: 60, opacity: 0.03, pointerEvents: 'none', color: '#6d28d9' }}>💰</div>
                       </div>
@@ -2083,10 +2083,10 @@ export default function FeesPage() {
         footer={<><Btn variant="secondary" onClick={() => setStructureModal(false)}>Cancel</Btn><Btn onClick={() => { if (!sf.class_id || !sf.fee_name || !sf.amount) { toast.error('Fill required fields'); return } createStructure.mutate({ school_id: schoolId, class_id: sf.class_id, term_id: term?.id, academic_year_id: (year as any)?.id, fee_name: sf.fee_name, amount: parseFloat(sf.amount), currency_code: sf.currency_code, description: sf.description || null, is_discountable: sf.is_discountable !== false }) }} loading={createStructure.isPending}>Create</Btn></>}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[
-            { label: 'Class *', children: <select value={sf.class_id} onChange={e => setSf(p => ({ ...p, class_id: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}><option value="">Select class…</option>{(classes as any[]).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</select> },
-            { label: 'Fee Name *', children: <input value={sf.fee_name} onChange={e => setSf(p => ({ ...p, fee_name: e.target.value }))} placeholder="e.g. Tuition Fee" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
-            { label: 'Amount *', children: <div style={{ display: 'flex', gap: 8 }}><select value={sf.currency_code} onChange={e => setSf(p => ({ ...p, currency_code: e.target.value }))} style={{ padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', background: '#f8fafc' }}><option value="GHS">GHS</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select><input type="number" value={sf.amount} onChange={e => setSf(p => ({ ...p, amount: e.target.value }))} placeholder="0.00" style={{ flex: 1, padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /></div> },
-            { label: 'Description', children: <input value={sf.description} onChange={e => setSf(p => ({ ...p, description: e.target.value }))} placeholder="Optional note" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
+            { label: 'Class *', children: <select value={sf.class_id} onChange={e => setSf(p => ({ ...p, class_id: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }}><option value="">Select class…</option>{(classes as any[]).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</select> },
+            { label: 'Fee Name *', children: <input value={sf.fee_name} onChange={e => setSf(p => ({ ...p, fee_name: e.target.value }))} placeholder="e.g. Tuition Fee" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
+            { label: 'Amount *', children: <div style={{ display: 'flex', gap: 8 }}><select value={sf.currency_code} onChange={e => setSf(p => ({ ...p, currency_code: e.target.value }))} style={{ padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', background: '#f8fafc' }}><option value="GHS">GHS</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select><input type="number" value={sf.amount} onChange={e => setSf(p => ({ ...p, amount: e.target.value }))} placeholder="0.00" style={{ flex: 1, padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /></div> },
+            { label: 'Description', children: <input value={sf.description} onChange={e => setSf(p => ({ ...p, description: e.target.value }))} placeholder="Optional note" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
             { label: 'Discount Policy', children: (
               <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#f8fafc', borderRadius: 10, border: '1.5px solid #e2e8f0', cursor: 'pointer' }}>
                 <input type="checkbox" checked={sf.is_discountable !== false} onChange={e => setSf(p => ({ ...p, is_discountable: e.target.checked }))} style={{ accentColor: '#7c3aed' }} />
@@ -2098,7 +2098,7 @@ export default function FeesPage() {
             )},
           ].map(f => (
             <div key={f.label}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{f.label}</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{f.label}</label>
               {f.children}
             </div>
           ))}
@@ -2110,12 +2110,12 @@ export default function FeesPage() {
         {printReceipt && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div style={{ background: '#f8fafc', borderRadius: 12, padding: 24, textAlign: 'center', border: '1.5px solid #e2e8f0' }}>
-              <div style={{ fontSize: 13, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.08em', fontWeight: 700, marginBottom: 8 }}>
+              <div style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.08em', fontWeight: 700, marginBottom: 8 }}>
                 {allocationResult ? 'Transaction Successfully Recorded' : 'Official Payment Record'}
               </div>
               <div style={{ fontSize: 36, fontWeight: 900, color: '#16a34a', fontFamily: '"Playfair Display",serif' }}>{CUR(printReceipt.amount_paid)}</div>
-              <div style={{ fontSize: 14, color: '#374151', marginTop: 8, fontWeight: 600 }}>{(students as any[]).find(s => s.id === printReceipt.student_id)?.full_name ?? 'Student'}</div>
-              <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>Receipt ID: {printReceipt.id?.slice(0,8).toUpperCase()}</div>
+              <div style={{ fontSize: 14, color: 'var(--text-main)', marginTop: 8, fontWeight: 600 }}>{(students as any[]).find(s => s.id === printReceipt.student_id)?.full_name ?? 'Student'}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 4 }}>Receipt ID: {printReceipt.id?.slice(0,8).toUpperCase()}</div>
             </div>
 
             {/* Allocation breakdown */}
@@ -2127,7 +2127,7 @@ export default function FeesPage() {
                     <span style={{ fontSize: 14, fontWeight: 900, color: '#16a34a', letterSpacing: '.04em' }}>✅ ALL PREVIOUS ARREARS CLEARED</span>
                   </div>
                 )}
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Payment Allocation</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Payment Allocation</div>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <tbody>
                     <tr style={{ borderBottom: '1px solid rgba(0,0,0,.06)' }}>
@@ -2150,7 +2150,7 @@ export default function FeesPage() {
             )}
 
             <div>
-              <p style={{ fontSize: 13, color: '#374151', fontWeight: 600, marginBottom: 12, textAlign: 'center' }}>How would you like to share this receipt?</p>
+              <p style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 600, marginBottom: 12, textAlign: 'center' }}>How would you like to share this receipt?</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <button onClick={() => handlePrint(printReceipt)} style={{ padding: '13px', borderRadius: 12, border: 'none', background: '#1e0646', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                   <Printer size={16} /> Print Detailed (Duplex)
@@ -2169,14 +2169,14 @@ export default function FeesPage() {
                   {isSendingSMS ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                   {isSendingSMS ? 'Sending…' : 'Send SMS to Guardian'}
                 </button>
-                <button onClick={() => { window.open(`mailto:?subject=Official School Fee Receipt&body=${encodeURIComponent(generateTextReceipt(printReceipt))}`, '_self') }} style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#f8fafc', color: '#374151', borderBottom: '2px solid #e2e8f0', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, gridColumn: 'span 2' }}>
+                <button onClick={() => { window.open(`mailto:?subject=Official School Fee Receipt&body=${encodeURIComponent(generateTextReceipt(printReceipt))}`, '_self') }} style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#f8fafc', color: 'var(--text-main)', borderBottom: '2px solid #e2e8f0', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, gridColumn: 'span 2' }}>
                   <Mail size={16} /> Send via Email
                 </button>
               </div>
             </div>
 
             <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: 16, display: 'flex', justifyContent: 'center' }}>
-              <button onClick={() => { setPrintReceipt(null); setAllocationResult(null) }} style={{ padding: '8px 24px', borderRadius: 8, border: 'none', background: 'transparent', color: '#6b7280', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Close this window</button>
+              <button onClick={() => { setPrintReceipt(null); setAllocationResult(null) }} style={{ padding: '8px 24px', borderRadius: 8, border: 'none', background: 'transparent', color: 'var(--text-muted)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Close this window</button>
             </div>
           </div>
         )}
@@ -2189,8 +2189,8 @@ export default function FeesPage() {
             <div style={{ background: '#fef2f2', border: '1.5px solid #fecaca', borderRadius: 12, padding: 12, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
               <Lock size={24} color="#dc2626" />
             </div>
-            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#111827', margin: '0 0 6px' }}>Verify Transaction PIN</h3>
-            <p style={{ fontSize: 12, color: '#6b7280', margin: 0 }}>This transaction requires your 4-digit security PIN to authorize checkout.</p>
+            <h3 style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 6px' }}>Verify Transaction PIN</h3>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>This transaction requires your 4-digit security PIN to authorize checkout.</p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
@@ -2204,7 +2204,7 @@ export default function FeesPage() {
                 width: '100%',
                 padding: '12px',
                 borderRadius: 10,
-                border: '2px solid #e5e7eb',
+                border: '2px solid var(--border-color)',
                 fontSize: 20,
                 letterSpacing: '0.5em',
                 textAlign: 'center',
@@ -2226,9 +2226,9 @@ export default function FeesPage() {
                 flex: 1,
                 padding: '10px 16px',
                 borderRadius: 10,
-                border: '1.5px solid #e5e7eb',
-                background: '#fff',
-                color: '#374151',
+                border: '1.5px solid var(--border-color)',
+                background: 'var(--bg-card)',
+                color: 'var(--text-main)',
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: 'pointer',

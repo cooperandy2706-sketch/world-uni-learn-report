@@ -92,22 +92,22 @@ export default function BatchPromotionPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 32 }}>
                 <div className="card" style={{ padding: '24px' }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#6b7280', marginBottom: 12, textTransform: 'uppercase' }}>Promote FROM</label>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 12, textTransform: 'uppercase' }}>Promote FROM</label>
                     <select 
                         value={fromClass} 
                         onChange={(e) => setFromClass(e.target.value)}
-                        style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1.5px solid #e5e7eb', fontSize: 15, fontWeight: 600, outline: 'none' }}
+                        style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1.5px solid var(--border-color)', fontSize: 15, fontWeight: 600, outline: 'none' }}
                     >
                         <option value="">Select Current Class</option>
                         {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                 </div>
                 <div className="card" style={{ padding: '24px' }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#6b7280', marginBottom: 12, textTransform: 'uppercase' }}>Promote TO</label>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 12, textTransform: 'uppercase' }}>Promote TO</label>
                     <select 
                         value={toClass} 
                         onChange={(e) => setToClass(e.target.value)}
-                        style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1.5px solid #e5e7eb', fontSize: 15, fontWeight: 600, outline: 'none' }}
+                        style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1.5px solid var(--border-color)', fontSize: 15, fontWeight: 600, outline: 'none' }}
                     >
                         <option value="">Select Destination Class</option>
                         {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -118,10 +118,10 @@ export default function BatchPromotionPage() {
 
             {fromClass && (
                 <div className="card" style={{ overflow: 'hidden', animation: 'fadeIn 0.3s ease' }}>
-                    <div style={{ padding: '20px 24px', background: '#f9fafb', borderBottom: '1px solid #f0eefe', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ padding: '20px 24px', background: 'var(--bg-input)', borderBottom: '1px solid #f0eefe', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                            <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{students.length} Students Found</span>
-                            <span style={{ fontSize: 13, color: '#6b7280', marginLeft: 12 }}>{selectedIds.size} selected for promotion</span>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{students.length} Students Found</span>
+                            <span style={{ fontSize: 13, color: 'var(--text-muted)', marginLeft: 12 }}>{selectedIds.size} selected for promotion</span>
                         </div>
                         <div style={{ display: 'flex', gap: 12 }}>
                             <button onClick={selectAll} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Select All</button>
@@ -133,7 +133,7 @@ export default function BatchPromotionPage() {
                         {loading ? (
                             <div style={{ padding: '60px', textAlign: 'center' }}>Loading students...</div>
                         ) : students.length === 0 ? (
-                            <div style={{ padding: '60px', textAlign: 'center', color: '#9ca3af' }}>No students in this class.</div>
+                            <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>No students in this class.</div>
                         ) : students.map((s, i) => (
                             <div 
                                 key={i} 
@@ -142,7 +142,7 @@ export default function BatchPromotionPage() {
                                 style={{ padding: '14px 24px', borderBottom: i === students.length - 1 ? 'none' : '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}
                             >
                                 <div style={{ 
-                                    width: 22, height: 22, borderRadius: '6px', border: '2px solid #e5e7eb', 
+                                    width: 22, height: 22, borderRadius: '6px', border: '2px solid var(--border-color)', 
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     background: selectedIds.has(s.id) ? '#7c3aed' : 'white',
                                     borderColor: selectedIds.has(s.id) ? '#7c3aed' : '#e5e7eb'
@@ -155,7 +155,7 @@ export default function BatchPromotionPage() {
                                     </div>
                                     <div>
                                         <div style={{ fontSize: 14, fontWeight: 600 }}>{s.full_name}</div>
-                                        <div style={{ fontSize: 11, color: '#6b7280' }}>ID: {s.student_id}</div>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>ID: {s.student_id}</div>
                                     </div>
                                 </div>
                                 {selectedIds.has(s.id) ? (
@@ -189,10 +189,10 @@ export default function BatchPromotionPage() {
             )}
 
             {!fromClass && (
-                <div className="card" style={{ padding: '80px 40px', textAlign: 'center', borderStyle: 'dashed', background: '#f9fafb' }}>
+                <div className="card" style={{ padding: '80px 40px', textAlign: 'center', borderStyle: 'dashed', background: 'var(--bg-input)' }}>
                     <ShieldAlert size={48} color="#e5e7eb" style={{ marginBottom: 16 }} />
-                    <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>Start a Batch Promotion</h3>
-                    <p style={{ color: '#6b7280', fontSize: 14, maxWidth: '400px', margin: '0 auto' }}>Select the current class of the students you want to promote above.</p>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' }}>Start a Batch Promotion</h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: 14, maxWidth: '400px', margin: '0 auto' }}>Select the current class of the students you want to promote above.</p>
                 </div>
             )}
         </div>

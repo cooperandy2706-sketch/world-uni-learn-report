@@ -188,7 +188,7 @@ function AILessonModal({
 
     return (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.55)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 999, backdropFilter: 'blur(6px)', padding: '16px', overflowY: 'auto' }}>
-            <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 720, boxShadow: '0 32px 80px rgba(0,0,0,.25)', fontFamily: '"DM Sans",system-ui,sans-serif', marginTop: 16, marginBottom: 32 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 20, width: '100%', maxWidth: 720, boxShadow: '0 32px 80px rgba(0,0,0,.25)', fontFamily: '"DM Sans",system-ui,sans-serif', marginTop: 16, marginBottom: 32 }}>
 
                 {/* Modal Header */}
                 <div style={{ background: 'linear-gradient(135deg,#4c1d95,#7c3aed)', borderRadius: '20px 20px 0 0', padding: '20px 24px', color: '#fff' }}>
@@ -234,37 +234,37 @@ function AILessonModal({
                             </div>
 
                             {/* Topic */}
-                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>
                                 📌 Lesson Topic *
                             </label>
                             <input
                                 value={topic}
                                 onChange={e => setTopic(e.target.value)}
                                 placeholder="e.g. Photosynthesis, The Pythagorean Theorem, World War II causes…"
-                                style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif', marginBottom: 20 }}
+                                style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif', marginBottom: 20 }}
                                 onFocus={e => (e.target.style.borderColor = '#7c3aed')}
                                 onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
                             />
 
                             {/* Bullets */}
-                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>
                                 📋 Key Points / Objectives to Cover
                             </label>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
                                 {bullets.map((b, i) => (
                                     <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                                        <span style={{ color: '#9ca3af', fontSize: 16, flexShrink: 0 }}>•</span>
+                                        <span style={{ color: 'var(--text-subtle)', fontSize: 16, flexShrink: 0 }}>•</span>
                                         <input
                                             value={b}
                                             onChange={e => updateBullet(i, e.target.value)}
                                             placeholder={`Key point ${i + 1}…`}
-                                            style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}
+                                            style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}
                                             onFocus={e => (e.target.style.borderColor = '#7c3aed')}
                                             onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
                                             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addBullet() } }}
                                         />
                                         {bullets.length > 1 && (
-                                            <button onClick={() => removeBullet(i)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: 16, padding: '0 4px' }}>✕</button>
+                                            <button onClick={() => removeBullet(i)} style={{ background: 'none', border: 'none', color: 'var(--text-subtle)', cursor: 'pointer', fontSize: 16, padding: '0 4px' }}>✕</button>
                                         )}
                                     </div>
                                 ))}
@@ -275,7 +275,7 @@ function AILessonModal({
                             </button>
 
                             {/* Teacher Notes */}
-                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>
                                 📝 Personal Notes (optional, saved privately)
                             </label>
                             <textarea
@@ -283,7 +283,7 @@ function AILessonModal({
                                 onChange={e => setNotes(e.target.value)}
                                 rows={3}
                                 placeholder="Personal reminders, observations, what to emphasize…"
-                                style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', boxSizing: 'border-box' }}
+                                style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', boxSizing: 'border-box' }}
                             />
 
                             {error && <p style={{ fontSize: 12, color: '#dc2626', marginTop: 8 }}>⚠️ {error}</p>}
@@ -294,7 +294,7 @@ function AILessonModal({
                                 </div>
                                 <div style={{ display: 'flex', gap: 10 }}>
                                     <button onClick={handleSaveNotes}
-                                        style={{ padding: '9px 18px', borderRadius: 9, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
+                                        style={{ padding: '9px 18px', borderRadius: 9, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
                                         💾 Save Notes Only
                                     </button>
                                     <button
@@ -320,7 +320,7 @@ function AILessonModal({
                         plan && (
                             <div>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-                                    <div style={{ fontSize: 12, color: '#6b7280' }}>
+                                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                                         Generated {new Date(plan.generatedAt).toLocaleString()}
                                     </div>
                                     <div style={{ display: 'flex', gap: 8 }}>
@@ -364,11 +364,11 @@ function AILessonModal({
 
                                 <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                                     <button onClick={onClose}
-                                        style={{ padding: '9px 18px', borderRadius: 9, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
+                                        style={{ padding: '9px 18px', borderRadius: 9, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
                                         Close
                                     </button>
                                     <button onClick={handleSaveNotes}
-                                        style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: '#f3f4f6', color: '#111827', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
+                                        style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: 'var(--bg-hover)', color: 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
                                         💾 Save Locally
                                     </button>
                                     <button onClick={handleFormalSubmit} disabled={submitting}
@@ -604,7 +604,7 @@ export default function LessonTrackerPage() {
                 <div className="t-header" style={{ marginBottom: 20 }}>
                   <div>
                     <h1 className="t-title">Lesson Tracker</h1>
-                    <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>
                       {DAYS[todayDay]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                     </p>
                   </div>
@@ -618,7 +618,7 @@ export default function LessonTrackerPage() {
                         <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 22, fontWeight: 700, margin: '0 0 4px' }}>{activeLesson.subject}</h2>
                         <p style={{ fontSize: 14, opacity: .85, margin: '0 0 12px' }}>{activeLesson.class} · {activeLesson.period} · {activeLesson.startTime}–{activeLesson.endTime}</p>
                         <div style={{ height: 6, background: 'rgba(255,255,255,.2)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
-                            <div style={{ height: '100%', width: `${activeLesson.progress}%`, background: '#fff', borderRadius: 99, transition: 'width 1s linear' }} />
+                            <div style={{ height: '100%', width: `${activeLesson.progress}%`, background: 'var(--bg-card)', borderRadius: 99, transition: 'width 1s linear' }} />
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, opacity: .8 }}>
                             <span>{activeLesson.progress}% complete</span>
@@ -665,10 +665,10 @@ export default function LessonTrackerPage() {
                 ) : tab === 'today' ? (
                     // ── TODAY ──
                     todayItems.length === 0 ? (
-                        <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+                        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                             <div style={{ fontSize: 52, marginBottom: 12 }}>☀️</div>
-                            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827' }}>No classes today</h3>
-                            <p style={{ fontSize: 13, color: '#9ca3af' }}>Check the Full Week tab to see your schedule.</p>
+                            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>No classes today</h3>
+                            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Check the Full Week tab to see your schedule.</p>
                         </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -678,22 +678,22 @@ export default function LessonTrackerPage() {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                         <div style={{ textAlign: 'center', flexShrink: 0, width: 56 }}>
                                             <div style={{ fontSize: 14, fontWeight: 700, color: statusColor[l.status] }}>{l.startTime}</div>
-                                            <div style={{ fontSize: 10, color: '#9ca3af' }}>{l.endTime}</div>
+                                            <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{l.endTime}</div>
                                         </div>
                                         <div style={{ width: 2, height: 40, background: `${statusColor[l.status]}40`, borderRadius: 99, flexShrink: 0 }} />
                                         <div style={{ flex: 1 }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                                                <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{l.subject}</span>
+                                                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{l.subject}</span>
                                                 <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 99, background: statusColor[l.status] + '18', color: statusColor[l.status] }}>
                                                     {statusLabel[l.status]}
                                                 </span>
                                             </div>
-                                            <div style={{ fontSize: 12, color: '#6b7280' }}>{l.class} · {l.period}</div>
+                                            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{l.class} · {l.period}</div>
                                             {storedData[l.id]?.plan && (
                                                 <div style={{ fontSize: 11, color: '#6d28d9', marginTop: 4, fontStyle: 'italic' }}>✨ AI plan: {storedData[l.id].plan!.topic}</div>
                                             )}
                                             {storedData[l.id]?.notes && !storedData[l.id]?.plan && (
-                                                <div style={{ fontSize: 11, color: '#6b7280', marginTop: 4 }}>📝 {storedData[l.id].notes.slice(0, 60)}…</div>
+                                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>📝 {storedData[l.id].notes.slice(0, 60)}…</div>
                                             )}
                                         </div>
                                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
@@ -734,21 +734,21 @@ export default function LessonTrackerPage() {
                             const dayLessons = computed.filter(l => l.dayOfWeek === day).sort((a, b) => a.startMinutes - b.startMinutes)
                             const isToday = day === todayDay
                             return (
-                                <div key={day} style={{ background: '#fff', borderRadius: 14, border: `1.5px solid ${isToday ? '#7c3aed' : '#f0eefe'}`, overflow: 'hidden' }}>
+                                <div key={day} style={{ background: 'var(--bg-card)', borderRadius: 14, border: `1.5px solid ${isToday ? '#7c3aed' : '#f0eefe'}`, overflow: 'hidden' }}>
                                     <div style={{ padding: '10px 16px', background: isToday ? 'linear-gradient(135deg,#7c3aed,#6d28d9)' : '#f8fafc', borderBottom: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 8 }}>
                                         <span style={{ fontSize: 13, fontWeight: 700, color: isToday ? '#fff' : '#374151' }}>{DAYS[day]}</span>
                                         {isToday && <span style={{ fontSize: 10, background: 'rgba(255,255,255,.2)', color: '#fff', padding: '1px 8px', borderRadius: 99, fontWeight: 700 }}>TODAY</span>}
                                         <span style={{ fontSize: 11, color: isToday ? 'rgba(255,255,255,.7)' : '#9ca3af', marginLeft: 'auto' }}>{dayLessons.length} class{dayLessons.length !== 1 ? 'es' : ''}</span>
                                     </div>
                                     {dayLessons.length === 0 ? (
-                                        <div style={{ padding: '14px 16px', fontSize: 12, color: '#9ca3af', textAlign: 'center' }}>No classes</div>
+                                        <div style={{ padding: '14px 16px', fontSize: 12, color: 'var(--text-subtle)', textAlign: 'center' }}>No classes</div>
                                     ) : (
                                         <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                                             {dayLessons.map(l => (
                                                 <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 9, background: l.status === 'now' ? '#f0fdf4' : l.status === 'done' ? '#f9fafb' : '#f5f3ff', border: `1px solid ${l.status === 'now' ? '#bbf7d0' : l.status === 'done' ? '#e5e7eb' : '#ede9fe'}` }}>
-                                                    <span style={{ fontSize: 11, color: '#6b7280', width: 44, flexShrink: 0 }}>{l.startTime}</span>
+                                                    <span style={{ fontSize: 11, color: 'var(--text-muted)', width: 44, flexShrink: 0 }}>{l.startTime}</span>
                                                     <span style={{ fontSize: 12, fontWeight: 700, color: l.status === 'done' ? '#9ca3af' : '#111827', flex: 1 }}>{l.subject}</span>
-                                                    <span style={{ fontSize: 11, color: '#6b7280' }}>{l.class}</span>
+                                                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{l.class}</span>
                                                     {storedData[l.id]?.plan && <span style={{ fontSize: 10, background: '#7c3aed', color: '#fff', padding: '1px 7px', borderRadius: 99, fontWeight: 700 }}>✨ AI</span>}
                                                     {l.status === 'now' && <span style={{ fontSize: 10, background: '#16a34a', color: '#fff', padding: '1px 7px', borderRadius: 99, fontWeight: 700 }}>LIVE</span>}
                                                     {l.status === 'done' && <span style={{ fontSize: 14 }}>✓</span>}
@@ -794,7 +794,7 @@ export default function LessonTrackerPage() {
                                 const hasPlan = !!storedData[l.id]?.plan
                                 return (
                                     <div key={l.id} className="lt-card"
-                                        style={{ background: '#fff', borderRadius: 14, border: `1.5px solid ${hasPlan ? '#ddd6fe' : '#f0eefe'}`, padding: '14px 16px', boxShadow: '0 1px 4px rgba(0,0,0,.04)' }}>
+                                        style={{ background: 'var(--bg-card)', borderRadius: 14, border: `1.5px solid ${hasPlan ? '#ddd6fe' : '#f0eefe'}`, padding: '14px 16px', boxShadow: '0 1px 4px rgba(0,0,0,.04)' }}>
                                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                                             {/* Left icon */}
                                             <div style={{ width: 42, height: 42, borderRadius: 11, background: hasPlan ? 'linear-gradient(135deg,#7c3aed,#4f46e5)' : '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
@@ -803,8 +803,8 @@ export default function LessonTrackerPage() {
 
                                             <div style={{ flex: 1 }}>
                                                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
-                                                    <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{l.subject}</span>
-                                                    <span style={{ fontSize: 11, color: '#6b7280' }}>{l.class}</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{l.subject}</span>
+                                                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{l.class}</span>
                                                     <span style={{ fontSize: 10, background: '#f5f3ff', color: '#6d28d9', padding: '1px 7px', borderRadius: 99 }}>{DAYS[l.dayOfWeek]} {l.startTime}</span>
                                                     {hasPlan && <span style={{ fontSize: 10, background: '#7c3aed', color: '#fff', padding: '1px 7px', borderRadius: 99, fontWeight: 700 }}>AI PLAN READY</span>}
                                                 </div>
@@ -813,7 +813,7 @@ export default function LessonTrackerPage() {
                                                         {summary.label}
                                                     </p>
                                                 ) : (
-                                                    <p style={{ fontSize: 12, color: '#9ca3af', margin: 0, fontStyle: 'italic' }}>No plan yet — click to generate one with AI</p>
+                                                    <p style={{ fontSize: 12, color: 'var(--text-subtle)', margin: 0, fontStyle: 'italic' }}>No plan yet — click to generate one with AI</p>
                                                 )}
                                             </div>
 
@@ -829,10 +829,10 @@ export default function LessonTrackerPage() {
                             })}
 
                         {computed.filter(l => l.dayOfWeek >= 1 && l.dayOfWeek <= 5).length === 0 && (
-                            <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+                            <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                                 <div style={{ fontSize: 52, marginBottom: 12 }}>📋</div>
-                                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827' }}>No lessons in timetable</h3>
-                                <p style={{ fontSize: 13, color: '#9ca3af' }}>Once your timetable is set up, lessons will appear here for AI planning.</p>
+                                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>No lessons in timetable</h3>
+                                <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Once your timetable is set up, lessons will appear here for AI planning.</p>
                             </div>
                         )}
                     </div>

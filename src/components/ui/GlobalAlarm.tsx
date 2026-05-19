@@ -79,7 +79,7 @@ export default function GlobalAlarm() {
       <audio src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" autoPlay loop />
 
       <div style={{
-        background: '#fff', borderRadius: 24, padding: 40, maxWidth: 600, width: '100%',
+        background: 'var(--bg-card)', borderRadius: 24, padding: 40, maxWidth: 600, width: '100%',
         textAlign: 'center', boxShadow: '0 24px 64px rgba(220, 38, 38, 0.4)',
         animation: '_alarm_shake 0.5s ease-in-out'
       }}>
@@ -87,7 +87,7 @@ export default function GlobalAlarm() {
         <h1 style={{ margin: '0 0 16px', fontSize: 32, fontWeight: 900, color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {alarm.title}
         </h1>
-        <p style={{ fontSize: 20, color: '#111827', margin: '0 0 32px', lineHeight: 1.5, fontWeight: 600 }}>
+        <p style={{ fontSize: 20, color: 'var(--text-main)', margin: '0 0 32px', lineHeight: 1.5, fontWeight: 600 }}>
           {alarm.body}
         </p>
         

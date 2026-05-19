@@ -287,9 +287,9 @@ const POSTER_TEMPLATES: PosterTemplate[] = [
     elements: [
       { type: 'subtitle' as ElementType, content: '📢 ATTENTION PARENTS & STUDENTS', x: 50, y: 15, width: 80, fontSize: 16, fontFamily: "'Inter', sans-serif", color: '#ffffff', bold: true, italic: false, align: 'center' as TextAlign, bgColor: '#059669', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 3, locked: false },
       { type: 'title' as ElementType, content: 'SCHOOL\nREOPENING', x: 50, y: 34, width: 80, fontSize: 52, fontFamily: "'Inter', sans-serif", color: '#059669', bold: true, italic: false, align: 'center' as TextAlign, bgColor: 'transparent', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 2, locked: false },
-      { type: 'body' as ElementType, content: 'We are pleased to announce that school resumes for all students on the date below. Please ensure all requirements are met before resumption.', x: 50, y: 54, width: 78, fontSize: 15, fontFamily: 'Georgia, serif', color: '#1f2937', bold: false, italic: false, align: 'center' as TextAlign, bgColor: 'transparent', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 2, locked: false },
+      { type: 'body' as ElementType, content: 'We are pleased to announce that school resumes for all students on the date below. Please ensure all requirements are met before resumption.', x: 50, y: 54, width: 78, fontSize: 15, fontFamily: 'Georgia, serif', color: 'var(--text-main)', bold: false, italic: false, align: 'center' as TextAlign, bgColor: 'transparent', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 2, locked: false },
       { type: 'body' as ElementType, content: '📅  Monday, 8th September 2025\n🕐  Reporting Time: 7:30 AM\n📍  All classes resume normal schedule', x: 50, y: 72, width: 72, fontSize: 15, fontFamily: "'Inter', sans-serif", color: '#059669', bold: false, italic: false, align: 'left' as TextAlign, bgColor: '#ecfdf5', borderColor: '#a7f3d0', borderWidth: 1, opacity: 1, zIndex: 2, locked: false },
-      { type: 'footer' as ElementType, content: 'Items to bring: School fees receipt · Report card · Exercise books', x: 50, y: 90, width: 82, fontSize: 12, fontFamily: "'Inter', sans-serif", color: '#6b7280', bold: false, italic: false, align: 'center' as TextAlign, bgColor: 'transparent', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 2, locked: false },
+      { type: 'footer' as ElementType, content: 'Items to bring: School fees receipt · Report card · Exercise books', x: 50, y: 90, width: 82, fontSize: 12, fontFamily: "'Inter', sans-serif", color: 'var(--text-muted)', bold: false, italic: false, align: 'center' as TextAlign, bgColor: 'transparent', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 2, locked: false },
     ]
   },
   {
@@ -326,9 +326,9 @@ const POSTER_TEMPLATES: PosterTemplate[] = [
     elements: [
       { type: 'subtitle' as ElementType, content: '⚠️  URGENT NOTICE  ⚠️', x: 50, y: 15, width: 80, fontSize: 20, fontFamily: "'Inter', sans-serif", color: '#ffffff', bold: true, italic: false, align: 'center' as TextAlign, bgColor: '#dc2626', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 3, locked: false },
       { type: 'title' as ElementType, content: 'SCHOOL\nCLOSURE', x: 50, y: 36, width: 82, fontSize: 56, fontFamily: 'Impact, sans-serif', color: '#dc2626', bold: true, italic: false, align: 'center' as TextAlign, bgColor: 'transparent', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 2, locked: false },
-      { type: 'body' as ElementType, content: 'Due to unforeseen circumstances, school will be closed on the date(s) indicated below. All students are to remain at home until further notice.', x: 50, y: 56, width: 78, fontSize: 16, fontFamily: "'Inter', sans-serif", color: '#1f2937', bold: false, italic: false, align: 'center' as TextAlign, bgColor: 'transparent', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 2, locked: false },
+      { type: 'body' as ElementType, content: 'Due to unforeseen circumstances, school will be closed on the date(s) indicated below. All students are to remain at home until further notice.', x: 50, y: 56, width: 78, fontSize: 16, fontFamily: "'Inter', sans-serif", color: 'var(--text-main)', bold: false, italic: false, align: 'center' as TextAlign, bgColor: 'transparent', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 2, locked: false },
       { type: 'body' as ElementType, content: '📅  Effective: [DATE]\n📞  Emergency Contact: [PHONE]\n📧  Email: [EMAIL]', x: 50, y: 74, width: 72, fontSize: 15, fontFamily: "'Inter', sans-serif", color: '#dc2626', bold: true, italic: false, align: 'left' as TextAlign, bgColor: '#fef2f2', borderColor: '#fca5a5', borderWidth: 1, opacity: 1, zIndex: 2, locked: false },
-      { type: 'footer' as ElementType, content: 'Updates will be communicated via SMS and the school portal.', x: 50, y: 90, width: 80, fontSize: 13, fontFamily: "'Inter', sans-serif", color: '#6b7280', bold: false, italic: true, align: 'center' as TextAlign, bgColor: 'transparent', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 2, locked: false },
+      { type: 'footer' as ElementType, content: 'Updates will be communicated via SMS and the school portal.', x: 50, y: 90, width: 80, fontSize: 13, fontFamily: "'Inter', sans-serif", color: 'var(--text-muted)', bold: false, italic: true, align: 'center' as TextAlign, bgColor: 'transparent', borderColor: 'transparent', borderWidth: 0, opacity: 1, zIndex: 2, locked: false },
     ]
   },
   {
@@ -1094,9 +1094,9 @@ export default function PosterMakerPage() {
   // ─────────────────────────────────────────────
   const isLand = orientation === 'landscape'
   const canvasAspect = isLand ? '1.414 / 1' : '1 / 1.414'
-  const inp = (extra?: React.CSSProperties): React.CSSProperties => ({ width: '100%', padding: '8px 10px', borderRadius: 7, border: '1px solid #e5e7eb', fontSize: 12.5, boxSizing: 'border-box', fontFamily: 'inherit', background: '#fff', ...extra })
-  const lbl: React.CSSProperties = { display: 'block', fontSize: 11.5, fontWeight: 600, color: '#6b7280', marginBottom: 4 }
-  const secH: React.CSSProperties = { fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: '#9ca3af', marginTop: 16, marginBottom: 6 }
+  const inp = (extra?: React.CSSProperties): React.CSSProperties => ({ width: '100%', padding: '8px 10px', borderRadius: 7, border: '1px solid var(--border-color)', fontSize: 12.5, boxSizing: 'border-box', fontFamily: 'inherit', background: 'var(--bg-card)', ...extra })
+  const lbl: React.CSSProperties = { display: 'block', fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }
+  const secH: React.CSSProperties = { fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--text-subtle)', marginTop: 16, marginBottom: 6 }
   const row: React.CSSProperties = { display: 'flex', gap: 8 }
   const field = (extra?: React.CSSProperties): React.CSSProperties => ({ marginBottom: 10, ...extra })
 
@@ -1135,7 +1135,7 @@ export default function PosterMakerPage() {
             {side.showRole && <div style={{ fontSize: fs(8), color: '#666', fontFamily: tc.fontFamily }}>{s.role}</div>}
             {side.showStudentId && s.studentId && <div style={{ fontSize: fs(7), color: '#888', fontFamily: tc.fontFamily, marginTop: 2 }}>{s.studentId}</div>}
           </> : <div style={{ fontSize: fs(7), color: side.primaryColor, fontFamily: tc.fontFamily, padding: 8, textAlign: 'center', lineHeight: 1.4 }}>
-            {side.showQRCode && <div style={{ marginBottom: 6 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: pw * 0.4, height: pw * 0.4, background: '#fff', padding: 3, borderRadius: 4 }} /></div>}
+            {side.showQRCode && <div style={{ marginBottom: 6 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: pw * 0.4, height: pw * 0.4, background: 'var(--bg-card)', padding: 3, borderRadius: 4 }} /></div>}
             {side.customText || tc.schoolName}
           </div>}
         </div>
@@ -1161,7 +1161,7 @@ export default function PosterMakerPage() {
               {side.showLogo && tc.logoUrl ? <img src={tc.logoUrl} style={{ height: pw * 0.15, objectFit: 'contain', opacity: 0.9 }} /> : <div style={{ fontSize: fs(7), fontWeight: 700, color: '#fff', fontFamily: tc.fontFamily }}>{tc.schoolName}</div>}
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 8, textAlign: 'center' }}>
-              {side.showQRCode && <div style={{ marginBottom: 8 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 120)} style={{ width: pw * 0.45, height: pw * 0.45, background: '#fff', padding: 4, borderRadius: 4, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }} /></div>}
+              {side.showQRCode && <div style={{ marginBottom: 8 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 120)} style={{ width: pw * 0.45, height: pw * 0.45, background: 'var(--bg-card)', padding: 4, borderRadius: 4, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }} /></div>}
               <div style={{ fontSize: fs(6.5), color: side.primaryColor, fontFamily: tc.fontFamily, lineHeight: 1.5 }}>{side.customText || 'This ID card must be worn at all times while on school premises.'}</div>
             </div>
             <div style={{ width: '100%', height: 3 * scale, background: side.accentColor }} />
@@ -1190,7 +1190,7 @@ export default function PosterMakerPage() {
             <div style={{ height: 3 * scale, background: side.accentColor }} />
           </> : <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 10, textAlign: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-              {side.showQRCode && <img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: ph * 0.3, height: ph * 0.3, background: '#fff', padding: 3, borderRadius: 3 }} />}
+              {side.showQRCode && <img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: ph * 0.3, height: ph * 0.3, background: 'var(--bg-card)', padding: 3, borderRadius: 3 }} />}
               <div style={{ textAlign: side.showQRCode ? 'left' : 'center' }}>
                 {side.showLogo && tc.logoUrl && <img src={tc.logoUrl} style={{ height: ph * 0.18, objectFit: 'contain', marginBottom: 4, opacity: 0.7 }} />}
                 <div style={{ fontSize: fs(6.5), color: side.primaryColor, fontFamily: tc.fontFamily, lineHeight: 1.5 }}>{side.customText || 'Return to school office if found.'}</div>
@@ -1213,7 +1213,7 @@ export default function PosterMakerPage() {
               {side.showLogo && tc.logoUrl ? <img src={tc.logoUrl} style={{ maxHeight: ph * 0.2, objectFit: 'contain', opacity: 0.4 }} /> : <div style={{ fontSize: fs(6), color: '#aaa', fontFamily: tc.fontFamily }}>{tc.schoolName}</div>}
             </div>
           </> : <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 8 }}>
-            {side.showQRCode && <div style={{ marginBottom: 6 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: pw * 0.35, height: pw * 0.35, background: '#fff', padding: 3, borderRadius: 3 }} /></div>}
+            {side.showQRCode && <div style={{ marginBottom: 6 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: pw * 0.35, height: pw * 0.35, background: 'var(--bg-card)', padding: 3, borderRadius: 3 }} /></div>}
             <div style={{ fontSize: fs(6.5), color: side.primaryColor, fontFamily: tc.fontFamily, textAlign: 'center', lineHeight: 1.5 }}>{side.customText || tc.schoolName}</div>
           </div>}
         </div>
@@ -1224,7 +1224,7 @@ export default function PosterMakerPage() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
         {cardContent()}
         {showBothSides && (
-          <div style={{ fontSize: 10, color: '#9ca3af', display: 'flex', alignItems: 'center', gap: 3 }}>
+          <div style={{ fontSize: 10, color: 'var(--text-subtle)', display: 'flex', alignItems: 'center', gap: 3 }}>
             <RotateCcw size={9} /> Click to flip
           </div>
         )}
@@ -1264,11 +1264,11 @@ export default function PosterMakerPage() {
       {/* Header */}
       <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: 0 }}>Design Studio</h1>
-          <p style={{ color: '#9ca3af', marginTop: 3, fontSize: 13 }}>Create posters, ID cards, and student tags for any school event.</p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Design Studio</h1>
+          <p style={{ color: 'var(--text-subtle)', marginTop: 3, fontSize: 13 }}>Create posters, ID cards, and student tags for any school event.</p>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: 6, background: '#f3f4f6', padding: 4, borderRadius: 10 }}>
+          <div style={{ display: 'flex', gap: 6, background: 'var(--bg-hover)', padding: 4, borderRadius: 10 }}>
             <button className={`tab-btn${activeTab === 'poster' ? ' active' : ''}`} onClick={() => setActiveTab('poster')}>
               <Layout size={14} style={{ marginRight: 5, verticalAlign: 'middle' }} />Poster
             </button>
@@ -1282,7 +1282,7 @@ export default function PosterMakerPage() {
           {activeTab === 'poster' && (
             <>
               <button onClick={savePDF}
-                style={{ padding: '9px 16px', borderRadius: 10, background: '#fff', color: '#6d28d9', border: '1.5px solid #c4b5fd', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13 }}>
+                style={{ padding: '9px 16px', borderRadius: 10, background: 'var(--bg-card)', color: '#6d28d9', border: '1.5px solid #c4b5fd', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13 }}>
                 <Download size={14} /> Save PDF
               </button>
               <button onClick={printPoster}
@@ -1300,7 +1300,7 @@ export default function PosterMakerPage() {
           {activeTab === 'flyer' && (
             <>
               <button onClick={downloadFlyer} disabled={flyerExporting}
-                style={{ padding: '9px 16px', borderRadius: 10, background: '#fff', color: '#6d28d9', border: '1.5px solid #c4b5fd', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13, opacity: flyerExporting ? 0.5 : 1 }}>
+                style={{ padding: '9px 16px', borderRadius: 10, background: 'var(--bg-card)', color: '#6d28d9', border: '1.5px solid #c4b5fd', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13, opacity: flyerExporting ? 0.5 : 1 }}>
                 <Download size={14} /> Download PNG
               </button>
               <button onClick={() => shareFlyer()} disabled={flyerExporting}
@@ -1320,9 +1320,9 @@ export default function PosterMakerPage() {
           <div style={{ width: 270, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 0 }}>
 
             {/* Elements list */}
-            <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #f3f4f6', padding: '14px 14px 10px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-light)', padding: '14px 14px 10px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>Elements</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)' }}>Elements</span>
                 <div style={{ display: 'flex', gap: 4 }}>
                   <button className="ctrl-btn" style={{ padding: '4px 8px', fontSize: 11 }} onClick={() => addTextElement('title')} title="Add text"><Plus size={12} /> Text</button>
                   <button className="ctrl-btn" style={{ padding: '4px 8px', fontSize: 11 }} onClick={() => elemImgInputRef.current?.click()} title="Add image"><ImageIcon size={12} /> Img</button>
@@ -1337,7 +1337,7 @@ export default function PosterMakerPage() {
                   onClick={() => setSelectedId(el.id === selectedId ? null : el.id)}
                   style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', borderRadius: 7, border: '1px solid transparent', cursor: 'pointer', marginBottom: 3 }}>
                   <Move size={12} style={{ color: '#d1d5db', flexShrink: 0 }} />
-                  <span style={{ fontSize: 12, color: '#374151', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ fontSize: 12, color: 'var(--text-main)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {el.type === 'image' ? '🖼 Image' : el.type === 'shape' ? '⬜ Shape' : el.content.slice(0, 22) + (el.content.length > 22 ? '…' : '')}
                   </span>
                   <span style={{ fontSize: 10, color: '#d1d5db' }}>{el.type}</span>
@@ -1348,9 +1348,9 @@ export default function PosterMakerPage() {
 
             {/* Element controls */}
             {selected && (
-              <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #f3f4f6', padding: '14px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-light)', padding: '14px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>Edit Element</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)' }}>Edit Element</span>
                   <div style={{ display: 'flex', gap: 4 }}>
                     <button className="ctrl-btn" style={{ padding: '3px 7px' }} onClick={() => moveZ('up')} title="Bring forward"><ChevronUp size={12} /></button>
                     <button className="ctrl-btn" style={{ padding: '3px 7px' }} onClick={() => moveZ('down')} title="Send back"><ChevronDown size={12} /></button>
@@ -1405,7 +1405,7 @@ export default function PosterMakerPage() {
                       <label style={lbl}>Background</label>
                       <div style={{ display: 'flex', gap: 6 }}>
                         <input type="color" value={selected.bgColor === 'transparent' ? '#ffffff' : selected.bgColor} onChange={e => updateEl(selected.id, { bgColor: e.target.value })} style={{ ...inp(), height: 32, padding: 2, flex: 1 }} />
-                        <button className="ctrl-btn" style={{ fontSize: 11, padding: '3px 8px', color: '#9ca3af' }} onClick={() => updateEl(selected.id, { bgColor: 'transparent' })}>None</button>
+                        <button className="ctrl-btn" style={{ fontSize: 11, padding: '3px 8px', color: 'var(--text-subtle)' }} onClick={() => updateEl(selected.id, { bgColor: 'transparent' })}>None</button>
                       </div>
                     </div>
                   </>
@@ -1434,7 +1434,7 @@ export default function PosterMakerPage() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <input type="checkbox" id="lock-el" checked={selected.locked} onChange={e => updateEl(selected.id, { locked: e.target.checked })} />
-                  <label htmlFor="lock-el" style={{ fontSize: 12, color: '#6b7280' }}>Lock position</label>
+                  <label htmlFor="lock-el" style={{ fontSize: 12, color: 'var(--text-muted)' }}>Lock position</label>
                 </div>
               </div>
             )}
@@ -1452,18 +1452,18 @@ export default function PosterMakerPage() {
                 <button key={o} className="ctrl-btn" style={{ background: orientation === o ? '#ede9fe' : undefined, color: orientation === o ? '#6d28d9' : undefined, borderColor: orientation === o ? '#c4b5fd' : undefined, textTransform: 'capitalize', fontSize: 12 }} onClick={() => setOrientation(o)}>{o}</button>
               ))}
               <div style={{ width: 1, height: 20, background: '#e5e7eb' }} />
-              <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#6b7280', cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--text-muted)', cursor: 'pointer' }}>
                 <input type="checkbox" checked={snapToGrid} onChange={e => setSnapToGrid(e.target.checked)} /> Snap to grid
               </label>
               <div style={{ width: 1, height: 20, background: '#e5e7eb' }} />
-              <span style={{ fontSize: 11.5, color: '#9ca3af' }}>Drag elements to reposition • Click to select</span>
+              <span style={{ fontSize: 11.5, color: 'var(--text-subtle)' }}>Drag elements to reposition • Click to select</span>
             </div>
 
             {/* Templates panel */}
             {showTemplates && (
-              <div style={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: 12, padding: 16, marginBottom: 14, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+              <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: 12, padding: 16, marginBottom: 14, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#374151' }}>Choose a Template</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Choose a Template</span>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button className="ctrl-btn" style={{ fontSize: 11 }} onClick={() => setShowSaveDialog(true)}><Save size={11} /> Save Current</button>
                     <button className="ctrl-btn" style={{ fontSize: 11 }} onClick={() => setShowTemplates(false)}>✕ Close</button>
@@ -1485,7 +1485,7 @@ export default function PosterMakerPage() {
                 )}
 
                 {/* Built-in templates */}
-                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: '#9ca3af', marginBottom: 6, marginTop: 0 }}>Built-in Templates</p>
+                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--text-subtle)', marginBottom: 6, marginTop: 0 }}>Built-in Templates</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8, marginBottom: customTemplates.length > 0 ? 14 : 0 }}>
                   {POSTER_TEMPLATES.map(tpl => {
                     const Icon = tpl.icon
@@ -1495,11 +1495,11 @@ export default function PosterMakerPage() {
                           <div style={{ width: 26, height: 26, borderRadius: 6, background: tpl.primaryColor + '15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <Icon size={13} style={{ color: tpl.primaryColor }} />
                           </div>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>{tpl.name}</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)' }}>{tpl.name}</span>
                         </div>
-                        <div style={{ fontSize: 10, color: '#9ca3af' }}>{tpl.category}</div>
+                        <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{tpl.category}</div>
                         <div style={{ display: 'flex', gap: 3, marginTop: 6 }}>
-                          <div style={{ width: 12, height: 12, borderRadius: 3, background: tpl.bgColor, border: '1px solid #e5e7eb' }} />
+                          <div style={{ width: 12, height: 12, borderRadius: 3, background: tpl.bgColor, border: '1px solid var(--border-color)' }} />
                           <div style={{ width: 12, height: 12, borderRadius: 3, background: tpl.primaryColor }} />
                           <div style={{ width: 12, height: 12, borderRadius: 3, background: tpl.accentColor }} />
                         </div>
@@ -1511,9 +1511,9 @@ export default function PosterMakerPage() {
                 {/* Custom templates from Supabase */}
                 {(customTemplates.length > 0 || loadingCustom) && (
                   <>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: '#9ca3af', marginBottom: 6, marginTop: 0 }}>My Custom Templates</p>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--text-subtle)', marginBottom: 6, marginTop: 0 }}>My Custom Templates</p>
                     {loadingCustom ? (
-                      <div style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', padding: '12px 0' }}>Loading saved templates...</div>
+                      <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-subtle)', padding: '12px 0' }}>Loading saved templates...</div>
                     ) : (
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
                         {customTemplates.map(ct => (
@@ -1523,11 +1523,11 @@ export default function PosterMakerPage() {
                                 <div style={{ width: 26, height: 26, borderRadius: 6, background: (ct.primary_color || '#6d28d9') + '15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                   <FolderOpen size={13} style={{ color: ct.primary_color || '#6d28d9' }} />
                                 </div>
-                                <span style={{ fontSize: 12, fontWeight: 700, color: '#374151' }}>{ct.name}</span>
+                                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)' }}>{ct.name}</span>
                               </div>
-                              <div style={{ fontSize: 10, color: '#9ca3af' }}>{ct.category} · {ct.orientation}</div>
+                              <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{ct.category} · {ct.orientation}</div>
                               <div style={{ display: 'flex', gap: 3, marginTop: 6 }}>
-                                <div style={{ width: 12, height: 12, borderRadius: 3, background: ct.bg_color || '#fff', border: '1px solid #e5e7eb' }} />
+                                <div style={{ width: 12, height: 12, borderRadius: 3, background: ct.bg_color || '#fff', border: '1px solid var(--border-color)' }} />
                                 <div style={{ width: 12, height: 12, borderRadius: 3, background: ct.primary_color || '#6d28d9' }} />
                                 <div style={{ width: 12, height: 12, borderRadius: 3, background: ct.accent_color || '#f59e0b' }} />
                               </div>
@@ -1584,7 +1584,7 @@ export default function PosterMakerPage() {
           </div>
 
           {/* ── Right sidebar ── */}
-          <div style={{ width: 230, flexShrink: 0, background: '#fff', borderRadius: 12, border: '1px solid #f3f4f6', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', maxHeight: 'calc(100vh - 160px)', overflowY: 'auto' }}>
+          <div style={{ width: 230, flexShrink: 0, background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-light)', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', maxHeight: 'calc(100vh - 160px)', overflowY: 'auto' }}>
             <p style={{ ...secH, marginTop: 0 }}>Canvas</p>
             <div style={field()}>
               <label style={lbl}>Background Color</label>
@@ -1619,7 +1619,7 @@ export default function PosterMakerPage() {
             </div>
             {borderStyle !== 'none' && (
               <div style={field()}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}><label style={lbl}>Width</label><span style={{ fontSize: 11, color: '#9ca3af' }}>{borderWidth}mm</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><label style={lbl}>Width</label><span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{borderWidth}mm</span></div>
                 <input type="range" min={2} max={30} value={borderWidth} onChange={e => setBorderWidth(+e.target.value)} style={{ width: '100%', accentColor: '#6d28d9' }} />
               </div>
             )}
@@ -1634,7 +1634,7 @@ export default function PosterMakerPage() {
               <div style={field()}>
                 <label style={lbl}>Logo Size %</label>
                 <input type="range" min={4} max={30} value={logoSize} onChange={e => setLogoSize(+e.target.value)} style={{ width: '100%', accentColor: '#6d28d9' }} />
-                <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 3 }}>Drag the logo on the canvas to reposition</p>
+                <p style={{ fontSize: 10, color: 'var(--text-subtle)', marginTop: 3 }}>Drag the logo on the canvas to reposition</p>
               </div>
             )}
 
@@ -1644,11 +1644,11 @@ export default function PosterMakerPage() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
               <input type="checkbox" id="showSch" checked={showSchoolName} onChange={e => setShowSchoolName(e.target.checked)} />
-              <label htmlFor="showSch" style={{ fontSize: 12, color: '#6b7280' }}>Show school name</label>
+              <label htmlFor="showSch" style={{ fontSize: 12, color: 'var(--text-muted)' }}>Show school name</label>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="showDeco" checked={showDecorations} onChange={e => setShowDecorations(e.target.checked)} />
-              <label htmlFor="showDeco" style={{ fontSize: 12, color: '#6b7280' }}>Show decorations</label>
+              <label htmlFor="showDeco" style={{ fontSize: 12, color: 'var(--text-muted)' }}>Show decorations</label>
             </div>
           </div>
         </div>
@@ -1659,7 +1659,7 @@ export default function PosterMakerPage() {
         <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
 
           {/* Tag settings */}
-          <div style={{ width: 300, flexShrink: 0, background: '#fff', borderRadius: 12, border: '1px solid #f3f4f6', padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', maxHeight: 'calc(100vh - 160px)', overflowY: 'auto' }}>
+          <div style={{ width: 300, flexShrink: 0, background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-light)', padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', maxHeight: 'calc(100vh - 160px)', overflowY: 'auto' }}>
 
             <p style={{ ...secH, marginTop: 0 }}>Tag Style</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 14 }}>
@@ -1667,7 +1667,7 @@ export default function PosterMakerPage() {
                 <button key={ts.value} onClick={() => setTC({ style: ts.value })}
                   style={{ padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${tagConfig.style === ts.value ? '#7c3aed' : '#e5e7eb'}`, background: tagConfig.style === ts.value ? '#f5f3ff' : '#fff', cursor: 'pointer', textAlign: 'left', transition: 'all .12s' }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: tagConfig.style === ts.value ? '#6d28d9' : '#374151' }}>{ts.label}</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>{ts.desc}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 1 }}>{ts.desc}</div>
                 </button>
               ))}
             </div>
@@ -1701,7 +1701,7 @@ export default function PosterMakerPage() {
             <button className="ctrl-btn" style={{ width: '100%', justifyContent: 'center', fontSize: 11, marginBottom: 10 }} onClick={() => tagLogoInputRef.current?.click()}><ImageIcon size={11} /> Upload School Logo</button>
 
             {/* ── FRONT / BACK side tabs ── */}
-            <div style={{ display: 'flex', gap: 0, background: '#f3f4f6', borderRadius: 9, padding: 3, marginBottom: 12 }}>
+            <div style={{ display: 'flex', gap: 0, background: 'var(--bg-hover)', borderRadius: 9, padding: 3, marginBottom: 12 }}>
               <button className={`side-tab${tagViewSide === 'front' ? ' active' : ''}`} style={{ flex: 1 }} onClick={() => setTagViewSide('front')}>
                 ▶ Front Side
               </button>
@@ -1710,7 +1710,7 @@ export default function PosterMakerPage() {
               </button>
             </div>
 
-            <div style={{ background: '#f9fafb', borderRadius: 8, padding: '10px 12px', border: '1px solid #f3f4f6' }}>
+            <div style={{ background: 'var(--bg-input)', borderRadius: 8, padding: '10px 12px', border: '1px solid var(--border-light)' }}>
               <p style={{ ...secH, marginTop: 0 }}>Colors — {tagViewSide}</p>
               <div style={{ ...field(), ...row }}>
                 <div style={{ flex: 1 }}><label style={lbl}>Background</label><input type="color" value={activeSide.bgColor} onChange={e => setActiveSide({ bgColor: e.target.value })} style={{ ...inp(), height: 32, padding: 2 }} /></div>
@@ -1738,7 +1738,7 @@ export default function PosterMakerPage() {
                       ['showStudentId', 'Student ID'],
                       ['showBarcode', 'Barcode'],
                     ] as const).map(([key, label]) => (
-                      <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#6b7280', cursor: 'pointer' }}>
+                      <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-muted)', cursor: 'pointer' }}>
                         <input type="checkbox" checked={activeSide[key as keyof TagSide] as boolean} onChange={e => setActiveSide({ [key]: e.target.checked })} /> {label}
                       </label>
                     ))}
@@ -1751,7 +1751,7 @@ export default function PosterMakerPage() {
                   <p style={secH}>Show on Back</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
                     {([['showLogo', 'Logo'], ['showQRCode', 'Unique QR Code']] as const).map(([key, label]) => (
-                      <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#6b7280', cursor: 'pointer' }}>
+                      <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-muted)', cursor: 'pointer' }}>
                         <input type="checkbox" checked={activeSide[key as keyof TagSide] as boolean} onChange={e => setActiveSide({ [key]: e.target.checked })} /> {label}
                       </label>
                     ))}
@@ -1767,11 +1767,11 @@ export default function PosterMakerPage() {
           <div style={{ flex: 1, minWidth: 0 }}>
 
             {/* Students list */}
-            <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #f3f4f6', padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', marginBottom: 14 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-light)', padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', marginBottom: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <div>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#374151' }}><Users size={14} style={{ verticalAlign: 'middle', marginRight: 5 }} />Students / People</span>
-                  <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 8 }}>{students.length} total</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}><Users size={14} style={{ verticalAlign: 'middle', marginRight: 5 }} />Students / People</span>
+                  <span style={{ fontSize: 11, color: 'var(--text-subtle)', marginLeft: 8 }}>{students.length} total</span>
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button className="ctrl-btn" style={{ fontSize: 11 }} onClick={() => setShowBulk(b => !b)}>Bulk Import</button>
@@ -1779,8 +1779,8 @@ export default function PosterMakerPage() {
               </div>
 
               {showBulk && (
-                <div style={{ background: '#f9fafb', borderRadius: 8, padding: 12, marginBottom: 12, border: '1px solid #f3f4f6' }}>
-                  <p style={{ fontSize: 11, color: '#6b7280', marginBottom: 6 }}>One per line: <code>Name, Role, Class</code></p>
+                <div style={{ background: 'var(--bg-input)', borderRadius: 8, padding: 12, marginBottom: 12, border: '1px solid var(--border-light)' }}>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>One per line: <code>Name, Role, Class</code></p>
                   <textarea rows={4} value={bulkText} onChange={e => setBulkText(e.target.value)} placeholder={"Ama Owusu, Head Prefect, Class 3A\nKofi Mensah, Student, Class 2B"} style={{ ...inp(), resize: 'vertical', marginBottom: 8, fontFamily: 'monospace', fontSize: 12 }} />
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button className="ctrl-btn primary" style={{ flex: 1, justifyContent: 'center' }} onClick={importBulk}>Import</button>
@@ -1802,15 +1802,15 @@ export default function PosterMakerPage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 200, overflowY: 'auto' }}>
                 {loadingStudents ? (
-                  <div style={{ textAlign: 'center', fontSize: 13, color: '#9ca3af', padding: '20px 0' }}>Loading students...</div>
+                  <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-subtle)', padding: '20px 0' }}>Loading students...</div>
                 ) : (
                   <>
                     {students.map(s => (
-                      <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 8, background: '#f9fafb', border: '1px solid #f3f4f6' }}>
+                      <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 8, background: 'var(--bg-input)', border: '1px solid var(--border-light)' }}>
                         <div style={{ width: 30, height: 30, borderRadius: '50%', background: tagConfig.front.primaryColor + '20', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: tagConfig.front.primaryColor, flexShrink: 0 }}>{s.name.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{s.name}</div>
-                          <div style={{ fontSize: 11, color: '#9ca3af' }}>{s.role}{s.className ? ` · ${s.className}` : ''}</div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{s.name}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{s.role}{s.className ? ` · ${s.className}` : ''}</div>
                         </div>
                         <button className="ctrl-btn danger" style={{ padding: '3px 7px', flexShrink: 0 }} onClick={() => setStudents(st => st.filter(x => x.id !== s.id))}><Trash2 size={11} /></button>
                       </div>
@@ -1834,16 +1834,16 @@ export default function PosterMakerPage() {
                 <div style={{ background: '#f5f3ff', border: '1px solid #e0d9fa', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 13 }}>
                   <strong style={{ color: '#6d28d9' }}>{cols} × {rows}</strong> <span style={{ color: '#7c3aed' }}>= {perPage} tags per A4 page</span>
                   {' · '}
-                  <span style={{ color: '#6b7280' }}>{students.length} people → <strong>{pages} page{pages !== 1 ? 's' : ''} front</strong> + <strong>{pages} page{pages !== 1 ? 's' : ''} back</strong> = <strong>{pages * 2} total pages</strong></span>
+                  <span style={{ color: 'var(--text-muted)' }}>{students.length} people → <strong>{pages} page{pages !== 1 ? 's' : ''} front</strong> + <strong>{pages} page{pages !== 1 ? 's' : ''} back</strong> = <strong>{pages * 2} total pages</strong></span>
                 </div>
               )
             })()}
 
             {/* Tag preview grid */}
-            <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #f3f4f6', padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-light)', padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: 0 }}>Tag Preview</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#9ca3af' }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Tag Preview</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-subtle)' }}>
                   <RotateCcw size={11} /> Click any tag to flip front/back
                 </div>
               </div>
@@ -1853,7 +1853,7 @@ export default function PosterMakerPage() {
                 </div>
                 : <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
                   {students.slice(0, 6).map(s => <TagPreview key={s.id} s={s} showBothSides />)}
-                  {students.length > 6 && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#9ca3af', width: 80 }}>+{students.length - 6} more</div>}
+                  {students.length > 6 && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: 'var(--text-subtle)', width: 80 }}>+{students.length - 6} more</div>}
                 </div>
               }
             </div>
@@ -1866,7 +1866,7 @@ export default function PosterMakerPage() {
         <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
 
           {/* Left: Format & Share options */}
-          <div style={{ width: 280, flexShrink: 0, background: '#fff', borderRadius: 12, border: '1px solid #f3f4f6', padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', maxHeight: 'calc(100vh - 160px)', overflowY: 'auto' }}>
+          <div style={{ width: 280, flexShrink: 0, background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-light)', padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', maxHeight: 'calc(100vh - 160px)', overflowY: 'auto' }}>
 
             <p style={{ ...secH, marginTop: 0 }}>Social Format</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 14 }}>
@@ -1874,7 +1874,7 @@ export default function PosterMakerPage() {
                 <button key={fmt.id} onClick={() => setFlyerFormat(fmt)}
                   style={{ padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${flyerFormat.id === fmt.id ? '#7c3aed' : '#e5e7eb'}`, background: flyerFormat.id === fmt.id ? '#f5f3ff' : '#fff', cursor: 'pointer', textAlign: 'left', transition: 'all .12s' }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: flyerFormat.id === fmt.id ? '#6d28d9' : '#374151' }}>{fmt.label}</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>{fmt.w} × {fmt.h}px</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 1 }}>{fmt.w} × {fmt.h}px</div>
                 </button>
               ))}
             </div>
@@ -1903,7 +1903,7 @@ export default function PosterMakerPage() {
             </div>
 
             <p style={secH}>How it works</p>
-            <ol style={{ fontSize: 12, color: '#6b7280', lineHeight: 1.6, paddingLeft: 18, margin: 0 }}>
+            <ol style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6, paddingLeft: 18, margin: 0 }}>
               <li>Design your poster in the <strong>Poster</strong> tab</li>
               <li>Switch to <strong>Flyer / Share</strong></li>
               <li>Pick a social format (Instagram, WhatsApp, etc.)</li>
@@ -1913,8 +1913,8 @@ export default function PosterMakerPage() {
 
           {/* Right: Flyer preview canvas */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ background: '#f9fafb', borderRadius: 12, border: '1px solid #f3f4f6', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 12, alignSelf: 'flex-start' }}>Flyer Preview — {flyerFormat.label}</p>
+            <div style={{ background: 'var(--bg-input)', borderRadius: 12, border: '1px solid var(--border-light)', padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12, alignSelf: 'flex-start' }}>Flyer Preview — {flyerFormat.label}</p>
 
               {/* Scaled preview wrapper */}
               <div style={{ width: '100%', maxWidth: 600, position: 'relative' }}>

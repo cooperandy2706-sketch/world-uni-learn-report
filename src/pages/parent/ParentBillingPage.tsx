@@ -194,8 +194,8 @@ export default function ParentBillingPage() {
       `}</style>
 
       <div style={{ marginBottom: 24, padding: '0 4px' }}>
-        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Fees & Billing</h1>
-        <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Track and pay school fees for {term?.name || 'Current Term'}.</p>
+        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Fees & Billing</h1>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Track and pay school fees for {term?.name || 'Current Term'}.</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -204,7 +204,7 @@ export default function ParentBillingPage() {
           const isExpanded = expandedWard === ward.id
 
           return (
-            <div key={ward.id} style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 16px rgba(109,40,217,0.03)' }}>
+            <div key={ward.id} style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 16px rgba(109,40,217,0.03)' }}>
               
               <div 
                 onClick={() => setExpandedWard(isExpanded ? null : ward.id)}
@@ -215,8 +215,8 @@ export default function ParentBillingPage() {
                     <Wallet size={22} />
                   </div>
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>{ward.full_name}</div>
-                    <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{ward.class?.name || 'No Class'}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>{ward.full_name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{ward.class?.name || 'No Class'}</div>
                   </div>
                 </div>
 
@@ -237,11 +237,11 @@ export default function ParentBillingPage() {
                 <div style={{ padding: '24px', borderTop: '1px solid #f0eefe', background: '#fafbff' }}>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 20 }}>
-                    <div style={{ background: '#fff', padding: 16, borderRadius: 16, border: '1px solid #e2e8f0' }}>
+                    <div style={{ background: 'var(--bg-card)', padding: 16, borderRadius: 16, border: '1px solid #e2e8f0' }}>
                       <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Total Charges</div>
                       <div style={{ fontSize: 18, fontWeight: 800, color: '#1e293b', marginTop: 4 }}>{formatCurrency(bill.summary.totalCharges, schoolInfo?.currency || 'GHS')}</div>
                     </div>
-                    <div style={{ background: '#fff', padding: 16, borderRadius: 16, border: '1px solid #e2e8f0' }}>
+                    <div style={{ background: 'var(--bg-card)', padding: 16, borderRadius: 16, border: '1px solid #e2e8f0' }}>
                       <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Amount Paid</div>
                       <div style={{ fontSize: 18, fontWeight: 800, color: '#16a34a', marginTop: 4 }}>{formatCurrency(bill.summary.totalPaid, schoolInfo?.currency || 'GHS')}</div>
                     </div>
@@ -261,7 +261,7 @@ export default function ParentBillingPage() {
                   <h4 style={{ fontSize: 13, fontWeight: 800, color: '#1e293b', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{ width: 4, height: 16, background: '#7c3aed', borderRadius: 2 }} /> Fee Breakdown
                   </h4>
-                  <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', marginBottom: 24 }}>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', marginBottom: 24 }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <tbody>
                         {bill.arrears > 0 && (
@@ -287,11 +287,11 @@ export default function ParentBillingPage() {
                     <div style={{ width: 4, height: 16, background: '#16a34a', borderRadius: 2 }} /> Recent Payments
                   </h4>
                   {bill.payments.length === 0 ? (
-                    <div style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', padding: '20px 0', background: '#fff', borderRadius: 16, border: '1px dashed #e2e8f0' }}>No payments recorded.</div>
+                    <div style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', padding: '20px 0', background: 'var(--bg-card)', borderRadius: 16, border: '1px dashed #e2e8f0' }}>No payments recorded.</div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       {bill.payments.map((p: any) => (
-                        <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: '#fff', borderRadius: 14, border: '1px solid #e2e8f0' }}>
+                        <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--bg-card)', borderRadius: 14, border: '1px solid #e2e8f0' }}>
                           <div>
                             <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', textTransform: 'capitalize' }}>{p.payment_method === 'online' ? '🌐 Online' : p.payment_method} Payment</div>
                             <div style={{ fontSize: 11, color: '#64748b' }}>{new Date(p.payment_date).toLocaleDateString()} {p.reference ? `· Ref: ${p.reference.slice(-8)}` : ''} · <span style={{ color: '#7c3aed', fontWeight: 600 }}>Official Receipt available at Office</span></div>
@@ -321,9 +321,9 @@ export default function ParentBillingPage() {
       {/* Payment Modal */}
       {showPayModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', padding: 20 }}>
-          <div style={{ background: '#fff', borderRadius: 24, width: '100%', maxWidth: 400, overflow: 'hidden', animation: '_modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 400, overflow: 'hidden', animation: '_modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-               <h3 style={{ fontSize: 18, fontWeight: 800, color: '#111827', margin: 0 }}>Pay Fees</h3>
+               <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Pay Fees</h3>
                <button onClick={() => setShowPayModal(false)} style={{ border: 'none', background: '#f1f5f9', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                   <X size={18} color="#64748b" />
                </button>
@@ -331,10 +331,10 @@ export default function ParentBillingPage() {
             
             {payStep === 1 ? (
               <div style={{ padding: 24 }}>
-                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, padding: 14, background: '#f8f7ff', borderRadius: 16, border: '1px solid #ede9fe' }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 10, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>👶</div>
+                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, padding: 14, background: 'var(--bg-app)', borderRadius: 16, border: '1px solid #ede9fe' }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>👶</div>
                     <div>
-                       <div style={{ fontSize: 14, fontWeight: 800, color: '#111827' }}>{selectedWardForPay?.full_name}</div>
+                       <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)' }}>{selectedWardForPay?.full_name}</div>
                        <div style={{ fontSize: 12, color: '#7c3aed', fontWeight: 600 }}>{selectedWardForPay?.class?.name}</div>
                     </div>
                  </div>
@@ -345,7 +345,7 @@ export default function ParentBillingPage() {
                       type="number"
                       value={payAmount}
                       onChange={e => setPayAmount(e.target.value)}
-                      style={{ width: '100%', padding: '14px 18px', borderRadius: 14, border: '2px solid #e2e8f0', fontSize: 24, fontWeight: 900, color: '#111827', outline: 'none', transition: 'border-color 0.2s' }}
+                      style={{ width: '100%', padding: '14px 18px', borderRadius: 14, border: '2px solid #e2e8f0', fontSize: 24, fontWeight: 900, color: 'var(--text-main)', outline: 'none', transition: 'border-color 0.2s' }}
                       onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
                       onBlur={e => e.currentTarget.style.borderColor = '#e2e8f0'}
                     />
@@ -366,12 +366,12 @@ export default function ParentBillingPage() {
               </div>
             ) : (
               <div style={{ padding: '32px 24px', textAlign: 'center', animation: '_modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-                 <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#f8f7ff', color: '#6d28d9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, margin: '0 auto 16px', boxShadow: '0 4px 12px rgba(109,40,217,0.1)' }}>
+                 <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--bg-app)', color: '#6d28d9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, margin: '0 auto 16px', boxShadow: '0 4px 12px rgba(109,40,217,0.1)' }}>
                    🏫
                  </div>
-                 <h3 style={{ fontSize: 22, fontWeight: 800, color: '#111827', margin: '0 0 12px' }}>Confirm Payment</h3>
+                 <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 12px' }}>Confirm Payment</h3>
                  <p style={{ fontSize: 15, color: '#64748b', margin: '0 0 32px', lineHeight: 1.6 }}>
-                   You are about to securely pay <strong style={{ color: '#111827' }}>{formatCurrency(payAmount || 0, schoolInfo?.currency || 'GHS')}</strong> directly to:<br/>
+                   You are about to securely pay <strong style={{ color: 'var(--text-main)' }}>{formatCurrency(payAmount || 0, schoolInfo?.currency || 'GHS')}</strong> directly to:<br/>
                    <span style={{ color: '#6d28d9', fontSize: 18, fontWeight: 800, display: 'inline-block', marginTop: 8 }}>{schoolInfo?.name}</span>
                  </p>
 

@@ -98,7 +98,7 @@ export default function StudentProfilePage() {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '70vh', flexDirection: 'column', gap: 16 }}>
       <style>{`@keyframes _ssp{to{transform:rotate(360deg)}}`}</style>
       <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_ssp .8s linear infinite' }} />
-      <p style={{ fontSize: 13, color: '#6b7280', fontFamily: '"DM Sans",sans-serif' }}>Loading profile…</p>
+      <p style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: '"DM Sans",sans-serif' }}>Loading profile…</p>
     </div>
   )
 
@@ -126,10 +126,10 @@ export default function StudentProfilePage() {
         {/* Header */}
         <div className="header-row" style={{ marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', animation: '_sfu .5s ease both' }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 32, fontWeight: 700, color: '#111827', margin: 0 }}>My Profile</h1>
-            <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>Manage your personal information and account settings</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 32, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>My Profile</h1>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Manage your personal information and account settings</p>
           </div>
-          <Link to={ROUTES.STUDENT_DASHBOARD} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', textDecoration: 'none', border: '1.5px solid #e5e7eb', justifyContent: 'center' }}>← Dashboard</Link>
+          <Link to={ROUTES.STUDENT_DASHBOARD} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600, background: 'var(--bg-card)', color: 'var(--text-main)', textDecoration: 'none', border: '1.5px solid var(--border-color)', justifyContent: 'center' }}>← Dashboard</Link>
         </div>
 
         <div className="profile-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 32 }}>
@@ -141,7 +141,7 @@ export default function StudentProfilePage() {
                 <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: user?.avatar_url ? `url(${user.avatar_url}) center/cover no-repeat` : 'linear-gradient(135deg, #7c3aed, #6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48, fontWeight: 800, color: '#fff', boxShadow: '0 12px 24px rgba(109,40,217,0.2)' }}>
                   {!user?.avatar_url && user?.full_name?.charAt(0).toUpperCase()}
                 </div>
-                <label style={{ position: 'absolute', bottom: 4, right: 4, width: 36, height: 36, borderRadius: '50%', background: '#fff', border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#6d28d9', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                <label style={{ position: 'absolute', bottom: 4, right: 4, width: 36, height: 36, borderRadius: '50%', background: 'var(--bg-card)', border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#6d28d9', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                   {uploading ? '⏳' : '📸'}
                   <input type="file" hidden accept="image/*" onChange={handleAvatarUpload} disabled={uploading} />
                 </label>
@@ -167,7 +167,7 @@ export default function StudentProfilePage() {
                 <button 
                   onClick={handleChangePassword}
                   disabled={changingPassword}
-                  style={{ width: '100%', padding: '12px', borderRadius: 12, background: '#fff', color: '#6d28d9', fontSize: 13, fontWeight: 700, border: '1.5px solid #6d28d9', cursor: 'pointer', transition: 'all 0.2s', opacity: changingPassword ? 0.6 : 1 }}>
+                  style={{ width: '100%', padding: '12px', borderRadius: 12, background: 'var(--bg-card)', color: '#6d28d9', fontSize: 13, fontWeight: 700, border: '1.5px solid #6d28d9', cursor: 'pointer', transition: 'all 0.2s', opacity: changingPassword ? 0.6 : 1 }}>
                   {changingPassword ? 'Updating...' : 'Change Password'}
                 </button>
               </div>

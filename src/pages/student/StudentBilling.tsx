@@ -144,8 +144,8 @@ export default function StudentBillingPage() {
       `}</style>
 
       <div className="billing-header" style={{ marginBottom: 28 }}>
-        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>Fees & Billing</h1>
-        <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>View your payment history and manage school fees.</p>
+        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Fees & Billing</h1>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>View your payment history and manage school fees.</p>
       </div>
 
       <div className="billing-grid">
@@ -161,8 +161,8 @@ export default function StudentBillingPage() {
                   <FileText size={20} color="#7c3aed" />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>Term Fee Statement</h3>
-                  <p style={{ fontSize: 11, color: '#6b7280', margin: 0 }}>{term?.name} Breakdown</p>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Term Fee Statement</h3>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>{term?.name} Breakdown</p>
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
@@ -234,7 +234,7 @@ export default function StudentBillingPage() {
             {/* Payment Summary */}
             <div className="billing-card-padding" style={{ padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <h4 style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: 0 }}>Payments Applied</h4>
+                <h4 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Payments Applied</h4>
                 <button onClick={() => setShowHistory(!showHistory)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                   {showHistory ? <ChevronUp size={14} /> : <ChevronDown size={14} />} {showHistory ? 'Hide' : 'Show'} History
                 </button>
@@ -263,7 +263,7 @@ export default function StudentBillingPage() {
               )}
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '2px solid #f1f5f9', paddingTop: 16 }}>
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>Total Amount Paid</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>Total Amount Paid</span>
                 <span style={{ fontSize: 18, fontWeight: 900, color: '#16a34a' }}>GH₵ {billData?.summary.totalPaid.toLocaleString()}</span>
               </div>
             </div>
@@ -321,7 +321,7 @@ export default function StudentBillingPage() {
           </div>
 
           <div className="billing-card" style={{ padding: 24 }}>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Info size={16} color="#7c3aed" /> Payment Methods
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

@@ -68,13 +68,13 @@ export default function StudentNotificationsPage() {
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 28, fontWeight: 700, margin: 0, color: '#111827' }}>Notifications</h1>
-          <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>You have {unreadCount} unread message{unreadCount !== 1 ? 's' : ''}</p>
+          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 28, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Notifications</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 4 }}>You have {unreadCount} unread message{unreadCount !== 1 ? 's' : ''}</p>
         </div>
         {unreadCount > 0 && (
           <button 
             onClick={markAllAsRead}
-            style={{ padding: '8px 16px', background: 'white', border: '1.5px solid #e5e7eb', borderRadius: '12px', fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+            style={{ padding: '8px 16px', background: 'white', border: '1.5px solid var(--border-color)', borderRadius: '12px', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
           >
             <CheckCircle2 size={16} /> Mark all read
           </button>
@@ -86,12 +86,12 @@ export default function StudentNotificationsPage() {
           <div className="animate-spin" style={{ width: 32, height: 32, border: '3px solid #f3f3f3', borderTop: '3px solid #7c3aed', borderRadius: '50%' }} />
         </div>
       ) : notifications.length === 0 ? (
-        <div style={{ background: 'white', borderRadius: '20px', padding: '60px 20px', textAlign: 'center', border: '1.5px dashed #e5e7eb' }}>
-          <div style={{ width: 64, height: 64, background: '#f9fafb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+        <div style={{ background: 'white', borderRadius: '20px', padding: '60px 20px', textAlign: 'center', border: '1.5px dashed var(--border-color)' }}>
+          <div style={{ width: 64, height: 64, background: 'var(--bg-input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
             <Bell size={28} color="#9ca3af" />
           </div>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>All caught up!</h3>
-          <p style={{ color: '#6b7280', fontSize: 14 }}>You have no notifications at the moment.</p>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>All caught up!</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>You have no notifications at the moment.</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -106,9 +106,9 @@ export default function StudentNotificationsPage() {
                 {!n.is_read ? <Circle size={12} fill="#7c3aed" color="#7c3aed" /> : <Circle size={12} color="#d1d5db" />}
               </div>
               <div>
-                <h4 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: !n.is_read ? 700 : 600, color: '#111827' }}>{n.title}</h4>
-                <p style={{ margin: '0 0 8px', fontSize: 14, color: '#4b5563', lineHeight: 1.5 }}>{n.body}</p>
-                <div style={{ fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>
+                <h4 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: !n.is_read ? 700 : 600, color: 'var(--text-main)' }}>{n.title}</h4>
+                <p style={{ margin: '0 0 8px', fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.5 }}>{n.body}</p>
+                <div style={{ fontSize: 12, color: 'var(--text-subtle)', fontWeight: 500 }}>
                   {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
                 </div>
               </div>

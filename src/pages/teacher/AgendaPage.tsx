@@ -12,7 +12,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
   const [hov, setHov] = useState(false)
   const v: any = {
     primary: { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none' },
-    secondary: { background: hov ? '#fff' : '#fafafa', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#fff' : '#fafafa', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     success: { background: hov ? '#15803d' : '#16a34a', color: '#fff', border: 'none' },
     danger: { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
   }
@@ -120,24 +120,24 @@ export default function TeacherAgendaPage() {
         <div className="t-header" style={{ marginBottom: 24 }}>
           <div>
             <h1 className="t-title">School Roadmap</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Track your progress through the term's key milestones and sync with admin guidance.</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Track your progress through the term's key milestones and sync with admin guidance.</p>
           </div>
         </div>
 
         {!term ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '40px 20px', textAlign: 'center', border: '1px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '40px 20px', textAlign: 'center', border: '1px solid #f0eefe' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📆</div>
-            <p style={{ color: '#6b7280' }}>No active term detected. Agendas will appear here once a term is set.</p>
+            <p style={{ color: 'var(--text-muted)' }}>No active term detected. Agendas will appear here once a term is set.</p>
           </div>
         ) : loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 100 }}>
             <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: 'tap_spin .8s linear infinite' }} />
           </div>
         ) : agendas.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
              <div style={{ fontSize: 48, marginBottom: 16 }}>🎯</div>
-             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>Welcome to {term.name}</h3>
-             <p style={{ fontSize: 13, color: '#9ca3af', maxWidth: 300, marginInline: 'auto' }}>The school agenda hasn't been published yet. Check back soon for milestones and goals.</p>
+             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>Welcome to {term.name}</h3>
+             <p style={{ fontSize: 13, color: 'var(--text-subtle)', maxWidth: 300, marginInline: 'auto' }}>The school agenda hasn't been published yet. Check back soon for milestones and goals.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -161,13 +161,13 @@ export default function TeacherAgendaPage() {
 
                   {/* Card */}
                   <div className="agenda-card-teacher" style={{ 
-                    flex: 1, background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '20px 24px', 
+                    flex: 1, background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '20px 24px', 
                     boxShadow: '0 2px 8px rgba(0,0,0,0.03)', transition: 'all .25s ease'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
                       <div>
                          <div style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Week {item.week_number} Milestone</div>
-                         <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 }}>{item.title}</h3>
+                         <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{item.title}</h3>
                       </div>
                       <div style={{ display: 'flex', gap: 6 }}>
                          {resp && (
@@ -183,7 +183,7 @@ export default function TeacherAgendaPage() {
                       </div>
                     </div>
 
-                    <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.6, marginBottom: 20 }}>{item.description}</p>
+                    <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 20 }}>{item.description}</p>
                     
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                        {/* Admin Reply Banner */}
@@ -215,12 +215,12 @@ export default function TeacherAgendaPage() {
             <div style={{ paddingTop: 10 }}>
                {selectedAgenda && (
                  <div style={{ background: '#f8fafc', borderRadius: 12, padding: '12px', border: '1px solid #e2e8f0', marginBottom: 18 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>Week {selectedAgenda.week_number}: {selectedAgenda.title}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>Week {selectedAgenda.week_number}: {selectedAgenda.title}</div>
                  </div>
                )}
 
                <div style={{ marginBottom: 18 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>How are you doing with this plan? *</label>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>How are you doing with this plan? *</label>
                   <div className="resp-grid-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
                      {[
                        { v: 'pending', label: 'Working on it', icon: <Clock size={14} />, color: '#6d28d9', bg: '#f5f3ff' },
@@ -243,7 +243,7 @@ export default function TeacherAgendaPage() {
                </div>
 
                <div style={{ marginBottom: 20 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Share your feedback or struggles (to Admin)</label>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Share your feedback or struggles (to Admin)</label>
                   <textarea value={feedbackText} onChange={e => setFeedbackText(e.target.value)} rows={4}
                     placeholder="e.g. Students are finding the fractions difficult, I might need more time..."
                     style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid #e2e8f0', fontSize: 13.5, outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', boxSizing: 'border-box' }} />

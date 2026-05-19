@@ -109,7 +109,7 @@ function ComposePanel({ onClose, onSent }: { onClose: () => void; onSent: () => 
         .cp-btn:hover{filter:brightness(1.08);transform:scale(1.02)}
       `}</style>
       <div onClick={e => e.stopPropagation()} style={{
-        width: '100%', maxWidth: 560, background: '#fff', borderRadius: 24, overflow: 'hidden',
+        width: '100%', maxWidth: 560, background: 'var(--bg-card)', borderRadius: 24, overflow: 'hidden',
         boxShadow: '0 40px 100px rgba(0,0,0,0.3)',
         fontFamily: '"DM Sans",sans-serif',
         animation: 'cp_in 0.35s cubic-bezier(0.16,1,0.3,1)',
@@ -268,7 +268,7 @@ function ComposePanel({ onClose, onSent }: { onClose: () => void; onSent: () => 
           <button onClick={onClose} className="cp-btn"
             style={{
               flex: 1, padding: '12px 0', borderRadius: 12,
-              border: '1.5px solid #e2e8f0', background: '#fff',
+              border: '1.5px solid #e2e8f0', background: 'var(--bg-card)',
               fontSize: 13, fontWeight: 600, color: '#64748b',
               fontFamily: '"DM Sans",sans-serif',
             }}>
@@ -423,7 +423,7 @@ export default function GlobalMessagingPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div style={{
-            textAlign: 'center', padding: 60, background: '#fff', borderRadius: 20,
+            textAlign: 'center', padding: 60, background: 'var(--bg-card)', borderRadius: 20,
             border: '1px solid #e2e8f0',
           }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📭</div>
@@ -448,7 +448,7 @@ export default function GlobalMessagingPage() {
               const tCfg = TYPES.find(t => t.value === msg.type)!
               return (
                 <div key={msg.id} className="msg-row" style={{
-                  background: '#fff', borderRadius: 16, padding: '18px 20px',
+                  background: 'var(--bg-card)', borderRadius: 16, padding: '18px 20px',
                   border: '1px solid #e2e8f0', display: 'flex', gap: 16,
                   animationDelay: `${i * 0.04}s`,
                 }}>

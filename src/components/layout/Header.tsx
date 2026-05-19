@@ -7,6 +7,7 @@ import { useSchoolInvoices } from '../../hooks/useBilling'
 import { supabase } from '../../lib/supabase'
 import NotificationBell from './NotificationBell'
 import AdminAnnouncementHeaderPill from './AdminAnnouncementHeaderPill'
+import ThemeToggle from '../ui/ThemeToggle'
 import {
   Search, Settings, ChevronDown, ChevronLeft, ChevronRight,
   LogOut, User, Shield, Calendar, AlertTriangle, CreditCard,
@@ -306,7 +307,7 @@ function NavItem({ group }: { group: any }) {
         <div style={{
           position: 'fixed', top: dropPos.top, left: dropPos.left,
           minWidth: 200,
-          background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb',
+          background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-color)',
           boxShadow: '0 10px 25px rgba(0,0,0,0.12)', zIndex: 9999,
           padding: '6px', animation: 'fadeDown 0.15s ease',
         }}>
@@ -316,7 +317,7 @@ function NavItem({ group }: { group: any }) {
               onClick={() => { navigate(item.to); setOpen(false) }}
               style={{
                 padding: '9px 14px', borderRadius: 10, fontSize: 13, fontWeight: 500,
-                color: '#374151', cursor: 'pointer', transition: 'all 0.15s',
+                color: 'var(--text-main)', cursor: 'pointer', transition: 'all 0.15s',
               }}
               onMouseEnter={e => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.color = '#1a56db' }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#374151' }}
@@ -595,7 +596,7 @@ export default function Header() {
             resultKind: 'intent', type: 'Inventory',
             label: `Inventory — ${i.item_name}`,
             subtitle: 'Operations → Assets',
-            icon: '📦', color: '#374151',
+            icon: '📦', color: 'var(--text-main)',
             path: `/bursar/inventory?search=${encodeURIComponent(i.item_name)}`,
           }))
         }
@@ -652,7 +653,7 @@ export default function Header() {
 
       <header style={{
         height: 76, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 28px', background: '#f8f7ff', flexShrink: 0,
+        padding: '0 28px', background: 'var(--bg-app)', flexShrink: 0,
         borderBottom: '1px solid #e8e8f0',
         fontFamily: '"DM Sans", system-ui, sans-serif',
         position: 'sticky', top: 0, zIndex: 200,
@@ -664,7 +665,7 @@ export default function Header() {
           <button 
             className="mobile-menu-btn"
             onClick={() => setMobileMenuOpen(true)}
-            style={{ border: 'none', background: '#fff', width: 42, height: 42, borderRadius: 12, display: 'none', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', cursor: 'pointer', color: '#1a56db' }}
+            style={{ border: 'none', background: 'var(--bg-card)', width: 42, height: 42, borderRadius: 12, display: 'none', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', cursor: 'pointer', color: '#1a56db' }}
           >
             <Command size={20} />
           </button>
@@ -672,20 +673,20 @@ export default function Header() {
           {userSchool?.logo_url ? (
             <img
               src={userSchool.logo_url} alt="School"
-              style={{ width: 42, height: 42, borderRadius: 12, objectFit: 'contain', background: '#fff', padding: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+              style={{ width: 42, height: 42, borderRadius: 12, objectFit: 'contain', background: 'var(--bg-card)', padding: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
             />
           ) : (
-            <div style={{ width: 42, height: 42, borderRadius: 12, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+            <div style={{ width: 42, height: 42, borderRadius: 12, background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
               <GraduationCap size={22} color="#1a56db" />
             </div>
           )}
           <div className="school-branding-text" style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <span style={{ fontSize: 15, fontWeight: 800, color: '#111827', whiteSpace: 'nowrap', maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em' }}>
+            <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', whiteSpace: 'nowrap', maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em' }}>
               {userSchool?.name || 'Nexora'}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               {year && term ? (
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                   {year.name} · {term.name}
                 </span>
               ) : (
@@ -701,9 +702,9 @@ export default function Header() {
         {/* ── RIGHT PILL: Nav + Bell + Profile ── */}
         <div className="header-pill-container" style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          background: '#fff',
+          background: 'var(--bg-card)',
           borderRadius: 99,
-          border: '1px solid #e5e7eb',
+          border: '1px solid var(--border-color)',
           boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
           padding: '6px 6px 6px 16px',
           flex: 1,
@@ -733,8 +734,8 @@ export default function Header() {
                 onFocus={() => setShowResults(true)}
                 placeholder="Search or type a command…"
                 style={{
-                  width: 160, background: '#f3f4f6', border: '1.5px solid transparent',
-                  borderRadius: 99, padding: '7px 36px 7px 30px', fontSize: 13, color: '#111827',
+                  width: 160, background: 'var(--bg-hover)', border: '1.5px solid transparent',
+                  borderRadius: 99, padding: '7px 36px 7px 30px', fontSize: 13, color: 'var(--text-main)',
                   outline: 'none', transition: 'all 0.25s',
                 }}
                 onFocusCapture={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.borderColor = '#1a56db'; e.currentTarget.style.width = '240px' }}
@@ -742,14 +743,14 @@ export default function Header() {
               />
               {/* ⌘K badge */}
               {!searching && !searchQuery && (
-                <kbd style={{ position: 'absolute', right: 8, fontSize: 10, background: '#e5e7eb', color: '#9ca3af', padding: '2px 5px', borderRadius: 4, border: '1px solid #d1d5db', pointerEvents: 'none', whiteSpace: 'nowrap' }}>⌘K</kbd>
+                <kbd style={{ position: 'absolute', right: 8, fontSize: 10, background: '#e5e7eb', color: 'var(--text-subtle)', padding: '2px 5px', borderRadius: 4, border: '1px solid #d1d5db', pointerEvents: 'none', whiteSpace: 'nowrap' }}>⌘K</kbd>
               )}
             </div>
 
             {showResults && (
               <div style={{
-                position: 'absolute', top: 48, right: 0, width: 340, background: '#fff',
-                borderRadius: 20, border: '1px solid #e5e7eb',
+                position: 'absolute', top: 48, right: 0, width: 340, background: 'var(--bg-card)',
+                borderRadius: 20, border: '1px solid var(--border-color)',
                 boxShadow: '0 20px 40px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06)',
                 padding: '8px', zIndex: 9999, animation: 'fadeDown 0.15s ease',
                 overflow: 'hidden',
@@ -759,7 +760,7 @@ export default function Header() {
                 {!searchQuery && !selectedPerson && recentSearches.length > 0 && (
                   <div style={{ marginBottom: 4 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 12px 6px' }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Recent</span>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Recent</span>
                       <button onClick={() => { setRecentSearches([]); localStorage.removeItem('wul_recent_searches') }} style={{ border: 'none', background: 'none', fontSize: 10, color: '#d1d5db', cursor: 'pointer', padding: 0 }}>Clear</button>
                     </div>
                     {recentSearches.map((r, i) => (
@@ -768,12 +769,12 @@ export default function Header() {
                         onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
                         onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                       >
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, flexShrink: 0 }}>🕐</div>
-                        <span style={{ fontSize: 13, color: '#374151', fontWeight: 500, flex: 1 }}>{r}</span>
+                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, flexShrink: 0 }}>🕐</div>
+                        <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 500, flex: 1 }}>{r}</span>
                         <span style={{ fontSize: 11, color: '#d1d5db' }}>↵</span>
                       </div>
                     ))}
-                    <div style={{ height: 1, background: '#f3f4f6', margin: '6px 0' }} />
+                    <div style={{ height: 1, background: 'var(--bg-hover)', margin: '6px 0' }} />
                   </div>
                 )}
 
@@ -781,8 +782,8 @@ export default function Header() {
                 {searchQuery && searchResults.length === 0 && !searching && (
                   <div style={{ padding: '24px 16px', textAlign: 'center' }}>
                     <div style={{ fontSize: 24, marginBottom: 8 }}>🔍</div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>No results found</div>
-                    <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>Try: "pay fees", "attendance", "grade 5"</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>No results found</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 4 }}>Try: "pay fees", "attendance", "grade 5"</div>
                   </div>
                 )}
 
@@ -808,7 +809,7 @@ export default function Header() {
                       {/* 1. Quick Actions */}
                       {intents.length > 0 && (
                         <div>
-                          <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
                             <Zap size={10} /> Quick Actions
                           </div>
                           {intents.map((r, i) => (
@@ -821,8 +822,8 @@ export default function Header() {
                             >
                               <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, border: `1px solid ${r.color}25` }}>{r.icon}</div>
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.label}</div>
-                                <div style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500 }}>{r.subtitle}</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{r.label}</div>
+                                <div style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 500 }}>{r.subtitle}</div>
                               </div>
                               <div style={{ fontSize: 10, color: r.color, fontWeight: 800, background: `${r.color}10`, padding: '2px 8px', borderRadius: 99 }}>Go</div>
                             </div>
@@ -833,7 +834,7 @@ export default function Header() {
                       {/* 2. People */}
                       {people.length > 0 && (
                         <div>
-                          <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
                             <User size={10} /> People
                           </div>
                           {people.map((r, i) => (
@@ -846,8 +847,8 @@ export default function Header() {
                             >
                               <div style={{ width: 34, height: 34, borderRadius: '50%', background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{r.icon}</div>
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</div>
-                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.subtitle}</div>
+                                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</div>
+                                <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{r.subtitle}</div>
                               </div>
                               <ChevronRight size={10} color="#9ca3af" />
                             </div>
@@ -858,7 +859,7 @@ export default function Header() {
                       {/* 3. Academics */}
                       {academics.length > 0 && (
                         <div>
-                          <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
                             <BookOpen size={10} /> Academics
                           </div>
                           {academics.map((r, i) => (
@@ -871,8 +872,8 @@ export default function Header() {
                             >
                               <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>{r.icon}</div>
                               <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.label}</div>
-                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.subtitle}</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{r.label}</div>
+                                <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{r.subtitle}</div>
                               </div>
                             </div>
                           ))}
@@ -882,7 +883,7 @@ export default function Header() {
                       {/* 4. Operations */}
                       {operations.length > 0 && (
                         <div>
-                          <div style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 12px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
                             <Shield size={10} /> Operations
                           </div>
                           {operations.map((r, i) => (
@@ -895,8 +896,8 @@ export default function Header() {
                             >
                               <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>{r.icon}</div>
                               <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.label}</div>
-                                <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.subtitle}</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{r.label}</div>
+                                <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{r.subtitle}</div>
                               </div>
                             </div>
                           ))}
@@ -944,19 +945,19 @@ export default function Header() {
                   return (
                     <div style={{ animation: 'fadeDown 0.15s ease' }}>
                       {/* Header */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px 12px', borderBottom: '1px solid #f3f4f6' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px 12px', borderBottom: '1px solid var(--border-light)' }}>
                         <button
                           onClick={() => setSelectedPerson(null)}
-                          style={{ border: 'none', background: '#f3f4f6', width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                          style={{ border: 'none', background: 'var(--bg-hover)', width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
                         >
                           <ChevronLeft size={14} color="#6b7280" />
                         </button>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 800, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedPerson.label}</div>
-                          <div style={{ fontSize: 11, color: '#9ca3af' }}>{selectedPerson.subtitle}</div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedPerson.label}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{selectedPerson.subtitle}</div>
                         </div>
                       </div>
-                      <div style={{ padding: '6px 4px 4px', fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', paddingLeft: 12, paddingTop: 10 }}>
+                      <div style={{ padding: '6px 4px 4px', fontSize: 10, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', paddingLeft: 12, paddingTop: 10 }}>
                         What do you want to do?
                       </div>
                       {/* Action list */}
@@ -972,8 +973,8 @@ export default function Header() {
                             {a.icon}
                           </div>
                           <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{a.label}</div>
-                            <div style={{ fontSize: 11, color: '#9ca3af' }}>{a.subtitle}</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{a.label}</div>
+                            <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{a.subtitle}</div>
                           </div>
                           <ChevronRight size={13} color="#d1d5db" />
                         </div>
@@ -983,9 +984,9 @@ export default function Header() {
                 })()}
 
                 {/* Footer hint */}
-                <div style={{ marginTop: 8, padding: '8px 12px', borderTop: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ marginTop: 8, padding: '8px 12px', borderTop: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 11, color: '#d1d5db' }}>Try: "pay fees" • "top students" • "grade 5 attendance"</span>
-                  <kbd style={{ fontSize: 10, background: '#f3f4f6', color: '#9ca3af', padding: '2px 6px', borderRadius: 4, border: '1px solid #e5e7eb' }}>Esc</kbd>
+                  <kbd style={{ fontSize: 10, background: 'var(--bg-hover)', color: 'var(--text-subtle)', padding: '2px 6px', borderRadius: 4, border: '1px solid var(--border-color)' }}>Esc</kbd>
                 </div>
               </div>
             )}
@@ -1001,17 +1002,17 @@ export default function Header() {
             <div
               onClick={() => setProfileOpen(!profileOpen)}
               style={{
-                width: 36, height: 36, borderRadius: '50%', background: '#fff',
+                width: 36, height: 36, borderRadius: '50%', background: 'var(--bg-card)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
                 fontSize: 14, fontWeight: 700, color: '#1a56db', cursor: 'pointer',
-                border: '2px solid #e5e7eb', transition: 'box-shadow 0.2s',
+                border: '2px solid var(--border-color)', transition: 'box-shadow 0.2s',
                 boxShadow: profileOpen ? '0 0 0 3px #bfdbfe' : 'none',
               }}
             >
               {user?.avatar_url
-                ? <img src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', background: '#fff' }} />
+                ? <img src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', background: 'var(--bg-card)' }} />
                 : userSchool?.logo_url
-                  ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
+                  ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: 'var(--bg-card)' }} />
                   : (user?.full_name?.charAt(0).toUpperCase() || <Shield size={16} />)
               }
             </div>
@@ -1020,23 +1021,23 @@ export default function Header() {
               <div style={{
                 position: 'fixed',
                 top: 82, right: 24,
-                width: 260, background: '#fff',
-                borderRadius: 18, border: '1px solid #e5e7eb',
+                width: 260, background: 'var(--bg-card)',
+                borderRadius: 18, border: '1px solid var(--border-color)',
                 boxShadow: '0 12px 28px rgba(0,0,0,0.12)',
                 padding: 16, zIndex: 9999, animation: 'fadeDown 0.15s ease',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid #f3f4f6' }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', fontSize: 18, fontWeight: 700, color: '#1a56db', flexShrink: 0, border: '1px solid #e5e7eb' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid var(--border-light)' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', fontSize: 18, fontWeight: 700, color: '#1a56db', flexShrink: 0, border: '1px solid var(--border-color)' }}>
                     {user?.avatar_url
-                      ? <img src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', background: '#fff' }} />
+                      ? <img src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', background: 'var(--bg-card)' }} />
                       : userSchool?.logo_url
-                        ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
+                        ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: 'var(--bg-card)' }} />
                         : (user?.full_name?.charAt(0).toUpperCase() || <Shield size={20} />)
                     }
                   </div>
                   <div style={{ overflow: 'hidden' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.full_name || 'System Admin'}</div>
-                    <div style={{ fontSize: 11, color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.full_name || 'System Admin'}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
                     <div style={{ fontSize: 10, fontWeight: 700, color: '#1a56db', textTransform: 'uppercase', marginTop: 2 }}>{user?.role}</div>
                   </div>
                 </div>
@@ -1047,9 +1048,9 @@ export default function Header() {
                       navigate('/account')
                       setProfileOpen(false) 
                     }}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', background: '#f3f4f6', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left' }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#e5e7eb'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#f3f4f6'}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', background: 'var(--bg-input)', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-input)'}
                   >
                     <Settings size={15} /> Manage Account
                   </button>
@@ -1058,12 +1059,15 @@ export default function Header() {
                       navigate('/privacy')
                       setProfileOpen(false) 
                     }}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', background: '#f3f4f6', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left' }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#e5e7eb'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#f3f4f6'}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', background: 'var(--bg-input)', display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-input)'}
                   >
                     <Shield size={15} /> Data & Privacy
                   </button>
+                  <div style={{ padding: '8px 0', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', margin: '4px 0', display: 'flex', justifyContent: 'center' }}>
+                    <ThemeToggle />
+                  </div>
                   <button
                     onClick={handleSignOut}
                     disabled={signing}
@@ -1089,7 +1093,7 @@ export default function Header() {
           />
           <div style={{
             position: 'fixed', top: 0, right: 0, bottom: 0, width: '85%', maxWidth: 360,
-            background: '#fff', zIndex: 1001, boxShadow: '-10px 0 30px rgba(0,0,0,0.1)',
+            background: 'var(--bg-card)', zIndex: 1001, boxShadow: '-10px 0 30px rgba(0,0,0,0.1)',
             padding: '24px', display: 'flex', flexDirection: 'column', gap: 24,
             animation: 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
           }}>
@@ -1098,9 +1102,9 @@ export default function Header() {
                 <div style={{ width: 36, height: 36, background: '#eff6ff', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Command size={18} color="#1a56db" />
                 </div>
-                <span style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>Navigation</span>
+                <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>Navigation</span>
               </div>
-              <button onClick={() => setMobileMenuOpen(false)} style={{ border: 'none', background: '#f3f4f6', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <button onClick={() => setMobileMenuOpen(false)} style={{ border: 'none', background: 'var(--bg-hover)', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                 <ChevronRight size={18} />
               </button>
             </div>
@@ -1108,7 +1112,7 @@ export default function Header() {
             <nav style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', paddingRight: 4 }}>
               {navGroups.map((group: any, i: number) => (
                 <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 12px 4px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 12px 4px' }}>
                     {group.label}
                   </div>
                   {group.single ? (
@@ -1146,7 +1150,7 @@ export default function Header() {
               ))}
             </nav>
 
-            <div style={{ marginTop: 'auto', paddingTop: 20, borderTop: '1px solid #f3f4f6' }}>
+            <div style={{ marginTop: 'auto', paddingTop: 20, borderTop: '1px solid var(--border-light)' }}>
               <button 
                 onClick={handleSignOut}
                 style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px', borderRadius: 14, background: '#fff5f5', border: 'none', color: '#ef4444', fontWeight: 700, cursor: 'pointer' }}

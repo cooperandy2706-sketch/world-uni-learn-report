@@ -158,10 +158,10 @@ export default function ReportsPage() {
         <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1e0646', margin: 0 }}>Advanced Financial Audits</h1>
-            <p style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>Professional Profit & Loss statements and itemized transaction ledgers</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>Professional Profit & Loss statements and itemized transaction ledgers</p>
           </div>
           <div className="no-print" style={{ display: 'flex', gap: 10 }}>
-            <button onClick={handleExport} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '10px 18px', background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, color: '#374151', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+            <button onClick={handleExport} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '10px 18px', background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 10, color: 'var(--text-main)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
               <Download size={15} /> Export CSV
             </button>
             <button onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '10px 18px', background: '#1e0646', border: 'none', borderRadius: 10, color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
@@ -171,10 +171,10 @@ export default function ReportsPage() {
         </div>
 
         {/* Filters */}
-        <div className="no-print" style={{ background: '#fff', border: '1.5px solid #f0eefe', borderRadius: 16, padding: '20px', marginBottom: 24, display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="no-print" style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 16, padding: '20px', marginBottom: 24, display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Filter size={16} color="#6d28d9" />
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#374151' }}>Period:</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Period:</span>
             <div style={{ display: 'flex', background: '#f5f3ff', padding: 3, borderRadius: 10 }}>
               {(['term', 'month', 'custom'] as Period[]).map(p => (
                 <button
@@ -194,14 +194,14 @@ export default function ReportsPage() {
           </div>
 
           {period === 'month' && (
-            <input type="month" value={month} onChange={e => setMonth(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', outline: 'none', fontSize: 13 }} />
+            <input type="month" value={month} onChange={e => setMonth(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 13 }} />
           )}
 
           {period === 'custom' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', outline: 'none', fontSize: 13 }} />
-              <span style={{ fontSize: 12, color: '#9ca3af' }}>to</span>
-              <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', outline: 'none', fontSize: 13 }} />
+              <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 13 }} />
+              <span style={{ fontSize: 12, color: 'var(--text-subtle)' }}>to</span>
+              <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 13 }} />
             </div>
           )}
           
@@ -212,11 +212,11 @@ export default function ReportsPage() {
 
         {isLoading ? (
           <div style={{ padding: '100px 0', textAlign: 'center' }}>
-            <div style={{ width: 40, height: 40, border: '3px solid #f3f4f6', borderTopColor: '#6d28d9', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-            <p style={{ fontSize: 14, color: '#6b7280' }}>Generating high-precision audit report...</p>
+            <div style={{ width: 40, height: 40, border: '3px solid var(--border-light)', borderTopColor: '#6d28d9', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
+            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Generating high-precision audit report...</p>
           </div>
         ) : !metrics ? (
-          <div style={{ padding: 80, textAlign: 'center', color: '#9ca3af' }}>No financial data found for this period</div>
+          <div style={{ padding: 80, textAlign: 'center', color: 'var(--text-subtle)' }}>No financial data found for this period</div>
         ) : (
           <div id="report-print-area">
             
@@ -233,13 +233,13 @@ export default function ReportsPage() {
                   )}
                   <div>
                     <h1 style={{ fontSize: 28, fontWeight: 900, color: '#1e0646', margin: 0, letterSpacing: '-0.02em' }}>{school?.name || 'School Financial Report'}</h1>
-                    <p style={{ fontSize: 13, color: '#4b5563', margin: '4px 0 0', fontWeight: 600 }}>{school?.address}</p>
-                    <p style={{ fontSize: 12, color: '#6b7280', margin: '2px 0 0' }}>{school?.phone_number} {school?.email ? `· ${school.email}` : ''}</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 0', fontWeight: 600 }}>{school?.address}</p>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>{school?.phone_number} {school?.email ? `· ${school.email}` : ''}</p>
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: 11, fontWeight: 800, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Audit Report</div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#1f2937', marginTop: 4 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginTop: 4 }}>
                     {period === 'term' ? term?.name : period === 'month' ? format(new Date(`${month}-01`), 'MMMM yyyy') : `${format(new Date(customStart), 'dd MMM')} - ${format(new Date(customEnd), 'dd MMM yyyy')}`}
                   </div>
                 </div>
@@ -259,7 +259,7 @@ export default function ReportsPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 30 }}>
               
               {/* Income Column */}
-              <div style={{ background: '#fff', border: '1.5px solid #f0eefe', borderRadius: 20, overflow: 'hidden' }}>
+              <div style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 20, overflow: 'hidden' }}>
                 <div style={{ padding: '18px 24px', background: '#ecfdf5', borderBottom: '1px solid #d1fae5', display: 'flex', alignItems: 'center', gap: 10 }}>
                   <TrendingUp size={18} color="#059669" />
                   <span style={{ fontSize: 15, fontWeight: 800, color: '#065f46' }}>Statement of Revenue</span>
@@ -267,8 +267,8 @@ export default function ReportsPage() {
                 <div style={{ padding: '4px 0' }}>
                   {Object.entries(metrics.incomeByCategory).map(([cat, val]) => (
                     <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 24px', borderBottom: '1px solid #fafafa' }}>
-                      <span style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>{cat}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{CUR(val)}</span>
+                      <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>{cat}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{CUR(val)}</span>
                     </div>
                   ))}
                 </div>
@@ -279,7 +279,7 @@ export default function ReportsPage() {
               </div>
 
               {/* Expense Column */}
-              <div style={{ background: '#fff', border: '1.5px solid #f0eefe', borderRadius: 20, overflow: 'hidden' }}>
+              <div style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 20, overflow: 'hidden' }}>
                 <div style={{ padding: '18px 24px', background: '#fef2f2', borderBottom: '1px solid #fee2e2', display: 'flex', alignItems: 'center', gap: 10 }}>
                   <TrendingDown size={18} color="#dc2626" />
                   <span style={{ fontSize: 15, fontWeight: 800, color: '#991b1b' }}>Statement of Expenditure</span>
@@ -287,8 +287,8 @@ export default function ReportsPage() {
                 <div style={{ padding: '4px 0' }}>
                   {Object.entries(metrics.expenseByCategory).map(([cat, val]) => (
                     <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 24px', borderBottom: '1px solid #fafafa' }}>
-                      <span style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>{cat}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{CUR(val)}</span>
+                      <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>{cat}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{CUR(val)}</span>
                     </div>
                   ))}
                 </div>
@@ -318,13 +318,13 @@ export default function ReportsPage() {
             </div>
 
             {/* Itemized Ledger Table */}
-            <div style={{ background: '#fff', border: '1.5px solid #f0eefe', borderRadius: 20, overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 20, overflow: 'hidden' }}>
               <div style={{ padding: '18px 24px', borderBottom: '1.5px solid #f0eefe', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <TableIcon size={18} color="#1e0646" />
                   <span style={{ fontSize: 15, fontWeight: 800, color: '#1e0646' }}>Itemized Audit Ledger</span>
                 </div>
-                <span style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>{metrics.ledger.length} Transactions found</span>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{metrics.ledger.length} Transactions found</span>
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
@@ -338,16 +338,16 @@ export default function ReportsPage() {
                   <tbody>
                     {metrics.ledger.map((l, i) => (
                       <tr key={i} className="rp-row" style={{ borderBottom: '1px solid #f0eefe' }}>
-                        <td style={{ padding: '14px 24px', fontSize: 13, color: '#6b7280' }}>{format(new Date(l.date), 'dd MMM yyyy')}</td>
-                        <td style={{ padding: '14px 24px', fontSize: 13, fontWeight: 700, color: '#111827' }}>{l.desc}</td>
+                        <td style={{ padding: '14px 24px', fontSize: 13, color: 'var(--text-muted)' }}>{format(new Date(l.date), 'dd MMM yyyy')}</td>
+                        <td style={{ padding: '14px 24px', fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{l.desc}</td>
                         <td style={{ padding: '14px 24px' }}>
                           <span style={{ fontSize: 10, fontWeight: 800, background: l.type === 'Revenue' ? '#f0fdf4' : '#fef2f2', color: l.type === 'Revenue' ? '#16a34a' : '#dc2626', padding: '3px 10px', borderRadius: 8 }}>{l.type}</span>
                         </td>
-                        <td style={{ padding: '14px 24px', fontSize: 13, color: '#6b7280' }}>{l.cat}</td>
+                        <td style={{ padding: '14px 24px', fontSize: 13, color: 'var(--text-muted)' }}>{l.cat}</td>
                         <td style={{ padding: '14px 24px', fontSize: 14, fontWeight: 800, color: l.type === 'Revenue' ? '#059669' : '#dc2626' }}>
                           {l.type === 'Revenue' ? '+' : '-'}{CUR(l.amount)}
                         </td>
-                        <td style={{ padding: '14px 24px', fontSize: 12, color: '#9ca3af', textTransform: 'capitalize' }}>{(l.method || '').replace('_', ' ')}</td>
+                        <td style={{ padding: '14px 24px', fontSize: 12, color: 'var(--text-subtle)', textTransform: 'capitalize' }}>{(l.method || '').replace('_', ' ')}</td>
                       </tr>
                     ))}
                   </tbody>

@@ -8,7 +8,7 @@ function Btn({children,onClick,variant='primary',disabled,loading,style}:any){
   const [hov,setHov]=useState(false)
   const v:any={
     primary:  {background:hov?'#5b21b6':'linear-gradient(135deg,#7c3aed,#6d28d9)',color:'#fff',border:'none',boxShadow:'0 2px 8px rgba(109,40,217,.25)'},
-    secondary:{background:hov?'#f5f3ff':'#fff',color:'#374151',border:'1.5px solid #e5e7eb'},
+    secondary:{background:hov?'#f5f3ff':'#fff',color: 'var(--text-main)',border: '1.5px solid var(--border-color)'},
     danger:   {background:hov?'#b91c1c':'#dc2626',color:'#fff',border:'none'},
     success:  {background:hov?'#15803d':'#16a34a',color:'#fff',border:'none'},
     warning:  {background:hov?'#b45309':'linear-gradient(135deg,#f59e0b,#d97706)',color:'#fff',border:'none'},
@@ -160,8 +160,8 @@ export default function AnnouncementsPage(){
         {/* Header */}
         <div style={{marginBottom:22,display:'flex',alignItems:'flex-start',justifyContent:'space-between',flexWrap:'wrap',gap:12}}>
           <div>
-            <h1 style={{fontFamily:'"Playfair Display",serif',fontSize:26,fontWeight:700,color:'#111827',margin:0}}>Announcements</h1>
-            <p style={{fontSize:13,color:'#6b7280',marginTop:3}}>Post announcements, schedule meetings and send reminders to staff & students</p>
+            <h1 style={{fontFamily:'"Playfair Display",serif',fontSize:26,fontWeight:700,color: 'var(--text-main)',margin:0}}>Announcements</h1>
+            <p style={{fontSize:13,color: 'var(--text-muted)',marginTop:3}}>Post announcements, schedule meetings and send reminders to staff & students</p>
           </div>
           <Btn onClick={()=>setModalOpen(true)}>✏️ New Post</Btn>
         </div>
@@ -174,10 +174,10 @@ export default function AnnouncementsPage(){
             {label:'Staff',value:teachers.length,icon:'👨‍🏫',color:'#16a34a'},
             {label:'Students',value:students.length,icon:'🎓',color:'#a21caf'},
           ].map(s=>(
-            <div key={s.label} style={{background:'#fff',borderRadius:14,padding:'14px 16px',border:'1.5px solid #f0eefe',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
+            <div key={s.label} style={{background: 'var(--bg-card)',borderRadius:14,padding:'14px 16px',border:'1.5px solid #f0eefe',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
               <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
                 <span style={{fontSize:18}}>{s.icon}</span>
-                <span style={{fontSize:10,fontWeight:700,color:'#6b7280',textTransform:'uppercase',letterSpacing:'.06em'}}>{s.label}</span>
+                <span style={{fontSize:10,fontWeight:700,color: 'var(--text-muted)',textTransform:'uppercase',letterSpacing:'.06em'}}>{s.label}</span>
               </div>
               <div style={{fontFamily:'"Playfair Display",serif',fontSize:22,fontWeight:700,color:s.color}}>{s.value}</div>
             </div>
@@ -204,10 +204,10 @@ export default function AnnouncementsPage(){
             <div style={{width:32,height:32,borderRadius:'50%',border:'3px solid #ede9fe',borderTopColor:'#6d28d9',animation:'_an_spin .8s linear infinite'}}/>
           </div>
         ) : filtered.length===0 ? (
-          <div style={{background:'#fff',borderRadius:16,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
+          <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
             <div style={{fontSize:52,marginBottom:12}}>📭</div>
-            <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:18,fontWeight:700,color:'#111827',marginBottom:6}}>No posts yet</h3>
-            <p style={{fontSize:13,color:'#9ca3af',marginBottom:18}}>Click "New Post" to send your first announcement.</p>
+            <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:18,fontWeight:700,color: 'var(--text-main)',marginBottom:6}}>No posts yet</h3>
+            <p style={{fontSize:13,color: 'var(--text-subtle)',marginBottom:18}}>Click "New Post" to send your first announcement.</p>
             <Btn onClick={()=>setModalOpen(true)}>✏️ Create First Post</Btn>
           </div>
         ) : (
@@ -216,7 +216,7 @@ export default function AnnouncementsPage(){
               const tc=TYPE_CONFIG[a.type]??TYPE_CONFIG.announcement
               return(
                 <div key={a.id} className="ann-card"
-                  style={{background:'#fff',borderRadius:14,padding:'16px 20px',border:`1.5px solid ${a.is_pinned?'#fde68a':'#f0eefe'}`,boxShadow:'0 1px 4px rgba(109,40,217,.06)',animation:`_an_fu .3s ease ${i*.03}s both`,position:'relative'}}>
+                  style={{background: 'var(--bg-card)',borderRadius:14,padding:'16px 20px',border:`1.5px solid ${a.is_pinned?'#fde68a':'#f0eefe'}`,boxShadow:'0 1px 4px rgba(109,40,217,.06)',animation:`_an_fu .3s ease ${i*.03}s both`,position:'relative'}}>
                   {a.is_pinned&&<div style={{position:'absolute',top:12,right:12,fontSize:14}}>📌</div>}
                   <div style={{display:'flex',alignItems:'flex-start',gap:12}}>
                     <div style={{width:40,height:40,borderRadius:12,background:tc.bg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0}}>
@@ -224,11 +224,11 @@ export default function AnnouncementsPage(){
                     </div>
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:3,flexWrap:'wrap'}}>
-                        <h3 style={{fontSize:14,fontWeight:700,color:'#111827',margin:0}}>{a.title}</h3>
+                        <h3 style={{fontSize:14,fontWeight:700,color: 'var(--text-main)',margin:0}}>{a.title}</h3>
                         <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:99,background:tc.bg,color:tc.color}}>{tc.label}</span>
                         {(()=>{ const ac=AUDIENCE_CONFIG[a.target_role]||AUDIENCE_CONFIG.all; return <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:99,background:ac.bg,color:ac.color}}>{ac.icon} {ac.label}</span> })()}
                       </div>
-                      <p style={{fontSize:13,color:'#374151',margin:'0 0 8px',lineHeight:1.5}}>{a.body}</p>
+                      <p style={{fontSize:13,color: 'var(--text-main)',margin:'0 0 8px',lineHeight:1.5}}>{a.body}</p>
                       {a.meeting_date&&(
                         <div style={{fontSize:12,color:'#0369a1',fontWeight:600,marginBottom:6}}>
                           📅 {new Date(a.meeting_date).toLocaleString()}
@@ -236,9 +236,9 @@ export default function AnnouncementsPage(){
                         </div>
                       )}
                       <div style={{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}>
-                        <span style={{fontSize:11,color:'#9ca3af'}}>{new Date(a.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span>
-                        <span style={{fontSize:11,color:'#9ca3af'}}>by {a.from_user?.full_name??'Admin'}</span>
-                        <span style={{fontSize:11,color:'#9ca3af'}}>{a.reads?.length??0} read{a.reads?.length!==1?'s':''}</span>
+                        <span style={{fontSize:11,color: 'var(--text-subtle)'}}>{new Date(a.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span>
+                        <span style={{fontSize:11,color: 'var(--text-subtle)'}}>by {a.from_user?.full_name??'Admin'}</span>
+                        <span style={{fontSize:11,color: 'var(--text-subtle)'}}>{a.reads?.length??0} read{a.reads?.length!==1?'s':''}</span>
                       </div>
                     </div>
                     <div style={{display:'flex',gap:4,flexShrink:0}}>
@@ -262,14 +262,14 @@ export default function AnnouncementsPage(){
       {/* Create modal */}
       {modalOpen&&(
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.45)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999,backdropFilter:'blur(4px)',padding:16}}>
-          <div style={{background:'#fff',borderRadius:16,padding:'24px',width:'100%',maxWidth:520,maxHeight:'90vh',overflowY:'auto',boxShadow:'0 24px 64px rgba(0,0,0,.18)',fontFamily:'"DM Sans",sans-serif'}}>
-            <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:19,fontWeight:700,color:'#111827',marginBottom:18}}>✏️ New Post</h3>
+          <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'24px',width:'100%',maxWidth:520,maxHeight:'90vh',overflowY:'auto',boxShadow:'0 24px 64px rgba(0,0,0,.18)',fontFamily:'"DM Sans",sans-serif'}}>
+            <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:19,fontWeight:700,color: 'var(--text-main)',marginBottom:18}}>✏️ New Post</h3>
 
             {/* Type selector */}
             <div style={{display:'flex',gap:6,marginBottom:16,flexWrap:'wrap'}}>
               {Object.entries(TYPE_CONFIG).map(([k,v]:any)=>(
                 <button key={k} onClick={()=>setForm(f=>({...f,type:k}))}
-                  style={{padding:'6px 12px',borderRadius:99,border:`1.5px solid ${form.type===k?v.color:'#e5e7eb'}`,background:form.type===k?v.bg:'#fff',color:form.type===k?v.color:'#374151',fontSize:11,fontWeight:600,cursor:'pointer',transition:'all .15s',fontFamily:'"DM Sans",sans-serif'}}>
+                  style={{padding:'6px 12px',borderRadius:99,border:`1.5px solid ${form.type===k?v.color:'#e5e7eb'}`,background:form.type===k?v.bg:'#fff',color:form.type===k?v.color: 'var(--text-main)',fontSize:11,fontWeight:600,cursor:'pointer',transition:'all .15s',fontFamily:'"DM Sans",sans-serif'}}>
                   {v.icon} {v.label}
                 </button>
               ))}
@@ -277,18 +277,18 @@ export default function AnnouncementsPage(){
 
             <div style={{display:'flex',flexDirection:'column',gap:14}}>
               <div>
-                <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Title *</label>
+                <label style={{display:'block',fontSize:11,fontWeight:700,color: 'var(--text-main)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Title *</label>
                 <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="e.g. End of Term Exam Schedule"
-                  style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
+                  style={{width:'100%',padding:'9px 12px',borderRadius:9,border: '1.5px solid var(--border-color)',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
               </div>
               <div>
-                <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Message *</label>
+                <label style={{display:'block',fontSize:11,fontWeight:700,color: 'var(--text-main)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Message *</label>
                 <textarea value={form.body} onChange={e=>setForm(f=>({...f,body:e.target.value}))} rows={4} placeholder="Write your message here…"
-                  style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',resize:'vertical',boxSizing:'border-box'}}/>
+                  style={{width:'100%',padding:'9px 12px',borderRadius:9,border: '1.5px solid var(--border-color)',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',resize:'vertical',boxSizing:'border-box'}}/>
               </div>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
                 <div>
-                  <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Audience</label>
+                  <label style={{display:'block',fontSize:11,fontWeight:700,color: 'var(--text-main)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Audience</label>
                   <div style={{display:'flex',gap:6}}>
                     {(['all','staff','student','driver','security'] as const).map(r=>{
                       const ac=AUDIENCE_CONFIG[r]
@@ -297,7 +297,7 @@ export default function AnnouncementsPage(){
                         <button key={r} onClick={()=>setForm(f=>({...f,target_role:r}))}
                           style={{flex:1,padding:'8px 4px',borderRadius:10,border:`1.5px solid ${sel?ac.color:'#e5e7eb'}`,background:sel?ac.bg:'#fff',cursor:'pointer',textAlign:'center',transition:'all .15s'}}>
                           <div style={{fontSize:16}}>{ac.icon}</div>
-                          <div style={{fontSize:10,fontWeight:700,color:sel?ac.color:'#6b7280',marginTop:2}}>{ac.label}</div>
+                          <div style={{fontSize:10,fontWeight:700,color:sel?ac.color: 'var(--text-muted)',marginTop:2}}>{ac.label}</div>
                         </button>
                       )
                     })}
@@ -305,40 +305,40 @@ export default function AnnouncementsPage(){
                 </div>
                 {form.type==='meeting'&&(
                   <div>
-                    <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Meeting Date & Time</label>
+                    <label style={{display:'block',fontSize:11,fontWeight:700,color: 'var(--text-main)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Meeting Date & Time</label>
                     <input type="datetime-local" value={form.meeting_date} onChange={e=>setForm(f=>({...f,meeting_date:e.target.value}))}
-                      style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:12,outline:'none',fontFamily:'"DM Sans",sans-serif'}}/>
+                      style={{width:'100%',padding:'9px 12px',borderRadius:9,border: '1.5px solid var(--border-color)',fontSize:12,outline:'none',fontFamily:'"DM Sans",sans-serif'}}/>
                   </div>
                 )}
               </div>
               {form.type==='meeting'&&(
                 <div>
-                  <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Meeting Link (optional)</label>
+                  <label style={{display:'block',fontSize:11,fontWeight:700,color: 'var(--text-main)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Meeting Link (optional)</label>
                   <input value={form.meeting_link} onChange={e=>setForm(f=>({...f,meeting_link:e.target.value}))} placeholder="https://meet.google.com/..."
-                    style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
+                    style={{width:'100%',padding:'9px 12px',borderRadius:9,border: '1.5px solid var(--border-color)',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
                 </div>
               )}
               
               {/* Expiration Date */}
               <div>
-                <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Expiration Date (Optional)</label>
-                <div style={{fontSize:11,color:'#6b7280',marginBottom:6}}>Notification will automatically disappear from feeds after this time.</div>
+                <label style={{display:'block',fontSize:11,fontWeight:700,color: 'var(--text-main)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Expiration Date (Optional)</label>
+                <div style={{fontSize:11,color: 'var(--text-muted)',marginBottom:6}}>Notification will automatically disappear from feeds after this time.</div>
                 <input type="datetime-local" value={form.expires_at} onChange={e=>setForm(f=>({...f,expires_at:e.target.value}))}
-                  style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:12,outline:'none',fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
+                  style={{width:'100%',padding:'9px 12px',borderRadius:9,border: '1.5px solid var(--border-color)',fontSize:12,outline:'none',fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
               </div>
 
               <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',fontSize:13,color:'#374151'}}>
+                <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',fontSize:13,color: 'var(--text-main)'}}>
                   <input type="checkbox" checked={form.is_pinned} onChange={e=>setForm(f=>({...f,is_pinned:e.target.checked}))}/>
                   📌 Pin this post (shows at top)
                 </label>
                 
                 <div style={{background:'#fffbeb',border:'1.5px solid #d97706',borderRadius:10,padding:'12px',marginTop:8}}>
-                  <label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer',fontSize:13,color:'#111827',fontWeight:600}}>
+                  <label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer',fontSize:13,color: 'var(--text-main)',fontWeight:600}}>
                     <input type="checkbox" checked={form.is_alarm} onChange={e=>setForm(f=>({...f,is_alarm:e.target.checked}))} style={{marginTop:3,accentColor:'#d97706'}}/>
                     <div style={{flex:1}}>
                       <div>⏰ Set as Scheduled Alarm</div>
-                      <div style={{fontSize:11,color:'#6b7280',fontWeight:500,marginTop:2}}>Triggers a massive full-screen pop-up alarm on targeted users' devices.</div>
+                      <div style={{fontSize:11,color: 'var(--text-muted)',fontWeight:500,marginTop:2}}>Triggers a massive full-screen pop-up alarm on targeted users' devices.</div>
                       {form.is_alarm && (
                         <div style={{marginTop:8}}>
                           <input type="datetime-local" value={form.trigger_at} onChange={e=>setForm(f=>({...f,trigger_at:e.target.value}))} required
@@ -350,11 +350,11 @@ export default function AnnouncementsPage(){
                 </div>
                 
                 <div style={{background:'#f5f3ff',border:'1.5px solid #6d28d9',borderRadius:10,padding:'12px',marginTop:8}}>
-                  <label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer',fontSize:13,color:'#111827',fontWeight:600}}>
+                  <label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer',fontSize:13,color: 'var(--text-main)',fontWeight:600}}>
                     <input type="checkbox" checked={form.send_push} onChange={e=>setForm(f=>({...f,send_push:e.target.checked}))} style={{marginTop:3,accentColor:'#6d28d9'}}/>
                     <div>
                       <div>📡 Send Live Push Notification</div>
-                      <div style={{fontSize:11,color:'#6b7280',fontWeight:500,marginTop:2}}>Instantly alerts locked/closed devices (WhatsApp style)</div>
+                      <div style={{fontSize:11,color: 'var(--text-muted)',fontWeight:500,marginTop:2}}>Instantly alerts locked/closed devices (WhatsApp style)</div>
                     </div>
                   </label>
                 </div>

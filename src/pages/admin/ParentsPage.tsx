@@ -27,7 +27,7 @@ function Avatar({ name, size = 36 }: { name: string; size?: number }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 16 }}>
-      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{label}</label>
+      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{label}</label>
       {children}
     </div>
   )
@@ -39,7 +39,7 @@ function StyledInput({ ...props }: React.InputHTMLAttributes<HTMLInputElement>) 
       {...props}
       style={{
         width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13,
-        border: '1.5px solid #e5e7eb', outline: 'none', background: '#fff', color: '#111827',
+        border: '1.5px solid var(--border-color)', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)',
         fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box',
       }}
     />
@@ -137,12 +137,12 @@ export default function ParentsPage() {
 
       <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
-          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Parent Access Control</h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Generate and manage portal logins for parents & guardians.</p>
+          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Parent Access Control</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Generate and manage portal logins for parents & guardians.</p>
         </div>
       </div>
 
-      <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
         
         {/* Tabs */}
         <div style={{ display: 'flex', borderBottom: '1px solid #f1f5f9', padding: '0 20px' }}>
@@ -254,7 +254,7 @@ export default function ParentsPage() {
               />
               <button 
                 onClick={() => setFormData(prev => ({ ...prev, password: Math.random().toString(36).slice(-8) }))}
-                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: '#f3f4f6', border: 'none', padding: '4px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: 'pointer' }}
+                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'var(--bg-hover)', border: 'none', padding: '4px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: 'pointer' }}
               >Auto-Gen</button>
             </div>
           </Field>

@@ -38,7 +38,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
   const [hov, setHov] = useState(false)
   const v: Record<string, React.CSSProperties> = {
     primary:  { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,.25)' },
-    secondary:{ background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary:{ background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     success:  { background: hov ? '#15803d' : '#16a34a', color: '#fff', border: 'none' },
     info:     { background: hov ? '#0369a1' : 'linear-gradient(135deg,#0891b2,#0369a1)', color: '#fff', border: 'none' },
     orange:   { background: hov ? '#c2410c' : 'linear-gradient(135deg,#f97316,#ea580c)', color: '#fff', border: 'none' },
@@ -338,7 +338,7 @@ export default function TeacherReportsPage() {
         <div className="t-header" style={{ marginBottom: 22 }}>
           <div>
             <h1 className="t-title">Report Cards</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>
               {(term as any)?.name ?? '—'} · {(year as any)?.name ?? '—'}
             </p>
           </div>
@@ -379,13 +379,13 @@ export default function TeacherReportsPage() {
         {/* ── Selectors ────────────────────────────────────────────────── */}
         <div className="t-grid t-grid-stack" style={{ gap: 14, marginBottom: 18 }}>
           {/* Class */}
-          <div style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.05)' }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 6 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.05)' }}>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>
               Step 1 — Select Class
             </label>
             <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}
               onFocus={() => setClassFocused(true)} onBlur={() => setClassFocused(false)}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 14, fontWeight: 600, border: `1.5px solid ${classFocused ? '#7c3aed' : '#e5e7eb'}`, boxShadow: classFocused ? '0 0 0 3px rgba(109,40,217,.1)' : 'none', outline: 'none', background: '#faf5ff', color: '#111827', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 14, fontWeight: 600, border: `1.5px solid ${classFocused ? '#7c3aed' : '#e5e7eb'}`, boxShadow: classFocused ? '0 0 0 3px rgba(109,40,217,.1)' : 'none', outline: 'none', background: '#faf5ff', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
               <option value="">Choose class…</option>
               {(classOptions as any[]).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
@@ -393,14 +393,14 @@ export default function TeacherReportsPage() {
           </div>
 
           {/* Student */}
-          <div style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.05)' }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 6 }}>
-              Step 2 — Select Student <span style={{ fontWeight: 400, textTransform: 'none', color: '#9ca3af' }}>— scores & details auto-fill</span>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.05)' }}>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>
+              Step 2 — Select Student <span style={{ fontWeight: 400, textTransform: 'none', color: 'var(--text-subtle)' }}>— scores & details auto-fill</span>
             </label>
             <select value={selectedStudent?.id ?? ''} onChange={e => setSelectedStudent(students.find(s => s.id === e.target.value) ?? null)}
               disabled={!selectedClass || students.length === 0}
               onFocus={() => setStudentFocused(true)} onBlur={() => setStudentFocused(false)}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 14, fontWeight: 600, border: `1.5px solid ${studentFocused ? '#7c3aed' : '#e5e7eb'}`, boxShadow: studentFocused ? '0 0 0 3px rgba(109,40,217,.1)' : 'none', outline: 'none', background: selectedClass ? '#faf5ff' : '#f9fafb', color: '#111827', fontFamily: '"DM Sans",sans-serif', cursor: selectedClass ? 'pointer' : 'not-allowed', opacity: selectedClass ? 1 : 0.6 }}>
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 14, fontWeight: 600, border: `1.5px solid ${studentFocused ? '#7c3aed' : '#e5e7eb'}`, boxShadow: studentFocused ? '0 0 0 3px rgba(109,40,217,.1)' : 'none', outline: 'none', background: selectedClass ? '#faf5ff' : '#f9fafb', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', cursor: selectedClass ? 'pointer' : 'not-allowed', opacity: selectedClass ? 1 : 0.6 }}>
               <option value="">Choose student…</option>
               {students.map(s => <option key={s.id} value={s.id}>{s.full_name}{s.student_id ? ` — ${s.student_id}` : ''}</option>)}
             </select>
@@ -412,8 +412,8 @@ export default function TeacherReportsPage() {
 
         {/* ── Quick-select pills ───────────────────────────────────────── */}
         {selectedClass && students.length > 0 && !selectedStudent && (
-          <div style={{ background: '#fff', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 18, animation: '_rp_fu .35s ease' }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 18, animation: '_rp_fu .35s ease' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>
               Quick select — {selectedClassName}
             </p>
             <div className="resp-pills" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -430,10 +430,10 @@ export default function TeacherReportsPage() {
 
         {/* ── Empty state ──────────────────────────────────────────────── */}
         {!selectedClass && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>📄</div>
             <h3 className="t-title" style={{ fontSize: 18, marginBottom: 6 }}>Select a class to begin</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Choose a class, then a student — their scores and report details fill in automatically.</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Choose a class, then a student — their scores and report details fill in automatically.</p>
           </div>
         )}
 
@@ -441,7 +441,7 @@ export default function TeacherReportsPage() {
         {loadingReport && (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '50px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_rp_spin .8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading {selectedStudent?.full_name}'s report…</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading {selectedStudent?.full_name}'s report…</p>
           </div>
         )}
 
@@ -503,7 +503,7 @@ export default function TeacherReportsPage() {
 
               {/* Scores table */}
               {scores.length > 0 && (
-                <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ padding: '13px 18px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 16 }}>📊</span>
                     <h3 className="t-title" style={{ fontSize: 15, margin: 0 }}>Subject Scores</h3>
@@ -537,7 +537,7 @@ export default function TeacherReportsPage() {
                         const g = getGrade(sc.total_score ?? 0)
                         return (
                           <tr key={sc.id} className="rp-row" style={{ borderBottom: i < scores.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background .12s' }}>
-                            <td data-label="Subject" style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: '#111827' }}>{sc.subject?.name}</td>
+                            <td data-label="Subject" style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{sc.subject?.name}</td>
                             {/* Dynamic category score columns */}
                             {(gradingCategories.length > 0
                               ? gradingCategories
@@ -561,8 +561,8 @@ export default function TeacherReportsPage() {
                             <td data-label="Grade" style={{ padding: '9px 13px', textAlign: 'center' }}>
                               <span style={{ width: 28, height: 28, borderRadius: 8, background: g.color + '18', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: g.color }}>{g.grade}</span>
                             </td>
-                            <td data-label="Position" style={{ padding: '9px 13px', textAlign: 'center', fontSize: 12, color: '#374151', fontWeight: 500 }}>{sc.position ? ordinalFn(sc.position) : '—'}</td>
-                            <td data-label="Remark" style={{ padding: '9px 13px', fontSize: 11, color: '#6b7280' }}>{sc.teacher_remarks ?? '—'}</td>
+                            <td data-label="Position" style={{ padding: '9px 13px', textAlign: 'center', fontSize: 12, color: 'var(--text-main)', fontWeight: 500 }}>{sc.position ? ordinalFn(sc.position) : '—'}</td>
+                            <td data-label="Remark" style={{ padding: '9px 13px', fontSize: 11, color: 'var(--text-muted)' }}>{sc.teacher_remarks ?? '—'}</td>
                           </tr>
                         )
                       })}
@@ -570,7 +570,7 @@ export default function TeacherReportsPage() {
                     <tfoot>
                       <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderTop: '2px solid #ede9fe' }}>
                         <td style={{ padding: '9px 13px', fontSize: 12, fontWeight: 800, color: '#6d28d9' }}>Summary</td>
-                        <td colSpan={2} style={{ padding: '9px 13px', fontSize: 11, color: '#6b7280' }}>{scores.length} subjects · {passCount} passed</td>
+                        <td colSpan={2} style={{ padding: '9px 13px', fontSize: 11, color: 'var(--text-muted)' }}>{scores.length} subjects · {passCount} passed</td>
                         <td style={{ padding: '9px 13px', textAlign: 'center' }}>
                           <span style={{ fontSize: 14, fontWeight: 800, color: avg >= 50 ? '#16a34a' : '#dc2626' }}>{avg.toFixed(1)}%</span>
                         </td>
@@ -593,7 +593,7 @@ export default function TeacherReportsPage() {
               )}
 
               {/* ── Remarks editor ─────────────────────────────────────── */}
-              <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                 <div style={{ padding: '13px 18px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 16 }}>💬</span>
@@ -610,27 +610,27 @@ export default function TeacherReportsPage() {
 
                 <div className="t-grid" style={{ padding: '16px 18px', gap: 14 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>
                       Class Teacher's Remarks
                     </label>
                     <select value={teacherRemark} onChange={e => { setTeacherRemark(e.target.value); setRemarksDirty(true) }}
-                      style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 12, border: '1.5px solid #e5e7eb', outline: 'none', background: '#faf5ff', color: '#374151', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 12, border: '1.5px solid var(--border-color)', outline: 'none', background: '#faf5ff', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
                       <option value="">Select remark…</option>
                       {TEACHER_REMARKS.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
-                    {teacherRemark && <p style={{ fontSize: 11, color: '#6b7280', marginTop: 5, fontStyle: 'italic', lineHeight: 1.4 }}>"{teacherRemark}"</p>}
+                    {teacherRemark && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 5, fontStyle: 'italic', lineHeight: 1.4 }}>"{teacherRemark}"</p>}
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>
                       Headteacher's Remarks
                     </label>
                     <select value={htRemark} onChange={e => { setHtRemark(e.target.value); setRemarksDirty(true) }}
-                      style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 12, border: '1.5px solid #e5e7eb', outline: 'none', background: '#faf5ff', color: '#374151', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 12, border: '1.5px solid var(--border-color)', outline: 'none', background: '#faf5ff', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
                       <option value="">Select remark…</option>
                       {HEADTEACHER_REMARKS.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
-                    {htRemark && <p style={{ fontSize: 11, color: '#6b7280', marginTop: 5, fontStyle: 'italic', lineHeight: 1.4 }}>"{htRemark}"</p>}
+                    {htRemark && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 5, fontStyle: 'italic', lineHeight: 1.4 }}>"{htRemark}"</p>}
                   </div>
                 </div>
 
@@ -662,8 +662,8 @@ export default function TeacherReportsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
               {/* Report status */}
-              <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 12 }}>Report Status</p>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 12 }}>Report Status</p>
                 {reportCard ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {[
@@ -673,7 +673,7 @@ export default function TeacherReportsPage() {
                       { l: 'Pass/Fail', v: `${passCount}/${scores.length} passed`, color: passCount === scores.length ? '#16a34a' : '#d97706' },
                     ].map(({ l, v, color }) => (
                       <div key={l} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                        <span style={{ color: '#6b7280' }}>{l}</span>
+                        <span style={{ color: 'var(--text-muted)' }}>{l}</span>
                         <span style={{ fontWeight: 700, color: color ?? '#111827' }}>{v}</span>
                       </div>
                     ))}
@@ -685,15 +685,15 @@ export default function TeacherReportsPage() {
                   </div>
                 ) : (
                   <div style={{ textAlign: 'center', padding: '12px 0' }}>
-                    <p style={{ fontSize: 12, color: '#9ca3af' }}>Report not generated yet</p>
-                    <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>Ask admin to generate from Reports page</p>
+                    <p style={{ fontSize: 12, color: 'var(--text-subtle)' }}>Report not generated yet</p>
+                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 3 }}>Ask admin to generate from Reports page</p>
                   </div>
                 )}
               </div>
 
               {/* Attendance */}
-              <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Attendance</p>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Attendance</p>
                 {attendance ? (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
                     {[
@@ -703,27 +703,27 @@ export default function TeacherReportsPage() {
                     ].map(s => (
                       <div key={s.l} style={{ background: s.bg, borderRadius: 9, padding: '9px', textAlign: 'center' }}>
                         <div className="t-title" style={{ fontSize: 18, color: s.color }}>{s.v}</div>
-                        <div style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }}>{s.l}</div>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{s.l}</div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', padding: '6px 0' }}>No attendance recorded</p>
+                  <p style={{ fontSize: 12, color: 'var(--text-subtle)', textAlign: 'center', padding: '6px 0' }}>No attendance recorded</p>
                 )}
               </div>
 
               {/* Guardian */}
               {(selectedStudent.guardian_name || selectedStudent.guardian_phone) && (
-                <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Guardian</p>
-                  {selectedStudent.guardian_name && <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 3 }}>{selectedStudent.guardian_name}</p>}
-                  {selectedStudent.guardian_phone && <p style={{ fontSize: 12, color: '#6b7280' }}>📱 {selectedStudent.guardian_phone}</p>}
+                <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Guardian</p>
+                  {selectedStudent.guardian_name && <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 3 }}>{selectedStudent.guardian_name}</p>}
+                  {selectedStudent.guardian_phone && <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>📱 {selectedStudent.guardian_phone}</p>}
                 </div>
               )}
 
               {/* Student list */}
-              <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '14px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', maxHeight: 260, overflowY: 'auto' }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>All Students</p>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '14px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', maxHeight: 260, overflowY: 'auto' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>All Students</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {students.map((s, i) => (
                     <button key={s.id} onClick={() => setSelectedStudent(s)}

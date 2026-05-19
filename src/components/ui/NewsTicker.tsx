@@ -189,7 +189,7 @@ export const NewsTicker: React.FC = () => {
         alignItems: 'center',
         fontSize: '11px',
         fontWeight: 700,
-        color: '#9ca3af',
+        color: 'var(--text-subtle)',
         zIndex: 10,
         borderLeft: '1px solid rgba(255,255,255,0.1)',
         whiteSpace: 'nowrap'

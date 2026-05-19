@@ -109,10 +109,10 @@ export default function ParentAttendancePage() {
 
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
-          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>
+          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px' }}>
             Attendance Tracker
           </h1>
-          <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>Monitor your children's school attendance records for this term.</p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Monitor your children's school attendance records for this term.</p>
         </div>
 
         {/* Ward selector tabs */}
@@ -136,10 +136,10 @@ export default function ParentAttendancePage() {
         )}
 
         {wards.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 20, padding: '50px 30px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: '50px 30px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>👨‍👩‍👦</div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No children linked</h3>
-            <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>Contact school administration to link your children.</p>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No children linked</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Contact school administration to link your children.</p>
           </div>
         ) : loading ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 0' }}>
@@ -168,10 +168,10 @@ export default function ParentAttendancePage() {
                 { label: 'Days Late', value: summary.late, icon: <Clock size={18} />, color: '#d97706', bg: '#fffbeb' },
                 { label: 'Days Absent', value: summary.absent, icon: <XCircle size={18} />, color: '#dc2626', bg: '#fef2f2' },
               ].map((s, i) => (
-                <div key={i} style={{ background: '#fff', borderRadius: 18, padding: '18px 20px', border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 1px 4px rgba(109,40,217,.04)' }}>
+                <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '18px 20px', border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 1px 4px rgba(109,40,217,.04)' }}>
                   <div style={{ width: 42, height: 42, borderRadius: 12, background: s.bg, color: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{s.icon}</div>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '.05em' }}>{s.label}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '.05em' }}>{s.label}</div>
                     <div style={{ fontSize: 22, fontWeight: 800, color: '#1e293b', lineHeight: 1.2 }}>{s.value}</div>
                   </div>
                 </div>
@@ -182,19 +182,19 @@ export default function ParentAttendancePage() {
             <div className="att-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 24 }}>
 
               {/* Calendar */}
-              <div style={{ background: '#fff', borderRadius: 20, padding: 24, border: '1.5px solid #f0eefe' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, border: '1.5px solid #f0eefe' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                   <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0 }}>Monthly View</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <button onClick={() => setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1))}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: 4 }}>
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}>
                       <ChevronLeft size={18} />
                     </button>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#374151', minWidth: 120, textAlign: 'center' }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', minWidth: 120, textAlign: 'center' }}>
                       {selectedMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
                     </span>
                     <button onClick={() => setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1))}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: 4 }}>
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}>
                       <ChevronRight size={18} />
                     </button>
                   </div>
@@ -221,14 +221,14 @@ export default function ParentAttendancePage() {
                   {Object.entries({ present: '#16a34a', late: '#d97706', absent: '#dc2626', none: '#94a3b8' }).map(([label, color]) => (
                     <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                       <div style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
-                      <span style={{ fontSize: 10, fontWeight: 600, color: '#6b7280', textTransform: 'capitalize' }}>{label === 'none' ? 'No Data' : label}</span>
+                      <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'capitalize' }}>{label === 'none' ? 'No Data' : label}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Recent records */}
-              <div style={{ background: '#fff', borderRadius: 20, padding: 24, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column' }}>
                 <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: '0 0 16px' }}>Recent Records</h3>
                 <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {records.length === 0 ? (
@@ -248,7 +248,7 @@ export default function ParentAttendancePage() {
                             <div style={{ fontSize: 12, fontWeight: 700, color: '#1e293b' }}>
                               {new Date(r.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </div>
-                            <div style={{ fontSize: 10, color: '#6b7280' }}>
+                            <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
                               {new Date(r.date).toLocaleDateString('en-GB', { weekday: 'long' })}
                             </div>
                           </div>

@@ -27,7 +27,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   }
   const variants: Record<string, React.CSSProperties> = {
     primary: { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
   }
   return (
     <button type={type} onClick={onClick} disabled={disabled}
@@ -134,7 +134,7 @@ export default function AIQuizGenerator({ open, onClose, initialText = '', subje
         </div>
 
         <div className="field-group">
-          <label style={{ fontSize: 12, fontWeight: 700, color: '#4b5563', marginBottom: 6, display: 'flex', justifyContent: 'space-between' }}>
+          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, display: 'flex', justifyContent: 'space-between' }}>
             <span>Source Text *</span>
             <label style={{ color: '#7c3aed', cursor: 'pointer' }}>
               📁 Extract from PDF
@@ -145,21 +145,21 @@ export default function AIQuizGenerator({ open, onClose, initialText = '', subje
             value={text}
             onChange={e => setText(e.target.value)}
             placeholder="Paste syllabus, notes, or chapter text here..."
-            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', height: 180, resize: 'vertical', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', height: 180, resize: 'vertical', boxSizing: 'border-box' }}
             disabled={isParsing || isGenerating}
           />
           {isParsing && <p style={{ fontSize: 11, color: '#f59e0b', marginTop: 4 }}>Extracting text from PDF...</p>}
         </div>
 
         <div className="field-group">
-          <label style={{ fontSize: 12, fontWeight: 700, color: '#4b5563', marginBottom: 6, display: 'block' }}>Number of Questions</label>
+          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>Number of Questions</label>
           <input
             type="number"
             value={questionCount}
             onChange={e => setQuestionCount(parseInt(e.target.value) || 10)}
             min={1}
             max={50}
-            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
             disabled={isGenerating}
           />
         </div>

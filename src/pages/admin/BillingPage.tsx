@@ -99,7 +99,7 @@ export default function BillingPage() {
           <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0', lineHeight: 1.2 }}>Billing & Subscription</h1>
           <p style={{ fontSize: 15, color: '#64748b', margin: 0 }}>Manage your institution's onboarding, termly licenses, and cloud storage.</p>
         </div>
-        <div style={{ padding: '12px 24px', borderRadius: 16, background: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+        <div style={{ padding: '12px 24px', borderRadius: 16, background: 'var(--bg-card)', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
           <div style={{ width: 10, height: 10, borderRadius: '50%', background: school?.status === 'active' ? '#10b981' : '#f59e0b', boxShadow: `0 0 0 4px ${school?.status === 'active' ? '#d1fae5' : '#fef3c7'}` }} />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>System Status</span>
@@ -202,7 +202,7 @@ export default function BillingPage() {
               <div className="table-wrapper">
                 <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
                   <thead>
-                    <tr style={{ background: '#fff', borderBottom: '2px solid #e2e8f0' }}>
+                    <tr style={{ background: 'var(--bg-card)', borderBottom: '2px solid #e2e8f0' }}>
                       <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748b', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Date Issued</th>
                       <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748b', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Description</th>
                       <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748b', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Amount</th>

@@ -225,8 +225,8 @@ export default function AdminAttendancePage() {
 
         {/* Header */}
         <div style={{ marginBottom: 20 }}>
-          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 24, fontWeight: 700, color: '#111827', margin: 0 }}>Attendance Monitoring</h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Gate scans, teacher register, and absence tracking.</p>
+          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 24, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Attendance Monitoring</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Gate scans, teacher register, and absence tracking.</p>
         </div>
 
         {/* Tabs */}
@@ -237,27 +237,27 @@ export default function AdminAttendancePage() {
         </div>
 
         {/* Filters */}
-        <div style={{ background: '#fff', borderRadius: 14, padding: '16px', border: '1.5px solid #f0eefe', marginBottom: 18 }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px', border: '1.5px solid #f0eefe', marginBottom: 18 }}>
           <div className="att-filters">
             <div style={{ flex: 1, minWidth: 130 }}>
-              <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.05em' }}>Date</label>
+              <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.05em' }}>Date</label>
               <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
             </div>
             {tab !== 'teachers' && (
               <div style={{ flex: '1 1 180px' }}>
-                <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.05em' }}>Class</label>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.05em' }}>Class</label>
                 <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}
-                  style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', background: '#fff' }}>
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', background: 'var(--bg-card)' }}>
                   <option value="">Choose class…</option>
                   {(classes as any[]).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
             )}
             <div style={{ flex: '1 1 160px' }}>
-              <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.05em' }}>Search</label>
+              <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.05em' }}>Search</label>
               <input placeholder="Name or ID…" value={search} onChange={e => setSearch(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
             </div>
             <button onClick={() => { if (date && selectedClass) { loadStudents(); loadAbsent() }; loadTeachers() }}
               style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', background: '#0f172a', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
@@ -275,7 +275,7 @@ export default function AdminAttendancePage() {
             )}
             {selectedClass && filteredStudents.length > 0 && (
               <>
-                <div className="att-table" style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+                <div className="att-table" style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ background: '#faf5ff', borderBottom: '1.5px solid #ede9fe' }}>
@@ -288,8 +288,8 @@ export default function AdminAttendancePage() {
                       {filteredStudents.map((r, i) => (
                         <tr key={r.id} style={{ borderBottom: i < filteredStudents.length - 1 ? '1px solid #fafafa' : 'none' }}>
                           <td style={{ padding: '12px 16px' }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{r.student_name}</div>
-                            <div style={{ fontSize: 11, color: '#9ca3af' }}>{r.student_id}</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{r.student_name}</div>
+                            <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{r.student_id}</div>
                           </td>
                           <td style={{ padding: '12px 16px' }}><StatusBadge status={r.status} /></td>
                           <td style={{ padding: '12px 16px' }}>
@@ -297,7 +297,7 @@ export default function AdminAttendancePage() {
                               {(r as any).source === 'gate' ? '🔒 Gate' : '📋 Register'}
                             </span>
                           </td>
-                          <td style={{ padding: '12px 16px', fontSize: 12, color: '#4b5563' }}>{r.teacher_name}</td>
+                          <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-muted)' }}>{r.teacher_name}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -305,11 +305,11 @@ export default function AdminAttendancePage() {
                 </div>
                 <div className="att-cards" style={{ display: 'none' }}>
                   {filteredStudents.map(r => (
-                    <div key={r.id} style={{ background: '#fff', borderRadius: 12, padding: '14px', border: `1.5px solid ${(r as any).source === 'gate' ? '#bbf7d0' : '#ede9fe'}` }}>
+                    <div key={r.id} style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '14px', border: `1.5px solid ${(r as any).source === 'gate' ? '#bbf7d0' : '#ede9fe'}` }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{r.student_name}</div>
-                          <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{r.student_id}</div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{r.student_name}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 2 }}>{r.student_id}</div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                           <StatusBadge status={r.status} />
@@ -318,7 +318,7 @@ export default function AdminAttendancePage() {
                           </span>
                         </div>
                       </div>
-                      <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #f9fafb', fontSize: 11, color: '#6b7280' }}>By: {r.teacher_name}</div>
+                      <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #f9fafb', fontSize: 11, color: 'var(--text-muted)' }}>By: {r.teacher_name}</div>
                     </div>
                   ))}
                 </div>
@@ -348,13 +348,13 @@ export default function AdminAttendancePage() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {filteredTeachers.map(t => (
-                    <div key={t.teacher_id} style={{ background: '#fff', borderRadius: 14, border: `1.5px solid ${t.left_mid_day && !t.on_campus ? '#fca5a5' : t.left_mid_day ? '#fed7aa' : '#f0eefe'}`, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div key={t.teacher_id} style={{ background: 'var(--bg-card)', borderRadius: 14, border: `1.5px solid ${t.left_mid_day && !t.on_campus ? '#fca5a5' : t.left_mid_day ? '#fed7aa' : '#f0eefe'}`, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
                       <div style={{ width: 44, height: 44, borderRadius: '50%', background: t.on_campus ? '#dcfce7' : '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 900, color: t.on_campus ? '#059669' : '#dc2626', flexShrink: 0 }}>
                         {t.teacher_name.charAt(0)}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{t.teacher_name}</div>
-                        <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{t.teacher_name}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
                           In: {fmtTime(t.time_in)}
                           {t.time_out && <> · Out: <span style={{ color: '#dc2626', fontWeight: 700 }}>{fmtTime(t.time_out)}</span></>}
                         </div>
@@ -387,14 +387,14 @@ export default function AdminAttendancePage() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {filteredAbsent.map(s => (
-                    <div key={s.id} style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #fca5a5', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div key={s.id} style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #fca5a5', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
                       <div style={{ width: 42, height: 42, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, fontWeight: 900, color: '#dc2626', flexShrink: 0 }}>
                         {s.full_name.charAt(0)}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{s.full_name}</div>
-                        <div style={{ fontSize: 11, color: '#9ca3af' }}>{s.student_id}</div>
-                        {s.guardian_name && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>👤 {s.guardian_name}</div>}
+                        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{s.full_name}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{s.student_id}</div>
+                        {s.guardian_name && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>👤 {s.guardian_name}</div>}
                       </div>
                       <div style={{ flexShrink: 0 }}>
                         {s.guardian_phone ? (
@@ -420,10 +420,10 @@ export default function AdminAttendancePage() {
 
 function EmptyPrompt({ icon, title, sub }: { icon: string; title: string; sub: string }) {
   return (
-    <div style={{ background: '#fff', borderRadius: 14, padding: '50px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '50px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
       <div style={{ fontSize: 48, marginBottom: 10 }}>{icon}</div>
-      <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 6 }}>{title}</div>
-      <p style={{ fontSize: 13, color: '#9ca3af', margin: 0 }}>{sub}</p>
+      <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>{title}</div>
+      <p style={{ fontSize: 13, color: 'var(--text-subtle)', margin: 0 }}>{sub}</p>
     </div>
   )
 }

@@ -238,7 +238,7 @@ export default function StaffDashboard() {
             {loading ? (
               <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>Loading…</div>
             ) : announcements.length === 0 ? (
-              <div style={{ padding: 48, textAlign: 'center', background: '#fff', borderRadius: 20, border: '1.5px dashed #e2e8f0' }}>
+              <div style={{ padding: 48, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 20, border: '1.5px dashed #e2e8f0' }}>
                 <Megaphone size={36} color="#ddd6fe" style={{ marginBottom: 12 }} />
                 <p style={{ color: '#94a3b8', fontSize: 14 }}>No announcements yet.</p>
               </div>
@@ -275,7 +275,7 @@ export default function StaffDashboard() {
               <TrendingUp size={18} color="#0284c7" />
               <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: 0 }}>Payroll History</h3>
             </div>
-            <div style={{ background: '#fff', borderRadius: 20, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
               {loading ? (
                 <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>Loading…</div>
               ) : payslips.length === 0 ? (
@@ -307,7 +307,7 @@ export default function StaffDashboard() {
             </div>
 
             {/* This Month Attendance Breakdown */}
-            <div style={{ marginTop: 20, background: '#fff', borderRadius: 20, border: '1px solid #e2e8f0', padding: 24 }}>
+            <div style={{ marginTop: 20, background: 'var(--bg-card)', borderRadius: 20, border: '1px solid #e2e8f0', padding: 24 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
                 <Clock size={16} color="#6d28d9" />
                 <span style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>This Month's Attendance</span>

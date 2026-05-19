@@ -119,7 +119,7 @@ export default function VisitorsPage() {
         </div>
 
         {/* Visitor List */}
-        <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f1f5f9', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f1f5f9', overflow: 'hidden' }}>
           {isLoading ? (
             <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>Loading…</div>
           ) : filtered.length === 0 ? (
@@ -159,7 +159,7 @@ export default function VisitorsPage() {
         {addOpen && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'flex-end', zIndex: 9999 }}
             onClick={e => { if (e.target === e.currentTarget) setAddOpen(false) }}>
-            <div style={{ background: '#fff', borderRadius: '22px 22px 0 0', padding: '24px 20px 90px', width: '100%', maxHeight: '92vh', overflowY: 'auto', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: '22px 22px 0 0', padding: '24px 20px 90px', width: '100%', maxHeight: '92vh', overflowY: 'auto', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }}>
               {/* Drag handle */}
               <div style={{ width: 40, height: 4, borderRadius: 4, background: '#e2e8f0', margin: '0 auto 18px' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>

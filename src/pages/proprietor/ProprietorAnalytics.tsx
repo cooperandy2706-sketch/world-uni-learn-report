@@ -175,7 +175,7 @@ export default function ProprietorAnalytics() {
           </div>
         </div>
 
-        <div style={{ background: '#fff', borderRadius: 24, padding: 32, border: '1px solid #e2e8f0' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 32, border: '1px solid #e2e8f0' }}>
           <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <Award color="#f59e0b" /> Top Performing Classes
           </h3>

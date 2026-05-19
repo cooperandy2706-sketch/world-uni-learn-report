@@ -117,7 +117,7 @@ export default function TeacherGlobalQuizDetailsPage() {
     return (
       <div style={{ padding: 40, textAlign: 'center', fontFamily: '"DM Sans",sans-serif' }}>
         <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#7c3aed', animation: '_spin 0.8s linear infinite', margin: '0 auto 16px' }} />
-        <p style={{ color: '#9ca3af', fontSize: 13, fontWeight: 500 }}>Loading Submissions...</p>
+        <p style={{ color: 'var(--text-subtle)', fontSize: 13, fontWeight: 500 }}>Loading Submissions...</p>
         <style>{`@keyframes _spin { to { transform: rotate(360deg) } }`}</style>
       </div>
     )
@@ -152,25 +152,25 @@ export default function TeacherGlobalQuizDetailsPage() {
         
         {/* Header Breadcrumb */}
         <div style={{ marginBottom: 24 }}>
-          <button onClick={() => navigate('/teacher/assignments')} style={{ border: 'none', background: 'transparent', color: '#6b7280', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0' }}>
+          <button onClick={() => navigate('/teacher/assignments')} style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0' }}>
              ← Back to Assignments
           </button>
         </div>
 
         {/* Global Quiz Header */}
-        <div className="resp-header-box" style={{ background: '#fff', borderRadius: 20, padding: 30, border: '1px solid #f0eefe', boxShadow: '0 4px 20px rgba(109,40,217,0.04)', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20 }}>
+        <div className="resp-header-box" style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 30, border: '1px solid #f0eefe', boxShadow: '0 4px 20px rgba(109,40,217,0.04)', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
               <span style={{ fontSize: 11, fontWeight: 800, background: '#f5f3ff', color: '#7c3aed', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 🌍 Global Challenge
               </span>
-              <span style={{ fontSize: 11, fontWeight: 800, background: '#f3f4f6', color: '#4b5563', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <span style={{ fontSize: 11, fontWeight: 800, background: 'var(--bg-hover)', color: 'var(--text-muted)', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {quiz.subject?.name || 'General'}
               </span>
             </div>
             
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: '0 0 8px 0' }}>{quiz.title}</h1>
-            <p style={{ fontSize: 14, color: '#6b7280', margin: 0, maxWidth: 600, lineHeight: 1.5 }}>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px 0' }}>{quiz.title}</h1>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0, maxWidth: 600, lineHeight: 1.5 }}>
               This quiz was published globally by the school administration. You are viewing completion metrics specifically for your assigned students.
             </p>
           </div>
@@ -182,43 +182,43 @@ export default function TeacherGlobalQuizDetailsPage() {
 
         {/* Mini Stats */}
         <div className="resp-minmax-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 30 }}>
-          <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fdf4ff', color: '#c026d3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>👩‍🎓</div>
              <div>
-               <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>Your Students</div>
-               <div style={{ fontSize: 20, fontWeight: 800, color: '#111827' }}>{totalCount}</div>
+               <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Your Students</div>
+               <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)' }}>{totalCount}</div>
              </div>
           </div>
-          <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>✅</div>
              <div>
-               <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>Completed</div>
-               <div style={{ fontSize: 20, fontWeight: 800, color: '#111827' }}>{submittedCount}</div>
+               <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Completed</div>
+               <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)' }}>{submittedCount}</div>
              </div>
           </div>
-          <div style={{ background: '#fff', borderRadius: 16, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fffbeb', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📊</div>
              <div>
-               <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>Avg Score</div>
-               <div style={{ fontSize: 20, fontWeight: 800, color: '#111827' }}>{avgPct.toFixed(1)}%</div>
+               <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Avg Score</div>
+               <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)' }}>{avgPct.toFixed(1)}%</div>
              </div>
           </div>
         </div>
 
         {/* Student List */}
-        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 16 }}>Student Breakdown</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16 }}>Student Breakdown</h3>
         
         {students.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
              <div style={{ fontSize: 40, marginBottom: 12 }}>🤷‍♀️</div>
-             <div style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 4 }}>No Students Found</div>
-             <p style={{ fontSize: 13, color: '#6b7280' }}>You do not have any classes assigned to you, so no student performance can be shown.</p>
+             <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>No Students Found</div>
+             <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>You do not have any classes assigned to you, so no student performance can be shown.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {students.map(s => (
               <div key={s.id} className="s-card" style={{ 
-                background: '#fff', borderRadius: 16, padding: '16px 20px', border: '1px solid #f0eefe',
+                background: 'var(--bg-card)', borderRadius: 16, padding: '16px 20px', border: '1px solid #f0eefe',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -226,21 +226,21 @@ export default function TeacherGlobalQuizDetailsPage() {
                     {avatarLetter(s.full_name)}
                   </div>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{s.full_name}</div>
-                    <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{s.class?.name || 'No Class'}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{s.full_name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{s.class?.name || 'No Class'}</div>
                   </div>
                 </div>
 
                 {s.has_submitted ? (
                   <div className="resp-flex-col" style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Submitted</div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#4b5563' }}>{formatDate(s.submitted_at)}</div>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Submitted</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)' }}>{formatDate(s.submitted_at)}</div>
                     </div>
                     {s.duration !== undefined && s.duration !== null && (
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>Time Taken</div>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: '#4b5563' }}>{formatSecs(s.duration)}</div>
+                        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Time Taken</div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)' }}>{formatSecs(s.duration)}</div>
                       </div>
                     )}
                     <div style={{ background: '#ecfdf5', borderRadius: 10, padding: '8px 14px', textAlign: 'center', minWidth: 60 }}>

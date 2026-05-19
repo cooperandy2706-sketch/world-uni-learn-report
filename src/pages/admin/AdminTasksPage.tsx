@@ -126,8 +126,8 @@ export default function AdminTasksPage() {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32 }}>
                 <div>
-                    <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 32, fontWeight: 700, color: '#111827', margin: 0 }}>Task Manager</h1>
-                    <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Internal collaborative to-do list for the administration team.</p>
+                    <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 32, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Task Manager</h1>
+                    <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 4 }}>Internal collaborative to-do list for the administration team.</p>
                 </div>
                 <button onClick={() => setShowModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)' }}>
                     <Plus size={20} /> Create Task
@@ -139,7 +139,7 @@ export default function AdminTasksPage() {
                     <button 
                         key={s} 
                         onClick={() => setFilter(s)}
-                        style={{ padding: '8px 16px', borderRadius: 99, border: '1.5px solid #e5e7eb', background: filter === s ? '#7c3aed' : 'white', color: filter === s ? 'white' : '#6b7280', fontSize: 13, fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize' }}
+                        style={{ padding: '8px 16px', borderRadius: 99, border: '1.5px solid var(--border-color)', background: filter === s ? '#7c3aed' : 'white', color: filter === s ? 'white' : '#6b7280', fontSize: 13, fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize' }}
                     >
                         {s}
                     </button>
@@ -150,7 +150,7 @@ export default function AdminTasksPage() {
                 {filteredTasks.length === 0 ? (
                     <div style={{ padding: '80px 40px', textAlign: 'center' }}>
                         <CheckCircle2 size={48} color="#e5e7eb" style={{ marginBottom: 16 }} />
-                        <p style={{ color: '#9ca3af', fontWeight: 500 }}>No tasks found. Relax or create a new one!</p>
+                        <p style={{ color: 'var(--text-subtle)', fontWeight: 500 }}>No tasks found. Relax or create a new one!</p>
                     </div>
                 ) : filteredTasks.map((t, i) => (
                     <div key={i} className="task-row" style={{ padding: '20px 24px', borderBottom: i === filteredTasks.length - 1 ? 'none' : '1px solid #f0eefe', display: 'flex', gap: 20, alignItems: 'flex-start' }}>
@@ -166,9 +166,9 @@ export default function AdminTasksPage() {
                                 <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: t.status === 'completed' ? '#9ca3af' : '#111827', textDecoration: t.status === 'completed' ? 'line-through' : 'none' }}>{t.title}</h3>
                                 <span className={`priority-${t.priority}`} style={{ fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 99, textTransform: 'uppercase' }}>{t.priority}</span>
                             </div>
-                            <p style={{ fontSize: 14, color: '#6b7280', margin: '0 0 12px', lineHeight: 1.5 }}>{t.description}</p>
+                            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: '0 0 12px', lineHeight: 1.5 }}>{t.description}</p>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#9ca3af' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-subtle)' }}>
                                     <User size={14} />
                                     <span>{t.assignee?.full_name || 'Unassigned'}</span>
                                 </div>
@@ -181,7 +181,7 @@ export default function AdminTasksPage() {
                             </div>
                         </div>
 
-                        <button onClick={() => deleteTask(t.id)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: 8 }}>
+                        <button onClick={() => deleteTask(t.id)} style={{ background: 'none', border: 'none', color: 'var(--text-subtle)', cursor: 'pointer', padding: 8 }}>
                             <Trash2 size={18} />
                         </button>
                     </div>
@@ -194,7 +194,7 @@ export default function AdminTasksPage() {
                     <div className="card" style={{ width: '100%', maxWidth: '500px', padding: '32px', animation: 'fadeIn 0.3s ease' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
                             <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Create Admin Task</h2>
-                            <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: 24 }}>✕</button>
+                            <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', fontSize: 24 }}>✕</button>
                         </div>
 
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -205,7 +205,7 @@ export default function AdminTasksPage() {
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
                                     placeholder="e.g., Fix broken desk in Class 4"
-                                    style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }}
+                                    style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }}
                                 />
                             </div>
                             <div>
@@ -215,13 +215,13 @@ export default function AdminTasksPage() {
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     placeholder="Add more details about the task..."
-                                    style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none', resize: 'none' }}
+                                    style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none', resize: 'none' }}
                                 />
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                 <div>
                                     <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Priority</label>
-                                    <select value={priority} onChange={(e) => setPriority(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }}>
+                                    <select value={priority} onChange={(e) => setPriority(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }}>
                                         <option value="low">Low</option>
                                         <option value="medium">Medium</option>
                                         <option value="high">High</option>
@@ -229,7 +229,7 @@ export default function AdminTasksPage() {
                                 </div>
                                 <div>
                                     <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Assign To</label>
-                                    <select value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }}>
+                                    <select value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }}>
                                         <option value="">Select Staff</option>
                                         {staff.map(s => <option key={s.id} value={s.id}>{s.full_name}</option>)}
                                     </select>
@@ -241,12 +241,12 @@ export default function AdminTasksPage() {
                                     type="date"
                                     value={dueDate}
                                     onChange={(e) => setDueDate(e.target.value)}
-                                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }}
+                                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }}
                                 />
                             </div>
 
                             <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-                                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '12px', borderRadius: '12px', border: '1.5px solid #e5e7eb', background: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '12px', borderRadius: '12px', border: '1.5px solid var(--border-color)', background: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                                 <button type="submit" disabled={submitting} style={{ flex: 2, padding: '12px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', fontWeight: 700, cursor: 'pointer' }}>
                                     {submitting ? 'Creating...' : 'Create Task'}
                                 </button>

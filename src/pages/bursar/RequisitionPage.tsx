@@ -142,14 +142,14 @@ export default function RequisitionPage() {
         {isLoading ? (
           <div style={{ padding: 100, textAlign: 'center', color: '#94a3b8' }}>Loading requests...</div>
         ) : displayList.length === 0 ? (
-          <div style={{ padding: 80, textAlign: 'center', background: '#fff', borderRadius: 24, border: '1.5px dashed #e2e8f0' }}>
+          <div style={{ padding: 80, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 24, border: '1.5px dashed #e2e8f0' }}>
             <ClipboardList size={48} color="#cbd5e1" style={{ marginBottom: 16 }} />
             <h3 style={{ fontSize: 18, fontWeight: 700, color: '#475569', margin: 0 }}>No Requisitions Found</h3>
             <p style={{ color: '#94a3b8', fontSize: 14, marginTop: 8 }}>Everything is up to date.</p>
           </div>
         ) : (
           displayList.map(r => (
-            <div key={r.id} className="req-card" style={{ background: '#fff', borderRadius: 24, padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div key={r.id} className="req-card" style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 20, flex: 1 }}>
                 <div style={{ width: 56, height: 56, borderRadius: 16, background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
                   {r.status === 'pending' ? <Clock size={24} color="#f97316" /> : r.status === 'approved' ? <CheckCircle size={24} color="#10b981" /> : r.status === 'paid' ? <DollarSign size={24} color="#3b82f6" /> : <XCircle size={24} color="#ef4444" />}
@@ -235,7 +235,7 @@ export default function RequisitionPage() {
               <button onClick={() => rejectMutation.mutate({ id: selectedReq.id, reason: rejectionReason })} disabled={rejectMutation.isPending || !rejectionReason} style={{ flex: 1, background: '#dc2626', color: '#fff', border: 'none', padding: '12px', borderRadius: 10, fontWeight: 700, cursor: 'pointer' }}>
                 Confirm Rejection
               </button>
-              <button onClick={() => setSelectedReq(null)} style={{ flex: 0.5, background: '#fff', border: '1.5px solid #e2e8f0', padding: '12px', borderRadius: 10, fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => setSelectedReq(null)} style={{ flex: 0.5, background: 'var(--bg-card)', border: '1.5px solid #e2e8f0', padding: '12px', borderRadius: 10, fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
             </div>
           </div>
         </Modal>

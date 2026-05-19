@@ -5,10 +5,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Theme Variables ── */
+:root {
+  --bg-app: #f8f7ff;
+  --bg-card: #ffffff;
+  --bg-input: #f9fafb;
+  --bg-hover: #f3f4f6;
+  --bg-accent-hover: #faf5ff;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --text-subtle: #9ca3af;
+  --border-color: #e5e7eb;
+  --border-light: #f3f4f6;
+}
+
+html.dark {
+  --bg-app: #0f172a;       /* slate-900 */
+  --bg-card: #1e293b;      /* slate-800 */
+  --bg-input: #334155;     /* slate-700 */
+  --bg-hover: #334155;     /* slate-700 */
+  --bg-accent-hover: #1e1b4b; /* deep purple hover */
+  --text-main: #f8fafc;    /* slate-50 */
+  --text-muted: #94a3b8;   /* slate-400 */
+  --text-subtle: #64748b;  /* slate-500 */
+  --border-color: #334155; /* slate-700 */
+  --border-light: #1e293b; /* slate-800 */
+}
+
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 15px; -webkit-font-smoothing: antialiased; }
-body { font-family: 'DM Sans', system-ui, sans-serif; background: #f8f7ff; color: #111827; line-height: 1.6; }
+body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg-app); color: var(--text-main); line-height: 1.6; transition: background-color 0.3s ease, color 0.3s ease; }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar       { width: 5px; height: 5px; }
@@ -30,12 +57,12 @@ body { font-family: 'DM Sans', system-ui, sans-serif; background: #f8f7ff; color
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 5px;
 }
 
 /* ── Table row hover ── */
-.table-row-hover:hover { background: #faf5ff; }
+.table-row-hover:hover { background: var(--bg-accent-hover); }
 
 /* ══════════════════════════════════════════════════════════════════
    GLOBAL COMPONENT STYLES

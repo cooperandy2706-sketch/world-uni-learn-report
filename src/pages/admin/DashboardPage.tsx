@@ -775,14 +775,14 @@ export default function DashboardPage() {
               ].map(s => (
                 <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '10px 12px', textAlign: 'center' }}>
                   <div style={{ fontSize: 20, fontWeight: 800, color: s.color, lineHeight: 1 }}><AnimNum to={s.value} /></div>
-                  <div style={{ fontSize: 10, color: '#9ca3af', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', marginTop: 4 }}>{s.label}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', marginTop: 4 }}>{s.label}</div>
                 </div>
               ))}
             </div>
 
             {/* Progress bar */}
             <div style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, color: '#9ca3af', marginBottom: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', marginBottom: 6 }}>
                 <span>Progress</span>
                 <span>{stats?.reportsGenerated ?? 0} / {stats?.totalStudentsForReports ?? 0} students</span>
               </div>
@@ -953,7 +953,7 @@ export default function DashboardPage() {
         {/* Message Modal */}
         {activeMsg && (
           <div onClick={() => setActiveMsg(null)} style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 24, width: '100%', maxWidth: 520, boxShadow: '0 24px 64px rgba(0,0,0,0.2)', overflow: 'hidden', animation: 'scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 520, boxShadow: '0 24px 64px rgba(0,0,0,0.2)', overflow: 'hidden', animation: 'scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
               <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', background: '#f8fafc' }}>
                 <div>
                   <p style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.02em' }}>{activeMsg.body.split("\n")[0].slice(0, 80)}</p>

@@ -10,7 +10,7 @@ function Btn({children,onClick,variant='primary',disabled,loading,style}:any){
   const [hov,setHov]=useState(false)
   const v:any={
     primary:  {background:hov?'#5b21b6':'linear-gradient(135deg,#7c3aed,#6d28d9)',color:'#fff',border:'none'},
-    secondary:{background:hov?'#f5f3ff':'#fff',color:'#374151',border:'1.5px solid #e5e7eb'},
+    secondary:{background:hov?'#f5f3ff':'#fff',color: 'var(--text-main)',border: '1.5px solid var(--border-color)'},
     danger:   {background:hov?'#b91c1c':'#dc2626',color:'#fff',border:'none'},
   }
   return(
@@ -114,21 +114,21 @@ export default function SyllabusPage(){
 
         <div style={{marginBottom:22,display:'flex',alignItems:'flex-start',justifyContent:'space-between',flexWrap:'wrap',gap:12}}>
           <div>
-            <h1 style={{fontFamily:'"Playfair Display",serif',fontSize:26,fontWeight:700,color:'#111827',margin:0}}>Syllabus</h1>
-            <p style={{fontSize:13,color:'#6b7280',marginTop:3}}>Upload and manage syllabuses for each class and subject</p>
+            <h1 style={{fontFamily:'"Playfair Display",serif',fontSize:26,fontWeight:700,color: 'var(--text-main)',margin:0}}>Syllabus</h1>
+            <p style={{fontSize:13,color: 'var(--text-muted)',marginTop:3}}>Upload and manage syllabuses for each class and subject</p>
           </div>
           <Btn onClick={()=>setModalOpen(true)}>📤 Upload Syllabus</Btn>
         </div>
 
         {/* Filter */}
-        <div style={{background:'#fff',borderRadius:14,padding:'14px 18px',border:'1.5px solid #f0eefe',marginBottom:18,display:'flex',gap:12,alignItems:'center',flexWrap:'wrap'}}>
-          <label style={{fontSize:11,fontWeight:700,color:'#6b7280',textTransform:'uppercase',letterSpacing:'.06em'}}>Filter by class:</label>
+        <div style={{background: 'var(--bg-card)',borderRadius:14,padding:'14px 18px',border:'1.5px solid #f0eefe',marginBottom:18,display:'flex',gap:12,alignItems:'center',flexWrap:'wrap'}}>
+          <label style={{fontSize:11,fontWeight:700,color: 'var(--text-muted)',textTransform:'uppercase',letterSpacing:'.06em'}}>Filter by class:</label>
           <select value={selectedClass} onChange={e=>setSelectedClass(e.target.value)}
-            style={{padding:'7px 12px',borderRadius:8,border:'1.5px solid #e5e7eb',fontSize:13,outline:'none',background:'#faf5ff',fontFamily:'"DM Sans",sans-serif',cursor:'pointer'}}>
+            style={{padding:'7px 12px',borderRadius:8,border: '1.5px solid var(--border-color)',fontSize:13,outline:'none',background:'#faf5ff',fontFamily:'"DM Sans",sans-serif',cursor:'pointer'}}>
             <option value="">All Classes</option>
             {(classes as any[]).map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-          <span style={{fontSize:12,color:'#6b7280',marginLeft:'auto'}}>{filtered.length} file{filtered.length!==1?'s':''}</span>
+          <span style={{fontSize:12,color: 'var(--text-muted)',marginLeft:'auto'}}>{filtered.length} file{filtered.length!==1?'s':''}</span>
         </div>
 
         {loading ? (
@@ -136,24 +136,24 @@ export default function SyllabusPage(){
             <div style={{width:32,height:32,borderRadius:'50%',border:'3px solid #ede9fe',borderTopColor:'#6d28d9',animation:'_syl_spin .8s linear infinite'}}/>
           </div>
         ) : filtered.length===0 ? (
-          <div style={{background:'#fff',borderRadius:16,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
+          <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
             <div style={{fontSize:52,marginBottom:12}}>📚</div>
-            <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:18,fontWeight:700,color:'#111827',marginBottom:6}}>No syllabuses uploaded yet</h3>
-            <p style={{fontSize:13,color:'#9ca3af',marginBottom:18}}>Upload a syllabus PDF for any class and subject.</p>
+            <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:18,fontWeight:700,color: 'var(--text-main)',marginBottom:6}}>No syllabuses uploaded yet</h3>
+            <p style={{fontSize:13,color: 'var(--text-subtle)',marginBottom:18}}>Upload a syllabus PDF for any class and subject.</p>
             <Btn onClick={()=>setModalOpen(true)}>📤 Upload First Syllabus</Btn>
           </div>
         ) : (
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:14}}>
             {filtered.map((s,i)=>(
               <div key={s.id} className="syl-card"
-                style={{background:'#fff',borderRadius:14,padding:'16px',border:'1.5px solid #f0eefe',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
+                style={{background: 'var(--bg-card)',borderRadius:14,padding:'16px',border:'1.5px solid #f0eefe',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
                 <div style={{display:'flex',alignItems:'flex-start',gap:12,marginBottom:12}}>
                   <div style={{width:44,height:44,borderRadius:12,background:'linear-gradient(135deg,#fee2e2,#fecaca)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0}}>
                     📄
                   </div>
                   <div style={{flex:1,minWidth:0}}>
-                    <h3 style={{fontSize:13,fontWeight:700,color:'#111827',margin:'0 0 3px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.title}</h3>
-                    <div style={{fontSize:11,color:'#6b7280',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.file_name}</div>
+                    <h3 style={{fontSize:13,fontWeight:700,color: 'var(--text-main)',margin:'0 0 3px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.title}</h3>
+                    <div style={{fontSize:11,color: 'var(--text-muted)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.file_name}</div>
                   </div>
                 </div>
                 <div style={{display:'flex',gap:6,marginBottom:12,flexWrap:'wrap'}}>
@@ -168,7 +168,7 @@ export default function SyllabusPage(){
                     <span style={{fontSize:11,fontWeight:700,padding:'2px 10px',borderRadius:99,background:'linear-gradient(135deg,#fae8ff,#f5d0fe)',color:'#a21caf',border:'1px solid #f0abfc'}}>✨ Combined Scheme</span>
                   )}
                 </div>
-                <div style={{fontSize:11,color:'#9ca3af',marginBottom:12}}>
+                <div style={{fontSize:11,color: 'var(--text-subtle)',marginBottom:12}}>
                   Uploaded by {s.uploader?.full_name??'Admin'} · {new Date(s.created_at).toLocaleDateString('en-GB')}
                 </div>
                 <div style={{display:'flex',gap:6}}>
@@ -194,17 +194,17 @@ export default function SyllabusPage(){
       {/* Upload modal */}
       {modalOpen&&(
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.45)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999,backdropFilter:'blur(4px)',padding:16}}>
-          <div style={{background:'#fff',borderRadius:16,padding:'24px',width:'100%',maxWidth:460,boxShadow:'0 24px 64px rgba(0,0,0,.18)',fontFamily:'"DM Sans",sans-serif'}}>
-            <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:19,fontWeight:700,color:'#111827',marginBottom:18}}>📤 Upload Syllabus</h3>
+          <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'24px',width:'100%',maxWidth:460,boxShadow:'0 24px 64px rgba(0,0,0,.18)',fontFamily:'"DM Sans",sans-serif'}}>
+            <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:19,fontWeight:700,color: 'var(--text-main)',marginBottom:18}}>📤 Upload Syllabus</h3>
             <div style={{display:'flex',flexDirection:'column',gap:14}}>
               {[
                 {label:'Class',field:'class_id',options:(classes as any[]).map(c=>({id:c.id,name:c.name}))},
                 {label:'Subject *',field:'subject_id',options:subjects.map(s=>({id:s.id,name:s.name}))},
               ].map(({label,field,options})=>(
                 <div key={field}>
-                  <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>{label}</label>
+                  <label style={{display:'block',fontSize:11,fontWeight:700,color: 'var(--text-main)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>{label}</label>
                   <select value={(form as any)[field]} onChange={e=>setForm(f=>({...f,[field]:e.target.value}))}
-                    style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',cursor:'pointer'}}>
+                    style={{width:'100%',padding:'9px 12px',borderRadius:9,border: '1.5px solid var(--border-color)',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',cursor:'pointer'}}>
                     <option value="">Select…</option>
                     {field==='subject_id' && <option value="combined" style={{fontWeight:700,color:'#7c3aed'}}>📂 Combined Scheme (All Subjects)</option>}
                     {options.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}
@@ -212,15 +212,15 @@ export default function SyllabusPage(){
                 </div>
               ))}
               <div>
-                <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Title *</label>
+                <label style={{display:'block',fontSize:11,fontWeight:700,color: 'var(--text-main)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>Title *</label>
                 <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="e.g. Term 2 Mathematics Syllabus"
-                  style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
+                  style={{width:'100%',padding:'9px 12px',borderRadius:9,border: '1.5px solid var(--border-color)',fontSize:13,outline:'none',fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
               </div>
               <div>
-                <label style={{display:'block',fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>File (PDF, Word, Image) *</label>
+                <label style={{display:'block',fontSize:11,fontWeight:700,color: 'var(--text-main)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:5}}>File (PDF, Word, Image) *</label>
                 <input type="file" accept=".pdf,.doc,.docx,.jpg,.png"
                   onChange={e=>setForm(f=>({...f,file:e.target.files?.[0]??null}))}
-                  style={{width:'100%',padding:'9px 12px',borderRadius:9,border:'1.5px solid #e5e7eb',fontSize:13,fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
+                  style={{width:'100%',padding:'9px 12px',borderRadius:9,border: '1.5px solid var(--border-color)',fontSize:13,fontFamily:'"DM Sans",sans-serif',boxSizing:'border-box'}}/>
                 {form.file&&<p style={{fontSize:11,color:'#16a34a',marginTop:4}}>✓ {form.file.name} ({(form.file.size/1024).toFixed(0)}KB)</p>}
               </div>
             </div>

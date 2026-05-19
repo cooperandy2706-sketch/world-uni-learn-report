@@ -20,10 +20,10 @@ export default function TypingGamePage() {
         }}>🏎️</div>
         <div>
           <h1 style={{
-            fontSize: 22, fontWeight: 800, color: '#111827', margin: 0,
+            fontSize: 22, fontWeight: 800, color: 'var(--text-main)', margin: 0,
             fontFamily: '"Playfair Display", serif',
           }}>Nitro Typer</h1>
-          <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>
+          <p style={{ fontSize: 12, color: 'var(--text-subtle)', margin: 0 }}>
             Type enemy words to destroy them · Chain combos · Survive all waves
           </p>
         </div>

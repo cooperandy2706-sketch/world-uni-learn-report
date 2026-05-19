@@ -12,7 +12,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
   const [h, setH] = useState(false)
   const v: any = {
     primary: { background: h ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none' },
-    secondary: { background: h ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: h ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger: { background: h ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
   }
   return (
@@ -116,8 +116,8 @@ export default function BursarStaffPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_brs_fi .4s ease' }}>
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Bursar Accounts</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Manage financial staff accounts for this school</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Bursar Accounts</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Manage financial staff accounts for this school</p>
           </div>
           <Btn onClick={() => setCreateModal(true)}><Plus size={14} /> Add Bursar</Btn>
         </div>
@@ -132,30 +132,30 @@ export default function BursarStaffPage() {
         </div>
 
         {isLoading ? (
-          <div style={{ padding: '60px', textAlign: 'center', color: '#9ca3af' }}>Loading…</div>
+          <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>Loading…</div>
         ) : (bursars as any[]).length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 18, padding: '60px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '60px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <ShieldCheck size={48} color="#d1d5db" style={{ marginBottom: 16 }} />
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>No Bursar Accounts</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 20 }}>Create a bursar account to give financial access to a staff member.</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>No Bursar Accounts</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 20 }}>Create a bursar account to give financial access to a staff member.</p>
             <Btn onClick={() => setCreateModal(true)}><Plus size={14} /> Create First Bursar</Btn>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 16 }}>
             {(bursars as any[]).map((b: any) => (
-              <div key={b.id} className="brs-card" style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', padding: '22px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', position: 'relative', overflow: 'hidden' }}>
+              <div key={b.id} className="brs-card" style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: '22px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg,#f5f3ff,#ede9fe)', pointerEvents: 'none' }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16, position: 'relative' }}>
                   <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 900, color: '#fff', flexShrink: 0 }}>
                     {b.full_name?.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{b.full_name}</div>
-                    <div style={{ fontSize: 12, color: '#6b7280' }}>{b.email}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{b.full_name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{b.email}</div>
                     <span style={{ fontSize: 10, fontWeight: 700, background: '#f5f3ff', color: '#6d28d9', padding: '2px 8px', borderRadius: 99, marginTop: 4, display: 'inline-block' }}>Bursar</span>
                   </div>
                 </div>
-                {b.phone && <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>📱 {b.phone}</div>}
+                {b.phone && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>📱 {b.phone}</div>}
                 <div style={{ display: 'flex', gap: 8, borderTop: '1px solid #faf5ff', paddingTop: 14 }}>
                   <button onClick={() => { setSelectedUser(b); setNewPw(''); setResetModal(true) }}
                     style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, padding: '8px', borderRadius: 8, border: '1px solid #ddd6fe', background: 'transparent', color: '#6d28d9', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
@@ -183,9 +183,9 @@ export default function BursarStaffPage() {
             { label: 'Password', key: 'password', placeholder: 'Leave blank for "bursar123"', type: 'password' },
           ].map(f => (
             <div key={f.key}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{f.label}</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{f.label}</label>
               <input type={f.type} placeholder={f.placeholder} value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif' }} />
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif' }} />
             </div>
           ))}
           <div style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: 9, padding: '10px 14px', fontSize: 12, color: '#92400e' }}>
@@ -202,9 +202,9 @@ export default function BursarStaffPage() {
             This will immediately change the login password for {selectedUser?.full_name}.
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>New Password</label>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>New Password</label>
             <input type="password" value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="Min 6 characters"
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
+              style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
           </div>
         </div>
       </Modal>

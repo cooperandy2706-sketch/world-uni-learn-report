@@ -136,18 +136,18 @@ export default function StaffPayslipsPage() {
       
       <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>
+          <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px' }}>
             My Payslips
           </h1>
-          <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>View and download your monthly salary vouchers.</p>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>View and download your monthly salary vouchers.</p>
         </div>
 
-        <div style={{ background: '#fff', borderRadius: 12, border: '1.5px solid #f0eefe', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <Calendar size={18} color="#6d28d9" />
           <select 
             value={selectedYear} 
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 14, fontWeight: 700, color: '#374151', cursor: 'pointer' }}
+            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', cursor: 'pointer' }}
           >
             {[...Array(5)].map((_, i) => {
               const yr = new Date().getFullYear() - i
@@ -159,21 +159,21 @@ export default function StaffPayslipsPage() {
 
       <div style={{ display: 'grid', gap: 16 }}>
         {payslips.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 20, border: '2px dashed #e2e8f0', padding: 60, textAlign: 'center' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '2px dashed #e2e8f0', padding: 60, textAlign: 'center' }}>
             <FileText size={48} color="#cbd5e1" style={{ margin: '0 auto 16px' }} />
             <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e293b', margin: '0 0 8px' }}>No payslips found for {selectedYear}</h3>
             <p style={{ fontSize: 14, color: '#64748b', margin: 0 }}>When payroll is processed by the bursar, your payslips will appear here.</p>
           </div>
         ) : (
           payslips.map(ps => (
-            <div key={ps.id} className="payslip-card" style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div key={ps.id} className="payslip-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                 <div style={{ width: 56, height: 56, background: '#f5f3ff', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6d28d9' }}>
                    <DollarSign size={28} />
                 </div>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Salary Voucher</div>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: '#111827', marginTop: 2 }}>{ps.month} {ps.year}</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', marginTop: 2 }}>{ps.month} {ps.year}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
                     <CheckCircle2 size={14} color="#059669" />
                     <span style={{ fontSize: 12, color: '#059669', fontWeight: 600 }}>Paid via {ps.payment_method.toUpperCase()}</span>

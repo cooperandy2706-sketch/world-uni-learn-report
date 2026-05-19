@@ -65,7 +65,7 @@ export default function ParentExeatPage() {
         <Btn onClick={() => { setForm({ student_id: wards[0]?.id || '', reason: '', destination: '', departure_time: '', expected_return_time: '' }); setModal(true) }}><Plus size={16} /> New Request</Btn>
       </div>
 
-      <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#fcfaff', borderBottom: '1.5px solid #f0eefe' }}>
@@ -98,7 +98,7 @@ export default function ParentExeatPage() {
                 </td>
               </tr>
             ))}
-            {exeats.length === 0 && <tr><td colSpan={3} style={{ padding: 32, textAlign: 'center', color: '#9ca3af', fontSize: 14 }}>No requests submitted yet.</td></tr>}
+            {exeats.length === 0 && <tr><td colSpan={3} style={{ padding: 32, textAlign: 'center', color: 'var(--text-subtle)', fontSize: 14 }}>No requests submitted yet.</td></tr>}
           </tbody>
         </table>
       </div>

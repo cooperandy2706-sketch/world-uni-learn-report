@@ -57,7 +57,7 @@ export default function StudentCalendarPage() {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '70vh', flexDirection: 'column', gap: 16 }}>
       <style>{`@keyframes _ssp{to{transform:rotate(360deg)}}`}</style>
       <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_ssp .8s linear infinite' }} />
-      <p style={{ fontSize: 13, color: '#6b7280', fontFamily: '"DM Sans",sans-serif' }}>Loading school calendar…</p>
+      <p style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: '"DM Sans",sans-serif' }}>Loading school calendar…</p>
     </div>
   )
 
@@ -90,10 +90,10 @@ export default function StudentCalendarPage() {
         {/* Header */}
         <div className="header-row" style={{ marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', animation: '_sfu .5s ease both' }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>School Calendar</h1>
-            <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>Overview of holidays, exams, and special events</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>School Calendar</h1>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Overview of holidays, exams, and special events</p>
           </div>
-          <Link to={ROUTES.STUDENT_DASHBOARD} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', textDecoration: 'none', border: '1.5px solid #e5e7eb', justifyContent: 'center' }}>← Dashboard</Link>
+          <Link to={ROUTES.STUDENT_DASHBOARD} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600, background: 'var(--bg-card)', color: 'var(--text-main)', textDecoration: 'none', border: '1.5px solid var(--border-color)', justifyContent: 'center' }}>← Dashboard</Link>
         </div>
 
         <div className="cal-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 32 }}>
@@ -108,9 +108,9 @@ export default function StudentCalendarPage() {
                 </h3>
               </div>
               <div className="cal-controls" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <button onClick={prevMonth} style={{ width: 36, height: 36, borderRadius: 10, border: '1.5px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
-                <button onClick={() => setViewDate(new Date())} style={{ padding: '8px 16px', borderRadius: 10, border: '1.5px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Today</button>
-                <button onClick={nextMonth} style={{ width: 36, height: 36, borderRadius: 10, border: '1.5px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
+                <button onClick={prevMonth} style={{ width: 36, height: 36, borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
+                <button onClick={() => setViewDate(new Date())} style={{ padding: '8px 16px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Today</button>
+                <button onClick={nextMonth} style={{ width: 36, height: 36, borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
               </div>
             </div>
 

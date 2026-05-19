@@ -1289,7 +1289,7 @@ export default function TimetablePage() {
                   setMorningCutoff(val)
                   await persistConfig({ morning_cutoff: val })
                 }}
-                style={{ ...fieldStyle, flex: 1, background: '#fff' }}
+                style={{ ...fieldStyle, flex: 1, background: 'var(--bg-card)' }}
               >
                 <option value={-1}>No cutoff (treat all slots same)</option>
                 {teachablePeriods.map((p, i) => (

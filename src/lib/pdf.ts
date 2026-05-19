@@ -96,7 +96,7 @@ export async function downloadReportPDF(
       scale: 2,               // retina quality
       useCORS: true,          // allow cross-origin images (school logo)
       allowTaint: false,
-      backgroundColor: '#ffffff',
+      backgroundColor: 'var(--bg-card)',
       logging: false,
       windowWidth: 794,       // A4 @ 96 dpi
     })

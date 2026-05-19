@@ -184,7 +184,7 @@ export default function NurseVisitsPage() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <button onClick={exportCSV} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, border: `1px solid ${T.border}`, background: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: T.text }}>
+          <button onClick={exportCSV} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, border: `1px solid ${T.border}`, background: 'var(--bg-card)', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: T.text }}>
             <Download size={15} /> Export CSV
           </button>
           <button onClick={() => setModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, border: 'none', background: T.primary, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: '#fff', boxShadow: `0 4px 12px ${T.primary}40` }}>
@@ -217,7 +217,7 @@ export default function NurseVisitsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Filter size={15} color={T.muted} />
           <select value={period} onChange={e => setPeriod(e.target.value)}
-            style={{ padding: '9px 12px', borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontSize: 13, background: '#fff' }}>
+            style={{ padding: '9px 12px', borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontSize: 13, background: 'var(--bg-card)' }}>
             {PERIODS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
           </select>
         </div>
@@ -295,7 +295,7 @@ export default function NurseVisitsPage() {
       {/* Log Visit Modal */}
       {modalOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, backdropFilter: 'blur(4px)' }}>
-          <div style={{ background: '#fff', width: '100%', maxWidth: 500, borderRadius: 20, overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 20, overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
             <div style={{ padding: '20px 24px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Log Clinic Visit</h3>
               <button onClick={() => setModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.muted }}><X size={20} /></button>

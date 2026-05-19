@@ -43,7 +43,7 @@ function getSubjectMeta(name: string) {
   for (const [key, meta] of Object.entries(SUBJECT_META)) {
     if (lower.includes(key)) return meta
   }
-  return { icon: '📚', color: '#6b7280', bg: '#f9fafb', category: 'General' }
+  return { icon: '📚', color: 'var(--text-muted)', bg: '#f9fafb', category: 'General' }
 }
 
 // ── helpers ───────────────────────────────────────────────
@@ -51,7 +51,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   const [hov, setHov] = useState(false)
   const variants: Record<string, React.CSSProperties> = {
     primary:   { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,0.28)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     danger:    { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
   }
   return (
@@ -65,7 +65,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
 }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>{children}</label>
+  return <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{children}</label>
 }
 
 function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { error?: string }) {
@@ -75,7 +75,7 @@ function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputEle
       <input {...props}
         onFocus={e => { setF(true); props.onFocus?.(e) }}
         onBlur={e => { setF(false); props.onBlur?.(e) }}
-        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: '#fff', color: '#111827', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
+        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: `1.5px solid ${error ? '#f87171' : f ? '#7c3aed' : '#e5e7eb'}`, boxShadow: f ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s', boxSizing: 'border-box' as const }} />
       {error && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 3 }}>⚠ {error}</p>}
     </div>
   )
@@ -179,16 +179,16 @@ export default function SubjectsPage() {
             { label: 'Humanities',     value: subjects.filter(s => getSubjectMeta(s.name).category === 'Humanities').length, icon: '🌍', color: '#16a34a', bg: '#f0fdf4' },
             { label: 'Arts & PE',      value: subjects.filter(s => ['Arts','Physical'].includes(getSubjectMeta(s.name).category)).length, icon: '🎨', color: '#db2777', bg: '#fdf2f8' },
           ].map((s, i) => (
-            <div key={i} style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp2 0.4s ease ${i * 0.07}s both` }}>
+            <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp2 0.4s ease ${i * 0.07}s both` }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, marginBottom: 8 }}>{s.icon}</div>
-              <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 24, fontWeight: 700, color: '#111827', lineHeight: 1 }}>{s.value}</div>
-              <div style={{ fontSize: 12, color: '#6b7280', marginTop: 3 }}>{s.label}</div>
+              <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 24, fontWeight: 700, color: 'var(--text-main)', lineHeight: 1 }}>{s.value}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>{s.label}</div>
             </div>
           ))}
         </div>
 
         {/* ── Filter bar ── */}
-        <div style={{ background: '#fff', borderRadius: 14, padding: '14px 16px', border: '1.5px solid #f0eefe', marginBottom: 22, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 16px', border: '1.5px solid #f0eefe', marginBottom: 22, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
           {/* Search */}
           <div style={{ position: 'relative', flex: '1 1 200px' }}>
             <span style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', fontSize: 15 }}>🔍</span>
@@ -210,23 +210,23 @@ export default function SubjectsPage() {
               </button>
             ))}
           </div>
-          <span style={{ fontSize: 12, color: '#9ca3af', whiteSpace: 'nowrap' }}>{filtered.length} subject{filtered.length !== 1 ? 's' : ''}</span>
+          <span style={{ fontSize: 12, color: 'var(--text-subtle)', whiteSpace: 'nowrap' }}>{filtered.length} subject{filtered.length !== 1 ? 's' : ''}</span>
         </div>
 
         {/* ── Loading ── */}
         {isLoading && (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin2 0.8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading subjects…</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading subjects…</p>
           </div>
         )}
 
         {/* ── Empty ── */}
         {!isLoading && filtered.length === 0 && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📚</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>{search || filterCategory ? 'No subjects found' : 'No subjects yet'}</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 18 }}>{search || filterCategory ? 'Try adjusting your filters.' : 'Add your first subject to get started.'}</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>{search || filterCategory ? 'No subjects found' : 'No subjects yet'}</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>{search || filterCategory ? 'Try adjusting your filters.' : 'Add your first subject to get started.'}</p>
             {!search && !filterCategory && <Btn onClick={openCreate}>➕ Add First Subject</Btn>}
           </div>
         )}
@@ -259,7 +259,7 @@ export default function SubjectsPage() {
                       <div key={s.id} className="sub-card"
                         onMouseEnter={() => setHoveredId(s.id)}
                         onMouseLeave={() => setHoveredId(null)}
-                        style={{ background: '#fff', borderRadius: 16, border: `1.5px solid ${isHov ? meta.color + '40' : '#f0eefe'}`, padding: '18px', boxShadow: '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.22s', animation: `_fadeUp2 0.35s ease ${i * 0.05}s both`, overflow: 'hidden', position: 'relative' }}>
+                        style={{ background: 'var(--bg-card)', borderRadius: 16, border: `1.5px solid ${isHov ? meta.color + '40' : '#f0eefe'}`, padding: '18px', boxShadow: '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.22s', animation: `_fadeUp2 0.35s ease ${i * 0.05}s both`, overflow: 'hidden', position: 'relative' }}>
 
                         {/* Background icon watermark */}
                         <div style={{ position: 'absolute', bottom: -10, right: -6, fontSize: 52, opacity: 0.05, pointerEvents: 'none', transform: isHov ? 'scale(1.1) rotate(-5deg)' : 'scale(1)', transition: 'transform 0.3s' }}>
@@ -272,7 +272,7 @@ export default function SubjectsPage() {
                         </div>
 
                         {/* Info */}
-                        <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: '0 0 3px', lineHeight: 1.3 }}>{s.name}</h3>
+                        <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 3px', lineHeight: 1.3 }}>{s.name}</h3>
                         {s.code && <span style={{ fontSize: 11, fontWeight: 700, fontFamily: 'monospace', color: meta.color, background: meta.bg, padding: '2px 7px', borderRadius: 5 }}>{s.code}</span>}
 
                         <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -330,7 +330,7 @@ export default function SubjectsPage() {
               <div>
                 <FieldLabel>Subject Code</FieldLabel>
                 <StyledInput {...register('code')} placeholder="e.g. MATH, ENG" />
-                <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>Optional short code shown on report cards</p>
+                <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 3 }}>Optional short code shown on report cards</p>
               </div>
 
               {/* Live preview */}

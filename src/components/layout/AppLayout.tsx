@@ -59,7 +59,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
 
     if (isTrialExpired || overdueInvoice) {
       return (
-        <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center', background: '#f8f7ff', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center', background: 'var(--bg-app)', flexDirection: 'column' }}>
           <div style={{ fontSize: 60, marginBottom: 24 }}>💳</div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: '#1e0646', marginBottom: 12 }}>
             {isTrialExpired ? 'Free Trial Expired' : 'Payment Overdue'}
@@ -70,7 +70,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
               : 'You have an unpaid invoice that is past its due date. Please settle the outstanding balance to restore access to your dashboard.'
             }
           </p>
-          <div style={{ background: '#fff', padding: 24, borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', marginBottom: 24, width: '100%', maxWidth: 400 }}>
+          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', marginBottom: 24, width: '100%', maxWidth: 400 }}>
             <div style={{ fontSize: 13, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, marginBottom: 8 }}>Payment Instructions</div>
             <div style={{ fontSize: 16, color: '#1e0646', fontWeight: 600, marginBottom: 4 }}>Pay via Mobile Money to:</div>
             <div style={{ fontSize: 28, fontWeight: 800, color: '#f59e0b', letterSpacing: '0.05em', marginBottom: 16 }}>0532416607</div>
@@ -94,7 +94,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
 
   return (
     <>
-      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: '#f8f7ff', fontFamily: '"DM Sans",system-ui,sans-serif' }}>
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: 'var(--bg-app)', fontFamily: '"DM Sans",system-ui,sans-serif' }}>
 
         {/* Subtle Watermark Background */}
         <div style={{

@@ -399,7 +399,7 @@ export default function DriverDashboard() {
             <Bus size={32} />
           </div>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: '#111827' }}>Driver Portal</h1>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Driver Portal</h1>
             <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: 14 }}>
               {vehicle ? `${vehicle.make_model || 'Bus'} — ${vehicle.plate_number}` : 'No Vehicle Assigned'}
             </p>
@@ -419,7 +419,7 @@ export default function DriverDashboard() {
       ) : (
         <>
           {/* Trip Controls */}
-          <div style={{ background: '#fff', borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: 24 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trip Status</div>
@@ -455,7 +455,7 @@ export default function DriverDashboard() {
 
           {/* Scanner Controls (Only if trip is active) */}
           {tripActive && (
-            <div style={{ background: '#fff', borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
               
               <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
                 <button 
@@ -509,8 +509,8 @@ export default function DriverDashboard() {
 
           {/* Expected Passengers Manifest */}
           {tripActive && expectedStudents.length > 0 && (
-            <div style={{ background: '#fff', borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginTop: 24 }}>
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#111827', marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginTop: 24 }}>
+              <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
                 <span>Expected Passengers</span>
                 <span style={{ fontSize: 14, color: '#64748b', fontWeight: 600 }}>
                   {expectedStudents.filter(s => boardedStudentIds.has(`${s.student_id}-${direction}`)).length} / {expectedStudents.length} {direction === 'pickup' ? 'Boarded' : 'Dropped'}
@@ -555,7 +555,7 @@ export default function DriverDashboard() {
           <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
             <button 
               onClick={() => setShowMaintenanceModal(true)}
-              style={{ flex: 1, padding: '16px', borderRadius: 16, border: '1px solid #e2e8f0', background: '#fff', color: '#475569', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}
+              style={{ flex: 1, padding: '16px', borderRadius: 16, border: '1px solid #e2e8f0', background: 'var(--bg-card)', color: '#475569', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}
             >
               <Wrench size={18} /> Report Issue
             </button>
@@ -567,11 +567,11 @@ export default function DriverDashboard() {
       <Modal open={showMaintenanceModal} onClose={() => setShowMaintenanceModal(false)} title="Report Maintenance Issue" subtitle="Log a problem with the vehicle for admin review.">
         <form onSubmit={submitMaintenance} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Category</label>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Category</label>
             <select 
               value={maintenanceCat} 
               onChange={e => setMaintenanceCat(e.target.value)}
-              style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: '1px solid #e5e7eb', background: '#f9fafb', fontSize: 15, outline: 'none' }}
+              style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: '1px solid var(--border-color)', background: 'var(--bg-input)', fontSize: 15, outline: 'none' }}
               required
             >
               <option value="Engine">Engine / Mechanical</option>
@@ -583,12 +583,12 @@ export default function DriverDashboard() {
             </select>
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>Description</label>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Description</label>
             <textarea 
               value={maintenanceDesc}
               onChange={e => setMaintenanceDesc(e.target.value)}
               placeholder="Describe the issue in detail..."
-              style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: '1px solid #e5e7eb', background: '#f9fafb', fontSize: 15, outline: 'none', minHeight: 100, resize: 'vertical' }}
+              style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: '1px solid var(--border-color)', background: 'var(--bg-input)', fontSize: 15, outline: 'none', minHeight: 100, resize: 'vertical' }}
               required
             />
           </div>

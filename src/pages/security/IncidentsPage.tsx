@@ -84,7 +84,7 @@ export default function IncidentsPage() {
           {isLoading ? (
             <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>Loading…</div>
           ) : incidents.length === 0 ? (
-            <div style={{ padding: '44px 24px', textAlign: 'center', color: '#94a3b8', background: '#fff', borderRadius: 18, border: '1.5px solid #f1f5f9' }}>
+            <div style={{ padding: '44px 24px', textAlign: 'center', color: '#94a3b8', background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f1f5f9' }}>
               <AlertTriangle size={36} style={{ marginBottom: 10, opacity: .3 }} />
               <div style={{ fontSize: 14, fontWeight: 700, color: '#334155' }}>No incidents recorded</div>
               <div style={{ fontSize: 13, marginTop: 4 }}>Use the Report button to log an incident</div>
@@ -93,7 +93,7 @@ export default function IncidentsPage() {
             const meta = parseMeta(inc.link ?? '{}')
             const sev = SEVERITY.find(s => s.value === meta.severity) ?? SEVERITY[1]
             return (
-              <div key={inc.id} style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f1f5f9', padding: '16px' }}>
+              <div key={inc.id} style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f1f5f9', padding: '16px' }}>
                 <div className="ip-inc-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 38, height: 38, borderRadius: 11, background: sev.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -120,7 +120,7 @@ export default function IncidentsPage() {
         {open && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 9999 }}
             onClick={e => { if (e.target === e.currentTarget) setOpen(false) }}>
-            <div style={{ background: '#fff', borderRadius: '22px 22px 0 0', padding: '24px 20px 90px', width: '100%', maxWidth: 540, maxHeight: '92vh', overflowY: 'auto', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: '22px 22px 0 0', padding: '24px 20px 90px', width: '100%', maxWidth: 540, maxHeight: '92vh', overflowY: 'auto', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif' }}>
               {/* Drag handle */}
               <div style={{ width: 40, height: 4, borderRadius: 4, background: '#e2e8f0', margin: '0 auto 18px' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
@@ -132,7 +132,7 @@ export default function IncidentsPage() {
               <div style={{ marginBottom: 14 }}>
                 <label style={{ fontSize: 12, fontWeight: 700, color: '#334155', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em' }}>Incident Type</label>
                 <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
-                  style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', background: '#fff' }}>
+                  style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', background: 'var(--bg-card)' }}>
                   {TYPES.map(t => <option key={t}>{t}</option>)}
                 </select>
               </div>

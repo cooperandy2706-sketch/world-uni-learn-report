@@ -9,13 +9,13 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(({ label, error, optio
   const inputId = id ?? label?.toLowerCase().replace(/\s+/g,'-')
   return (
     <div style={{ width:'100%', fontFamily:'"DM Sans",sans-serif' }}>
-      {label && <label htmlFor={inputId} style={{ display:'block', fontSize:11, fontWeight:700, letterSpacing:'0.05em', textTransform:'uppercase', color:'#6b7280', marginBottom:5 }}>{label}</label>}
+      {label && <label htmlFor={inputId} style={{ display:'block', fontSize:11, fontWeight:700, letterSpacing:'0.05em', textTransform:'uppercase', color: 'var(--text-muted)', marginBottom:5 }}>{label}</label>}
       <select
         ref={ref} id={inputId}
         className={className}
         style={{
           width:'100%', borderRadius:9, border: error ? '1.5px solid #f87171' : '1.5px solid #e5e7eb',
-          background:'#fff', padding:'9px 12px', fontSize:13, color:'#111827',
+          background: 'var(--bg-card)', padding:'9px 12px', fontSize:13, color: 'var(--text-main)',
           outline:'none', cursor:'pointer', fontFamily:'"DM Sans",sans-serif',
           boxSizing:'border-box', ...style,
         }}

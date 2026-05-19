@@ -18,7 +18,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
   const [hov, setHov] = useState(false)
   const v: Record<string, React.CSSProperties> = {
     primary:   { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(109,40,217,.25)' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
     success:   { background: hov ? '#15803d' : '#16a34a', color: '#fff', border: 'none' },
     danger:    { background: hov ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
     ghost:     { background: hov ? '#f5f3ff' : 'transparent', color: '#6d28d9', border: 'none' },
@@ -150,10 +150,10 @@ export default function PromotionPage() {
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>
+        <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
           Bulk Promotion & Graduation
         </h1>
-        <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>
+        <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>
           Efficiency tool for moving students between classes or graduating them at the end of the academic year.
         </p>
       </div>
@@ -168,13 +168,13 @@ export default function PromotionPage() {
             </h3>
 
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
                 Current Class (From)
               </label>
               <select 
                 value={fromClassId} 
                 onChange={e => { setFromClassId(e.target.value); setSelectedIds([]) }}
-                style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 14, outline: 'none', background: '#fcfaff', color: '#111827', cursor: 'pointer' }}
+                style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none', background: '#fcfaff', color: 'var(--text-main)', cursor: 'pointer' }}
               >
                 <option value="">Select a class...</option>
                 {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -182,13 +182,13 @@ export default function PromotionPage() {
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
                 Next Destination (To)
               </label>
               <select 
                 value={targetClassId} 
                 onChange={e => setTargetClassId(e.target.value)}
-                style={{ width: '100%', padding: '12px', borderRadius: 10, border: `1.5px solid ${isGraduating ? '#f59e0b' : '#e5e7eb'}`, fontSize: 14, outline: 'none', background: isGraduating ? '#fffbeb' : '#fcfaff', color: '#111827', cursor: 'pointer', transition: 'all 0.2s' }}
+                style={{ width: '100%', padding: '12px', borderRadius: 10, border: `1.5px solid ${isGraduating ? '#f59e0b' : '#e5e7eb'}`, fontSize: 14, outline: 'none', background: isGraduating ? '#fffbeb' : '#fcfaff', color: 'var(--text-main)', cursor: 'pointer', transition: 'all 0.2s' }}
               >
                 <option value="">Select target class...</option>
                 <optgroup label="Promote To">
@@ -228,13 +228,13 @@ export default function PromotionPage() {
                 Step 2: Review & Select Students
               </h3>
               <div style={{ position: 'relative', width: 260 }}>
-                <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+                <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-subtle)' }} />
                 <input 
                   type="text" 
                   placeholder="Filter by name..." 
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }}
+                  style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }}
                 />
               </div>
             </div>
@@ -252,7 +252,7 @@ export default function PromotionPage() {
             ) : (
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ textAlign: 'left', borderBottom: '2px solid #f3f4f6' }}>
+                  <tr style={{ textAlign: 'left', borderBottom: '2px solid var(--border-light)' }}>
                     <th style={{ padding: '12px', width: 40 }}>
                       <input 
                         type="checkbox" 
@@ -261,14 +261,14 @@ export default function PromotionPage() {
                         style={{ cursor: 'pointer' }}
                       />
                     </th>
-                    <th style={{ padding: '12px', fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase' }}>Student Name</th>
-                    <th style={{ padding: '12px', fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase' }}>Student ID</th>
-                    <th style={{ padding: '12px', fontSize: 11, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase' }}>Gender</th>
+                    <th style={{ padding: '12px', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Student Name</th>
+                    <th style={{ padding: '12px', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Student ID</th>
+                    <th style={{ padding: '12px', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Gender</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredStudents.map((s, i) => (
-                    <tr key={s.id} className="std-row" style={{ borderBottom: '1px solid #f3f4f6', animation: `_fadeUp 0.3s ease ${i * 0.02}s both` }}>
+                    <tr key={s.id} className="std-row" style={{ borderBottom: '1px solid var(--border-light)', animation: `_fadeUp 0.3s ease ${i * 0.02}s both` }}>
                       <td style={{ padding: '12px' }}>
                         <input 
                           type="checkbox" 
@@ -279,13 +279,13 @@ export default function PromotionPage() {
                       </td>
                       <td style={{ padding: '12px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>
+                          <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'var(--bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>
                             {s.full_name.charAt(0)}
                           </div>
-                          <span style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{s.full_name}</span>
+                          <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{s.full_name}</span>
                         </div>
                       </td>
-                      <td style={{ padding: '12px', fontSize: 13, color: '#6b7280' }}>{s.student_id || 'N/A'}</td>
+                      <td style={{ padding: '12px', fontSize: 13, color: 'var(--text-muted)' }}>{s.student_id || 'N/A'}</td>
                       <td style={{ padding: '12px' }}>
                         <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 99, background: s.gender === 'male' ? '#eff6ff' : '#fdf2f8', color: s.gender === 'male' ? '#2563eb' : '#db2777' }}>
                           {s.gender || '—'}
@@ -323,8 +323,8 @@ export default function PromotionPage() {
             {isGraduating ? <GraduationCap size={32} color="#d97706" /> : <ArrowUpRight size={32} color="#7c3aed" />}
           </div>
           
-          <h4 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 12px' }}>Are you sure?</h4>
-          <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.6, margin: 0 }}>
+          <h4 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 12px' }}>Are you sure?</h4>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
             You are about to {isGraduating ? 'graduate' : 'promote'} <strong>{selectedIds.length}</strong> students from 
             <span style={{ color: '#7c3aed', fontWeight: 700 }}> {fromClassName}</span> to 
             <span style={{ color: isGraduating ? '#d97706' : '#7c3aed', fontWeight: 700 }}> {targetClassName}</span>.

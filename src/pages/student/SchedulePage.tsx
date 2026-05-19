@@ -98,10 +98,10 @@ export default function StudentSchedulePage() {
 
     if (isBreak) {
       return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: compact ? '6px 10px' : '8px 12px', borderRadius: 8, background: '#f9fafb', border: '1px dashed #e5e7eb' }}>
-          <span style={{ fontSize: 11, color: '#9ca3af' }}>☕</span>
-          <span style={{ fontSize: compact ? 11 : 12, color: '#9ca3af', fontWeight: 500 }}>{slot.period?.name}</span>
-          <span style={{ fontSize: 10, color: '#9ca3af', marginLeft: 'auto' }}>{formatTime(sTime)} – {formatTime(eTime)}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: compact ? '6px 10px' : '8px 12px', borderRadius: 8, background: 'var(--bg-input)', border: '1px dashed var(--border-color)' }}>
+          <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>☕</span>
+          <span style={{ fontSize: compact ? 11 : 12, color: 'var(--text-subtle)', fontWeight: 500 }}>{slot.period?.name}</span>
+          <span style={{ fontSize: 10, color: 'var(--text-subtle)', marginLeft: 'auto' }}>{formatTime(sTime)} – {formatTime(eTime)}</span>
         </div>
       )
     }
@@ -114,18 +114,18 @@ export default function StudentSchedulePage() {
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                  <span style={{ fontSize: compact ? 12 : 13, fontWeight: 700, color: '#111827' }}>{slot.subject?.name}</span>
+                  <span style={{ fontSize: compact ? 12 : 13, fontWeight: 700, color: 'var(--text-main)' }}>{slot.subject?.name}</span>
                   {isNow && <span style={{ fontSize: 9, fontWeight: 800, background: color, color: '#fff', padding: '1px 6px', borderRadius: 99 }}>LIVE</span>}
                   {isDone && !isNow && <span style={{ fontSize: 11, color: '#d1d5db' }}>✓</span>}
                 </div>
                 {slot.teacher?.user?.full_name && (
-                  <div style={{ fontSize: compact ? 10 : 11, color: '#6b7280' }}>👤 {slot.teacher.user.full_name}</div>
+                  <div style={{ fontSize: compact ? 10 : 11, color: 'var(--text-muted)' }}>👤 {slot.teacher.user.full_name}</div>
                 )}
-                <div style={{ fontSize: compact ? 10 : 11, color: '#9ca3af', marginTop: 2 }}>{slot.period?.name}</div>
+                <div style={{ fontSize: compact ? 10 : 11, color: 'var(--text-subtle)', marginTop: 2 }}>{slot.period?.name}</div>
               </div>
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
                 <div style={{ fontSize: compact ? 11 : 12, fontWeight: 700, color }}>{formatTime(sTime)}</div>
-                <div style={{ fontSize: 10, color: '#9ca3af' }}>{formatTime(eTime)}</div>
+                <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{formatTime(eTime)}</div>
               </div>
             </div>
           </div>
@@ -164,24 +164,24 @@ export default function StudentSchedulePage() {
         {/* Header */}
         <div className="sch-header" style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, animation: '_schfade .5s ease both' }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Class Schedule</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Class Schedule</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>
               {studentData?.class?.name ?? '—'} · {(term as any)?.name ?? 'No active term'}
             </p>
           </div>
-          <Link to={ROUTES.STUDENT_DASHBOARD} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', textDecoration: 'none', border: '1.5px solid #e5e7eb' }}>← Dashboard</Link>
+          <Link to={ROUTES.STUDENT_DASHBOARD} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: 'var(--bg-card)', color: 'var(--text-main)', textDecoration: 'none', border: '1.5px solid var(--border-color)' }}>← Dashboard</Link>
         </div>
 
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_schspin .8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading timetable…</p>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading timetable…</p>
           </div>
         ) : timetable.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '64px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '64px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>📅</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No timetable available</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Your school administrator hasn't published a timetable for this term yet.</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No timetable available</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Your school administrator hasn't published a timetable for this term yet.</p>
           </div>
         ) : (
           <>
@@ -195,7 +195,7 @@ export default function StudentSchedulePage() {
             )}
 
             {/* View mode tabs + day selector */}
-            <div className="sch-controls" style={{ background: '#fff', borderRadius: 14, padding: '12px 16px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between', animation: '_schfade .5s ease .08s both' }}>
+            <div className="sch-controls" style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '12px 16px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between', animation: '_schfade .5s ease .08s both' }}>
               {/* View toggle */}
               <div style={{ display: 'flex', gap: 4, background: '#f5f3ff', borderRadius: 9, padding: 3 }}>
                 {['today', 'week'].map(v => (
@@ -229,14 +229,14 @@ export default function StudentSchedulePage() {
               <div className="sch-day-view" style={{ display: 'grid', gridTemplateColumns: '1fr 260px', gap: 20, animation: '_schfade .4s ease .12s both' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                    <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 }}>{DAY_LABELS[selectedDay]}</h2>
+                    <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{DAY_LABELS[selectedDay]}</h2>
                     {selectedDay === todayDay && <span style={{ fontSize: 11, fontWeight: 700, background: '#f0fdf4', color: '#16a34a', padding: '2px 9px', borderRadius: 99, border: '1px solid #bbf7d0' }}>TODAY</span>}
                   </div>
                   {todaySlots.length === 0 ? (
-                    <div style={{ background: '#fff', borderRadius: 16, padding: '48px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+                    <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '48px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                       <div style={{ fontSize: 40, marginBottom: 8 }}>🌟</div>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', margin: 0 }}>No classes on {DAY_LABELS[selectedDay]}</p>
-                      <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>Enjoy your free day!</p>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>No classes on {DAY_LABELS[selectedDay]}</p>
+                      <p style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 4 }}>Enjoy your free day!</p>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -261,8 +261,8 @@ export default function StudentSchedulePage() {
                   )}
 
                   {/* Week summary */}
-                  <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
-                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: '#111827', margin: '0 0 12px' }}>Week at a Glance</h3>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 12px' }}>Week at a Glance</h3>
                     {WEEKDAYS.map(day => {
                       const slots = getDaySlots(day).filter((s: any) => !s.period?.is_break)
                       const isToday = day === todayDay
@@ -279,25 +279,25 @@ export default function StudentSchedulePage() {
                               {slots.slice(0, 4).map((s: any) => (
                                 <span key={s.id} style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 99, background: (subjectColorMap[s.subject?.id] ?? '#6d28d9') + '18', color: subjectColorMap[s.subject?.id] ?? '#6d28d9' }}>{s.subject?.name?.split(' ')[0]}</span>
                               ))}
-                              {slots.length > 4 && <span style={{ fontSize: 9, color: '#9ca3af' }}>+{slots.length - 4}</span>}
+                              {slots.length > 4 && <span style={{ fontSize: 9, color: 'var(--text-subtle)' }}>+{slots.length - 4}</span>}
                             </div>
                           </div>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', flexShrink: 0 }}>{slots.length} cls</div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', flexShrink: 0 }}>{slots.length} cls</div>
                         </div>
                       )
                     })}
                   </div>
 
                   {/* Subjects legend */}
-                  <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
-                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: '#111827', margin: '0 0 11px' }}>My Subjects</h3>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 11px' }}>My Subjects</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {Object.entries(subjectColorMap).map(([id, color]) => {
                         const slot = timetable.find((s: any) => s.subject?.id === id)
                         return slot ? (
                           <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <div style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
-                            <span style={{ fontSize: 12, color: '#374151', fontWeight: 500 }}>{slot.subject?.name}</span>
+                            <span style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 500 }}>{slot.subject?.name}</span>
                           </div>
                         ) : null
                       })}
@@ -315,7 +315,7 @@ export default function StudentSchedulePage() {
                   const slots = getDaySlots(day)
                   const isToday = day === todayDay
                   return (
-                    <div key={day} style={{ background: '#fff', borderRadius: 14, border: `1.5px solid ${isToday ? '#6d28d9' : '#f0eefe'}`, overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                    <div key={day} style={{ background: 'var(--bg-card)', borderRadius: 14, border: `1.5px solid ${isToday ? '#6d28d9' : '#f0eefe'}`, overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                       <div style={{ padding: '10px 12px', background: isToday ? 'linear-gradient(135deg,#6d28d9,#5b21b6)' : '#faf5ff', borderBottom: '1px solid #f0eefe', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: 12, fontWeight: 700, color: isToday ? '#fff' : '#374151' }}>{DAY_LABELS[day]}</span>
                         {isToday && <span style={{ fontSize: 9, fontWeight: 800, background: 'rgba(255,255,255,.2)', color: '#fff', padding: '1px 6px', borderRadius: 99 }}>TODAY</span>}

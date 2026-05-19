@@ -258,8 +258,8 @@ export default function BillSheetPage() {
         {/* Header */}
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 }}>Student Bill Sheet</h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Generate professional fee statements for parents · {term?.name ?? 'No active term'}</p>
+            <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Student Bill Sheet</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Generate professional fee statements for parents · {term?.name ?? 'No active term'}</p>
           </div>
           {selectedStudentId && billData && (
             <button onClick={printBillSheet}
@@ -273,9 +273,9 @@ export default function BillSheetPage() {
         <div style={{ display: 'grid', gridTemplateColumns: selectedStudentId ? '320px 1fr' : '1fr', gap: 20 }}>
 
           {/* Student selector panel */}
-          <div style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
             <div style={{ padding: '16px 18px', borderBottom: '1px solid #f5f3ff' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, border: '1.5px solid #e5e7eb', background: '#fafafa' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: '#fafafa' }}>
                 <Search size={14} color="#9ca3af" />
                 <input
                   placeholder="Search by name or ID..."
@@ -287,7 +287,7 @@ export default function BillSheetPage() {
             </div>
             <div style={{ maxHeight: selectedStudentId ? 520 : 600, overflowY: 'auto' }}>
               {filteredStudents.length === 0 ? (
-                <div style={{ padding: '40px 20px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No students found</div>
+                <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>No students found</div>
               ) : filteredStudents.map((s: any) => (
                 <div
                   key={s.id}
@@ -296,7 +296,7 @@ export default function BillSheetPage() {
                   style={{ padding: '12px 18px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: selectedStudentId === s.id ? '#f5f3ff' : '#fff' }}
                 >
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 6 }}>
                       {s.full_name}
                       {s.scholarship_type && s.scholarship_type !== 'none' && (
                         <span style={{ fontSize: 9, fontWeight: 800, background: '#f0fdf4', color: '#16a34a', padding: '2px 6px', borderRadius: 99 }}>
@@ -304,7 +304,7 @@ export default function BillSheetPage() {
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2, display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2, display: 'flex', justifyContent: 'space-between' }}>
                       <span>{(s.class as any)?.name ?? 'No class'} {s.student_id ? `· ${s.student_id}` : ''}</span>
                       {Number(s.fees_arrears) > 0 && <span style={{ color: '#dc2626', fontWeight: 800 }}>{CUR(Number(s.fees_arrears))}</span>}
                     </div>
@@ -319,21 +319,21 @@ export default function BillSheetPage() {
           {selectedStudentId && (
             <div style={{ animation: '_bs_fu .35s ease' }}>
               {loadingBill ? (
-                <div style={{ background: '#fff', borderRadius: 18, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                   <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_bs_fi .8s linear infinite', margin: '0 auto 12px' }} />
-                  <p style={{ fontSize: 13, color: '#9ca3af' }}>Loading bill data…</p>
+                  <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading bill data…</p>
                 </div>
               ) : !billData ? (
-                <div style={{ background: '#fff', borderRadius: 18, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
-                  <p style={{ fontSize: 13, color: '#9ca3af' }}>Could not load bill data</p>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+                  <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Could not load bill data</p>
                 </div>
               ) : (
                 <>
                   {/* Student info + status header */}
-                  <div className="bs-card" style={{ background: '#fff', borderRadius: 16, padding: '20px 24px', border: '1.5px solid #f0eefe', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px 24px', border: '1.5px solid #f0eefe', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
                       <div>
-                        <div style={{ fontSize: 20, fontWeight: 800, color: '#111827', fontFamily: '"Playfair Display",serif', display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', fontFamily: '"Playfair Display",serif', display: 'flex', alignItems: 'center', gap: 10 }}>
                           {selectedStudent?.full_name}
                           {billData.scholarship.type !== 'none' && (
                             <span style={{ fontSize: 11, fontWeight: 700, background: '#f0fdf4', color: '#16a34a', padding: '4px 10px', borderRadius: 99, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -341,7 +341,7 @@ export default function BillSheetPage() {
                             </span>
                           )}
                         </div>
-                        <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
                           {(selectedStudent?.class as any)?.name ?? '—'} · ID: {selectedStudent?.student_id ?? '—'} · Guardian: {selectedStudent?.guardian_name ?? '—'}
                         </div>
                       </div>
@@ -362,22 +362,22 @@ export default function BillSheetPage() {
                   {/* Summary cards row */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 16 }}>
                     {[
-                      { label: 'Total Charges', value: CUR(grandTotalCharges), color: '#374151', bg: '#f8fafc' },
+                      { label: 'Total Charges', value: CUR(grandTotalCharges), color: 'var(--text-main)', bg: '#f8fafc' },
                       { label: 'Scholarship Discount', value: billData.scholarship.discount > 0 ? `− ${CUR(billData.scholarship.discount)}` : '—', color: '#16a34a', bg: '#f0fdf4' },
                       { label: 'Total Paid', value: CUR(billData.summary.totalPaid), color: '#16a34a', bg: '#f0fdf4' },
                       { label: grandBalance < 0 ? 'Credit Balance' : 'Balance Due', value: CUR(Math.abs(grandBalance)), color: grandBalance > 0 ? '#dc2626' : '#16a34a', bg: grandBalance > 0 ? '#fef2f2' : '#f0fdf4' },
                     ].map((c, i) => (
-                      <div key={c.label} className="bs-card" style={{ background: '#fff', borderRadius: 14, padding: '14px 16px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', animation: `_bs_fu .3s ease ${i * 0.05}s both` }}>
+                      <div key={c.label} className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 16px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', animation: `_bs_fu .3s ease ${i * 0.05}s both` }}>
                         <div style={{ fontSize: 18, fontWeight: 900, color: c.color, fontFamily: '"Playfair Display",serif' }}>{c.value}</div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', marginTop: 3, textTransform: 'uppercase', letterSpacing: '.06em' }}>{c.label}</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginTop: 3, textTransform: 'uppercase', letterSpacing: '.06em' }}>{c.label}</div>
                       </div>
                     ))}
                   </div>
 
                   {/* Tuition breakdown */}
-                  <div className="bs-card" style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
                         <FileText size={14} color="#6d28d9" /> Term Fee Charges
                       </h3>
                       <span style={{ fontSize: 12, fontWeight: 800, color: '#6d28d9' }}>Net: {CUR(billData.tuition.net)}</span>
@@ -401,14 +401,14 @@ export default function BillSheetPage() {
                           </tr>
                         )}
                         {billData.structures.length === 0 ? (
-                          <tr><td colSpan={2} style={{ padding: '24px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No fee structures for this class/term</td></tr>
+                          <tr><td colSpan={2} style={{ padding: '24px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>No fee structures for this class/term</td></tr>
                         ) : billData.structures.map((f: any) => (
                           <tr key={f.id} style={{ borderBottom: '1px solid #faf5ff' }}>
-                            <td style={{ padding: '10px 20px', fontSize: 13, color: '#374151' }}>
+                            <td style={{ padding: '10px 20px', fontSize: 13, color: 'var(--text-main)' }}>
                               {f.fee_name}
                               {f.is_discountable === false && <span style={{ fontSize: 10, color: '#dc2626', fontWeight: 800, marginLeft: 8 }}>[EXEMPT FROM DISCOUNT]</span>}
                             </td>
-                            <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 700, color: '#374151', textAlign: 'right' }}>{CUR(f.amount)}</td>
+                            <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 700, color: 'var(--text-main)', textAlign: 'right' }}>{CUR(f.amount)}</td>
                           </tr>
                         ))}
                         {billData.scholarship.discount > 0 && (
@@ -422,10 +422,10 @@ export default function BillSheetPage() {
                       </tbody>
                       <tfoot>
                         <tr style={{ background: '#faf5ff', borderTop: '2px solid #ede9fe' }}>
-                          <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 800, color: '#111827' }}>Tuition — Paid / Owed</td>
+                          <td style={{ padding: '10px 20px', fontSize: 13, fontWeight: 800, color: 'var(--text-main)' }}>Tuition — Paid / Owed</td>
                           <td style={{ padding: '10px 20px', textAlign: 'right' }}>
                             <span style={{ color: '#16a34a', fontWeight: 700, fontSize: 12 }}>{CUR(billData.tuition.paid)}</span>
-                            <span style={{ color: '#9ca3af', margin: '0 4px' }}>/</span>
+                            <span style={{ color: 'var(--text-subtle)', margin: '0 4px' }}>/</span>
                             <span style={{ color: billData.tuition.owed > 0 ? '#dc2626' : '#16a34a', fontWeight: 800, fontSize: 13 }}>{CUR(billData.tuition.owed)}</span>
                           </td>
                         </tr>
@@ -435,9 +435,9 @@ export default function BillSheetPage() {
 
                   {/* Daily fees section */}
                   {(billData.dailyFees.feeding.expected > 0 || billData.dailyFees.studies.expected > 0) && (
-                    <div className="bs-card" style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                    <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                       <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff' }}>
-                        <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>
+                        <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
                           Daily Fees ({billData.dailyFees.feeding.days} school days elapsed)
                         </h3>
                       </div>
@@ -452,8 +452,8 @@ export default function BillSheetPage() {
                         <tbody>
                           {billData.dailyFees.feeding.expected > 0 && (
                             <tr style={{ borderBottom: '1px solid #faf5ff' }}>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#374151' }}>Feeding Fee</td>
-                              <td style={{ padding: '10px 16px', fontSize: 12, color: '#6b7280', textAlign: 'right' }}>{CUR(billData.dailyFees.feeding.rate)}/day</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>Feeding Fee</td>
+                              <td style={{ padding: '10px 16px', fontSize: 12, color: 'var(--text-muted)', textAlign: 'right' }}>{CUR(billData.dailyFees.feeding.rate)}/day</td>
                               <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, textAlign: 'right' }}>{CUR(billData.dailyFees.feeding.expected)}</td>
                               <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, color: '#16a34a', textAlign: 'right' }}>{CUR(billData.dailyFees.feeding.paid)}</td>
                               <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 800, color: billData.dailyFees.feeding.owed > 0 ? '#dc2626' : '#16a34a', textAlign: 'right' }}>{CUR(billData.dailyFees.feeding.owed)}</td>
@@ -461,8 +461,8 @@ export default function BillSheetPage() {
                           )}
                           {billData.dailyFees.studies.expected > 0 && (
                             <tr style={{ borderBottom: '1px solid #faf5ff' }}>
-                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: '#374151' }}>Studies Fee</td>
-                              <td style={{ padding: '10px 16px', fontSize: 12, color: '#6b7280', textAlign: 'right' }}>{CUR(billData.dailyFees.studies.rate)}/day</td>
+                              <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>Studies Fee</td>
+                              <td style={{ padding: '10px 16px', fontSize: 12, color: 'var(--text-muted)', textAlign: 'right' }}>{CUR(billData.dailyFees.studies.rate)}/day</td>
                               <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, textAlign: 'right' }}>{CUR(billData.dailyFees.studies.expected)}</td>
                               <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 700, color: '#16a34a', textAlign: 'right' }}>{CUR(billData.dailyFees.studies.paid)}</td>
                               <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 800, color: billData.dailyFees.studies.owed > 0 ? '#dc2626' : '#16a34a', textAlign: 'right' }}>{CUR(billData.dailyFees.studies.owed)}</td>
@@ -474,13 +474,13 @@ export default function BillSheetPage() {
                   )}
 
                   {/* Recent payments list */}
-                  <div className="bs-card" style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>Payments Received This Term</h3>
+                      <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Payments Received This Term</h3>
                       <span style={{ fontSize: 12, fontWeight: 800, color: '#16a34a' }}>{CUR(billData.summary.totalPaid)}</span>
                     </div>
                     {billData.payments.length === 0 ? (
-                      <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No payments recorded this term</div>
+                      <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>No payments recorded this term</div>
                     ) : (
                       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
@@ -493,10 +493,10 @@ export default function BillSheetPage() {
                         <tbody>
                           {billData.payments.map((p: any) => (
                             <tr key={p.id} style={{ borderBottom: '1px solid #faf5ff' }}>
-                              <td style={{ padding: '10px 16px', fontSize: 12, color: '#6b7280' }}>{new Date(p.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
-                              <td style={{ padding: '10px 16px', fontSize: 12, color: '#374151' }}>{p.fee_structure?.fee_name ?? 'General'}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 12, color: 'var(--text-muted)' }}>{new Date(p.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 12, color: 'var(--text-main)' }}>{p.fee_structure?.fee_name ?? 'General'}</td>
                               <td style={{ padding: '10px 16px' }}><span style={{ fontSize: 10, fontWeight: 600, background: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: 99, textTransform: 'capitalize' }}>{p.payment_method}</span></td>
-                              <td style={{ padding: '10px 16px', fontSize: 11, color: '#9ca3af', fontFamily: 'monospace' }}>{p.reference_number ?? '—'}</td>
+                              <td style={{ padding: '10px 16px', fontSize: 11, color: 'var(--text-subtle)', fontFamily: 'monospace' }}>{p.reference_number ?? '—'}</td>
                               <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 800, color: '#16a34a', textAlign: 'right' }}>{CUR(p.amount_paid)}</td>
                             </tr>
                           ))}
@@ -505,15 +505,15 @@ export default function BillSheetPage() {
                     )}
                   </div>
                   {/* Custom adjustments */}
-                  <div className="bs-card" style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff' }}>
-                      <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>Custom Adjustments (Add / Remove)</h3>
-                      <p style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>Add extra charges (positive) or discounts (negative) to this bill</p>
+                      <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Custom Adjustments (Add / Remove)</h3>
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Add extra charges (positive) or discounts (negative) to this bill</p>
                     </div>
                     <div style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', gap: 10, marginBottom: customItems.length > 0 ? 16 : 0, flexWrap: 'wrap' }}>
-                        <input placeholder="Item Description (e.g., Uniform, Waiver)" value={newItemName} onChange={e => setNewItemName(e.target.value)} style={{ flex: 1, minWidth: 200, padding: '9px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }} />
-                        <input placeholder="Amount (GH₵)" type="number" step="0.01" value={newItemAmount} onChange={e => setNewItemAmount(e.target.value)} style={{ width: 140, padding: '9px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none' }} />
+                        <input placeholder="Item Description (e.g., Uniform, Waiver)" value={newItemName} onChange={e => setNewItemName(e.target.value)} style={{ flex: 1, minWidth: 200, padding: '9px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }} />
+                        <input placeholder="Amount (GH₵)" type="number" step="0.01" value={newItemAmount} onChange={e => setNewItemAmount(e.target.value)} style={{ width: 140, padding: '9px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }} />
                         <button onClick={() => { 
                           if(!newItemName || !newItemAmount) return; 
                           setCustomItems(prev => [...prev, { id: Math.random().toString(36).substr(2, 9), name: newItemName, amount: parseFloat(newItemAmount) }]); 
@@ -529,7 +529,7 @@ export default function BillSheetPage() {
                           <tbody>
                             {customItems.map(item => (
                               <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                <td style={{ padding: '10px 0', fontSize: 13, color: '#374151' }}>{item.name}</td>
+                                <td style={{ padding: '10px 0', fontSize: 13, color: 'var(--text-main)' }}>{item.name}</td>
                                 <td style={{ padding: '10px 0', fontSize: 13, fontWeight: 700, color: item.amount > 0 ? '#dc2626' : '#16a34a', textAlign: 'right' }}>
                                   {item.amount > 0 ? '+' : ''}{CUR(item.amount)}
                                 </td>

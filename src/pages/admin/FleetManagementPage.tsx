@@ -188,7 +188,7 @@ export default function FleetManagementPage() {
             <>
               <button 
                 onClick={() => setIsRouteModalOpen(true)}
-                style={{ padding: '10px 20px', borderRadius: 10, background: '#f3f4f6', color: '#374151', border: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+                style={{ padding: '10px 20px', borderRadius: 10, background: 'var(--bg-hover)', color: 'var(--text-main)', border: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
               >
                 <MapPin size={18} /> New Route
               </button>
@@ -239,7 +239,7 @@ export default function FleetManagementPage() {
               No vehicles found. Add your first school bus!
             </div>
           ) : vehicles.map(v => (
-            <div key={v.id} style={{ background: '#fff', padding: 24, borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+            <div key={v.id} style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                 <div style={{ width: 48, height: 48, borderRadius: 12, background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Bus size={24} />
@@ -248,7 +248,7 @@ export default function FleetManagementPage() {
                   <Trash2 size={18} />
                 </button>
               </div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: '#111827', marginBottom: 4 }}>{v.plate_number}</div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>{v.plate_number}</div>
               <div style={{ fontSize: 13, color: '#64748b', fontWeight: 500, marginBottom: 16 }}>{v.make_model || 'Standard Bus'} • {v.capacity} Seats</div>
               
               <div style={{ padding: 12, background: '#f8fafc', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -264,7 +264,7 @@ export default function FleetManagementPage() {
 
       {/* ROUTES TAB */}
       {activeTab === 'routes' && (
-        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
@@ -279,7 +279,7 @@ export default function FleetManagementPage() {
                 <tr><td colSpan={4} style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>No routes defined.</td></tr>
               ) : routes.map(r => (
                 <tr key={r.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <td style={{ padding: '16px 24px', fontSize: 15, fontWeight: 700, color: '#111827' }}>
+                  <td style={{ padding: '16px 24px', fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <MapPin size={18} color="#2563eb" /> {r.name}
                     </div>
@@ -300,7 +300,7 @@ export default function FleetManagementPage() {
 
       {/* ASSIGNMENTS TAB */}
       {activeTab === 'assignments' && (
-        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
@@ -316,7 +316,7 @@ export default function FleetManagementPage() {
               ) : assignments.map(a => (
                 <tr key={a.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
                   <td style={{ padding: '16px 24px' }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{a.student?.full_name}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{a.student?.full_name}</div>
                     <div style={{ fontSize: 13, color: '#64748b' }}>{a.student?.class?.name}</div>
                   </td>
                   <td style={{ padding: '16px 24px' }}>
@@ -341,7 +341,7 @@ export default function FleetManagementPage() {
 
       {/* MAINTENANCE TAB */}
       {activeTab === 'maintenance' && (
-        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
               <tr>
@@ -363,7 +363,7 @@ export default function FleetManagementPage() {
                     {new Date(log.created_at).toLocaleDateString()}
                   </td>
                   <td style={{ padding: '16px 24px' }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{log.vehicle?.plate_number}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{log.vehicle?.plate_number}</div>
                     <div style={{ fontSize: 13, color: '#64748b' }}>{log.driver?.full_name}</div>
                   </td>
                   <td style={{ padding: '16px 24px' }}>
@@ -396,30 +396,30 @@ export default function FleetManagementPage() {
       {/* Modals */}
       {isVehicleModalOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}>
-          <div style={{ background: '#fff', padding: 24, borderRadius: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             <h2 style={{ margin: '0 0 24px', fontSize: 24, fontWeight: 800 }}>Add New Vehicle</h2>
             <form onSubmit={handleSaveVehicle}>
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Plate Number *</label>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Plate Number *</label>
                 <input required value={vForm.plate_number} onChange={e => setVForm({...vForm, plate_number: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db' }} placeholder="e.g. GR-1234-22" />
               </div>
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Make & Model</label>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Make & Model</label>
                 <input value={vForm.make_model} onChange={e => setVForm({...vForm, make_model: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db' }} placeholder="e.g. Toyota Coaster" />
               </div>
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Capacity (Seats) *</label>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Capacity (Seats) *</label>
                 <input required type="number" value={vForm.capacity} onChange={e => setVForm({...vForm, capacity: Number(e.target.value)})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db' }} />
               </div>
               <div style={{ marginBottom: 24 }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Assign Driver</label>
-                <select value={vForm.driver_id} onChange={e => setVForm({...vForm, driver_id: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Assign Driver</label>
+                <select value={vForm.driver_id} onChange={e => setVForm({...vForm, driver_id: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db', background: 'var(--bg-card)' }}>
                   <option value="">-- No Driver Assigned --</option>
                   {drivers.map(d => <option key={d.id} value={d.id}>{d.full_name}</option>)}
                 </select>
               </div>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsVehicleModalOpen(false)} style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#f3f4f6', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                <button type="button" onClick={() => setIsVehicleModalOpen(false)} style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: 'var(--bg-hover)', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#1d4ed8', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Save Vehicle</button>
               </div>
             </form>
@@ -429,23 +429,23 @@ export default function FleetManagementPage() {
 
       {isRouteModalOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}>
-          <div style={{ background: '#fff', padding: 24, borderRadius: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             <h2 style={{ margin: '0 0 24px', fontSize: 24, fontWeight: 800 }}>Create Route</h2>
             <form onSubmit={handleSaveRoute}>
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Route Name *</label>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Route Name *</label>
                 <input required value={rForm.name} onChange={e => setRForm({...rForm, name: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db' }} placeholder="e.g. Route A (East Legon)" />
               </div>
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Description</label>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Description</label>
                 <input value={rForm.description} onChange={e => setRForm({...rForm, description: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db' }} placeholder="e.g. Morning pick up from East Legon" />
               </div>
               <div style={{ marginBottom: 24 }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Termly Transport Fee (GH₵) *</label>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Termly Transport Fee (GH₵) *</label>
                 <input required type="number" step="0.01" value={rForm.fee_amount} onChange={e => setRForm({...rForm, fee_amount: Number(e.target.value)})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db' }} />
               </div>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsRouteModalOpen(false)} style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#f3f4f6', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                <button type="button" onClick={() => setIsRouteModalOpen(false)} style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: 'var(--bg-hover)', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#1d4ed8', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Save Route</button>
               </div>
             </form>
@@ -454,12 +454,12 @@ export default function FleetManagementPage() {
       )}
       {isAssignModalOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}>
-          <div style={{ background: '#fff', padding: 24, borderRadius: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             <h2 style={{ margin: '0 0 24px', fontSize: 24, fontWeight: 800 }}>Assign Student to Transport</h2>
             <form onSubmit={handleSaveAssignment}>
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Filter by Class</label>
-                <select value={assignClassFilter} onChange={e => setAssignClassFilter(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Filter by Class</label>
+                <select value={assignClassFilter} onChange={e => setAssignClassFilter(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db', background: 'var(--bg-card)' }}>
                   <option value="">-- All Classes --</option>
                   {Array.from(new Set(students.map(s => s.class?.name).filter(Boolean))).sort().map(c => (
                     <option key={String(c)} value={String(c)}>{String(c)}</option>
@@ -468,7 +468,7 @@ export default function FleetManagementPage() {
               </div>
 
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Select Students * ({aForm.student_ids.length} selected)</label>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Select Students * ({aForm.student_ids.length} selected)</label>
                 <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid #d1d5db', borderRadius: 10, padding: 12, background: '#f8fafc' }}>
                   {students.filter(s => assignClassFilter ? s.class?.name === assignClassFilter : true).map(s => (
                     <label key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', cursor: 'pointer', borderBottom: '1px solid #e2e8f0', fontSize: 14 }}>
@@ -489,31 +489,31 @@ export default function FleetManagementPage() {
                 </div>
               </div>
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Route *</label>
-                <select required value={aForm.route_id} onChange={e => setAForm({...aForm, route_id: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Route *</label>
+                <select required value={aForm.route_id} onChange={e => setAForm({...aForm, route_id: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db', background: 'var(--bg-card)' }}>
                   <option value="">-- Select Route --</option>
                   {routes.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                 </select>
               </div>
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Specific Vehicle (Optional)</label>
-                <select value={aForm.vehicle_id} onChange={e => setAForm({...aForm, vehicle_id: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Specific Vehicle (Optional)</label>
+                <select value={aForm.vehicle_id} onChange={e => setAForm({...aForm, vehicle_id: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db', background: 'var(--bg-card)' }}>
                   <option value="">-- Any Vehicle on this Route --</option>
                   {vehicles.map(v => <option key={v.id} value={v.id}>{v.plate_number}</option>)}
                 </select>
               </div>
               <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Pickup Area</label>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Pickup Area</label>
                   <input value={aForm.pickup_location} onChange={e => setAForm({...aForm, pickup_location: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db' }} placeholder="e.g. Total Station" />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#374151' }}>Dropoff Area</label>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Dropoff Area</label>
                   <input value={aForm.dropoff_location} onChange={e => setAForm({...aForm, dropoff_location: e.target.value})} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db' }} placeholder="e.g. Home" />
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsAssignModalOpen(false)} style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#f3f4f6', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                <button type="button" onClick={() => setIsAssignModalOpen(false)} style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: 'var(--bg-hover)', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#1d4ed8', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Save Assignment</button>
               </div>
             </form>

@@ -100,7 +100,7 @@ export default function StaffRequestsPage() {
                 .status-rejected { background: #fee2e2; color: #dc2626; }
             `}</style>
 
-            <div style={{ display: 'flex', gap: 32, borderBottom: '1px solid #e5e7eb', marginBottom: 24 }}>
+            <div style={{ display: 'flex', gap: 32, borderBottom: '1px solid var(--border-color)', marginBottom: 24 }}>
                 <button className={`tab-btn ${activeTab === 'leave' ? 'active' : ''}`} onClick={() => setActiveTab('leave')}>Leave Applications</button>
                 <button className={`tab-btn ${activeTab === 'docs' ? 'active' : ''}`} onClick={() => setActiveTab('docs')}>Professional Documents</button>
             </div>
@@ -113,7 +113,7 @@ export default function StaffRequestsPage() {
                                 key={s}
                                 onClick={() => setFilterStatus(s)}
                                 style={{ 
-                                    padding: '6px 16px', borderRadius: 99, fontSize: 12, fontWeight: 600, border: '1.5px solid #e5e7eb',
+                                    padding: '6px 16px', borderRadius: 99, fontSize: 12, fontWeight: 600, border: '1.5px solid var(--border-color)',
                                     background: filterStatus === s ? '#7c3aed' : 'white',
                                     color: filterStatus === s ? 'white' : '#6b7280',
                                     cursor: 'pointer', textTransform: 'capitalize'
@@ -126,18 +126,18 @@ export default function StaffRequestsPage() {
 
                     <div className="card" style={{ overflow: 'hidden' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ background: '#f9fafb', borderBottom: '1.5px solid #f0eefe' }}>
+                            <thead style={{ background: 'var(--bg-input)', borderBottom: '1.5px solid #f0eefe' }}>
                                 <tr>
-                                    <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>STAFF MEMBER</th>
-                                    <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>LEAVE TYPE</th>
-                                    <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>PERIOD</th>
-                                    <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>STATUS</th>
-                                    <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>ACTION</th>
+                                    <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>STAFF MEMBER</th>
+                                    <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>LEAVE TYPE</th>
+                                    <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>PERIOD</th>
+                                    <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>STATUS</th>
+                                    <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>ACTION</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredLeaves.length === 0 ? (
-                                    <tr><td colSpan={5} style={{ padding: '60px', textAlign: 'center', color: '#9ca3af' }}>No leave requests found.</td></tr>
+                                    <tr><td colSpan={5} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>No leave requests found.</td></tr>
                                 ) : filteredLeaves.map((l, i) => (
                                     <tr key={i} style={{ borderBottom: '1px solid #f0eefe' }}>
                                         <td style={{ padding: '16px' }}>
@@ -147,14 +147,14 @@ export default function StaffRequestsPage() {
                                                 </div>
                                                 <div>
                                                     <div style={{ fontSize: 14, fontWeight: 600 }}>{l.user?.full_name}</div>
-                                                    <div style={{ fontSize: 11, color: '#6b7280', textTransform: 'capitalize' }}>{l.user?.role}</div>
+                                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'capitalize' }}>{l.user?.role}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td style={{ padding: '16px', fontSize: 14, textTransform: 'capitalize' }}>{l.leave_type}</td>
                                         <td style={{ padding: '16px' }}>
                                             <div style={{ fontSize: 13, fontWeight: 500 }}>{format(new Date(l.start_date), 'MMM dd')} - {format(new Date(l.end_date), 'MMM dd')}</div>
-                                            <div style={{ fontSize: 11, color: '#9ca3af' }}>{format(new Date(l.created_at), 'yyyy')}</div>
+                                            <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{format(new Date(l.created_at), 'yyyy')}</div>
                                         </td>
                                         <td style={{ padding: '16px' }}>
                                             <span className={`status-badge status-${l.status}`}>{l.status}</span>
@@ -162,7 +162,7 @@ export default function StaffRequestsPage() {
                                         <td style={{ padding: '16px' }}>
                                             <button 
                                                 onClick={() => setSelectedLeave(l)}
-                                                style={{ padding: '6px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: 'white', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+                                                style={{ padding: '6px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', background: 'white', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
                                             >
                                                 Details
                                             </button>
@@ -178,7 +178,7 @@ export default function StaffRequestsPage() {
             {activeTab === 'docs' && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
                     {docs.length === 0 ? (
-                        <div style={{ gridColumn: '1/-1', padding: '60px', textAlign: 'center', color: '#9ca3af' }}>No documents uploaded by staff yet.</div>
+                        <div style={{ gridColumn: '1/-1', padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>No documents uploaded by staff yet.</div>
                     ) : docs.map((d, i) => (
                         <div key={i} className="card" style={{ padding: '20px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
@@ -187,10 +187,10 @@ export default function StaffRequestsPage() {
                                 </div>
                                 <div>
                                     <div style={{ fontSize: 14, fontWeight: 700 }}>{d.title}</div>
-                                    <div style={{ fontSize: 11, color: '#6b7280' }}>by {d.user?.full_name}</div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>by {d.user?.full_name}</div>
                                 </div>
                             </div>
-                            <div style={{ fontSize: 12, color: '#4b5563', marginBottom: 16 }}>
+                            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
                                 Type: <strong>{d.document_type}</strong><br/>
                                 Uploaded: {format(new Date(d.created_at), 'MMM dd, yyyy')}
                             </div>
@@ -209,25 +209,25 @@ export default function StaffRequestsPage() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
                             <div>
                                 <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>Leave Application</h2>
-                                <p style={{ fontSize: 13, color: '#6b7280' }}>from {selectedLeave.user?.full_name}</p>
+                                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>from {selectedLeave.user?.full_name}</p>
                             </div>
-                            <button onClick={() => setSelectedLeave(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af' }}>✕</button>
+                            <button onClick={() => setSelectedLeave(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)' }}>✕</button>
                         </div>
 
-                        <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '12px', marginBottom: 20 }}>
+                        <div style={{ background: 'var(--bg-input)', padding: '16px', borderRadius: '12px', marginBottom: 20 }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12 }}>
                                 <div>
-                                    <label style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>Type</label>
+                                    <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Type</label>
                                     <div style={{ fontSize: 14, fontWeight: 600, textTransform: 'capitalize' }}>{selectedLeave.leave_type}</div>
                                 </div>
                                 <div>
-                                    <label style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>Duration</label>
+                                    <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Duration</label>
                                     <div style={{ fontSize: 14, fontWeight: 600 }}>{format(new Date(selectedLeave.start_date), 'MMM dd')} - {format(new Date(selectedLeave.end_date), 'MMM dd')}</div>
                                 </div>
                             </div>
                             <div>
-                                <label style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>Reason</label>
-                                <div style={{ fontSize: 14, color: '#374151', lineHeight: 1.5 }}>{selectedLeave.reason || 'No reason provided.'}</div>
+                                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Reason</label>
+                                <div style={{ fontSize: 14, color: 'var(--text-main)', lineHeight: 1.5 }}>{selectedLeave.reason || 'No reason provided.'}</div>
                             </div>
                         </div>
 
@@ -239,13 +239,13 @@ export default function StaffRequestsPage() {
                                     value={adminNotes}
                                     onChange={(e) => setAdminNotes(e.target.value)}
                                     placeholder="Add notes for the teacher..."
-                                    style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none', resize: 'none', marginBottom: 20 }}
+                                    style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none', resize: 'none', marginBottom: 20 }}
                                 />
                                 <div style={{ display: 'flex', gap: 12 }}>
                                     <button 
                                         disabled={submitting}
                                         onClick={() => handleStatusUpdate('rejected')}
-                                        style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1.5px solid #ef4444', background: '#fff', color: '#ef4444', fontWeight: 600, cursor: 'pointer' }}
+                                        style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1.5px solid #ef4444', background: 'var(--bg-card)', color: '#ef4444', fontWeight: 600, cursor: 'pointer' }}
                                     >
                                         Reject
                                     </button>

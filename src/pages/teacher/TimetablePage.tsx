@@ -86,7 +86,7 @@ export default function TeacherTimetablePage(){
         <div className="t-header" style={{marginBottom:22}}>
           <div>
             <h1 className="t-title">My Timetable</h1>
-            <p style={{fontSize:13,color:'#6b7280',marginTop:3}}>{(term as any)?.name} Schedule</p>
+            <p style={{fontSize:13,color: 'var(--text-muted)',marginTop:3}}>{(term as any)?.name} Schedule</p>
           </div>
         </div>
 
@@ -116,7 +116,7 @@ export default function TeacherTimetablePage(){
         </div>
 
         {/* Full week grid */}
-        <div className="t-table-scroll" style={{background:'#fff',borderRadius:16,border:'1.5px solid #f0eefe',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
+        <div className="t-table-scroll" style={{background: 'var(--bg-card)',borderRadius:16,border:'1.5px solid #f0eefe',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
           <table style={{width:'100%',borderCollapse:'collapse',minWidth:600}}>
             <thead>
               <tr style={{background:'linear-gradient(135deg,#1e3a8a,#1e40af)'}}>
@@ -135,7 +135,7 @@ export default function TeacherTimetablePage(){
                 <tr key={p.id} style={{borderBottom:pi<periods.length-1?'1px solid #f0eefe':'none',background:p.is_break?'#fef9c3':'#fff'}}>
                   <td style={{padding:'10px 14px'}}>
                     <div style={{fontSize:11,fontWeight:700,color:p.is_break?'#92400e':'#1e3a8a'}}>{p.name}</div>
-                    <div style={{fontSize:10,color:'#6b7280'}}>{p.start_time?.slice(0,5)}–{p.end_time?.slice(0,5)}</div>
+                    <div style={{fontSize:10,color: 'var(--text-muted)'}}>{p.start_time?.slice(0,5)}–{p.end_time?.slice(0,5)}</div>
                   </td>
                   {p.is_break ? (
                     <td colSpan={5} style={{textAlign:'center',fontSize:11,color:'#92400e',fontWeight:600,padding:10,background:'#fef9c3'}}>

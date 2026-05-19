@@ -62,13 +62,13 @@ export default function DriverTripLogsPage() {
       
       <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: '#111827' }}>Trip Logs</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Trip Logs</h1>
           <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: 14 }}>History of scanned student boardings and drop-offs for your vehicle.</p>
         </div>
       </div>
 
       {/* Filters */}
-      <div style={{ background: '#fff', padding: 20, borderRadius: 16, border: '1px solid #e5e7eb', marginBottom: 24, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+      <div style={{ background: 'var(--bg-card)', padding: 20, borderRadius: 16, border: '1px solid var(--border-color)', marginBottom: 24, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 200 }}>
           <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6, textTransform: 'uppercase' }}>Date</label>
           <div style={{ position: 'relative' }}>
@@ -116,7 +116,7 @@ export default function DriverTripLogsPage() {
           <p style={{ margin: 0, color: '#94a3b8', fontSize: 14 }}>Try selecting a different date or filter.</p>
         </div>
       ) : (
-        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>

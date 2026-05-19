@@ -298,14 +298,14 @@ export default function TeacherDashboardPage() {
             <h1 className="t-title">
               {timeGreeting}, {user?.full_name?.split(' ')[0]} 👋
             </h1>
-            <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4, fontWeight: 500 }}>{roleMessage}</p>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4, fontWeight: 500 }}>{roleMessage}</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
               {DAYS[now.getDay()]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit' })} · {(year as any)?.name} · {(term as any)?.name ?? 'No active term'}
             </p>
           </div>
           <div className="t-btn-group">
             <button onClick={() => setMsgOpen(true)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 14px', borderRadius: 9, fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', border: '1.5px solid #e5e7eb', cursor: 'pointer', transition: 'all .15s' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 14px', borderRadius: 9, fontSize: 13, fontWeight: 600, background: 'var(--bg-card)', color: 'var(--text-main)', border: '1.5px solid var(--border-color)', cursor: 'pointer', transition: 'all .15s' }}
               onMouseEnter={e => { e.currentTarget.style.background = '#f5f3ff'; e.currentTarget.style.borderColor = '#ddd6fe' }}
               onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e5e7eb' }}>
               💬 Message Admin
@@ -351,10 +351,10 @@ export default function TeacherDashboardPage() {
         )}
 
         {assignments.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '56px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', animation: '_fu .5s ease both' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '56px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', animation: '_fu .5s ease both' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>📋</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No class assignments yet</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Ask your admin to assign classes and subjects for this term.</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No class assignments yet</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Ask your admin to assign classes and subjects for this term.</p>
           </div>
         ) : (
           <>
@@ -397,11 +397,11 @@ export default function TeacherDashboardPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
                 {/* Today's Timetable */}
-                <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span>📅</span>
-                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>Today's Schedule</h3>
+                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Today's Schedule</h3>
                       <span style={{ fontSize: 11, background: '#f5f3ff', color: '#6d28d9', padding: '2px 8px', borderRadius: 99, fontWeight: 700 }}>{DAYS[now.getDay()]}</span>
                     </div>
                     <Link to={ROUTES.TEACHER_TIMETABLE} style={{ fontSize: 12, fontWeight: 600, color: '#6d28d9', textDecoration: 'none' }}>Full timetable →</Link>
@@ -409,7 +409,7 @@ export default function TeacherDashboardPage() {
                   {todayLessons.length === 0 ? (
                     <div style={{ padding: '28px 20px', textAlign: 'center' }}>
                       <div style={{ fontSize: 32, marginBottom: 6 }}>☀️</div>
-                      <p style={{ fontSize: 13, color: '#9ca3af', margin: 0 }}>No timetable entries for today</p>
+                      <p style={{ fontSize: 13, color: 'var(--text-subtle)', margin: 0 }}>No timetable entries for today</p>
                     </div>
                   ) : (
                     <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -425,12 +425,12 @@ export default function TeacherDashboardPage() {
                           <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: bg, border: `1px solid ${color}22` }}>
                             <div style={{ textAlign: 'center', flexShrink: 0, width: 50 }}>
                               <div style={{ fontSize: 12, fontWeight: 700, color }}>{sTime}</div>
-                              <div style={{ fontSize: 10, color: '#9ca3af' }}>{eTime}</div>
+                              <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{eTime}</div>
                             </div>
                             <div style={{ width: 2, height: 36, background: color + '40', borderRadius: 99, flexShrink: 0 }} />
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{l.subject?.name}</div>
-                              <div style={{ fontSize: 11, color: '#6b7280' }}>{l.class?.name} · {l.period?.name}</div>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{l.subject?.name}</div>
+                              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{l.class?.name} · {l.period?.name}</div>
                             </div>
                             {isNow && <span style={{ fontSize: 10, fontWeight: 800, background: '#16a34a', color: '#fff', padding: '2px 8px', borderRadius: 99 }}>LIVE</span>}
                             {isDone && <span style={{ fontSize: 13, color: '#d1d5db' }}>✓</span>}
@@ -442,11 +442,11 @@ export default function TeacherDashboardPage() {
                 </div>
 
                 {/* Class Performance */}
-                <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span>🏫</span>
-                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>My Classes</h3>
+                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>My Classes</h3>
                     </div>
                     <Link to={ROUTES.TEACHER_MY_CLASSES} style={{ fontSize: 12, fontWeight: 600, color: '#6d28d9', textDecoration: 'none' }}>View all →</Link>
                   </div>
@@ -458,9 +458,9 @@ export default function TeacherDashboardPage() {
                         <div style={{ width: 40, height: 40, borderRadius: 11, background: '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, flexShrink: 0 }}>🏫</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{cls.className}</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{cls.className}</span>
                             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                              <span style={{ fontSize: 10, color: '#9ca3af' }}>{cls.studentCount} students</span>
+                              <span style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{cls.studentCount} students</span>
                               <span
                                 className="att-pill"
                                 style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: attSubmitted ? '#f0fdf4' : '#fffbeb', color: attSubmitted ? '#16a34a' : '#d97706', border: `1px solid ${attSubmitted ? '#bbf7d0' : '#fde68a'}` }}>
@@ -471,7 +471,7 @@ export default function TeacherDashboardPage() {
                           <div style={{ height: 5, background: '#f0eefe', borderRadius: 99, overflow: 'hidden', marginBottom: 3 }}>
                             <div style={{ height: '100%', width: cPct + '%', background: cPct === 100 ? 'linear-gradient(90deg,#16a34a,#22c55e)' : 'linear-gradient(90deg,#7c3aed,#a78bfa)', borderRadius: 99, transition: 'width 1s ease' }} />
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#9ca3af' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-subtle)' }}>
                             <span>{cls.submitted} scores submitted · pass rate {cls.passRate}%</span>
                             <span style={{ fontWeight: 700, color: cPct === 100 ? '#16a34a' : '#6d28d9' }}>{cPct}%</span>
                           </div>
@@ -487,11 +487,11 @@ export default function TeacherDashboardPage() {
 
                 {/* Recent Quiz Submissions */}
                 {recentQuizSubs.length > 0 && (
-                  <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <span>📝</span>
-                        <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>Quiz Submissions</h3>
+                        <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Quiz Submissions</h3>
                       </div>
                       <Link to={ROUTES.TEACHER_ASSIGNMENTS} style={{ fontSize: 12, fontWeight: 600, color: '#6d28d9', textDecoration: 'none' }}>Manage quizzes →</Link>
                     </div>
@@ -503,8 +503,8 @@ export default function TeacherDashboardPage() {
                           style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 20px', borderBottom: i < recentQuizSubs.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background .12s' }}>
                           <div style={{ width: 30, height: 30, borderRadius: 8, background: g.color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: g.color, flexShrink: 0 }}>{g.grade}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.student?.full_name} — {s.assignments?.title}</p>
-                            <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>{timeAgo(s.submitted_at)}</p>
+                            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.student?.full_name} — {s.assignments?.title}</p>
+                            <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0 }}>{timeAgo(s.submitted_at)}</p>
                           </div>
                           <span style={{ fontSize: 13, fontWeight: 800, color: g.color, flexShrink: 0 }}>{pct.toFixed(0)}%</span>
                         </div>
@@ -515,10 +515,10 @@ export default function TeacherDashboardPage() {
 
                 {/* Recent Score Entries */}
                 {recentScores.length > 0 && (
-                  <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span>⚡</span>
-                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>Recent Score Entries</h3>
+                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Recent Score Entries</h3>
                     </div>
                     {recentScores.map((a: any, i: number) => {
                       const g = getGradeInfo(a.total_score ?? 0)
@@ -527,8 +527,8 @@ export default function TeacherDashboardPage() {
                           style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '10px 20px', borderBottom: i < recentScores.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background .12s' }}>
                           <div style={{ width: 30, height: 30, borderRadius: 8, background: g.color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: g.color, flexShrink: 0 }}>{g.grade}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.student?.full_name} — {a.subject?.name}</p>
-                            <p style={{ fontSize: 10, color: '#9ca3af', margin: 0 }}>{a.class?.name} · {timeAgo(a.updated_at)}</p>
+                            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.student?.full_name} — {a.subject?.name}</p>
+                            <p style={{ fontSize: 10, color: 'var(--text-subtle)', margin: 0 }}>{a.class?.name} · {timeAgo(a.updated_at)}</p>
                           </div>
                           <span style={{ fontSize: 13, fontWeight: 800, color: g.color, flexShrink: 0 }}>{a.total_score?.toFixed(1)}%</span>
                         </div>
@@ -570,29 +570,29 @@ export default function TeacherDashboardPage() {
 
                 {/* Announcements */}
                 {announcements.length > 0 && (
-                  <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                       <span>📢</span>
-                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>Announcements</h3>
+                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Announcements</h3>
                     </div>
                     {announcements.map((a: any, i: number) => (
                       <div key={a.id} style={{ paddingBottom: i < announcements.length - 1 ? 11 : 0, marginBottom: i < announcements.length - 1 ? 11 : 0, borderBottom: i < announcements.length - 1 ? '1px solid #f5f3ff' : 'none' }}>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start', marginBottom: 2 }}>
                           {a.is_pinned && <span style={{ fontSize: 10, flexShrink: 0, marginTop: 2 }}>📌</span>}
-                          <span style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{a.title}</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)' }}>{a.title}</span>
                         </div>
-                        <p style={{ fontSize: 11, color: '#6b7280', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' } as any}>{a.body}</p>
-                        <span style={{ fontSize: 10, color: '#9ca3af' }}>{timeAgo(a.created_at)}</span>
+                        <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' } as any}>{a.body}</p>
+                        <span style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{timeAgo(a.created_at)}</span>
                       </div>
                     ))}
                   </div>
                 )}
 
                 {/* Term info */}
-                <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <span>📆</span>
-                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>Term Info</h3>
+                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Term Info</h3>
                   </div>
                   {term && year ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
@@ -603,22 +603,22 @@ export default function TeacherDashboardPage() {
                         { l: 'End', v: (term as any).end_date ? formatDate((term as any).end_date) : 'Not set' },
                       ].map(({ l, v }) => (
                         <div key={l} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                          <span style={{ color: '#6b7280' }}>{l}</span>
-                          <span style={{ fontWeight: 600, color: '#111827' }}>{v}</span>
+                          <span style={{ color: 'var(--text-muted)' }}>{l}</span>
+                          <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{v}</span>
                         </div>
                       ))}
                       <div style={{ marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 5, background: (term as any).is_locked ? '#fef2f2' : '#f0fdf4', border: `1px solid ${(term as any).is_locked ? '#fca5a5' : '#bbf7d0'}`, borderRadius: 99, padding: '4px 10px', fontSize: 11, fontWeight: 700, color: (term as any).is_locked ? '#dc2626' : '#16a34a' }}>
                         {(term as any).is_locked ? '🔒 Locked' : '🟢 Open for entry'}
                       </div>
                     </div>
-                  ) : <p style={{ fontSize: 12, color: '#9ca3af' }}>No active term.</p>}
+                  ) : <p style={{ fontSize: 12, color: 'var(--text-subtle)' }}>No active term.</p>}
                 </div>
 
                 {/* Quick Actions — ALL teacher features */}
-                <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <span>⚡</span>
-                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>Quick Actions</h3>
+                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Quick Actions</h3>
                   </div>
                   <div className="t-quick-grid">
                     {[
@@ -636,13 +636,13 @@ export default function TeacherDashboardPage() {
                       <Link key={label} to={to} className="ql"
                         style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', borderRadius: 9, background: '#faf5ff', textDecoration: 'none', transition: 'all .15s' }}>
                         <span style={{ fontSize: 13 }}>{icon}</span>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: '#374151' }}>{label}</span>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-main)' }}>{label}</span>
                       </Link>
                     ))}
                     <button onClick={() => setMsgOpen(true)} className="ql"
                       style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', borderRadius: 9, background: '#faf5ff', border: 'none', cursor: 'pointer', transition: 'all .15s', gridColumn: 'span 2' }}>
                       <span style={{ fontSize: 13 }}>💬</span>
-                      <span style={{ fontSize: 11, fontWeight: 600, color: '#374151' }}>Message Admin</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-main)' }}>Message Admin</span>
                     </button>
                   </div>
                 </div>
@@ -657,14 +657,14 @@ export default function TeacherDashboardPage() {
         <div className="t-modal-box">
           <div style={{ padding: '16px 20px', borderBottom: '1px solid #f5f3ff', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>Message Admin</h3>
-              <p style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>Send a message directly to the school administrator</p>
+              <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Message Admin</h3>
+              <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Send a message directly to the school administrator</p>
             </div>
             <button onClick={() => setMsgOpen(false)} style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: '#ede9fe', cursor: 'pointer', fontSize: 14, color: '#6d28d9', fontWeight: 700 }}>✕</button>
           </div>
           <div style={{ padding: '18px 20px' }}>
             <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>Priority</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>Priority</label>
               <div style={{ display: 'flex', gap: 6 }}>
                 {[{ v: 'low', label: '🔵 Low', color: '#0891b2' }, { v: 'normal', label: '🟣 Normal', color: '#6d28d9' }, { v: 'high', label: '🟠 High', color: '#ea580c' }, { v: 'urgent', label: '🔴 Urgent', color: '#dc2626' }].map(p => (
                   <button key={p.v} onClick={() => setMsgPriority(p.v)}
@@ -675,21 +675,21 @@ export default function TeacherDashboardPage() {
               </div>
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>Subject *</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>Subject *</label>
               <input value={msgSubject} onChange={e => setMsgSubject(e.target.value)} placeholder="e.g. Score entry issue in Class 6A"
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' as const }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid var(--border-color)', outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' as const }}
                 onFocus={e => { e.currentTarget.style.borderColor = '#7c3aed' }}
                 onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb' }} />
             </div>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 5 }}>Message *</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>Message *</label>
               <textarea value={msgBody} onChange={e => setMsgBody(e.target.value)} placeholder="Describe the issue or message…" rows={4}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #e5e7eb', outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', boxSizing: 'border-box' as const }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid var(--border-color)', outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', boxSizing: 'border-box' as const }}
                 onFocus={e => { e.currentTarget.style.borderColor = '#7c3aed' }}
                 onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb' }} />
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setMsgOpen(false)} style={{ flex: 1, padding: '9px', borderRadius: 9, border: '1.5px solid #e5e7eb', background: '#fff', fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => setMsgOpen(false)} style={{ flex: 1, padding: '9px', borderRadius: 9, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer' }}>Cancel</button>
               <button onClick={sendMessage} disabled={sendingMsg || !msgSubject.trim() || !msgBody.trim()}
                 style={{ flex: 2, padding: '9px', borderRadius: 9, border: 'none', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: sendingMsg || !msgSubject.trim() || !msgBody.trim() ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
                 {sendingMsg && <span style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid rgba(255,255,255,.3)', borderTopColor: '#fff', animation: '_sp .7s linear infinite' }} />}

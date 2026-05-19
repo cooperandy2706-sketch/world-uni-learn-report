@@ -31,19 +31,19 @@ export default function Modal({ open, onClose, title, subtitle, children, size='
       >
         <div style={{
           width:'100%', maxWidth:sizeW[size], maxHeight:'90vh',
-          background:'#fff', borderRadius:16, display:'flex', flexDirection:'column',
+          background: 'var(--bg-card)', borderRadius:16, display:'flex', flexDirection:'column',
           boxShadow:'0 24px 64px rgba(0,0,0,0.18)', animation:'_msu 0.2s ease',
           border:'1px solid #f0eefe', overflow:'hidden',
         }}>
           {title && (
             <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', padding:'20px 24px 16px', borderBottom:'1px solid #f5f3ff', flexShrink:0 }}>
               <div>
-                <h2 style={{ fontFamily:'"Playfair Display",serif', fontSize:19, fontWeight:700, color:'#111827', margin:0 }}>{title}</h2>
-                {subtitle && <p style={{ fontSize:12, color:'#6b7280', marginTop:3 }}>{subtitle}</p>}
+                <h2 style={{ fontFamily:'"Playfair Display",serif', fontSize:19, fontWeight:700, color: 'var(--text-main)', margin:0 }}>{title}</h2>
+                {subtitle && <p style={{ fontSize:12, color: 'var(--text-muted)', marginTop:3 }}>{subtitle}</p>}
               </div>
               <button
                 onClick={onClose}
-                style={{ width:30, height:30, borderRadius:8, border:'none', background:'#f9fafb', cursor:'pointer', fontSize:16, color:'#6b7280', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginLeft:12 }}
+                style={{ width:30, height:30, borderRadius:8, border:'none', background: 'var(--bg-input)', cursor:'pointer', fontSize:16, color: 'var(--text-muted)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginLeft:12 }}
                 onMouseEnter={e => { e.currentTarget.style.background='#f5f3ff'; e.currentTarget.style.color='#6d28d9' }}
                 onMouseLeave={e => { e.currentTarget.style.background='#f9fafb'; e.currentTarget.style.color='#6b7280' }}
               >✕</button>

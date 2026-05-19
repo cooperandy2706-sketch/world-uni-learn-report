@@ -120,8 +120,8 @@ export default function AssetManagerPage() {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32 }}>
                 <div>
-                    <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 32, fontWeight: 700, color: '#111827', margin: 0 }}>Asset Register</h1>
-                    <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>Track school property, condition, and maintenance locations.</p>
+                    <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 32, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Asset Register</h1>
+                    <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 4 }}>Track school property, condition, and maintenance locations.</p>
                 </div>
                 <button onClick={() => setShowModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)' }}>
                     <Plus size={20} /> Add Asset
@@ -143,19 +143,19 @@ export default function AssetManagerPage() {
 
             <div className="card" style={{ overflow: 'hidden' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead style={{ background: '#f9fafb', borderBottom: '1.5px solid #f0eefe' }}>
+                    <thead style={{ background: 'var(--bg-input)', borderBottom: '1.5px solid #f0eefe' }}>
                         <tr>
-                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>ASSET NAME</th>
-                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>CATEGORY</th>
-                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>CONDITION</th>
-                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>LOCATION</th>
-                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>VALUE</th>
-                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: '#6b7280' }}>ACTION</th>
+                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>ASSET NAME</th>
+                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>CATEGORY</th>
+                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>CONDITION</th>
+                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>LOCATION</th>
+                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>VALUE</th>
+                            <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>ACTION</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredAssets.length === 0 ? (
-                            <tr><td colSpan={6} style={{ padding: '60px', textAlign: 'center', color: '#9ca3af' }}>No assets found in the register.</td></tr>
+                            <tr><td colSpan={6} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>No assets found in the register.</td></tr>
                         ) : filteredAssets.map((a, i) => (
                             <tr key={i} style={{ borderBottom: '1px solid #f0eefe' }}>
                                 <td style={{ padding: '16px' }}>
@@ -165,7 +165,7 @@ export default function AssetManagerPage() {
                                         </div>
                                         <div>
                                             <div style={{ fontSize: 14, fontWeight: 700 }}>{a.name}</div>
-                                            <div style={{ fontSize: 11, color: '#9ca3af' }}>Qty: {a.quantity}</div>
+                                            <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>Qty: {a.quantity}</div>
                                         </div>
                                     </div>
                                 </td>
@@ -201,19 +201,19 @@ export default function AssetManagerPage() {
                     <div className="card" style={{ width: '100%', maxWidth: '500px', padding: '32px', animation: 'fadeIn 0.3s ease' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
                             <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Register New Asset</h2>
-                            <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: 24 }}>✕</button>
+                            <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', fontSize: 24 }}>✕</button>
                         </div>
 
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                             <div>
                                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Asset Name</label>
-                                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Dell Latitude Laptop" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }} required />
+                                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Dell Latitude Laptop" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }} required />
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                 <div>
                                     <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Category</label>
-                                    <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }}>
+                                    <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }}>
                                         <option value="Electronics">Electronics / IT</option>
                                         <option value="Furniture">Furniture</option>
                                         <option value="Vehicles">Vehicles</option>
@@ -224,7 +224,7 @@ export default function AssetManagerPage() {
                                 </div>
                                 <div>
                                     <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Condition</label>
-                                    <select value={condition} onChange={(e) => setCondition(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }}>
+                                    <select value={condition} onChange={(e) => setCondition(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }}>
                                         <option value="new">Brand New</option>
                                         <option value="good">Good</option>
                                         <option value="fair">Fair (Usable)</option>
@@ -237,27 +237,27 @@ export default function AssetManagerPage() {
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                 <div>
                                     <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Quantity</label>
-                                    <input type="number" value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }} />
+                                    <input type="number" value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }} />
                                 </div>
                                 <div>
                                     <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Estimated Value (GHS)</label>
-                                    <input type="number" value={value} onChange={(e) => setValue(e.target.value)} placeholder="0.00" style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }} />
+                                    <input type="number" value={value} onChange={(e) => setValue(e.target.value)} placeholder="0.00" style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }} />
                                 </div>
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                 <div>
                                     <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Location</label>
-                                    <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. IT Lab" style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }} />
+                                    <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. IT Lab" style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }} />
                                 </div>
                                 <div>
                                     <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Purchase Date</label>
-                                    <input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', outline: 'none' }} />
+                                    <input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }} />
                                 </div>
                             </div>
 
                             <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-                                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                                 <button type="submit" disabled={submitting} style={{ flex: 2, padding: '12px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', fontWeight: 700, cursor: 'pointer' }}>
                                     {submitting ? 'Registering...' : 'Add to Register'}
                                 </button>

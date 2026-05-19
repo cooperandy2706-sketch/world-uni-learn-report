@@ -23,7 +23,7 @@ function Btn({ children, onClick, variant = 'primary', style, loading }: any) {
   const v: any = {
     primary: { background: h ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none' },
     danger: { background: h ? '#b91c1c' : '#dc2626', color: '#fff', border: 'none' },
-    ghost: { background: h ? '#f5f3ff' : 'transparent', color: '#6b7280', border: 'none' },
+    ghost: { background: h ? '#f5f3ff' : 'transparent', color: 'var(--text-muted)', border: 'none' },
   }
   return (
     <button onClick={onClick} onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
@@ -182,15 +182,15 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
   }
 
   return (
-    <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24 }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24 }}>
       <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 180px' }}>
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Date</label>
-          <input type="date" value={recDate} onChange={e => setRecDate(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', outline: 'none' }} />
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Date</label>
+          <input type="date" value={recDate} onChange={e => setRecDate(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', outline: 'none' }} />
         </div>
         <div style={{ flex: '1 1 180px' }}>
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Class</label>
-          <select value={recClass} onChange={e => setRecClass(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', outline: 'none' }}>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Class</label>
+          <select value={recClass} onChange={e => setRecClass(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', outline: 'none' }}>
             <option value="">Select a class...</option>
             {Array.from(new Set((students as any[]).map((s:any) => s.class?.id))).filter(Boolean).map((cid: any) => {
               const stu = (students as any[]).find((s:any) => s.class?.id === cid)
@@ -202,12 +202,12 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
       </div>
 
       {!recClass ? (
-        <div style={{ padding: '60px 20px', textAlign: 'center', background: '#f8fafc', borderRadius: 16, border: '1.5px dashed #e5e7eb', color: '#6b7280' }}>
+        <div style={{ padding: '60px 20px', textAlign: 'center', background: '#f8fafc', borderRadius: 16, border: '1.5px dashed var(--border-color)', color: 'var(--text-muted)' }}>
           <div style={{ fontSize: 32, marginBottom: 10 }}>🏫</div>
           Select a class to load the register.
         </div>
       ) : loadingAtt ? (
-        <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Checking attendance records...</div>
+        <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>Checking attendance records...</div>
       ) : !isRegisterSubmitted ? (
         <div style={{ padding: '60px 20px', textAlign: 'center', background: '#fef2f2', borderRadius: 16, border: '1.5px solid #fecaca', color: '#dc2626' }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🛑</div>
@@ -217,7 +217,7 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
       ) : (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20, alignItems: 'center' }}>
-            <h3 style={{ fontSize: 14, fontWeight: 800, color: '#111827', margin: 0 }}>Register for {recStudents.length} Students</h3>
+            <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Register for {recStudents.length} Students</h3>
             <Btn onClick={printRegister} variant="ghost" style={{ boxShadow: 'none' }}><Printer size={14}/> Print PDF</Btn>
           </div>
 
@@ -240,7 +240,7 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 800, color: absent ? '#94a3b8' : '#111827' }}>{stu.full_name}</div>
-                      <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{stu.student_id || 'REGISTERED STUDENT'}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 2 }}>{stu.student_id || 'REGISTERED STUDENT'}</div>
                     </div>
                     {absent ? (
                       <span style={{ fontSize: 10, fontWeight: 900, padding: '3px 10px', borderRadius: 99, background: '#fef2f2', color: '#dc2626', border: '1px solid #fee2e2' }}>🛑 ABSENT</span>
@@ -251,7 +251,7 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Feeding 🥘</label>
+                      <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Feeding 🥘</label>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <input type="number" step="0.1" disabled={absent} value={entry.feeding} onChange={e => setRecEntries(p => ({...p, [stu.id]: { ...p[stu.id], feeding: e.target.value }}))} 
                           style={{ width: '100%', padding: '7px 10px', borderRadius: 8, border: `1.5px solid ${feedPaid ? '#34d399' : '#e5e7eb'}`, fontSize: 13, outline: 'none', background: absent ? '#f3f4f6' : '#fff' }} />
@@ -259,7 +259,7 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
                       </div>
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Studies 📚</label>
+                      <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Studies 📚</label>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <input type="number" step="0.1" disabled={absent} value={entry.studies} onChange={e => setRecEntries(p => ({...p, [stu.id]: { ...p[stu.id], studies: e.target.value }}))} 
                           style={{ width: '100%', padding: '7px 10px', borderRadius: 8, border: `1.5px solid ${studiesPaid ? '#34d399' : '#e5e7eb'}`, fontSize: 13, outline: 'none', background: absent ? '#f3f4f6' : '#fff' }} />
@@ -426,7 +426,7 @@ export default function DailyFeesPage() {
       
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, margin: 0 }}>Daily Fees Management</h1>
-        <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Configure daily feeding and studies fees and monitor debts</p>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Configure daily feeding and studies fees and monitor debts</p>
       </div>
 
       <div style={{ display: 'flex', gap: 4, background: '#f5f3ff', borderRadius: 12, padding: 4, marginBottom: 22, width: 'fit-content' }}>
@@ -444,26 +444,26 @@ export default function DailyFeesPage() {
       </div>
 
       {tab === 'config' && (
-        <div style={{ background: '#fff', borderRadius: 16, padding: 24, border: '1.5px solid #f0eefe', maxWidth: 800 }}>
-          <h2 style={{ fontSize: 16, margin: '0 0 20px', color: '#111827' }}>Class Daily Rates</h2>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, border: '1.5px solid #f0eefe', maxWidth: 800 }}>
+          <h2 style={{ fontSize: 16, margin: '0 0 20px', color: 'var(--text-main)' }}>Class Daily Rates</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
-                  <th style={{ textAlign: 'left', fontSize: 11, color: '#6b7280', textTransform: 'uppercase', paddingBottom: 10 }}>Class Name</th>
-                  <th style={{ textAlign: 'left', fontSize: 11, color: '#6b7280', textTransform: 'uppercase', paddingBottom: 10 }}>Feeding Rate (GH₵)</th>
-                  <th style={{ textAlign: 'left', fontSize: 11, color: '#6b7280', textTransform: 'uppercase', paddingBottom: 10 }}>Studies Rate (GH₵)</th>
+                  <th style={{ textAlign: 'left', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', paddingBottom: 10 }}>Class Name</th>
+                  <th style={{ textAlign: 'left', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', paddingBottom: 10 }}>Feeding Rate (GH₵)</th>
+                  <th style={{ textAlign: 'left', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', paddingBottom: 10 }}>Studies Rate (GH₵)</th>
                 </tr>
               </thead>
               <tbody>
                 {(classesAll as any[]).map(c => (
                   <tr key={c.id}>
-                    <td style={{ padding: '8px 0', fontSize: 13, fontWeight: 600, color: '#374151' }}>{c.name}</td>
+                    <td style={{ padding: '8px 0', fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{c.name}</td>
                     <td style={{ padding: '8px 12px 8px 0' }}>
-                      <input type="number" step="0.5" value={cfg[c.id]?.expected_feeding_fee || ''} onChange={e => setCfg(p => ({...p, [c.id]: {...p[c.id], expected_feeding_fee: e.target.value}}))} style={{ width: '100%', padding: '7px 10px', borderRadius: 8, border: '1.5px solid #e5e7eb', outline: 'none' }} />
+                      <input type="number" step="0.5" value={cfg[c.id]?.expected_feeding_fee || ''} onChange={e => setCfg(p => ({...p, [c.id]: {...p[c.id], expected_feeding_fee: e.target.value}}))} style={{ width: '100%', padding: '7px 10px', borderRadius: 8, border: '1.5px solid var(--border-color)', outline: 'none' }} />
                     </td>
                     <td style={{ padding: '8px 0' }}>
-                      <input type="number" step="0.5" value={cfg[c.id]?.expected_studies_fee || ''} onChange={e => setCfg(p => ({...p, [c.id]: {...p[c.id], expected_studies_fee: e.target.value}}))} style={{ width: '100%', padding: '7px 10px', borderRadius: 8, border: '1.5px solid #e5e7eb', outline: 'none' }} />
+                      <input type="number" step="0.5" value={cfg[c.id]?.expected_studies_fee || ''} onChange={e => setCfg(p => ({...p, [c.id]: {...p[c.id], expected_studies_fee: e.target.value}}))} style={{ width: '100%', padding: '7px 10px', borderRadius: 8, border: '1.5px solid var(--border-color)', outline: 'none' }} />
                     </td>
                   </tr>
                 ))}
@@ -481,19 +481,19 @@ export default function DailyFeesPage() {
 
       {tab === 'collectors' && (
         <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          <div style={{ background: '#fff', borderRadius: 16, padding: 24, border: '1.5px solid #f0eefe', flex: '1 1 300px', maxWidth: 400 }}>
-            <h2 style={{ fontSize: 16, margin: '0 0 20px', color: '#111827' }}>Assign Collector</h2>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, border: '1.5px solid #f0eefe', flex: '1 1 300px', maxWidth: 400 }}>
+            <h2 style={{ fontSize: 16, margin: '0 0 20px', color: 'var(--text-main)' }}>Assign Collector</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Teacher</label>
-                <select value={newColTid} onChange={e => setNewColTid(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', outline: 'none' }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Teacher</label>
+                <select value={newColTid} onChange={e => setNewColTid(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', outline: 'none' }}>
                   <option value="">Select teacher...</option>
                   {teachers.map((t: any) => <option key={t.id} value={t.id}>{t.user?.full_name}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Allowed To Collect</label>
-                <select value={newColType} onChange={e => setNewColType(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', outline: 'none' }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Allowed To Collect</label>
+                <select value={newColType} onChange={e => setNewColType(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', outline: 'none' }}>
                   <option value="both">Both Feeding & Studies</option>
                   <option value="feeding">Feeding Fee Only</option>
                   <option value="studies">Studies Fee Only</option>
@@ -502,7 +502,7 @@ export default function DailyFeesPage() {
               <Btn onClick={() => { if(!newColTid) toast.error('Select teacher'); else addCollector.mutate() }} loading={addCollector.isPending}><UserPlus size={16}/> Grant Access</Btn>
             </div>
           </div>
-          <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', flex: '2 1 400px', overflow: 'hidden' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', flex: '2 1 400px', overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#faf5ff' }}>
@@ -512,7 +512,7 @@ export default function DailyFeesPage() {
                 </tr>
               </thead>
               <tbody>
-                {collectors.length === 0 ? <tr><td colSpan={3} style={{ padding: 24, textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No collectors assigned yet</td></tr> : collectors.map((c: any) => (
+                {collectors.length === 0 ? <tr><td colSpan={3} style={{ padding: 24, textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>No collectors assigned yet</td></tr> : collectors.map((c: any) => (
                   <tr key={c.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                     <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600 }}>{c.teacher?.user?.full_name}</td>
                     <td style={{ padding: '12px 16px' }}><span style={{ textTransform: 'capitalize', fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '3px 8px', borderRadius: 99 }}>{c.collection_type}</span></td>
@@ -529,12 +529,12 @@ export default function DailyFeesPage() {
 
       {tab === 'overview' && (
         <div>
-          <div style={{ display: 'flex', gap: 12, marginBottom: 16, background: '#fff', padding: '12px 16px', borderRadius: 12, border: '1.5px solid #f0eefe' }}>
-            <select value={ovTypeFilter} onChange={e => setOvTypeFilter(e.target.value)} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', outline: 'none', fontSize: 13, width: 180 }}>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 16, background: 'var(--bg-card)', padding: '12px 16px', borderRadius: 12, border: '1.5px solid #f0eefe' }}>
+            <select value={ovTypeFilter} onChange={e => setOvTypeFilter(e.target.value)} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 13, width: 180 }}>
               <option value="feeding">Feeding Fees</option>
               <option value="studies">Studies Fees</option>
             </select>
-            <select value={ovClassFilter} onChange={e => setOvClassFilter(e.target.value)} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid #e5e7eb', outline: 'none', fontSize: 13, width: 180 }}>
+            <select value={ovClassFilter} onChange={e => setOvClassFilter(e.target.value)} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 13, width: 180 }}>
               <option value="">All Classes</option>
               {Array.from(new Set((students as any[]).map((s:any) => s.class?.id))).filter(Boolean).map((cid: any) => {
                 const stu = (students as any[]).find((s:any) => s.class?.id === cid)
@@ -544,16 +544,16 @@ export default function DailyFeesPage() {
             </select>
 
             <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-              <div style={{ fontSize: 11, color: '#6b7280', textTransform: 'uppercase', fontWeight: 700 }}>Debtors Mode</div>
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#111827' }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Debtors Mode</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)' }}>
                 Class-Based 
               </div>
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {debtorsData.length === 0 ? <div style={{ background: '#fff', padding: 40, textAlign: 'center', borderRadius: 12, color: '#9ca3af' }}>No students found</div> : debtorsData.map((cls) => (
-              <div key={cls.class_name} style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+            {debtorsData.length === 0 ? <div style={{ background: 'var(--bg-card)', padding: 40, textAlign: 'center', borderRadius: 12, color: 'var(--text-subtle)' }}>No students found</div> : debtorsData.map((cls) => (
+              <div key={cls.class_name} style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
                 <div style={{ background: '#faf5ff', padding: '12px 16px', borderBottom: '1px solid #f0eefe', display: 'flex', justifyContent: 'space-between' }}>
                   <div style={{ fontWeight: 700, color: '#5b21b6', fontSize: 14 }}>{cls.class_name}</div>
                   <div style={{ fontSize: 12, color: '#6d28d9', fontWeight: 600 }}>Total Class Debt: {CUR(cls.total_owed)}</div>
@@ -562,13 +562,13 @@ export default function DailyFeesPage() {
                   <tbody>
                     {cls.students.map((stu: any) => (
                       <tr key={stu.id} style={{ borderBottom: '1px solid #f8fafc' }}>
-                        <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 500, color: '#374151', width: '40%' }}>{stu.full_name}</td>
+                        <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 500, color: 'var(--text-main)', width: '40%' }}>{stu.full_name}</td>
                         <td style={{ padding: '10px 16px', fontSize: 13, width: '30%' }}>
                           <span style={{ color: '#16a34a', fontWeight: 600 }}>Paid: {CUR(stu.paid)}</span>
                         </td>
                         <td style={{ padding: '10px 16px', fontSize: 13, textAlign: 'right' }}>
-                          <span style={{ fontSize: 11, color: '#6b7280', marginRight: 12 }}>({stu.daysPresent} days)</span>
-                          {stu.owes > 0 ? <span style={{ background: '#fef2f2', color: '#dc2626', padding: '3px 8px', borderRadius: 99, fontWeight: 700, fontSize: 12 }}>Owes {CUR(stu.owes)}</span> : <span style={{ color: '#9ca3af', fontSize: 12 }}>Cleared ✅</span>}
+                          <span style={{ fontSize: 11, color: 'var(--text-muted)', marginRight: 12 }}>({stu.daysPresent} days)</span>
+                          {stu.owes > 0 ? <span style={{ background: '#fef2f2', color: '#dc2626', padding: '3px 8px', borderRadius: 99, fontWeight: 700, fontSize: 12 }}>Owes {CUR(stu.owes)}</span> : <span style={{ color: 'var(--text-subtle)', fontSize: 12 }}>Cleared ✅</span>}
                         </td>
                       </tr>
                     ))}

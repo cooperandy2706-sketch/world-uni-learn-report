@@ -26,7 +26,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, style }: any) {
   }
   const variants: Record<string, React.CSSProperties> = {
     primary: { background: hov ? '#5b21b6' : 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff' },
-    secondary: { background: hov ? '#f5f3ff' : '#fff', color: '#374151', border: '1.5px solid #e5e7eb' },
+    secondary: { background: hov ? '#f5f3ff' : '#fff', color: 'var(--text-main)', border: '1.5px solid var(--border-color)' },
   }
   return (
     <button onClick={onClick} disabled={disabled} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ ...base, ...variants[variant] }}>
@@ -116,7 +116,7 @@ export default function TeacherAssignmentDetailsPage() {
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
         <button onClick={() => navigate('/teacher/assignments')} style={{ 
-          background: 'transparent', border: 'none', color: '#6b7280', fontSize: 13, fontWeight: 700,
+          background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 13, fontWeight: 700,
           display: 'flex', gap: 6, alignItems: 'center', cursor: 'pointer', padding: 0, marginBottom: 16
         }}>
           ← Back to Assignments
@@ -130,16 +130,16 @@ export default function TeacherAssignmentDetailsPage() {
             <h1 className="t-title">
               {assignment.title}
             </h1>
-            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>{assignment.description || 'No description provided.'}</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>{assignment.description || 'No description provided.'}</p>
           </div>
           <div style={{ background: '#f5f3ff', padding: '12px 20px', borderRadius: 14, textAlign: 'right' }}>
-             <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>Submissions</div>
+             <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Submissions</div>
              <div style={{ fontSize: 24, fontWeight: 800, color: '#7c3aed' }}>{submissions.length}</div>
           </div>
         </div>
 
         {/* ── Submissions Table ── */}
-        <div className="t-table-scroll" style={{ background: '#fff', borderRadius: 20, border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div className="t-table-scroll" style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
           <div className="resp-table-min">
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 120px 140px 120px 160px', padding: '16px 24px', background: '#f8fafc', borderBottom: '1px solid #f1f5f9', fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
              <div>Student Name</div>
@@ -172,7 +172,7 @@ export default function TeacherAssignmentDetailsPage() {
                   <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>
                     {sub.student?.full_name || 'Unknown Student'}
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: '#4b5563' }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-muted)' }}>
                     {sub.score} / {sub.total_possible}
                   </div>
                   <div>
@@ -208,7 +208,7 @@ export default function TeacherAssignmentDetailsPage() {
             <div style={{ display: 'flex', gap: 16, marginBottom: 24, padding: 16, background: '#f8fafc', borderRadius: 12, border: '1.5px solid #e2e8f0' }}>
               <div>
                 <p style={{ fontSize: 11, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 2 }}>Final Score</p>
-                <div style={{ fontSize: 24, fontWeight: 800, color: '#10b981' }}>{selectedSub.score} <span style={{ fontSize: 14, color: '#9ca3af' }}>/ {selectedSub.total_possible}</span></div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: '#10b981' }}>{selectedSub.score} <span style={{ fontSize: 14, color: 'var(--text-subtle)' }}>/ {selectedSub.total_possible}</span></div>
               </div>
               <div style={{ width: 1.5, background: '#e2e8f0' }} />
               <div>
@@ -225,10 +225,10 @@ export default function TeacherAssignmentDetailsPage() {
                 const isCorrect = stuAnswer.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase()
                 
                 return (
-                  <div key={q.id} style={{ padding: 20, borderRadius: 16, background: '#fff', border: `1.5px solid ${isCorrect ? '#d1fae5' : '#fee2e2'}` }}>
+                  <div key={q.id} style={{ padding: 20, borderRadius: 16, background: 'var(--bg-card)', border: `1.5px solid ${isCorrect ? '#d1fae5' : '#fee2e2'}` }}>
                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                         <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', lineHeight: 1.5 }}>
-                          <span style={{ color: '#9ca3af', marginRight: 8 }}>{i + 1}.</span>
+                          <span style={{ color: 'var(--text-subtle)', marginRight: 8 }}>{i + 1}.</span>
                           {q.text}
                         </div>
                         <span style={{ fontSize: 16 }}>{isCorrect ? '✅' : '❌'}</span>
@@ -238,7 +238,7 @@ export default function TeacherAssignmentDetailsPage() {
                         <div style={{ background: '#f8fafc', padding: 12, borderRadius: 12 }}>
                            <p style={{ fontSize: 10, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Student Answer</p>
                            <p style={{ fontSize: 14, fontWeight: 600, color: isCorrect ? '#059669' : '#dc2626', margin: 0, wordBreak: 'break-word' }}>
-                             {stuAnswer || <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>No Answer</span>}
+                             {stuAnswer || <span style={{ color: 'var(--text-subtle)', fontStyle: 'italic' }}>No Answer</span>}
                            </p>
                         </div>
                         <div style={{ background: '#ecfdf5', padding: 12, borderRadius: 12 }}>

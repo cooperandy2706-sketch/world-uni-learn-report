@@ -30,7 +30,7 @@ export default function BECEReportCard({ student, school, term, year, scores, is
       maxWidth: '800px', 
       margin: '0 auto', 
       padding: '40px', 
-      background: '#fff', 
+      background: 'var(--bg-card)', 
       fontFamily: '"DM Sans", sans-serif',
       color: T.text,
       boxSizing: 'border-box',

@@ -78,7 +78,7 @@ export default function TeacherSyllabusPage() {
 
                 {viewingFile ? (
                     /* ── INLINE SCHEME PREVIEW VIEW ── */
-                    <div style={{ background: '#fff', borderRadius: 20, border: '1.5px solid #e5e7eb', padding: 20, animation: '_syl_fu 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+                    <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid var(--border-color)', padding: 20, animation: '_syl_fu 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
                       <div style={{ paddingBottom: 16, borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
                         <div>
                           <button onClick={() => setViewingFile(null)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Syllabus</button>
@@ -102,7 +102,7 @@ export default function TeacherSyllabusPage() {
                         <div className="t-header" style={{ marginBottom: 22 }}>
                           <div>
                             <h1 className="t-title">Syllabus</h1>
-                            <p style={{ fontSize: 13, color: '#6b7280', marginTop: 3 }}>Teaching materials uploaded by admin for your classes</p>
+                            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Teaching materials uploaded by admin for your classes</p>
                           </div>
                         </div>
 
@@ -111,14 +111,14 @@ export default function TeacherSyllabusPage() {
                             <div style={{ position: 'relative', flex: '1 1 200px' }}>
                                 <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14 }}>🔍</span>
                                 <input placeholder="Search syllabus…" value={search} onChange={e => setSearch(e.target.value)}
-                                    style={{ width: '100%', padding: '8px 12px 8px 32px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', background: '#faf5ff', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' as any }} />
+                                    style={{ width: '100%', padding: '8px 12px 8px 32px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', background: '#faf5ff', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' as any }} />
                             </div>
                             <select value={filterClass} onChange={e => setFilterClass(e.target.value)}
-                                style={{ padding: '8px 12px', borderRadius: 9, border: '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', background: '#faf5ff' }}>
+                                style={{ padding: '8px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', background: '#faf5ff' }}>
                                 <option value="">All Classes</option>
                                 {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                             </select>
-                            <span style={{ fontSize: 12, color: '#6b7280', marginLeft: 'auto' }}>{filtered.length} file{filtered.length !== 1 ? 's' : ''}</span>
+                            <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 'auto' }}>{filtered.length} file{filtered.length !== 1 ? 's' : ''}</span>
                         </div>
 
                         {loading ? (
@@ -126,12 +126,12 @@ export default function TeacherSyllabusPage() {
                                 <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_syl_fi .8s linear infinite' }} />
                             </div>
                         ) : filtered.length === 0 ? (
-                            <div style={{ background: '#fff', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+                            <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                                 <div style={{ fontSize: 52, marginBottom: 12 }}>📚</div>
-                                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>
+                                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>
                                     {syllabus.length === 0 ? 'No syllabus uploaded yet' : 'No results found'}
                                 </h3>
-                                <p style={{ fontSize: 13, color: '#9ca3af' }}>
+                                <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>
                                     {syllabus.length === 0 ? 'Ask admin to upload syllabus files for your classes.' : 'Try a different search or filter.'}
                                 </p>
                             </div>
@@ -144,7 +144,7 @@ export default function TeacherSyllabusPage() {
                                             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: cls.id ? '#1e1b4b' : '#92400e', margin: 0 }}>
                                                 {cls.name}
                                             </h3>
-                                            <span style={{ fontSize: 11, color: '#9ca3af' }}>{items.length} file{items.length !== 1 ? 's' : ''}</span>
+                                            <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{items.length} file{items.length !== 1 ? 's' : ''}</span>
                                         </div>
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 12 }}>
                                             {items.map((s, i) => {
@@ -155,14 +155,14 @@ export default function TeacherSyllabusPage() {
 
                                                 return (
                                                     <div key={s.id} className="syl-card"
-                                                        style={{ background: '#fff', borderRadius: 14, padding: '16px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: `_syl_fu .3s ease ${i * .05}s both` }}>
+                                                        style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: `_syl_fu .3s ease ${i * .05}s both` }}>
                                                         <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 12 }}>
                                                             <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg,#f5f3ff,#ede9fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
                                                                 {fileIcon}
                                                             </div>
                                                             <div style={{ flex: 1, minWidth: 0 }}>
-                                                                <h4 style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: '0 0 3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.title}</h4>
-                                                                <div style={{ fontSize: 11, color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.file_name}</div>
+                                                                <h4 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.title}</h4>
+                                                                <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.file_name}</div>
                                                             </div>
                                                         </div>
                                                         <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
@@ -171,9 +171,9 @@ export default function TeacherSyllabusPage() {
                                                             ) : (
                                                                 <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 10px', borderRadius: 99, background: 'linear-gradient(135deg,#fae8ff,#f5d0fe)', color: '#a21caf', border: '1px solid #f0abfc' }}>✨ Combined Subject Scheme</span>
                                                             )}
-                                                            <span style={{ fontSize: 11, color: '#9ca3af' }}>by {s.uploader?.full_name ?? 'Admin'}</span>
+                                                            <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>by {s.uploader?.full_name ?? 'Admin'}</span>
                                                         </div>
-                                                        <div style={{ fontSize: 10, color: '#9ca3af', marginBottom: 12 }}>
+                                                        <div style={{ fontSize: 10, color: 'var(--text-subtle)', marginBottom: 12 }}>
                                                             Uploaded {new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                         </div>
                                                         <div style={{ display: 'flex', gap: 6 }}>

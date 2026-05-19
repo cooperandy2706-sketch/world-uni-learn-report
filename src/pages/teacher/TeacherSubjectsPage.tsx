@@ -30,7 +30,7 @@ function getSubjectMeta(name: string) {
   for (const [key, meta] of Object.entries(SUBJECT_META)) {
     if (lower.includes(key)) return meta
   }
-  return { icon: '📚', color: '#6b7280', bg: '#f9fafb', category: 'General' }
+  return { icon: '📚', color: 'var(--text-muted)', bg: '#f9fafb', category: 'General' }
 }
 
 export default function TeacherSubjectsPage() {
@@ -82,17 +82,17 @@ export default function TeacherSubjectsPage() {
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
         <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: 0 }}>Discover Library 📚</h1>
-          <p style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>Explore study materials, global challenges, and interactive resources by subject.</p>
+          <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Discover Library 📚</h1>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Explore study materials, global challenges, and interactive resources by subject.</p>
         </div>
 
         {isLoading ? (
-          <div style={{ padding: '60px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>Loading subjects...</div>
+          <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>Loading subjects...</div>
         ) : subjects.length === 0 ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>🏫</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 6 }}>No Subjects Found</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Your school has not configured any subjects yet.</p>
+            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No Subjects Found</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Your school has not configured any subjects yet.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
@@ -122,11 +122,11 @@ export default function TeacherSubjectsPage() {
                           {meta.icon}
                         </div>
 
-                        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 4px 0' }}>{s.name}</h3>
+                        <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px 0' }}>{s.name}</h3>
                         {s.code && <div style={{ fontSize: 11, fontWeight: 700, fontFamily: 'monospace', color: meta.color }}>{s.code}</div>}
 
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px dashed ${meta.color}30`, marginTop: 16, paddingTop: 16 }}>
-                           <span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280' }}>Explore Resources</span>
+                           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>Explore Resources</span>
                            <span style={{ fontSize: 14, color: meta.color }}>➔</span>
                         </div>
                       </div>
