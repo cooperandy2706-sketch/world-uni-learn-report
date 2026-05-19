@@ -1,4 +1,4 @@
-// public/sw.js — WULA Reports Service Worker v2
+// public/sw.js — Nexora Reports Service Worker v2
 const CACHE_NAME = 'wula-assets-v2'
 const STATIC_ASSETS = [
   '/',
@@ -118,7 +118,7 @@ self.addEventListener('push', (e) => {
   console.log('[SW] Push received raw:', rawData)
 
   let data = {
-    title: 'WULA Reports',
+    title: 'Nexora Reports',
     body: 'You have a new notification',
     url: '/',
     icon: '/icon-192.png'

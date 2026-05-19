@@ -50,7 +50,7 @@ export default function BillingPage() {
 
   const handleRequestStorage = async () => {
     if (!confirm('Request an additional 50GB of cloud storage for 250 GHS annually?')) return
-    toast.success('Storage upgrade request sent to World Uni-Learn Admin. You will be invoiced shortly.')
+    toast.success('Storage upgrade request sent to Nexora Admin. You will be invoiced shortly.')
   }
 
   const getStatusBadge = (status: string) => {

@@ -547,7 +547,7 @@ export default function SuperAdminDashboard() {
       </div>
 
       <p style={{ textAlign: 'center', marginTop: 40, fontSize: 13, color: '#94a3b8' }}>
-        World Uni-Learn Platform Management Dashboard v1.0
+        Nexora Platform Management Dashboard v1.0
       </p>
 
       <Modal

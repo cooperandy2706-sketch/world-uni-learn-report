@@ -477,8 +477,8 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
       <div className="container">
         <div className="nav-inner">
           <a href="#" className="logo">
-            <div className="logo-icon">W</div>
-            <span>World Uni-Learn</span>
+            <div className="logo-icon">N</div>
+            <span>Nexora</span>
           </a>
 
           <div className="nav-links">
@@ -779,8 +779,8 @@ export default function LandingPage() {
           <div className="footer-grid">
             <div className="footer-col">
               <div className="logo footer-logo">
-                <div className="logo-icon" style={{ background: 'var(--accent)' }}>W</div>
-                <span style={{ color: 'white' }}>World Uni-Learn</span>
+                <div className="logo-icon" style={{ background: 'var(--accent)' }}>N</div>
+                <span style={{ color: 'white' }}>Nexora</span>
               </div>
               <p className="footer-desc">The all-in-one School Management System built for Ghanaian schools. Empowering administrators, teachers, bursars, and students.</p>
             </div>
@@ -802,7 +802,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>© {new Date().getFullYear()} World Uni-Learn Platform. Built for Ghana.</p>
+            <p>© {new Date().getFullYear()} Nexora Platform. Built for Ghana.</p>
             <div style={{ display: 'flex', gap: '1.5rem' }}>
               <span>GES Compliant</span>
               <span>Secure Cloud Storage</span>

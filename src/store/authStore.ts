@@ -81,7 +81,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     //  PASSWORD_RECOVERY  - Magic link / reset flow
     //
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.debug('[WULA Auth]', event, session?.user?.id ?? 'no-user')
+      console.debug('[Nexora Auth]', event, session?.user?.id ?? 'no-user')
 
       if (event === 'SIGNED_OUT' || !session?.user) {
         // Clear all cached data so the next user gets a clean slate

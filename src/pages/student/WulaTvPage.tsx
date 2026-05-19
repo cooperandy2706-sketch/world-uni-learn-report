@@ -174,7 +174,7 @@ export default function WulaTvPage() {
         <div style={{ position: 'relative', paddingTop: 60, paddingBottom: 60, paddingLeft: 24, paddingRight: 24, background: 'linear-gradient(to bottom, rgba(124,58,237,0.15) 0%, #0f172a 100%)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
             <Tv size={28} color="#a78bfa" />
-            <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>WULA TV</h1>
+            <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>Nexora TV</h1>
           </div>
           <p style={{ fontSize: 15, color: '#94a3b8', maxWidth: 600, lineHeight: 1.6, margin: 0 }}>
             Your educational streaming hub. Watch curated science, history, and math videos, or tune into live educational cameras from around the world.

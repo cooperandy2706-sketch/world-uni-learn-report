@@ -166,7 +166,7 @@ export default function WhatsNewModal() {
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', position: 'relative' }}>
                         <div>
                             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.14em', color: 'rgba(255,255,255,.55)', marginBottom: 6 }}>
-                                WORLD UNI-LEARN · VERSION {APP_VERSION}
+                                NEXORA · VERSION {APP_VERSION}
                             </div>
                             <h1 style={{
                                 fontFamily: '"Playfair Display",serif',

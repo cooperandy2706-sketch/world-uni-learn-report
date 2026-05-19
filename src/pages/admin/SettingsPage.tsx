@@ -445,7 +445,7 @@ export default function SettingsPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                     <div style={{ gridColumn: '1 / -1' }}>
                       <Field label="School Name *">
-                        <StyledInput {...register('school_name')} placeholder="e.g. World Uni-Learn Academy" error={errors.school_name?.message} />
+                        <StyledInput {...register('school_name')} placeholder="e.g. Nexora Academy" error={errors.school_name?.message} />
                       </Field>
                     </div>
                     <Field label="School Motto">

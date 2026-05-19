@@ -1,4 +1,4 @@
-# World Uni-Learn Academy (WULA)
+# Nexora
 **The Ultimate Educational Ecosystem for Modern Ghanaian Schools**
 
 ---
@@ -6,15 +6,15 @@
 ## Executive Summary
 Managing a modern school in Ghana involves juggling a massive amount of data: continuous assessments, GES-compliant grading, fee collections, gate security, library inventory, and parent communication. Too often, schools rely on fragmented systems, Excel sheets, and paper trails that lead to data loss, stressed staff, unpaid arrears, and frustrated parents. 
 
-**World Uni-Learn Academy (WULA)** is the definitive solution. It is a comprehensive, cloud-based School Management System engineered specifically for the Ghanaian educational landscape. 
+**Nexora** is the definitive solution. It is a comprehensive, cloud-based School Management System engineered specifically for the Ghanaian educational landscape. 
 
-WULA goes beyond simple grading. It is an **11-Portal Ecosystem** that connects every stakeholder in your school into one secure, lightning-fast digital environment.
+Nexora goes beyond simple grading. It is an **11-Portal Ecosystem** that connects every stakeholder in your school into one secure, lightning-fast digital environment.
 
 ---
 
 ## The 11-Portal Ecosystem: A Comprehensive Breakdown
 
-WULA features strictly isolated, purpose-built dashboards tailored to the exact workflow of every staff member and stakeholder in your school.
+Nexora features strictly isolated, purpose-built dashboards tailored to the exact workflow of every staff member and stakeholder in your school.
 
 ### 1. 🏢 The Proprietor (Super Admin) Dashboard
 *Strategic oversight for the school owner.*
@@ -104,22 +104,22 @@ WULA features strictly isolated, purpose-built dashboards tailored to the exact 
 
 ---
 
-## Why WULA Wins
+## Why Nexora Wins
 
 ### Stop Chasing Fees
-Schools using WULA see a **30% increase in fee collection** within the first term due to automated SMS reminders and absolute balance transparency.
+Schools using Nexora see a **30% increase in fee collection** within the first term due to automated SMS reminders and absolute balance transparency.
 
 ### Flawless GES Reporting
-Generate 500+ report cards in under 10 minutes. WULA handles all the math, grading scales, and formatting perfectly.
+Generate 500+ report cards in under 10 minutes. Nexora handles all the math, grading scales, and formatting perfectly.
 
 ### A Modern Reputation
-Schools with WULA are seen as "Elite" and "Tech-Forward." Parents are more likely to enroll their children in a school that offers live bus tracking and digital progress reports.
+Schools with Nexora are seen as "Elite" and "Tech-Forward." Parents are more likely to enroll their children in a school that offers live bus tracking and digital progress reports.
 
 ### Unmatched Security
 Powered by Supabase and Bank-Grade Encryption, your school's data is isolated and protected 24/7.
 
 ---
 
-**World Uni-Learn Academy (WULA)** is not just software; it is your school's new competitive advantage.
+**Nexora** is not just software; it is your school's new competitive advantage.
 
-**Join the future of education. Upgrade to World Uni-Learn today.**
+**Join the future of education. Upgrade to Nexora today.**

@@ -122,7 +122,7 @@ const STUDENT_NAV = [
   },
   {
     label: 'Explore', items: [
-      { label: 'WULA TV', to: '/student/wula-tv' },
+      { label: 'Nexora TV', to: '/student/nexora-tv' },
       { label: 'Global Library', to: ROUTES.STUDENT_LIBRARY },
       { label: 'Resources', to: ROUTES.STUDENT_RESOURCES },
       { label: 'Typing Nitro', to: ROUTES.STUDENT_TYPING_GAME },
@@ -681,7 +681,7 @@ export default function Header() {
           )}
           <div className="school-branding-text" style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             <span style={{ fontSize: 15, fontWeight: 800, color: '#111827', whiteSpace: 'nowrap', maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em' }}>
-              {userSchool?.name || 'World Uni-Learn'}
+              {userSchool?.name || 'Nexora'}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               {year && term ? (

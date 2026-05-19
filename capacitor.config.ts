@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.wula.reports',
-  appName: 'World UniLearn',
+  appId: 'com.nexora.reports',
+  appName: 'Nexora',
   webDir: 'dist'
 };
 

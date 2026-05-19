@@ -1,5 +1,5 @@
 {
-  "name": "world-uni-learn-report",
+  "name": "nexora",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -15,8 +15,8 @@
     "electron:build:win": "vite build && electron-builder --win"
   },
   "build": {
-    "appId": "com.worldunilearn.app",
-    "productName": "WorldUniLearn",
+    "appId": "com.nexora.app",
+    "productName": "Nexora",
     "directories": {
       "output": "dist-electron"
     },

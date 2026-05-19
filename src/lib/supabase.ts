@@ -16,7 +16,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     // Detect magic-link / OAuth tokens in the URL on load
     detectSessionInUrl: true,
-    // Unique storage key so multiple WULA tabs don't clobber each other's sessions
+    // Unique storage key so multiple Nexora tabs don't clobber each other's sessions
     storageKey: 'wula-auth-token',
     // Use localStorage (default) – works in PWA/offline scenarios better than cookies
     storage: window.localStorage,

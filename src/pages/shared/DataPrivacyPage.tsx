@@ -163,7 +163,7 @@ export default function DataPrivacyPage() {
             <div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 4 }}>Media & Photography</h3>
               <p style={{ fontSize: 14, color: '#6b7280', maxWidth: 500 }}>
-                Consent to use your (or your ward's) image/video in internal school news, WULA TV, and marketing materials.
+                Consent to use your (or your ward's) image/video in internal school news, Nexora TV, and marketing materials.
               </p>
             </div>
             <button

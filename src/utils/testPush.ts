@@ -13,7 +13,7 @@ export async function sendTestNotification() {
     body: {
       user_id: session.user.id,
       title: '🔔 Test Notification',
-      body: 'Push notifications are working! This is a test from WULA Reports.',
+      body: 'Push notifications are working! This is a test from Nexora Reports.',
       url: '/teacher/notifications',
     }
   })

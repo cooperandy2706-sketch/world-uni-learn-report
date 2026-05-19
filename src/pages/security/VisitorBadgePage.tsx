@@ -114,7 +114,7 @@ export default function VisitorBadgePage() {
       <body>
         <div class="badge">
           <div class="badge-header">
-            <div class="school">WULA Platform — ${schoolName}</div>
+            <div class="school">Nexora Platform — ${schoolName}</div>
             <div class="visitor-tag">🪪 VISITOR PASS</div>
           </div>
           <div class="badge-body">

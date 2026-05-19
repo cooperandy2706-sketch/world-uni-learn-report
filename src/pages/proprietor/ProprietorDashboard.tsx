@@ -242,7 +242,7 @@ export default function ProprietorDashboard() {
             Executive Overview
           </h1>
           <p style={{ fontSize: 16, color: '#64748b', margin: 0, fontWeight: 500 }}>
-            {userSchool?.name || 'World Uni-Learn'} • {year?.name} • {term?.name}
+            {userSchool?.name || 'Nexora'} • {year?.name} • {term?.name}
           </p>
         </div>
 
