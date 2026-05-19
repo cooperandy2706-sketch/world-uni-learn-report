@@ -39,3 +39,8 @@ client_secret.json
 supabase/.env
 supabase/.temp/
 supabase/functions/**/.env
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
