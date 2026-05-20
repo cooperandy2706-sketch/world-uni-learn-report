@@ -28,7 +28,7 @@ export default function ParentBillingPage() {
   
   const [showPayModal, setShowPayModal] = useState(false)
   const [payStep, setPayStep] = useState<1 | 2>(1)
-  const [schoolInfo, setSchoolInfo] = useState<{name: string, subaccount: string, currency: string} | null>(null)
+  const [schoolInfo, setSchoolInfo] = useState<{name: string, subaccount: string, currency: string, logo_url?: string} | null>(null)
   const [selectedWardForPay, setSelectedWardForPay] = useState<any>(null)
   const [payAmount, setPayAmount] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
@@ -77,21 +77,25 @@ export default function ParentBillingPage() {
     try {
       const { data: school, error: schoolErr } = await (await import('../../lib/supabase')).supabase
         .from('schools')
-        .select('name, paystack_public_key, id, currency_code')
+        .select('name, paystack_public_key, id, currency_code, logo_url')
         .eq('id', selectedWardForPay.school_id)
         .single()
 
       if (schoolErr) throw new Error('Could not fetch school configuration.')
 
+      const masterPublicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
+      const isSandboxKey = !masterPublicKey || masterPublicKey.includes('your_actual') || masterPublicKey.includes('placeholder')
+
       const subaccountCode = school?.paystack_public_key
-      if (!subaccountCode) {
+      if (!subaccountCode && !isSandboxKey) {
         throw new Error('This school has not been configured for online payments yet.')
       }
 
       setSchoolInfo({ 
         name: school.name, 
-        subaccount: subaccountCode, 
-        currency: school.currency_code || 'GHS' 
+        subaccount: subaccountCode || 'sandbox_subaccount', 
+        currency: school.currency_code || 'GHS',
+        logo_url: school.logo_url || undefined
       })
       setPayStep(2)
     } catch (err: any) {
@@ -110,13 +114,36 @@ export default function ParentBillingPage() {
       const subaccountCode = schoolInfo.subaccount
 
       const masterPublicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
-      if (!masterPublicKey) {
-        throw new Error('Platform payment gateway is not configured.')
-      }
+      const isSandboxKey = !masterPublicKey || masterPublicKey.includes('your_actual') || masterPublicKey.includes('placeholder')
       
+      if (isSandboxKey) {
+        // Sandbox Flow (Local / Development Simulator)
+        toast.loading('Simulating payment success...', { id: 'verify_payment' })
+        const reference = `sandbox_${Math.floor(Math.random() * 1000000000 + 1)}`
+        
+        try {
+          await paymentService.verifyPaymentOnServer(
+            reference,
+            selectedWardForPay.id,
+            term!.id,
+            selectedWardForPay.school_id,
+            amountToPay
+          )
+          toast.success('Sandbox: Payment successful! Your balance has been updated.', { id: 'verify_payment' })
+          setShowPayModal(false)
+          loadBilling() 
+        } catch (err) {
+          console.error('Sandbox payment verification error:', err)
+          toast.error('Sandbox verification failed. Please check RPC config.', { id: 'verify_payment' })
+        } finally {
+          setIsProcessing(false)
+        }
+        return
+      }
+
+      // Live Paystack Payment Flow
       const reference = `pay_${Math.floor(Math.random() * 1000000000 + 1)}`
 
-      // 2. Launch Paystack with Split
       await paymentService.payWithPaystack({
         email: user?.email || 'parent@example.com',
         amount: amountToPay,
@@ -135,38 +162,24 @@ export default function ParentBillingPage() {
         onSuccess: async (response) => {
           toast.loading('Verifying payment...', { id: 'verify_payment' })
           try {
-            // 3. Verify on server
-              await paymentService.verifyPaymentOnServer(
-                response.reference,
-                selectedWardForPay.id,
-                term!.id,
-                selectedWardForPay.school_id
-              )
+            // Verify on server (which automatically records payment using record_online_payment RPC)
+            await paymentService.verifyPaymentOnServer(
+              response.reference,
+              selectedWardForPay.id,
+              term!.id,
+              selectedWardForPay.school_id
+            )
 
-              // 4. Record payment in the database (Frontend Automation)
-              await feePaymentsService.createWithAllocation({
-                school_id: selectedWardForPay.school_id,
-                student_id: selectedWardForPay.id,
-                term_id: term!.id,
-                academic_year_id: term!.academic_year_id,
-                amount_paid: amountToPay,
-                payment_date: new Date().toISOString(),
-                payment_method: 'online',
-                reference_number: response.reference,
-                currency_code: schoolInfo.currency,
-                notes: `Online payment via Paystack. Ref: ${response.reference}`
-              })
-
-              toast.success('Payment successful! Your balance has been updated.', { id: 'verify_payment' })
-              setShowPayModal(false)
-              loadBilling() 
-            } catch (err) {
-              console.error('Payment verification/recording error:', err)
-              toast.error('Verification failed. Please contact school admin.', { id: 'verify_payment' })
-            } finally {
-              setIsProcessing(false)
-            }
-          },
+            toast.success('Payment successful! Your balance has been updated.', { id: 'verify_payment' })
+            setShowPayModal(false)
+            loadBilling() 
+          } catch (err) {
+            console.error('Payment verification error:', err)
+            toast.error('Verification failed. Please contact school admin.', { id: 'verify_payment' })
+          } finally {
+            setIsProcessing(false)
+          }
+        },
         onClose: () => {
           setIsProcessing(false)
         }
@@ -181,7 +194,7 @@ export default function ParentBillingPage() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
         <style>{`@keyframes _spin { to { transform: rotate(360deg); } }`}</style>
-        <div style={{ width: 24, height: 24, borderRadius: '50%', border: '2.5px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
+        <div style={{ width: 24, height: 24, borderRadius: '50%', border: '2.5px solid var(--border-color)', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
       </div>
     )
   }
@@ -204,14 +217,14 @@ export default function ParentBillingPage() {
           const isExpanded = expandedWard === ward.id
 
           return (
-            <div key={ward.id} style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 16px rgba(109,40,217,0.03)' }}>
+            <div key={ward.id} style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid var(--border-color)', overflow: 'hidden', boxShadow: '0 4px 16px rgba(109,40,217,0.03)' }}>
               
               <div 
                 onClick={() => setExpandedWard(isExpanded ? null : ward.id)}
-                style={{ padding: '20px 24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: isExpanded ? '#faf5ff' : '#fff', transition: 'background 0.2s' }}
+                style={{ padding: '20px 24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: isExpanded ? 'var(--bg-input)' : 'var(--bg-card)', transition: 'background 0.2s' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 14, background: '#ede9fe', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 14, background: 'var(--bg-app)', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Wallet size={22} />
                   </div>
                   <div>
@@ -222,28 +235,28 @@ export default function ParentBillingPage() {
 
                 <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: 16 }}>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{bill?.summary?.balance < 0 ? 'Credit Balance' : 'Balance Due'}</div>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{bill?.summary?.balance < 0 ? 'Credit Balance' : 'Balance Due'}</div>
                     <div style={{ fontSize: 18, fontWeight: 900, color: bill?.summary?.balance > 0 ? '#ef4444' : '#10b981' }}>
                       {bill?.summary?.balance < 0 ? `(Credit) ${formatCurrency(Math.abs(bill.summary.balance), schoolCurrency)}` : formatCurrency(bill?.summary?.balance || 0, schoolCurrency)}
                     </div>
                   </div>
-                  <div style={{ color: '#d1d5db', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: '#f8fafc' }}>
+                  <div style={{ color: 'var(--text-muted)', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: 'var(--bg-app)' }}>
                     {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </div>
                 </div>
               </div>
 
               {isExpanded && bill && (
-                <div style={{ padding: '24px', borderTop: '1px solid #f0eefe', background: '#fafbff' }}>
+                <div style={{ padding: '24px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-app)' }}>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 20 }}>
-                    <div style={{ background: 'var(--bg-card)', padding: 16, borderRadius: 16, border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Total Charges</div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: '#1e293b', marginTop: 4 }}>{formatCurrency(bill.summary.totalCharges, schoolInfo?.currency || 'GHS')}</div>
+                    <div style={{ background: 'var(--bg-card)', padding: 16, borderRadius: 16, border: '1px solid var(--border-color)' }}>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Total Charges</div>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', marginTop: 4 }}>{formatCurrency(bill.summary.totalCharges, schoolCurrency)}</div>
                     </div>
-                    <div style={{ background: 'var(--bg-card)', padding: 16, borderRadius: 16, border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Amount Paid</div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: '#16a34a', marginTop: 4 }}>{formatCurrency(bill.summary.totalPaid, schoolInfo?.currency || 'GHS')}</div>
+                    <div style={{ background: 'var(--bg-card)', padding: 16, borderRadius: 16, border: '1px solid var(--border-color)' }}>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Amount Paid</div>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: '#16a34a', marginTop: 4 }}>{formatCurrency(bill.summary.totalPaid, schoolCurrency)}</div>
                     </div>
                   </div>
 
@@ -258,55 +271,55 @@ export default function ParentBillingPage() {
                     </button>
                   )}
 
-                  <h4 style={{ fontSize: 13, fontWeight: 800, color: '#1e293b', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <h4 style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{ width: 4, height: 16, background: '#7c3aed', borderRadius: 2 }} /> Fee Breakdown
                   </h4>
-                  <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', marginBottom: 24 }}>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid var(--border-color)', overflow: 'hidden', marginBottom: 24 }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <tbody>
                         {bill.arrears > 0 && (
-                          <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                             <td style={{ padding: '12px 16px', fontSize: 13, color: '#ef4444', fontWeight: 600 }}>Previous Balance (Arrears)</td>
-                            <td style={{ padding: '12px 16px', fontSize: 13, color: '#ef4444', fontWeight: 800, textAlign: 'right' }}>{formatCurrency(bill.arrears, schoolInfo?.currency || 'GHS')}</td>
+                            <td style={{ padding: '12px 16px', fontSize: 13, color: '#ef4444', fontWeight: 800, textAlign: 'right' }}>{formatCurrency(bill.arrears, schoolCurrency)}</td>
                           </tr>
                         )}
                         {bill.structures.map((f: any) => (
-                          <tr key={f.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                            <td style={{ padding: '12px 16px', fontSize: 13, color: '#334155', fontWeight: 500 }}>
+                          <tr key={f.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                            <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>
                               {f.fee_name}
                               {f.is_discountable === false && <span style={{ fontSize: 10, color: '#ef4444', marginLeft: 6, fontWeight: 700 }}>[NO SCHOLARSHIP DISCOUNT]</span>}
                             </td>
-                            <td style={{ padding: '12px 16px', fontSize: 13, color: '#334155', fontWeight: 800, textAlign: 'right' }}>{formatCurrency(f.amount, schoolInfo?.currency || 'GHS')}</td>
+                            <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-main)', fontWeight: 800, textAlign: 'right' }}>{formatCurrency(f.amount, schoolCurrency)}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
 
-                  <h4 style={{ fontSize: 13, fontWeight: 800, color: '#1e293b', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <h4 style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{ width: 4, height: 16, background: '#16a34a', borderRadius: 2 }} /> Recent Payments
                   </h4>
                   {bill.payments.length === 0 ? (
-                    <div style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', padding: '20px 0', background: 'var(--bg-card)', borderRadius: 16, border: '1px dashed #e2e8f0' }}>No payments recorded.</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0', background: 'var(--bg-card)', borderRadius: 16, border: '1px dashed var(--border-color)' }}>No payments recorded.</div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       {bill.payments.map((p: any) => (
-                        <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--bg-card)', borderRadius: 14, border: '1px solid #e2e8f0' }}>
+                        <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-color)' }}>
                           <div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', textTransform: 'capitalize' }}>{p.payment_method === 'online' ? '🌐 Online' : p.payment_method} Payment</div>
-                            <div style={{ fontSize: 11, color: '#64748b' }}>{new Date(p.payment_date).toLocaleDateString()} {p.reference ? `· Ref: ${p.reference.slice(-8)}` : ''} · <span style={{ color: '#7c3aed', fontWeight: 600 }}>Official Receipt available at Office</span></div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', textTransform: 'capitalize' }}>{p.payment_method === 'online' ? '🌐 Online' : p.payment_method} Payment</div>
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{new Date(p.payment_date).toLocaleDateString()} {p.reference_number ? `· Ref: ${p.reference_number.slice(-8)}` : ''} · <span style={{ color: '#7c3aed', fontWeight: 600 }}>Official Receipt available at Office</span></div>
                           </div>
                           <div style={{ fontSize: 15, fontWeight: 800, color: '#16a34a' }}>
-                            {formatCurrency(p.amount_paid, schoolInfo?.currency || 'GHS')}
+                            {formatCurrency(p.amount_paid, schoolCurrency)}
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  <div style={{ marginTop: 28, padding: 16, background: '#f8fafc', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontSize: 12, color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Note</div>
-                    <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.6 }}>
+                  <div style={{ marginTop: 28, padding: 16, background: 'var(--bg-input)', borderRadius: 16, border: '1px solid var(--border-color)' }}>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Note</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-main)', lineHeight: 1.6 }}>
                       For offline payments, please visit the school Bursary or use Mobile Money. Reference: <strong>{ward.student_id}</strong>.
                     </div>
                   </div>
@@ -321,17 +334,17 @@ export default function ParentBillingPage() {
       {/* Payment Modal */}
       {showPayModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', padding: 20 }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 400, overflow: 'hidden', animation: '_modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 400, overflow: 'hidden', animation: '_modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)', boxShadow: '0 20px 50px rgba(0,0,0,0.2)', border: '1px solid var(--border-color)' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Pay Fees</h3>
-               <button onClick={() => setShowPayModal(false)} style={{ border: 'none', background: '#f1f5f9', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                  <X size={18} color="#64748b" />
+               <button onClick={() => setShowPayModal(false)} style={{ border: 'none', background: 'var(--bg-input)', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <X size={18} color="var(--text-muted)" />
                </button>
             </div>
             
             {payStep === 1 ? (
               <div style={{ padding: 24 }}>
-                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, padding: 14, background: 'var(--bg-app)', borderRadius: 16, border: '1px solid #ede9fe' }}>
+                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, padding: 14, background: 'var(--bg-app)', borderRadius: 16, border: '1px solid var(--border-color)' }}>
                     <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>👶</div>
                     <div>
                        <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)' }}>{selectedWardForPay?.full_name}</div>
@@ -340,20 +353,27 @@ export default function ParentBillingPage() {
                  </div>
 
                  <div style={{ marginBottom: 24 }}>
-                    <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>Amount to Pay ({schoolInfo?.currency || 'GHS'})</label>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>Amount to Pay ({schoolCurrency})</label>
                     <input 
                       type="number"
                       value={payAmount}
                       onChange={e => setPayAmount(e.target.value)}
-                      style={{ width: '100%', padding: '14px 18px', borderRadius: 14, border: '2px solid #e2e8f0', fontSize: 24, fontWeight: 900, color: 'var(--text-main)', outline: 'none', transition: 'border-color 0.2s' }}
+                      style={{ width: '100%', padding: '14px 18px', borderRadius: 14, border: '2px solid var(--border-color)', fontSize: 24, fontWeight: 900, color: 'var(--text-main)', background: 'var(--bg-input)', outline: 'none', transition: 'border-color 0.2s' }}
                       onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
-                      onBlur={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+                      onBlur={e => e.currentTarget.style.borderColor = 'var(--border-color)'}
                     />
                  </div>
 
-                 <div style={{ background: '#f0fdf4', borderRadius: 14, padding: 12, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
+                 {(!import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || import.meta.env.VITE_PAYSTACK_PUBLIC_KEY.includes('your_actual') || import.meta.env.VITE_PAYSTACK_PUBLIC_KEY.includes('placeholder')) && (
+                   <div style={{ background: 'rgba(217, 119, 6, 0.1)', borderRadius: 14, padding: 12, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                     <span style={{ fontSize: 16 }}>🛠️</span>
+                     <span style={{ fontSize: 12, color: '#d97706', fontWeight: 600 }}>Sandbox active (Key is placeholder)</span>
+                   </div>
+                 )}
+
+                 <div style={{ background: 'rgba(22, 163, 74, 0.1)', borderRadius: 14, padding: 12, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
                     <ShieldCheck size={16} color="#16a34a" />
-                    <span style={{ fontSize: 12, color: '#15803d', fontWeight: 600 }}>Secure payment connection</span>
+                    <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>Secure payment connection</span>
                  </div>
 
                  <button 
@@ -366,23 +386,31 @@ export default function ParentBillingPage() {
               </div>
             ) : (
               <div style={{ padding: '32px 24px', textAlign: 'center', animation: '_modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-                 <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--bg-app)', color: '#6d28d9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, margin: '0 auto 16px', boxShadow: '0 4px 12px rgba(109,40,217,0.1)' }}>
-                   🏫
-                 </div>
+                 {schoolInfo?.logo_url ? (
+                   <img 
+                     src={schoolInfo.logo_url} 
+                     alt="School Logo" 
+                     style={{ width: 80, height: 80, borderRadius: 16, objectFit: 'contain', margin: '0 auto 16px', border: '1.5px solid var(--border-color)', padding: 4, background: '#fff', boxShadow: '0 4px 12px rgba(0,0,0,0.04)' }} 
+                   />
+                 ) : (
+                   <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--bg-input)', color: '#6d28d9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, margin: '0 auto 16px', boxShadow: '0 4px 12px rgba(109,40,217,0.1)' }}>
+                     🏫
+                   </div>
+                 )}
                  <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 12px' }}>Confirm Payment</h3>
-                 <p style={{ fontSize: 15, color: '#64748b', margin: '0 0 32px', lineHeight: 1.6 }}>
-                   You are about to securely pay <strong style={{ color: 'var(--text-main)' }}>{formatCurrency(payAmount || 0, schoolInfo?.currency || 'GHS')}</strong> directly to:<br/>
+                 <p style={{ fontSize: 15, color: 'var(--text-muted)', margin: '0 0 32px', lineHeight: 1.6 }}>
+                   You are about to securely pay <strong style={{ color: 'var(--text-main)' }}>{formatCurrency(payAmount || 0, schoolCurrency)}</strong> directly to:<br/>
                    <span style={{ color: '#6d28d9', fontSize: 18, fontWeight: 800, display: 'inline-block', marginTop: 8 }}>{schoolInfo?.name}</span>
                  </p>
 
                  <div style={{ display: 'flex', gap: 12 }}>
-                   <button onClick={() => setPayStep(1)} style={{ flex: 1, padding: '14px', borderRadius: 14, background: '#f1f5f9', color: '#475569', border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Back</button>
+                   <button onClick={() => setPayStep(1)} style={{ flex: 1, padding: '14px', borderRadius: 14, background: 'var(--bg-input)', color: 'var(--text-main)', border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Back</button>
                    <button 
                      onClick={handlePayOnline} 
                      disabled={isProcessing} 
                      style={{ flex: 2, padding: '14px', borderRadius: 14, background: 'linear-gradient(135deg, #16a34a, #15803d)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 12px rgba(22,163,74,0.3)', opacity: isProcessing ? 0.7 : 1 }}
                    >
-                     {isProcessing ? 'Processing...' : 'Confirm & Pay'}
+                     {isProcessing ? 'Processing...' : (schoolInfo?.subaccount === 'sandbox_subaccount' ? 'Simulate Pay' : 'Confirm & Pay')}
                    </button>
                  </div>
               </div>

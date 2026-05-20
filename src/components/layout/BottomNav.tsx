@@ -11,7 +11,7 @@ import {
   Megaphone, PencilLine, Calendar, Timer, BookOpen, 
   ShieldCheck, Shield, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School,
   CreditCard, Wallet, Gamepad2, Library, Bell, Tv, ScanLine, AlertTriangle, MapPin,
-  Printer, Package
+  Printer, Package, FolderLock
 } from 'lucide-react'
 import NotificationsModal from '../ui/NotificationsModal'
 
@@ -25,6 +25,7 @@ const adminLinks = [
   { to: '/admin/reports', icon: FileSpreadsheet, label: 'Reports' },
   { to: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/admin/boarding', icon: MapPin, label: 'Boarding' },
+  { to: '/admin/staff-vault', icon: FolderLock, label: 'Vault' },
   { to: '/admin/settings', icon: ShieldCheck, label: 'Settings' },
   { to: '/privacy', icon: Shield, label: 'Privacy' },
   { to: '/admin/news', icon: Tv, label: 'News' },
@@ -42,6 +43,7 @@ const teacherLinks = [
   { to: '/teacher/syllabus', icon: BookOpen, label: 'Syllabus' },
   { to: '/teacher/timetable', icon: Calendar, label: 'Schedule' },
   { to: '/teacher/reports', icon: FileSpreadsheet, label: 'Reports' },
+  { to: '/teacher/my-vault', icon: FolderLock, label: 'My Vault' },
   { to: '/teacher/self-service', icon: UserCheck, label: 'Service' },
   { to: '/teacher/pastoral', icon: ClipboardList, label: 'Pastoral' },
    { to: '/teacher/typing-game', icon: Gamepad2, label: 'Nitro' },

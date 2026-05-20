@@ -125,3 +125,121 @@ body.sp-active { background: transparent !important; }
 /* ── App Layout main padding ── */
 .app-main { padding: 28px 32px 80px; }
 @media (max-width: 600px) { .app-main { padding: 20px 16px 100px; } }
+
+/* ── Dark Theme Glassmorphism & Color Fixes for Bursar Portal ── */
+
+/* Glassmorphism class */
+.glass-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.dark .glass-card,
+html.dark [style*="background: var(--bg-card)"],
+html.dark [style*="background:var(--bg-card)"] {
+  background: rgba(30, 41, 59, 0.55) !important;
+  backdrop-filter: blur(16px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(120%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Target elements with hardcoded inline colors in dark theme */
+html.dark [style*="color: #0f172a"], html.dark [style*="color:#0f172a"],
+html.dark [style*="color: rgb(15, 23, 42)"], html.dark [style*="color:rgb(15,23,42)"],
+html.dark [style*="color: #111827"], html.dark [style*="color:#111827"],
+html.dark [style*="color: rgb(17, 24, 39)"], html.dark [style*="color:rgb(17,24,39)"],
+html.dark [style*="color: #334155"], html.dark [style*="color:#334155"],
+html.dark [style*="color: rgb(51, 65, 85)"], html.dark [style*="color:rgb(51,65,85)"],
+html.dark [style*="color: #374151"], html.dark [style*="color:#374151"],
+html.dark [style*="color: rgb(55, 65, 81)"], html.dark [style*="color:rgb(55,65,81)"],
+html.dark [style*="color: #1e0646"], html.dark [style*="color:#1e0646"],
+html.dark [style*="color: rgb(30, 6, 70)"], html.dark [style*="color:rgb(30,6,70)"],
+html.dark [style*="color: #1e293b"], html.dark [style*="color:#1e293b"],
+html.dark [style*="color: rgb(30, 41, 59)"], html.dark [style*="color:rgb(30,41,59)"],
+html.dark [style*="color: #4b5563"], html.dark [style*="color:#4b5563"],
+html.dark [style*="color: rgb(75, 85, 99)"], html.dark [style*="color:rgb(75,85,99)"],
+html.dark [style*="color: #374151"], html.dark [style*="color:#374151"] {
+  color: var(--text-main) !important;
+}
+
+html.dark [style*="color: #64748b"], html.dark [style*="color:#64748b"],
+html.dark [style*="color: rgb(100, 116, 139)"], html.dark [style*="color:rgb(100,116,139)"],
+html.dark [style*="color: #475569"], html.dark [style*="color:#475569"],
+html.dark [style*="color: rgb(71, 85, 105)"], html.dark [style*="color:rgb(71,85,105)"] {
+  color: var(--text-muted) !important;
+}
+
+/* Target hardcoded light backgrounds in dark theme */
+html.dark [style*="background: #fff"], html.dark [style*="background:#fff"],
+html.dark [style*="background: white"], html.dark [style*="background:white"],
+html.dark [style*="background: rgb(255, 255, 255)"], html.dark [style*="background:rgb(255,255,255)"],
+html.dark [style*="background: #fafafa"], html.dark [style*="background:#fafafa"],
+html.dark [style*="background: rgb(250, 250, 250)"], html.dark [style*="background:rgb(250,250,250)"],
+html.dark [style*="background: #f8fafc"], html.dark [style*="background:#f8fafc"],
+html.dark [style*="background: rgb(248, 250, 252)"], html.dark [style*="background:rgb(248,250,252)"],
+html.dark [style*="background: #fcfaff"], html.dark [style*="background:#fcfaff"],
+html.dark [style*="background: #faf5ff"], html.dark [style*="background:#faf5ff"],
+html.dark [style*="background: rgb(250, 245, 255)"], html.dark [style*="background:rgb(250,245,255)"],
+html.dark [style*="background: #f5f3ff"], html.dark [style*="background:#f5f3ff"],
+html.dark [style*="background: rgb(245, 243, 255)"], html.dark [style*="background:rgb(245,243,255)"] {
+  background: var(--bg-card) !important;
+}
+
+/* Override hardcoded border colors in dark theme */
+html.dark [style*="border: 1.5px solid #f0eefe"], html.dark [style*="border:1.5px solid #f0eefe"],
+html.dark [style*="border: 1px solid #e2e8f0"], html.dark [style*="border:1px solid #e2e8f0"],
+html.dark [style*="border-bottom: 1.5px solid #f0eefe"], html.dark [style*="border-bottom:1.5px solid #f0eefe"],
+html.dark [style*="border: 1.5px solid var(--border-color)"], html.dark [style*="border:1.5px solid var(--border-color)"],
+html.dark [style*="border: 1px solid var(--border-color)"], html.dark [style*="border:1px solid var(--border-color)"] {
+  border-color: var(--border-color) !important;
+}
+
+/* Input, select and textarea glassmorphism in dark theme */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background: rgba(15, 23, 42, 0.45) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-main) !important;
+  transition: all 0.2s ease;
+}
+
+html.dark input::placeholder {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: rgba(139, 92, 246, 0.6) !important;
+  background: rgba(15, 23, 42, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important;
+}
+
+/* Tables visual enhancements for dark mode */
+html.dark table,
+html.dark tr,
+html.dark td,
+html.dark th {
+  border-color: var(--border-color) !important;
+}
+
+html.dark thead tr {
+  background: linear-gradient(135deg, #1e1b4b, #2e1065) !important;
+}
+
+html.dark thead tr th {
+  color: #c084fc !important;
+}
+
+/* Override row hover backgrounds across the entire portal in dark theme */
+html.dark .bst-row:hover,
+html.dark .dbt-row:hover,
+html.dark .fp-row:hover,
+html.dark .inc-row:hover,
+html.dark .rp-row:hover,
+html.dark .exp-row:hover,
+html.dark .bs-stu-row:hover,
+html.dark tr:hover {
+  background: rgba(51, 65, 85, 0.4) !important;
+}

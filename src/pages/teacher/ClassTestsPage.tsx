@@ -183,12 +183,12 @@ export default function ClassTestsPage() {
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '20px 16px', fontFamily: '"DM Sans", sans-serif' }}>
       <style>{`
         @keyframes _fi { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .card { background: #fff; border-radius: 16px; border: 1.5px solid #f1f5f9; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); animation: _fi 0.3s ease; }
+        .card { background: var(--bg-card); border-radius: 16px; border: 1.5px solid var(--border-color); color: var(--text-main); padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); animation: _fi 0.3s ease; }
         .btn { padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
         .btn-primary { background: #7c3aed; color: #fff; }
         .btn-primary:hover { background: #6d28d9; }
-        .btn-outline { background: #fff; border: 1.5px solid #e2e8f0; color: #475569; }
-        .input { width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid #e2e8f0; outline: none; font-family: inherit; font-size: 14px; }
+        .btn-outline { background: var(--bg-card); border: 1.5px solid var(--border-color); color: var(--text-main); }
+        .input { width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-card); color: var(--text-main); outline: none; font-family: inherit; font-size: 14px; }
         .input:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); }
         .test-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
         @media (min-width: 768px) { .test-grid { grid-template-columns: 1fr 1fr; } }
@@ -196,30 +196,30 @@ export default function ClassTestsPage() {
 
       {/* ── SCORE ENTRY INLINE VIEW ── */}
       {activeTest ? (
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #e2e8f0', padding: 20, animation: '_fi 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-          <div style={{ paddingBottom: 16, borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid var(--border-color)', padding: 20, animation: '_fi 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+          <div style={{ paddingBottom: 16, borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <div>
               <button onClick={() => setActiveTest(null)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Tests</button>
-              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#1e293b' }}>{activeTest.title}</h2>
-              <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>Score out of {activeTest.max_score}</p>
+              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: 'var(--text-main)' }}>{activeTest.title}</h2>
+              <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)' }}>Score out of {activeTest.max_score}</p>
             </div>
-            <button onClick={() => setActiveTest(null)} style={{ background: '#f1f5f9', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            <button onClick={() => setActiveTest(null)} style={{ background: 'var(--bg-input)', border: 'none', width: 32, height: 32, borderRadius: '50%', color: 'var(--text-main)', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
           </div>
 
           <div style={{ maxHeight: 450, overflowY: 'auto', paddingRight: 4, marginBottom: 16 }}>
             {students.map(s => (
-              <div key={s.id} style={{ background: '#f8fafc', borderRadius: 12, padding: 12, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12, border: '1px solid #f1f5f9' }}>
+              <div key={s.id} style={{ background: 'var(--bg-input)', borderRadius: 12, padding: 12, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12, border: '1px solid var(--border-color)' }}>
                 <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#7c3aed', fontSize: 13 }}>
                   {s.full_name.charAt(0)}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>{s.full_name}</div>
-                  <div style={{ fontSize: 11, color: '#64748b' }}>ID: {s.student_id || 'N/A'}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{s.full_name}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>ID: {s.student_id || 'N/A'}</div>
                 </div>
                 <input 
                   type="number" 
                   placeholder="0"
-                  style={{ width: 70, textAlign: 'center', padding: '10px 6px', borderRadius: 8, border: '1.5px solid #cbd5e1', fontWeight: 800, fontSize: 15, outline: 'none' }}
+                  style={{ width: 70, textAlign: 'center', padding: '10px 6px', borderRadius: 8, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontWeight: 800, fontSize: 15, outline: 'none' }}
                   value={scores[s.id] || ''}
                   onChange={e => {
                     const v = e.target.value
@@ -233,7 +233,7 @@ export default function ClassTestsPage() {
             ))}
           </div>
 
-          <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: 16, display: 'flex', gap: 10 }}>
+          <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 16, display: 'flex', gap: 10 }}>
              <button onClick={() => setActiveTest(null)} className="btn btn-outline" style={{ flex: 1, justifyContent: 'center' }}>
                Cancel
              </button>
@@ -247,8 +247,8 @@ export default function ClassTestsPage() {
           {/* Header */}
           <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1e293b', margin: 0 }}>Class Tests</h1>
-              <p style={{ color: '#64748b', fontSize: 13, margin: '4px 0 0' }}>Manage continuous assessments</p>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Class Tests</h1>
+              <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: '4px 0 0' }}>Manage continuous assessments</p>
             </div>
             {selectedClass && selectedSubject && !showCreate && (
               <button onClick={() => setShowCreate(true)} className="btn btn-primary" style={{ height: 40, width: 40, borderRadius: '50%', justifyContent: 'center', padding: 0 }}>
@@ -259,10 +259,10 @@ export default function ClassTestsPage() {
 
           {/* ── CREATE INLINE CARD ── */}
           {showCreate && (
-            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #e2e8f0', padding: 20, animation: '_fi 0.3s ease', marginBottom: 20, boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid #f1f5f9', paddingBottom: 10 }}>
-                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1e293b' }}>New Class Test</h2>
-                 <button onClick={() => setShowCreate(false)} style={{ background: '#f1f5f9', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid var(--border-color)', padding: 20, animation: '_fi 0.3s ease', marginBottom: 20, boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid var(--border-color)', paddingBottom: 10 }}>
+                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>New Class Test</h2>
+                 <button onClick={() => setShowCreate(false)} style={{ background: 'var(--bg-input)', border: 'none', width: 32, height: 32, borderRadius: '50%', color: 'var(--text-main)', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                </div>
                <form onSubmit={handleCreateTest} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                  <div>
@@ -313,7 +313,7 @@ export default function ClassTestsPage() {
           {selectedClass && selectedSubject && tests.length > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, padding: '0 4px' }}>
               <div style={{ color: '#64748b', fontSize: 13, fontWeight: 600 }}>{tests.length} tests recorded</div>
-              <button onClick={handleSync} className="btn btn-outline" style={{ border: '1.5px solid #7c3aed', color: '#7c3aed', background: '#f5f3ff' }}>
+              <button onClick={handleSync} className="btn btn-outline" style={{ border: '1.5px solid #7c3aed', color: '#7c3aed', background: 'var(--bg-input)' }}>
                  🪄 Sync to Report
               </button>
             </div>
@@ -338,10 +338,10 @@ export default function ClassTestsPage() {
             ) : (
               tests.map(t => (
                 <div key={t.id} className="card" style={{ borderLeft: '4px solid #7c3aed' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1e293b' }}>{t.title}</h3>
-                      <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                      <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>{t.title}</h3>
+                      <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>
                         {new Date(t.test_date).toLocaleDateString()} · Max: <b>{t.max_score}</b>
                       </p>
                     </div>

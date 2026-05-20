@@ -9,9 +9,13 @@ type Mode = 'login' | 'register'
 type Role = 'teacher' | 'student'
 
 // ── Shared Underline Field Component ──
-function UnderlineField({ label, error, ...props }: any) {
+interface UnderlineFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string
+  error?: string
+}
+
+function UnderlineField({ label, error, ...props }: UnderlineFieldProps) {
   const [focused, setFocused] = useState(false)
-  const isPassword = props.type === 'password'
   
   return (
     <div style={{ marginBottom: 20, position: 'relative' }}>
@@ -172,8 +176,8 @@ export default function AuthPage() {
           type: 'info',
         })
       }
-    } catch(e:any) {
-      setError(e.message ?? 'Registration failed.')
+    } catch(e: unknown) {
+      setError(e instanceof Error ? e.message : 'Registration failed.')
     }
     setLoading(false)
   }
@@ -183,8 +187,8 @@ export default function AuthPage() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({ provider })
       if (error) throw error
-    } catch(e:any) {
-      setError(e.message ?? `Failed to sign in with ${provider}.`)
+    } catch(e: unknown) {
+      setError(e instanceof Error ? e.message : `Failed to sign in with ${provider}.`)
     }
   }
 
@@ -429,8 +433,8 @@ export default function AuthPage() {
           <div className={isAnimating ? 'view-exit' : 'view-enter'}>
             {isLogin ? (
               <form onSubmit={handleLogin}>
-                <UnderlineField label="Email address" type="email" value={form.email} onChange={(e:any)=>update('email',e.target.value)} required />
-                <UnderlineField label="Password" type="password" value={form.password} onChange={(e:any)=>update('password',e.target.value)} required />
+                <UnderlineField label="Email address" type="email" value={form.email} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('email',e.target.value)} required />
+                <UnderlineField label="Password" type="password" value={form.password} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('password',e.target.value)} required />
                 
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24, marginTop: -8 }}>
                   <a href="#" className="form-link" style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.6)' }}>
@@ -455,21 +459,21 @@ export default function AuthPage() {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <UnderlineField label="School Code" type="text" value={form.school_code} onChange={(e:any)=>update('school_code',e.target.value)} required />
-                  <UnderlineField label="Full Name" type="text" value={form.full_name} onChange={(e:any)=>update('full_name',e.target.value)} required />
+                  <UnderlineField label="School Code" type="text" value={form.school_code} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('school_code',e.target.value)} required />
+                  <UnderlineField label="Full Name" type="text" value={form.full_name} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('full_name',e.target.value)} required />
                 </div>
                 
-                <UnderlineField label="Email Address" type="email" value={form.email} onChange={(e:any)=>update('email',e.target.value)} required />
+                <UnderlineField label="Email Address" type="email" value={form.email} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('email',e.target.value)} required />
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <UnderlineField label="Password" type="password" value={form.password} onChange={(e:any)=>update('password',e.target.value)} required />
-                  <UnderlineField label="Confirm" type="password" value={form.confirm_password} onChange={(e:any)=>update('confirm_password',e.target.value)} required />
+                  <UnderlineField label="Password" type="password" value={form.password} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('password',e.target.value)} required />
+                  <UnderlineField label="Confirm" type="password" value={form.confirm_password} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('confirm_password',e.target.value)} required />
                 </div>
 
                 {role === 'teacher' && (
                   <div className="view-enter" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                    <UnderlineField label="Staff ID (Optional)" type="text" value={form.staff_id} onChange={(e:any)=>update('staff_id',e.target.value)} />
-                    <UnderlineField label="Qualification" type="text" value={form.qualification} onChange={(e:any)=>update('qualification',e.target.value)} />
+                    <UnderlineField label="Staff ID (Optional)" type="text" value={form.staff_id} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('staff_id',e.target.value)} />
+                    <UnderlineField label="Qualification" type="text" value={form.qualification} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('qualification',e.target.value)} />
                   </div>
                 )}
 

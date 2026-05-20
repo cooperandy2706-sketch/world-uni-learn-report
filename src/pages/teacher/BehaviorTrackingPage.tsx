@@ -125,12 +125,12 @@ export default function BehaviorTrackingPage() {
         <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', animation: 'fadeIn 0.5s ease' }}>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .card { background: white; border-radius: 16px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-                .type-btn { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid #f0eefe; background: white; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+                .card { background: var(--bg-card); border-radius: 16px; border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+                .type-btn { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--bg-card); color: var(--text-main); cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
                 .type-btn.active.merit { border-color: #10b981; background: #ecfdf5; color: #065f46; }
                 .type-btn.active.demerit { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
                 .type-btn.active.counseling { border-color: #6366f1; background: #eef2ff; color: #3730a3; }
-                .student-row:hover { background: #f5f3ff; cursor: pointer; }
+                .student-row:hover { background: var(--bg-input); cursor: pointer; }
                 @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr !important; } }
             `}</style>
 
@@ -164,8 +164,8 @@ export default function BehaviorTrackingPage() {
                                     className="student-row"
                                     style={{ 
                                         display: 'flex', alignItems: 'center', gap: 12, padding: '12px', borderRadius: '12px', marginBottom: 4,
-                                        background: selectedStudent?.id === s.id ? '#f5f3ff' : 'transparent',
-                                        border: selectedStudent?.id === s.id ? '1.5px solid #c4b5fd' : '1.5px solid transparent'
+                                        background: selectedStudent?.id === s.id ? 'var(--bg-input)' : 'transparent',
+                                        border: selectedStudent?.id === s.id ? '1.5px solid var(--border-color)' : '1.5px solid transparent'
                                     }}
                                 >
                                     <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#ede9fe', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 }}>
@@ -231,7 +231,7 @@ export default function BehaviorTrackingPage() {
                                             <select 
                                                 value={category}
                                                 onChange={(e) => setCategory(e.target.value)}
-                                                style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none' }}
+                                                style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)' }}
                                             >
                                                 <option value="">Select Category</option>
                                                 {categories[logType].map(c => <option key={c} value={c}>{c}</option>)}
@@ -261,12 +261,12 @@ export default function BehaviorTrackingPage() {
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
                                             placeholder={`Describe the ${logType} details...`}
-                                            style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid var(--border-color)', outline: 'none', resize: 'none' }}
+                                            style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid var(--border-color)', outline: 'none', resize: 'none', background: 'var(--bg-card)', color: 'var(--text-main)' }}
                                         />
                                     </div>
 
                                     <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 12 }}>
-                                        <button type="button" onClick={() => setSelectedStudent(null)} style={{ padding: '12px 24px', borderRadius: '12px', border: '1.5px solid var(--border-color)', background: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                                        <button type="button" onClick={() => setSelectedStudent(null)} style={{ padding: '12px 24px', borderRadius: '12px', border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                                         <button type="submit" disabled={submitting} style={{ padding: '12px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(109,40,217,0.3)' }}>
                                             {submitting ? 'Saving...' : `Record ${logType.charAt(0).toUpperCase() + logType.slice(1)}`}
                                         </button>

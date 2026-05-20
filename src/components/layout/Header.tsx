@@ -36,12 +36,8 @@ const ADMIN_NAV = [
   {
     label: 'People', items: [
       { label: 'Student Directory', to: '/admin/student-directory' },
-      { label: 'Staff Directory', to: ROUTES.ADMIN_TEACHERS },
+      { label: 'Staff Directory', to: ROUTES.ADMIN_STAFF_DIRECTORY },
       { label: 'Parent Logins', to: '/admin/parents' },
-      { label: 'Other Staff', to: '/admin/other-staff' },
-      { label: 'Bursar Staff', to: '/admin/bursars' },
-      { label: 'Security Personnel', to: ROUTES.ADMIN_SECURITY },
-      { label: 'Drivers', to: '/admin/drivers' },
       { label: 'Alumni', to: ROUTES.ADMIN_ALUMNI },
       { label: 'Boarding & Dorms', to: '/admin/boarding' },
       { label: 'Exeat Requests', to: '/admin/exeats' },
@@ -56,6 +52,7 @@ const ADMIN_NAV = [
       { label: 'Calendar', to: ROUTES.ADMIN_CALENDAR },
       { label: 'Messages', to: ROUTES.ADMIN_MESSAGES },
       { label: 'Staff Operations', to: '/admin/staff-operations' },
+      { label: 'Staff Vault', to: '/admin/staff-vault' },
       { label: 'Asset Register', to: '/admin/assets' },
       { label: 'Billing', to: '/admin/billing' },
       { label: 'Fleet Management', to: ROUTES.ADMIN_FLEET },
@@ -251,7 +248,6 @@ const LIBRARIAN_NAV = [
 // ─── NavItem component ─────────────────────────────────────────────────────────
 function NavItem({ group }: { group: any }) {
   const [open, setOpen] = useState(false)
-  const [dropPos, setDropPos] = useState({ top: 0, left: 0 })
   const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
 
@@ -264,10 +260,6 @@ function NavItem({ group }: { group: any }) {
   }, [])
 
   function openDropdown() {
-    if (ref.current) {
-      const rect = ref.current.getBoundingClientRect()
-      setDropPos({ top: rect.bottom + 6, left: rect.left })
-    }
     setOpen(o => !o)
   }
 
@@ -279,7 +271,7 @@ function NavItem({ group }: { group: any }) {
           padding: '7px 14px', borderRadius: 99, fontSize: 13, fontWeight: 600,
           textDecoration: 'none', whiteSpace: 'nowrap', transition: 'all 0.15s',
           background: isActive ? '#1a56db' : 'transparent',
-          color: isActive ? '#fff' : '#374151',
+          color: isActive ? '#fff' : 'var(--text-main)',
         })}
       >
         {group.label}
@@ -294,8 +286,8 @@ function NavItem({ group }: { group: any }) {
         style={{
           display: 'flex', alignItems: 'center', gap: 4,
           padding: '7px 14px', borderRadius: 99, fontSize: 13, fontWeight: 600,
-          border: 'none', background: open ? '#eff6ff' : 'transparent',
-          color: open ? '#1a56db' : '#374151', cursor: 'pointer', transition: 'all 0.15s',
+          border: 'none', background: open ? 'var(--bg-hover)' : 'transparent',
+          color: open ? '#1a56db' : 'var(--text-main)', cursor: 'pointer', transition: 'all 0.15s',
           whiteSpace: 'nowrap',
         }}
       >
@@ -305,7 +297,7 @@ function NavItem({ group }: { group: any }) {
 
       {open && (
         <div style={{
-          position: 'fixed', top: dropPos.top, left: dropPos.left,
+          position: 'absolute', top: 'calc(100% + 6px)', left: 0,
           minWidth: 200,
           background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-color)',
           boxShadow: '0 10px 25px rgba(0,0,0,0.12)', zIndex: 9999,
@@ -319,8 +311,8 @@ function NavItem({ group }: { group: any }) {
                 padding: '9px 14px', borderRadius: 10, fontSize: 13, fontWeight: 500,
                 color: 'var(--text-main)', cursor: 'pointer', transition: 'all 0.15s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.color = '#1a56db' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#374151' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)'; e.currentTarget.style.color = '#1a56db' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-main)' }}
             >
               {item.label}
             </div>
@@ -635,7 +627,7 @@ export default function Header() {
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
         @keyframes slideInRight { from { transform: translateX(100%) } to { transform: translateX(0) } }
         @keyframes spin { to { transform: rotate(360deg) } }
-        .top-nav-pill { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; flex-shrink: 1; min-width: 0; }
+        .top-nav-pill { display: flex; align-items: center; gap: 2px; overflow: visible; flex-shrink: 1; min-width: 0; }
         .top-nav-pill::-webkit-scrollbar { display: none; }
         .mobile-menu-btn { display: none; }
         @media (max-width: 1024px) {
@@ -1019,8 +1011,9 @@ export default function Header() {
 
             {profileOpen && (
               <div style={{
-                position: 'fixed',
-                top: 82, right: 24,
+                position: 'absolute',
+                top: 'calc(100% + 12px)',
+                right: 0,
                 width: 260, background: 'var(--bg-card)',
                 borderRadius: 18, border: '1px solid var(--border-color)',
                 boxShadow: '0 12px 28px rgba(0,0,0,0.12)',

@@ -108,7 +108,7 @@ export default function FeesPage() {
   })
 
   const schoolCurrency = school?.currency_code || 'GHS'
-  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
+  const CUR = (n: number, currencyCode?: string) => formatCurrency(n, currencyCode || schoolCurrency)
 
   useEffect(() => {
     if (schoolCurrency) {
@@ -551,6 +551,9 @@ export default function FeesPage() {
     const arrRemain = Number(payment.arrears_balance_after || 0)
     const currentPaid = Number(payment.amount_paid) - arrPaid
     
+    const txCurrency = payment.currency_code || schoolCurrency
+    const CUR = (n: number) => formatCurrency(n, txCurrency)
+    
     let text = `🏫 SCHOOL FEE RECEIPT\n\nStudent: ${stu?.full_name ?? 'Unknown'}\nClass: ${(stu?.class as any)?.name ?? 'Unknown'}\n\nAmount Paid: ${CUR(payment.amount_paid)}\nMethod: ${payment.payment_method.toUpperCase()}\nDate: ${new Date(payment.payment_date).toLocaleDateString('en-GB')}`
     
     if (payment.notes) {
@@ -677,6 +680,9 @@ export default function FeesPage() {
     const struct = structures.find((s: any) => s.id === payment.fee_structure_id) as any
     const win = window.open('', '_blank', 'width=800,height=900')
     if (!win) return
+
+    const txCurrency = payment.currency_code || schoolCurrency
+    const CUR = (n: number) => formatCurrency(n, txCurrency)
 
     const arrPaid = Number(payment.arrears_paid || 0)
     const arrRemain = Number(payment.arrears_balance_after || 0)
@@ -841,6 +847,9 @@ export default function FeesPage() {
     const stu = students.find((s: any) => s.id === payment.student_id) as any
     const win = window.open('', '_blank', 'width=800,height=900')
     if (!win) return
+
+    const txCurrency = payment.currency_code || schoolCurrency
+    const CUR = (n: number) => formatCurrency(n, txCurrency)
 
     const arrPaid = Number(payment.arrears_paid || 0)
     const arrRemain = Number(payment.arrears_balance_after || 0)
@@ -1981,7 +1990,7 @@ export default function FeesPage() {
                         <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{p.student?.full_name}</td>
                         <td style={{ padding: '11px 14px' }}><span style={{ fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: 99 }}>{(p.student as any)?.class?.name ?? '—'}</span></td>
                         <td style={{ padding: '11px 14px', fontSize: 12, color: 'var(--text-muted)' }}>{p.fee_structure?.fee_name ?? 'General'}</td>
-                        <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 800, color: '#16a34a' }}>{CUR(p.amount_paid)}</td>
+                        <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 800, color: '#16a34a' }}>{CUR(p.amount_paid, p.currency_code)}</td>
                         <td style={{ padding: '11px 14px' }}>
                           <span style={{ 
                             fontSize: 11, 
@@ -2113,7 +2122,7 @@ export default function FeesPage() {
               <div style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.08em', fontWeight: 700, marginBottom: 8 }}>
                 {allocationResult ? 'Transaction Successfully Recorded' : 'Official Payment Record'}
               </div>
-              <div style={{ fontSize: 36, fontWeight: 900, color: '#16a34a', fontFamily: '"Playfair Display",serif' }}>{CUR(printReceipt.amount_paid)}</div>
+              <div style={{ fontSize: 36, fontWeight: 900, color: '#16a34a', fontFamily: '"Playfair Display",serif' }}>{CUR(printReceipt.amount_paid, printReceipt.currency_code)}</div>
               <div style={{ fontSize: 14, color: 'var(--text-main)', marginTop: 8, fontWeight: 600 }}>{(students as any[]).find(s => s.id === printReceipt.student_id)?.full_name ?? 'Student'}</div>
               <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 4 }}>Receipt ID: {printReceipt.id?.slice(0,8).toUpperCase()}</div>
             </div>
@@ -2132,16 +2141,16 @@ export default function FeesPage() {
                   <tbody>
                     <tr style={{ borderBottom: '1px solid rgba(0,0,0,.06)' }}>
                       <td style={{ padding: '7px 0', fontSize: 12, color: '#dc2626', fontWeight: 600 }}>Applied to Previous Arrears</td>
-                      <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 800, color: '#dc2626', textAlign: 'right' }}>{CUR(allocationResult.arrearsPaid)}</td>
+                      <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 800, color: '#dc2626', textAlign: 'right' }}>{CUR(allocationResult.arrearsPaid, printReceipt.currency_code)}</td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid rgba(0,0,0,.06)' }}>
                       <td style={{ padding: '7px 0', fontSize: 12, color: '#16a34a', fontWeight: 600 }}>Applied to Current Term Fees</td>
-                      <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 800, color: '#16a34a', textAlign: 'right' }}>{CUR(allocationResult.currentTermPaid)}</td>
+                      <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 800, color: '#16a34a', textAlign: 'right' }}>{CUR(allocationResult.currentTermPaid, printReceipt.currency_code)}</td>
                     </tr>
                     {!allocationResult.arrearsCleared && (
                       <tr>
                         <td style={{ padding: '7px 0', fontSize: 12, color: '#d97706', fontWeight: 700 }}>Remaining Arrears Balance</td>
-                        <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 900, color: '#d97706', textAlign: 'right' }}>{CUR(allocationResult.remainingArrears)}</td>
+                        <td style={{ padding: '7px 0', fontSize: 13, fontWeight: 900, color: '#d97706', textAlign: 'right' }}>{CUR(allocationResult.remainingArrears, printReceipt.currency_code)}</td>
                       </tr>
                     )}
                   </tbody>

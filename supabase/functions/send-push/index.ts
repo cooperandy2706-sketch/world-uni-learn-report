@@ -16,11 +16,11 @@ serve(async (req) => {
   }
 
   try {
-    const vapidPublicKey = Deno.env.get("VITE_VAPID_PUBLIC_KEY")
+    const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY") || Deno.env.get("VITE_VAPID_PUBLIC_KEY")
     const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY")
     
     if (!vapidPublicKey || !vapidPrivateKey) {
-      throw new Error("Missing VAPID keys. Set VITE_VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY in Supabase Secrets.")
+      throw new Error("Missing VAPID keys. Set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY in Supabase Secrets.")
     }
 
     // Initialize Web Push
@@ -70,16 +70,28 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
     
-    // Fetch subscriptions for all users in the specific school
-    // We join with the users table to filter by school_id
-    const { data: subs, error: subsError } = await supabaseAdmin
-      .from('push_subscriptions')
-      .select('*, user:users!inner(school_id)')
-      .eq('user.school_id', effectiveSchoolId)
+    // Fetch subscriptions for all users in the specific school using a two-step lookup to bypass PostgREST join mapping failures
+    const { data: schoolUsers, error: usersError } = await supabaseAdmin
+      .from('users')
+      .select('id')
+      .eq('school_id', effectiveSchoolId)
       
-    if (subsError) throw new Error(`Database error fetching subscriptions: ${subsError.message}`)
+    if (usersError) throw new Error(`Database error fetching school users: ${usersError.message}`)
     
-    if (!subs || subs.length === 0) {
+    const userIds = (schoolUsers || []).map(u => u.id)
+    let subs: any[] = []
+    
+    if (userIds.length > 0) {
+      const { data: fetchedSubs, error: subsError } = await supabaseAdmin
+        .from('push_subscriptions')
+        .select('*')
+        .in('user_id', userIds)
+        
+      if (subsError) throw new Error(`Database error fetching subscriptions: ${subsError.message}`)
+      subs = fetchedSubs || []
+    }
+    
+    if (subs.length === 0) {
       return new Response(
         JSON.stringify({ success: true, message: "No active device subscriptions found for this school." }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

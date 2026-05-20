@@ -82,15 +82,15 @@ self.addEventListener('fetch', (e) => {
     return
   }
 
-  // 3. Stale-While-Revalidate for the main shell index page
+  // 3. Network-First (with cache fallback) for the main shell index page
   if (
     e.request.mode === 'navigate' ||
     url.pathname === '/' ||
     url.pathname === '/index.html'
   ) {
     e.respondWith(
-      caches.match('/index.html').then((cachedResponse) => {
-        const networkFetch = fetch(e.request).then((networkResponse) => {
+      fetch(e.request)
+        .then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
             const cacheCopy = networkResponse.clone()
             caches.open(CACHE_NAME).then((cache) => {
@@ -98,15 +98,11 @@ self.addEventListener('fetch', (e) => {
             })
           }
           return networkResponse
-        }).catch(() => {
-          // If offline and cache exists, return it, otherwise let it fail
-          if (cachedResponse) return cachedResponse
-          throw new Error('Offline and no cached index.html available')
         })
-
-        // Return cached page instantly if available, otherwise wait for network
-        return cachedResponse || networkFetch
-      })
+        .catch(() => {
+          // If offline or network fails, fallback to cached index.html
+          return caches.match('/index.html')
+        })
     )
   }
 })

@@ -352,7 +352,7 @@ export default function PayrollPage() {
                   <option value="">Select Staff...</option>
                   {staff.map((s:any) => <option key={s.id} value={s.id}>{s.full_name} {s.designation ? `(${s.designation})` : ''}</option>)}
                 </select>
-                <input type="number" placeholder="Amount (GH₵)" value={weeklyConfigForm.amount} onChange={e => setWeeklyConfigForm({...weeklyConfigForm, amount: e.target.value})} style={{ width: 150, padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)' }} />
+                <input type="number" placeholder={`Amount (${schoolCurrency})`} value={weeklyConfigForm.amount} onChange={e => setWeeklyConfigForm({...weeklyConfigForm, amount: e.target.value})} style={{ width: 150, padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)' }} />
                 <Btn onClick={() => {
                    if(!weeklyConfigForm.user_id) return toast.error('Select staff')
                    saveWeekly.mutate({ school_id: schoolId, user_id: weeklyConfigForm.user_id, month, type: 'weekly_pay', amount: Number(weeklyConfigForm.amount), description: `Week ${selectedWeek} Top-up`, week_number: selectedWeek, recorded_at: format(new Date(), 'yyyy-MM-dd') })
@@ -416,7 +416,7 @@ export default function PayrollPage() {
                   <option value="">Select Staff...</option>
                   {staff.map((s:any) => <option key={s.id} value={s.id}>{s.full_name} {s.designation ? `(${s.designation})` : ''}</option>)}
                 </select>
-                <input type="number" placeholder="Amount (GH₵)" value={dailyForm.amount} onChange={e => setDailyForm({...dailyForm, amount: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)' }} />
+                <input type="number" placeholder={`Amount (${schoolCurrency})`} value={dailyForm.amount} onChange={e => setDailyForm({...dailyForm, amount: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)' }} />
                 <input placeholder="Reason (e.g. Lunch)" value={dailyForm.description} onChange={e => setDailyForm({...dailyForm, description: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)', gridColumn: 'span 2' }} />
                 <Btn style={{ gridColumn: 'span 2' }} onClick={() => {
                    if(!dailyForm.user_id) return toast.error('Select staff')

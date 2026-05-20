@@ -513,7 +513,7 @@ export default function BillSheetPage() {
                     <div style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', gap: 10, marginBottom: customItems.length > 0 ? 16 : 0, flexWrap: 'wrap' }}>
                         <input placeholder="Item Description (e.g., Uniform, Waiver)" value={newItemName} onChange={e => setNewItemName(e.target.value)} style={{ flex: 1, minWidth: 200, padding: '9px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }} />
-                        <input placeholder="Amount (GH₵)" type="number" step="0.01" value={newItemAmount} onChange={e => setNewItemAmount(e.target.value)} style={{ width: 140, padding: '9px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }} />
+                        <input placeholder={`Amount (${schoolCurrency})`} type="number" step="0.01" value={newItemAmount} onChange={e => setNewItemAmount(e.target.value)} style={{ width: 140, padding: '9px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }} />
                         <button onClick={() => { 
                           if(!newItemName || !newItemAmount) return; 
                           setCustomItems(prev => [...prev, { id: Math.random().toString(36).substr(2, 9), name: newItemName, amount: parseFloat(newItemAmount) }]); 

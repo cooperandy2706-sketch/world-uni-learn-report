@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import Modal from '../../components/ui/Modal'
 
-const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
+import { formatCurrency } from '../../utils/currency'
 
 export default function VendorsPage() {
   const { user } = useAuth()
@@ -59,6 +59,19 @@ export default function VendorsPage() {
     },
     enabled: !!schoolId
   })
+
+  // 3. Fetch School Context for Currency
+  const { data: school } = useQuery({
+    queryKey: ['school-currency', schoolId],
+    queryFn: async () => {
+      const { data } = await supabase.from('schools').select('currency_code').eq('id', schoolId).single()
+      return data
+    },
+    enabled: !!schoolId
+  })
+  
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
 
   const saveMutation = useMutation({
     mutationFn: async (data: Partial<Vendor>) => {
@@ -146,7 +159,7 @@ export default function VendorsPage() {
           </div>
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Spend</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#0f172a' }}>{GHS(totalSpent)}</div>
+            <div style={{ fontSize: 24, fontWeight: 900, color: '#0f172a' }}>{CUR(totalSpent)}</div>
           </div>
         </div>
       </div>
@@ -207,7 +220,7 @@ export default function VendorsPage() {
               <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1.5px solid #f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Total Spend</div>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: '#0f172a' }}>{GHS(spending[v.id] || 0)}</div>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: '#0f172a' }}>{CUR(spending[v.id] || 0)}</div>
                 </div>
                 <button style={{ padding: '8px 12px', borderRadius: 10, border: '1.5px solid #e2e8f0', background: 'var(--bg-card)', color: '#64748b', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                   History <ExternalLink size={12} />

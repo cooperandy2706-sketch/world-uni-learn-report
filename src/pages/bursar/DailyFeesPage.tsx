@@ -182,7 +182,7 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
   }
 
   return (
-    <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24 }}>
+    <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24 }}>
       <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 180px' }}>
           <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Date</label>
@@ -444,15 +444,15 @@ export default function DailyFeesPage() {
       </div>
 
       {tab === 'config' && (
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, border: '1.5px solid #f0eefe', maxWidth: 800 }}>
+        <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, border: '1.5px solid #f0eefe', maxWidth: 800 }}>
           <h2 style={{ fontSize: 16, margin: '0 0 20px', color: 'var(--text-main)' }}>Class Daily Rates</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
                   <th style={{ textAlign: 'left', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', paddingBottom: 10 }}>Class Name</th>
-                  <th style={{ textAlign: 'left', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', paddingBottom: 10 }}>Feeding Rate (GH₵)</th>
-                  <th style={{ textAlign: 'left', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', paddingBottom: 10 }}>Studies Rate (GH₵)</th>
+                  <th style={{ textAlign: 'left', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', paddingBottom: 10 }}>{`Feeding Rate (${schoolCurrency})`}</th>
+                  <th style={{ textAlign: 'left', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', paddingBottom: 10 }}>{`Studies Rate (${schoolCurrency})`}</th>
                 </tr>
               </thead>
               <tbody>
@@ -481,7 +481,7 @@ export default function DailyFeesPage() {
 
       {tab === 'collectors' && (
         <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, border: '1.5px solid #f0eefe', flex: '1 1 300px', maxWidth: 400 }}>
+          <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, border: '1.5px solid #f0eefe', flex: '1 1 300px', maxWidth: 400 }}>
             <h2 style={{ fontSize: 16, margin: '0 0 20px', color: 'var(--text-main)' }}>Assign Collector</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
@@ -502,7 +502,7 @@ export default function DailyFeesPage() {
               <Btn onClick={() => { if(!newColTid) toast.error('Select teacher'); else addCollector.mutate() }} loading={addCollector.isPending}><UserPlus size={16}/> Grant Access</Btn>
             </div>
           </div>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', flex: '2 1 400px', overflow: 'hidden' }}>
+          <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', flex: '2 1 400px', overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#faf5ff' }}>
@@ -529,7 +529,7 @@ export default function DailyFeesPage() {
 
       {tab === 'overview' && (
         <div>
-          <div style={{ display: 'flex', gap: 12, marginBottom: 16, background: 'var(--bg-card)', padding: '12px 16px', borderRadius: 12, border: '1.5px solid #f0eefe' }}>
+          <div className="glass-card" style={{ display: 'flex', gap: 12, marginBottom: 16, background: 'var(--bg-card)', padding: '12px 16px', borderRadius: 12, border: '1.5px solid #f0eefe' }}>
             <select value={ovTypeFilter} onChange={e => setOvTypeFilter(e.target.value)} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 13, width: 180 }}>
               <option value="feeding">Feeding Fees</option>
               <option value="studies">Studies Fees</option>
@@ -553,10 +553,10 @@ export default function DailyFeesPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {debtorsData.length === 0 ? <div style={{ background: 'var(--bg-card)', padding: 40, textAlign: 'center', borderRadius: 12, color: 'var(--text-subtle)' }}>No students found</div> : debtorsData.map((cls) => (
-              <div key={cls.class_name} style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
-                <div style={{ background: '#faf5ff', padding: '12px 16px', borderBottom: '1px solid #f0eefe', display: 'flex', justifyContent: 'space-between' }}>
-                  <div style={{ fontWeight: 700, color: '#5b21b6', fontSize: 14 }}>{cls.class_name}</div>
-                  <div style={{ fontSize: 12, color: '#6d28d9', fontWeight: 600 }}>Total Class Debt: {CUR(cls.total_owed)}</div>
+              <div key={cls.class_name} className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+                <div style={{ background: 'var(--bg-hover)', padding: '12px 16px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: 14 }}>{cls.class_name}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>Total Class Debt: {CUR(cls.total_owed)}</div>
                 </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <tbody>

@@ -116,7 +116,7 @@ export default function TeacherSelfServicePage() {
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .tab-btn { transition: all 0.2s ease; border-bottom: 2px solid transparent; }
                 .tab-btn.active { color: #7c3aed; border-bottom-color: #7c3aed; }
-                .card { background: white; border-radius: 16px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+                .card { background: var(--bg-card); border-radius: 16px; border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
                 .status-badge { padding: 4px 10px; border-radius: 99px; font-size: 11px; fontWeight: 700; text-transform: uppercase; }
                 .status-pending { background: #fef3c7; color: #d97706; }
                 .status-approved { background: #dcfce7; color: #16a34a; }
@@ -149,8 +149,8 @@ export default function TeacherSelfServicePage() {
                     .responsive-table thead { display: none !important; }
                     .responsive-table tr { 
                         display: block !important; 
-                        background: #fff !important; 
-                        border: 1.5px solid #f0eefe !important; 
+                        background: var(--bg-card) !important; 
+                        border: 1.5px solid var(--border-color) !important; 
                         border-radius: 16px !important; 
                         padding: 16px !important; 
                         margin-bottom: 14px !important; 
@@ -163,7 +163,7 @@ export default function TeacherSelfServicePage() {
                         border: none !important; 
                         padding: 8px 0 !important; 
                         font-size: 13px !important; 
-                        border-bottom: 1px solid #f8fafc !important;
+                        border-bottom: 1px solid var(--border-color) !important;
                         text-align: right !important;
                     }
                     .responsive-table td:last-child { border-bottom: none !important; }
@@ -184,13 +184,13 @@ export default function TeacherSelfServicePage() {
             {viewMode === 'apply-leave' ? (
                 /* ── INLINE LEAVE REQUEST CARD FORM ── */
                 <div className="card" style={{ padding: '24px 20px', animation: 'fadeIn 0.3s ease', maxWidth: 600, margin: '0 auto' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid #f1f5f9', paddingBottom: 16 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid var(--border-color)', paddingBottom: 16 }}>
                         <div>
                             <button onClick={() => setViewMode('dashboard')} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Dashboard</button>
                             <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Apply for Leave</h2>
                             <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>Submit a digital leave application to administration</p>
                         </div>
-                        <button onClick={() => setViewMode('dashboard')} style={{ background: '#f1f5f9', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                        <button onClick={() => setViewMode('dashboard')} style={{ background: 'var(--bg-input)', color: 'var(--text-main)', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                     </div>
 
                     <form onSubmit={handleLeaveSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -199,7 +199,7 @@ export default function TeacherSelfServicePage() {
                             <select 
                                 value={leaveType} 
                                 onChange={(e) => setLeaveType(e.target.value)}
-                                style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)', boxSizing: 'border-box' }}
+                                style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', boxSizing: 'border-box' }}
                             >
                                 <option value="personal">Personal Leave</option>
                                 <option value="sick">Sick Leave</option>
@@ -216,7 +216,7 @@ export default function TeacherSelfServicePage() {
                                     type="date" 
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, boxSizing: 'border-box', fontFamily: 'inherit' }}
+                                    style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', boxSizing: 'border-box', fontFamily: 'inherit' }}
                                 />
                             </div>
                             <div>
@@ -225,7 +225,7 @@ export default function TeacherSelfServicePage() {
                                     type="date" 
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, boxSizing: 'border-box', fontFamily: 'inherit' }}
+                                    style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', boxSizing: 'border-box', fontFamily: 'inherit' }}
                                 />
                             </div>
                         </div>
@@ -236,11 +236,11 @@ export default function TeacherSelfServicePage() {
                                 value={reason}
                                 onChange={(e) => setReason(e.target.value)}
                                 placeholder="Describe the duration and context of your leave request securely..."
-                                style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', resize: 'none', fontSize: 14, boxSizing: 'border-box', fontFamily: 'inherit' }}
+                                style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', resize: 'none', fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', boxSizing: 'border-box', fontFamily: 'inherit' }}
                             />
                         </div>
                         <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-                            <button type="button" onClick={() => setViewMode('dashboard')} style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', background: 'white', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>Cancel</button>
+                            <button type="button" onClick={() => setViewMode('dashboard')} style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>Cancel</button>
                             <button type="submit" disabled={submittingLeave} style={{ flex: 2, padding: '12px', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>
                                 {submittingLeave ? 'Submitting...' : 'Submit Request 📤'}
                             </button>
@@ -253,7 +253,7 @@ export default function TeacherSelfServicePage() {
                     {/* Header Area */}
                     <div className="t-header" style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
                         <div>
-                            <h1 className="t-title" style={{ margin: 0, fontSize: 26, fontWeight: 800, color: '#1e0646' }}>Self Service Hub</h1>
+                            <h1 className="t-title" style={{ margin: 0, fontSize: 26, fontWeight: 800, color: 'var(--text-main)' }}>Self Service Hub</h1>
                             <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 4 }}>Manage your teacher portfolio, payslips, and leave requests in one secure location.</p>
                         </div>
                         <div className="t-btn-group">
@@ -304,7 +304,7 @@ export default function TeacherSelfServicePage() {
                         {activeTab === 'profile' && (
                             <div className="profile-grid">
                                 <div className="card" style={{ padding: '24px' }}>
-                                    <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 20, color: '#1e0646', borderBottom: '1px solid #f1f5f9', paddingBottom: 10 }}>Professional Information</h3>
+                                    <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 20, color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)', paddingBottom: 10 }}>Professional Information</h3>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                                         <div>
                                             <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Full Name</label>
@@ -325,7 +325,7 @@ export default function TeacherSelfServicePage() {
                                     </div>
                                 </div>
                                 <div className="card" style={{ padding: '24px' }}>
-                                    <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 20, color: '#1e0646', borderBottom: '1px solid #f1f5f9', paddingBottom: 10 }}>Contact & Emergency</h3>
+                                    <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 20, color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)', paddingBottom: 10 }}>Contact & Emergency</h3>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                                         <div>
                                             <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Email Address</label>
@@ -347,7 +347,7 @@ export default function TeacherSelfServicePage() {
                         {activeTab === 'payroll' && (
                             <div className="card" style={{ overflow: 'hidden' }}>
                                 <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                    <thead style={{ background: 'var(--bg-input)', borderBottom: '1.5px solid #f0eefe' }}>
+                                    <thead style={{ background: 'var(--bg-input)', borderBottom: '1.5px solid var(--border-color)' }}>
                                         <tr>
                                             <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>MONTH</th>
                                             <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>GROSS PAY</th>
@@ -363,8 +363,8 @@ export default function TeacherSelfServicePage() {
                                                 <td colSpan={6} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>No payslips found yet.</td>
                                             </tr>
                                         ) : payroll.map((p, i) => (
-                                            <tr key={i} style={{ borderBottom: '1px solid #f0eefe' }}>
-                                                <td data-label="MONTH" style={{ padding: '16px', fontWeight: 700, color: '#1e0646' }}>{p.month}</td>
+                                            <tr key={i} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                                <td data-label="MONTH" style={{ padding: '16px', fontWeight: 700, color: 'var(--text-main)' }}>{p.month}</td>
                                                 <td data-label="GROSS PAY" style={{ padding: '16px', color: 'var(--text-main)' }}>GH₵ {(p.basic_salary + p.allowances).toFixed(2)}</td>
                                                 <td data-label="DEDUCTIONS" style={{ padding: '16px', color: '#dc2626', fontWeight: 600 }}>- GH₵ {p.deductions.toFixed(2)}</td>
                                                 <td data-label="NET SALARY" style={{ padding: '16px', fontWeight: 800, color: '#7c3aed' }}>GH₵ {p.net_salary.toFixed(2)}</td>
@@ -388,7 +388,7 @@ export default function TeacherSelfServicePage() {
                         {activeTab === 'leave' && (
                             <div className="card" style={{ overflow: 'hidden' }}>
                                 <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                    <thead style={{ background: 'var(--bg-input)', borderBottom: '1.5px solid #f0eefe' }}>
+                                    <thead style={{ background: 'var(--bg-input)', borderBottom: '1.5px solid var(--border-color)' }}>
                                         <tr>
                                             <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>TYPE</th>
                                             <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>START DATE</th>
@@ -403,8 +403,8 @@ export default function TeacherSelfServicePage() {
                                                 <td colSpan={5} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>You haven't submitted any leave requests yet.</td>
                                             </tr>
                                         ) : leaves.map((l, i) => (
-                                            <tr key={i} style={{ borderBottom: '1px solid #f0eefe' }}>
-                                                <td data-label="TYPE" style={{ padding: '16px', fontWeight: 700, color: '#1e0646', textTransform: 'capitalize' }}>{l.leave_type}</td>
+                                            <tr key={i} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                                <td data-label="TYPE" style={{ padding: '16px', fontWeight: 700, color: 'var(--text-main)', textTransform: 'capitalize' }}>{l.leave_type}</td>
                                                 <td data-label="START DATE" style={{ padding: '16px', color: 'var(--text-main)' }}>{format(new Date(l.start_date), 'MMM dd, yyyy')}</td>
                                                 <td data-label="END DATE" style={{ padding: '16px', color: 'var(--text-main)' }}>{format(new Date(l.end_date), 'MMM dd, yyyy')}</td>
                                                 <td data-label="REASON" style={{ padding: '16px', fontSize: 13, color: 'var(--text-muted)' }}>{l.reason || '—'}</td>
@@ -422,23 +422,23 @@ export default function TeacherSelfServicePage() {
 
                         {activeTab === 'docs' && (
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
-                                <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', borderStyle: 'dashed', border: '2px dashed #f0eefe', background: 'var(--bg-input)', cursor: 'pointer' }}>
+                                <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', borderStyle: 'dashed', border: '2px dashed var(--border-color)', background: 'var(--bg-input)', cursor: 'pointer' }}>
                                     <div style={{ background: '#7c3aed', color: 'white', width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
                                         <Plus size={24} />
                                     </div>
-                                    <div style={{ fontSize: 14, fontWeight: 700, color: '#1e0646' }}>Upload Certificate</div>
+                                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>Upload Certificate</div>
                                     <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 4 }}>PDF, JPG or PNG (Max 5MB)</div>
                                 </div>
                                 {docs.map((d, i) => (
                                     <div key={i} className="card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 180 }}>
                                         <div>
-                                            <div style={{ background: '#f5f3ff', color: '#7c3aed', padding: '12px', borderRadius: '12px', display: 'inline-block', marginBottom: 16 }}>
+                                            <div style={{ background: 'var(--bg-input)', color: '#7c3aed', padding: '12px', borderRadius: '12px', display: 'inline-block', marginBottom: 16 }}>
                                                 <Award size={24} />
                                             </div>
-                                            <h4 style={{ fontSize: 15, fontWeight: 800, color: '#1e0646', margin: '0 0 4px' }}>{d.title}</h4>
+                                            <h4 style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 4px' }}>{d.title}</h4>
                                             <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 16px' }}>{d.document_type} · Uploaded {format(new Date(d.created_at), 'MMM dd, yyyy')}</p>
                                         </div>
-                                        <button style={{ width: '100%', padding: '10px', borderRadius: '9px', border: '1.5px solid var(--border-color)', background: 'white', color: 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s' }}>
+                                        <button style={{ width: '100%', padding: '10px', borderRadius: '9px', border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s' }}>
                                             View Document
                                         </button>
                                     </div>

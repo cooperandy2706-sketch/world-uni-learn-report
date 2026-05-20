@@ -13,7 +13,7 @@ import {
   Award, Filter, Edit3, Plus, Minus, ChevronDown, ChevronUp, Coffee
 } from 'lucide-react'
 
-const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
+import { formatCurrency } from '../../utils/currency'
 
 export default function BursarStudentsPage() {
   const { user } = useAuth()
@@ -58,6 +58,15 @@ export default function BursarStudentsPage() {
     },
     enabled: !!schoolId,
   })
+
+  // School context for currency
+  const { data: school } = useQuery({
+    queryKey: ['school-currency', schoolId],
+    queryFn: async () => { const { data } = await supabase.from('schools').select('currency_code').eq('id', schoolId).single(); return data },
+    enabled: !!schoolId,
+  })
+  const schoolCurrency = school?.currency_code || 'GHS'
+  const CUR = (n: number) => formatCurrency(n, schoolCurrency)
 
   // Scholarship mutation
   const awardMutation = useMutation({
@@ -206,9 +215,9 @@ export default function BursarStudentsPage() {
             { label: 'Total Students', value: String((students as any[]).length), icon: Users, color: '#7c3aed', bg: '#f5f3ff' },
             { label: 'Scholarship Students', value: String(scholarshipCount), icon: GraduationCap, color: '#059669', bg: '#ecfdf5' },
             { label: 'Students with Arrears', value: String(arrearsCount), icon: AlertTriangle, color: '#dc2626', bg: '#fef2f2' },
-            { label: 'Total Outstanding Arrears', value: GHS(totalArrears), icon: AlertTriangle, color: '#b91c1c', bg: '#fef2f2' },
+            { label: 'Total Outstanding Arrears', value: CUR(totalArrears), icon: AlertTriangle, color: '#b91c1c', bg: '#fef2f2' },
           ].map((c, i) => (
-            <div key={c.label} style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '18px 20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', animation: `_bst_fu .35s ease ${i * 0.06}s both` }}>
+            <div key={c.label} className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '18px 20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', animation: `_bst_fu .35s ease ${i * 0.06}s both` }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                 <div style={{ width: 38, height: 38, borderRadius: 12, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <c.icon size={18} color={c.color} strokeWidth={2.5} />
@@ -221,27 +230,27 @@ export default function BursarStudentsPage() {
         </div>
 
         {/* Filters */}
-        <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+        <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 18, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-muted)', fontSize: 13 }}><Filter size={14} /> Filters:</div>
           <select value={classFilter} onChange={e => setClassFilter(e.target.value)} style={{ padding: '7px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}>
             <option value="">All Classes</option>
             {(classes as any[]).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-          <div style={{ display: 'flex', background: '#f5f3ff', borderRadius: 9, padding: 3, gap: 2 }}>
+          <div style={{ display: 'flex', background: 'var(--bg-input)', borderRadius: 9, padding: 3, gap: 2 }}>
             {([['all', 'All'], ['scholarship', '🎓 Scholarship'], ['arrears', '⚠️ Arrears']] as const).map(([f, l]) => (
-              <button key={f} onClick={() => setScholarshipFilter(f as any)} style={{ padding: '6px 12px', borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: scholarshipFilter === f ? '#6d28d9' : 'transparent', color: scholarshipFilter === f ? '#fff' : '#6b7280', fontFamily: '"DM Sans",sans-serif' }}>
+              <button key={f} onClick={() => setScholarshipFilter(f as any)} style={{ padding: '6px 12px', borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: scholarshipFilter === f ? '#6d28d9' : 'transparent', color: scholarshipFilter === f ? '#fff' : 'var(--text-muted)', fontFamily: '"DM Sans",sans-serif' }}>
                 {l}
               </button>
             ))}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, border: '1.5px solid var(--border-color)', background: '#fafafa', marginLeft: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, border: '1.5px solid var(--border-color)', background: 'var(--bg-input)', marginLeft: 'auto' }}>
             <Search size={12} color="#9ca3af" />
-            <input placeholder="Search student..." value={searchQ} onChange={e => setSearchQ(e.target.value)} style={{ border: 'none', outline: 'none', fontSize: 12, background: 'transparent', fontFamily: '"DM Sans",sans-serif', width: 150 }} />
+            <input placeholder="Search student..." value={searchQ} onChange={e => setSearchQ(e.target.value)} style={{ border: 'none', outline: 'none', fontSize: 12, background: 'transparent', fontFamily: '"DM Sans",sans-serif', width: 150, color: 'var(--text-main)' }} />
           </div>
         </div>
 
         {/* Table */}
-        <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+        <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
           {isLoading ? (
             <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>Loading students…</div>
           ) : filtered.length === 0 ? (
@@ -299,7 +308,7 @@ export default function BursarStudentsPage() {
                         </td>
                         <td style={{ padding: '11px 14px', textAlign: 'right' }}>
                           {arrears > 0 ? (
-                            <span style={{ fontSize: 13, fontWeight: 800, color: '#dc2626' }}>{GHS(arrears)}</span>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: '#dc2626' }}>{CUR(arrears)}</span>
                           ) : (
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#16a34a', fontWeight: 600 }}>
                               <CheckCircle2 size={12} /> Clear
@@ -329,7 +338,7 @@ export default function BursarStudentsPage() {
                       TOTALS ({filtered.length} students · {filtered.filter(s => s.scholarship_type && s.scholarship_type !== 'none').length} scholarships)
                     </td>
                     <td style={{ padding: '12px 14px', textAlign: 'right', fontSize: 14, fontWeight: 900, color: '#dc2626' }}>
-                      {GHS(filtered.reduce((sum: number, s: any) => sum + Number(s.fees_arrears || 0), 0))}
+                      {CUR(filtered.reduce((sum: number, s: any) => sum + Number(s.fees_arrears || 0), 0))}
                     </td>
                     <td />
                   </tr>
@@ -390,7 +399,7 @@ export default function BursarStudentsPage() {
               <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{(selectedStudent.class as any)?.name ?? '—'} · {selectedStudent.student_id ?? 'No ID'}</div>
               <div style={{ marginTop: 10, padding: '8px 12px', borderRadius: 8, background: Number(selectedStudent.fees_arrears || 0) > 0 ? '#fef2f2' : '#f0fdf4', border: `1px solid ${Number(selectedStudent.fees_arrears || 0) > 0 ? '#fecaca' : '#bbf7d0'}` }}>
                 <span style={{ fontSize: 12, fontWeight: 700, color: Number(selectedStudent.fees_arrears || 0) > 0 ? '#dc2626' : '#16a34a' }}>
-                  Current Arrears: {GHS(Number(selectedStudent.fees_arrears || 0))}
+                  Current Arrears: {CUR(Number(selectedStudent.fees_arrears || 0))}
                 </span>
               </div>
             </div>
@@ -409,12 +418,12 @@ export default function BursarStudentsPage() {
 
             <div>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>
-                {arrAction === 'add' ? 'Amount to Add (GH₵)' : 'New Arrears Amount (GH₵)'}
+                {arrAction === 'add' ? `Amount to Add (${schoolCurrency})` : `New Arrears Amount (${schoolCurrency})`}
               </label>
               <input type="number" min="0" step="0.01" value={arrAmt} onChange={e => setArrAmt(e.target.value)} placeholder="0.00" style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 15, fontWeight: 600, outline: 'none', boxSizing: 'border-box' }} />
               {arrAction === 'add' && arrAmt && (
                 <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-main)', fontWeight: 600, padding: '8px 12px', background: '#fef2f2', borderRadius: 8 }}>
-                  New total: {GHS(Number(selectedStudent.fees_arrears || 0) + Number(arrAmt))}
+                  New total: {CUR(Number(selectedStudent.fees_arrears || 0) + Number(arrAmt))}
                 </div>
               )}
               {arrAction === 'set' && (
@@ -456,7 +465,7 @@ export default function BursarStudentsPage() {
                   <button key={t} onClick={() => setDailyFeeMode(t)} style={{ padding: '12px 16px', textAlign: 'left', borderRadius: 10, border: dailyFeeMode === t ? '2px solid #d97706' : '1.5px solid #e5e7eb', background: dailyFeeMode === t ? '#fffbeb' : '#fff', color: dailyFeeMode === t ? '#b45309' : '#374151', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif', transition: 'all .15s' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <Coffee size={16} />
-                      {t === 'all' ? 'Standard (Feeding & Studies)' : t === 'feeding' ? 'Feeding Fee Only' : 'Fully Exempt (GH₵ 0 Daily)'}
+                      {t === 'all' ? 'Standard (Feeding & Studies)' : t === 'feeding' ? 'Feeding Fee Only' : `Fully Exempt (${schoolCurrency} 0 Daily)`}
                     </div>
                     <div style={{ fontSize: 11, fontWeight: 500, color: dailyFeeMode === t ? '#d97706' : '#9ca3af', marginTop: 4, paddingLeft: 24 }}>
                       {t === 'all' ? 'Charges regular daily feeding and studies when marked present.' : t === 'feeding' ? 'Never charged for studies even if present; only expected to pay feeding.' : 'Completely exempt from daily fees. No deficit will accrue when present.'}

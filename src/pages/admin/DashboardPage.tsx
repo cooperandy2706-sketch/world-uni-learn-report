@@ -10,6 +10,13 @@ import { ROUTES } from '../../constants/routes'
 import { feeStructuresService, feePaymentsService } from '../../services/bursar.service'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import WelcomeOnboarding from '../../components/ui/WelcomeOnboarding'
+import { AreaChart, Area, BarChart, Bar, Cell, Legend, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare } from 'lucide-react'
+import { useThemeStore } from '../../store/themeStore'
+
+
+// ... interfaces and helper functions
 
 interface Stats {
   students: number; teachers: number; classes: number; subjects: number
@@ -20,9 +27,36 @@ interface Stats {
   totalDebt: number; pendingApproval: number
 }
 interface TopStudent { student_id: string; full_name: string; class_name: string; average_score: number; overall_position: number; total_students: number }
+interface TopSubject { subject_id: string; name: string; average: number }
+interface AbsentStudent { student_id: string; full_name: string; guardian_name: string; guardian_phone: string; class_name: string; }
+interface GateActivity { id: string; name: string; type: string; time: string; direction: string }
 interface Message { id: string; body: string; created_at: string; is_read: boolean; sender?: { full_name: string } }
 interface ClassStat { id: string; name: string; student_count: number; avg_score: number | null; reports_done: number }
 interface RecentActivity { type: string; label: string; sub: string; time: string; icon: string; color: string }
+
+interface TimetableLesson {
+  id: string
+  day_of_week: number
+  class_id: string
+  subject_id: string
+  teacher_id: string
+  period_id: string
+  class: { id: string; name: string } | null
+  subject: { id: string; name: string } | null
+  teacher: { id: string; user: { full_name: string } } | null
+  period: { id: string; name: string; start_time: string; end_time: string; is_break: boolean; sort_order: number } | null
+  isNow: boolean
+}
+interface CoverageStats {
+  activeClasses: number
+  totalClasses: number
+  percentage: number
+}
+interface WeeklyGoalsStats {
+  total: number
+  completed: number
+  percentage: number
+}
 
 function timeAgo(ts: string) {
   const diff = Date.now() - new Date(ts).getTime()
@@ -30,13 +64,6 @@ function timeAgo(ts: string) {
   if (m < 1) return 'just now'; if (m < 60) return `${m}m ago`
   const h = Math.floor(m / 60)
   return h < 24 ? `${h}h ago` : `${Math.floor(h / 24)}d ago`
-}
-
-const priorityStyle: Record<string, { bg: string; color: string; label: string }> = {
-  urgent: { bg: '#fef2f2', color: '#dc2626', label: 'URGENT' },
-  high:   { bg: '#fff7ed', color: '#ea580c', label: 'HIGH' },
-  normal: { bg: '#f5f3ff', color: '#6d28d9', label: 'MSG' },
-  low:    { bg: '#f0fdf4', color: '#16a34a', label: 'INFO' },
 }
 
 function AnimNum({ to, duration = 900 }: { to: number; duration?: number }) {
@@ -52,28 +79,6 @@ function AnimNum({ to, duration = 900 }: { to: number; duration?: number }) {
   return <>{val.toLocaleString()}</>
 }
 
-function StatCard({ icon, label, value, color, bg, link, pulse, sub }: {
-  icon: string; label: string; value: number; color: string; bg: string; link: string; pulse?: boolean; sub?: string
-}) {
-  const [hov, setHov] = useState(false)
-  return (
-    <Link to={link} className="stat-card" style={{ '--accent': color } as any}>
-      <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 14, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, transition: 'transform 0.3s', transform: hov ? 'scale(1.12) rotate(-6deg)' : 'none', position: 'relative' }}>
-            {icon}
-            {pulse && <span style={{ position: 'absolute', top: -4, right: -4, width: 11, height: 11, borderRadius: '50%', background: color, border: '2px solid #fff', animation: '_pulse 1.5s infinite' }} />}
-          </div>
-          <span style={{ fontSize: 18, color: '#e2e8f0', fontWeight: 600, transition: 'all 0.25s', transform: hov ? 'translateX(3px)' : 'none', opacity: hov ? 1 : 0.6 }}>→</span>
-        </div>
-        <div style={{ fontSize: 30, fontWeight: 800, color: '#0f172a', lineHeight: 1, letterSpacing: '-0.03em' }}><AnimNum to={value} /></div>
-        <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 700, marginTop: 6, textTransform: 'uppercase', letterSpacing: '.04em' }}>{label}</div>
-        {sub && <div style={{ fontSize: 11, color, fontWeight: 700, marginTop: 5, background: `${color}15`, padding: '3px 8px', borderRadius: 6, display: 'inline-block' }}>{sub}</div>}
-      </div>
-    </Link>
-  )
-}
-
 function DashboardClock() {
   const [t, setT] = useState(new Date())
   useEffect(() => { const i = setInterval(() => setT(new Date()), 1000); return () => clearInterval(i) }, [])
@@ -84,6 +89,20 @@ function DashboardClock() {
 export default function DashboardPage() {
   const { setFirstLoadComplete } = useAuthStore()
   const { user } = useAuth()
+
+  const theme = useThemeStore(state => state.theme)
+  const [isDark, setIsDark] = useState(false)
+  useEffect(() => {
+    const root = window.document.documentElement
+    const checkDark = () => {
+      setIsDark(root.classList.contains('dark'))
+    }
+    checkDark()
+    const observer = new MutationObserver(checkDark)
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
+
   const userSchool = user?.school as any
   const navigate = useNavigate()
   const { data: term } = useCurrentTerm()
@@ -91,6 +110,9 @@ export default function DashboardPage() {
 
   const [stats, setStats] = useState<Stats | null>(null)
   const [topStudents, setTopStudents] = useState<TopStudent[]>([])
+  const [topSubjects, setTopSubjects] = useState<TopSubject[]>([])
+  const [absentStudents, setAbsentStudents] = useState<AbsentStudent[]>([])
+  const [outOfCampus, setOutOfCampus] = useState<GateActivity[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [classStats, setClassStats] = useState<ClassStat[]>([])
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([])
@@ -100,6 +122,16 @@ export default function DashboardPage() {
   const [financeData, setFinanceData] = useState<{ month: string, amount: number }[]>([])
   const [activeMsg, setActiveMsg] = useState<Message | null>(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [topTab, setTopTab] = useState<'students' | 'subjects'>('students')
+
+  // New State variables
+  const [activeAnalyticsTab, setActiveAnalyticsTab] = useState<'financials' | 'academics' | 'goals'>('financials')
+  const [todayLessons, setTodayLessons] = useState<TimetableLesson[]>([])
+  const [coverageStats, setCoverageStats] = useState<CoverageStats>({ activeClasses: 0, totalClasses: 0, percentage: 0 })
+  const [pendingLeavesCount, setPendingLeavesCount] = useState<number>(0)
+  const [pendingExeatsCount, setPendingExeatsCount] = useState<number>(0)
+  const [weeklyGoalsStats, setWeeklyGoalsStats] = useState<WeeklyGoalsStats>({ total: 0, completed: 0, percentage: 0 })
+  const [locateClass, setLocateClass] = useState<any | null>(null)
 
   useEffect(() => {
     const hasSeenOnboarding = localStorage.getItem(`onboarding_seen_${user?.id}`)
@@ -122,22 +154,22 @@ export default function DashboardPage() {
     }
     loadAll()
 
-    // Real-time listeners
     const channel = supabase.channel('dashboard-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages', filter: `school_id=eq.${user.school_id}` }, () => loadMessages())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'fee_payments', filter: `school_id=eq.${user.school_id}` }, () => {
-        loadStats()
-        loadFinancePerformance()
+        loadStats(); loadFinancePerformance()
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'report_cards', filter: `school_id=eq.${user.school_id}` }, () => {
-        loadStats()
-        loadTopStudents()
+        loadStats(); loadTopStudents()
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'scores', filter: `school_id=eq.${user.school_id}` }, () => {
-        loadTopStudents()
+        loadTopStudents(); loadTopSubjects()
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'students', filter: `school_id=eq.${user.school_id}` }, () => {
         loadStats()
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'gate_scans', filter: `school_id=eq.${user.school_id}` }, () => {
+        loadGateActivity()
       })
       .subscribe()
 
@@ -149,11 +181,17 @@ export default function DashboardPage() {
       await Promise.all([
         loadStats(), 
         loadTopStudents(), 
+        loadTopSubjects(),
         loadMessages(), 
         loadClassStats(), 
         loadRecentActivity(), 
         loadAnnouncements(),
-        loadFinancePerformance()
+        loadFinancePerformance(),
+        loadGateActivity(),
+        loadAbsentStudents(),
+        loadTimetableLessons(),
+        loadPendingOperations(),
+        loadWeeklyGoalsStats()
       ])
     } finally {
       setLoading(false)
@@ -161,13 +199,78 @@ export default function DashboardPage() {
     }
   }
 
+  async function loadGateActivity() {
+    if (!user?.school_id) return
+    const today = new Date().toISOString().slice(0, 10)
+    // Fetch latest scans
+    const { data: scans } = await supabase
+      .from('gate_scans')
+      .select('id, scan_time, person_type, direction, person_db_id')
+      .eq('school_id', user.school_id)
+      .eq('scan_date', today)
+      .order('scan_time', { ascending: false })
+    
+    if (!scans || scans.length === 0) return
+
+    // Group by person to get latest status
+    const latestScans = new Map()
+    scans.forEach(s => {
+      const personKey = `${s.person_type}_${s.person_db_id}`
+      if (!latestScans.has(personKey)) latestScans.set(personKey, s)
+    })
+
+    const outOnly = Array.from(latestScans.values()).filter(s => s.direction === 'out')
+    
+    // Now fetch names
+    const outStudents = outOnly.filter(s => s.person_type === 'student').map(s => s.person_db_id)
+    const outStaff = outOnly.filter(s => s.person_type === 'staff').map(s => s.person_db_id)
+
+    let stuNames: any = [], staffNames: any = []
+    if (outStudents.length) {
+      const { data } = await supabase.from('students').select('id, full_name').in('id', outStudents)
+      stuNames = data || []
+    }
+    if (outStaff.length) {
+      const { data } = await supabase.from('teachers').select('id, user:users(full_name)').in('id', outStaff)
+      staffNames = data || []
+    }
+
+    const mapped = outOnly.map(s => {
+      let name = 'Unknown'
+      if (s.person_type === 'student') name = stuNames.find((x:any) => x.id === s.person_db_id)?.full_name || 'Student'
+      if (s.person_type === 'staff') name = staffNames.find((x:any) => x.id === s.person_db_id)?.user?.full_name || 'Staff'
+      return { id: s.id, name, type: s.person_type, time: s.scan_time, direction: s.direction }
+    })
+    
+    setOutOfCampus(mapped)
+  }
+
+  async function loadAbsentStudents() {
+    if (!user?.school_id) return
+    const today = new Date().toISOString().slice(0, 10)
+    const { data: absentData } = await supabase
+      .from('attendance_records')
+      .select('student_id, student:students!inner(full_name, guardian_name, guardian_phone, class:classes(name))')
+      .eq('school_id', user.school_id)
+      .eq('date', today)
+      .eq('status', 'absent')
+
+    const mapped = (absentData || []).map((a:any) => ({
+      student_id: a.student_id,
+      full_name: a.student?.full_name || '',
+      guardian_name: a.student?.guardian_name || '',
+      guardian_phone: a.student?.guardian_phone || '',
+      class_name: a.student?.class?.name || ''
+    }))
+    setAbsentStudents(mapped)
+  }
+
   async function loadFinancePerformance() {
     if (!user?.school_id) return
     const sid = user.school_id
-    
-    // Fetch payments from the last 6 months
     const sixMonthsAgo = new Date()
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5) // Last 6 months inclusive
+    sixMonthsAgo.setDate(1)
     
     const { data: payments } = await supabase
       .from('fee_payments')
@@ -175,10 +278,7 @@ export default function DashboardPage() {
       .eq('school_id', sid)
       .gte('payment_date', sixMonthsAgo.toISOString())
 
-    if (!payments) return
-
-    // Group by month
-    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     const last6Months = []
     for (let i = 5; i >= 0; i--) {
       const d = new Date()
@@ -190,7 +290,7 @@ export default function DashboardPage() {
     }
 
     const aggregated = last6Months.map(m => {
-      const total = payments
+      const total = (payments || [])
         .filter(p => p.payment_date.startsWith(m.key))
         .reduce((sum, p) => sum + Number(p.amount_paid), 0)
       return { month: m.label, amount: total }
@@ -211,7 +311,6 @@ export default function DashboardPage() {
       supabase.from('classes').select('*', { count: 'exact', head: true }).eq('school_id', sid),
       supabase.from('subjects').select('*', { count: 'exact', head: true }).eq('school_id', sid),
       supabase.from('departments').select('*', { count: 'exact', head: true }).eq('school_id', sid),
-      // Unread count: chat messages in school conversations newer than admin's last_read_at
       supabase.from('chat_messages').select('*', { count: 'exact', head: true }).eq('school_id', sid)
         .gt('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
       supabase.from('assignments').select('*', { count: 'exact', head: true }).eq('school_id', sid),
@@ -228,15 +327,7 @@ export default function DashboardPage() {
       ])
       reports = r ?? 0; pendingScores = p ?? 0; pendingApproval = pa ?? 0
 
-      // Calculate True Outstanding Debt (Tuition + Daily + Arrears)
-      const [
-        { data: studentsForDebt },
-        { data: structures },
-        { data: payments },
-        { data: dailyConfigData },
-        { data: dailyCollections },
-        { data: attendance },
-      ] = await Promise.all([
+      const [{ data: studentsForDebt }, { data: structures }, { data: payments }, { data: dailyConfigData }, { data: dailyCollections }, { data: attendance }] = await Promise.all([
         supabase.from('students').select('id, scholarship_percentage, fees_arrears, daily_fee_mode, class_id').eq('school_id', sid).eq('is_active', true),
         feeStructuresService.getAll(sid, term.id),
         feePaymentsService.getAll(sid, term.id),
@@ -247,20 +338,16 @@ export default function DashboardPage() {
 
       const structuresByClass: Record<string, number> = {}
       for (const s of structures || []) structuresByClass[s.class_id] = (structuresByClass[s.class_id] || 0) + (s.amount || 0)
-
       const paidByStudent: Record<string, number> = {}
       for (const p of payments || []) paidByStudent[p.student_id] = (paidByStudent[p.student_id] || 0) + (p.amount_paid || 0)
-
       const dailyPaidByStudent: Record<string, { f: number; s: number }> = {}
       for (const c of dailyCollections || []) {
         if (!dailyPaidByStudent[c.student_id]) dailyPaidByStudent[c.student_id] = { f: 0, s: 0 }
         if (c.fee_type === 'feeding') dailyPaidByStudent[c.student_id].f += Number(c.amount)
         else if (c.fee_type === 'studies') dailyPaidByStudent[c.student_id].s += Number(c.amount)
       }
-
       const attendanceMap: Record<string, number> = {}
       for (const a of attendance || []) attendanceMap[a.student_id] = a.days_present || 0
-
       const dailyRatesMap: Record<string, { f: number, s: number }> = {}
       for (const r of dailyConfigData || []) dailyRatesMap[r.class_id] = { f: Number(r.expected_feeding_fee || 0), s: Number(r.expected_studies_fee || 0) }
 
@@ -268,49 +355,29 @@ export default function DashboardPage() {
         const classFee = structuresByClass[s.class_id] || 0
         const netTuition = classFee - (classFee * ((s.scholarship_percentage || 0) / 100))
         const tuitionOwed = Math.max(0, netTuition - (paidByStudent[s.id] || 0))
-
         const daysPresent = attendanceMap[s.id] || 0
         const classRates = dailyRatesMap[s.class_id] || { f: 0, s: 0 }
         const feeMode = s.daily_fee_mode || 'all'
-        
         const expectedFeeding = feeMode === 'none' ? 0 : classRates.f * daysPresent
         const expectedStudies = (feeMode === 'none' || feeMode === 'feeding') ? 0 : classRates.s * daysPresent
-
         const daily = dailyPaidByStudent[s.id] || { f: 0, s: 0 }
         const dailyOwed = Math.max(0, expectedFeeding - daily.f) + Math.max(0, expectedStudies - daily.s)
-
         totalDebt += (Number(s.fees_arrears || 0) + tuitionOwed + dailyOwed)
       }
     }
 
-    // Today's attendance
     const today = new Date().toISOString().slice(0, 10)
     const { data: attToday } = await supabase.from('attendance_records').select('status, student_id').eq('school_id', sid).eq('date', today)
     const presentToday = attToday?.filter((a: any) => a.status === 'present' || a.status === 'late').length ?? 0
     const absentToday = attToday?.filter((a: any) => a.status === 'absent').length ?? 0
-
-    // How many classes took attendance today
     const { data: attClasses } = await supabase.from('attendance_records').select('class_id').eq('school_id', sid).eq('date', today)
     const attendanceClasses = new Set(attClasses?.map((a: any) => a.class_id)).size
 
     setStats({ 
-      students: students ?? 0, 
-      teachers: teachers ?? 0, 
-      classes: classes ?? 0, 
-      subjects: subjects ?? 0, 
-      departments: departments ?? 0, 
-      reportsGenerated: reports, 
-      totalStudentsForReports: totalForReports, 
-      pendingScores, 
-      unreadMessages: msgs ?? 0, 
-      totalAssignments: assigns ?? 0, 
-      totalSubmissions: subs ?? 0, 
-      totalAnnouncements: announceCount ?? 0, 
-      presentToday, 
-      absentToday, 
-      attendanceClasses,
-      totalDebt,
-      pendingApproval
+      students: students ?? 0, teachers: teachers ?? 0, classes: classes ?? 0, subjects: subjects ?? 0, 
+      departments: departments ?? 0, reportsGenerated: reports, totalStudentsForReports: totalForReports, 
+      pendingScores, unreadMessages: msgs ?? 0, totalAssignments: assigns ?? 0, totalSubmissions: subs ?? 0, 
+      totalAnnouncements: announceCount ?? 0, presentToday, absentToday, attendanceClasses, totalDebt, pendingApproval
     })
   }
 
@@ -321,7 +388,6 @@ export default function DashboardPage() {
       supabase.from('scores').select('updated_at, total_score, student:students!inner(full_name, school_id), subject:subjects(name)').eq('students.school_id', sid).order('updated_at', { ascending: false }).limit(4),
       supabase.from('students').select('created_at, full_name').eq('school_id', sid).order('created_at', { ascending: false }).limit(3),
     ])
-
     const activities: RecentActivity[] = []
     recentSubs?.forEach((s: any) => activities.push({ type: 'quiz', label: `${s.student?.full_name} submitted "${s.assignment?.title}"`, sub: 'Quiz submission', time: s.submitted_at, icon: '📝', color: '#6d28d9' }))
     recentScores?.slice(0, 3).forEach((s: any) => activities.push({ type: 'score', label: `Score entered for ${s.student?.full_name} — ${s.subject?.name}`, sub: `${s.total_score?.toFixed(1)}%`, time: s.updated_at, icon: '✏️', color: '#0891b2' }))
@@ -332,80 +398,42 @@ export default function DashboardPage() {
 
   async function loadTopStudents() {
     if (!term?.id) return
-    
-    // Fetch all scores for the current term to calculate live rankings
-    const { data: scores, error } = await supabase
-      .from('scores')
-      .select('student_id, total_score, student:students!inner(full_name, school_id, class:classes(name))')
-      .eq('students.school_id', user!.school_id)
-      .eq('term_id', term.id)
-    
-    if (error || !scores) return
-
-    // Group by student and calculate averages
+    const { data: scores } = await supabase.from('scores').select('student_id, total_score, student:students!inner(full_name, school_id, class:classes(name))').eq('students.school_id', user!.school_id).eq('term_id', term.id)
+    if (!scores) return
     const studentMap: Record<string, { full_name: string, class_name: string, total: number, count: number }> = {}
-    
     scores.forEach(s => {
       if (!s.student_id) return
-      if (!studentMap[s.student_id]) {
-        studentMap[s.student_id] = {
-          full_name: s.student?.full_name ?? 'Unknown',
-          class_name: s.student?.class?.name ?? 'Unknown',
-          total: 0,
-          count: 0
-        }
-      }
-      studentMap[s.student_id].total += (s.total_score || 0)
-      studentMap[s.student_id].count += 1
+      const studentObj = s.student as any
+      if (!studentMap[s.student_id]) studentMap[s.student_id] = { full_name: studentObj?.full_name ?? 'Unknown', class_name: studentObj?.class?.name ?? 'Unknown', total: 0, count: 0 }
+      studentMap[s.student_id].total += (s.total_score || 0); studentMap[s.student_id].count += 1
     })
-
-    const ranked = Object.entries(studentMap)
-      .map(([id, data]) => ({
-        student_id: id,
-        full_name: data.full_name,
-        class_name: data.class_name,
-        average_score: data.total / data.count
-      }))
-      .sort((a, b) => b.average_score - a.average_score)
-      .slice(0, 5)
-
+    const ranked = Object.entries(studentMap).map(([id, data]) => ({ student_id: id, full_name: data.full_name, class_name: data.class_name, average_score: data.total / data.count })).sort((a, b) => b.average_score - a.average_score).slice(0, 5)
     setTopStudents(ranked as any)
   }
 
+  async function loadTopSubjects() {
+    if (!term?.id) return
+    const { data: scores } = await supabase.from('scores').select('subject_id, total_score, subject:subjects!inner(name)').eq('subjects.school_id', user!.school_id).eq('term_id', term.id)
+    if (!scores) return
+    const subMap: Record<string, { name: string, total: number, count: number }> = {}
+    scores.forEach(s => {
+      if (!s.subject_id) return
+      const subjectObj = s.subject as any
+      if (!subMap[s.subject_id]) subMap[s.subject_id] = { name: subjectObj?.name || 'Unknown', total: 0, count: 0 }
+      subMap[s.subject_id].total += (s.total_score || 0); subMap[s.subject_id].count += 1
+    })
+    const ranked = Object.entries(subMap).map(([id, data]) => ({ subject_id: id, name: data.name, average: data.total / data.count })).sort((a, b) => b.average - a.average).slice(0, 5)
+    setTopSubjects(ranked)
+  }
+
   async function loadMessages() {
-    const schoolId = user!.school_id
-    const groupKey = `staff_inbox_${schoolId}`
-    // Find the staff inbox conversation
-    const { data: conv } = await supabase
-      .from('chat_conversations')
-      .select('id')
-      .eq('group_key', groupKey)
-      .maybeSingle()
+    const groupKey = `staff_inbox_${user!.school_id}`
+    const { data: conv } = await supabase.from('chat_conversations').select('id').eq('group_key', groupKey).maybeSingle()
     if (!conv?.id) { setMessages([]); return }
-    // Fetch latest messages with sender name
-    const { data } = await supabase
-      .from('chat_messages')
-      .select('id, body, created_at, sender_id, sender:users!chat_messages_sender_id_fkey(full_name)')
-      .eq('conversation_id', conv.id)
-      .order('created_at', { ascending: false })
-      .limit(6)
-    // Mark unread: messages newer than admin's last_read_at
-    const { data: membership } = await supabase
-      .from('chat_members')
-      .select('last_read_at')
-      .eq('conversation_id', conv.id)
-      .eq('user_id', user!.id)
-      .maybeSingle()
+    const { data } = await supabase.from('chat_messages').select('id, body, created_at, sender_id, sender:users!chat_messages_sender_id_fkey(full_name)').eq('conversation_id', conv.id).order('created_at', { ascending: false }).limit(6)
+    const { data: membership } = await supabase.from('chat_members').select('last_read_at').eq('conversation_id', conv.id).eq('user_id', user!.id).maybeSingle()
     const lastRead = membership?.last_read_at ? new Date(membership.last_read_at) : new Date(0)
-    setMessages(
-      (data ?? []).map((m: any) => ({
-        id: m.id,
-        body: m.body,
-        created_at: m.created_at,
-        is_read: new Date(m.created_at) <= lastRead,
-        sender: m.sender,
-      }))
-    )
+    setMessages((data ?? []).map((m: any) => ({ id: m.id, body: m.body, created_at: m.created_at, is_read: new Date(m.created_at) <= lastRead, sender: m.sender })))
   }
 
   async function loadClassStats() {
@@ -428,549 +456,1071 @@ export default function DashboardPage() {
     setAnnouncements(data ?? [])
   }
 
-  async function markRead(id: string) {
-    // Update last_read_at to now in chat_members for the staff_inbox conversation
-    const groupKey = `staff_inbox_${user!.school_id}`
-    const { data: conv } = await supabase
-      .from('chat_conversations')
-      .select('id')
-      .eq('group_key', groupKey)
-      .maybeSingle()
-    if (conv?.id) {
-      await supabase.from('chat_members')
-        .update({ last_read_at: new Date().toISOString() })
-        .eq('conversation_id', conv.id)
-        .eq('user_id', user!.id)
+  async function loadTimetableLessons() {
+    if (!user?.school_id || !term?.id) return
+    const now = new Date()
+    const todayDay = now.getDay()
+    const isWeekend = todayDay === 0 || todayDay === 6
+    const queryDay = isWeekend ? 1 : todayDay // Fallback to Monday on weekends
+
+    const { data: slots } = await supabase
+      .from('timetable_slots')
+      .select(`
+        id,
+        day_of_week,
+        class_id,
+        subject_id,
+        teacher_id,
+        period_id,
+        class:classes(id, name),
+        subject:subjects(id, name),
+        teacher:teachers(id, user:users(full_name)),
+        period:timetable_periods(id, name, start_time, end_time, is_break, sort_order)
+      `)
+      .eq('school_id', user.school_id)
+      .eq('term_id', term.id)
+      .eq('day_of_week', queryDay)
+
+    if (!slots) return
+
+    const tpList = slots.filter((s: any) => s.period && !s.period.is_break)
+      .sort((a: any, b: any) => {
+        const aSort = a.period?.sort_order ?? 999
+        const bSort = b.period?.sort_order ?? 999
+        if (aSort !== bSort) return aSort - bSort
+        return (a.period?.start_time ?? '').localeCompare(b.period?.start_time ?? '')
+      })
+
+    const hour = now.getHours()
+    const currentMins = hour * 60 + now.getMinutes()
+
+    function timeToMins(t: string) {
+      if (!t) return 0
+      const [h, m] = t.split(':').map(Number)
+      return (isNaN(h) ? 0 : h * 60) + (isNaN(m) ? 0 : m)
     }
-    setMessages(prev => prev.map(m => m.id === id ? { ...m, is_read: true } : m))
-    setStats(prev => prev ? { ...prev, unreadMessages: Math.max(0, prev.unreadMessages - 1) } : prev)
+
+    let activeCount = 0
+    const activeLessonsList = tpList.map((l: any) => {
+      const start = l.period?.start_time?.slice(0, 5)
+      const end = l.period?.end_time?.slice(0, 5)
+      let isNow = false
+
+      if (start && end) {
+        const sMins = timeToMins(start)
+        const eMins = timeToMins(end)
+        if (isWeekend) {
+          // Weekend mock: Mark period index 1 & 2 lessons as active
+          const pIdx = l.period?.sort_order ?? 0
+          isNow = pIdx === 1 || pIdx === 2
+        } else {
+          isNow = currentMins >= sMins && currentMins < eMins
+        }
+      }
+
+      if (isNow) activeCount++
+      return { ...l, isNow }
+    })
+
+    setTodayLessons(activeLessonsList)
+
+    const uniqueClasses = Array.from(new Set(tpList.map((l: any) => l.class_id)))
+    const activeOccupied = Array.from(new Set(activeLessonsList.filter(l => l.isNow).map((l: any) => l.class_id)))
+
+    setCoverageStats({
+      activeClasses: activeOccupied.length,
+      totalClasses: uniqueClasses.length || stats?.classes || 1,
+      percentage: uniqueClasses.length ? Math.round((activeOccupied.length / uniqueClasses.length) * 100) : 0
+    })
   }
 
-  if (loading) return <FlaskLoader fullScreen={false} label="Loading dashboard…" />
+  async function loadPendingOperations() {
+    if (!user?.school_id) return
+    const [leavesRes, exeatsRes] = await Promise.all([
+      supabase.from('leave_requests').select('id', { count: 'exact', head: true }).eq('school_id', user.school_id).eq('status', 'pending'),
+      supabase.from('exeat_requests').select('id', { count: 'exact', head: true }).eq('school_id', user.school_id).eq('status', 'pending')
+    ])
+    setPendingLeavesCount(leavesRes.count ?? 0)
+    setPendingExeatsCount(exeatsRes.count ?? 0)
+  }
 
-  const reportsRemaining = (stats?.totalStudentsForReports ?? 0) - (stats?.reportsGenerated ?? 0)
+  async function loadWeeklyGoalsStats() {
+    if (!user?.school_id || !term?.id) return
+    const { data } = await supabase
+      .from('weekly_goals')
+      .select('id, is_completed')
+      .eq('school_id', user.school_id)
+      .eq('term_id', term.id)
+
+    if (!data) return
+    const total = data.length
+    const completed = data.filter((g: any) => g.is_completed).length
+    setWeeklyGoalsStats({
+      total,
+      completed,
+      percentage: total ? Math.round((completed / total) * 100) : 0
+    })
+  }
+
   const reportPct = stats?.totalStudentsForReports ? Math.round((stats.reportsGenerated / stats.totalStudentsForReports) * 100) : 0
   const { timeGreeting, roleMessage } = getEngagingGreeting(user?.role)
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  }
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } }
+  }
+
+  if (loading) return <FlaskLoader fullScreen={false} label="Initializing Command Center…" />
 
   return (
     <>
       {showOnboarding && <WelcomeOnboarding userName={user?.full_name?.split(' ')[0] || 'Admin'} onComplete={handleOnboardingComplete} />}
       
-      {/* Floating Tour Bubble */}
-      {!showOnboarding && (
-        <button 
-          onClick={() => setShowOnboarding(true)}
-          title="Watch Feature Tour"
-          style={{
-            position: 'fixed',
-            bottom: '30px',
-            right: '30px',
-            zIndex: 999,
-            width: '60px',
-            height: '60px',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #6366f1, #a855f7)',
-            color: 'white',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
-            boxShadow: '0 10px 25px rgba(99, 102, 241, 0.4)',
-            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-            animation: 'floatBubble 3s infinite ease-in-out'
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.transform = 'scale(1.1) translateY(-5px)'
-            e.currentTarget.style.boxShadow = '0 15px 30px rgba(99, 102, 241, 0.6)'
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.transform = 'scale(1) translateY(0)'
-            e.currentTarget.style.boxShadow = '0 10px 25px rgba(99, 102, 241, 0.4)'
-          }}
-        >
-          🎓
-        </button>
-      )}
-
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-        @keyframes floatBubble { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes scaleIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
-        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
-        @keyframes pulseGlow { 0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,0.4)} 50%{box-shadow:0 0 0 8px rgba(99,102,241,0)} }
-        @keyframes slideInRight { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
-        @keyframes _pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(0.8);opacity:0.5} }
-        @keyframes countUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-        .dashboard-container {
+        .noc-dashboard {
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-          opacity: ${mounted ? 1 : 0};
-          transition: opacity 0.5s ease-out;
-          max-width: 1440px;
-          margin: 0 auto;
-          color: #0f172a;
+          color: var(--text-main);
           padding-bottom: 60px;
+          max-width: 1600px;
+          margin: 0 auto;
         }
-
-        .anim-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
-        .delay-1 { animation-delay: 0.08s; }
-        .delay-2 { animation-delay: 0.16s; }
-        .delay-3 { animation-delay: 0.24s; }
-        .delay-4 { animation-delay: 0.32s; }
-        .delay-5 { animation-delay: 0.40s; }
-
-        .glass-card {
-          background: rgba(255,255,255,0.92);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255,255,255,0.7);
+        .glass-panel {
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border: 1px solid rgba(255, 255, 255, 0.5);
           border-radius: 24px;
-          box-shadow: 0 4px 24px -4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1);
-          transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-          position: relative;
+          box-shadow: 0 10px 40px -10px rgba(0,0,0,0.04);
           overflow: hidden;
+          position: relative;
+          transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
-        .glass-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 16px 40px -8px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,1);
+        html.dark .glass-panel {
+          background: rgba(30, 41, 59, 0.45);
+          border: 1.5px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
-
-        .stat-card {
-          background: #fff;
-          border-radius: 20px;
-          padding: 22px;
+        .kpi-card {
+          background: white;
+          border-radius: 24px;
+          padding: 24px;
           border: 1px solid #f1f5f9;
-          box-shadow: 0 2px 12px -2px rgba(0,0,0,0.06);
-          transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          text-decoration: none;
+          color: var(--text-main);
           position: relative;
           overflow: hidden;
-          cursor: pointer;
-          text-decoration: none;
-          display: block;
         }
-        .stat-card:hover {
-          transform: translateY(-4px) scale(1.01);
-          box-shadow: 0 12px 28px -6px rgba(0,0,0,0.10);
-          border-color: #e2e8f0;
+        html.dark .kpi-card {
+          background: var(--bg-card);
+          border-color: var(--border-color);
+          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
-        .stat-card::before {
+        .kpi-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+          border-color: rgba(79, 70, 229, 0.15);
+        }
+        html.dark .kpi-card:hover {
+          border-color: rgba(139, 92, 246, 0.3);
+          box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+        }
+        .kpi-card::after {
           content: '';
           position: absolute;
-          top: 0; left: 0; right: 0;
-          height: 3px;
-          background: var(--accent, #6366f1);
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: var(--theme-color);
           opacity: 0;
-          transition: opacity 0.25s;
+          transition: opacity 0.3s;
         }
-        .stat-card:hover::before { opacity: 1; }
-
-        .btn-primary {
-          background: linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);
-          color: white; border: none; padding: 11px 22px; border-radius: 13px;
-          font-weight: 700; font-size: 14px; cursor: pointer;
-          transition: all 0.25s ease;
-          box-shadow: 0 4px 14px rgba(99,102,241,0.35);
-          display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+        .kpi-card:hover::after {
+          opacity: 1;
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99,102,241,0.45); }
-
-        .btn-secondary {
-          background: white; color: #334155; border: 1px solid #e2e8f0;
-          padding: 11px 22px; border-radius: 13px; font-weight: 700; font-size: 14px;
-          cursor: pointer; transition: all 0.25s ease;
-          display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
-        }
-        .btn-secondary:hover { background:#f8fafc; border-color:#cbd5e1; transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.05); }
-
-        .context-pill {
-          display: inline-flex; align-items: center; gap: 6px;
-          padding: 5px 12px; border-radius: 100px;
-          font-size: 13px; font-weight: 700;
+        .btn-modern {
+          background: #0f172a;
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 14px;
+          font-weight: 700;
+          font-size: 14px;
+          cursor: pointer;
           transition: all 0.2s;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
         }
-        .context-pill:hover { transform: scale(1.03); }
+        html.dark .btn-modern {
+          background: var(--text-main);
+          color: var(--bg-app);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .btn-modern:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 16px rgba(15, 23, 42, 0.2);
+        }
+        .btn-secondary-modern {
+          background: #f8fafc;
+          color: #0f172a;
+          border: 1px solid #e2e8f0;
+          padding: 12px 24px;
+          border-radius: 14px;
+          font-weight: 700;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+        html.dark .btn-secondary-modern {
+          background: var(--bg-card);
+          color: var(--text-main);
+          border: 1.5px solid var(--border-color);
+        }
+        .btn-secondary-modern:hover {
+          background: #f1f5f9;
+          transform: translateY(-2px);
+        }
+        html.dark .btn-secondary-modern:hover {
+          background: var(--bg-hover);
+        }
+        .ops-action-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          padding: 16px 8px;
+          background: #f8fafc;
+          border-radius: 16px;
+          text-decoration: none;
+          transition: all 0.2s;
+          border: 1px solid transparent;
+        }
+        html.dark .ops-action-card {
+          background: var(--bg-app);
+        }
+        .ops-action-card:hover {
+          background: white;
+          border-color: #e2e8f0;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+        html.dark .ops-action-card:hover {
+          background: var(--bg-card);
+          border-color: var(--border-color);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        }
+        .list-item-hover {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 12px;
+          background: #f8fafc;
+          border-radius: 16px;
+          border: 1px solid transparent;
+          transition: all 0.2s ease;
+        }
+        html.dark .list-item-hover {
+          background: var(--bg-app);
+          border-color: var(--border-light);
+        }
+        .list-item-hover:hover {
+          transform: translateX(4px);
+          background: white;
+          border-color: #e2e8f0;
+        }
+        html.dark .list-item-hover:hover {
+          background: var(--bg-hover);
+          border-color: var(--border-color);
+        }
+        .recharts-tooltip-wrapper {
+          outline: none;
+        }
+        .hide-scroll::-webkit-scrollbar {
+          display: none;
+        }
+        
+        .tier2-grid {
+          display: grid;
+          grid-template-columns: 2fr 1fr;
+          gap: 24px;
+          margin-bottom: 24px;
+        }
+        .tier3-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+        }
 
-        .op-card {
-          display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
-          padding: 20px 10px; border-radius: 18px; background: #f8fafc; text-decoration: none;
-          transition: all 0.25s cubic-bezier(0.4,0,0.2,1); border: 1.5px solid transparent;
+        @media (max-width: 1024px) {
+          .tier2-grid {
+            grid-template-columns: 1fr;
+          }
+          .tier3-grid {
+            grid-template-columns: 1fr;
+          }
         }
-        .op-card:hover {
-          background: #fff; border-color: #e2e8f0; transform: translateY(-4px) scale(1.03);
-          box-shadow: 0 10px 24px -6px rgba(0,0,0,0.08);
+        .campus-block {
+          border-radius: 16px;
+          padding: 20px;
+          background: var(--bg-card);
+          border: 1.5px solid var(--border-color);
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.25s ease;
+          text-align: center;
         }
-
-        .chart-bar-wrap:hover .chart-bar { filter: brightness(1.15); }
-
-        .activity-row {
-          display: flex; align-items: center; gap: 14px;
-          padding: 12px 0; border-bottom: 1px solid #f8fafc;
-          transition: background 0.2s; border-radius: 12px;
-          cursor: default;
+        html.dark .campus-block {
+          background: rgba(30, 41, 59, 0.25);
         }
-        .activity-row:hover { background: #f8fafc; padding-left: 10px; padding-right: 10px; margin: 0 -10px; }
-        .activity-row:last-child { border-bottom: none; }
+        .campus-block.active-block {
+          border-color: #10b981;
+          background: rgba(16, 185, 129, 0.06);
+          box-shadow: 0 10px 25px rgba(16, 185, 129, 0.12);
+        }
+        html.dark .campus-block.active-block {
+          background: rgba(16, 185, 129, 0.15);
+        }
+        .pulse-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: #10b981;
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+          animation: map-pulse 1.8s infinite;
+        }
+        @keyframes map-pulse {
+          0% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+          }
+          70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+          }
+          100% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+          }
+        }
+        .timetable-card {
+          background: var(--bg-card);
+          border-radius: 20px;
+          border: 1.5px solid var(--border-color);
+          padding: 20px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .timetable-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 24px rgba(0,0,0,0.04);
+        }
       `}</style>
 
-      <div className="dashboard-container">
+      <motion.div className="noc-dashboard" variants={containerVariants} initial="hidden" animate="show">
         
-        {/* ── HEADER SECTION ── */}
-        <div className="anim-fade-up" style={{ marginBottom: 28 }}>
-          {/* Top row: greeting + actions */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 20 }}>
-            <div>
-              <h2 style={{ fontSize: 30, fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.03em', lineHeight: 1.2 }}>
-                {timeGreeting}, <span style={{ background: 'linear-gradient(135deg,#4f46e5,#9333ea)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{user?.full_name?.split(' ')[0]}</span> 👋
-              </h2>
-              <p style={{ fontSize: 14, color: '#64748b', marginTop: 5, fontWeight: 500 }}>{roleMessage}</p>
+        {/* COMMAND CENTER HEADER */}
+        <motion.div variants={itemVariants} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32, flexWrap: 'wrap', gap: 20 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+              <div style={{ padding: '6px 12px', background: isDark ? 'rgba(79, 70, 229, 0.2)' : '#e0e7ff', color: isDark ? '#818cf8' : '#4f46e5', borderRadius: 20, fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Activity size={14} /> Live Monitor
+              </div>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} • <DashboardClock /></span>
             </div>
-            <div style={{ display: 'flex', gap: 10, flexShrink: 0, alignItems: 'center' }}>
-              <Link to={ROUTES.ADMIN_ANNOUNCEMENTS} className="btn-secondary" style={{ fontSize: 13, padding: '10px 18px' }}>
-                📢 Announce
-              </Link>
-              <Link to={ROUTES.ADMIN_REPORTS} className="btn-primary" style={{ fontSize: 13, padding: '10px 18px' }}>
-                📄 Reports
-              </Link>
-            </div>
+            <h1 style={{ fontSize: 36, fontWeight: 800, margin: 0, letterSpacing: '-0.03em', color: 'var(--text-main)' }}>{userSchool?.name ?? 'Campus Command Center'}</h1>
           </div>
-
-          {/* Academic context banner */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
-            background: 'linear-gradient(135deg,#1e1b4b 0%,#312e81 100%)',
-            borderRadius: 18, padding: '14px 22px',
-            boxShadow: '0 8px 24px -6px rgba(30,27,75,0.35)'
-          }}>
-            {/* School name */}
-            <div style={{ display:'flex', alignItems:'center', gap: 8, marginRight: 4 }}>
-              <span style={{ fontSize: 20 }}>{userSchool?.logo_url ? <img src={userSchool.logo_url} alt="" style={{ width:28,height:28,objectFit:'contain',borderRadius:6 }} /> : '🏫'}</span>
-              <span style={{ fontSize: 14, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
-                {userSchool?.name ?? 'Your School'}
-              </span>
-            </div>
-
-            <div style={{ width:1, height:20, background:'rgba(255,255,255,0.15)', margin:'0 6px' }} />
-
-            {/* Academic year */}
-            {year?.name && (
-              <span className="context-pill" style={{ background:'rgba(99,102,241,0.25)', color:'#c7d2fe' }}>
-                <span style={{ width:6,height:6,borderRadius:'50%',background:'#818cf8',flexShrink:0 }} />
-                {year.name}
-              </span>
-            )}
-
-            {/* Term / Semester — shows full name exactly as stored */}
-            {term ? (
-              <span className="context-pill" style={{ background:'rgba(34,197,94,0.2)', color:'#86efac' }}>
-                <span style={{ width:6,height:6,borderRadius:'50%',background:'#4ade80',flexShrink:0, animation:'_pulse 2s ease infinite' }} />
-                {term.name}
-                <span style={{ fontSize:10, opacity:.8, fontWeight:600, textTransform:'uppercase', letterSpacing:'.06em', marginLeft:2 }}>ACTIVE</span>
-              </span>
-            ) : (
-              <span className="context-pill" style={{ background:'rgba(239,68,68,0.2)', color:'#fca5a5' }}>
-                <span style={{ width:6,height:6,borderRadius:'50%',background:'#f87171',flexShrink:0 }} />
-                No Active Term
-              </span>
-            )}
-
-            <div style={{ width:1, height:20, background:'rgba(255,255,255,0.15)', margin:'0 6px' }} />
-
-            {/* Date + Clock */}
-            <span style={{ fontSize:13, fontWeight:600, color:'rgba(255,255,255,0.6)' }}>
-              {new Date().toLocaleDateString('en-GH',{ weekday:'short', day:'numeric', month:'short' })}
-            </span>
-            <span style={{ fontSize:13, fontWeight:800, color:'#a5b4fc', background:'rgba(99,102,241,0.2)', padding:'3px 10px', borderRadius:8 }}>
-              <DashboardClock />
-            </span>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <Link to={ROUTES.ADMIN_ANNOUNCEMENTS} className="btn-secondary-modern"><MessageSquare size={16} /> Broadcast</Link>
+            <Link to={ROUTES.ADMIN_REPORTS} className="btn-modern"><ArrowUpRight size={16} /> Generate Reports</Link>
           </div>
-        </div>
+        </motion.div>
 
-        {/* ── TOP HERO METRICS ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(400px, 1.5fr) minmax(300px, 1fr)', gap: 24, marginBottom: 24 }}>
+        {/* TOP KPIs GRID */}
+        <motion.div variants={itemVariants} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 24 }}>
           
-          {/* Main Hero Card */}
-          <div className="glass-card anim-fade-up delay-1" style={{ 
-            background: 'linear-gradient(135deg, #1e1b4b 0%, #311860 100%)',
-            color: '#fff', padding: 40, border: 'none', minHeight: 340,
-            display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
-          }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '60%', background: 'radial-gradient(circle at top right, rgba(139,92,246,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
-            
-            {userSchool?.logo_url ? (
-              <img src={userSchool.logo_url} alt="" style={{ position: 'absolute', right: -40, top: '50%', transform: 'translateY(-50%)', width: 300, height: 300, objectFit: 'contain', opacity: 0.1, pointerEvents: 'none' }} />
-            ) : (
-              <div style={{ position: 'absolute', right: -20, top: '50%', transform: 'translateY(-50%)', fontSize: 200, opacity: 0.05, pointerEvents: 'none' }}>🏫</div>
-            )}
-
-            <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#a5b4fc', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 12px' }}>Total Population</p>
-                <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.04em', display: 'flex', alignItems: 'baseline', gap: 12 }}>
-                  <AnimNum to={(stats?.students ?? 0) + (stats?.teachers ?? 0)} />
-                  <span style={{ fontSize: 20, fontWeight: 600, color: '#818cf8', letterSpacing: '0' }}>members</span>
-                </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                {userSchool?.logo_url && <img src={userSchool.logo_url} alt="School Logo" style={{ width: 64, height: 64, objectFit: 'contain', background: 'rgba(255,255,255,0.1)', padding: 8, borderRadius: 16 }} />}
-              </div>
+          <Link to={ROUTES.ADMIN_STUDENTS} className="kpi-card" style={{ '--theme-color': '#3b82f6' } as any}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 16, background: isDark ? 'rgba(59, 130, 246, 0.2)' : '#eff6ff', color: isDark ? '#60a5fa' : '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BookOpen size={24} /></div>
+              <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
             </div>
-
-            <div style={{ position: 'relative', zIndex: 1, display: 'flex', gap: 24, marginTop: 40 }}>
-              <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)', padding: '20px 24px', borderRadius: 20, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <div style={{ fontSize: 13, color: '#c7d2fe', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Students Enrolled</div>
-                <div style={{ fontSize: 32, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ color: '#38bdf8' }}>👨‍🎓</span> <AnimNum to={stats?.students ?? 0} />
-                </div>
-              </div>
-              <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)', padding: '20px 24px', borderRadius: 20, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <div style={{ fontSize: 13, color: '#c7d2fe', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Teaching Staff</div>
-                <div style={{ fontSize: 32, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ color: '#a78bfa' }}>👩‍🏫</span> <AnimNum to={stats?.teachers ?? 0} />
-                </div>
-              </div>
+            <div>
+              <div style={{ fontSize: 32, fontWeight: 800, lineHeight: 1, color: 'var(--text-main)' }}><AnimNum to={stats?.students ?? 0} /></div>
+              <div style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 600, marginTop: 8 }}>Total Students Active</div>
             </div>
-          </div>
+          </Link>
 
-          {/* Reports Progress Card */}
-          <div className="glass-card anim-fade-up delay-2" style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #fffbf5 100%)', padding: 32, display: 'flex', flexDirection: 'column', gap: 0 }}>
+          <Link to={ROUTES.ADMIN_STAFF_DIRECTORY} className="kpi-card" style={{ '--theme-color': '#8b5cf6' } as any}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 16, background: isDark ? 'rgba(139, 92, 246, 0.2)' : '#f5f3ff', color: isDark ? '#a78bfa' : '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Activity size={24} /></div>
+              <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
+            </div>
+            <div>
+              <div style={{ fontSize: 32, fontWeight: 800, lineHeight: 1, color: 'var(--text-main)' }}><AnimNum to={stats?.teachers ?? 0} /></div>
+              <div style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 600, marginTop: 8 }}>Teaching Staff</div>
+            </div>
+          </Link>
 
-            {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <Link to={ROUTES.ADMIN_ATTENDANCE} className="kpi-card" style={{ '--theme-color': '#10b981' } as any}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 16, background: isDark ? 'rgba(16, 185, 129, 0.2)' : '#ecfdf5', color: isDark ? '#34d399' : '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CheckCircle2 size={24} /></div>
+              <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
+            </div>
+            <div>
+              <div style={{ fontSize: 32, fontWeight: 800, lineHeight: 1, color: 'var(--text-main)' }}>{stats?.students ? Math.round((stats.presentToday / stats.students) * 100) : 0}%</div>
+              <div style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 600, marginTop: 8 }}>Today's Attendance Rate</div>
+            </div>
+          </Link>
+
+          <Link to={'/bursar/fees'} className="kpi-card" style={{ '--theme-color': '#f59e0b' } as any}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 16, background: isDark ? 'rgba(245, 158, 11, 0.2)' : '#fffbeb', color: isDark ? '#fbbf24' : '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 800 }}>₵</div>
+              <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
+            </div>
+            <div>
+              <div style={{ fontSize: 32, fontWeight: 800, lineHeight: 1, color: 'var(--text-main)' }}><AnimNum to={stats?.totalDebt ?? 0} /></div>
+              <div style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 600, marginTop: 8 }}>Outstanding Revenue</div>
+            </div>
+          </Link>
+
+        </motion.div>
+
+        {/* MAIN DASHBOARD STRUCTURED GRID */}
+        {/* Tier 2: Analytical & Operations Deck */}
+        <div className="tier2-grid">
+          
+          {/* Tabbed Analytics Panel */}
+          <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 32, height: 400 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
               <div>
-                <h3 style={{ fontSize: 17, fontWeight: 800, color: '#9a3412', margin: 0 }}>Report Cards</h3>
-                <p style={{ fontSize: 12, color: '#c2410c', margin: '3px 0 0', fontWeight: 600 }}>
-                  {term?.name ?? 'No active term set'}
+                <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
+                  {activeAnalyticsTab === 'financials' ? 'Revenue Trend' : activeAnalyticsTab === 'academics' ? 'Class Academics' : 'Weekly Goals Tracker'}
+                </h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '4px 0 0' }}>
+                  {activeAnalyticsTab === 'financials' 
+                    ? 'Fee collections over the last 6 months' 
+                    : activeAnalyticsTab === 'academics' 
+                      ? 'Academic average scores compared across all classes' 
+                      : 'Weekly instruction goals set for teachers this term'}
                 </p>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-                {/* Donut */}
-                <div style={{ position: 'relative', width: 64, height: 64 }}>
-                  <svg width="64" height="64" viewBox="0 0 64 64">
-                    <circle cx="32" cy="32" r="26" fill="none" stroke="#fed7aa" strokeWidth="8"/>
-                    <circle cx="32" cy="32" r="26" fill="none"
-                      stroke={reportPct === 100 ? '#16a34a' : '#f97316'} strokeWidth="8"
-                      strokeDasharray={`${(reportPct / 100) * 163.4} 163.4`}
-                      strokeLinecap="round"
-                      transform="rotate(-90 32 32)"
-                      style={{ transition: 'stroke-dasharray 1s ease' }}
+              
+              <div style={{ display: 'flex', background: isDark ? 'var(--bg-app)' : '#f1f5f9', borderRadius: 14, padding: 4 }}>
+                {[
+                  { id: 'financials', label: '📈 Revenue' },
+                  { id: 'academics', label: '🎓 Academics' },
+                  { id: 'goals', label: '🎯 Goals' }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveAnalyticsTab(tab.id as any)}
+                    className="tab-button"
+                    style={{
+                      background: activeAnalyticsTab === tab.id ? 'var(--bg-card)' : 'transparent',
+                      color: activeAnalyticsTab === tab.id ? 'var(--text-main)' : 'var(--text-muted)',
+                      boxShadow: activeAnalyticsTab === tab.id ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+                      borderRadius: 10,
+                      padding: '6px 12px',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {activeAnalyticsTab === 'financials' && (
+              <div style={{ width: '100%', height: 280 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={financeData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#6366f1" stopOpacity={isDark ? 0.45 : 0.3}/>
+                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255, 255, 255, 0.06)' : '#e2e8f0'} />
+                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} tickFormatter={val => `₵${val/1000}k`} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: isDark ? 'var(--bg-card)' : 'white', 
+                        borderColor: 'var(--border-color)', 
+                        borderRadius: 12, 
+                        border: '1.5px solid var(--border-color)', 
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                        color: 'var(--text-main)'
+                      }}
+                      itemStyle={{ color: 'var(--text-main)' }}
+                      labelStyle={{ color: 'var(--text-muted)' }}
+                      formatter={(value: number) => [`GH₵ ${value.toLocaleString()}`, 'Collected']}
                     />
-                  </svg>
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: reportPct === 100 ? '#16a34a' : '#ea580c' }}>
-                    {reportPct}%
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Stats row */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 18 }}>
-              {[
-                { label: 'Generated', value: stats?.reportsGenerated ?? 0, color: '#f97316', bg: '#fff7ed' },
-                { label: 'Approved', value: stats?.reportsGenerated ? (stats.reportsGenerated - (stats.pendingApproval ?? 0)) : 0, color: '#16a34a', bg: '#f0fdf4' },
-                { label: 'Pending ✍️', value: stats?.pendingApproval ?? 0, color: stats?.pendingApproval ? '#dc2626' : '#94a3b8', bg: stats?.pendingApproval ? '#fef2f2' : '#f8fafc' },
-              ].map(s => (
-                <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '10px 12px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: s.color, lineHeight: 1 }}><AnimNum to={s.value} /></div>
-                  <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', marginTop: 4 }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Progress bar */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', marginBottom: 6 }}>
-                <span>Progress</span>
-                <span>{stats?.reportsGenerated ?? 0} / {stats?.totalStudentsForReports ?? 0} students</span>
-              </div>
-              <div style={{ height: 8, background: '#fed7aa', borderRadius: 99, overflow: 'hidden' }}>
-                <div style={{
-                  height: '100%',
-                  width: `${reportPct}%`,
-                  background: reportPct === 100 ? 'linear-gradient(90deg,#16a34a,#22c55e)' : 'linear-gradient(90deg,#f97316,#fb923c)',
-                  borderRadius: 99,
-                  transition: 'width 1.2s cubic-bezier(0.4,0,0.2,1)'
-                }} />
-              </div>
-            </div>
-
-            {/* Pending approval alert */}
-            {(stats?.pendingApproval ?? 0) > 0 && (
-              <div style={{ background: '#fef2f2', border: '1.5px solid #fecaca', borderRadius: 12, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: '#dc2626' }}>
-                    {stats?.pendingApproval} report{(stats?.pendingApproval ?? 0) > 1 ? 's' : ''} awaiting your approval
-                  </div>
-                  <div style={{ fontSize: 11, color: '#ef4444', marginTop: 2 }}>Review and approve to finalise this term</div>
-                </div>
+                    <Area type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorAmount)" activeDot={{ r: 6, strokeWidth: 0, fill: '#6366f1' }} />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             )}
 
-            {/* Scores not submitted alert */}
-            {(stats?.pendingScores ?? 0) > 0 && (
-              <div style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 12, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 18, flexShrink: 0 }}>✏️</span>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: '#d97706' }}>
-                    {stats?.pendingScores} score{(stats?.pendingScores ?? 0) > 1 ? 's' : ''} not yet submitted by teachers
+            {activeAnalyticsTab === 'academics' && (
+              <div style={{ width: '100%', height: 280 }}>
+                {classStats.length === 0 ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-subtle)', fontSize: 14 }}>No academic averages found.</div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart 
+                      data={classStats.map(c => ({
+                        name: c.name,
+                        average: c.avg_score ? Math.round(c.avg_score) : 0
+                      }))}
+                      margin={{ top: 10, right: 0, left: -20, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255, 255, 255, 0.06)' : '#e2e8f0'} />
+                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} dy={10} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} tickFormatter={val => `${val}%`} />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: isDark ? 'var(--bg-card)' : 'white', 
+                          borderColor: 'var(--border-color)', 
+                          borderRadius: 12, 
+                          border: '1.5px solid var(--border-color)', 
+                          boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                          color: 'var(--text-main)'
+                        }}
+                        itemStyle={{ color: 'var(--text-main)' }}
+                        labelStyle={{ color: 'var(--text-muted)' }}
+                        formatter={(value: number) => [`${value}%`, 'Class Average']}
+                      />
+                      <Bar dataKey="average" radius={[6, 6, 0, 0]}>
+                        {classStats.map((entry, index) => {
+                          const score = entry.avg_score || 0
+                          const color = score >= 75 ? '#10b981' : score >= 50 ? '#6366f1' : '#f59e0b'
+                          return <Cell key={`cell-${index}`} fill={color} />
+                        })}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            )}
+
+            {activeAnalyticsTab === 'goals' && (
+              <div style={{ display: 'flex', height: 280, gap: 24, alignItems: 'center' }}>
+                <div style={{ width: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ position: 'relative', width: 140, height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                      <circle 
+                        cx="70" cy="70" r="55" 
+                        stroke={isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'} 
+                        strokeWidth="12" fill="transparent" 
+                      />
+                      <circle 
+                        cx="70" cy="70" r="55" 
+                        stroke="#f59e0b" strokeWidth="12" fill="transparent" 
+                        strokeDasharray={2 * Math.PI * 55}
+                        strokeDashoffset={2 * Math.PI * 55 * (1 - (weeklyGoalsStats.percentage / 100))}
+                        strokeLinecap="round"
+                        style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+                      />
+                    </svg>
+                    <div style={{ position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <span style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)' }}>{weeklyGoalsStats.percentage}%</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Completed</span>
+                    </div>
                   </div>
-                  <div style={{ fontSize: 11, color: '#ca8a04', marginTop: 2 }}>Reports can't be generated until all scores are in</div>
+                </div>
+                <div style={{ width: '60%', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 16, border: '1.5px solid var(--border-color)' }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Set</div>
+                      <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginTop: 4 }}>{weeklyGoalsStats.total}</div>
+                    </div>
+                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 16, border: '1.5px solid var(--border-color)' }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Achieved</div>
+                      <div style={{ fontSize: 24, fontWeight: 800, color: '#10b981', marginTop: 4 }}>{weeklyGoalsStats.completed}</div>
+                    </div>
+                  </div>
+                  <Link 
+                    to="/admin/weekly-goals" 
+                    style={{ 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, 
+                      padding: 12, background: 'var(--text-main)', color: 'var(--bg-app)', 
+                      borderRadius: 12, fontWeight: 700, fontSize: 13, textDecoration: 'none', 
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)', transition: 'all 0.2s' 
+                    }}
+                    onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                    onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}
+                  >
+                    <CheckSquare size={16} /> Manage Weekly Goals
+                  </Link>
                 </div>
               </div>
             )}
+          </motion.div>
 
-            {/* Done state */}
-            {reportPct === 100 && (stats?.pendingApproval ?? 0) === 0 && (
-              <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 12, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 18 }}>🎉</span>
-                <div style={{ fontSize: 12, fontWeight: 800, color: '#16a34a' }}>All reports generated & approved!</div>
+          {/* Operations Deck */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {/* Attention Required (System Alerts) */}
+            {(stats?.pendingApproval || stats?.pendingScores || stats?.unreadMessages || pendingLeavesCount > 0 || pendingExeatsCount > 0) ? (
+              <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, background: isDark ? 'rgba(225, 29, 72, 0.08)' : 'linear-gradient(135deg, #fff1f2 0%, #fff 100%)', border: isDark ? '1.5px solid rgba(225, 29, 72, 0.2)' : '1px solid #ffe4e6' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                  <AlertCircle color="#e11d48" size={20} />
+                  <h3 style={{ fontSize: 16, fontWeight: 800, color: '#e11d48', margin: 0 }}>Attention Required</h3>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {stats && stats.pendingApproval > 0 && (
+                    <Link to={ROUTES.ADMIN_REPORTS} style={{ display: 'flex', justifyContent: 'space-between', padding: 12, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 12, textDecoration: 'none', color: 'var(--text-main)', fontWeight: 600, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                      <span>Reports awaiting approval</span>
+                      <span style={{ background: '#e11d48', color: 'white', padding: '2px 8px', borderRadius: 99, fontSize: 12 }}>{stats.pendingApproval}</span>
+                    </Link>
+                  )}
+                  {stats && stats.pendingScores > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: 12, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 12, color: 'var(--text-main)', fontWeight: 600, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                      <span>Missing teacher scores</span>
+                      <span style={{ background: '#f59e0b', color: 'white', padding: '2px 8px', borderRadius: 99, fontSize: 12 }}>{stats.pendingScores}</span>
+                    </div>
+                  )}
+                  {pendingLeavesCount > 0 && (
+                    <Link to="/admin/staff-leave" style={{ display: 'flex', justifyContent: 'space-between', padding: 12, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 12, textDecoration: 'none', color: 'var(--text-main)', fontWeight: 600, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                      <span>Staff leave requests pending</span>
+                      <span style={{ background: '#d97706', color: 'white', padding: '2px 8px', borderRadius: 99, fontSize: 12 }}>{pendingLeavesCount}</span>
+                    </Link>
+                  )}
+                  {pendingExeatsCount > 0 && (
+                    <Link to="/admin/exeats" style={{ display: 'flex', justifyContent: 'space-between', padding: 12, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 12, textDecoration: 'none', color: 'var(--text-main)', fontWeight: 600, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                      <span>Student exeat requests pending</span>
+                      <span style={{ background: '#2563eb', color: 'white', padding: '2px 8px', borderRadius: 99, fontSize: 12 }}>{pendingExeatsCount}</span>
+                    </Link>
+                  )}
+                </div>
+              </motion.div>
+            ) : null}
+
+            {/* Quick Actions Deck */}
+            <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 16px', color: 'var(--text-main)' }}>Operations</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                {[
+                  { icon: '📁', label: 'Vault', to: '/admin/staff-vault', color: '#facc15' },
+                  { icon: '📅', label: 'Calendar', to: ROUTES.ADMIN_CALENDAR, color: '#ef4444' },
+                  { icon: '📱', label: 'SMS', to: ROUTES.ADMIN_SMS, color: '#14b8a6' },
+                  { icon: '⚙️', label: 'Settings', to: ROUTES.ADMIN_SETTINGS, color: '#64748b' },
+                  { icon: '🛏️', label: 'Boarding', to: '/admin/boarding', color: '#10b981' },
+                  { icon: '❤️', label: 'Pastoral', to: '/admin/pastoral', color: '#ef4444' },
+                ].map(({ icon, label, to, color }) => (
+                  <Link key={label} to={to} className="ops-action-card">
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{icon}</div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-main)' }}>{label}</span>
+                  </Link>
+                ))}
               </div>
-            )}
+            </motion.div>
+          </div>
+        </div>
 
-            {/* Action buttons */}
-            <div style={{ marginTop: 'auto', display: 'flex', gap: 10 }}>
-              <Link to={ROUTES.ADMIN_REPORTS} style={{
-                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                background: 'linear-gradient(135deg,#ea580c,#f97316)', color: '#fff',
-                padding: '13px 16px', borderRadius: 14, textDecoration: 'none',
-                fontWeight: 800, fontSize: 14,
-                boxShadow: '0 6px 18px rgba(249,115,22,0.35)',
-                transition: 'all 0.2s'
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 24px rgba(249,115,22,0.45)' }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(249,115,22,0.35)' }}
-              >
-                📄 Manage Reports →
-              </Link>
+        {/* Live Classroom Coverage Monitor & Teacher Schedule Coverage */}
+        <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 32, marginBottom: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
+                <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Live Classroom Monitor</h3>
+              </div>
+              <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '4px 0 0' }}>
+                Active classes, schedules, and assigned teachers on campus today.
+              </p>
+            </div>
+            
+            <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)' }}>Classroom Coverage</div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: '#10b981', marginTop: 2 }}>
+                  {coverageStats.percentage}% <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>({coverageStats.activeClasses}/{coverageStats.totalClasses} Active)</span>
+                </div>
+              </div>
+              <div style={{ width: 100, height: 8, background: isDark ? 'rgba(255,255,255,0.06)' : '#e2e8f0', borderRadius: 99, overflow: 'hidden' }}>
+                <div style={{ width: `${coverageStats.percentage}%`, height: '100%', background: '#10b981', borderRadius: 99 }} />
+              </div>
             </div>
           </div>
 
+          {/* Weekend Mode Indicator */}
+          {(new Date().getDay() === 0 || new Date().getDay() === 6) && (
+            <div style={{ 
+              background: isDark ? 'rgba(99,102,241,0.1)' : '#e0e7ff',
+              border: '1px solid rgba(99,102,241,0.2)',
+              borderRadius: 14, padding: '12px 16px', fontSize: 13, color: isDark ? '#a5b4fc' : '#4f46e5',
+              display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontWeight: 600
+            }}>
+              💡 Weekend Mode: Currently displaying Monday's simulated class schedules for presentation purposes.
+            </div>
+          )}
 
-        </div>
+          {/* Classroom Cards Grid */}
+          {todayLessons.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-subtle)', fontSize: 14 }}>
+              No timetable classes scheduled for today.
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+              {todayLessons.map((l: any) => (
+                <div key={l.id} className="timetable-card">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                    <span style={{ 
+                      padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 800, textTransform: 'uppercase',
+                      background: l.isNow ? (isDark ? 'rgba(16,185,129,0.15)' : '#ecfdf5') : (isDark ? 'rgba(255,255,255,0.04)' : '#f1f5f9'),
+                      color: l.isNow ? '#10b981' : 'var(--text-muted)',
+                      display: 'inline-flex', alignItems: 'center', gap: 6
+                    }}>
+                      {l.isNow && <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', display: 'inline-block', animation: 'map-pulse 1.8s infinite' }} />}
+                      {l.isNow ? 'In Session' : 'Scheduled'}
+                    </span>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{l.period?.name}</span>
+                  </div>
 
-        {/* ── METRICS GRID ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
+                  <h4 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 4px' }}>{l.class?.name}</h4>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#6366f1', marginBottom: 14 }}>{l.subject?.name}</div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 700, textTransform: 'uppercase' }}>Teacher</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginTop: 2 }}>{l.teacher?.user?.full_name ?? 'Substitute Assigned'}</div>
+                    </div>
+                    
+                    <button 
+                      onClick={() => setLocateClass(l)}
+                      style={{ 
+                        display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 12px', 
+                        background: isDark ? 'rgba(99,102,241,0.15)' : '#e0e7ff', color: isDark ? '#a5b4fc' : '#4f46e5',
+                        border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseOver={e => { e.currentTarget.style.transform = 'scale(1.03)' }}
+                      onMouseOut={e => { e.currentTarget.style.transform = 'scale(1)' }}
+                    >
+                      <MapPin size={12} /> Locate
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+
+        {/* Tier 3: Campus Vital Signs Grid */}
+        <div className="tier3-grid">
           
-          {/* Finance Performance */}
-          <div className="glass-card anim-fade-up delay-3" style={{ padding: 32, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>Financial Overview</h3>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: '#f0fdfa', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0d9488', fontSize: 20 }}>💰</div>
-            </div>
-            
-            <div style={{ marginBottom: 40 }}>
-              <div style={{ fontSize: 36, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 8 }}>
-                GH₵<AnimNum to={stats?.totalDebt ?? 0} />
+          {/* Column 1: Academic Standings */}
+          <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', minHeight: 380 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Academic Leaders</h3>
+              <div style={{ display: 'flex', background: isDark ? 'var(--bg-app)' : '#f1f5f9', borderRadius: 12, padding: 4 }}>
+                <button 
+                  onClick={() => setTopTab('students')} 
+                  className="tab-button"
+                  style={{ 
+                    background: topTab === 'students' ? 'var(--bg-card)' : 'transparent', 
+                    color: topTab === 'students' ? 'var(--text-main)' : 'var(--text-muted)',
+                    boxShadow: topTab === 'students' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'
+                  }}
+                >
+                  Students
+                </button>
+                <button 
+                  onClick={() => setTopTab('subjects')} 
+                  className="tab-button"
+                  style={{ 
+                    background: topTab === 'subjects' ? 'var(--bg-card)' : 'transparent', 
+                    color: topTab === 'subjects' ? 'var(--text-main)' : 'var(--text-muted)',
+                    boxShadow: topTab === 'subjects' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'
+                  }}
+                >
+                  Subjects
+                </button>
               </div>
-              <div style={{ fontSize: 14, color: '#64748b', fontWeight: 500, marginTop: 4 }}>Total outstanding fees/arrears</div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: 140, gap: 12, marginTop: 'auto', padding: '20px 0 0' }}>
-              {financeData.length === 0 ? (
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 13, fontWeight: 500 }}>No payment data yet</div>
-              ) : (
-                financeData.map((d, i) => {
-                  const maxVal = Math.max(...financeData.map(m => m.amount), 1000)
-                  const h = Math.max(10, (d.amount / maxVal) * 100)
-                  const isLast = i === financeData.length - 1
-                  return (
-                    <div key={i} className="chart-bar-wrap" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, cursor: 'pointer', group: 'true' }}>
-                      <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-                        <div className="chart-bar" style={{ width: 12, height: `${h}%`, background: isLast ? 'linear-gradient(to top, #0ea5e9, #38bdf8)' : '#e0f2fe', borderRadius: 99, transition: 'all 0.3s' }} />
-                      </div>
-                      <span style={{ fontSize: 11, color: isLast ? '#0ea5e9' : '#94a3b8', fontWeight: 700 }}>{d.month}</span>
-                    </div>
-                  )
-                })
-              )}
-            </div>
-          </div>
-
-          {/* Top Performers */}
-          <div className="glass-card anim-fade-up delay-3" style={{ padding: 32 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>Top Performers</h3>
-              <div style={{ background: '#fef3c7', color: '#d97706', padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>Live Rank</div>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {topStudents.length === 0 ? (
-                <div style={{ padding: '40px 0', textAlign: 'center', color: '#64748b', fontSize: 14, fontWeight: 500 }}>No scores entered yet this term</div>
-              ) : topStudents.slice(0, 5).map((s, i) => {
-                const g = getGradeInfo(s.average_score)
-                return (
-                  <div key={s.student_id} className="hover-row" style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 16px', margin: '0 -16px', borderBottom: i < 4 ? '1px solid #f1f5f9' : 'none' }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 10, background: i === 0 ? '#fef3c7' : i === 1 ? '#f1f5f9' : i === 2 ? '#ffedd5' : '#f8fafc', color: i === 0 ? '#d97706' : i === 1 ? '#64748b' : i === 2 ? '#c2410c' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800 }}>
-                      #{i + 1}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 15, fontWeight: 700, color: '#1e293b', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.full_name}</p>
-                      <p style={{ fontSize: 12, color: '#64748b', margin: '2px 0 0', fontWeight: 500 }}>{s.class_name}</p>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: g.color }}>{(s.average_score / 20).toFixed(1)}</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>GPA</div>
-                    </div>
-                  </div>
-                )
-              })}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }} className="hide-scroll">
+              <AnimatePresence mode="wait">
+                {topTab === 'students' ? (
+                  <motion.div key="students" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {topStudents.length ? topStudents.map((s, i) => {
+                      const g = getGradeInfo(s.average_score)
+                      return (
+                        <div key={s.student_id} className="list-item-hover">
+                          <div style={{ width: 36, height: 36, borderRadius: 12, background: i === 0 ? (isDark ? '#854d0e' : '#fef3c7') : (isDark ? '#334155' : '#fff'), color: i === 0 ? (isDark ? '#fef08a' : '#d97706') : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, border: '1.5px solid var(--border-light)', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>#{i + 1}</div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{s.full_name}</div>
+                            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>{s.class_name}</div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: 16, fontWeight: 800, color: g.color }}>{(s.average_score / 20).toFixed(2)}</div>
+                            <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 700 }}>GPA</div>
+                          </div>
+                        </div>
+                      )
+                    }) : <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-subtle)' }}>No scores available</div>}
+                  </motion.div>
+                ) : (
+                  <motion.div key="subjects" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {topSubjects.length ? topSubjects.map((s, i) => (
+                      <div key={s.subject_id} className="list-item-hover">
+                        <div style={{ width: 36, height: 36, borderRadius: 12, background: isDark ? 'rgba(99,102,241,0.2)' : '#e0e7ff', color: isDark ? '#a5b4fc' : '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, border: '1.5px solid var(--border-light)', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>#{i + 1}</div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{s.name}</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: 16, fontWeight: 800, color: '#10b981' }}>{s.average.toFixed(1)}%</div>
+                          <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 700 }}>AVG SCORE</div>
+                        </div>
+                      </div>
+                    )) : <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-subtle)' }}>No subject data available</div>}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Quick Operations Grid */}
-          <div className="glass-card anim-fade-up delay-4" style={{ padding: 32 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', margin: '0 0 24px' }}>Quick Operations</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-              {[
-                { icon: '👥', label: 'Students', to: ROUTES.ADMIN_STUDENTS, color: '#3b82f6' },
-                { icon: '👩‍🏫', label: 'Teachers', to: ROUTES.ADMIN_TEACHERS, color: '#8b5cf6' },
-                { icon: '🏫', label: 'Classes', to: ROUTES.ADMIN_CLASSES, color: '#10b981' },
-                { icon: '📚', label: 'Subjects', to: ROUTES.ADMIN_SUBJECTS, color: '#f59e0b' },
-                { icon: '📅', label: 'Calendar', to: ROUTES.ADMIN_CALENDAR, color: '#ef4444' },
-                { icon: '📊', label: 'Analytics', to: ROUTES.ADMIN_ANALYTICS, color: '#06b6d4' },
-                { icon: '📱', label: 'SMS', to: ROUTES.ADMIN_SMS, color: '#14b8a6' },
-                { icon: '⚙️', label: 'Settings', to: ROUTES.ADMIN_SETTINGS, color: '#64748b' },
-                { icon: '🛏️', label: 'Boarding', to: '/admin/boarding', color: '#10b981' },
-                { icon: '🚪', label: 'Exeats', to: '/admin/exeats', color: '#f59e0b' },
-                { icon: '❤️', label: 'Pastoral', to: '/admin/pastoral', color: '#ef4444' },
-              ].map(({ icon, label, to, color }) => (
-                <Link key={label} to={to} className="op-card">
-                  <div style={{ width: 44, height: 44, borderRadius: 14, background: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: color }}>
-                    {icon}
+          {/* Column 2: Gate Security Monitor */}
+          <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', minHeight: 380 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-main)' }}>
+                <Navigation size={18} color="#6366f1" /> Campus Security
+              </h3>
+              <Link to={'/admin/exeats'} style={{ fontSize: 12, fontWeight: 700, color: '#6366f1', textDecoration: 'none' }}>View Log</Link>
+            </div>
+            
+            <div className="hide-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {outOfCampus.length === 0 ? (
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14, padding: 40 }}>All personnel on campus.</div>
+              ) : outOfCampus.map(o => (
+                <div key={o.id} className="list-item-hover">
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{o.name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', textTransform: 'capitalize' }}>{o.type} • Left at {new Date(o.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#334155' }}>{label}</span>
-                </Link>
+                </div>
               ))}
             </div>
-          </div>
+          </motion.div>
+
+          {/* Column 3: Attendance Welfare */}
+          <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', minHeight: 380 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Absentee Alert</h3>
+              <span style={{ background: isDark ? 'rgba(239,68,68,0.2)' : '#fef2f2', color: '#ef4444', padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 800 }}>{absentStudents.length} Students</span>
+            </div>
+            
+            <div className="hide-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {absentStudents.length === 0 ? (
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14, padding: 40 }}>No absences reported today.</div>
+              ) : absentStudents.map(a => (
+                <div key={a.student_id} className="list-item-hover" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)' }}>{a.full_name}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{a.class_name}</div>
+                    </div>
+                  </div>
+                  
+                  <div style={{ background: 'var(--bg-card)', padding: 12, borderRadius: 12, border: '1.5px solid var(--border-light)' }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>Contact Guardian</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      👤 {a.guardian_name || 'N/A'}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#6366f1' }}>{a.guardian_phone || 'No phone'}</span>
+                      {a.guardian_phone && (
+                        <a href={`tel:${a.guardian_phone}`} style={{ width: 28, height: 28, background: isDark ? 'rgba(99,102,241,0.2)' : '#e0e7ff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#a5b4fc' : '#4f46e5', textDecoration: 'none' }}>
+                          <Phone size={14} />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
 
         </div>
 
-        {/* Message Modal */}
-        {activeMsg && (
-          <div onClick={() => setActiveMsg(null)} style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-            <div onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 520, boxShadow: '0 24px 64px rgba(0,0,0,0.2)', overflow: 'hidden', animation: 'scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-              <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', background: '#f8fafc' }}>
-                <div>
-                  <p style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.02em' }}>{activeMsg.body.split("\n")[0].slice(0, 80)}</p>
-                  <p style={{ fontSize: 14, color: '#64748b', margin: '6px 0 0', fontWeight: 500 }}>From: {activeMsg.sender?.full_name ?? 'Staff'} • {timeAgo(activeMsg.created_at)}</p>
+        {/* MAP MODAL */}
+        {locateClass && (
+          <div 
+            onClick={() => setLocateClass(null)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 1000, 
+              background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(8px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24
+            }}
+          >
+            <div 
+              onClick={e => e.stopPropagation()}
+              style={{
+                background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 840,
+                maxHeight: 'calc(100vh - 48px)',
+                boxShadow: '0 24px 64px rgba(0,0,0,0.2)', border: '1.5px solid var(--border-color)',
+                display: 'flex', flexDirection: 'column', overflow: 'hidden',
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif"
+              }}
+            >
+              {/* Modal Header */}
+              <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Navigation color="#6366f1" size={20} />
+                  <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Campus Classroom Directory</h3>
                 </div>
-                <button onClick={() => setActiveMsg(null)} style={{ width: 36, height: 36, borderRadius: 12, border: 'none', background: '#e2e8f0', cursor: 'pointer', fontSize: 16, color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#cbd5e1'} onMouseLeave={e => e.currentTarget.style.background = '#e2e8f0'}>✕</button>
+                <button onClick={() => setLocateClass(null)} style={{ background: isDark ? 'var(--bg-app)' : '#f1f5f9', border: 'none', borderRadius: 10, padding: 8, cursor: 'pointer', color: 'var(--text-muted)', fontWeight: 'bold' }}>✕</button>
               </div>
-              <div style={{ padding: '32px' }}>
-                <p style={{ fontSize: 16, color: '#334155', lineHeight: 1.6, margin: 0 }}>{activeMsg.body}</p>
+
+              {/* Modal Body */}
+              <div style={{ padding: 24, display: 'flex', gap: 24, flexWrap: 'wrap', overflowY: 'auto', flex: 1 }}>
+                {/* Visual Map Column (Left) */}
+                <div style={{ flex: '1 1 450px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Visual Location Map</div>
+                  
+                  {/* Outer Map Grid */}
+                  <div style={{ 
+                    background: isDark ? 'rgba(15,23,42,0.4)' : '#f8fafc',
+                    border: '1.5px dashed var(--border-color)', borderRadius: 16,
+                    padding: 24, minHeight: 260, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16,
+                    position: 'relative'
+                  }}>
+                    {/* Block A */}
+                    <div className={`campus-block ${locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A') ? 'active-block' : ''}`}>
+                      <span style={{ fontSize: 24 }}>🏫</span>
+                      <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-main)' }}>Block A</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Science & Admin</div>
+                      { (locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A')) && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
+                          <div className="pulse-dot" />
+                          <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981' }}>{locateClass.class?.name} Room</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Block B */}
+                    <div className={`campus-block ${locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B') ? 'active-block' : ''}`}>
+                      <span style={{ fontSize: 24 }}>📚</span>
+                      <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-main)' }}>Block B</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Humanities & Library</div>
+                      { (locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')) && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
+                          <div className="pulse-dot" />
+                          <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981' }}>{locateClass.class?.name} Room</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Block C */}
+                    <div className={`campus-block ${!(locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A') || locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')) ? 'active-block' : ''}`}>
+                      <span style={{ fontSize: 24 }}>💻</span>
+                      <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-main)' }}>Block C</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Math & Technology</div>
+                      { !(locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A') || locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')) && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
+                          <div className="pulse-dot" />
+                          <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981' }}>{locateClass.class?.name} Room</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Gate to Block directions */}
+                  <div style={{ background: isDark ? 'var(--bg-app)' : '#f1f5f9', padding: '12px 16px', borderRadius: 12, fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    📍 <strong>Main Gate Entrance</strong> ────────▶ <strong>Administration Archway</strong> ────────▶ <strong>Active Building Highlighted</strong>
+                  </div>
+                </div>
+
+                {/* Details Column (Right) */}
+                <div style={{ flex: '1 1 280px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>Class Details</div>
+                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 16, border: '1.5px solid var(--border-color)' }}>
+                      <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>{locateClass.class?.name}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: '#6366f1', marginBottom: 12 }}>{locateClass.subject?.name}</div>
+                      <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ color: 'var(--text-muted)' }}>Instructor:</span>
+                          <strong style={{ color: 'var(--text-main)' }}>{locateClass.teacher?.user?.full_name ?? 'Substitute Assigned'}</strong>
+                        </div>
+                        <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ color: 'var(--text-muted)' }}>Period:</span>
+                          <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{locateClass.period?.name} ({locateClass.period?.start_time?.slice(0, 5)} - {locateClass.period?.end_time?.slice(0, 5)})</span>
+                        </div>
+                        <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ color: 'var(--text-muted)' }}>Session:</span>
+                          <span style={{ color: locateClass.isNow ? '#10b981' : '#f59e0b', fontWeight: 800, textTransform: 'uppercase', fontSize: 11 }}>
+                            {locateClass.isNow ? '● IN SESSION' : '○ UPCOMING'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>Directions from Office</div>
+                    <div style={{ border: '1.5px solid var(--border-color)', padding: 16, borderRadius: 16, background: 'var(--bg-card)' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12 }}>
+                        <div style={{ background: '#6366f1', color: 'white', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 'bold', flexShrink: 0 }}>1</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-main)', lineHeight: 1.4 }}>
+                          {locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A') 
+                            ? 'Head to Block A (Administration & Science Block).' 
+                            : locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')
+                              ? 'Proceed past Block A towards Block B (Humanities Block).'
+                              : 'Head straight to Block C (Math & Tech Block) near the labs.'}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12 }}>
+                        <div style={{ background: '#6366f1', color: 'white', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 'bold', flexShrink: 0 }}>2</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-main)', lineHeight: 1.4 }}>
+                          Take the central stairwell to the <strong>2nd Floor</strong>.
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                        <div style={{ background: '#6366f1', color: 'white', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 'bold', flexShrink: 0 }}>3</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-main)', lineHeight: 1.4 }}>
+                          Room is on your immediate left, designated as <strong>Room {locateClass.class?.name?.match(/\d+/)?.[0] ?? '20'}{locateClass.class?.name?.slice(-1) || 'A'}</strong>.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div style={{ padding: '20px 32px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', background: '#f8fafc' }}>
-                <button onClick={() => setActiveMsg(null)} className="btn-primary">Done</button>
+
+              {/* Modal Footer */}
+              <div style={{ padding: '16px 24px', background: isDark ? 'rgba(15,23,42,0.4)' : '#f8fafc', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'flex-end' }}>
+                <button onClick={() => setLocateClass(null)} style={{ background: '#6366f1', color: 'white', border: 'none', borderRadius: 12, padding: '10px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Close Directory</button>
               </div>
             </div>
           </div>
         )}
-      </div>
+
+      </motion.div>
     </>
   )
 }

@@ -7,8 +7,7 @@ export const ROUTES = {
   // Admin
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_STUDENTS: '/admin/students',
-  ADMIN_TEACHERS: '/admin/teachers',
-  ADMIN_OTHER_STAFF: '/admin/other-staff',
+  ADMIN_STAFF_DIRECTORY: '/admin/staff-directory',
   ADMIN_CLASSES: '/admin/classes',
   ADMIN_SUBJECTS: '/admin/subjects',
   ADMIN_DEPARTMENTS: '/admin/departments',
@@ -27,7 +26,7 @@ export const ROUTES = {
   ADMIN_AGENDA: '/admin/agenda',
   ADMIN_SMS: '/admin/sms',
   ADMIN_ADMISSIONS: '/admin/admissions',
-  ADMIN_BURSARS: '/admin/bursars',
+
   ADMIN_TEST_ANALYTICS: '/admin/test-analytics',
   ADMIN_VISITORS: '/admin/visitors',
   ADMIN_PROMOTION: '/admin/promotion',
@@ -36,7 +35,7 @@ export const ROUTES = {
   ADMIN_FLEET: '/admin/fleet',
   ADMIN_FLEET_LIVE: '/admin/fleet/live',
   ADMIN_ACCOUNT: '/admin/account',
-  ADMIN_SECURITY: '/admin/security',
+
   SECURITY_DASHBOARD: '/security/dashboard',
   SECURITY_ACCOUNT: '/security/account',
   SECURITY_SCANNER: '/security/scanner',

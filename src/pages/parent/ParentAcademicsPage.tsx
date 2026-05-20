@@ -8,6 +8,7 @@ import { getGradeInfo } from '../../utils/grading'
 import { ChevronDown, ChevronUp, BarChart3, Trophy, BookOpen, Calendar } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
+import { formatCurrency } from '../../utils/currency'
 
 export default function ParentAcademicsPage() {
   const { user } = useAuth()
@@ -34,6 +35,19 @@ export default function ParentAcademicsPage() {
     },
     enabled: !!user?.school_id
   })
+
+  // Fetch school info for currency
+  const { data: school } = useQuery({
+    queryKey: ['parent_school_info', user?.school_id],
+    queryFn: async () => {
+      if (!user?.school_id) return null
+      const { data, error } = await supabase.from('schools').select('currency_code').eq('id', user.school_id).single()
+      if (error) throw error
+      return data
+    },
+    enabled: !!user?.school_id
+  })
+  const schoolCurrency = school?.currency_code || 'GHS'
 
   // Initialize selectedTermId when currentTerm is loaded
   useEffect(() => {
@@ -220,7 +234,7 @@ export default function ParentAcademicsPage() {
                       <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
                       <h4 style={{ fontSize: 18, fontWeight: 800, color: '#991b1b', margin: '0 0 8px' }}>Financial Hold</h4>
                       <p style={{ fontSize: 13, color: '#b91c1c', lineHeight: 1.5, margin: 0 }}>
-                        {ward.full_name}'s results are locked due to an outstanding balance of GH₵ {totalOutstanding.toFixed(2)}. 
+                        {ward.full_name}'s results are locked due to an outstanding balance of {formatCurrency(totalOutstanding, schoolCurrency)}. 
                         Please settle all fees to view the report card.
                       </p>
                       <button 

@@ -13,21 +13,29 @@ serve(async (req) => {
   }
 
   try {
-    const { reference, student_id, term_id, school_id } = await req.json()
+    const { reference, student_id, term_id, school_id, amount } = await req.json()
 
-    // 1. Verify with Paystack
-    const res = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
-      headers: {
-        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
-      },
-    })
-    const data = await res.json()
+    let amountPaid = 0
 
-    if (!data.status || data.data.status !== 'success') {
-      return new Response(JSON.stringify({ error: 'Payment verification failed' }), { status: 400 })
+    // 1. Verify with Paystack or handle sandbox
+    if (reference && (reference.startsWith('sandbox_') || reference.startsWith('sim_'))) {
+      // Sandbox Mode: Bypass Paystack API verification and accept client-side amount
+      amountPaid = Number(amount || 0)
+    } else {
+      // Live Mode: Verify with Paystack
+      const res = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+        },
+      })
+      const data = await res.json()
+
+      if (!data.status || data.data.status !== 'success') {
+        return new Response(JSON.stringify({ error: 'Payment verification failed' }), { status: 400 })
+      }
+
+      amountPaid = data.data.amount / 100 // Convert back from pesewas
     }
-
-    const amountPaid = data.data.amount / 100 // Convert back from pesewas
 
     // 2. Initialize Supabase Admin Client
     const supabaseAdmin = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
@@ -36,7 +44,7 @@ serve(async (req) => {
     const { data: existing } = await supabaseAdmin
       .from('fee_payments')
       .select('id')
-      .eq('reference', reference)
+      .eq('reference_number', reference)
       .maybeSingle()
 
     if (existing) {

@@ -248,10 +248,10 @@ export default function BursarDashboard() {
           flex-direction: column;
           justify-content: center;
           padding: 24px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
         }
-
+        
         .card-back {
           transform: rotateY(180deg);
           background: #1e1b4b !important;
@@ -268,7 +268,7 @@ export default function BursarDashboard() {
         }
         
         .ql-btn { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-        .ql-btn:hover { background: #f8fafc !important; transform: translateY(-2px); box-shadow: 0 10px 20px -10px rgba(0,0,0,0.05); }
+        .ql-btn:hover { background: var(--bg-hover) !important; transform: translateY(-2px); box-shadow: 0 10px 20px -10px rgba(0,0,0,0.05); }
         
         .stat-icon-wrap {
           transition: transform 0.3s ease;
@@ -328,14 +328,14 @@ export default function BursarDashboard() {
                 >
                   <div className="card-inner">
                     {/* Front */}
-                    <div className="card-front bursar-card" style={{ background: 'var(--bg-card)' }}>
+                    <div className="card-front bursar-card glass-card" style={{ background: 'var(--bg-card)' }}>
                       <div className="stat-icon-wrap" style={{ width: 40, height: 40, borderRadius: 12, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
                         <c.icon size={20} color={c.color} strokeWidth={2.5} />
                       </div>
-                      <div style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', fontFamily: '"Outfit", sans-serif', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                      <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', fontFamily: '"Outfit", sans-serif', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                         {c.nativeValue}
                       </div>
-                      <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, fontWeight: 500 }}>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, fontWeight: 500 }}>
                         {c.label}
                       </div>
                     </div>
@@ -359,15 +359,15 @@ export default function BursarDashboard() {
 
             {/* Quick Actions Strip */}
             <div style={{ marginBottom: 32 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', marginBottom: 16, fontFamily: '"Outfit", sans-serif' }}>Quick Actions</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16, fontFamily: '"Outfit", sans-serif' }}>Quick Actions</h3>
               <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 10, scrollbarWidth: 'none' }}>
                 {quickLinks.map((q, i) => (
                   <Link key={q.to} to={q.to} style={{ textDecoration: 'none', flexShrink: 0 }}>
-                    <div className="ql-btn" style={{ 
+                    <div className="ql-btn glass-card" style={{ 
                       background: 'var(--bg-card)', 
                       borderRadius: 16, 
                       padding: '14px 20px', 
-                      border: '1px solid #e2e8f0', 
+                      border: '1px solid var(--border-color)', 
                       display: 'flex', 
                       alignItems: 'center', 
                       gap: 12,
@@ -376,7 +376,7 @@ export default function BursarDashboard() {
                       <div style={{ width: 36, height: 36, borderRadius: 10, background: `${q.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <q.icon size={18} color={q.color} strokeWidth={2} />
                       </div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: '#334155' }}>{q.label}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{q.label}</div>
                     </div>
                   </Link>
                 ))}
@@ -387,10 +387,10 @@ export default function BursarDashboard() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, marginBottom: 32 }}>
               
               {/* Income vs Expenses Bar Chart */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '28px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+              <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '28px', border: '1px solid var(--border-color)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
                 <div style={{ marginBottom: 24 }}>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Income vs Expenses</h3>
-                  <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Monthly financial flow for {currentYear}</p>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Income vs Expenses</h3>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Monthly financial flow for {currentYear}</p>
                 </div>
                 <ResponsiveContainer width="100%" height={260}>
                   <BarChart data={monthlyData} barSize={12}>
@@ -409,10 +409,10 @@ export default function BursarDashboard() {
                     <YAxis tick={{ fontSize: 12, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dx={-10} tickFormatter={v => `${v/1000}k`} />
                     <Tooltip 
                       formatter={(v: any) => formatCurrency(v, schoolCurrency)} 
-                      cursor={{ fill: '#f8fafc' }}
+                      cursor={{ fill: 'var(--bg-hover)' }}
                       contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: 13, fontWeight: 600, padding: '12px 16px' }} 
                     />
-                    <Legend iconType="circle" wrapperStyle={{ paddingTop: 20, fontSize: 13, fontWeight: 500, color: '#475569' }} />
+                    <Legend iconType="circle" wrapperStyle={{ paddingTop: 20, fontSize: 13, fontWeight: 500, color: 'var(--text-muted)' }} />
                     <Bar dataKey="income" name="Income" fill="url(#colorInc)" radius={[6, 6, 0, 0]} />
                     <Bar dataKey="expenses" name="Expenses" fill="url(#colorExp)" radius={[6, 6, 0, 0]} />
                   </BarChart>
@@ -420,10 +420,10 @@ export default function BursarDashboard() {
               </div>
 
               {/* Expenses by category */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '28px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+              <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '28px', border: '1px solid var(--border-color)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
                 <div style={{ marginBottom: 24 }}>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Expense Distribution</h3>
-                  <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Where is the money going?</p>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Expense Distribution</h3>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Where is the money going?</p>
                 </div>
                 {expenseByCategory.length > 0 ? (
                   <ResponsiveContainer width="100%" height={260}>
@@ -431,7 +431,7 @@ export default function BursarDashboard() {
                       <Pie data={expenseByCategory} cx="50%" cy="50%" innerRadius={70} outerRadius={100} dataKey="value" nameKey="name" paddingAngle={5}>
                         {expenseByCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="none" />)}
                       </Pie>
-                      <Legend iconType="circle" iconSize={8} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: 13, fontWeight: 500, color: '#475569' }} />
+                      <Legend iconType="circle" iconSize={8} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: 13, fontWeight: 500, color: 'var(--text-muted)' }} />
                       <Tooltip 
                         formatter={(v: any) => formatCurrency(v, schoolCurrency)} 
                         contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: 13, fontWeight: 600 }} 
@@ -439,46 +439,46 @@ export default function BursarDashboard() {
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div style={{ height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 14, fontWeight: 500 }}>No expense data recorded</div>
+                  <div style={{ height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14, fontWeight: 500 }}>No expense data recorded</div>
                 )}
               </div>
             </div>
 
             {/* Recent payments Data Table */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
-              <div style={{ padding: '24px 28px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0, fontFamily: '"Outfit", sans-serif' }}>Recent Transactions</h3>
-                <Link to={ROUTES.BURSAR_FEES} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#6366f1', textDecoration: 'none', padding: '6px 12px', background: '#eef2ff', borderRadius: 99 }}>
+            <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1px solid var(--border-color)', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+              <div style={{ padding: '24px 28px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0, fontFamily: '"Outfit", sans-serif' }}>Recent Transactions</h3>
+                <Link to={ROUTES.BURSAR_FEES} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#6366f1', textDecoration: 'none', padding: '6px 12px', background: 'var(--bg-accent-hover)', borderRadius: 99 }}>
                   View Ledger <ArrowRight size={14} />
                 </Link>
               </div>
               {recentPayments.length === 0 ? (
-                <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', fontSize: 14, fontWeight: 500 }}>No recent transactions</div>
+                <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 14, fontWeight: 500 }}>No recent transactions</div>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', whiteSpace: 'nowrap' }}>
                     <thead>
-                      <tr style={{ background: '#f8fafc' }}>
+                      <tr style={{ background: 'var(--bg-app)' }}>
                         {['Student', 'Class', 'Fee Category', 'Amount', 'Method', 'Date'].map(h => (
-                          <th key={h} style={{ padding: '16px 28px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                          <th key={h} style={{ padding: '16px 28px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {recentPayments.map((p: any, i) => (
-                        <tr key={p.id} style={{ borderBottom: i < recentPayments.length - 1 ? '1px solid #f1f5f9' : 'none', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                          <td style={{ padding: '16px 28px', fontSize: 14, fontWeight: 600, color: '#0f172a' }}>{p.student?.full_name ?? '—'}</td>
+                        <tr key={p.id} style={{ borderBottom: i < recentPayments.length - 1 ? '1px solid var(--border-color)' : 'none', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                          <td style={{ padding: '16px 28px', fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{p.student?.full_name ?? '—'}</td>
                           <td style={{ padding: '16px 28px' }}>
-                            <span style={{ fontSize: 12, background: '#f1f5f9', color: '#475569', padding: '4px 10px', borderRadius: 6, fontWeight: 600 }}>{(p.student as any)?.class?.name ?? '—'}</span>
+                            <span style={{ fontSize: 12, background: 'var(--bg-input)', color: 'var(--text-main)', padding: '4px 10px', borderRadius: 6, fontWeight: 600 }}>{(p.student as any)?.class?.name ?? '—'}</span>
                           </td>
-                          <td style={{ padding: '16px 28px', fontSize: 13, color: '#64748b', fontWeight: 500 }}>{p.fee_structure?.fee_name ?? 'General'}</td>
+                          <td style={{ padding: '16px 28px', fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>{p.fee_structure?.fee_name ?? 'General'}</td>
                           <td style={{ padding: '16px 28px', fontSize: 14, fontWeight: 700, color: '#10b981' }}>{formatCurrency(p.amount_paid, schoolCurrency)}</td>
                           <td style={{ padding: '16px 28px' }}>
                             <span style={{ fontSize: 12, fontWeight: 600, background: '#ecfdf5', color: '#10b981', padding: '4px 10px', borderRadius: 99, textTransform: 'capitalize' }}>
                               {p.payment_method}
                             </span>
                           </td>
-                          <td style={{ padding: '16px 28px', fontSize: 13, color: '#64748b', fontWeight: 500 }}>
+                          <td style={{ padding: '16px 28px', fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>
                             {new Date(p.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </td>
                         </tr>
