@@ -877,6 +877,28 @@ export default function StudentsPage() {
     XLSX.writeFile(wb, 'student_import_template.xlsx')
   }
 
+  function exportData() {
+    if (filtered.length === 0) {
+      toast.error('No students found to export')
+      return
+    }
+    const data = filtered.map((s: any) => ({
+      'Full Name': s.full_name,
+      'Student ID': s.student_id || '',
+      'Gender': s.gender || '',
+      'Class': s.class?.name || '',
+      'House': s.house || '',
+      'Guardian Name': s.guardian_name || '',
+      'Guardian Phone': s.guardian_phone || '',
+      'Guardian Email': s.guardian_email || '',
+      'Arrears': s.fees_arrears || 0
+    }))
+    const ws = XLSX.utils.json_to_sheet(data)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Students')
+    XLSX.writeFile(wb, `Students_Export_${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
+
   const totalMale = students.filter(s => s.gender === 'male').length
   const totalFemale = students.filter(s => s.gender === 'female').length
 
@@ -905,6 +927,9 @@ export default function StudentsPage() {
               </Btn>
               <Btn variant="secondary" onClick={() => fileRef.current?.click()} loading={importLoading}>
                 📥 Import Excel
+              </Btn>
+              <Btn variant="secondary" onClick={exportData}>
+                📤 Export
               </Btn>
               <Btn onClick={openCreate}>➕ Add Student</Btn>
             </div>

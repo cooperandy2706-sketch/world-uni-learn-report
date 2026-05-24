@@ -173,6 +173,7 @@ const SUPER_ADMIN_NAV = [
   { label: 'Leaderboards', to: ROUTES.SUPER_ADMIN_ANALYTICS, single: true },
   { label: 'Subjects', to: ROUTES.SUPER_ADMIN_SUBJECTS, single: true },
   { label: 'Resources', to: ROUTES.SUPER_ADMIN_RESOURCES, single: true },
+  { label: 'Global Ads', to: ROUTES.SUPER_ADMIN_ADS, single: true },
 ]
 
 const PROPRIETOR_NAV = [
@@ -646,7 +647,7 @@ export default function Header() {
       <header style={{
         height: 76, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 28px', background: 'var(--bg-app)', flexShrink: 0,
-        borderBottom: '1px solid #e8e8f0',
+        borderBottom: '1px solid var(--border-color)',
         fontFamily: '"DM Sans", system-ui, sans-serif',
         position: 'sticky', top: 0, zIndex: 200,
         gap: 16,
@@ -712,7 +713,7 @@ export default function Header() {
           </nav>
 
           {/* Separator */}
-          <div style={{ width: 1, height: 24, background: '#e5e7eb', flexShrink: 0, margin: '0 4px' }} />
+          <div style={{ width: 1, height: 24, background: 'var(--border-color)', flexShrink: 0, margin: '0 4px' }} />
 
           {/* Search */}
           <div ref={searchRef} className="search-input-pill" style={{ position: 'relative', flexShrink: 0 }}>
@@ -730,12 +731,12 @@ export default function Header() {
                   borderRadius: 99, padding: '7px 36px 7px 30px', fontSize: 13, color: 'var(--text-main)',
                   outline: 'none', transition: 'all 0.25s',
                 }}
-                onFocusCapture={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.borderColor = '#1a56db'; e.currentTarget.style.width = '240px' }}
-                onBlurCapture={e => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.width = '160px' }}
+                onFocusCapture={e => { e.currentTarget.style.background = 'var(--bg-accent-hover)'; e.currentTarget.style.borderColor = '#1a56db'; e.currentTarget.style.width = '240px' }}
+                onBlurCapture={e => { e.currentTarget.style.background = 'var(--bg-hover)'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.width = '160px' }}
               />
               {/* ⌘K badge */}
               {!searching && !searchQuery && (
-                <kbd style={{ position: 'absolute', right: 8, fontSize: 10, background: '#e5e7eb', color: 'var(--text-subtle)', padding: '2px 5px', borderRadius: 4, border: '1px solid #d1d5db', pointerEvents: 'none', whiteSpace: 'nowrap' }}>⌘K</kbd>
+                <kbd style={{ position: 'absolute', right: 8, fontSize: 10, background: 'var(--bg-input)', color: 'var(--text-subtle)', padding: '2px 5px', borderRadius: 4, border: '1px solid var(--border-color)', pointerEvents: 'none', whiteSpace: 'nowrap' }}>⌘K</kbd>
               )}
             </div>
 
@@ -758,7 +759,7 @@ export default function Header() {
                     {recentSearches.map((r, i) => (
                       <div key={i} onClick={() => { setSearchQuery(r); setHighlightedIdx(-1) }}
                         style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 10, cursor: 'pointer', transition: 'background 0.12s' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)' }}
                         onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                       >
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, flexShrink: 0 }}>🕐</div>
@@ -781,7 +782,7 @@ export default function Header() {
 
                 {/* Class context hint */}
                 {extractClassHint(searchQuery) && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', marginBottom: 4, background: '#eff6ff', borderRadius: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', marginBottom: 4, background: 'var(--bg-hover)', borderRadius: 12 }}>
                     <Zap size={13} color="#1a56db" />
                     <span style={{ fontSize: 12, color: '#1a56db', fontWeight: 700 }}>
                       Context: <strong>{extractClassHint(searchQuery)}</strong> detected — filtering to that class
@@ -808,9 +809,9 @@ export default function Header() {
                             <div
                               key={`intent-${i}`}
                               onClick={() => { saveRecent(searchQuery); navigate(r.path); setShowResults(false); setSearchQuery(''); setHighlightedIdx(-1) }}
-                              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s', background: highlightedIdx === i ? '#f0f4ff' : 'transparent' }}
-                              onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
-                              onMouseLeave={e => { e.currentTarget.style.background = highlightedIdx === i ? '#f0f4ff' : 'transparent' }}
+                              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s', background: highlightedIdx === i ? 'var(--bg-hover)' : 'transparent' }}
+                              onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)' }}
+                              onMouseLeave={e => { e.currentTarget.style.background = highlightedIdx === i ? 'var(--bg-hover)' : 'transparent' }}
                             >
                               <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, border: `1px solid ${r.color}25` }}>{r.icon}</div>
                               <div style={{ flex: 1, minWidth: 0 }}>
@@ -834,7 +835,7 @@ export default function Header() {
                               key={`person-${i}`}
                               onClick={() => setSelectedPerson({ label: r.label, subtitle: r.subtitle, type: r.type, name: r.label })}
                               style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s' }}
-                              onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                              onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)' }}
                               onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                             >
                               <div style={{ width: 34, height: 34, borderRadius: '50%', background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{r.icon}</div>
@@ -859,7 +860,7 @@ export default function Header() {
                               key={`academic-${i}`}
                               onClick={() => { saveRecent(searchQuery); navigate(r.path); setShowResults(false); setSearchQuery(''); }}
                               style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s' }}
-                              onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                              onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)' }}
                               onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                             >
                               <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>{r.icon}</div>
@@ -883,7 +884,7 @@ export default function Header() {
                               key={`op-${i}`}
                               onClick={() => { saveRecent(searchQuery); navigate(r.path); setShowResults(false); setSearchQuery(''); }}
                               style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, cursor: 'pointer', transition: 'background 0.12s' }}
-                              onMouseEnter={e => { e.currentTarget.style.background = '#f8f9ff' }}
+                              onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)' }}
                               onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                             >
                               <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>{r.icon}</div>

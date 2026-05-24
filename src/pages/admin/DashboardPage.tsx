@@ -606,10 +606,10 @@ export default function DashboardPage() {
           box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
         .kpi-card {
-          background: white;
+          background: var(--bg-card);
           border-radius: 24px;
           padding: 24px;
-          border: 1px solid #f1f5f9;
+          border: 1px solid var(--border-color);
           box-shadow: 0 4px 12px rgba(0,0,0,0.01);
           display: flex;
           flex-direction: column;
@@ -674,9 +674,9 @@ export default function DashboardPage() {
           box-shadow: 0 8px 16px rgba(15, 23, 42, 0.2);
         }
         .btn-secondary-modern {
-          background: #f8fafc;
-          color: #0f172a;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-card);
+          color: var(--text-main);
+          border: 1px solid var(--border-color);
           padding: 12px 24px;
           border-radius: 14px;
           font-weight: 700;

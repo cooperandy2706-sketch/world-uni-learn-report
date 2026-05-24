@@ -1,5 +1,6 @@
 // src/pages/teacher/BehaviorTrackingPage.tsx
 import { useState, useEffect } from 'react'
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm } from '../../hooks/useSettings'
@@ -115,9 +116,23 @@ export default function BehaviorTrackingPage() {
         counseling: ['Emotional Well-being', 'Family Issues', 'Academic Stress', 'Peer Conflict', 'Career Guidance']
     }
 
+    const { showManualRetry, manualReload } = useStuckLoadingReload(loading)
+
     if (loading) return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-            <div className="animate-spin" style={{ width: 40, height: 40, border: '4px solid #f3f3f3', borderTop: '4px solid #7c3aed', borderRadius: '50%' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '60vh', gap: 16 }}>
+            <div style={{ width: 40, height: 40, border: '4px solid #ede9fe', borderTop: '4px solid #7c3aed', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <p style={{ color: '#94a3b8', fontSize: 14, margin: 0 }}>
+                {showManualRetry ? 'Still having trouble loading…' : 'Loading behavior data…'}
+            </p>
+            {showManualRetry && (
+                <button
+                    onClick={manualReload}
+                    style={{ padding: '10px 24px', borderRadius: 12, background: '#7c3aed', color: '#fff', border: 'none', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+                >
+                    🔄 Retry
+                </button>
+            )}
         </div>
     )
 

@@ -25,6 +25,8 @@ export const router = createBrowserRouter([
     errorElement: <RouteErrorPage />,
     children: [
       { index: true, element: <LandingPage /> },
+      { path: '/privacy-policy', element: lazyPage(() => import('./pages/legal/PrivacyPolicyPage')) },
+      { path: '/terms-of-service', element: lazyPage(() => import('./pages/legal/TermsOfServicePage')) },
 
       {
         element: <AuthLayout />,
@@ -186,6 +188,7 @@ export const router = createBrowserRouter([
           { path: 'analytics', element: lazyPage(() => import('./pages/admin/GlobalAnalyticsPage')) },
           { path: 'resources', element: lazyPage(() => import('./pages/admin/GlobalResourcesPage')) },
            { path: 'subjects', element: lazyPage(() => import('./pages/admin/PlatformSubjectsPage')) },
+           { path: 'ads', element: lazyPage(() => import('./pages/super-admin/GlobalAdsPage')) },
           { path: 'news', element: lazyPage(() => import('./pages/shared/NewsPortalPage')) },
         ],
       },

@@ -1,5 +1,6 @@
 // src/pages/teacher/ClassTestsPage.tsx
 import { useState, useEffect, useCallback } from 'react'
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -177,7 +178,26 @@ export default function ClassTestsPage() {
     .filter(a => a.class?.id === selectedClass)
     .map(a => a.subject)
 
-  if (loading) return <div style={{ padding: 20 }}>Loading...</div>
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { showManualRetry, manualReload } = useStuckLoadingReload(loading)
+
+  if (loading) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: 16 }}>
+      <div style={{ width: 40, height: 40, border: '4px solid #ede9fe', borderTop: '4px solid #7c3aed', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <p style={{ color: '#94a3b8', fontSize: 14, margin: 0 }}>
+        {showManualRetry ? 'Still having trouble loading…' : 'Loading your tests…'}
+      </p>
+      {showManualRetry && (
+        <button
+          onClick={manualReload}
+          style={{ padding: '10px 24px', borderRadius: 12, background: '#7c3aed', color: '#fff', border: 'none', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+        >
+          🔄 Retry
+        </button>
+      )}
+    </div>
+  )
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '20px 16px', fontFamily: '"DM Sans", sans-serif' }}>

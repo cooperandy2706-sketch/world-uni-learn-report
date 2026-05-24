@@ -636,3 +636,16 @@ export interface PrivacyConsent {
   created_at: string
   updated_at: string
 }
+
+export interface GlobalAd {
+  id: string
+  title: string
+  media_url: string
+  media_type: 'image' | 'video'
+  target_url?: string
+  active_from: string
+  active_until: string
+  is_active: boolean
+  created_by?: string
+  created_at: string
+}

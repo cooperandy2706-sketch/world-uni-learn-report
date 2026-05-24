@@ -1,5 +1,15 @@
 // src/components/ui/FlaskLoader.tsx
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+
+/** How long (ms) before we decide the page is stuck and reload */
+const STUCK_TIMEOUT_MS = 8_000;
+/** Maximum number of automatic reloads before giving up */
+const MAX_AUTO_RELOADS = 2;
+
+/** Session-storage key that tracks how many times we've already auto-reloaded. */
+function getReloadKey() {
+  return `_stuckReloads_${window.location.pathname}`;
+}
 
 interface FlaskLoaderProps {
   fullScreen?: boolean;
@@ -7,6 +17,31 @@ interface FlaskLoaderProps {
 }
 
 export default function FlaskLoader({ fullScreen = true, label }: FlaskLoaderProps) {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showManualRetry, setShowManualRetry] = useState(false);
+
+  useEffect(() => {
+    const key = getReloadKey();
+    const reloadCount = parseInt(sessionStorage.getItem(key) ?? '0', 10);
+
+    timerRef.current = setTimeout(() => {
+      if (reloadCount < MAX_AUTO_RELOADS) {
+        sessionStorage.setItem(key, String(reloadCount + 1));
+        window.location.reload();
+      } else {
+        // Too many auto-reloads — surface the manual retry button
+        setShowManualRetry(true);
+      }
+    }, STUCK_TIMEOUT_MS);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      // Clear the counter whenever this loader unmounts (data loaded successfully)
+      sessionStorage.removeItem(key);
+    };
+  }, []);
+
+
   const wrapper: React.CSSProperties = fullScreen
     ? { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg-app)', gap: 24 }
     : { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: 20 };
@@ -262,8 +297,22 @@ export default function FlaskLoader({ fullScreen = true, label }: FlaskLoaderPro
         letterSpacing: '0.12em', textTransform: 'uppercase',
         opacity: 0.8, margin: 0
       }}>
-        {label ?? 'Loading...'}
+        {showManualRetry ? 'Still having trouble loading…' : (label ?? 'Loading...')}
       </p>
+      {showManualRetry && (
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            marginTop: 8, padding: '10px 28px', borderRadius: 12,
+            background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
+            color: '#fff', border: 'none', fontWeight: 700,
+            fontSize: 14, cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(109,40,217,0.3)',
+          }}
+        >
+          🔄 Retry
+        </button>
+      )}
     </div>
   );
 }

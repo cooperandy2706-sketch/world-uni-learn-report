@@ -509,6 +509,10 @@ export default function AuthPage() {
               </button>
             </div>
 
+            <div style={{ marginTop: 24, textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
+              By continuing, you agree to our <Link to="/terms-of-service" className="form-link" style={{ fontSize: 11 }}>Terms of Service</Link> and <Link to="/privacy-policy" className="form-link" style={{ fontSize: 11 }}>Privacy Policy</Link>.
+            </div>
+
           </div>
         </div>
       </div>

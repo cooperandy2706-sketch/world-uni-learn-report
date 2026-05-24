@@ -11,6 +11,7 @@ import { supabase } from '../../lib/supabase'
 import Modal from '../../components/ui/Modal'
 import toast from 'react-hot-toast'
 import { Plus, Trash2, Printer, CreditCard, Settings, GraduationCap, MessageCircle, Mail, Smartphone, AlertTriangle, CheckCircle2, Send, Loader2, Download, Bell, ShoppingCart, History, Trash, Minus, Search, Users, Check, Lock, Shield, X, Coins } from 'lucide-react'
+import * as XLSX from 'xlsx'
 import { formatCurrency } from '../../utils/currency'
 
 const METHODS = ['cash', 'momo', 'bank', 'cheque'] as const
@@ -673,6 +674,28 @@ export default function FeesPage() {
       </html>
     `)
     win.document.close()
+  }
+
+  function exportHistoryData() {
+    if (!payments || (payments as any[]).length === 0) {
+      toast.error('No payments found to export')
+      return
+    }
+    const data = (payments as any[]).map((p: any) => ({
+      'Receipt ID': p.id?.slice(0, 8).toUpperCase(),
+      'Student Name': p.student?.full_name || '—',
+      'Class': (p.student as any)?.class?.name || '—',
+      'Fee Type': p.fee_structure?.fee_name || 'General',
+      'Amount Paid': p.amount_paid,
+      'Currency': p.currency_code || schoolCurrency,
+      'Payment Method': p.payment_method?.toUpperCase() || '—',
+      'Reference': p.reference_number || '',
+      'Date': new Date(p.payment_date).toLocaleDateString('en-GB')
+    }))
+    const ws = XLSX.utils.json_to_sheet(data)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Payments')
+    XLSX.writeFile(wb, `Payment_History_${new Date().toISOString().split('T')[0]}.xlsx`)
   }
 
   function handlePrint(payment: any) {
@@ -1972,7 +1995,12 @@ export default function FeesPage() {
           <div style={{ background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
             <div style={{ padding: '16px 22px', borderBottom: '1px solid #faf5ff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{(payments as any[]).length} payments recorded {term ? `· ${term.name}` : ''}</span>
-              <span style={{ fontSize: 13, fontWeight: 800, color: '#16a34a' }}>Total: {CUR((payments as any[]).reduce((s: number, p: any) => s + (p.amount_paid || 0), 0))}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <Btn variant="secondary" onClick={exportHistoryData} style={{ padding: '6px 12px', fontSize: 12 }}>
+                  <Download size={14} /> Export CSV
+                </Btn>
+                <span style={{ fontSize: 13, fontWeight: 800, color: '#16a34a' }}>Total: {CUR((payments as any[]).reduce((s: number, p: any) => s + (p.amount_paid || 0), 0))}</span>
+              </div>
             </div>
             {loadingPayments ? <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-subtle)' }}>Loading…</div> : (payments as any[]).length === 0 ? <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>No payments for this term yet</div> : (
               <div style={{ overflowX: 'auto' }}>

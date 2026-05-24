@@ -1,8 +1,10 @@
 // src/constants/routes.ts
 export const ROUTES = {
-  // Auth
+  // Auth / Public
   LOGIN: '/login',
   FORGOT_PASSWORD: '/forgot-password',
+  PRIVACY_POLICY: '/privacy-policy',
+  TERMS_OF_SERVICE: '/terms-of-service',
 
   // Admin
   ADMIN_DASHBOARD: '/admin/dashboard',
@@ -113,6 +115,7 @@ export const ROUTES = {
   SUPER_ADMIN_ANALYTICS: '/super-admin/analytics',
   SUPER_ADMIN_RESOURCES: '/super-admin/resources',
   SUPER_ADMIN_SUBJECTS: '/super-admin/subjects',
+  SUPER_ADMIN_ADS: '/super-admin/ads',
   SUPER_ADMIN_ACCOUNT: '/super-admin/account',
 
   // Parent
