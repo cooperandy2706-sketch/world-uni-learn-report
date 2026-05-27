@@ -93,7 +93,9 @@ app.whenReady().then(() => {
   
   // Only check for updates in production
   if (!process.env.VITE_DEV_SERVER_URL) {
-    autoUpdater.checkForUpdatesAndNotify()
+    autoUpdater.checkForUpdatesAndNotify().catch((err) => {
+      log.error('Failed to check for updates:', err)
+    })
   }
 
   app.on('activate', () => {
