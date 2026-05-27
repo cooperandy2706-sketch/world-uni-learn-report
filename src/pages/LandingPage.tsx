@@ -210,26 +210,6 @@ const CSS = `
     .hero-art { display: block; position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.4; pointer-events: none; z-index: 1; filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.5)); }
     .hero-art path, .hero-art circle, .hero-art rect { stroke: #fbbf24; stroke-width: 2.5; fill: none; stroke-dasharray: 2000; stroke-dashoffset: 2000; animation: drawArt 20s cubic-bezier(0.4, 0, 0.2, 1) forwards infinite alternate; }
   }
-  
-  .global-contact-float {
-    position: fixed; bottom: 1rem; right: 1rem; left: 1rem;
-    background: rgba(30, 6, 70, 0.95); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15);
-    padding: 1rem; border-radius: 16px; display: flex; flex-direction: column; gap: 0.75rem; z-index: 9999;
-    color: white; font-size: 0.85rem; font-weight: 600; text-align: center; align-items: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    transition: transform 0.3s;
-  }
-  @media (min-width: 768px) {
-    .global-contact-float {
-      bottom: 2rem; right: 2rem; left: auto; border-radius: 20px; align-items: flex-start; text-align: left;
-      padding: 1.25rem 1.5rem; font-size: 0.95rem; white-space: nowrap;
-    }
-    .global-contact-float:hover { transform: translateY(-5px); }
-  }
-  .global-contact-item { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: rgba(255,255,255,0.9); transition: color 0.3s; justify-content: center; width: 100%; }
-  @media (min-width: 768px) { .global-contact-item { justify-content: flex-start; } }
-  .global-contact-item:hover { color: #fbbf24; }
-  .global-contact-header { font-size: 0.75rem; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; margin-bottom: -0.25rem; }
 
   /* ── NAV ── */
   .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; transition: all 0.3s ease; padding: 1rem 0; }
@@ -761,20 +741,6 @@ export default function LandingPage() {
       </div>
 
       <Navbar scrolled={scrolled} setMenuOpen={setMenuOpen} />
-
-      <div className="global-contact-float">
-        <div className="global-contact-header">Sales & Support</div>
-        <div className="global-contact-item" style={{ fontSize: '1rem', color: 'white' }}>Cooper Andy Mawunyo</div>
-        <div className="global-contact-item" style={{ opacity: 0.8 }}>Novara Techs</div>
-        <a href="mailto:hello@worldunilearn.com" className="global-contact-item" style={{ marginTop: '0.25rem' }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-          hello@worldunilearn.com
-        </a>
-        <a href="tel:+233537996934" className="global-contact-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-          +233 537 996 934
-        </a>
-      </div>
 
       <Hero />
 
