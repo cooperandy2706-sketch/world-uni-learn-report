@@ -52,9 +52,10 @@ function createWindow() {
     // Production mode
     win.loadFile(path.join(__dirname, '../dist/index.html'))
     
-    // If the page fails to load (e.g. missing env vars), show an error screen
-    win.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
-      log.error('Page failed to load:', errorCode, errorDescription)
+    // If the main page fails to load, show an error screen
+    win.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+      if (!isMainFrame) return // Ignore missing background images, favicons, or service workers
+      log.error('Main page failed to load:', errorCode, errorDescription, validatedURL)
       win.webContents.loadURL(`data:text/html,<html><body style="font-family:sans-serif;padding:40px;background:#111;color:#fff"><h2>⚠️ App Failed to Load</h2><p>${errorDescription}</p><p style="color:#aaa;font-size:13px">Error code: ${errorCode}</p></body></html>`)
     })
 
