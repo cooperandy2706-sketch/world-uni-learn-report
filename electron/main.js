@@ -47,9 +47,27 @@ function createWindow() {
   if (isDev) {
     // Development mode
     win.loadURL(process.env.VITE_DEV_SERVER_URL)
+    win.webContents.openDevTools()
   } else {
     // Production mode
     win.loadFile(path.join(__dirname, '../dist/index.html'))
+    
+    // If the page fails to load (e.g. missing env vars), show an error screen
+    win.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+      log.error('Page failed to load:', errorCode, errorDescription)
+      win.webContents.loadURL(`data:text/html,<html><body style="font-family:sans-serif;padding:40px;background:#111;color:#fff"><h2>⚠️ App Failed to Load</h2><p>${errorDescription}</p><p style="color:#aaa;font-size:13px">Error code: ${errorCode}</p></body></html>`)
+    })
+
+    // Catch renderer JS crashes and show DevTools
+    win.webContents.on('render-process-gone', (event, details) => {
+      log.error('Renderer process gone:', details)
+      win.webContents.openDevTools()
+    })
+
+    win.webContents.on('console-message', (event, level, message) => {
+      if (level >= 2) log.error('[Renderer]', message) // 2=warning, 3=error
+      else log.info('[Renderer]', message)
+    })
   }
 }
 
