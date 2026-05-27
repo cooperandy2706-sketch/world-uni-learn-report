@@ -645,8 +645,8 @@ export default function Header() {
       `}</style>
 
       <header style={{
-        height: 76, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 28px', background: 'var(--bg-app)', flexShrink: 0,
+        height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 20px', background: 'var(--bg-card)', flexShrink: 0,
         borderBottom: '1px solid var(--border-color)',
         fontFamily: '"DM Sans", system-ui, sans-serif',
         position: 'sticky', top: 0, zIndex: 200,
@@ -666,11 +666,11 @@ export default function Header() {
           {userSchool?.logo_url ? (
             <img
               src={userSchool.logo_url} alt="School"
-              style={{ width: 42, height: 42, borderRadius: 12, objectFit: 'contain', background: 'var(--bg-card)', padding: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+              style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-hover)', padding: 3, border: '1px solid var(--border-color)' }}
             />
           ) : (
-            <div style={{ width: 42, height: 42, borderRadius: 12, background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-              <GraduationCap size={22} color="#1a56db" />
+            <div style={{ width: 38, height: 38, borderRadius: 10, background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <GraduationCap size={20} color="#1a56db" />
             </div>
           )}
           <div className="school-branding-text" style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -694,12 +694,12 @@ export default function Header() {
 
         {/* ── RIGHT PILL: Nav + Bell + Profile ── */}
         <div className="header-pill-container" style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          background: 'var(--bg-card)',
-          borderRadius: 99,
-          border: '1px solid var(--border-color)',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-          padding: '6px 6px 6px 16px',
+          display: 'flex', alignItems: 'center', gap: 4,
+          background: 'transparent',
+          borderRadius: 0,
+          border: 'none',
+          boxShadow: 'none',
+          padding: '0',
           flex: 1,
           justifyContent: 'flex-end',
           maxWidth: 'fit-content'

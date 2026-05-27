@@ -7,29 +7,29 @@
 
 /* ── Theme Variables ── */
 :root {
-  --bg-app: #f8f7ff;
+  --bg-app: #f0f2f5;
   --bg-card: #ffffff;
   --bg-input: #f9fafb;
-  --bg-hover: #f3f4f6;
-  --bg-accent-hover: #faf5ff;
+  --bg-hover: #f5f6f6;
+  --bg-accent-hover: #f0eefe;
   --text-main: #111827;
   --text-muted: #6b7280;
   --text-subtle: #9ca3af;
-  --border-color: #e5e7eb;
-  --border-light: #f3f4f6;
+  --border-color: #e9edef;
+  --border-light: #f0f2f5;
 }
 
 html.dark {
-  --bg-app: #0f172a;       /* slate-900 */
-  --bg-card: #1e293b;      /* slate-800 */
-  --bg-input: #334155;     /* slate-700 */
-  --bg-hover: #334155;     /* slate-700 */
-  --bg-accent-hover: #1e1b4b; /* deep purple hover */
-  --text-main: #f8fafc;    /* slate-50 */
-  --text-muted: #94a3b8;   /* slate-400 */
-  --text-subtle: #64748b;  /* slate-500 */
-  --border-color: #334155; /* slate-700 */
-  --border-light: #1e293b; /* slate-800 */
+  --bg-app: #111b21;       /* WhatsApp dark background */
+  --bg-card: #202c33;      /* WhatsApp dark panel */
+  --bg-input: #2a3942;
+  --bg-hover: #2a3942;
+  --bg-accent-hover: #1e1b4b;
+  --text-main: #e9edef;    /* WhatsApp dark text */
+  --text-muted: #8696a0;
+  --text-subtle: #667781;
+  --border-color: #2a3942;
+  --border-light: #202c33;
 }
 
 /* ── Reset ── */
@@ -40,8 +40,8 @@ body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg-app);
 /* ── Scrollbar ── */
 ::-webkit-scrollbar       { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #ddd6fe; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 
 /* ── Print ── */
 @media print {
@@ -136,11 +136,8 @@ body.sp-active { background: transparent !important; }
 html.dark .glass-card,
 html.dark [style*="background: var(--bg-card)"],
 html.dark [style*="background:var(--bg-card)"] {
-  background: rgba(30, 41, 59, 0.55) !important;
-  backdrop-filter: blur(16px) saturate(120%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(120%) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 /* Target elements with hardcoded inline colors in dark theme */

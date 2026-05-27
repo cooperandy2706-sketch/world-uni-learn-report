@@ -592,31 +592,27 @@ export default function DashboardPage() {
           margin: 0 auto;
         }
         .glass-panel {
-          background: rgba(255, 255, 255, 0.8);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
-          border: 1px solid rgba(255, 255, 255, 0.5);
-          border-radius: 24px;
-          box-shadow: 0 10px 40px -10px rgba(0,0,0,0.04);
+          background: #ffffff;
+          border: 1px solid var(--border-color);
+          border-radius: 16px;
           overflow: hidden;
           position: relative;
-          transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+          transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         html.dark .glass-panel {
-          background: rgba(30, 41, 59, 0.45);
-          border: 1.5px solid rgba(255, 255, 255, 0.08);
-          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
         }
         .kpi-card {
           background: var(--bg-card);
-          border-radius: 24px;
+          border-radius: 16px;
           padding: 24px;
           border: 1px solid var(--border-color);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+          box-shadow: none;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.2s ease;
           text-decoration: none;
           color: var(--text-main);
           position: relative;
@@ -625,30 +621,14 @@ export default function DashboardPage() {
         html.dark .kpi-card {
           background: var(--bg-card);
           border-color: var(--border-color);
-          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
         .kpi-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 12px 24px rgba(0,0,0,0.05);
-          border-color: rgba(79, 70, 229, 0.15);
+          background: var(--bg-hover);
+          border-color: #1a56db;
         }
         html.dark .kpi-card:hover {
-          border-color: rgba(139, 92, 246, 0.3);
-          box-shadow: 0 12px 30px rgba(0,0,0,0.4);
-        }
-        .kpi-card::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: var(--theme-color);
-          opacity: 0;
-          transition: opacity 0.3s;
-        }
-        .kpi-card:hover::after {
-          opacity: 1;
+          background: var(--bg-hover);
+          border-color: #1a56db;
         }
         .btn-modern {
           background: #0f172a;
@@ -708,48 +688,46 @@ export default function DashboardPage() {
           align-items: center;
           gap: 8px;
           padding: 16px 8px;
-          background: #f8fafc;
-          border-radius: 16px;
+          background: var(--bg-hover);
+          border-radius: 12px;
           text-decoration: none;
-          transition: all 0.2s;
+          transition: all 0.15s;
           border: 1px solid transparent;
         }
         html.dark .ops-action-card {
-          background: var(--bg-app);
+          background: var(--bg-hover);
         }
         .ops-action-card:hover {
-          background: white;
-          border-color: #e2e8f0;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+          background: var(--bg-card);
+          border-color: var(--border-color);
         }
         html.dark .ops-action-card:hover {
           background: var(--bg-card);
           border-color: var(--border-color);
-          box-shadow: 0 4px 20px rgba(0,0,0,0.25);
         }
         .list-item-hover {
           display: flex;
           align-items: center;
           gap: 12px;
           padding: 10px 12px;
-          background: #f8fafc;
-          border-radius: 16px;
-          border: 1px solid transparent;
-          transition: all 0.2s ease;
+          background: transparent;
+          border-radius: 0;
+          border: none;
+          border-bottom: 1px solid var(--border-light);
+          transition: background 0.15s ease;
+        }
+        .list-item-hover:last-child {
+          border-bottom: none;
         }
         html.dark .list-item-hover {
-          background: var(--bg-app);
-          border-color: var(--border-light);
+          background: transparent;
+          border-color: var(--border-color);
         }
         .list-item-hover:hover {
-          transform: translateX(4px);
-          background: white;
-          border-color: #e2e8f0;
+          background: var(--bg-hover);
         }
         html.dark .list-item-hover:hover {
           background: var(--bg-hover);
-          border-color: var(--border-color);
         }
         .recharts-tooltip-wrapper {
           outline: none;
@@ -779,29 +757,28 @@ export default function DashboardPage() {
           }
         }
         .campus-block {
-          border-radius: 16px;
+          border-radius: 12px;
           padding: 20px;
           background: var(--bg-card);
-          border: 1.5px solid var(--border-color);
+          border: 1px solid var(--border-color);
           position: relative;
           display: flex;
           flex-direction: column;
           gap: 6px;
           align-items: center;
           justify-content: center;
-          transition: all 0.25s ease;
+          transition: all 0.15s ease;
           text-align: center;
         }
         html.dark .campus-block {
-          background: rgba(30, 41, 59, 0.25);
+          background: var(--bg-card);
         }
         .campus-block.active-block {
           border-color: #10b981;
-          background: rgba(16, 185, 129, 0.06);
-          box-shadow: 0 10px 25px rgba(16, 185, 129, 0.12);
+          background: rgba(16, 185, 129, 0.05);
         }
         html.dark .campus-block.active-block {
-          background: rgba(16, 185, 129, 0.15);
+          background: rgba(16, 185, 129, 0.1);
         }
         .pulse-dot {
           width: 10px;
@@ -827,14 +804,13 @@ export default function DashboardPage() {
         }
         .timetable-card {
           background: var(--bg-card);
-          border-radius: 20px;
-          border: 1.5px solid var(--border-color);
+          border-radius: 12px;
+          border: 1px solid var(--border-color);
           padding: 20px;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: background 0.15s ease;
         }
         .timetable-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 24px rgba(0,0,0,0.04);
+          background: var(--bg-hover);
         }
       `}</style>
 

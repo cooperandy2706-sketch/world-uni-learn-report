@@ -116,17 +116,6 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
   return (
     <>
       <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: 'var(--bg-app)', fontFamily: '"DM Sans",system-ui,sans-serif' }}>
-
-        {/* Subtle Watermark Background */}
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
-          backgroundImage: 'url(/wula-logo.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.03
-        }} />
-
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
           <NewsTicker />
           <Header />
