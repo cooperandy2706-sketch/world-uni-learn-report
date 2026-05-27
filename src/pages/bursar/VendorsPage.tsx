@@ -64,7 +64,7 @@ export default function VendorsPage() {
   const { data: school } = useQuery({
     queryKey: ['school-currency', schoolId],
     queryFn: async () => {
-      const { data } = await supabase.from('schools').select('currency_code').eq('id', schoolId).single()
+      const { data } = await supabase.from('schools').select('currency_code').eq('id', schoolId).maybeSingle()
       return data
     },
     enabled: !!schoolId

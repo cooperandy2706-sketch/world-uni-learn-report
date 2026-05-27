@@ -1,6 +1,6 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/BehaviorTrackingPage.tsx
 import { useState, useEffect } from 'react'
-import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm } from '../../hooks/useSettings'
@@ -53,7 +53,7 @@ export default function BehaviorTrackingPage() {
             const { data: assignments } = await supabase
                 .from('teacher_assignments')
                 .select('class_id')
-                .eq('teacher_id', (await supabase.from('teachers').select('id').eq('user_id', user!.id).single()).data?.id)
+                .eq('teacher_id', (await supabase.from('teachers').select('id').eq('user_id', user!.id).maybeSingle()).data?.id)
 
             const classIds = assignments?.map(a => a.class_id) || []
 

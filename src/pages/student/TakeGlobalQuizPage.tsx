@@ -88,11 +88,11 @@ export default function TakeGlobalQuizPage() {
         .from('global_quizzes')
         .select('*, subject:subjects(name)')
         .eq('id', id)
-        .single()
+        .maybeSingle()
 
       if (error) throw error
       
-      const { data: student } = await supabase.from('students').select('id').eq('user_id', user!.id).single()
+      const { data: student } = await supabase.from('students').select('id').eq('user_id', user!.id).maybeSingle()
       
       const { data: sub } = await supabase
         .from('global_quiz_submissions')
@@ -141,7 +141,7 @@ export default function TakeGlobalQuizPage() {
     
     setIsSubmitting(true)
     try {
-      const { data: student } = await supabase.from('students').select('id').eq('user_id', user!.id).single()
+      const { data: student } = await supabase.from('students').select('id').eq('user_id', user!.id).maybeSingle()
       
       let earned = 0
       let total = 0

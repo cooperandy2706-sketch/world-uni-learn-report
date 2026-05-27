@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/TeacherElectionsHub.tsx
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
@@ -8,6 +9,7 @@ import { Election, ElectionPosition, ElectionCandidate, ElectionVote } from '../
 export default function TeacherElectionsHub() {
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [elections, setElections] = useState<Election[]>([])
   const [positions, setPositions] = useState<ElectionPosition[]>([])
   const [candidates, setCandidates] = useState<ElectionCandidate[]>([])

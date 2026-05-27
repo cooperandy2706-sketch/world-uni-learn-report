@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/bursar/AnalyticsPage.tsx
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
@@ -15,6 +16,7 @@ export default function AnalyticsPage() {
   const currentYear = new Date().getFullYear()
   const [year, setYear] = useState(currentYear)
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
 
   const [monthly, setMonthly] = useState<any[]>([])
   const [expByCat, setExpByCat] = useState<any[]>([])
@@ -25,7 +27,7 @@ export default function AnalyticsPage() {
   const [school, setSchool] = useState<any>(null)
   useEffect(() => {
     if (schoolId) {
-      supabase.from('schools').select('currency_code').eq('id', schoolId).single().then(({ data }) => setSchool(data))
+      supabase.from('schools').select('currency_code').eq('id', schoolId).maybeSingle().then(({ data }) => setSchool(data))
     }
   }, [schoolId])
 

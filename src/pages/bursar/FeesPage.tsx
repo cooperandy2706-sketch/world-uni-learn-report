@@ -82,7 +82,7 @@ export default function FeesPage() {
   // School context
   const { data: school } = useQuery({
     queryKey: ['school-receipt', schoolId],
-    queryFn: async () => { const { data } = await supabase.from('schools').select('*').eq('id', schoolId).single(); return data },
+    queryFn: async () => { const { data } = await supabase.from('schools').select('*').eq('id', schoolId).maybeSingle(); return data },
     enabled: !!schoolId,
   })
 

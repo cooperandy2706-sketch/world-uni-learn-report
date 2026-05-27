@@ -26,7 +26,7 @@ export default function StaffElectionsPage() {
         .eq('is_archived', false)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
       
       if (!elData) {
         setActiveElection(null)

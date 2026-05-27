@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/StudentVaultPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -22,6 +23,7 @@ import {
 export default function StudentVaultPage() {
     const { user } = useAuth()
     const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
     const [students, setStudents] = useState<any[]>([])
     const [search, setSearch] = useState('')
     const [selectedStudent, setSelectedStudent] = useState<any>(null)

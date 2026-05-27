@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/student/SchedulePage.tsx
 // Student's personalized class timetable — full weekly view with teacher names
 import { useState, useEffect } from 'react'
@@ -34,6 +35,7 @@ export default function StudentSchedulePage() {
   const [timetable, setTimetable] = useState<any[]>([])
   const [periods, setPeriods] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [mounted, setMounted] = useState(false)
   const [selectedDay, setSelectedDay] = useState<number>(new Date().getDay() === 0 || new Date().getDay() === 6 ? 1 : new Date().getDay())
   const [viewMode, setViewMode] = useState<'today' | 'week'>('today')
@@ -45,7 +47,7 @@ export default function StudentSchedulePage() {
   async function loadSchedule() {
     setLoading(true)
     try {
-      const { data: student } = await supabase.from('students').select('*, class:classes(id,name)').eq('user_id', user!.id).single()
+      const { data: student } = await supabase.from('students').select('*, class:classes(id,name)').eq('user_id', user!.id).maybeSingle()
       if (!student) { setLoading(false); return }
       setStudentData(student)
 

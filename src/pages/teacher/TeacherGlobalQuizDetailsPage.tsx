@@ -27,12 +27,12 @@ export default function TeacherGlobalQuizDetailsPage() {
         .from('global_quizzes')
         .select('*, subject:subjects(name)')
         .eq('id', id)
-        .single()
+        .maybeSingle()
       if (qErr) throw qErr
       setQuiz(qData)
 
       // 2. Get Teacher classes
-      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
+      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).maybeSingle()
       if (!teacher) return
       
       const { data: tAssigns } = await supabase

@@ -58,7 +58,7 @@ export default function TeacherAssignmentDetailsPage() {
         .from('assignments')
         .select('*, class:classes(name), subject:subjects(name)')
         .eq('id', id)
-        .single()
+        .maybeSingle()
         
       if (assignErr) throw assignErr
       setAssignment(assignData)

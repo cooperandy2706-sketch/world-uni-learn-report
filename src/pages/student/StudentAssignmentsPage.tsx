@@ -29,7 +29,7 @@ export default function StudentAssignmentsPage() {
     setIsLoading(true)
     try {
       // 1. Get student record to find class_id and school_id
-      const { data: student } = await supabase.from('students').select('id, class_id, school_id').eq('user_id', user!.id).single()
+      const { data: student } = await supabase.from('students').select('id, class_id, school_id').eq('user_id', user!.id).maybeSingle()
       if (!student) return
 
       // --- Fetch Class Assignments ---

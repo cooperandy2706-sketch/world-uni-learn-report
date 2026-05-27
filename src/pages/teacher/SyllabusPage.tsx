@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/SyllabusPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -9,6 +10,7 @@ export default function TeacherSyllabusPage() {
     const { data: term } = useCurrentTerm()
     const [syllabus, setSyllabus] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
     const [search, setSearch] = useState('')
     const [filterClass, setFilterClass] = useState('')
     const [classes, setClasses] = useState<any[]>([])
@@ -19,7 +21,7 @@ export default function TeacherSyllabusPage() {
     async function load() {
         setLoading(true)
         // Get teacher's assigned class IDs
-        const { data: t } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
+        const { data: t } = await supabase.from('teachers').select('id').eq('user_id', user!.id).maybeSingle()
         if (!t) { setLoading(false); return }
 
         const { data: assignments } = await supabase

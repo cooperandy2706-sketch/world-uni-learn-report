@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/student/ElectionsPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -8,6 +9,7 @@ import { Election, ElectionPosition, ElectionCandidate, ElectionVote } from '../
 export default function StudentElectionsPage() {
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [elections, setElections] = useState<Election[]>([])
   const [positions, setPositions] = useState<ElectionPosition[]>([])
   const [candidates, setCandidates] = useState<ElectionCandidate[]>([])
@@ -27,7 +29,7 @@ export default function StudentElectionsPage() {
     setLoading(true)
     try {
       // Get student profile
-      const { data: stuData } = await supabase.from('students').select('id').eq('user_id', user.id).single()
+      const { data: stuData } = await supabase.from('students').select('id').eq('user_id', user.id).maybeSingle()
       if (!stuData) throw new Error("Student profile not found")
       setStudentId(stuData.id)
 

@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -24,6 +25,7 @@ export default function LessonPlansPage() {
   const { data: term } = useCurrentTerm()
   const [plans, setPlans] = useState<LessonPlan[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending')
   const [activePlan, setActivePlan] = useState<LessonPlan | null>(null)
 

@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../store/authStore'
@@ -24,6 +25,7 @@ export default function GlobalAnalyticsPage() {
   const { setFirstLoadComplete } = useAuthStore()
   const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [topStudents, setTopStudents] = useState<any[]>([])
   const [topSchools, setTopSchools] = useState<any[]>([])
 

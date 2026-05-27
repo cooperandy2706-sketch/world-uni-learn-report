@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/LessonTrackerPage.tsx
 // Detects upcoming lessons from timetable and shows countdown + alerts
 // Notes tab: full AI-powered lesson plan generator
@@ -391,6 +392,7 @@ export default function LessonTrackerPage() {
     const { data: term } = useCurrentTerm()
     const [lessons, setLessons] = useState<Lesson[]>([])
     const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
     const [now, setNow] = useState(new Date())
     const [tab, setTab] = useState<'today' | 'week' | 'tracker'>('today')
     const [activeModal, setActiveModal] = useState<Lesson | null>(null)
@@ -416,7 +418,7 @@ export default function LessonTrackerPage() {
 
     async function load() {
         setLoading(true)
-        const { data: t } = await supabase.from('teachers').select('id, school_id').eq('user_id', user!.id).single()
+        const { data: t } = await supabase.from('teachers').select('id, school_id').eq('user_id', user!.id).maybeSingle()
         if (!t) { setLoading(false); return }
         setTeacherInfo({ id: t.id, schoolId: t.school_id })
 

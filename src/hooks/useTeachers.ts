@@ -57,7 +57,7 @@ export function useTeacherDetail(teacherId: string) {
           .select('*, user:users(*)')
           .eq('id', teacherId)
           .eq('school_id', schoolId)
-          .single(),
+          .maybeSingle(),
         supabase.from('teacher_assignments')
           .select('*, class:classes(id,name), subject:subjects(id,name), term:terms(id,name)')
           .eq('teacher_id', teacherId)

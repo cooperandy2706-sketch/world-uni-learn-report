@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/AgendaPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -36,6 +37,7 @@ export default function AdminAgendaPage() {
   const [selectedTermId, setSelectedTermId] = useState('')
   const [agendas, setAgendas] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [modalOpen, setModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)

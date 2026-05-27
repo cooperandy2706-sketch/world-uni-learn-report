@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/AnnouncementsPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -35,6 +36,7 @@ export default function AnnouncementsPage(){
   const {user}=useAuth()
   const [announcements,setAnnouncements]=useState<any[]>([])
   const [loading,setLoading]=useState(true)
+  useStuckLoadingReload(loading)
   const [modalOpen,setModalOpen]=useState(false)
   const [form,setForm]=useState({title:'',body:'',type:'announcement',target_role:'all',meeting_date:'',meeting_link:'',is_pinned:false,send_push:false, expires_at:'', trigger_at:'', is_alarm:false})
   const [saving,setSaving]=useState(false)

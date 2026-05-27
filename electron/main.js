@@ -1,7 +1,14 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, dialog } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
+import log from 'electron-log'
+import { autoUpdater } from 'electron-updater'
+
+// Configure updater logging
+autoUpdater.logger = log
+autoUpdater.logger.transports.file.level = 'info'
+log.info('App starting...')
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -45,8 +52,30 @@ function createWindow() {
   }
 }
 
+// Updater Events
+autoUpdater.on('update-available', () => {
+  log.info('Update available.')
+})
+
+autoUpdater.on('update-downloaded', () => {
+  log.info('Update downloaded')
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Update Ready',
+    message: 'A new version of Nexora has been downloaded. The app will automatically restart and install the update.',
+    buttons: ['Restart Now']
+  }).then(() => {
+    autoUpdater.quitAndInstall()
+  })
+})
+
 app.whenReady().then(() => {
   createWindow()
+  
+  // Only check for updates in production
+  if (!process.env.VITE_DEV_SERVER_URL) {
+    autoUpdater.checkForUpdatesAndNotify()
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

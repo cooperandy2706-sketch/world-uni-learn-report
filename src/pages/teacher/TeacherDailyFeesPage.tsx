@@ -32,7 +32,7 @@ export default function TeacherDailyFeesPage() {
   const { data: classes = [] } = useQuery({
     queryKey: ['teacher-classes', user?.id],
     queryFn: async () => {
-      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
+      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).maybeSingle()
       if (!teacher) return []
       const { data } = await supabase.from('teacher_assignments').select('class:classes(id,name)').eq('teacher_id', teacher.id)
       return Array.from(new Map((data ?? []).map(a => [(a.class as any)?.id, a.class])).values())

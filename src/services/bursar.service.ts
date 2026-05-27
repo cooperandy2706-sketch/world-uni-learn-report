@@ -63,7 +63,7 @@ export const feePaymentsService = {
       .from('students')
       .select('fees_arrears')
       .eq('id', studentId)
-      .single()
+      .maybeSingle()
 
     const previousArrears = Number(student?.fees_arrears || 0)
 
@@ -142,7 +142,7 @@ export const feePaymentsService = {
           .from('students')
           .select('fees_arrears')
           .eq('id', payment.student_id)
-          .single()
+          .maybeSingle()
 
         const currentArrears = Number(student?.fees_arrears || 0)
         await supabase

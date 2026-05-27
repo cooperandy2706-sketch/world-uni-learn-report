@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
@@ -29,6 +30,7 @@ export default function BursarDashboard() {
   const [expenseByCategory, setExpenseByCategory] = useState<any[]>([])
   const [schoolCurrency, setSchoolCurrency] = useState('GHS')
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [flippedCards, setFlippedCards] = useState<number[]>([])
 
   const toggleFlip = (idx: number) => {
@@ -65,7 +67,7 @@ export default function BursarDashboard() {
         supabase.from('fee_payments').select('amount_paid, student_id').eq('school_id', schoolId).eq('term_id', term?.id),
         supabase.from('daily_fees_collected').select('amount, date').eq('school_id', schoolId).gte('date', `${currentYear}-01-01`),
         supabase.from('attendance').select('student_id, days_present').eq('term_id', term?.id),
-        supabase.from('schools').select('currency_code').eq('id', schoolId).single()
+        supabase.from('schools').select('currency_code').eq('id', schoolId).maybeSingle()
       ])
 
       const [paymentsRes, incomeRes, expensesRes, payrollRes, recentRes, studentsRes, structRes, dailyConfRes, dailyCollRes, termPaymentsRes, dailyCollFullYearRes, attendanceRes, schoolRes] = resData as any

@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -14,6 +15,7 @@ export default function TeacherVideoAssignmentsPage() {
   const [assignments, setAssignments] = useState<any[]>([])
   const [classes, setClasses] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
 
   // Form state
   const [showModal, setShowModal] = useState(false)

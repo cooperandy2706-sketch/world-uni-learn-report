@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -9,6 +10,7 @@ export default function DataPrivacyPage() {
   const schoolId = user?.school_id
 
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
@@ -33,7 +35,7 @@ export default function DataPrivacyPage() {
         .from('privacy_consents')
         .select('*')
         .eq('user_id', user!.id)
-        .single()
+        .maybeSingle()
 
       if (error && error.code !== 'PGRST116') throw error // Ignore 'no rows' error
       if (data) {

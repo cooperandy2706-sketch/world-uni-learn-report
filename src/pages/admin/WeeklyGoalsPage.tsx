@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/WeeklyGoalsPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -33,6 +34,7 @@ export default function WeeklyGoalsPage(){
   const [teachers,setTeachers]=useState<any[]>([])
   const [subjects,setSubjects]=useState<any[]>([])
   const [loading,setLoading]=useState(true)
+  useStuckLoadingReload(loading)
   const [modalOpen,setModalOpen]=useState(false)
   const [saving,setSaving]=useState(false)
   const [filterWeek,setFilterWeek]=useState<number|''>('')

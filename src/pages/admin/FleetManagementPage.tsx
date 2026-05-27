@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
@@ -16,6 +17,7 @@ export default function FleetManagementPage() {
   const [maintenanceLogs, setMaintenanceLogs] = useState<any[]>([])
   const [students, setStudents] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
 
   // Modals
   const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false)

@@ -1,6 +1,6 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/ClassTestsPage.tsx
 import { useState, useEffect, useCallback } from 'react'
-import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -51,7 +51,7 @@ export default function ClassTestsPage() {
   }, [selectedClass, selectedSubject, term?.id])
 
   async function initTeacher() {
-    const { data: t } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
+    const { data: t } = await supabase.from('teachers').select('id').eq('user_id', user!.id).maybeSingle()
     if (!t) return
     setTeacherId(t.id)
 

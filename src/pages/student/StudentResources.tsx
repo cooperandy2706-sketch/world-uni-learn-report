@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -8,6 +9,7 @@ import { ROUTES } from '../../constants/routes'
 export default function StudentResourcesPage() {
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [assignments, setAssignments] = useState<any[]>([])
   const [resources, setResources] = useState<any[]>([])
   const [student, setStudent] = useState<any>(null)
@@ -23,7 +25,7 @@ export default function StudentResourcesPage() {
         .from('students')
         .select('*, class:classes(id,name)')
         .eq('user_id', user!.id)
-        .single()
+        .maybeSingle()
       
       if (s) {
         setStudent(s)

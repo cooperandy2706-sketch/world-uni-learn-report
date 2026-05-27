@@ -48,16 +48,39 @@ export function persistQueryCache(queryClient: QueryClient) {
   try {
     const allQueries = queryClient.getQueryCache().getAll()
     const allowedPrefixes = [
+      // Academic structure
       'settings',
       'term-current',
       'academic-year-current',
       'academic-years',
       'terms',
       'classes',
+      'subjects',
+      'departments',
+      'syllabus',
+      // People
       'teachers',
       'teacher-assignments',
-      'syllabus',
-      'assignments'
+      'students',
+      'parents',
+      'staff',
+      // Assessments & scores
+      'assignments',
+      'scores',
+      'reports',
+      'assessments',
+      // Finance
+      'fees',
+      'invoices',
+      'payroll',
+      // Operations
+      'attendance',
+      'timetable',
+      'announcements',
+      'news',
+      'school',
+      'user-profile',
+      'notifications',
     ]
 
     const serializable = allQueries

@@ -1,5 +1,5 @@
 // src/components/layout/AppLayout.tsx
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useSchoolInvoices } from '../../hooks/useBilling'
@@ -22,6 +22,26 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
   const { user, loading, initialized } = useAuth()
   const userSchool = user?.school as any
   const { data: invoices = [], isLoading: invoicesLoading } = useSchoolInvoices(userSchool?.id)
+
+  const [refreshKey, setRefreshKey] = useState(Date.now())
+  const lastHiddenTime = useRef(Date.now())
+
+  useEffect(() => {
+    const handleVis = () => {
+      if (document.visibilityState === 'hidden') {
+        lastHiddenTime.current = Date.now()
+      } else {
+        const awayTime = Date.now() - lastHiddenTime.current
+        // If away for more than 3 minutes, force remount the active page
+        // to clear stale data, hang states, and reset WebSockets
+        if (awayTime > 3 * 60 * 1000) {
+          setRefreshKey(Date.now())
+        }
+      }
+    }
+    document.addEventListener('visibilitychange', handleVis)
+    return () => document.removeEventListener('visibilitychange', handleVis)
+  }, [])
 
   if (!initialized || loading) {
     return <FlaskLoader label="Authenticating..." />
@@ -112,7 +132,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
           <Header />
                     <main className="app-main" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
             <EnablePushButton />
-            <Outlet />
+            <Outlet key={refreshKey} />
           </main>
         </div>
       </div>

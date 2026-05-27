@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { Calendar, Clock, CheckCircle, XCircle, AlertCircle, Plus, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
@@ -9,6 +10,7 @@ export default function TeacherLeavePage() {
   const { user } = useAuth()
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [showForm, setShowForm] = useState(false)
   
   // Form state

@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -54,6 +55,7 @@ export default function WulaTvPage() {
   const [assignments, setAssignments] = useState<any[]>([])
   const [progressMap, setProgressMap] = useState<Record<string, boolean>>({})
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [playingVideo, setPlayingVideo] = useState<any | null>(null)
   
   // ── Data Fetching ──
@@ -65,7 +67,7 @@ export default function WulaTvPage() {
     setLoading(true)
     try {
       // 1. Get student class
-      const { data: stu } = await supabase.from('students').select('id, class_id').eq('user_id', user!.id).single()
+      const { data: stu } = await supabase.from('students').select('id, class_id').eq('user_id', user!.id).maybeSingle()
       if (!stu) return
 
       // 2. Fetch assignments for that class
@@ -96,7 +98,7 @@ export default function WulaTvPage() {
 
   async function markAsWatched(assignmentId: string) {
     try {
-      const { data: stu } = await supabase.from('students').select('id').eq('user_id', user!.id).single()
+      const { data: stu } = await supabase.from('students').select('id').eq('user_id', user!.id).maybeSingle()
       if (!stu) return
 
       await supabase.from('video_progress').upsert({

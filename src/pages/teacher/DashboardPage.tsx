@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/DashboardPage.tsx
 // Full platform hub: timetable, attendance status, quiz submissions, all features
 import { useState, useEffect, useRef } from 'react'
@@ -53,6 +54,7 @@ export default function TeacherDashboardPage() {
   const [myQuizCount, setMyQuizCount] = useState(0)
   const [myQuizSubs, setMyQuizSubs] = useState(0)
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [msgOpen, setMsgOpen] = useState(false)
   const [msgSubject, setMsgSubject] = useState('')
   const [msgBody, setMsgBody] = useState('')
@@ -67,7 +69,7 @@ export default function TeacherDashboardPage() {
   async function loadDashboard() {
     setLoading(true)
     try {
-      const { data: teacher } = await supabase.from('teachers').select('*').eq('user_id', user!.id).single()
+      const { data: teacher } = await supabase.from('teachers').select('*').eq('user_id', user!.id).maybeSingle()
       if (!teacher) {
         setLoading(false)
         setFirstLoadComplete(true)

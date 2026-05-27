@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -20,6 +21,7 @@ const FOLDER_CATEGORIES = [
 export default function StaffVaultPage() {
     const { user } = useAuth()
     const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
     const [staff, setStaff] = useState<any[]>([])
     const [search, setSearch] = useState('')
     

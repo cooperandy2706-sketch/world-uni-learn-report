@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/shared/NewsPortalPage.tsx
 // ─────────────────────────────────────────────────────────────────
 //  NewsPortalPage — Production-grade, industry-standard news portal
@@ -535,6 +536,7 @@ export default function NewsPortalPage() {
   const [activeTab, setActiveTab] = useState('ges')
   const [news, setNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [online, setOnline] = useState(navigator.onLine)

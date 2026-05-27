@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -12,6 +13,7 @@ export default function StudentBillingPage() {
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [student, setStudent] = useState<any>(null)
   const [billData, setBillData] = useState<any>(null)
   const [showHistory, setShowHistory] = useState(true)
@@ -27,7 +29,7 @@ export default function StudentBillingPage() {
         .from('students')
         .select('id, full_name, student_id, class_id, school_id, school:schools(*)')
         .eq('user_id', user!.id)
-        .single()
+        .maybeSingle()
       
       if (s && term?.id) {
         setStudent(s)

@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
@@ -181,6 +182,7 @@ export default function StudentLibraryPage() {
   const navigate = useNavigate()
   const [resources, setResources] = useState<Resource[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [search, setSearch] = useState('')
   const [filterType, setFilterType] = useState<string>('all')
   const [filterSubject, setFilterSubject] = useState<string>('all')

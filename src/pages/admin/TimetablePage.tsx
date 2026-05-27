@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/TimetablePage.tsx
 import { useState, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
@@ -205,6 +206,7 @@ export default function TimetablePage() {
   const [classTeachers, setClassTeachers] = useState<any[]>([])
   const [classSubjects, setClassSubjects] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  useStuckLoadingReload(loading)
 
   // ── Slot Editing ──
   const [editing, setEditing] = useState<{ day: number; period_id: string } | null>(null)

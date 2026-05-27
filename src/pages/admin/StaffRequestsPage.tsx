@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/StaffRequestsPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -21,6 +22,7 @@ import {
 export default function StaffRequestsPage() {
     const { user: adminUser } = useAuth()
     const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
     const [leaves, setLeaves] = useState<any[]>([])
     const [docs, setDocs] = useState<any[]>([])
     const [activeTab, setActiveTab] = useState<'leave' | 'docs'>('leave')

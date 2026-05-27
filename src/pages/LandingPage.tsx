@@ -436,6 +436,24 @@ const CSS = `
   .stat-item h3 { font-family: var(--serif); font-size: 4rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; line-height: 1; }
   .stat-item p { font-size: 0.85rem; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.1em; }
 
+  /* ── DOWNLOAD ── */
+  .download-section { background: var(--bg); text-align: center; position: relative; overflow: hidden; }
+  .download-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(124,58,237,0.05) 0%, transparent 70%); pointer-events: none; }
+  .download-cards { display: flex; flex-direction: column; gap: 1.5rem; justify-content: center; margin-top: 3rem; }
+  @media (min-width: 640px) { .download-cards { flex-direction: row; } }
+  .download-card {
+    display: flex; align-items: center; gap: 1.25rem;
+    background: white; border: 1px solid rgba(0,0,0,0.07); border-radius: 20px;
+    padding: 1.5rem 2.5rem; text-decoration: none; color: var(--primary);
+    box-shadow: var(--shadow); transition: all 0.3s; min-width: 240px; justify-content: center;
+  }
+  .download-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-color: var(--accent); }
+  .download-card-icon { width: 48px; height: 48px; flex-shrink: 0; }
+  .download-card-text { text-align: left; }
+  .download-card-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-light); }
+  .download-card-name { font-size: 1.2rem; font-weight: 900; color: var(--primary); }
+  .download-note { margin-top: 1.75rem; font-size: 0.85rem; color: var(--text-light); font-weight: 500; }
+
   /* ── CTA ── */
   .cta { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; text-align: center; position: relative; overflow: hidden; }
   .cta::before { content: ''; position: absolute; width: 400px; height: 400px; background: var(--accent); filter: blur(100px); border-radius: 50%; top: -200px; left: -200px; opacity: 0.3; }
@@ -482,7 +500,7 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
           </a>
 
           <div className="nav-links">
-            {['Features', 'Pillars', 'Workflow', 'Pricing'].map(item => (
+            {['Features', 'Pillars', 'Workflow', 'Pricing', 'Download'].map(item => (
               <a key={item} href={`#${item.toLowerCase()}`} className="nav-link" aria-label={`Navigate to ${item}`}>{item}</a>
             ))}
           </div>
@@ -664,7 +682,7 @@ export default function LandingPage() {
       {/* Mobile Menu */}
       <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
         <button className="mobile-close" onClick={() => setMenuOpen(false)}>✕</button>
-        {['Features', 'Pillars', 'Workflow', 'Pricing', 'Stats'].map(item => (
+        {['Features', 'Pillars', 'Workflow', 'Pricing', 'Download'].map(item => (
           <a key={item} href={`#${item.toLowerCase()}`} className="mobile-link" onClick={() => setMenuOpen(false)}>{item}</a>
         ))}
         <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', padding: '0 2rem' }}>
@@ -759,6 +777,51 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Download Section */}
+      <section className="section download-section" id="download">
+        <div className="container">
+          <Reveal>
+            <SectionHeader eyebrow="Desktop App" title="Take Nexora with you, everywhere." />
+            <p style={{ color: 'var(--text-light)', fontSize: '1.1rem', maxWidth: 560, margin: '0 auto' }}>
+              Download the native desktop app for a faster, always-available experience — even with limited internet.
+            </p>
+            <div className="download-cards">
+              <a
+                href="https://github.com/cooperandy2706-sketch/world-uni-learn-report/releases/latest"
+                target="_blank"
+                rel="noreferrer"
+                className="download-card"
+              >
+                {/* Apple icon */}
+                <svg className="download-card-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.18 1.27-2.16 3.79.03 2.97 2.6 3.96 2.63 3.97-.03.07-.41 1.4-1.32 2.76zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                </svg>
+                <div className="download-card-text">
+                  <div className="download-card-label">Download for</div>
+                  <div className="download-card-name">macOS</div>
+                </div>
+              </a>
+              <a
+                href="https://github.com/cooperandy2706-sketch/world-uni-learn-report/releases/latest"
+                target="_blank"
+                rel="noreferrer"
+                className="download-card"
+              >
+                {/* Windows icon */}
+                <svg className="download-card-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                </svg>
+                <div className="download-card-text">
+                  <div className="download-card-label">Download for</div>
+                  <div className="download-card-name">Windows</div>
+                </div>
+              </a>
+            </div>
+            <p className="download-note">✦ Free download &nbsp;·&nbsp; Auto-updates via GitHub Releases &nbsp;·&nbsp; v0.0.0</p>
+          </Reveal>
         </div>
       </section>
 

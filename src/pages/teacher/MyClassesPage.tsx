@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/MyClassesPage.tsx
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
@@ -12,6 +13,7 @@ export default function MyClassesPage() {
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [classData, setClassData] = useState<any[]>([])
   const [expandedClass, setExpandedClass] = useState<string | null>(null)
 
@@ -22,7 +24,7 @@ export default function MyClassesPage() {
   async function loadMyClasses() {
     setLoading(true)
     try {
-      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
+      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).maybeSingle()
       if (!teacher) return
 
       const { data: assigns } = await supabase

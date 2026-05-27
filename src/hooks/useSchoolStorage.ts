@@ -63,7 +63,7 @@ export function useSchoolStorage(schoolId: string | undefined): StorageBreakdown
         .from('schools')
         .select('logo_url, headteacher_signature_url, storage_limit_gb')
         .eq('id', schoolId)
-        .single()
+        .maybeSingle()
 
       const logoBytes = school?.logo_url ? LOGO_ESTIMATE_BYTES : 0
       const sigBytes  = school?.headteacher_signature_url ? 50_000 : 0 // 50 KB est.

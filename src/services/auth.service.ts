@@ -6,7 +6,7 @@ export const authService = {
   async getCurrentUser(): Promise<User | null> {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
-    const { data } = await supabase.from('users').select('*').eq('id', user.id).single()
+    const { data } = await supabase.from('users').select('*').eq('id', user.id).maybeSingle()
     return data
   },
 

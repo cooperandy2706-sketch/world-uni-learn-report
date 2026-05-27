@@ -1,6 +1,6 @@
 // src/router.tsx
 import { lazy, Suspense } from 'react'
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createBrowserRouter, createHashRouter, Navigate } from 'react-router-dom'
 
 // Only eagerly import layout shells and the landing page (critical path)
 import AppLayout from './components/layout/AppLayout'
@@ -19,7 +19,11 @@ function lazyPage(importFn: () => Promise<{ default: React.ComponentType }>) {
   )
 }
 
-export const router = createBrowserRouter([
+// Detect if we are running inside Electron
+const isElectron = navigator.userAgent.toLowerCase().includes('electron')
+const createRouter = isElectron ? createHashRouter : createBrowserRouter
+
+export const router = createRouter([
   {
     path: '/',
     errorElement: <RouteErrorPage />,

@@ -4,6 +4,7 @@ import { QueryClientProvider, onlineManager } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { router } from './router'
 import { queryClient } from './lib/queryClient'
+import { supabase } from './lib/supabase'
 import SplashScreen from './components/layout/SplashScreen'
 import GlobalAlarm from './components/ui/GlobalAlarm'
 import { useAuthStore } from './store/authStore'
@@ -54,13 +55,17 @@ export default function App() {
   }, [])
 
   // ── Browser visibility (tab switching / screen sleep) ────────────────────
-  // When the user returns to the tab after a long absence, force a refresh
-  // of all queries so they never see stale data.
+  // When the user returns to the tab, validate the session is still alive
+  // BEFORE triggering any refetches. This prevents a race where queries fire
+  // with an expired token and get 401s right before TOKEN_REFRESHED fires.
+  // We also only refetch queries that are actively mounted AND already stale —
+  // avoids the flashing loading spinners that `invalidateQueries()` causes.
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        queryClient.invalidateQueries()
-      }
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState !== 'visible') return
+      const { data } = await supabase.auth.getSession()
+      if (!data.session) return // Auth listener will handle redirect to login
+      queryClient.refetchQueries({ type: 'active', stale: true })
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
@@ -69,42 +74,49 @@ export default function App() {
   // Exit splash once auth is initialized and minimum branding time has elapsed.
   const isReady = minTimeElapsed && initialized
 
-  if (!isReady) {
-    return <SplashScreen />
-  }
-
+  // ── QueryClientProvider wraps everything — including SplashScreen ──────────
+  // This guarantees the cache is always available from the very first render,
+  // even before auth initialises. Previously it only mounted AFTER isReady,
+  // which meant any component that called useQuery during the splash had no
+  // provider and would throw or silently hang.
   return (
     <QueryClientProvider client={queryClient}>
-      {/* ── Offline Banner ──────────────────────────────────────────────── */}
-      {isOffline && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 99999,
-          background: '#dc2626', color: '#fff', textAlign: 'center',
-          padding: '0.6rem 1rem', fontSize: '0.85rem', fontWeight: 700,
-          fontFamily: 'DM Sans, sans-serif', letterSpacing: '0.02em',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
-        }}>
-          📡 You are offline — changes may not save until you reconnect.
-        </div>
-      )}
+      {!isReady ? (
+        <SplashScreen />
+      ) : (
+        <>
+          {/* ── Offline Banner ────────────────────────────────────────── */}
+          {isOffline && (
+            <div style={{
+              position: 'fixed', top: 0, left: 0, right: 0, zIndex: 99999,
+              background: '#dc2626', color: '#fff', textAlign: 'center',
+              padding: '0.6rem 1rem', fontSize: '0.85rem', fontWeight: 700,
+              fontFamily: 'DM Sans, sans-serif', letterSpacing: '0.02em',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
+            }}>
+              📡 You are offline — changes may not save until you reconnect.
+            </div>
+          )}
 
-      <RouterProvider router={router} />
-      <GlobalAlarm />
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#1e293b',
-            color: '#f1f5f9',
-            borderRadius: '10px',
-            fontSize: '14px',
-            fontFamily: 'DM Sans, sans-serif',
-          },
-          success: { iconTheme: { primary: '#22c55e', secondary: '#fff' } },
-          error:   { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
-        }}
-      />
+          <RouterProvider router={router} />
+          <GlobalAlarm />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#1e293b',
+                color: '#f1f5f9',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontFamily: 'DM Sans, sans-serif',
+              },
+              success: { iconTheme: { primary: '#22c55e', secondary: '#fff' } },
+              error:   { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+            }}
+          />
+        </>
+      )}
     </QueryClientProvider>
   )
 }

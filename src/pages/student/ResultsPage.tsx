@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/student/ResultsPage.tsx
 // Student results portal — term scores, subject breakdown, report card, position
 import { useState, useEffect, Fragment, useMemo } from 'react'
@@ -35,6 +36,7 @@ export default function StudentResultsPage() {
 
 
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
@@ -49,7 +51,7 @@ export default function StudentResultsPage() {
 
 
   async function loadStudent() {
-    const { data: student } = await supabase.from('students').select('*, class:classes(name), school:schools(name)').eq('user_id', user!.id).single()
+    const { data: student } = await supabase.from('students').select('*, class:classes(name), school:schools(name)').eq('user_id', user!.id).maybeSingle()
     if (!student) { setLoading(false); return }
     setStudentData(student)
 

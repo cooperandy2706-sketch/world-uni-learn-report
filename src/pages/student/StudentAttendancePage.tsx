@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
@@ -12,6 +13,7 @@ export default function StudentAttendancePage() {
   const { data: term } = useCurrentTerm()
   
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [mounted, setMounted] = useState(false)
   const [attendance, setAttendance] = useState<any[]>([])
   const [summary, setSummary] = useState({ total: 0, present: 0, absent: 0, late: 0 })
@@ -25,7 +27,7 @@ export default function StudentAttendancePage() {
   async function loadAttendance() {
     setLoading(true)
     try {
-      const { data: student } = await supabase.from('students').select('id').eq('user_id', user!.id).single()
+      const { data: student } = await supabase.from('students').select('id').eq('user_id', user!.id).maybeSingle()
       if (!student) return
 
       const { data, error } = await supabase

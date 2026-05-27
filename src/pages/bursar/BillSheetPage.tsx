@@ -29,7 +29,7 @@ export default function BillSheetPage() {
   // Load school info
   const { data: school } = useQuery({
     queryKey: ['school-info', schoolId],
-    queryFn: async () => { const { data } = await supabase.from('schools').select('*').eq('id', schoolId).single(); return data },
+    queryFn: async () => { const { data } = await supabase.from('schools').select('*').eq('id', schoolId).maybeSingle(); return data },
     enabled: !!schoolId,
   })
 

@@ -41,7 +41,7 @@ export default function ParentAcademicsPage() {
     queryKey: ['parent_school_info', user?.school_id],
     queryFn: async () => {
       if (!user?.school_id) return null
-      const { data, error } = await supabase.from('schools').select('currency_code').eq('id', user.school_id).single()
+      const { data, error } = await supabase.from('schools').select('currency_code').eq('id', user.school_id).maybeSingle()
       if (error) throw error
       return data
     },

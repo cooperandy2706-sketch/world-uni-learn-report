@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -305,6 +306,7 @@ function ComposePanel({ onClose, onSent }: { onClose: () => void; onSent: () => 
 export default function GlobalMessagingPage() {
   const [messages, setMessages] = useState<PlatformMessage[]>([])
   const [loading, setLoading]   = useState(true)
+  useStuckLoadingReload(loading)
   const [showCompose, setShowCompose] = useState(false)
   const [filter, setFilter]     = useState<'all' | PlatformMessage['type']>('all')
 

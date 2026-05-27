@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/NotificationsPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -11,6 +12,7 @@ export default function TeacherNotificationsPage(){
   const [notifs,setNotifs]=useState<any[]>([])
   const [announcements,setAnnouncements]=useState<any[]>([])
   const [loading,setLoading]=useState(true)
+  useStuckLoadingReload(loading)
   const [tab,setTab]=useState<'notifications'|'announcements'>('notifications')
 
   useEffect(()=>{if(user)load()},[user])

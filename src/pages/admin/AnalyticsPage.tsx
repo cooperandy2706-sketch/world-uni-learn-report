@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/AnalyticsPage.tsx
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -54,6 +55,7 @@ export default function AnalyticsPage() {
   const [analytics, setAnalytics] = useState<any>(null)
   const [studentPerformance, setStudentPerformance] = useState<any>(null)
   const [loading, setLoading] = useState(false)
+  useStuckLoadingReload(loading)
   const [classFocused, setClassFocused] = useState(false)
 
   useEffect(() => {

@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
@@ -44,6 +45,7 @@ export default function LiveFleetTrackingPage() {
   const { user } = useAuth()
   const [activeTrips, setActiveTrips] = useState<ActiveTrip[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null)
 
   useEffect(() => {

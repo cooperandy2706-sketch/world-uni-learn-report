@@ -62,7 +62,7 @@ export default function BursarStudentsPage() {
   // School context for currency
   const { data: school } = useQuery({
     queryKey: ['school-currency', schoolId],
-    queryFn: async () => { const { data } = await supabase.from('schools').select('currency_code').eq('id', schoolId).single(); return data },
+    queryFn: async () => { const { data } = await supabase.from('schools').select('currency_code').eq('id', schoolId).maybeSingle(); return data },
     enabled: !!schoolId,
   })
   const schoolCurrency = school?.currency_code || 'GHS'

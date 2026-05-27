@@ -109,7 +109,7 @@ export const yearsService = {
       .select('*')
       .eq('school_id', schoolId)
       .eq('is_current', true)
-      .single()
+      .maybeSingle()
   },
   async create(data: any) {
     return supabase.from('academic_years').insert(data).select().single()
@@ -137,7 +137,7 @@ export const termsService = {
       .select('*')
       .eq('school_id', schoolId)
       .eq('is_current', true)
-      .single()
+      .maybeSingle()
   },
   async create(data: any) {
     const { data: term, error: termErr } = await supabase.from('terms').insert(data).select().single()
@@ -201,7 +201,7 @@ export const termsService = {
             .from('terms')
             .select('academic_year_id')
             .eq('id', id)
-            .single()
+            .maybeSingle()
           if (newTerm) {
             const mapped = oldStructs.map(s => ({
               school_id: s.school_id,

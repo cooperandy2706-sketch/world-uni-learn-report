@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/ScoreEntryPage.tsx
 // Flexible Gradebook Version
 import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
@@ -66,6 +67,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
   const [dirty, setDirty]                   = useState(false)
   const [activeCell, setActiveCell]         = useState<{sid:string;subId:string;field:string}|null>(null)
   const [loading, setLoading]               = useState(true)
+  useStuckLoadingReload(loading)
   const [syncingTests, setSyncingTests]     = useState(false)
   const autoSaveRef = useRef<any>(null)
 
@@ -88,7 +90,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
   }, [selectedClass, teacherRecord, term?.id])
 
   async function initTeacher() {
-    const { data: t } = await supabase.from('teachers').select('*').eq('user_id', user!.id).single()
+    const { data: t } = await supabase.from('teachers').select('*').eq('user_id', user!.id).maybeSingle()
     if (!t) { setLoading(false); return }
     setTeacherRecord(t)
     if (!term?.id) { setLoading(false); return }
@@ -115,7 +117,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
       const { data: cats } = await supabase.from('department_grading_categories').select('*').eq('department_id', departmentId).order('created_at')
       if (cats && cats.length > 0) categories = cats
 
-      const { data: scale } = await supabase.from('grading_scales').select('*, levels:grading_scale_levels(*)').eq('department_id', departmentId).single()
+      const { data: scale } = await supabase.from('grading_scales').select('*, levels:grading_scale_levels(*)').eq('department_id', departmentId).maybeSingle()
       if (scale?.levels) {
         levels = scale.levels.sort((a:any, b:any) => b.min_score - a.min_score)
       }

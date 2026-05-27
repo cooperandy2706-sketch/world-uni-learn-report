@@ -168,7 +168,7 @@ export default function AssignmentsPage() {
 
   async function loadData() {
     try {
-      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
+      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).maybeSingle()
       if (!teacher) return
 
       const { data: assigns } = await supabase
@@ -191,7 +191,7 @@ export default function AssignmentsPage() {
   async function loadAssignments() {
     setIsLoading(true)
     try {
-      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
+      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).maybeSingle()
       if (!teacher) return
 
       const [classRes, globalRes] = await Promise.all([
@@ -295,7 +295,7 @@ export default function AssignmentsPage() {
 
     setIsSubmitting(true)
     try {
-      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
+      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).maybeSingle()
       
       const payload = {
         ...form,

@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/AdminTasksPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -23,6 +24,7 @@ export default function AdminTasksPage() {
     const [tasks, setTasks] = useState<any[]>([])
     const [staff, setStaff] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
     const [showModal, setShowModal] = useState(false)
     const [filter, setFilter] = useState('all')
 

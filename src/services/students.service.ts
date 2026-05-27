@@ -28,7 +28,7 @@ export const studentsService = {
       .select('*, class:classes(id, name)')
       .eq('school_id', schoolId)
       .eq('id', id)
-      .single()
+      .maybeSingle()
   },
 
   async create(student: Omit<Student, 'id' | 'created_at'>) {

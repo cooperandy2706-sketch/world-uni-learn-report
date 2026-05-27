@@ -99,7 +99,7 @@ export default function NurseDashboard() {
       .from('medical_records')
       .select('*')
       .eq('student_id', studentId)
-      .single()
+      .maybeSingle()
     setMedicalRecord(data || null)
   }
 

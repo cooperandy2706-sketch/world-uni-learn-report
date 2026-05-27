@@ -26,10 +26,9 @@ export default function GlobalAdOverlay() {
         .gte('active_until', now)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
-      // Ignore single row not found error
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Error fetching global ad:', error)
         return
       }

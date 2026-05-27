@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { Calendar, Search, X, CheckCircle, XCircle, Clock, User } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
@@ -10,6 +11,7 @@ export default function AdminStaffLeavePage() {
   const [requests, setRequests] = useState<any[]>([])
   const [teachers, setTeachers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [filter, setFilter] = useState('pending')
   const [searchQuery, setSearchQuery] = useState('')
 

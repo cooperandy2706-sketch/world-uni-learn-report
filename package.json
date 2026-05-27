@@ -24,10 +24,17 @@
       "dist/**/*",
       "electron/**/*"
     ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "cooperandy2706-sketch",
+        "repo": "world-uni-learn-report"
+      }
+    ],
     "mac": {
       "icon": "public/icon-512.png",
       "target": [
-        "dmg"
+        "zip"
       ]
     },
     "win": {
@@ -51,6 +58,8 @@
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "electron-log": "^5.4.4",
+    "electron-updater": "^6.8.3",
     "framer-motion": "^12.38.0",
     "html2canvas": "^1.4.1",
     "html5-qrcode": "^2.3.8",

@@ -136,7 +136,7 @@ export default function AuthPage() {
 
     setLoading(true)
     try {
-      const { data: schoolCheck, error: verifyErr } = await supabase.from('schools').select('id').eq('id', form.school_code).single()
+      const { data: schoolCheck, error: verifyErr } = await supabase.from('schools').select('id').eq('id', form.school_code).maybeSingle()
       if (verifyErr || !schoolCheck) { throw new Error('Invalid school code.') }
 
       const { data: authData, error: authErr } = await supabase.auth.signUp({

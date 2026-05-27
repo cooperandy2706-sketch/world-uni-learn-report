@@ -25,7 +25,7 @@ async function fetchProfile(userId: string): Promise<User | null> {
     .from('users')
     .select('*')
     .eq('id', userId)
-    .single()
+    .maybeSingle()
 
   if (error || !profile) return null
 
@@ -34,7 +34,7 @@ async function fetchProfile(userId: string): Promise<User | null> {
       .from('schools')
       .select('*')
       .eq('id', profile.school_id)
-      .single()
+      .maybeSingle()
     if (school) profile.school = school
   }
 
@@ -59,8 +59,19 @@ export const useAuthStore = create<AuthStore>((set) => ({
     _authUnsubscribe = null
 
     // ── 1. Bootstrap: load existing session from localStorage ────────
-    const { data } = await supabase.auth.getSession()
-    const session = data.session
+    // Race the session fetch against a timeout so a slow network or
+    // Supabase cold-start can never leave the user on a blank splash
+    // screen forever. If the timeout wins, we surface the login page.
+    const sessionResult = await Promise.race([
+      supabase.auth.getSession(),
+      new Promise<{ data: { session: null } }>((resolve) =>
+        setTimeout(() => {
+          console.warn('[Nexora Auth] getSession() timed out after 8s — proceeding to login')
+          resolve({ data: { session: null } })
+        }, 8_000)
+      ),
+    ])
+    const session = sessionResult.data.session
 
     if (session?.user) {
       const profile = await fetchProfile(session.user.id)

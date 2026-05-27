@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/AttendancePage.tsx
 // Morning register — class teacher marks daily attendance
 // Uses the existing `attendance` table (term totals: total_days, days_present, days_absent)
@@ -32,6 +33,7 @@ export default function TeacherAttendancePage() {
   const { data: term } = useCurrentTerm()
 
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [saving, setSaving] = useState(false)
   const [myClasses, setMyClasses] = useState<any[]>([])
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null)
@@ -53,7 +55,7 @@ export default function TeacherAttendancePage() {
     setLoading(true)
 
     // 1. Get teacher record
-    const { data: t } = await supabase.from('teachers').select('id').eq('user_id', user.id).single()
+    const { data: t } = await supabase.from('teachers').select('id').eq('user_id', user.id).maybeSingle()
     if (!t) { setLoading(false); return }
 
     // 2. Find all classes where this teacher is the class teacher
@@ -202,7 +204,7 @@ export default function TeacherAttendancePage() {
         .from('teachers')
         .select('id')
         .eq('user_id', user!.id)
-        .single()
+        .maybeSingle()
 
       // 1. Get existing records for this class today (from both gate scanner and previous submit)
       const { data: existingRecs } = await supabase

@@ -56,7 +56,7 @@ export default function ParentBillingPage() {
     if (wards[0]?.school_id) {
       try {
         const { supabase: sb } = await import('../../lib/supabase')
-        const { data: school } = await sb.from('schools').select('currency_code').eq('id', wards[0].school_id).single()
+        const { data: school } = await sb.from('schools').select('currency_code').eq('id', wards[0].school_id).maybeSingle()
         if (school?.currency_code) setSchoolCurrency(school.currency_code)
       } catch { /* keep default GHS */ }
     }
@@ -79,7 +79,7 @@ export default function ParentBillingPage() {
         .from('schools')
         .select('name, paystack_public_key, id, currency_code, logo_url')
         .eq('id', selectedWardForPay.school_id)
-        .single()
+        .maybeSingle()
 
       if (schoolErr) throw new Error('Could not fetch school configuration.')
 

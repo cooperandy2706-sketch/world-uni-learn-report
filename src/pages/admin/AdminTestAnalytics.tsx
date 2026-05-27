@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/AdminTestAnalytics.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -10,6 +11,7 @@ export default function AdminTestAnalytics() {
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [classes, setClasses] = useState<any[]>([])
   const [subjects, setSubjects] = useState<any[]>([])
   const [selectedClass, setSelectedClass] = useState('')

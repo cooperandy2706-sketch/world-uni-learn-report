@@ -171,7 +171,7 @@ export default function TeacherStudentsPage() {
     setIsLoading(true)
     try {
       // 1. Get teacher ID
-      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
+      const { data: teacher } = await supabase.from('teachers').select('id').eq('user_id', user!.id).maybeSingle()
       if (!teacher) return
 
       // 2. Get assigned classes

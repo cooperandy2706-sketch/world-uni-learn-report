@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/TimetablePage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -13,6 +14,7 @@ export default function TeacherTimetablePage(){
   const [slots,setSlots]=useState<any[]>([])
   const [periods,setPeriods]=useState<any[]>([])
   const [loading,setLoading]=useState(true)
+  useStuckLoadingReload(loading)
   const [todayDay]=useState(()=>{
     const d=new Date().getDay() // 0=Sun
     return d>=1&&d<=5?d:1
@@ -22,7 +24,7 @@ export default function TeacherTimetablePage(){
 
   async function load(){
     setLoading(true)
-    const {data:t}=await supabase.from('teachers').select('id').eq('user_id',user!.id).single()
+    const {data:t}=await supabase.from('teachers').select('id').eq('user_id',user!.id).maybeSingle()
     if(!t){setLoading(false);return}
 
     // Find if this teacher is a substitute for anyone today

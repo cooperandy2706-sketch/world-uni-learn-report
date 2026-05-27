@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/TeacherSelfServicePage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -27,6 +28,7 @@ export default function TeacherSelfServicePage() {
     const { data: term } = useCurrentTerm()
     const [activeTab, setActiveTab] = useState<Tab>('profile')
     const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
     const [teacher, setTeacher] = useState<any>(null)
     const [payroll, setPayroll] = useState<any[]>([])
     const [leaves, setLeaves] = useState<any[]>([])
@@ -55,7 +57,7 @@ export default function TeacherSelfServicePage() {
                 { data: lData },
                 { data: dData }
             ] = await Promise.all([
-                supabase.from('teachers').select('*, user:users(*)').eq('user_id', user!.id).single(),
+                supabase.from('teachers').select('*, user:users(*)').eq('user_id', user!.id).maybeSingle(),
                 supabase.from('staff_payroll').select('*').eq('user_id', user!.id).order('month', { ascending: false }),
                 supabase.from('leave_requests').select('*').eq('user_id', user!.id).order('created_at', { ascending: false }),
                 supabase.from('staff_documents').select('*').eq('user_id', user!.id).order('created_at', { ascending: false })

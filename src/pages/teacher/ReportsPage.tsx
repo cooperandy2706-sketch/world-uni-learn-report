@@ -103,7 +103,7 @@ export default function TeacherReportsPage() {
 
   async function init() {
     setInitLoading(true)
-    const { data: t } = await supabase.from('teachers').select('id').eq('user_id', user!.id).single()
+    const { data: t } = await supabase.from('teachers').select('id').eq('user_id', user!.id).maybeSingle()
     if (!t) { setInitLoading(false); return }
     if (!term?.id) { setInitLoading(false); return }
     const { data: a } = await supabase

@@ -232,7 +232,7 @@ export default function MessagingPage() {
       if (conv.type === 'direct') {
         const { data: p } = await supabase.from('chat_members')
           .select('user_id, users!inner(full_name, role)')
-          .eq('conversation_id', conv.id).neq('user_id', user.id).limit(1).single()
+          .eq('conversation_id', conv.id).neq('user_id', user.id).limit(1).maybeSingle()
         dm_partner_id = (p as any)?.user_id
         dm_partner_name = (p as any)?.users?.full_name
         dm_partner_role = (p as any)?.users?.role

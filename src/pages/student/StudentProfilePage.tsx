@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
@@ -10,6 +11,7 @@ export default function StudentProfilePage() {
   const { user } = useAuth()
   const [studentData, setStudentData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [mounted, setMounted] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [changingPassword, setChangingPassword] = useState(false)
@@ -26,7 +28,7 @@ export default function StudentProfilePage() {
         .from('students')
         .select('*, class:classes(name), school:schools(name)')
         .eq('user_id', user!.id)
-        .single()
+        .maybeSingle()
       
       if (error) throw error
       setStudentData(data)

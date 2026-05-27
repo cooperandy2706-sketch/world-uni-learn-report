@@ -37,7 +37,7 @@ export default function ReportsPage() {
       let endDate: string | null = null
 
       if (period === 'term') {
-        const { data: t } = await supabase.from('terms').select('start_date, end_date').eq('id', term?.id).single()
+        const { data: t } = await supabase.from('terms').select('start_date, end_date').eq('id', term?.id).maybeSingle()
         startDate = t?.start_date
         endDate = t?.end_date
       } else if (period === 'month') {

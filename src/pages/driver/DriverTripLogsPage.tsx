@@ -24,7 +24,7 @@ export default function DriverTripLogsPage() {
       .from('transport_vehicles')
       .select('id')
       .eq('driver_id', user!.id)
-      .single()
+      .maybeSingle()
 
     if (!vehicle) {
       setLogs([])

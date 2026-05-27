@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/AssetManagerPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -23,6 +24,7 @@ export default function AssetManagerPage() {
     const { user } = useAuth()
     const [assets, setAssets] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
     const [showModal, setShowModal] = useState(false)
     const [search, setSearch] = useState('')
 

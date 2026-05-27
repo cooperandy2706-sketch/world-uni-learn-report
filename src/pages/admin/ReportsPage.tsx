@@ -261,7 +261,7 @@ export default function ReportsPage() {
       if (cls?.department_id) {
         const [catsRes, scaleRes] = await Promise.all([
           supabase.from('department_grading_categories').select('*').eq('department_id', cls.department_id).order('created_at'),
-          supabase.from('grading_scales').select('*, levels:grading_scale_levels(*)').eq('department_id', cls.department_id).single()
+          supabase.from('grading_scales').select('*, levels:grading_scale_levels(*)').eq('department_id', cls.department_id).maybeSingle()
         ])
 
         if (catsRes.data && catsRes.data.length > 0) {
@@ -476,7 +476,7 @@ export default function ReportsPage() {
         if (clsDeptId) {
           const [catsRes, scaleRes] = await Promise.all([
             supabase.from('department_grading_categories').select('*').eq('department_id', clsDeptId).order('created_at'),
-            supabase.from('grading_scales').select('*, levels:grading_scale_levels(*)').eq('department_id', clsDeptId).single()
+            supabase.from('grading_scales').select('*, levels:grading_scale_levels(*)').eq('department_id', clsDeptId).maybeSingle()
           ])
           if (catsRes.data && catsRes.data.length > 0) cats = catsRes.data
           if (scaleRes.data?.levels) scale = scaleRes.data.levels.sort((a: any, b: any) => b.min_score - a.min_score)

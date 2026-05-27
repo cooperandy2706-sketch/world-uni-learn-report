@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/AttendancePage.tsx
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
@@ -57,6 +58,7 @@ export default function AdminAttendancePage() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [selectedClass, setSelectedClass] = useState('')
   const [loading, setLoading] = useState(false)
+  useStuckLoadingReload(loading)
   const [search, setSearch] = useState('')
 
   const [studentRows, setStudentRows] = useState<StudentRow[]>([])

@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
@@ -38,6 +39,7 @@ export default function StudentDashboard() {
   const [historicalScores, setHistoricalScores] = useState<any[]>([])
   const [academicChallenges, setAcademicChallenges] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [mounted, setMounted] = useState(false)
   const [now] = useState(new Date())
 
@@ -52,7 +54,7 @@ export default function StudentDashboard() {
         .from('students')
         .select('*, class:classes(id,name), school:schools(name)')
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
       if (!student) { 
         setLoading(false)
         setFirstLoadComplete(true)

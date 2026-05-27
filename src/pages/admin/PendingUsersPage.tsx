@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/PendingUsersPage.tsx
 // Admin panel — approve or reject pending teacher signup requests
 import { useState, useEffect } from 'react'
@@ -17,6 +18,7 @@ export default function PendingUsersPage() {
   const { user } = useAuth()
   const [pending, setPending] = useState<PendingUser[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [acting, setActing] = useState<string | null>(null)
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
 

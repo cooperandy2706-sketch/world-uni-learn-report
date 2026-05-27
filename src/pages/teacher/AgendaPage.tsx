@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/AgendaPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -34,6 +35,7 @@ export default function TeacherAgendaPage() {
   const [agendas, setAgendas] = useState<any[]>([])
   const [responses, setResponses] = useState<Record<string, any>>({})
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   
   const [struggleModalOpen, setStruggleModalOpen] = useState(false)
   const [selectedAgenda, setSelectedAgenda] = useState<any>(null)
@@ -48,7 +50,7 @@ export default function TeacherAgendaPage() {
   async function loadAll() {
     setLoading(true)
     try {
-      const { data: t } = await supabase.from('teachers').select('*').eq('user_id', user!.id).single()
+      const { data: t } = await supabase.from('teachers').select('*').eq('user_id', user!.id).maybeSingle()
       if (!t) return
       setTeacher(t)
 

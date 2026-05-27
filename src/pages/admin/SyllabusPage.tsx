@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/SyllabusPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -31,6 +32,7 @@ export default function SyllabusPage(){
   const [syllabus,setSyllabus]=useState<any[]>([])
   const [subjects,setSubjects]=useState<any[]>([])
   const [loading,setLoading]=useState(true)
+  useStuckLoadingReload(loading)
   const [uploading,setUploading]=useState(false)
   const [modalOpen,setModalOpen]=useState(false)
   const [form,setForm]=useState({class_id:'',subject_id:'',title:'',file:null as File|null})

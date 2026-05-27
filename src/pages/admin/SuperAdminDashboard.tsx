@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/SuperAdminDashboard.tsx
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -80,6 +81,7 @@ export default function SuperAdminDashboard() {
   const [stats, setStats] = useState<PlatformStats | null>(null)
   const [schools, setSchools] = useState<School[]>([])
   const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | SchoolStatus>('all')
   const [mounted, setMounted] = useState(false)

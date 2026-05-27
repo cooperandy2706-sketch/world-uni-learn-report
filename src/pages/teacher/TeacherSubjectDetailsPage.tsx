@@ -31,7 +31,7 @@ export default function TeacherSubjectDetailsPage() {
         .select('*')
         .eq('id', id)
         .is('school_id', null)
-        .single()
+        .maybeSingle()
       setSubject(sub)
 
       // Load resources for this subject

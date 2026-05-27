@@ -84,7 +84,7 @@ export default function TeacherTakeGlobalQuizPage() {
         .from('global_quizzes')
         .select('*, subject:subjects(name)')
         .eq('id', id)
-        .single()
+        .maybeSingle()
 
       if (error) throw error
       

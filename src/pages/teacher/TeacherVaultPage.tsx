@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -10,6 +11,7 @@ import {
 export default function TeacherVaultPage() {
     const { user } = useAuth()
     const [loading, setLoading] = useState(true)
+  useStuckLoadingReload(loading)
     const [documents, setDocuments] = useState<any[]>([])
     const [showUploadModal, setShowUploadModal] = useState(false)
     const [teacher, setTeacher] = useState<any>(null)
@@ -31,7 +33,7 @@ export default function TeacherVaultPage() {
         if (!user) return
         setLoading(true)
         try {
-            const { data: tData } = await supabase.from('teachers').select('*, user:users(*)').eq('user_id', user.id).single()
+            const { data: tData } = await supabase.from('teachers').select('*, user:users(*)').eq('user_id', user.id).maybeSingle()
             setTeacher(tData)
 
             const { data: dData, error } = await supabase

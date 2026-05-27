@@ -122,7 +122,7 @@ export const reportsService = {
       .eq('school_id', schoolId)
       .eq('student_id', studentId)
       .eq('term_id', termId)
-      .single()
+      .maybeSingle()
   },
 
   async updateRemarks(

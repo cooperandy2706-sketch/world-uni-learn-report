@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/BatchPromotionPage.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -24,6 +25,7 @@ export default function BatchPromotionPage() {
     const [students, setStudents] = useState<any[]>([])
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
     const [loading, setLoading] = useState(false)
+  useStuckLoadingReload(loading)
     const [promoting, setPromoting] = useState(false)
 
     useEffect(() => {

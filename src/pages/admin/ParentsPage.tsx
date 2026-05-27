@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/ParentsPage.tsx
 import { useState, useMemo } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -56,6 +57,7 @@ export default function ParentsPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<any>(null)
   const [loading, setLoading] = useState(false)
+  useStuckLoadingReload(loading)
   const [formData, setFormData] = useState({ email: '', password: '' })
 
   // 1. Fetch Students with their class and parent status

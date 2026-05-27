@@ -1,3 +1,4 @@
+import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/admin/AssessmentsPage.tsx
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -111,6 +112,7 @@ export default function AssessmentsPage() {
   const [students, setStudents] = useState<any[]>([])
   const { data: allSubjects = [] } = useSubjects()
   const [loading, setLoading] = useState(false)
+  useStuckLoadingReload(loading)
   
   const classSubjects = useMemo(() => {
     if (!selectedClass) return []

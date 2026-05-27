@@ -56,18 +56,18 @@ export default function TakeAssignmentPage() {
         .from('assignments')
         .select('*, subject:subjects(name)')
         .eq('id', id)
-        .single()
+        .maybeSingle()
 
       if (error) throw error
       
       // Check if already submitted
-      const { data: student } = await supabase.from('students').select('id').eq('user_id', user!.id).single()
+      const { data: student } = await supabase.from('students').select('id').eq('user_id', user!.id).maybeSingle()
       const { data: sub } = await supabase
         .from('assignment_submissions')
         .select('id')
         .eq('assignment_id', id)
         .eq('student_id', student!.id)
-        .single()
+        .maybeSingle()
 
       if (sub) {
         toast.error('You have already completed this assignment')
@@ -105,7 +105,7 @@ export default function TakeAssignmentPage() {
     
     setIsSubmitting(true)
     try {
-      const { data: student } = await supabase.from('students').select('id').eq('user_id', user!.id).single()
+      const { data: student } = await supabase.from('students').select('id').eq('user_id', user!.id).maybeSingle()
       
       // 1. Calculate Score
       let earned = 0
