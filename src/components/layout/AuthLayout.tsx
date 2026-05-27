@@ -6,12 +6,37 @@ import { ROUTES } from '../../constants/routes'
 export default function AuthLayout() {
   const { user, initialized } = useAuth()
 
-  if (!initialized) return null
+  // Show a loading screen while auth is initialising — never show a blank page
+  if (!initialized) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #1e0646 0%, #3b0764 100%)',
+      }}>
+        <div style={{ textAlign: 'center', color: '#fff' }}>
+          <div style={{
+            width: 44, height: 44,
+            border: '3px solid rgba(255,255,255,0.2)',
+            borderTopColor: '#f59e0b',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+            margin: '0 auto 16px',
+          }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', margin: 0 }}>Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   if (user) {
     const redirect = user.role === 'admin' ? ROUTES.ADMIN_DASHBOARD : ROUTES.TEACHER_DASHBOARD
     return <Navigate to={redirect} replace />
   }
+
 
   return (
     <>

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 // ─── HOOKS ────────────────────────────────────────────────────────────────────
 
@@ -543,20 +544,28 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
     <nav className={navClass}>
       <div className="container">
         <div className="nav-inner">
-          <a href="#" className="logo">
+          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="logo" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: 0 }}>
             <div className="logo-icon">N</div>
             <span>Nexora</span>
-          </a>
+          </button>
 
           <div className="nav-links">
             {['Features', 'Pillars', 'Workflow', 'Pricing', 'Download'].map(item => (
-              <a key={item} href={`#${item.toLowerCase()}`} className="nav-link" aria-label={`Navigate to ${item}`}>{item}</a>
+              <button
+                key={item}
+                className="nav-link"
+                aria-label={`Navigate to ${item}`}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit' }}
+                onClick={() => {
+                  document.getElementById(item.toLowerCase())?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }}
+              >{item}</button>
             ))}
           </div>
 
           <div className="nav-actions">
-            <a href="/login" className="btn-login">Sign In</a>
-            <a href="/register-school" className="btn-primary">Register School</a>
+            <Link to="/login" className="btn-login">Sign In</Link>
+            <Link to="/register-school" className="btn-primary">Register School</Link>
           </div>
 
           <button className="mobile-toggle" onClick={() => setMenuOpen(true)}>
@@ -732,11 +741,21 @@ export default function LandingPage() {
       <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
         <button className="mobile-close" onClick={() => setMenuOpen(false)}>✕</button>
         {['Features', 'Pillars', 'Workflow', 'Pricing', 'Download'].map(item => (
-          <a key={item} href={`#${item.toLowerCase()}`} className="mobile-link" onClick={() => setMenuOpen(false)}>{item}</a>
+          <button
+            key={item}
+            className="mobile-link"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', width: '100%', textAlign: 'left' }}
+            onClick={() => {
+              setMenuOpen(false)
+              setTimeout(() => {
+                document.getElementById(item.toLowerCase())?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }, 300)
+            }}
+          >{item}</button>
         ))}
         <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', padding: '0 2rem' }}>
-          <a href="/login" className="btn-primary" style={{ background: 'white', color: 'var(--primary)', textAlign: 'center' }}>Sign In</a>
-          <a href="/register-school" className="btn-primary" style={{ background: 'var(--accent)', textAlign: 'center' }}>Get Started</a>
+          <Link to="/login" className="btn-primary" style={{ background: 'white', color: 'var(--primary)', textAlign: 'center' }} onClick={() => setMenuOpen(false)}>Sign In</Link>
+          <Link to="/register-school" className="btn-primary" style={{ background: 'var(--accent)', textAlign: 'center' }} onClick={() => setMenuOpen(false)}>Get Started</Link>
         </div>
       </div>
 
@@ -866,7 +885,7 @@ export default function LandingPage() {
             <h2 className="section-title cta-title">Ready to Transform Your School?</h2>
             <p className="cta-subtitle">Join the schools already ahead of the curve. Streamline operations, automate reporting, and elevate the academic experience.</p>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <a href="/register-school" className="btn-primary" style={{ background: 'white', color: 'var(--primary)', padding: '1.25rem 3rem' }}>Register School for Free</a>
+              <Link to="/register-school" className="btn-primary" style={{ background: 'white', color: 'var(--primary)', padding: '1.25rem 3rem' }}>Register School for Free</Link>
             </div>
           </Reveal>
         </div>
@@ -885,9 +904,13 @@ export default function LandingPage() {
             <div className="footer-col">
               <h5>Platform</h5>
               <ul className="footer-links">
-                {['Features', 'How It Works', 'Pricing', 'Register School'].map(l => (
-                  <li key={l}><a href="#" className="footer-link">{l}</a></li>
+                {['Features', 'How It Works', 'Pricing'].map(l => (
+                  <li key={l}><button className="footer-link" style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', padding: 0 }} onClick={() => {
+                    const sectionId = l === 'How It Works' ? 'workflow' : l.toLowerCase()
+                    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }}>{l}</button></li>
                 ))}
+                <li><Link to="/register-school" className="footer-link">Register School</Link></li>
               </ul>
             </div>
             <div className="footer-col">
