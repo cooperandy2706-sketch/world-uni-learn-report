@@ -11,7 +11,8 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Legend, Cell, AreaChart, Area, PieChart, Pie
 } from 'recharts'
-import { TrendingUp, User, Calendar, Award, BookOpen, ChevronRight, Search, LayoutDashboard, Users, Percent, FileText, Printer } from 'lucide-react'
+import { Printer, ChevronRight, TrendingUp, Award, LayoutDashboard, BookOpen, User, Users, Percent, Search } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 // ── Constants & Styles ──────────────────────────────────────
 const T = {
@@ -48,6 +49,7 @@ function MetricCard({ label, value, icon: Icon, color, subValue }: any) {
 }
 
 export default function PerformanceTrackingPage() {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { data: students = [], isLoading: loadingStudents } = useStudents()
   const { data: classes = [], isLoading: loadingClasses } = useClasses()
@@ -458,7 +460,7 @@ export default function PerformanceTrackingPage() {
                              <span style={{ padding: '3px 10px', borderRadius: 8, background: `${g.color}14`, color: g.color, fontSize: 11, fontWeight: 800 }}>{g.grade}</span>
                           </td>
                           <td style={{ padding: '14px 20px', textAlign: 'right' }}>
-                            <button onClick={() => window.location.href = `/admin/reports?student=${selectedStudentId}&term=${r.term_id}`}
+                            <button onClick={() => navigate(`/admin/reports?student=${selectedStudentId}&term=${r.term_id}`)}
                                     style={{ background: 'none', border: 'none', color: T.primary, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>View <ChevronRight size={14} style={{ verticalAlign: 'middle' }} /></button>
                           </td>
                         </tr>

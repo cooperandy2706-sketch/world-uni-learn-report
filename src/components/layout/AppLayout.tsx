@@ -1,6 +1,6 @@
 // src/components/layout/AppLayout.tsx
 import { useState, useEffect, useRef } from 'react'
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useSchoolInvoices } from '../../hooks/useBilling'
 import Header from './Header'
@@ -19,6 +19,7 @@ import { ROUTES } from '../../constants/routes'
 interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'proprietor' | 'teacher' | 'student' | 'bursar' | 'staff' | 'parent' | 'security' | 'driver' | 'nurse' | 'librarian' }
 
 export default function AppLayout({ requiredRole }: AppLayoutProps) {
+  const navigate = useNavigate()
   const { user, loading, initialized } = useAuth()
   const userSchool = user?.school as any
   const { data: invoices = [], isLoading: invoicesLoading } = useSchoolInvoices(userSchool?.id)
@@ -100,7 +101,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
             </p>
           </div>
           {user.role === 'admin' ? (
-            <button onClick={() => window.location.href = '/admin/billing'} style={{ padding: '14px 28px', borderRadius: 12, background: '#1e0646', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: 15, transition: 'all 0.2s' }}>
+            <button onClick={() => navigate('/admin/billing')} style={{ padding: '14px 28px', borderRadius: 12, background: '#1e0646', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: 15, transition: 'all 0.2s' }}>
               Go to Billing Page
             </button>
           ) : (

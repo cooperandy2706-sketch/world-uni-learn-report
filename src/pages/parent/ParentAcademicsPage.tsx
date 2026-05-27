@@ -1,5 +1,6 @@
 // src/pages/parent/ParentAcademicsPage.tsx
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useParentWards } from '../../hooks/useParents'
 import { useCurrentTerm } from '../../hooks/useSettings'
@@ -11,6 +12,7 @@ import toast from 'react-hot-toast'
 import { formatCurrency } from '../../utils/currency'
 
 export default function ParentAcademicsPage() {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { data: wards = [], isLoading: loadingWards } = useParentWards()
   const { data: currentTerm } = useCurrentTerm()
@@ -238,7 +240,7 @@ export default function ParentAcademicsPage() {
                         Please settle all fees to view the report card.
                       </p>
                       <button 
-                        onClick={() => window.location.href = '/parent/billing'}
+                        onClick={() => navigate('/parent/billing')}
                         style={{ marginTop: 16, background: '#991b1b', color: '#fff', padding: '10px 20px', borderRadius: 10, border: 'none', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
                       >
                         Go to Billing
