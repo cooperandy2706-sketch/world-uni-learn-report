@@ -9,6 +9,10 @@ const { autoUpdater } = pkg
 // Configure updater logging
 autoUpdater.logger = log
 autoUpdater.logger.transports.file.level = 'info'
+// Allow pre-release channels (electron-builder publishes as pre-release by default)
+autoUpdater.allowPrerelease = true
+// Don't auto-download — ask user first when an update is ready
+autoUpdater.autoDownload = false
 log.info('App starting...')
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -59,10 +63,23 @@ function createWindow() {
       win.webContents.loadURL(`data:text/html,<html><body style="font-family:sans-serif;padding:40px;background:#111;color:#fff"><h2>⚠️ App Failed to Load</h2><p>${errorDescription}</p><p style="color:#aaa;font-size:13px">Error code: ${errorCode}</p></body></html>`)
     })
 
-    // Catch renderer JS crashes and show DevTools
+    // Catch renderer JS crashes and show a friendly dialog
     win.webContents.on('render-process-gone', (event, details) => {
       log.error('Renderer process gone:', details)
-      win.webContents.openDevTools()
+      dialog.showMessageBox(win, {
+        type: 'error',
+        title: 'Nexora Crashed',
+        message: 'The app encountered an unexpected error and needs to restart.',
+        detail: `Reason: ${details.reason}`,
+        buttons: ['Restart', 'Quit']
+      }).then(({ response }) => {
+        if (response === 0) {
+          app.relaunch()
+          app.exit(0)
+        } else {
+          app.quit()
+        }
+      })
     })
 
     win.webContents.on('console-message', (event, level, message) => {
