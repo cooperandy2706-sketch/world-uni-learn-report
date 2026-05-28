@@ -15,7 +15,6 @@ import { AreaChart, Area, BarChart, Bar, Cell, Legend, XAxis, YAxis, CartesianGr
 import { motion, AnimatePresence } from 'framer-motion'
 import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare } from 'lucide-react'
 import { useThemeStore } from '../../store/themeStore'
-import { useExeats } from '../../hooks/useParents'
 import { useRecentActions } from '../../hooks/useAuditLogs'
 
 
@@ -133,7 +132,6 @@ export default function DashboardPage() {
   const [todayLessons, setTodayLessons] = useState<TimetableLesson[]>([])
   const [coverageStats, setCoverageStats] = useState<CoverageStats>({ activeClasses: 0, totalClasses: 0, percentage: 0 })
   const [pendingLeavesCount, setPendingLeavesCount] = useState<number>(0)
-  const { data: exeats = [], isLoading: loadingExeats } = useExeats()
   const { data: recentActions = [], isLoading: loadingActions } = useRecentActions(user?.school?.id, 10)
   const [pendingExeatsCount, setPendingExeatsCount] = useState<number>(0)
   const [weeklyGoalsStats, setWeeklyGoalsStats] = useState<WeeklyGoalsStats>({ total: 0, completed: 0, percentage: 0 })
