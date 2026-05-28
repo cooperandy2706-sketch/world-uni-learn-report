@@ -178,7 +178,7 @@ export default function SplashScreen() {
         <div className="splash-content">
           <div className="logo-box">
             <img
-              src="/nexora-logo.png"
+              src="./nexora-logo.png"
               alt="Nexora Logo"
               style={{
                 width: '100%',
