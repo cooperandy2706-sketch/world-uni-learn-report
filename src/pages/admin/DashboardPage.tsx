@@ -13,7 +13,7 @@ import FlaskLoader from '../../components/ui/FlaskLoader'
 import WelcomeOnboarding from '../../components/ui/WelcomeOnboarding'
 import { AreaChart, Area, BarChart, Bar, Cell, Legend, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare } from 'lucide-react'
+import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare, Users } from 'lucide-react'
 import { useThemeStore } from '../../store/themeStore'
 import { useRecentActions } from '../../hooks/useAuditLogs'
 
@@ -183,12 +183,12 @@ export default function DashboardPage() {
   async function loadAll() {
     try {
       await Promise.all([
-        loadStats(), 
-        loadTopStudents(), 
+        loadStats(),
+        loadTopStudents(),
         loadTopSubjects(),
-        loadMessages(), 
-        loadClassStats(), 
-        loadRecentActivity(), 
+        loadMessages(),
+        loadClassStats(),
+        loadRecentActivity(),
         loadAnnouncements(),
         loadFinancePerformance(),
         loadGateActivity(),
@@ -213,7 +213,7 @@ export default function DashboardPage() {
       .eq('school_id', user.school_id)
       .eq('scan_date', today)
       .order('scan_time', { ascending: false })
-    
+
     if (!scans || scans.length === 0) return
 
     // Group by person to get latest status
@@ -224,7 +224,7 @@ export default function DashboardPage() {
     })
 
     const outOnly = Array.from(latestScans.values()).filter(s => s.direction === 'out')
-    
+
     // Now fetch names
     const outStudents = outOnly.filter(s => s.person_type === 'student').map(s => s.person_db_id)
     const outStaff = outOnly.filter(s => s.person_type === 'staff').map(s => s.person_db_id)
@@ -241,11 +241,11 @@ export default function DashboardPage() {
 
     const mapped = outOnly.map(s => {
       let name = 'Unknown'
-      if (s.person_type === 'student') name = stuNames.find((x:any) => x.id === s.person_db_id)?.full_name || 'Student'
-      if (s.person_type === 'staff') name = staffNames.find((x:any) => x.id === s.person_db_id)?.user?.full_name || 'Staff'
+      if (s.person_type === 'student') name = stuNames.find((x: any) => x.id === s.person_db_id)?.full_name || 'Student'
+      if (s.person_type === 'staff') name = staffNames.find((x: any) => x.id === s.person_db_id)?.user?.full_name || 'Staff'
       return { id: s.id, name, type: s.person_type, time: s.scan_time, direction: s.direction }
     })
-    
+
     setOutOfCampus(mapped)
   }
 
@@ -259,7 +259,7 @@ export default function DashboardPage() {
       .eq('date', today)
       .eq('status', 'absent')
 
-    const mapped = (absentData || []).map((a:any) => ({
+    const mapped = (absentData || []).map((a: any) => ({
       student_id: a.student_id,
       full_name: a.student?.full_name || '',
       guardian_name: a.student?.guardian_name || '',
@@ -275,19 +275,19 @@ export default function DashboardPage() {
     const sixMonthsAgo = new Date()
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5) // Last 6 months inclusive
     sixMonthsAgo.setDate(1)
-    
+
     const { data: payments } = await supabase
       .from('fee_payments')
       .select('amount_paid, payment_date')
       .eq('school_id', sid)
       .gte('payment_date', sixMonthsAgo.toISOString())
 
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     const last6Months = []
     for (let i = 5; i >= 0; i--) {
       const d = new Date()
       d.setMonth(d.getMonth() - i)
-      last6Months.push({ 
+      last6Months.push({
         key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
         label: months[d.getMonth()]
       })
@@ -377,10 +377,10 @@ export default function DashboardPage() {
     const { data: attClasses } = await supabase.from('attendance_records').select('class_id').eq('school_id', sid).eq('date', today)
     const attendanceClasses = new Set(attClasses?.map((a: any) => a.class_id)).size
 
-    setStats({ 
-      students: students ?? 0, teachers: teachers ?? 0, classes: classes ?? 0, subjects: subjects ?? 0, 
-      departments: departments ?? 0, reportsGenerated: reports, totalStudentsForReports: totalForReports, 
-      pendingScores, unreadMessages: msgs ?? 0, totalAssignments: assigns ?? 0, totalSubmissions: subs ?? 0, 
+    setStats({
+      students: students ?? 0, teachers: teachers ?? 0, classes: classes ?? 0, subjects: subjects ?? 0,
+      departments: departments ?? 0, reportsGenerated: reports, totalStudentsForReports: totalForReports,
+      pendingScores, unreadMessages: msgs ?? 0, totalAssignments: assigns ?? 0, totalSubmissions: subs ?? 0,
       totalAnnouncements: announceCount ?? 0, presentToday, absentToday, attendanceClasses, totalDebt, pendingApproval
     })
   }
@@ -583,7 +583,7 @@ export default function DashboardPage() {
   return (
     <>
       {showOnboarding && <WelcomeOnboarding userName={user?.full_name?.split(' ')[0] || 'Admin'} onComplete={handleOnboardingComplete} />}
-      
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         .noc-dashboard {
@@ -817,7 +817,7 @@ export default function DashboardPage() {
       `}</style>
 
       <motion.div className="noc-dashboard" variants={containerVariants} initial="hidden" animate="show">
-        
+
         {/* COMMAND CENTER HEADER */}
         <motion.div variants={itemVariants} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32, flexWrap: 'wrap', gap: 20 }}>
           <div>
@@ -837,7 +837,7 @@ export default function DashboardPage() {
 
         {/* TOP KPIs GRID */}
         <motion.div variants={itemVariants} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 24 }}>
-          
+
           <Link to={ROUTES.ADMIN_STUDENTS} className="kpi-card" style={{ '--theme-color': '#3b82f6' } as any}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <div style={{ width: 48, height: 48, borderRadius: 8, background: isDark ? 'rgba(59, 130, 246, 0.2)' : '#eff6ff', color: isDark ? '#60a5fa' : '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BookOpen size={24} /></div>
@@ -887,7 +887,7 @@ export default function DashboardPage() {
         {/* MAIN DASHBOARD STRUCTURED GRID */}
         {/* Tier 2: Analytical & Operations Deck */}
         <div className="tier2-grid">
-          
+
           {/* Tabbed Analytics Panel */}
           <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 32, height: 400 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
@@ -896,14 +896,14 @@ export default function DashboardPage() {
                   {activeAnalyticsTab === 'financials' ? 'Revenue Trend' : activeAnalyticsTab === 'academics' ? 'Class Academics' : 'Weekly Goals Tracker'}
                 </h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '4px 0 0' }}>
-                  {activeAnalyticsTab === 'financials' 
-                    ? 'Fee collections over the last 6 months' 
-                    : activeAnalyticsTab === 'academics' 
-                      ? 'Academic average scores compared across all classes' 
+                  {activeAnalyticsTab === 'financials'
+                    ? 'Fee collections over the last 6 months'
+                    : activeAnalyticsTab === 'academics'
+                      ? 'Academic average scores compared across all classes'
                       : 'Weekly instruction goals set for teachers this term'}
                 </p>
               </div>
-              
+
               <div style={{ display: 'flex', background: isDark ? 'var(--bg-app)' : '#f1f5f9', borderRadius: 14, padding: 4 }}>
                 {[
                   { id: 'financials', label: '📈 Revenue' },
@@ -939,19 +939,19 @@ export default function DashboardPage() {
                   <AreaChart data={financeData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6366f1" stopOpacity={isDark ? 0.45 : 0.3}/>
-                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#6366f1" stopOpacity={isDark ? 0.45 : 0.3} />
+                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255, 255, 255, 0.06)' : '#e2e8f0'} />
                     <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} tickFormatter={val => `₵${val/1000}k`} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: isDark ? 'var(--bg-card)' : 'white', 
-                        borderColor: 'var(--border-color)', 
-                        borderRadius: 12, 
-                        border: '1.5px solid var(--border-color)', 
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} tickFormatter={val => `₵${val / 1000}k`} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: isDark ? 'var(--bg-card)' : 'white',
+                        borderColor: 'var(--border-color)',
+                        borderRadius: 12,
+                        border: '1.5px solid var(--border-color)',
                         boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
                         color: 'var(--text-main)'
                       }}
@@ -971,7 +971,7 @@ export default function DashboardPage() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-subtle)', fontSize: 14 }}>No academic averages found.</div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart 
+                    <BarChart
                       data={classStats.map(c => ({
                         name: c.name,
                         average: c.avg_score ? Math.round(c.avg_score) : 0
@@ -981,12 +981,12 @@ export default function DashboardPage() {
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255, 255, 255, 0.06)' : '#e2e8f0'} />
                       <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} dy={10} />
                       <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} tickFormatter={val => `${val}%`} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: isDark ? 'var(--bg-card)' : 'white', 
-                          borderColor: 'var(--border-color)', 
-                          borderRadius: 12, 
-                          border: '1.5px solid var(--border-color)', 
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: isDark ? 'var(--bg-card)' : 'white',
+                          borderColor: 'var(--border-color)',
+                          borderRadius: 12,
+                          border: '1.5px solid var(--border-color)',
                           boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
                           color: 'var(--text-main)'
                         }}
@@ -1012,14 +1012,14 @@ export default function DashboardPage() {
                 <div style={{ width: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={{ position: 'relative', width: 140, height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <svg style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-                      <circle 
-                        cx="70" cy="70" r="55" 
-                        stroke={isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'} 
-                        strokeWidth="12" fill="transparent" 
+                      <circle
+                        cx="70" cy="70" r="55"
+                        stroke={isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}
+                        strokeWidth="12" fill="transparent"
                       />
-                      <circle 
-                        cx="70" cy="70" r="55" 
-                        stroke="#f59e0b" strokeWidth="12" fill="transparent" 
+                      <circle
+                        cx="70" cy="70" r="55"
+                        stroke="#f59e0b" strokeWidth="12" fill="transparent"
                         strokeDasharray={2 * Math.PI * 55}
                         strokeDashoffset={2 * Math.PI * 55 * (1 - (weeklyGoalsStats.percentage / 100))}
                         strokeLinecap="round"
@@ -1043,13 +1043,13 @@ export default function DashboardPage() {
                       <div style={{ fontSize: 24, fontWeight: 800, color: '#10b981', marginTop: 4 }}>{weeklyGoalsStats.completed}</div>
                     </div>
                   </div>
-                  <Link 
-                    to="/admin/weekly-goals" 
-                    style={{ 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, 
-                      padding: 12, background: 'var(--text-main)', color: 'var(--bg-app)', 
-                      borderRadius: 12, fontWeight: 700, fontSize: 13, textDecoration: 'none', 
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)', transition: 'all 0.2s' 
+                  <Link
+                    to="/admin/weekly-goals"
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      padding: 12, background: 'var(--text-main)', color: 'var(--bg-app)',
+                      borderRadius: 12, fontWeight: 700, fontSize: 13, textDecoration: 'none',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)', transition: 'all 0.2s'
                     }}
                     onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'}
                     onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}
@@ -1146,7 +1146,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               recentActions.map((action) => {
-                let icon = <User size={16} />
+                let icon = <Users size={16} />
                 let color = '#6d28d9'
                 let actionDesc = 'Performed an action'
 
@@ -1170,13 +1170,13 @@ export default function DashboardPage() {
                 }
 
                 return (
-                  <div key={action.id} style={{ 
-                    display: 'flex', alignItems: 'flex-start', gap: 16, 
+                  <div key={action.id} style={{
+                    display: 'flex', alignItems: 'flex-start', gap: 16,
                     padding: '16px 20px', borderRadius: 12,
                     background: isDark ? 'rgba(255,255,255,0.03)' : '#f8fafc',
                     border: '1px solid var(--border-light)'
                   }}>
-                    <div style={{ 
+                    <div style={{
                       width: 40, height: 40, borderRadius: '50%', background: `${color}15`, color,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
                     }}>
@@ -1191,7 +1191,7 @@ export default function DashboardPage() {
                         • <span>{new Date(action.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}</span>
                       </div>
                     </div>
-                    <div style={{ 
+                    <div style={{
                       padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 800, textTransform: 'uppercase',
                       background: 'var(--bg-app)', color: 'var(--text-subtle)', border: '1px solid var(--border-color)'
                     }}>
@@ -1206,28 +1206,28 @@ export default function DashboardPage() {
 
         {/* Tier 3: Campus Vital Signs Grid */}
         <div className="tier3-grid">
-          
+
           {/* Column 1: Academic Standings */}
           <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', minHeight: 380 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Academic Leaders</h3>
               <div style={{ display: 'flex', background: isDark ? 'var(--bg-app)' : '#f1f5f9', borderRadius: 12, padding: 4 }}>
-                <button 
-                  onClick={() => setTopTab('students')} 
+                <button
+                  onClick={() => setTopTab('students')}
                   className="tab-button"
-                  style={{ 
-                    background: topTab === 'students' ? 'var(--bg-card)' : 'transparent', 
+                  style={{
+                    background: topTab === 'students' ? 'var(--bg-card)' : 'transparent',
                     color: topTab === 'students' ? 'var(--text-main)' : 'var(--text-muted)',
                     boxShadow: topTab === 'students' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'
                   }}
                 >
                   Students
                 </button>
-                <button 
-                  onClick={() => setTopTab('subjects')} 
+                <button
+                  onClick={() => setTopTab('subjects')}
                   className="tab-button"
-                  style={{ 
-                    background: topTab === 'subjects' ? 'var(--bg-card)' : 'transparent', 
+                  style={{
+                    background: topTab === 'subjects' ? 'var(--bg-card)' : 'transparent',
                     color: topTab === 'subjects' ? 'var(--text-main)' : 'var(--text-muted)',
                     boxShadow: topTab === 'subjects' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'
                   }}
@@ -1236,7 +1236,7 @@ export default function DashboardPage() {
                 </button>
               </div>
             </div>
-            
+
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }} className="hide-scroll">
               <AnimatePresence mode="wait">
                 {topTab === 'students' ? (
@@ -1286,7 +1286,7 @@ export default function DashboardPage() {
               </h3>
               <Link to={'/admin/exeats'} style={{ fontSize: 12, fontWeight: 700, color: '#6366f1', textDecoration: 'none' }}>View Log</Link>
             </div>
-            
+
             <div className="hide-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {outOfCampus.length === 0 ? (
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14, padding: 40 }}>All personnel on campus.</div>
@@ -1295,7 +1295,7 @@ export default function DashboardPage() {
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{o.name}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)', textTransform: 'capitalize' }}>{o.type} • Left at {new Date(o.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', textTransform: 'capitalize' }}>{o.type} • Left at {new Date(o.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                   </div>
                 </div>
               ))}
@@ -1308,7 +1308,7 @@ export default function DashboardPage() {
               <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Absentee Alert</h3>
               <span style={{ background: isDark ? 'rgba(239,68,68,0.2)' : '#fef2f2', color: '#ef4444', padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 800 }}>{absentStudents.length} Students</span>
             </div>
-            
+
             <div className="hide-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {absentStudents.length === 0 ? (
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14, padding: 40 }}>No absences reported today.</div>
@@ -1320,7 +1320,7 @@ export default function DashboardPage() {
                       <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{a.class_name}</div>
                     </div>
                   </div>
-                  
+
                   <div style={{ background: 'var(--bg-card)', padding: 12, borderRadius: 12, border: '1.5px solid var(--border-light)' }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>Contact Guardian</div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -1344,15 +1344,15 @@ export default function DashboardPage() {
 
         {/* MAP MODAL */}
         {locateClass && (
-          <div 
+          <div
             onClick={() => setLocateClass(null)}
             style={{
-              position: 'fixed', inset: 0, zIndex: 1000, 
+              position: 'fixed', inset: 0, zIndex: 1000,
               background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(8px)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24
             }}
           >
-            <div 
+            <div
               onClick={e => e.stopPropagation()}
               style={{
                 background: 'var(--bg-card)', borderRadius: 12, width: '100%', maxWidth: 840,
@@ -1376,9 +1376,9 @@ export default function DashboardPage() {
                 {/* Visual Map Column (Left) */}
                 <div style={{ flex: '1 1 450px', display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Visual Location Map</div>
-                  
+
                   {/* Outer Map Grid */}
-                  <div style={{ 
+                  <div style={{
                     background: isDark ? 'rgba(15,23,42,0.4)' : '#f8fafc',
                     border: '1.5px dashed var(--border-color)', borderRadius: 8,
                     padding: 24, minHeight: 260, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16,
@@ -1389,7 +1389,7 @@ export default function DashboardPage() {
                       <span style={{ fontSize: 24 }}>🏫</span>
                       <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-main)' }}>Block A</div>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Science & Admin</div>
-                      { (locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A')) && (
+                      {(locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A')) && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
                           <div className="pulse-dot" />
                           <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981' }}>{locateClass.class?.name} Room</span>
@@ -1402,7 +1402,7 @@ export default function DashboardPage() {
                       <span style={{ fontSize: 24 }}>📚</span>
                       <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-main)' }}>Block B</div>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Humanities & Library</div>
-                      { (locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')) && (
+                      {(locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')) && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
                           <div className="pulse-dot" />
                           <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981' }}>{locateClass.class?.name} Room</span>
@@ -1415,7 +1415,7 @@ export default function DashboardPage() {
                       <span style={{ fontSize: 24 }}>💻</span>
                       <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-main)' }}>Block C</div>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Math & Technology</div>
-                      { !(locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A') || locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')) && (
+                      {!(locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A') || locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')) && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
                           <div className="pulse-dot" />
                           <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981' }}>{locateClass.class?.name} Room</span>
@@ -1423,7 +1423,7 @@ export default function DashboardPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   {/* Gate to Block directions */}
                   <div style={{ background: isDark ? 'var(--bg-app)' : '#f1f5f9', padding: '12px 16px', borderRadius: 12, fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 8 }}>
                     📍 <strong>Main Gate Entrance</strong> ────────▶ <strong>Administration Archway</strong> ────────▶ <strong>Active Building Highlighted</strong>
@@ -1462,8 +1462,8 @@ export default function DashboardPage() {
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12 }}>
                         <div style={{ background: '#6366f1', color: 'white', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 'bold', flexShrink: 0 }}>1</div>
                         <div style={{ fontSize: 12, color: 'var(--text-main)', lineHeight: 1.4 }}>
-                          {locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A') 
-                            ? 'Head to Block A (Administration & Science Block).' 
+                          {locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A')
+                            ? 'Head to Block A (Administration & Science Block).'
                             : locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')
                               ? 'Proceed past Block A towards Block B (Humanities Block).'
                               : 'Head straight to Block C (Math & Tech Block) near the labs.'}
