@@ -233,6 +233,6 @@ ${text}
     throw new Error('⚠️ Your Gemini API key has exceeded its free quota for today. Please try again tomorrow.')
   }
 
-  throw new Error(\`AI Error: \${finalErr?.message ?? 'Failed to generate quiz.'}\`)
+  throw new Error(`AI Error: ${finalErr?.message ?? 'Failed to generate quiz.'}`)
 }
 

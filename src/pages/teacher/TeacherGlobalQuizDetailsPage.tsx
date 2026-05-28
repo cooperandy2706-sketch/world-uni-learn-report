@@ -60,7 +60,7 @@ export default function TeacherGlobalQuizDetailsPage() {
       const studentIds = studentList.map(s => s.id)
 
       // 4. Get subms
-      let submissionsMap = new Map<string, any>()
+      const submissionsMap = new Map<string, any>()
       if (studentIds.length > 0) {
         const { data: subs } = await supabase
           .from('global_quiz_submissions')

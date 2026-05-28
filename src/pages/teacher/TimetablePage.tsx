@@ -20,8 +20,6 @@ export default function TeacherTimetablePage(){
     return d>=1&&d<=5?d:1
   })
 
-  useEffect(()=>{if(user&&term?.id)load()},[user,term?.id])
-
   async function load(){
     setLoading(true)
     const {data:t}=await supabase.from('teachers').select('id').eq('user_id',user!.id).maybeSingle()
@@ -60,6 +58,9 @@ export default function TeacherTimetablePage(){
     setSlots(s??[])
     setLoading(false)
   }
+
+  useEffect(()=>{if(user&&term?.id)load()},[user,term?.id])
+
 
   function getSlot(day:number,periodId:string){
     return slots.find(s=>s.day_of_week===day&&s.period_id===periodId)

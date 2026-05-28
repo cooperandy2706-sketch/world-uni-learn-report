@@ -25,7 +25,7 @@ interface Recipient {
 const GHS = (n: number) => `GH₵ ${Number(n).toLocaleString('en-GH', { minimumFractionDigits: 2 })}`
 
 function normalizePhone(raw: string) {
-  let p = raw.replace(/\s+/g, '').replace('+', '')
+  const p = raw.replace(/\s+/g, '').replace('+', '')
   if (p.startsWith('0')) return '233' + p.substring(1)
   if (!p.startsWith('233')) return '233' + p
   return p
@@ -180,7 +180,7 @@ export default function SMSPage() {
 
   // Placeholder resolution
   function resolveMessage(template: string, recipient: Recipient) {
-    let msg = template
+    const msg = template
       .replace(/{parent}/g, recipient.name)
       .replace(/{parent_name}/g, recipient.name)
       .replace(/{student}/g, recipient.studentName || '')

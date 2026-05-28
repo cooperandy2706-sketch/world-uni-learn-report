@@ -178,7 +178,7 @@ export default function ClassTestsPage() {
     .filter(a => a.class?.id === selectedClass)
     .map(a => a.subject)
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+   
   const { showManualRetry, manualReload } = useStuckLoadingReload(loading)
 
   if (loading) return (

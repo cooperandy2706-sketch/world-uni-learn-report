@@ -89,7 +89,7 @@ export default function TeacherTakeGlobalQuizPage() {
       if (error) throw error
       
       setQuiz(data)
-      let qs: Question[] = data.content.questions || []
+      const qs: Question[] = data.content.questions || []
       // We don't shuffle for teachers so they see it in created order
       setQuestions(qs)
       setStatus('prep')

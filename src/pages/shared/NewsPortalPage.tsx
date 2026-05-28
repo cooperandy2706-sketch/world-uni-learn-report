@@ -280,7 +280,7 @@ function parseRSS(xml: string, catId: string, sourceName: string): NewsItem[] {
       const m = raw.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`)) ||
                 raw.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))
       if (!m) return ''
-      let s = m[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+      const s = m[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
       return decodeEntities(s)
     }
 

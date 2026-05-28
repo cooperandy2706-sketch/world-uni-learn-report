@@ -76,8 +76,8 @@ export default function AnalyticsPage() {
     try {
       let allTotals: number[] = []
       let reports: any[] = []
-      let subjectMap: Record<string, number[]> = {}
-      let studentMap: Record<string, { id: string, name: string, total: number, max: number, scores: any[] }> = {}
+      const subjectMap: Record<string, number[]> = {}
+      const studentMap: Record<string, { id: string, name: string, total: number, max: number, scores: any[] }> = {}
 
       if (activeSource === 'reports') {
         const [{ data: scores }, { data: repData }] = await Promise.all([

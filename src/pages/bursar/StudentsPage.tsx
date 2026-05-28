@@ -154,7 +154,7 @@ export default function BursarStudentsPage() {
 
   // Filter & sort
   const filtered = useMemo(() => {
-    let list = (students as any[]).filter(s => {
+    const list = (students as any[]).filter(s => {
       if (classFilter && (s.class as any)?.id !== classFilter) return false
       if (scholarshipFilter === 'scholarship' && (!s.scholarship_type || s.scholarship_type === 'none')) return false
       if (scholarshipFilter === 'arrears' && Number(s.fees_arrears || 0) <= 0) return false

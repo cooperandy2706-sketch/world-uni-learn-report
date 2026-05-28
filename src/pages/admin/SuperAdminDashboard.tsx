@@ -27,7 +27,7 @@ function AnimNum({ to }: { to: number }) {
   const [val, setVal] = useState(0)
   
   useEffect(() => {
-    let startVal = val
+    const startVal = val
     const startTime = performance.now()
     const duration = 800
 
