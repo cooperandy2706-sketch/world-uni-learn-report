@@ -147,7 +147,7 @@ export default function ParentAcademicsPage() {
           const isFinancialHold = totalOutstanding > 0
 
           return (
-            <div key={ward.id} style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 16px rgba(109,40,217,0.03)' }}>
+            <div key={ward.id} style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 16px rgba(109,40,217,0.03)' }}>
               
               <div 
                 onClick={() => setExpandedWard(isExpanded ? null : ward.id)}
@@ -232,7 +232,7 @@ export default function ParentAcademicsPage() {
                   </div>
 
                   {isFinancialHold && (
-                    <div style={{ marginTop: 20, padding: 24, background: '#fff1f2', borderRadius: 16, border: '1.5px solid #fecaca', textAlign: 'center' }}>
+                    <div style={{ marginTop: 20, padding: 24, background: '#fff1f2', borderRadius: 8, border: '1.5px solid #fecaca', textAlign: 'center' }}>
                       <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
                       <h4 style={{ fontSize: 18, fontWeight: 800, color: '#991b1b', margin: '0 0 8px' }}>Financial Hold</h4>
                       <p style={{ fontSize: 13, color: '#b91c1c', lineHeight: 1.5, margin: 0 }}>

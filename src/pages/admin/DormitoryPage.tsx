@@ -284,7 +284,7 @@ export default function DormitoryPage() {
                 return (
                   <tr key={a.id} style={{ borderBottom: '1px solid #f8fafc' }}>
                     <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 600, color: '#1e0646' }}>
-                      {a.student?.full_name} <span style={{ color: 'var(--text-subtle)', fontSize: 11, fontWeight: 400 }}>({a.student?.student_id})</span>
+                      {a.student?.full_name} <span style={{ color: 'var(--text-subtle)', fontSize: 11, fontWeight: 600 }}>({a.student?.student_id})</span>
                     </td>
                     <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>{dorm?.name || '—'}</td>
                     <td style={{ padding: '14px 18px', fontSize: 13, color: '#475569' }}>Room {room?.room_number || '—'}</td>

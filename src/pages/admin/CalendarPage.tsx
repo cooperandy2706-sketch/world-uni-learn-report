@@ -306,7 +306,7 @@ export default function CalendarPage() {
       )
       days = []
     }
-    return <div style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden', border: '1.5px solid #f1f5f9', boxShadow: '0 1px 4px rgba(0,0,0,0.02)' }}>{rows}</div>
+    return <div style={{ background: 'var(--bg-card)', borderRadius: 8, overflow: 'hidden', border: '1.5px solid #f1f5f9', boxShadow: '0 1px 4px rgba(0,0,0,0.02)' }}>{rows}</div>
   }
 
   return (
@@ -332,7 +332,7 @@ export default function CalendarPage() {
           {/* Live Clock Card */}
           <div style={{ 
             background: 'linear-gradient(135deg, #1e1b4b, #312e81)', 
-            borderRadius: 24, 
+            borderRadius: 12, 
             padding: 24, 
             color: '#fff',
             boxShadow: '0 10px 25px rgba(30,27,75,0.25)',
@@ -351,28 +351,28 @@ export default function CalendarPage() {
           </div>
 
           {/* Legend */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 20, border: '1.5px solid #f1f5f9' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 20, border: '1.5px solid #f1f5f9' }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Bookmark size={16} color="#7c3aed" /> Calendar Legend
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 12, height: 12, borderRadius: 4, background: '#7c3aed' }} />
-                <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>Academic Term</span>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>Academic Term</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 12, height: 12, borderRadius: 4, background: '#f59e0b' }} />
-                <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>Public Holiday</span>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>Public Holiday</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 12, height: 12, borderRadius: 4, background: '#f0fdf4', border: '1px solid #16a34a' }} />
-                <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>Current Day</span>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>Current Day</span>
               </div>
             </div>
           </div>
 
           {/* Upcoming Events */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 20, border: '1.5px solid #f1f5f9', flex: 1 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 20, border: '1.5px solid #f1f5f9', flex: 1 }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <PartyPopper size={16} color="#f59e0b" /> Upcoming
             </h3>
@@ -412,7 +412,7 @@ export default function CalendarPage() {
       {/* Add Event Modal */}
       {showAdd && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(17, 24, 39, 0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 440, boxShadow: '0 20px 50px rgba(0,0,0,0.15)', overflow: 'hidden' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, width: '100%', maxWidth: 440, boxShadow: '0 20px 50px rgba(0,0,0,0.15)', overflow: 'hidden' }}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Add Holiday/Event</h2>
               <button onClick={() => setShowAdd(false)} style={{ background: 'var(--bg-hover)', border: 'none', width: 32, height: 32, borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={18} /></button>

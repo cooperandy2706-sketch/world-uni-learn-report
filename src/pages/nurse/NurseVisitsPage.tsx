@@ -224,7 +224,7 @@ export default function NurseVisitsPage() {
       </div>
 
       {/* Visits Table */}
-      <div style={{ background: T.card, borderRadius: 16, border: `1px solid ${T.border}`, overflow: 'hidden' }}>
+      <div style={{ background: T.card, borderRadius: 8, border: `1px solid ${T.border}`, overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: 60, textAlign: 'center', color: T.muted }}>Loading visits...</div>
         ) : filtered.length === 0 ? (
@@ -295,7 +295,7 @@ export default function NurseVisitsPage() {
       {/* Log Visit Modal */}
       {modalOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, backdropFilter: 'blur(4px)' }}>
-          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 20, overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 8, overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
             <div style={{ padding: '20px 24px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Log Clinic Visit</h3>
               <button onClick={() => setModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.muted }}><X size={20} /></button>
@@ -313,7 +313,7 @@ export default function NurseVisitsPage() {
                     {students.filter((s:any) => s.full_name.toLowerCase().includes(studentSearch.toLowerCase())).slice(0, 5).map((s:any) => (
                       <div key={s.id} onClick={() => setSelectedStudent(s)} style={{ padding: '10px 14px', borderRadius: 8, border: `1px solid ${T.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${T.primary}20`, color: T.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{s.full_name[0]}</div>
-                        <div style={{ fontSize: 13, fontWeight: 600 }}>{s.full_name} <span style={{ color: T.muted, fontWeight: 400 }}>({s.class?.name})</span></div>
+                        <div style={{ fontSize: 13, fontWeight: 600 }}>{s.full_name} <span style={{ color: T.muted, fontWeight: 600 }}>({s.class?.name})</span></div>
                       </div>
                     ))}
                   </div>

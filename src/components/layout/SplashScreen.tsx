@@ -78,7 +78,7 @@ export default function SplashScreen() {
           width: 80px;
           height: 80px;
           background: #ffffff;
-          border-radius: 20px;
+          border-radius: 8px;
           padding: 14px;
           box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
           display: flex;
@@ -92,7 +92,7 @@ export default function SplashScreen() {
           content: '';
           position: absolute;
           inset: -1px;
-          border-radius: 20px;
+          border-radius: 8px;
           background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.05));
           pointer-events: none;
         }
@@ -142,7 +142,7 @@ export default function SplashScreen() {
 
         .status-text {
           font-size: 11px;
-          font-weight: 500;
+          font-weight: 600;
           color: #71717a;
           letter-spacing: 0.02em;
           animation: textEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;

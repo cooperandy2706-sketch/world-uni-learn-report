@@ -108,7 +108,7 @@ function Modal({ title, onClose, children, wide }: any) {
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24
     }}>
       <div style={{
-        background: 'var(--bg-card)', borderRadius: 20, width: '100%',
+        background: 'var(--bg-card)', borderRadius: 8, width: '100%',
         maxWidth: wide ? 860 : 560, maxHeight: '90vh', overflow: 'hidden',
         display: 'flex', flexDirection: 'column',
         boxShadow: '0 25px 60px rgba(0,0,0,0.25)'
@@ -407,7 +407,7 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
         const Icon = meta.icon
         const subtotal = catItems.reduce((s, i) => !i.is_optional ? s + Number(i.amount) : s, 0)
         return (
-          <div key={cat} style={{ marginBottom: 20, border: '1.5px solid var(--border-color)', borderRadius: 16, overflow: 'hidden' }}>
+          <div key={cat} style={{ marginBottom: 20, border: '1.5px solid var(--border-color)', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{ padding: '12px 18px', background: `${meta.color}0f`, borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: 10 }}>
               <Icon size={16} color={meta.color} />
               <span style={{ fontWeight: 700, fontSize: 14, color: meta.color }}>{meta.label}</span>
@@ -510,7 +510,7 @@ function ScholarshipsSection({ schoolId }: { schoolId: string }) {
   })
 
   return (
-    <div style={{ marginTop: 32, border: '1.5px solid #10b98133', borderRadius: 16, overflow: 'hidden' }}>
+    <div style={{ marginTop: 32, border: '1.5px solid #10b98133', borderRadius: 8, overflow: 'hidden' }}>
       <div style={{ padding: '14px 18px', background: '#10b9810f', borderBottom: '1px solid #10b98122', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <Gift size={16} color="#10b981" />
@@ -1110,7 +1110,7 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
         const meta = SUPPLY_CATEGORY_META[cat]
         const Icon = meta.icon
         return (
-          <div key={cat} style={{ marginBottom: 20, border: '1.5px solid var(--border-color)', borderRadius: 16, overflow: 'hidden' }}>
+          <div key={cat} style={{ marginBottom: 20, border: '1.5px solid var(--border-color)', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{ padding: '12px 18px', background: `${meta.color}0f`, borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: 10 }}>
               <Icon size={16} color={meta.color} />
               <span style={{ fontWeight: 700, fontSize: 14, color: meta.color }}>{meta.label}</span>
@@ -1383,7 +1383,7 @@ function printWelcomePack({ bills, supplies, scholarships, feeStructures = [], c
 
   <!-- PRE-SECTION: SCHOOL FEE STRUCTURE (if any) -->
   ${feeStructures.length ? `
-  <div class="section-title">📊 School Fee Structure <span style="font-size:12px;font-weight:500;color:#6b7280;font-family:'DM Sans',sans-serif">(Synced from School System)</span></div>
+  <div class="section-title">📊 School Fee Structure <span style="font-size:12px;font-weight: 600;color:#6b7280;font-family:'DM Sans',sans-serif">(Synced from School System)</span></div>
   <table>
     <thead><tr>
       <th>Fee Name</th><th>Term</th><th>Class Scope</th><th style="text-align:right">Amount</th>

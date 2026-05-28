@@ -288,7 +288,7 @@ export default function AnalyticsPage() {
 
         {/* No class */}
         {!selectedClass && !loading && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>📊</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>Select a class to view analytics</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Choose a class above to see detailed performance data.</p>
@@ -303,7 +303,7 @@ export default function AnalyticsPage() {
           </div>
         )}
         {!loading && analytics && analytics.empty && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>🌑</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No data found for this source</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Try selecting a different data source (Reports, Tests, or Assignments).</p>
@@ -334,7 +334,7 @@ export default function AnalyticsPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 20 }}>
               {/* Top Students / Drill-down List */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
                 <div style={{ padding: '16px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 18 }}>🎖️</span>
                   <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Student Ranking ({activeSource})</h3>
@@ -367,7 +367,7 @@ export default function AnalyticsPage() {
 
               {/* Student Subject Drilling */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                 <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', minHeight: 300 }}>
+                 <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', minHeight: 300 }}>
                     {!selectedStudentId ? (
                       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
                          <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
@@ -405,7 +405,7 @@ export default function AnalyticsPage() {
                  </div>
 
                  {/* Subject Averages */}
-                 <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
+                 <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 18 }}>Cohort Subject Averages</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                       {analytics?.subjectAverages?.map((s: any, i: number) => {
@@ -429,7 +429,7 @@ export default function AnalyticsPage() {
 
             {/* Performance segments & Distribution */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-               <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe' }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px', border: '1.5px solid #f0eefe' }}>
                   <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16 }}>Performance Segments</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
                     {[
@@ -445,7 +445,7 @@ export default function AnalyticsPage() {
                   </div>
                </div>
 
-               <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe' }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px', border: '1.5px solid #f0eefe' }}>
                   <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16 }}>Grade Distribution</h3>
                   <div style={{ display: 'flex', gap: 4, height: 40 }}>
                      {GRADE_SCALE.map(g => {

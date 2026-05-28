@@ -121,7 +121,7 @@ export default function WulaTvPage() {
       <div 
         onClick={() => setPlayingVideo({ ...video, assignmentId })}
         style={{
-          minWidth: 260, width: 260, background: '#1e1b4b', borderRadius: 16, overflow: 'hidden',
+          minWidth: 260, width: 260, background: '#1e1b4b', borderRadius: 8, overflow: 'hidden',
           cursor: 'pointer', transition: 'transform 0.2s', border: '1px solid rgba(255,255,255,0.1)',
           display: 'flex', flexDirection: 'column', flexShrink: 0
         }}
@@ -154,7 +154,7 @@ export default function WulaTvPage() {
           <h3 style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', margin: '0 0 4px', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
             {video.title}
           </h3>
-          <p style={{ fontSize: 12, color: '#94a3b8', margin: 0, fontWeight: 500 }}>
+          <p style={{ fontSize: 12, color: '#94a3b8', margin: 0, fontWeight: 600 }}>
             {video.channel || (video.teacher?.user?.full_name && `Assigned by ${video.teacher.user.full_name}`)}
           </p>
         </div>

@@ -252,7 +252,7 @@ export default function BECEProcessorPage() {
       </div>
 
       {/* Selection Panel */}
-      <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, border: `1.5px solid ${T.border}`, marginBottom: 24 }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, border: `1.5px solid ${T.border}`, marginBottom: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, alignItems: 'flex-end' }}>
           <div>
             <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: T.muted, textTransform: 'uppercase', marginBottom: 8 }}>Class</label>
@@ -283,7 +283,7 @@ export default function BECEProcessorPage() {
 
       {/* Results Table */}
       {processedData.length > 0 ? (
-        <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: `1.5px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
           {/* ... table ... */}
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -343,7 +343,7 @@ export default function BECEProcessorPage() {
           </div>
         </div>
       ) : (
-        <div style={{ height: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', borderRadius: 24, border: `1.5px solid ${T.border}` }}>
+        <div style={{ height: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', borderRadius: 12, border: `1.5px solid ${T.border}` }}>
           {selectedClass && students.length > 0 ? (
             <>
               <Users size={48} color={T.primary} style={{ marginBottom: 16, opacity: 0.8 }} />

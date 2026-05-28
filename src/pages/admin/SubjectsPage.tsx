@@ -223,7 +223,7 @@ export default function SubjectsPage() {
 
         {/* ── Empty ── */}
         {!isLoading && filtered.length === 0 && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📚</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>{search || filterCategory ? 'No subjects found' : 'No subjects yet'}</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>{search || filterCategory ? 'Try adjusting your filters.' : 'Add your first subject to get started.'}</p>
@@ -259,7 +259,7 @@ export default function SubjectsPage() {
                       <div key={s.id} className="sub-card"
                         onMouseEnter={() => setHoveredId(s.id)}
                         onMouseLeave={() => setHoveredId(null)}
-                        style={{ background: 'var(--bg-card)', borderRadius: 16, border: `1.5px solid ${isHov ? meta.color + '40' : '#f0eefe'}`, padding: '18px', boxShadow: '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.22s', animation: `_fadeUp2 0.35s ease ${i * 0.05}s both`, overflow: 'hidden', position: 'relative' }}>
+                        style={{ background: 'var(--bg-card)', borderRadius: 8, border: `1.5px solid ${isHov ? meta.color + '40' : '#f0eefe'}`, padding: '18px', boxShadow: '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.22s', animation: `_fadeUp2 0.35s ease ${i * 0.05}s both`, overflow: 'hidden', position: 'relative' }}>
 
                         {/* Background icon watermark */}
                         <div style={{ position: 'absolute', bottom: -10, right: -6, fontSize: 52, opacity: 0.05, pointerEvents: 'none', transform: isHov ? 'scale(1.1) rotate(-5deg)' : 'scale(1)', transition: 'transform 0.3s' }}>

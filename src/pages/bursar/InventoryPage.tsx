@@ -156,7 +156,7 @@ export default function InventoryPage() {
 
         {/* Dash Summary */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16, marginBottom: 30 }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 22, border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 22, border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
              <div style={{ width: 48, height: 48, background: '#f5f3ff', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                <Package size={24} color="#6d28d9" />
              </div>
@@ -165,7 +165,7 @@ export default function InventoryPage() {
                <div style={{ fontSize: 12, color: 'var(--text-subtle)', fontWeight: 600 }}>Total Items</div>
              </div>
           </div>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 22, border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 22, border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
              <div style={{ width: 48, height: 48, background: lowStock.length > 0 ? '#fef2f2' : '#f0fdf4', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                <AlertCircle size={24} color={lowStock.length > 0 ? '#dc2626' : '#16a34a'} />
              </div>
@@ -174,7 +174,7 @@ export default function InventoryPage() {
                <div style={{ fontSize: 12, color: 'var(--text-subtle)', fontWeight: 600 }}>Low Stock Warnings</div>
              </div>
           </div>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 22, border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 22, border: '1.5px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
              <div style={{ width: 48, height: 48, background: '#ecfdf5', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                <TrendingUp size={24} color="#059669" />
              </div>
@@ -227,7 +227,7 @@ export default function InventoryPage() {
             {tab === 'inventory' && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
                 {filteredItems.map(item => (
-                  <div key={item.id} style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, transition: 'all .3s ease' }} className="inv-card">
+                  <div key={item.id} style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', padding: 24, transition: 'all .3s ease' }} className="inv-card">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                       <div style={{ background: '#f5f3ff', color: '#6d28d9', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 8, textTransform: 'uppercase' }}>{item.category}</div>
                       <div style={{ display: 'flex', gap: 6 }}>
@@ -275,7 +275,7 @@ export default function InventoryPage() {
 
             {/* WELCOME PACK TAB */}
             {tab === 'supplies' && (
-              <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
                 <div style={{ padding: '24px', borderBottom: '1px solid #fcfaff' }}>
                   <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>Management: Admissions Welcome Pack Items</h3>
                   <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--text-muted)' }}>Items listed here will appear on the parent's admission packing list.</p>
@@ -294,7 +294,7 @@ export default function InventoryPage() {
                       return (
                         <tr key={item.id} style={{ borderBottom: '1px solid #f9fafb' }}>
                           <td style={{ padding: '16px 20px' }}>
-                            <span style={{ fontSize: 10, fontWeight: 800, padding: '4px 10px', borderRadius: 20, background: SUPPLY_CATEGORY_META[item.category]?.color + '15', color: SUPPLY_CATEGORY_META[item.category]?.color }}>
+                            <span style={{ fontSize: 10, fontWeight: 800, padding: '4px 10px', borderRadius: 8, background: SUPPLY_CATEGORY_META[item.category]?.color + '15', color: SUPPLY_CATEGORY_META[item.category]?.color }}>
                               {item.category.toUpperCase()}
                             </span>
                           </td>
@@ -331,7 +331,7 @@ export default function InventoryPage() {
             )}
 
             {tab === 'sales' && (
-              <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: '#fcfaff', borderBottom: '1.5px solid #f0eefe' }}>
@@ -361,7 +361,7 @@ export default function InventoryPage() {
             )}
 
             {tab === 'ledger' && (
-              <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: '#fcfaff', borderBottom: '1.5px solid #f0eefe' }}>
@@ -397,7 +397,7 @@ export default function InventoryPage() {
         {/* MODAL: Add/Edit Item */}
         {itemModal && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(30,6,70,0.4)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
-             <div style={{ background: 'var(--bg-card)', borderRadius: 28, width: '100%', maxWidth: 440, padding: 32, boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', animation: '_an_fi .3s ease-out' }}>
+             <div style={{ background: 'var(--bg-card)', borderRadius: 12, width: '100%', maxWidth: 440, padding: 32, boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', animation: '_an_fi .3s ease-out' }}>
                 <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 20 }}>{itemModal.id ? 'Edit Product' : 'New Product'}</h2>
                 <div style={{ display: 'grid', gap: 16 }}>
                    <div>
@@ -453,7 +453,7 @@ export default function InventoryPage() {
         {/* MODAL: RECORD SALE */}
         {saleModal && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(30,6,70,0.4)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
-             <div style={{ background: 'var(--bg-card)', borderRadius: 28, width: '100%', maxWidth: 440, padding: 32, animation: '_an_fi .3s ease-out' }}>
+             <div style={{ background: 'var(--bg-card)', borderRadius: 12, width: '100%', maxWidth: 440, padding: 32, animation: '_an_fi .3s ease-out' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
                    <div style={{ width: 44, height: 44, background: '#ecfdf5', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ShoppingCart size={20} color="#10b981"/></div>
                    <h2 style={{ fontSize: 20, fontWeight: 900, margin: 0 }}>Record Point of Sale</h2>
@@ -493,7 +493,7 @@ export default function InventoryPage() {
                        </select>
                      </div>
                    </div>
-                   <div style={{ marginTop: 10, padding: 16, background: '#fcfaff', borderRadius: 16, border: '1.5px dashed var(--border-color)', textAlign: 'center' }}>
+                   <div style={{ marginTop: 10, padding: 16, background: '#fcfaff', borderRadius: 8, border: '1.5px dashed var(--border-color)', textAlign: 'center' }}>
                       <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>Total Customer Pays:</div>
                       <div style={{ fontSize: 28, fontWeight: 900, color: '#059669', margin: '4px 0' }}>{CUR(saleModal.total_amount)}</div>
                    </div>
@@ -512,7 +512,7 @@ export default function InventoryPage() {
         {/* MODAL: WELCOME PACK ITEM */}
         {supplyModal && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(30,6,70,0.4)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
-             <div style={{ background: 'var(--bg-card)', borderRadius: 28, width: '100%', maxWidth: 500, padding: 32, animation: '_an_fi .3s ease-out' }}>
+             <div style={{ background: 'var(--bg-card)', borderRadius: 12, width: '100%', maxWidth: 500, padding: 32, animation: '_an_fi .3s ease-out' }}>
                 <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 20 }}>{supplyModal.id ? 'Edit Welcome Item' : 'New Welcome Item'}</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -573,7 +573,7 @@ export default function InventoryPage() {
         {/* MODAL: RESTOCK */}
         {restockModal && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(30,6,70,0.4)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
-             <div style={{ background: 'var(--bg-card)', borderRadius: 28, width: '100%', maxWidth: 440, padding: 32, animation: '_an_fi .3s ease-out' }}>
+             <div style={{ background: 'var(--bg-card)', borderRadius: 12, width: '100%', maxWidth: 440, padding: 32, animation: '_an_fi .3s ease-out' }}>
                 <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 20 }}>Restock Product</h2>
                 <div style={{ display: 'grid', gap: 16 }}>
                    <div>

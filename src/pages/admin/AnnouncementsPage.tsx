@@ -206,7 +206,7 @@ export default function AnnouncementsPage(){
             <div style={{width:32,height:32,borderRadius:'50%',border:'3px solid #ede9fe',borderTopColor:'#6d28d9',animation:'_an_spin .8s linear infinite'}}/>
           </div>
         ) : filtered.length===0 ? (
-          <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
+          <div style={{background: 'var(--bg-card)',borderRadius: 8,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
             <div style={{fontSize:52,marginBottom:12}}>📭</div>
             <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:18,fontWeight:700,color: 'var(--text-main)',marginBottom:6}}>No posts yet</h3>
             <p style={{fontSize:13,color: 'var(--text-subtle)',marginBottom:18}}>Click "New Post" to send your first announcement.</p>
@@ -264,7 +264,7 @@ export default function AnnouncementsPage(){
       {/* Create modal */}
       {modalOpen&&(
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.45)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999,backdropFilter:'blur(4px)',padding:16}}>
-          <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'24px',width:'100%',maxWidth:520,maxHeight:'90vh',overflowY:'auto',boxShadow:'0 24px 64px rgba(0,0,0,.18)',fontFamily:'"DM Sans",sans-serif'}}>
+          <div style={{background: 'var(--bg-card)',borderRadius: 8,padding:'24px',width:'100%',maxWidth:520,maxHeight:'90vh',overflowY:'auto',boxShadow:'0 24px 64px rgba(0,0,0,.18)',fontFamily:'"DM Sans",sans-serif'}}>
             <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:19,fontWeight:700,color: 'var(--text-main)',marginBottom:18}}>✏️ New Post</h3>
 
             {/* Type selector */}
@@ -340,7 +340,7 @@ export default function AnnouncementsPage(){
                     <input type="checkbox" checked={form.is_alarm} onChange={e=>setForm(f=>({...f,is_alarm:e.target.checked}))} style={{marginTop:3,accentColor:'#d97706'}}/>
                     <div style={{flex:1}}>
                       <div>⏰ Set as Scheduled Alarm</div>
-                      <div style={{fontSize:11,color: 'var(--text-muted)',fontWeight:500,marginTop:2}}>Triggers a massive full-screen pop-up alarm on targeted users' devices.</div>
+                      <div style={{fontSize:11,color: 'var(--text-muted)',fontWeight: 600,marginTop:2}}>Triggers a massive full-screen pop-up alarm on targeted users' devices.</div>
                       {form.is_alarm && (
                         <div style={{marginTop:8}}>
                           <input type="datetime-local" value={form.trigger_at} onChange={e=>setForm(f=>({...f,trigger_at:e.target.value}))} required
@@ -356,7 +356,7 @@ export default function AnnouncementsPage(){
                     <input type="checkbox" checked={form.send_push} onChange={e=>setForm(f=>({...f,send_push:e.target.checked}))} style={{marginTop:3,accentColor:'#6d28d9'}}/>
                     <div>
                       <div>📡 Send Live Push Notification</div>
-                      <div style={{fontSize:11,color: 'var(--text-muted)',fontWeight:500,marginTop:2}}>Instantly alerts locked/closed devices (WhatsApp style)</div>
+                      <div style={{fontSize:11,color: 'var(--text-muted)',fontWeight: 600,marginTop:2}}>Instantly alerts locked/closed devices (WhatsApp style)</div>
                     </div>
                   </label>
                 </div>

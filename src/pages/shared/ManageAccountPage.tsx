@@ -135,7 +135,7 @@ export default function ManageAccountPage() {
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '24px 16px', animation: 'fadeIn 0.4s ease' }}>
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
-        .acc-card { background: #fff; border-radius: 20px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 20px rgba(0,0,0,0.03); overflow: hidden; margin-bottom: 24px; }
+        .acc-card { background: #fff; border-radius: 8px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 20px rgba(0,0,0,0.03); overflow: hidden; margin-bottom: 24px; }
         .acc-header { background: linear-gradient(135deg, #f8fafc, #f1f5f9); padding: 20px 24px; border-bottom: 1.5px solid #f0eefe; display: flex; align-items: center; gap: 12px; }
         .acc-body { padding: 24px; }
         .input-group { margin-bottom: 16px; }

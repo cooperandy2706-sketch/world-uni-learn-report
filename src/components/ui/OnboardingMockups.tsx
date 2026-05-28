@@ -46,12 +46,12 @@ export function AnnotatedScreenshot({ imagePath, annotations }: { imagePath: str
             transition={{ delay: ann.delay + 0.3, type: 'spring' }}
             style={{ 
               background: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(12px)', 
-              padding: '16px 20px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.15)',
+              padding: '16px 20px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.15)',
               width: 240, color: 'white', boxShadow: '0 20px 40px rgba(0,0,0,0.5)'
             }}
           >
             <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 6, color: '#fb7185', letterSpacing: '0.05em', textTransform: 'uppercase' }}>{ann.title}</div>
-            <div style={{ fontSize: 13, color: '#cbd5e1', lineHeight: 1.5, fontWeight: 500 }}>{ann.description}</div>
+            <div style={{ fontSize: 13, color: '#cbd5e1', lineHeight: 1.5, fontWeight: 600 }}>{ann.description}</div>
           </motion.div>
         </motion.div>
       ))}

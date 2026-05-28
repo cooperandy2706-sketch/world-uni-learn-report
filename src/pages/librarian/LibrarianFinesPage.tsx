@@ -148,7 +148,7 @@ export default function LibrarianFinesPage() {
       </div>
 
       {/* Table */}
-      <div style={{ background: T.card, borderRadius: 16, border: `1px solid ${T.border}`, overflow: 'hidden' }}>
+      <div style={{ background: T.card, borderRadius: 8, border: `1px solid ${T.border}`, overflow: 'hidden' }}>
         {isLoading ? (
           <div style={{ padding: 60, textAlign: 'center', color: T.muted }}>Loading...</div>
         ) : filtered.length === 0 ? (

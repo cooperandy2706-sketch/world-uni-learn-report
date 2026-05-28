@@ -93,7 +93,7 @@ export default function IncidentsPage() {
             const meta = parseMeta(inc.link ?? '{}')
             const sev = SEVERITY.find(s => s.value === meta.severity) ?? SEVERITY[1]
             return (
-              <div key={inc.id} style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f1f5f9', padding: '16px' }}>
+              <div key={inc.id} style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9', padding: '16px' }}>
                 <div className="ip-inc-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 38, height: 38, borderRadius: 11, background: sev.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

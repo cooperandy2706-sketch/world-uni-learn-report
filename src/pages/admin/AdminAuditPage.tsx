@@ -133,7 +133,7 @@ export default function AdminAuditPage() {
       {/* ── Audit Logs Tab ── */}
       {activeTab === 'audit' && (
         <>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 20, marginBottom: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 20, marginBottom: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 250, position: 'relative' }}>
               <Search size={18} color="#9ca3af" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)' }} />
               <input
@@ -159,7 +159,7 @@ export default function AdminAuditPage() {
             </select>
           </div>
 
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
             {isLoading ? (
               <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading logs...</div>
             ) : filteredLogs?.length === 0 ? (
@@ -244,7 +244,7 @@ export default function AdminAuditPage() {
           {gdprLoading ? (
             <div style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>Loading requests…</div>
           ) : gdprRequests.length === 0 ? (
-            <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 48, textAlign: 'center', border: '1px solid #f1f5f9' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 48, textAlign: 'center', border: '1px solid #f1f5f9' }}>
               <Trash2 size={48} color="#d1d5db" style={{ margin: '0 auto 16px', display: 'block' }} />
               <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>No deletion requests</h3>
               <p style={{ color: '#94a3b8', fontSize: 14 }}>Users who submit data deletion requests from their Privacy settings will appear here.</p>
@@ -253,7 +253,7 @@ export default function AdminAuditPage() {
             gdprRequests.map((req: any) => {
               const sc = gdprStatusColor[req.status] ?? { bg: '#f3f4f6', text: '#374151' }
               return (
-                <div key={req.id} style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px 24px', border: '1px solid #f1f5f9', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div key={req.id} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px 24px', border: '1px solid #f1f5f9', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>

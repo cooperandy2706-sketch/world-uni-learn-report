@@ -203,7 +203,7 @@ export default function DriverRoutesPage() {
       </div>
 
       {!vehicle ? (
-        <div style={{ padding: 24, background: '#fee2e2', borderRadius: 16, border: '1px solid #fca5a5', display: 'flex', gap: 16 }}>
+        <div style={{ padding: 24, background: '#fee2e2', borderRadius: 8, border: '1px solid #fca5a5', display: 'flex', gap: 16 }}>
           <Info color="#b91c1c" />
           <div>
             <div style={{ fontWeight: 700, color: '#991b1b', marginBottom: 4 }}>No Vehicle Assigned</div>
@@ -211,7 +211,7 @@ export default function DriverRoutesPage() {
           </div>
         </div>
       ) : (
-        <div style={{ marginBottom: 24, padding: 20, background: activeTrip ? '#ecfdf5' : '#eff6ff', borderRadius: 16, border: activeTrip ? '1px solid #10b981' : '1px solid #bfdbfe', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.3s' }}>
+        <div style={{ marginBottom: 24, padding: 20, background: activeTrip ? '#ecfdf5' : '#eff6ff', borderRadius: 8, border: activeTrip ? '1px solid #10b981' : '1px solid #bfdbfe', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.3s' }}>
           <div style={{ width: 48, height: 48, background: activeTrip ? '#10b981' : '#3b82f6', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', transition: 'background 0.3s' }}>
             <Bus size={24} />
           </div>
@@ -234,14 +234,14 @@ export default function DriverRoutesPage() {
 
       <div style={{ display: 'grid', gap: 16 }}>
         {routes.length === 0 ? (
-          <div style={{ padding: 40, textAlign: 'center', background: '#f8fafc', borderRadius: 16, border: '2px dashed #e2e8f0', color: '#64748b' }}>
+          <div style={{ padding: 40, textAlign: 'center', background: '#f8fafc', borderRadius: 8, border: '2px dashed #e2e8f0', color: '#64748b' }}>
             No routes configured for this school.
           </div>
         ) : (
           routes.map((route) => {
              const isActive = activeRouteId === route.id
              return (
-              <div key={route.id} style={{ background: 'var(--bg-card)', borderRadius: 16, border: isActive ? '2px solid #6d28d9' : '1px solid #e2e8f0', overflow: 'hidden', boxShadow: isActive ? '0 8px 24px rgba(109,40,217,0.1)' : '0 2px 8px rgba(0,0,0,0.02)', transition: 'all 0.2s' }}>
+              <div key={route.id} style={{ background: 'var(--bg-card)', borderRadius: 8, border: isActive ? '2px solid #6d28d9' : '1px solid #e2e8f0', overflow: 'hidden', boxShadow: isActive ? '0 8px 24px rgba(109,40,217,0.1)' : '0 2px 8px rgba(0,0,0,0.02)', transition: 'all 0.2s' }}>
                 <div style={{ padding: 20, display: 'flex', gap: 16, background: isActive ? '#faf5ff' : '#fff' }}>
                   <div style={{ width: 40, height: 40, background: isActive ? '#ede9fe' : '#f1f5f9', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isActive ? '#6d28d9' : '#475569', flexShrink: 0 }}>
                     <MapPin size={20} />

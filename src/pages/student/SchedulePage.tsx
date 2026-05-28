@@ -102,7 +102,7 @@ export default function StudentSchedulePage() {
       return (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: compact ? '6px 10px' : '8px 12px', borderRadius: 8, background: 'var(--bg-input)', border: '1px dashed var(--border-color)' }}>
           <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>☕</span>
-          <span style={{ fontSize: compact ? 11 : 12, color: 'var(--text-subtle)', fontWeight: 500 }}>{slot.period?.name}</span>
+          <span style={{ fontSize: compact ? 11 : 12, color: 'var(--text-subtle)', fontWeight: 600 }}>{slot.period?.name}</span>
           <span style={{ fontSize: 10, color: 'var(--text-subtle)', marginLeft: 'auto' }}>{formatTime(sTime)} – {formatTime(eTime)}</span>
         </div>
       )
@@ -180,7 +180,7 @@ export default function StudentSchedulePage() {
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading timetable…</p>
           </div>
         ) : timetable.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '64px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '64px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>📅</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No timetable available</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Your school administrator hasn't published a timetable for this term yet.</p>
@@ -189,7 +189,7 @@ export default function StudentSchedulePage() {
           <>
             {/* Active class banner */}
             {activeSlot && selectedDay === todayDay && (
-              <div style={{ background: 'linear-gradient(135deg,#14532d,#16a34a)', borderRadius: 16, padding: '15px 20px', marginBottom: 16, color: '#fff', animation: '_schlive 3s ease infinite', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ background: 'linear-gradient(135deg,#14532d,#16a34a)', borderRadius: 8, padding: '15px 20px', marginBottom: 16, color: '#fff', animation: '_schlive 3s ease infinite', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', opacity: .8, marginBottom: 3 }}>🟢 YOU SHOULD BE IN CLASS NOW</div>
                 <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, margin: '0 0 2px' }}>{activeSlot.subject?.name}</h2>
                 <p style={{ fontSize: 12, opacity: .85, margin: 0 }}>{activeSlot.period?.name} · {formatTime(activeSlot.period?.start_time?.slice(0, 5))} – {formatTime(activeSlot.period?.end_time?.slice(0, 5))}{activeSlot.teacher?.user?.full_name ? ` · ${activeSlot.teacher.user.full_name}` : ''}</p>
@@ -235,7 +235,7 @@ export default function StudentSchedulePage() {
                     {selectedDay === todayDay && <span style={{ fontSize: 11, fontWeight: 700, background: '#f0fdf4', color: '#16a34a', padding: '2px 9px', borderRadius: 99, border: '1px solid #bbf7d0' }}>TODAY</span>}
                   </div>
                   {todaySlots.length === 0 ? (
-                    <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '48px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+                    <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '48px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                       <div style={{ fontSize: 40, marginBottom: 8 }}>🌟</div>
                       <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>No classes on {DAY_LABELS[selectedDay]}</p>
                       <p style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 4 }}>Enjoy your free day!</p>
@@ -299,7 +299,7 @@ export default function StudentSchedulePage() {
                         return slot ? (
                           <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <div style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
-                            <span style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 500 }}>{slot.subject?.name}</span>
+                            <span style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>{slot.subject?.name}</span>
                           </div>
                         ) : null
                       })}

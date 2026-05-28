@@ -139,7 +139,7 @@ export default function TeacherAssignmentDetailsPage() {
         </div>
 
         {/* ── Submissions Table ── */}
-        <div className="t-table-scroll" style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div className="t-table-scroll" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
           <div className="resp-table-min">
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 120px 140px 120px 160px', padding: '16px 24px', background: '#f8fafc', borderBottom: '1px solid #f1f5f9', fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
              <div>Student Name</div>
@@ -225,7 +225,7 @@ export default function TeacherAssignmentDetailsPage() {
                 const isCorrect = stuAnswer.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase()
                 
                 return (
-                  <div key={q.id} style={{ padding: 20, borderRadius: 16, background: 'var(--bg-card)', border: `1.5px solid ${isCorrect ? '#d1fae5' : '#fee2e2'}` }}>
+                  <div key={q.id} style={{ padding: 20, borderRadius: 8, background: 'var(--bg-card)', border: `1.5px solid ${isCorrect ? '#d1fae5' : '#fee2e2'}` }}>
                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                         <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', lineHeight: 1.5 }}>
                           <span style={{ color: 'var(--text-subtle)', marginRight: 8 }}>{i + 1}.</span>

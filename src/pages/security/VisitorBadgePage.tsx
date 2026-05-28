@@ -95,7 +95,7 @@ export default function VisitorBadgePage() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800;900&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'DM Sans', sans-serif; background: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .badge { width: 320px; border: 3px solid #0f172a; border-radius: 16px; overflow: hidden; page-break-inside: avoid; }
+        .badge { width: 320px; border: 3px solid #0f172a; border-radius: 8px; overflow: hidden; page-break-inside: avoid; }
         .badge-header { background: #0f172a; color: #fff; padding: 14px 18px; text-align: center; }
         .badge-header .school { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; opacity: .7; margin-bottom: 2px; }
         .badge-header .visitor-tag { font-size: 22px; font-weight: 900; letter-spacing: .05em; }
@@ -192,7 +192,7 @@ export default function VisitorBadgePage() {
         </div>
 
         {/* Visitor List */}
-        <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9', overflow: 'hidden' }}>
           {isLoading ? (
             <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>Loading…</div>
           ) : filtered.length === 0 ? (
@@ -294,7 +294,7 @@ export default function VisitorBadgePage() {
       {printing && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}
           onClick={e => { if (e.target === e.currentTarget) setPrinting(null) }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, maxWidth: 360, width: '100%', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.3)', animation: 'vb_pop .2s ease' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, maxWidth: 360, width: '100%', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.3)', animation: 'vb_pop .2s ease' }}>
             {/* Preview Header */}
             <div style={{ background: '#0f172a', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>

@@ -136,7 +136,7 @@ export default function AnnouncementPopup() {
         onClick={e => e.stopPropagation()}
         style={{
           width: '100%', maxWidth: 500,
-          background: 'var(--bg-card)', borderRadius: 24, overflow: 'hidden',
+          background: 'var(--bg-card)', borderRadius: 12, overflow: 'hidden',
           boxShadow: '0 40px 100px rgba(0,0,0,0.4)',
           fontFamily: '"DM Sans", sans-serif',
           animation: 'ann_card_in 0.35s cubic-bezier(0.16,1,0.3,1)',
@@ -157,7 +157,7 @@ export default function AnnouncementPopup() {
             <div style={{ display:'flex', alignItems:'center', gap:14 }}>
               {/* Icon */}
               <div style={{
-                width:52, height:52, borderRadius:16, flexShrink:0,
+                width:52, height:52, borderRadius: 8, flexShrink:0,
                 background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.2)',
                 display:'flex', alignItems:'center', justifyContent:'center', fontSize:24,
                 boxShadow:'0 4px 16px rgba(0,0,0,0.2)',

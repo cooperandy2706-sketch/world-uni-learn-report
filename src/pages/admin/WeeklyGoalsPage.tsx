@@ -168,13 +168,13 @@ export default function WeeklyGoalsPage(){
             <div style={{width:32,height:32,borderRadius:'50%',border:'3px solid #ede9fe',borderTopColor:'#6d28d9',animation:'_wg_spin .8s linear infinite'}}/>
           </div>
         ) : filtered.length===0 ? (
-          <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
+          <div style={{background: 'var(--bg-card)',borderRadius: 8,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
             <div style={{fontSize:52,marginBottom:12}}>🎯</div>
             <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:18,fontWeight:700,color: 'var(--text-main)',marginBottom:6}}>No goals set yet</h3>
             <Btn onClick={()=>setModalOpen(true)}>🎯 Set First Goal</Btn>
           </div>
         ) : (
-          <div style={{background: 'var(--bg-card)',borderRadius:16,border:'1.5px solid #f0eefe',overflow:'hidden',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
+          <div style={{background: 'var(--bg-card)',borderRadius: 8,border:'1.5px solid #f0eefe',overflow:'hidden',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
                 <tr style={{background:'linear-gradient(135deg,#faf5ff,#f5f3ff)',borderBottom:'1.5px solid #ede9fe'}}>
@@ -222,7 +222,7 @@ export default function WeeklyGoalsPage(){
       {/* Create goal modal */}
       {modalOpen&&(
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.45)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999,backdropFilter:'blur(4px)',padding:16}}>
-          <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'24px',width:'100%',maxWidth:480,boxShadow:'0 24px 64px rgba(0,0,0,.18)',fontFamily:'"DM Sans",sans-serif'}}>
+          <div style={{background: 'var(--bg-card)',borderRadius: 8,padding:'24px',width:'100%',maxWidth:480,boxShadow:'0 24px 64px rgba(0,0,0,.18)',fontFamily:'"DM Sans",sans-serif'}}>
             <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:19,fontWeight:700,color: 'var(--text-main)',marginBottom:18}}>🎯 Set Weekly Goal</h3>
             <div style={{display:'flex',flexDirection:'column',gap:14}}>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>

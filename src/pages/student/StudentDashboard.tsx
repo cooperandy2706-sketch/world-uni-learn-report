@@ -201,7 +201,7 @@ export default function StudentDashboard() {
 
         {/* ── Active lesson banner ── */}
         {activeLesson && (
-          <div style={{ background: 'linear-gradient(135deg,#14532d,#16a34a)', borderRadius: 16, padding: '16px 20px', marginBottom: 18, color: '#fff', animation: '_sglive 3s ease infinite', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ background: 'linear-gradient(135deg,#14532d,#16a34a)', borderRadius: 8, padding: '16px 20px', marginBottom: 18, color: '#fff', animation: '_sglive 3s ease infinite', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: -18, right: -18, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,.06)' }} />
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', opacity: .8, marginBottom: 4 }}>🟢 CLASS IN PROGRESS</div>
             <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, margin: '0 0 2px' }}>{activeLesson.subject?.name}</h2>
@@ -215,7 +215,7 @@ export default function StudentDashboard() {
             <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
               {timeGreeting}, {user?.full_name?.split(' ')[0]} 👋
             </h1>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4, fontWeight: 500 }}>{roleMessage}</p>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4, fontWeight: 600 }}>{roleMessage}</p>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
               {studentData?.class?.name ?? 'No class assigned'} · {(year as any)?.name} · {(term as any)?.name ?? 'No active term'} · {DAYS[now.getDay()]}
             </p>
@@ -245,7 +245,7 @@ export default function StudentDashboard() {
 
         <div className="sd-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24, marginBottom: 24 }}>
           {/* Progress Visualization */}
-          <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 20, padding: '24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .1s both' }}>
+          <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '24px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .1s both' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
               <div>
                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: '#1e1b4b', margin: 0 }}>Learning Journey</h3>
@@ -283,7 +283,7 @@ export default function StudentDashboard() {
 
           {/* Fee Quick Status */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81)', borderRadius: 20, padding: '20px', color: '#fff', animation: '_sfu .5s ease .15s both' }}>
+            <div style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81)', borderRadius: 8, padding: '20px', color: '#fff', animation: '_sfu .5s ease .15s both' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, opacity: 0.7 }}>
                 <Wallet size={16} />
                 <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.05em' }}>OUTSTANDING BALANCE</span>
@@ -292,7 +292,7 @@ export default function StudentDashboard() {
               <Link to={ROUTES.STUDENT_BILLING} style={{ display: 'block', marginTop: 16, textAlign: 'center', background: 'rgba(255,255,255,0.1)', color: '#fff', textDecoration: 'none', padding: '8px', borderRadius: 10, fontSize: 12, fontWeight: 700 }}>View Billing Tab →</Link>
             </div>
             
-            <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: '16px', border: '1.5px solid #f0eefe', animation: '_sfu .5s ease .2s both' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '16px', border: '1.5px solid #f0eefe', animation: '_sfu .5s ease .2s both' }}>
                <h4 style={{ fontSize: 12, fontWeight: 800, color: '#1e1b4b', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
                  <Clock size={14} color="#7c3aed" /> DUE SOON
                </h4>
@@ -313,7 +313,7 @@ export default function StudentDashboard() {
 
         {/* ── Academic Challenges (Parent Focus) ── */}
         {academicChallenges.length > 0 && (
-          <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 20, padding: '24px', border: '1.5px solid #fecaca', boxShadow: '0 8px 20px rgba(220,38,38,0.05)', marginBottom: 24, animation: '_sfu .5s ease both' }}>
+          <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '24px', border: '1.5px solid #fecaca', boxShadow: '0 8px 20px rgba(220,38,38,0.05)', marginBottom: 24, animation: '_sfu .5s ease both' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fef2f2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🎯</div>
               <div>
@@ -323,7 +323,7 @@ export default function StudentDashboard() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
               {academicChallenges.map((c, i) => (
-                <div key={i} style={{ background: 'var(--bg-card)', padding: 16, borderRadius: 16, border: '1px solid #fee2e2' }}>
+                <div key={i} style={{ background: 'var(--bg-card)', padding: 16, borderRadius: 8, border: '1px solid #fee2e2' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>{c.subject_name || 'General'}</div>
                     <div style={{ fontSize: 10, fontWeight: 700, color: '#991b1b', background: '#fef2f2', padding: '2px 8px', borderRadius: 99 }}>{new Date(c.created_at).toLocaleDateString()}</div>
@@ -401,7 +401,7 @@ export default function StudentDashboard() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
             {/* Today's Schedule */}
-            <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .2s both' }}>
+            <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .2s both' }}>
               <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span>📅</span>
@@ -447,7 +447,7 @@ export default function StudentDashboard() {
 
             {/* Subject Scores */}
             {subjectScores.length > 0 && (
-              <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .28s both' }}>
+              <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .28s both' }}>
                 <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span>📚</span>
@@ -510,7 +510,7 @@ export default function StudentDashboard() {
             </div>
 
             {/* Pending Assignments */}
-            <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: `1.5px solid ${pendingAssignments.length > 0 ? '#fde68a' : '#f0eefe'}`, padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .28s both' }}>
+            <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: `1.5px solid ${pendingAssignments.length > 0 ? '#fde68a' : '#f0eefe'}`, padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .28s both' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span>📝</span>
@@ -550,7 +550,7 @@ export default function StudentDashboard() {
 
             {/* Announcements */}
             {announcements.length > 0 && (
-              <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .34s both' }}>
+              <div className="sd-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .34s both' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                   <span>📢</span>
                   <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Announcements</h3>
@@ -570,7 +570,7 @@ export default function StudentDashboard() {
             )}
 
             {/* Quick links */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .4s both' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_sfu .5s ease .4s both' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 11 }}>
                 <span>⚡</span>
                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Quick Links</h3>
@@ -588,7 +588,7 @@ export default function StudentDashboard() {
                   <Link key={label} to={to} className="sd-link"
                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 10, background: '#faf5ff', textDecoration: 'none' }}>
                     <span style={{ fontSize: 15 }}>{icon}</span>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-main)', flex: 1 }}>{label}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)', flex: 1 }}>{label}</span>
                     <span style={{ fontSize: 13, color: '#a78bfa' }}>→</span>
                   </Link>
                 ))}

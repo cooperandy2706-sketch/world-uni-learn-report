@@ -102,12 +102,12 @@ export default function TeacherNotificationsPage(){
           </div>
         ) : tab==='notifications' ? (
           notifs.length===0 ? (
-            <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
+            <div style={{background: 'var(--bg-card)',borderRadius: 8,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
               <div style={{fontSize:52,marginBottom:12}}>🔔</div>
               <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:18,fontWeight:700,color: 'var(--text-main)'}}>No notifications yet</h3>
             </div>
           ) : (
-            <div style={{background: 'var(--bg-card)',borderRadius:16,border:'1.5px solid #f0eefe',overflow:'hidden'}}>
+            <div style={{background: 'var(--bg-card)',borderRadius: 8,border:'1.5px solid #f0eefe',overflow:'hidden'}}>
               {notifs.map((n,i)=>(
                 <div key={n.id} className="nt-item" onClick={()=>markRead(n.id)}
                   style={{padding:'14px 18px',borderBottom:i<notifs.length-1?'1px solid #f0eefe':'none',display:'flex',gap:12,alignItems:'flex-start',
@@ -129,7 +129,7 @@ export default function TeacherNotificationsPage(){
           )
         ) : (
           announcements.length===0 ? (
-            <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
+            <div style={{background: 'var(--bg-card)',borderRadius: 8,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
               <div style={{fontSize:52,marginBottom:12}}>📭</div>
               <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:18,fontWeight:700,color: 'var(--text-main)'}}>No announcements yet</h3>
             </div>

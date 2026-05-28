@@ -144,7 +144,7 @@ export default function ParentsPage() {
         </div>
       </div>
 
-      <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
         
         {/* Tabs */}
         <div style={{ display: 'flex', borderBottom: '1px solid #f1f5f9', padding: '0 20px' }}>

@@ -108,7 +108,7 @@ export default function NotificationsModal({ open, onClose, onRead }: Notificati
             style={{
               position: 'fixed', bottom: 20, left: 20, right: 20,
               zIndex: 10002, margin: '0 auto', maxWidth: 480,
-              background: 'var(--bg-card)', borderRadius: 24, overflow: 'hidden',
+              background: 'var(--bg-card)', borderRadius: 12, overflow: 'hidden',
               boxShadow: '0 40px 100px rgba(0,0,0,0.4)',
               fontFamily: '"DM Sans", sans-serif',
               display: 'flex', flexDirection: 'column',
@@ -223,7 +223,7 @@ export default function NotificationsModal({ open, onClose, onRead }: Notificati
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
                     style={{
-                      background: 'var(--bg-card)', borderRadius: 16, padding: '16px',
+                      background: 'var(--bg-card)', borderRadius: 8, padding: '16px',
                       boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
                       border: '1px solid #f1f0fb',
                       display: 'flex', gap: 14, position: 'relative'

@@ -512,7 +512,7 @@ export default function Sidebar() {
                             ? `${(storage.totalBytes / 1024 ** 2).toFixed(1)} MB`
                             : `${(storage.totalBytes / 1024 ** 3).toFixed(2)} GB`
                         }
-                        <span style={{ fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}> of {storage.limitGB} GB used</span>
+                        <span style={{ fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}> of {storage.limitGB} GB used</span>
                     </div>
 
                     {/* Breakdown rows */}

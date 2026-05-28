@@ -109,7 +109,7 @@ export default function StudentProfilePage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _sfu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        .profile-card{background:#fff; border-radius:24px; border:1.5px solid #f0eefe; padding:32px; box-shadow:0 1px 4px rgba(109,40,217,.06); transition:all .3s ease}
+        .profile-card{background:#fff; border-radius: 12px; border:1.5px solid #f0eefe; padding:32px; box-shadow:0 1px 4px rgba(109,40,217,.06); transition:all .3s ease}
         .profile-card:hover{box-shadow:0 8px 30px rgba(109,40,217,.08); transform:translateY(-2px)}
         .info-row{display:flex; align-items:center; gap:16px; padding:16px 0; border-bottom:1px solid #f8fafc}
         .info-row:last-child{border-bottom:none}
@@ -162,7 +162,7 @@ export default function StudentProfilePage() {
                 <Shield size={20} color="#6d28d9" /> Account Security
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ background: '#f8fafc', padding: 16, borderRadius: 16, border: '1px solid #f1f5f9' }}>
+                <div style={{ background: '#f8fafc', padding: 16, borderRadius: 8, border: '1px solid #f1f5f9' }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 4 }}>Email Address</div>
                   <div style={{ fontSize: 14, color: '#1e293b' }}>{user?.email}</div>
                 </div>
@@ -250,7 +250,7 @@ export default function StudentProfilePage() {
               </div>
             </div>
 
-            <div style={{ background: '#6d28d9', borderRadius: 24, padding: 24, color: '#fff', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ background: '#6d28d9', borderRadius: 12, padding: 24, color: '#fff', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', right: -20, bottom: -20, fontSize: 100, opacity: 0.1 }}>📞</div>
               <h4 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>Need to update your details?</h4>
               <p style={{ fontSize: 13, opacity: 0.8, margin: '0 0 16px', maxWidth: 400 }}>If any of your information is incorrect or has changed, please contact the school administration office to request an update.</p>

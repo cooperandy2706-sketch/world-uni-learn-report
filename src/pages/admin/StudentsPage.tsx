@@ -1022,7 +1022,7 @@ export default function StudentsPage() {
 
             {/* ── Empty state ── */}
             {!isLoading && filtered.length === 0 && (
-              <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>🎓</div>
                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>
                   {search || filterClass || filterGender ? 'No students found' : 'No students yet'}
@@ -1036,7 +1036,7 @@ export default function StudentsPage() {
 
             {/* ── TABLE VIEW ── */}
             {!isLoading && filtered.length > 0 && viewMode === 'table' && (
-              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom: '1.5px solid #ede9fe' }}>
@@ -1075,7 +1075,7 @@ export default function StudentsPage() {
                         </td>
                         <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-muted)' }}>{s.house ?? '—'}</td>
                         <td style={{ padding: '12px 16px' }}>
-                          <div style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 500 }}>{s.guardian_name ?? '—'}</div>
+                          <div style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>{s.guardian_name ?? '—'}</div>
                           {s.guardian_phone && <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{s.guardian_phone}</div>}
                         </td>
                         <td style={{ padding: '12px 16px' }}>
@@ -1113,7 +1113,7 @@ export default function StudentsPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 16 }}>
                 {filtered.map((s, i) => (
                   <div key={s.id} className="std-card"
-                    style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '20px', boxShadow: '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.2s', animation: `_fadeUp 0.35s ease ${i * 0.04}s both` }}>
+                    style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '20px', boxShadow: '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.2s', animation: `_fadeUp 0.35s ease ${i * 0.04}s both` }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
                       {s.photo_url ? (
                         <img src={s.photo_url} alt="" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }} />
@@ -1152,7 +1152,7 @@ export default function StudentsPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20, alignItems: 'start', animation: '_tp_fu .4s ease' }}>
             {/* Left — Student & Letter picker */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '24px', boxShadow: '0 1px 3px rgba(109,40,217,0.05)' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '24px', boxShadow: '0 1px 3px rgba(109,40,217,0.05)' }}>
                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 10px' }}>📄 Student Documents Centre</h3>
                 <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '0 0 20px', lineHeight: 1.6 }}>Select a student and a document type to generate official records.</p>
                 
@@ -1184,7 +1184,7 @@ export default function StudentsPage() {
                 )}
               </div>
 
-              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '24px', boxShadow: '0 1px 3px rgba(109,40,217,0.05)' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '24px', boxShadow: '0 1px 3px rgba(109,40,217,0.05)' }}>
                 <h4 style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 16 }}>Choose Document Type</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 10 }}>
                   {STUDENT_LETTER_TYPES.map(lt => (
@@ -1214,11 +1214,11 @@ export default function StudentsPage() {
 
             {/* Right — Form & Print */}
             <div style={{ position: 'sticky', top: 20 }}>
-              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '24px', boxShadow: '0 2px 10px rgba(109,40,217,0.08)' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '24px', boxShadow: '0 2px 10px rgba(109,40,217,0.08)' }}>
                 {!hrLetterType ? (
                   <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-subtle)' }}>
                     <div style={{ fontSize: 48, marginBottom: 16, opacity: 0.5 }}>✍️</div>
-                    <p style={{ fontSize: 14, fontWeight: 500 }}>Select a document type<br/>to fill in the details</p>
+                    <p style={{ fontSize: 14, fontWeight: 600 }}>Select a document type<br/>to fill in the details</p>
                   </div>
                 ) : (
                   <>
@@ -1378,7 +1378,7 @@ export default function StudentsPage() {
                 ].map(({ label, value }) => value && (
                   <div key={label} style={{ background: '#faf5ff', borderRadius: 10, padding: '10px 12px' }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>{value}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 600 }}>{value}</div>
                   </div>
                 ))}
               </div>

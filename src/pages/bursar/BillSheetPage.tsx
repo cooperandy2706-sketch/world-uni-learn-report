@@ -170,13 +170,13 @@ export default function BillSheetPage() {
       '<style>',
       '* { margin:0; padding:0; box-sizing:border-box; }',
       'body { font-family: "DM Sans", sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; color: #111827; background: #f8fafc; }',
-      '.container { background: #fff; border-radius: 16px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; overflow: hidden; }',
+      '.container { background: #fff; border-radius: 8px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; overflow: hidden; }',
       '.watermark { position: absolute; top: 15%; left: 50%; transform: translate(-50%, -15%) rotate(-15deg); font-size: 100px; font-weight: 900; color: rgba(76, 29, 149, 0.02); pointer-events: none; z-index: 0; text-transform: uppercase; white-space: nowrap; }',
       '.content { position: relative; z-index: 1; }',
       '.header { display: flex; align-items: center; gap: 24px; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #4c1d95; }',
       '.school-info { flex: 1; }',
       '.school-name { font-family: "Playfair Display", serif; font-size: 24px; font-weight: 900; color: #1e0646; margin-bottom: 4px; }',
-      '.school-sub { font-size: 11px; color: #6b7280; font-weight: 500; }',
+      '.school-sub { font-size: 11px; color: #6b7280; font-weight: 600; }',
       '.doc-title { text-align: center; font-size: 12px; font-weight: 900; color: #4c1d95; text-transform: uppercase; letter-spacing: .2em; margin-bottom: 32px; background: #f5f3ff; padding: 8px; border-radius: 8px; }',
       '.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }',
       '.info-box { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 12px; padding: 16px; }',
@@ -330,7 +330,7 @@ export default function BillSheetPage() {
               ) : (
                 <>
                   {/* Student info + status header */}
-                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px 24px', border: '1.5px solid #f0eefe', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px 24px', border: '1.5px solid #f0eefe', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
                       <div>
                         <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', fontFamily: '"Playfair Display",serif', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -375,7 +375,7 @@ export default function BillSheetPage() {
                   </div>
 
                   {/* Tuition breakdown */}
-                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
                         <FileText size={14} color="#6d28d9" /> Term Fee Charges
@@ -435,7 +435,7 @@ export default function BillSheetPage() {
 
                   {/* Daily fees section */}
                   {(billData.dailyFees.feeding.expected > 0 || billData.dailyFees.studies.expected > 0) && (
-                    <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                    <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                       <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff' }}>
                         <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
                           Daily Fees ({billData.dailyFees.feeding.days} school days elapsed)
@@ -474,7 +474,7 @@ export default function BillSheetPage() {
                   )}
 
                   {/* Recent payments list */}
-                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Payments Received This Term</h3>
                       <span style={{ fontSize: 12, fontWeight: 800, color: '#16a34a' }}>{CUR(billData.summary.totalPaid)}</span>
@@ -505,7 +505,7 @@ export default function BillSheetPage() {
                     )}
                   </div>
                   {/* Custom adjustments */}
-                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div className="bs-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff' }}>
                       <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Custom Adjustments (Add / Remove)</h3>
                       <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Add extra charges (positive) or discounts (negative) to this bill</p>

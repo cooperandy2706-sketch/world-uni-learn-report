@@ -144,14 +144,14 @@ export default function LiveFleetTrackingPage() {
           </h1>
           <p style={{ margin: '8px 0 0', color: '#64748b', fontSize: 15 }}>Monitor active trips and real-time passenger manifests.</p>
         </div>
-        <div style={{ padding: '8px 16px', background: '#ecfdf5', borderRadius: 20, border: '1px solid #10b981', display: 'flex', alignItems: 'center', gap: 8, color: '#059669', fontWeight: 700, fontSize: 14 }}>
+        <div style={{ padding: '8px 16px', background: '#ecfdf5', borderRadius: 8, border: '1px solid #10b981', display: 'flex', alignItems: 'center', gap: 8, color: '#059669', fontWeight: 700, fontSize: 14 }}>
           <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#10b981', animation: 'pulse 2s infinite' }} />
           {activeTrips.length} Active Trips
         </div>
       </div>
 
       {activeTrips.length === 0 ? (
-        <div style={{ padding: 60, textAlign: 'center', background: '#f8fafc', borderRadius: 24, border: '1px dashed #cbd5e1' }}>
+        <div style={{ padding: 60, textAlign: 'center', background: '#f8fafc', borderRadius: 12, border: '1px dashed #cbd5e1' }}>
           <Bus size={48} color="#94a3b8" style={{ marginBottom: 16 }} />
           <h3 style={{ margin: 0, fontSize: 18, color: '#334155', fontWeight: 700 }}>No Active Trips</h3>
           <p style={{ color: '#64748b', marginTop: 8 }}>Vehicles will appear here when drivers start their trip on the Driver Portal.</p>
@@ -160,7 +160,7 @@ export default function LiveFleetTrackingPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 24, height: 'calc(100vh - 200px)', minHeight: 600 }}>
           
           {/* Left: Map */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', position: 'relative' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', position: 'relative' }}>
             <MapContainer 
               center={[activeTrips[0]?.latitude || 5.6037, activeTrips[0]?.longitude || -0.1870]} 
               zoom={13} 
@@ -205,7 +205,7 @@ export default function LiveFleetTrackingPage() {
                   onClick={() => setSelectedTripId(trip.id)}
                   style={{ 
                     background: 'var(--bg-card)', 
-                    borderRadius: 20, 
+                    borderRadius: 8, 
                     overflow: 'hidden', 
                     boxShadow: isSelected ? '0 8px 24px rgba(59,130,246,0.15)' : '0 2px 8px rgba(0,0,0,0.04)', 
                     border: isSelected ? '2px solid #3b82f6' : '1px solid #e2e8f0', 

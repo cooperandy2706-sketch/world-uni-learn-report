@@ -68,7 +68,7 @@ export default function DriverTripLogsPage() {
       </div>
 
       {/* Filters */}
-      <div style={{ background: 'var(--bg-card)', padding: 20, borderRadius: 16, border: '1px solid var(--border-color)', marginBottom: 24, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+      <div style={{ background: 'var(--bg-card)', padding: 20, borderRadius: 8, border: '1px solid var(--border-color)', marginBottom: 24, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 200 }}>
           <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6, textTransform: 'uppercase' }}>Date</label>
           <div style={{ position: 'relative' }}>
@@ -110,13 +110,13 @@ export default function DriverTripLogsPage() {
       {loading ? (
         <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>Loading logs...</div>
       ) : logs.length === 0 ? (
-        <div style={{ padding: 60, textAlign: 'center', background: '#f8fafc', borderRadius: 16, border: '2px dashed #e2e8f0' }}>
+        <div style={{ padding: 60, textAlign: 'center', background: '#f8fafc', borderRadius: 8, border: '2px dashed #e2e8f0' }}>
           <Filter size={32} color="#cbd5e1" style={{ marginBottom: 12 }} />
           <h3 style={{ margin: '0 0 4px', color: '#334155', fontSize: 16 }}>No Scans Found</h3>
           <p style={{ margin: 0, color: '#94a3b8', fontSize: 14 }}>Try selecting a different date or filter.</p>
         </div>
       ) : (
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>

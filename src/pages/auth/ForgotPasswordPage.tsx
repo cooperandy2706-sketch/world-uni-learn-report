@@ -112,7 +112,7 @@ export default function ForgotPasswordPage() {
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: 20,
+          borderRadius: 8,
           padding: '36px 36px 32px',
           boxShadow: '0 24px 64px rgba(0,0,0,0.3)',
         }}>

@@ -53,7 +53,7 @@ export default function ParentWardPage() {
       </button>
 
       {/* Profile card */}
-      <div style={{ background: `linear-gradient(135deg, ${color}, ${color}cc)`, borderRadius: 20, padding: 28, color: '#fff', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 20, boxShadow: `0 8px 24px ${color}40` }}>
+      <div style={{ background: `linear-gradient(135deg, ${color}, ${color}cc)`, borderRadius: 8, padding: 28, color: '#fff', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 20, boxShadow: `0 8px 24px ${color}40` }}>
         <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, fontWeight: 800, flexShrink: 0, border: '3px solid rgba(255,255,255,0.4)' }}>
           {ward.full_name.charAt(0).toUpperCase()}
         </div>
@@ -87,7 +87,7 @@ export default function ParentWardPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         {actions.map(a => (
           <div key={a.label} className="action-card" onClick={() => navigate(a.path)}
-            style={{ background: a.bg, borderRadius: 16, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: `1.5px solid ${a.border}` }}>
+            style={{ background: a.bg, borderRadius: 8, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: `1.5px solid ${a.border}` }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>{a.icon}</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: a.textC }}>{a.label}</div>
             <div style={{ fontSize: 12, color: a.textC, marginTop: 2, opacity: 0.8 }}>{a.sub}</div>

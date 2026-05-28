@@ -75,7 +75,7 @@ export default function TeacherSubjectsPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        .sub-card { background: #fff; border-radius: 20px; padding: 24px; border: 1.5px solid #f0eefe; transition: all 0.3s cubic-bezier(.4, 0, .2, 1); cursor: pointer; position: relative; overflow: hidden; }
+        .sub-card { background: #fff; border-radius: 8px; padding: 24px; border: 1.5px solid #f0eefe; transition: all 0.3s cubic-bezier(.4, 0, .2, 1); cursor: pointer; position: relative; overflow: hidden; }
         .sub-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(109,40,217,0.12); border-color: #ddd6fe; }
         .sub-card:hover .icon-bounce { transform: scale(1.1) rotate(-5deg); }
       `}</style>
@@ -89,7 +89,7 @@ export default function TeacherSubjectsPage() {
         {isLoading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>Loading subjects...</div>
         ) : subjects.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>🏫</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No Subjects Found</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Your school has not configured any subjects yet.</p>

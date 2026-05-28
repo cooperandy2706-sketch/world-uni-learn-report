@@ -371,7 +371,7 @@ export default function TeacherReportsPage() {
         {/* ── Admin notice ─────────────────────────────────────────────── */}
         <div style={{ background: '#fef2f2', border: '1.5px solid #fca5a5', borderRadius: 12, padding: '10px 16px', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10, fontSize: 12 }}>
           <span style={{ fontSize: 16, flexShrink: 0 }}>🔒</span>
-          <p style={{ margin: 0, color: '#dc2626', fontWeight: 500 }}>
+          <p style={{ margin: 0, color: '#dc2626', fontWeight: 600 }}>
             The admin portal is restricted to administrators only. Use <strong>Save & Notify Admin</strong> to send your completed remarks to the admin for approval.
           </p>
         </div>
@@ -395,7 +395,7 @@ export default function TeacherReportsPage() {
           {/* Student */}
           <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.05)' }}>
             <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>
-              Step 2 — Select Student <span style={{ fontWeight: 400, textTransform: 'none', color: 'var(--text-subtle)' }}>— scores & details auto-fill</span>
+              Step 2 — Select Student <span style={{ fontWeight: 600, textTransform: 'none', color: 'var(--text-subtle)' }}>— scores & details auto-fill</span>
             </label>
             <select value={selectedStudent?.id ?? ''} onChange={e => setSelectedStudent(students.find(s => s.id === e.target.value) ?? null)}
               disabled={!selectedClass || students.length === 0}
@@ -430,7 +430,7 @@ export default function TeacherReportsPage() {
 
         {/* ── Empty state ──────────────────────────────────────────────── */}
         {!selectedClass && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>📄</div>
             <h3 className="t-title" style={{ fontSize: 18, marginBottom: 6 }}>Select a class to begin</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Choose a class, then a student — their scores and report details fill in automatically.</p>
@@ -453,7 +453,7 @@ export default function TeacherReportsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
               {/* Student banner */}
-              <div style={{ background: 'linear-gradient(135deg,#2e1065,#4c1d95,#5b21b6)', borderRadius: 16, padding: '18px 20px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ background: 'linear-gradient(135deg,#2e1065,#4c1d95,#5b21b6)', borderRadius: 8, padding: '18px 20px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: -16, right: -16, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,.05)' }} />
                 <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 14 }}>
                   <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,#f59e0b,#fbbf24)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 900, color: '#fff', flexShrink: 0 }}>
@@ -503,7 +503,7 @@ export default function TeacherReportsPage() {
 
               {/* Scores table */}
               {scores.length > 0 && (
-                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ padding: '13px 18px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 16 }}>📊</span>
                     <h3 className="t-title" style={{ fontSize: 15, margin: 0 }}>Subject Scores</h3>
@@ -561,7 +561,7 @@ export default function TeacherReportsPage() {
                             <td data-label="Grade" style={{ padding: '9px 13px', textAlign: 'center' }}>
                               <span style={{ width: 28, height: 28, borderRadius: 8, background: g.color + '18', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: g.color }}>{g.grade}</span>
                             </td>
-                            <td data-label="Position" style={{ padding: '9px 13px', textAlign: 'center', fontSize: 12, color: 'var(--text-main)', fontWeight: 500 }}>{sc.position ? ordinalFn(sc.position) : '—'}</td>
+                            <td data-label="Position" style={{ padding: '9px 13px', textAlign: 'center', fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>{sc.position ? ordinalFn(sc.position) : '—'}</td>
                             <td data-label="Remark" style={{ padding: '9px 13px', fontSize: 11, color: 'var(--text-muted)' }}>{sc.teacher_remarks ?? '—'}</td>
                           </tr>
                         )
@@ -593,7 +593,7 @@ export default function TeacherReportsPage() {
               )}
 
               {/* ── Remarks editor ─────────────────────────────────────── */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                 <div style={{ padding: '13px 18px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 16 }}>💬</span>

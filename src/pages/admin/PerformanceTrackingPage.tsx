@@ -33,7 +33,7 @@ const COLORS = ['#6d28d9', '#0891b2', '#16a34a', '#d97706', '#dc2626', '#db2777'
 // ── Components ──────────────────────────────────────────────
 function MetricCard({ label, value, icon: Icon, color, subValue }: any) {
   return (
-    <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: `1.5px solid ${T.border}`, boxShadow: '0 1px 4px rgba(109,40,217,0.06)', flex: 1 }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px', border: `1.5px solid ${T.border}`, boxShadow: '0 1px 4px rgba(109,40,217,0.06)', flex: 1 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: `${color}15`, color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Icon size={20} />
@@ -351,7 +351,7 @@ export default function PerformanceTrackingPage() {
 
         {/* ── Empty State ── */}
         {((viewMode === 'student' && !selectedStudent) || (viewMode === 'class' && !selectedClass)) && !loadingHistory && (
-          <div style={{ height: '54vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', borderRadius: 28, border: `1.5px solid ${T.border}` }} className="no-print">
+          <div style={{ height: '54vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', borderRadius: 12, border: `1.5px solid ${T.border}` }} className="no-print">
             <div style={{ width: 80, height: 80, borderRadius: '50%', background: T.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                {viewMode === 'student' ? <User size={40} color={T.primary} /> : <Users size={40} color={T.primary} />}
             </div>
@@ -376,7 +376,7 @@ export default function PerformanceTrackingPage() {
         {viewMode === 'student' && selectedStudent && !loadingHistory && (
           <div style={{ animation: '_perfFadeUp 0.5s ease both' }}>
             
-            <div style={{ background: 'linear-gradient(135deg, #1e0646 0%, #3b0764 100%)', borderRadius: 24, padding: '30px', color: '#fff', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 24, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ background: 'linear-gradient(135deg, #1e0646 0%, #3b0764 100%)', borderRadius: 12, padding: '30px', color: '#fff', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 24, position: 'relative', overflow: 'hidden' }}>
                <div style={{ position: 'absolute', right: -20, top: -20, width: 220, height: 220, borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
                <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '2px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, fontWeight: 800 }}>
                   {selectedStudent.full_name.charAt(0)}
@@ -406,7 +406,7 @@ export default function PerformanceTrackingPage() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 24, marginBottom: 24 }}>
-               <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '24px', border: `1.5px solid ${T.border}` }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, marginBottom: 24 }}>Academic Growth Curve</h3>
                   <div style={{ height: 320 }}>
                      <ResponsiveContainer width="100%" height="100%">
@@ -421,7 +421,7 @@ export default function PerformanceTrackingPage() {
                      </ResponsiveContainer>
                   </div>
                </div>
-               <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '24px', border: `1.5px solid ${T.border}` }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, marginBottom: 24 }}>Ranking History</h3>
                   <div style={{ height: 320 }}>
                      <ResponsiveContainer width="100%" height="100%">
@@ -437,7 +437,7 @@ export default function PerformanceTrackingPage() {
                </div>
             </div>
 
-            <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '24px', border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
                <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, marginBottom: 20 }}>Transcript Summary</h3>
                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
@@ -477,7 +477,7 @@ export default function PerformanceTrackingPage() {
         {viewMode === 'class' && selectedClass && !loadingHistory && (
           <div style={{ animation: '_perfFadeUp 0.5s ease both' }}>
             
-            <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', borderRadius: 24, padding: '30px', color: '#fff', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 24, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', borderRadius: 12, padding: '30px', color: '#fff', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 24, position: 'relative', overflow: 'hidden' }}>
                <div style={{ position: 'absolute', right: -20, top: -20, width: 220, height: 220, borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
                <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '2px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, fontWeight: 800 }}>
                   <Users size={32} />
@@ -508,7 +508,7 @@ export default function PerformanceTrackingPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
                {/* Class Growth Curve */}
-               <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '24px', border: `1.5px solid ${T.border}` }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, marginBottom: 24 }}>Collective Class Growth</h3>
                   <div style={{ height: 320 }}>
                      <ResponsiveContainer width="100%" height="100%">
@@ -525,7 +525,7 @@ export default function PerformanceTrackingPage() {
                </div>
 
                {/* Top Performers Bar Chart */}
-               <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}` }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '24px', border: `1.5px solid ${T.border}` }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, marginBottom: 24 }}>Top Performers (Latest Term)</h3>
                   <div style={{ height: 320 }}>
                      <ResponsiveContainer width="100%" height="100%">
@@ -545,7 +545,7 @@ export default function PerformanceTrackingPage() {
 
             {/* Least Performing & Struggle Subjects */}
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 24, marginBottom: 24 }}>
-                <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
                     <div style={{ padding: '20px 24px', borderBottom: `1.5px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, margin: 0 }}>Students Requiring Academic Support</h3>
                         <span style={{ fontSize: 11, fontWeight: 800, color: T.danger, background: '#fef2f2', padding: '4px 10px', borderRadius: 99 }}>Least Performing</span>
@@ -555,7 +555,7 @@ export default function PerformanceTrackingPage() {
                             <div key={p.id} 
                                  className="struggle-item"
                                  onClick={() => setExpandedStruggleId(expandedStruggleId === p.id ? null : p.id)}
-                                 style={{ padding: '16px', borderRadius: 16, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 16, background: expandedStruggleId === p.id ? '#fef2f2' : 'transparent' }}>
+                                 style={{ padding: '16px', borderRadius: 8, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 16, background: expandedStruggleId === p.id ? '#fef2f2' : 'transparent' }}>
                                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#fee2e2', color: T.danger, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 800 }}>
                                     {p.student?.full_name?.charAt(0)}
                                 </div>
@@ -586,7 +586,7 @@ export default function PerformanceTrackingPage() {
                     </div>
                 </div>
 
-                <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '24px', border: `1.5px solid ${T.border}`, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '24px', border: `1.5px solid ${T.border}`, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
                     <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#fff1f2', color: T.danger, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                         <Percent size={32} />
                     </div>
@@ -608,7 +608,7 @@ export default function PerformanceTrackingPage() {
             </div>
 
             {/* Class History Table */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>
                <div style={{ padding: '20px 24px', borderBottom: `1.5px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: T.slate, margin: 0 }}>Class Temporal History</h3>
                </div>
@@ -826,7 +826,7 @@ export default function PerformanceTrackingPage() {
                             <tr key={c.id} style={{ borderBottom: `1px solid ${T.border}` }}>
                                 <td style={{ padding: '16px 8px', fontSize: 13, fontWeight: 700 }}>
                                     {c.student?.full_name}
-                                    <div style={{ fontSize: 10, color: T.muted, fontWeight: 500 }}>ID: {c.student?.student_id}</div>
+                                    <div style={{ fontSize: 10, color: T.muted, fontWeight: 600 }}>ID: {c.student?.student_id}</div>
                                 </td>
                                 <td style={{ padding: '16px 8px', fontSize: 12, fontWeight: 700 }}>{c.subject_name || '—'}</td>
                                 <td style={{ padding: '16px 8px', fontSize: 12, color: T.muted }}>{c.teacher_name || '—'}</td>

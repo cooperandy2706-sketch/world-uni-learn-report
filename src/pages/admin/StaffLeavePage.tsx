@@ -132,8 +132,8 @@ export default function AdminStaffLeavePage() {
 
         {/* List */}
         {filtered.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', border: '1.5px dashed var(--border-color)', borderRadius: 24, padding: '60px 20px', textAlign: 'center', animation: 'fadeUp 0.4s ease 0.2s both' }}>
-            <div style={{ width: 64, height: 64, background: '#f8fafc', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1.5px dashed var(--border-color)', borderRadius: 12, padding: '60px 20px', textAlign: 'center', animation: 'fadeUp 0.4s ease 0.2s both' }}>
+            <div style={{ width: 64, height: 64, background: '#f8fafc', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <Calendar size={32} color="#94a3b8" />
             </div>
             <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' }}>No requests found</h3>
@@ -145,14 +145,14 @@ export default function AdminStaffLeavePage() {
               const statusInfo = getStatusDisplay(req.status)
               
               return (
-                <div key={req.id} className="req-card" style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1px solid #f0eefe', padding: 24, display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'space-between', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', animation: `fadeUp 0.4s ease ${0.15 + i * 0.05}s both` }}>
+                <div key={req.id} className="req-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1px solid #f0eefe', padding: 24, display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'space-between', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', animation: `fadeUp 0.4s ease ${0.15 + i * 0.05}s both` }}>
                   
                   <div style={{ display: 'flex', gap: 20, flex: 1, minWidth: 300 }}>
                     <div style={{ flexShrink: 0 }}>
                       {req.user?.avatar_url ? (
-                        <img src={req.user.avatar_url} alt="" style={{ width: 56, height: 56, borderRadius: 16, objectFit: 'cover', background: 'var(--bg-hover)' }} />
+                        <img src={req.user.avatar_url} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', background: 'var(--bg-hover)' }} />
                       ) : (
-                        <div style={{ width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, color: '#4f46e5' }}>
+                        <div style={{ width: 56, height: 56, borderRadius: 8, background: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, color: '#4f46e5' }}>
                           {req.user?.full_name?.charAt(0) || 'S'}
                         </div>
                       )}
@@ -223,7 +223,7 @@ export default function AdminStaffLeavePage() {
         {/* Review Modal */}
         {actionReq && (
           <div className="modal-overlay">
-            <div style={{ background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 540, boxShadow: '0 24px 48px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 12, width: '100%', maxWidth: 540, boxShadow: '0 24px 48px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
               
               <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc' }}>
                 <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: 0, fontFamily: '"Playfair Display", serif' }}>Review Leave Request</h2>
@@ -233,7 +233,7 @@ export default function AdminStaffLeavePage() {
               </div>
               
               <div style={{ padding: '32px' }}>
-                <div style={{ background: '#eff6ff', border: '1.5px solid #bfdbfe', borderRadius: 16, padding: 16, marginBottom: 24 }}>
+                <div style={{ background: '#eff6ff', border: '1.5px solid #bfdbfe', borderRadius: 8, padding: 16, marginBottom: 24 }}>
                   <p style={{ fontSize: 14, color: '#1e3a8a', margin: 0, lineHeight: 1.6 }}>
                     You are reviewing a <strong>{actionReq.leave_type}</strong> leave request from <strong style={{ color: '#1e40af' }}>{actionReq.user?.full_name}</strong> for dates <strong>{new Date(actionReq.start_date).toLocaleDateString('en-GB', { dateStyle: 'medium' })} to {new Date(actionReq.end_date).toLocaleDateString('en-GB', { dateStyle: 'medium' })}</strong>.
                   </p>

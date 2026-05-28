@@ -128,7 +128,7 @@ export default function AIQuizGenerator({ open, onClose, initialText = '', subje
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, fontFamily: '"DM Sans",sans-serif' }}>
         <div style={{ background: '#f5f3ff', padding: '12px 16px', borderRadius: 12, border: '1.5px solid #ede9fe' }}>
-          <p style={{ fontSize: 13, color: '#6d28d9', margin: 0, fontWeight: 500, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 13, color: '#6d28d9', margin: 0, fontWeight: 600, lineHeight: 1.5 }}>
             Groq will analyze your text and automatically build a structured multiple-choice quiz. It will be saved as a draft in Global Quizzes.
           </p>
         </div>

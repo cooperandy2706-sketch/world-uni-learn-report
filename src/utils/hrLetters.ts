@@ -260,7 +260,7 @@ export const LETTER_CSS = `
       color: #555;
     }
     .lh-meta-row strong { color: #222; }
-    .lh-date { font-weight: 500; color: #222; }
+    .lh-date { font-weight: 600; color: #222; }
 
     /* ── RECIPIENT BLOCK ── */
     .lh-recipient {

@@ -182,7 +182,7 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
   }
 
   return (
-    <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24 }}>
+    <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: 24 }}>
       <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 180px' }}>
           <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Date</label>
@@ -202,14 +202,14 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
       </div>
 
       {!recClass ? (
-        <div style={{ padding: '60px 20px', textAlign: 'center', background: '#f8fafc', borderRadius: 16, border: '1.5px dashed var(--border-color)', color: 'var(--text-muted)' }}>
+        <div style={{ padding: '60px 20px', textAlign: 'center', background: '#f8fafc', borderRadius: 8, border: '1.5px dashed var(--border-color)', color: 'var(--text-muted)' }}>
           <div style={{ fontSize: 32, marginBottom: 10 }}>🏫</div>
           Select a class to load the register.
         </div>
       ) : loadingAtt ? (
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>Checking attendance records...</div>
       ) : !isRegisterSubmitted ? (
-        <div style={{ padding: '60px 20px', textAlign: 'center', background: '#fef2f2', borderRadius: 16, border: '1.5px solid #fecaca', color: '#dc2626' }}>
+        <div style={{ padding: '60px 20px', textAlign: 'center', background: '#fef2f2', borderRadius: 8, border: '1.5px solid #fecaca', color: '#dc2626' }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🛑</div>
           <h3 style={{ margin: '0 0 8px', fontWeight: 800 }}>ATTENDANCE NOT YET SUBMITTED</h3>
           <p style={{ margin: 0, fontSize: 13, opacity: 0.8 }}>Morning register must be submitted before recording fees.</p>
@@ -231,7 +231,7 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
               return (
                 <div key={stu.id} style={{ 
                   background: absent ? '#f9fafb' : '#fff', 
-                  borderRadius: 16, 
+                  borderRadius: 8, 
                   padding: 18, 
                   border: `1.5px solid ${absent ? '#e5e7eb' : '#f0eefe'}`,
                   opacity: absent ? 0.7 : 1,
@@ -273,7 +273,7 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
           </div>
 
           <div style={{ position: 'sticky', zIndex: 100, bottom: 20 }}>
-             <Btn onClick={() => saveAll.mutate()} loading={saveAll.isPending} style={{ width: '100%', height: 50, borderRadius: 16, fontSize: 15, boxShadow: '0 8px 30px rgba(109,40,217,0.3)' }}>
+             <Btn onClick={() => saveAll.mutate()} loading={saveAll.isPending} style={{ width: '100%', height: 50, borderRadius: 8, fontSize: 15, boxShadow: '0 8px 30px rgba(109,40,217,0.3)' }}>
                 <Save size={18}/> SAVE REGISTER ENTRIES
              </Btn>
           </div>
@@ -444,7 +444,7 @@ export default function DailyFeesPage() {
       </div>
 
       {tab === 'config' && (
-        <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, border: '1.5px solid #f0eefe', maxWidth: 800 }}>
+        <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, border: '1.5px solid #f0eefe', maxWidth: 800 }}>
           <h2 style={{ fontSize: 16, margin: '0 0 20px', color: 'var(--text-main)' }}>Class Daily Rates</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -481,7 +481,7 @@ export default function DailyFeesPage() {
 
       {tab === 'collectors' && (
         <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, border: '1.5px solid #f0eefe', flex: '1 1 300px', maxWidth: 400 }}>
+          <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, border: '1.5px solid #f0eefe', flex: '1 1 300px', maxWidth: 400 }}>
             <h2 style={{ fontSize: 16, margin: '0 0 20px', color: 'var(--text-main)' }}>Assign Collector</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
@@ -502,7 +502,7 @@ export default function DailyFeesPage() {
               <Btn onClick={() => { if(!newColTid) toast.error('Select teacher'); else addCollector.mutate() }} loading={addCollector.isPending}><UserPlus size={16}/> Grant Access</Btn>
             </div>
           </div>
-          <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', flex: '2 1 400px', overflow: 'hidden' }}>
+          <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', flex: '2 1 400px', overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#faf5ff' }}>
@@ -553,7 +553,7 @@ export default function DailyFeesPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {debtorsData.length === 0 ? <div style={{ background: 'var(--bg-card)', padding: 40, textAlign: 'center', borderRadius: 12, color: 'var(--text-subtle)' }}>No students found</div> : debtorsData.map((cls) => (
-              <div key={cls.class_name} className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+              <div key={cls.class_name} className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
                 <div style={{ background: 'var(--bg-hover)', padding: '12px 16px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between' }}>
                   <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: 14 }}>{cls.class_name}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>Total Class Debt: {CUR(cls.total_owed)}</div>
@@ -562,7 +562,7 @@ export default function DailyFeesPage() {
                   <tbody>
                     {cls.students.map((stu: any) => (
                       <tr key={stu.id} style={{ borderBottom: '1px solid #f8fafc' }}>
-                        <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 500, color: 'var(--text-main)', width: '40%' }}>{stu.full_name}</td>
+                        <td style={{ padding: '10px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', width: '40%' }}>{stu.full_name}</td>
                         <td style={{ padding: '10px 16px', fontSize: 13, width: '30%' }}>
                           <span style={{ color: '#16a34a', fontWeight: 600 }}>Paid: {CUR(stu.paid)}</span>
                         </td>

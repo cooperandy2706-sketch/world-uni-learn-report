@@ -8,7 +8,7 @@ export default function PrivacyPolicyPage() {
         <div style={{ fontSize: 24, fontWeight: 800, color: '#4c1d95', letterSpacing: '-0.5px' }}>Nexora</div>
         <Link to="/" style={{ color: '#4c1d95', textDecoration: 'none', fontWeight: 600 }}>Back to Home</Link>
       </header>
-      <main style={{ maxWidth: 800, margin: '60px auto', background: '#fff', padding: 60, borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+      <main style={{ maxWidth: 800, margin: '60px auto', background: '#fff', padding: 60, borderRadius: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
         <h1 style={{ fontSize: 36, fontWeight: 800, color: '#1e293b', marginBottom: 20 }}>Privacy Policy</h1>
         <p style={{ color: '#64748b', marginBottom: 40 }}>Last updated: {new Date().toLocaleDateString()}</p>
 

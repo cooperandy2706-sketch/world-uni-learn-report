@@ -142,16 +142,16 @@ export default function RequisitionPage() {
         {isLoading ? (
           <div style={{ padding: 100, textAlign: 'center', color: '#94a3b8' }}>Loading requests...</div>
         ) : displayList.length === 0 ? (
-          <div style={{ padding: 80, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 24, border: '1.5px dashed #e2e8f0' }}>
+          <div style={{ padding: 80, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 12, border: '1.5px dashed #e2e8f0' }}>
             <ClipboardList size={48} color="#cbd5e1" style={{ marginBottom: 16 }} />
             <h3 style={{ fontSize: 18, fontWeight: 700, color: '#475569', margin: 0 }}>No Requisitions Found</h3>
             <p style={{ color: '#94a3b8', fontSize: 14, marginTop: 8 }}>Everything is up to date.</p>
           </div>
         ) : (
           displayList.map(r => (
-            <div key={r.id} className="req-card" style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div key={r.id} className="req-card" style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 20, flex: 1 }}>
-                <div style={{ width: 56, height: 56, borderRadius: 16, background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+                <div style={{ width: 56, height: 56, borderRadius: 8, background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
                   {r.status === 'pending' ? <Clock size={24} color="#f97316" /> : r.status === 'approved' ? <CheckCircle size={24} color="#10b981" /> : r.status === 'paid' ? <DollarSign size={24} color="#3b82f6" /> : <XCircle size={24} color="#ef4444" />}
                 </div>
                 <div>
@@ -245,7 +245,7 @@ export default function RequisitionPage() {
       {selectedReq && isPayModalOpen && (
         <Modal open={isPayModalOpen} onClose={() => setIsPayModalOpen(true)} title="Process Payment">
           <div style={{ padding: '10px 0' }}>
-            <div style={{ background: '#f8fafc', padding: 20, borderRadius: 16, marginBottom: 24 }}>
+            <div style={{ background: '#f8fafc', padding: 20, borderRadius: 8, marginBottom: 24 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: 8 }}>Paying To</div>
               <div style={{ fontSize: 18, fontWeight: 800, color: '#0f172a' }}>{(selectedReq as any).requested_user?.full_name}</div>
               <div style={{ fontSize: 24, fontWeight: 900, color: '#6d28d9', marginTop: 12 }}>{CUR(selectedReq.amount)}</div>

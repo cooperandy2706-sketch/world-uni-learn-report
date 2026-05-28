@@ -84,7 +84,7 @@ export const DailyInsightNotification: React.FC = () => {
 
           {!isExpanded && (
             <div style={{ marginTop: '8px' }}>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, fontWeight: 500 }}>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, fontWeight: 600 }}>
                 "{insight.quote.text.slice(0, 40)}..."
               </p>
               <span style={{ fontSize: '11px', color: '#7c3aed', fontWeight: 600 }}>Click to read more</span>

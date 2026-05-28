@@ -520,7 +520,7 @@ export default function ReportsPage() {
               <h2 style={{ fontSize:26, fontWeight:800, color:'#1e1b4b', margin:0, letterSpacing:'-0.02em' }}>
                 📄 Report Cards
               </h2>
-              <p style={{ fontSize:13, color: 'var(--text-muted)', marginTop:4, fontWeight:500 }}>
+              <p style={{ fontSize:13, color: 'var(--text-muted)', marginTop:4, fontWeight: 600 }}>
                 Generate, manage and print student report cards for the current academic period.
               </p>
             </div>
@@ -533,7 +533,7 @@ export default function ReportsPage() {
           <div style={{
             display:'flex', alignItems:'center', gap:10, flexWrap:'wrap',
             background:'linear-gradient(135deg,#1e1b4b,#312e81)',
-            borderRadius:16, padding:'12px 20px',
+            borderRadius: 8, padding:'12px 20px',
             boxShadow:'0 6px 20px -4px rgba(30,27,75,0.3)'
           }}>
             <span style={{ fontSize:12, fontWeight:800, color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'.08em', marginRight:4 }}>
@@ -593,7 +593,7 @@ export default function ReportsPage() {
 
 
         {/* ── Controls ── */}
-        <div style={{ background: 'var(--bg-card)', borderRadius:16, padding:'18px 20px', border:'1.5px solid #f0eefe', marginBottom:20, boxShadow:'0 1px 4px rgba(109,40,217,.06)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding:'18px 20px', border:'1.5px solid #f0eefe', marginBottom:20, boxShadow:'0 1px 4px rgba(109,40,217,.06)' }}>
           <div style={{ display:'flex', flexWrap:'wrap', gap:12, alignItems:'flex-end' }}>
             <div style={{ flex:'1 1 200px' }}>
               <label style={{ display:'block', fontSize:11, fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', color: 'var(--text-muted)', marginBottom:5 }}>Select Class</label>
@@ -633,7 +633,7 @@ export default function ReportsPage() {
 
         {/* ── Empty states ── */}
         {!selectedClass && (
-          <div style={{ background: 'var(--bg-card)', borderRadius:16, padding:'60px 20px', textAlign:'center', border:'1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding:'60px 20px', textAlign:'center', border:'1.5px solid #f0eefe' }}>
             <div style={{ fontSize:52, marginBottom:12 }}>📄</div>
             <h3 style={{ fontFamily:'"Playfair Display",serif', fontSize:18, fontWeight:700, color: 'var(--text-main)', marginBottom:6 }}>Select a class to begin</h3>
             <p style={{ fontSize:13, color: 'var(--text-subtle)' }}>Choose a class above to view and manage report cards.</p>
@@ -645,7 +645,7 @@ export default function ReportsPage() {
           </div>
         )}
         {selectedClass && !isLoading && (reports as any[]).length === 0 && (
-          <div style={{ background: 'var(--bg-card)', borderRadius:16, padding:'60px 20px', textAlign:'center', border:'1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding:'60px 20px', textAlign:'center', border:'1.5px solid #f0eefe' }}>
             <div style={{ fontSize:52, marginBottom:12 }}>📋</div>
             <h3 style={{ fontFamily:'"Playfair Display",serif', fontSize:18, fontWeight:700, color: 'var(--text-main)', marginBottom:6 }}>No reports for {selectedClassName}</h3>
             <Btn onClick={handleGenerate} loading={generateReports.isPending}>⚡ Generate Now</Btn>
@@ -677,7 +677,7 @@ export default function ReportsPage() {
             </div>
 
             {/* Table */}
-            <div style={{ background: 'var(--bg-card)', borderRadius:16, border:'1.5px solid #f0eefe', overflow:'hidden', boxShadow:'0 1px 4px rgba(109,40,217,.06)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border:'1.5px solid #f0eefe', overflow:'hidden', boxShadow:'0 1px 4px rgba(109,40,217,.06)' }}>
               <table style={{ width:'100%', borderCollapse:'collapse' }}>
                 <thead>
                   <tr style={{ background:'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom:'1.5px solid #ede9fe' }}>
@@ -708,7 +708,7 @@ export default function ReportsPage() {
                         <td style={{ padding:'11px 14px' }}>
                           <span style={{ fontSize:15, fontWeight:800, color:g.color }}>{(r.average_score ?? 0).toFixed(1)}%</span>
                         </td>
-                        <td style={{ padding:'11px 14px', fontSize:13, color: 'var(--text-main)', fontWeight:500 }}>
+                        <td style={{ padding:'11px 14px', fontSize:13, color: 'var(--text-main)', fontWeight: 600 }}>
                           {ordinal(r.overall_position ?? 0)} / {r.total_students}
                         </td>
                         <td style={{ padding:'11px 14px' }}>
@@ -717,7 +717,7 @@ export default function ReportsPage() {
                         <td style={{ padding:'11px 14px' }}>
                           <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
                             <button className="rpt-act" onClick={() => { setAttModal(r); setAttData({ total_days:'', days_present:'' }) }}
-                              style={{ padding:'4px 8px', borderRadius:7, border: '1.5px solid var(--border-color)', background: 'var(--bg-input)', fontSize:11, cursor:'pointer', transition:'all .15s', color: 'var(--text-main)', fontWeight:500 }}>
+                              style={{ padding:'4px 8px', borderRadius:7, border: '1.5px solid var(--border-color)', background: 'var(--bg-input)', fontSize:11, cursor:'pointer', transition:'all .15s', color: 'var(--text-main)', fontWeight: 600 }}>
                               📋 Att.
                             </button>
                             <button className="rpt-act" onClick={() => openFeesModal(r)}
@@ -1062,7 +1062,7 @@ function buildClassHTML(reports: any[], className: string, school: any, term: an
       <div style="border-top:${isBW?'3px solid #000':'2px solid #1e3a8a'};padding-top:7px">
         ${(settings as any)?.next_term_date?`<p style="font-size:10px;font-weight:700;color:${isBW?'#000':'#1e3a8a'};margin-bottom:2px">📅 Next Term: ${(settings as any).next_term_date}</p>`:''}
         ${(settings as any)?.school_fees_info?`<p style="font-size:10px;color:#000;margin-bottom:2px;font-weight:600">💰 Fees Info: ${(settings as any).school_fees_info}</p>`:''}
-        <p style="font-size:9px;color:${isBW?'#000':'#94a3b8'};margin-top:4px;text-align:center;font-weight:500">Generated by Nexora Report · ${school?.name??''} · ${(term as any)?.name??''} ${(year as any)?.name??''}</p>
+        <p style="font-size:9px;color:${isBW?'#000':'#94a3b8'};margin-top:4px;text-align:center;font-weight: 600">Generated by Nexora Report · ${school?.name??''} · ${(term as any)?.name??''} ${(year as any)?.name??''}</p>
       </div>
     </div>`
   }).join('')

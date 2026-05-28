@@ -151,7 +151,7 @@ export default function ProprietorDashboard() {
           backdrop-filter: blur(24px);
           -webkit-backdrop-filter: blur(24px);
           border: 1px solid rgba(255, 255, 255, 0.8);
-          border-radius: 24px;
+          border-radius: 12px;
           box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1);
           padding: 32px;
           animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -241,7 +241,7 @@ export default function ProprietorDashboard() {
           <h1 style={{ fontSize: 36, fontWeight: 800, color: '#0f172a', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
             Executive Overview
           </h1>
-          <p style={{ fontSize: 16, color: '#64748b', margin: 0, fontWeight: 500 }}>
+          <p style={{ fontSize: 16, color: '#64748b', margin: 0, fontWeight: 600 }}>
             {userSchool?.name || 'Nexora'} • {year?.name} • {term?.name}
           </p>
         </div>
@@ -251,7 +251,7 @@ export default function ProprietorDashboard() {
           
           <div className="exec-card" style={{ animationDelay: '0.1s' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div style={{ width: 48, height: 48, borderRadius: 16, background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 8, background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb' }}>
                 <Users size={24} strokeWidth={2.5} />
               </div>
               <span style={{ background: '#ecfdf5', color: '#059669', padding: '4px 10px', borderRadius: 99, fontSize: 12, fontWeight: 700 }}>Active</span>
@@ -259,19 +259,19 @@ export default function ProprietorDashboard() {
             <div className="metric-value" style={{ color: '#0f172a' }}>
               <AnimNum to={stats.students} />
             </div>
-            <div style={{ fontSize: 15, color: '#64748b', fontWeight: 500 }}>Total Enrolled Students</div>
+            <div style={{ fontSize: 15, color: '#64748b', fontWeight: 600 }}>Total Enrolled Students</div>
           </div>
 
           <div className="exec-card" style={{ animationDelay: '0.2s' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div style={{ width: 48, height: 48, borderRadius: 16, background: 'linear-gradient(135deg, #f5f3ff, #ede9fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7c3aed' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 8, background: 'linear-gradient(135deg, #f5f3ff, #ede9fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7c3aed' }}>
                 <UserCheck size={24} strokeWidth={2.5} />
               </div>
             </div>
             <div className="metric-value" style={{ color: '#0f172a' }}>
               <AnimNum to={stats.teachers + stats.staff} />
             </div>
-            <div style={{ fontSize: 15, color: '#64748b', fontWeight: 500 }}>Total Staff Members</div>
+            <div style={{ fontSize: 15, color: '#64748b', fontWeight: 600 }}>Total Staff Members</div>
             <div style={{ display: 'flex', gap: 12, marginTop: 12, fontSize: 13, color: '#94a3b8', fontWeight: 600 }}>
               <span>{stats.teachers} Teachers</span>
               <span>•</span>
@@ -282,7 +282,7 @@ export default function ProprietorDashboard() {
           <div className="exec-card" style={{ animationDelay: '0.3s', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: '#fff', border: 'none' }}>
             <div style={{ position: 'absolute', top: -20, right: -20, width: 150, height: 150, background: 'radial-gradient(circle, rgba(56,189,248,0.2) 0%, transparent 70%)', borderRadius: '50%' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 16, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#38bdf8' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 8, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#38bdf8' }}>
                 <Wallet size={24} strokeWidth={2.5} />
               </div>
               <span style={{ background: 'rgba(56,189,248,0.2)', color: '#38bdf8', padding: '4px 10px', borderRadius: 99, fontSize: 12, fontWeight: 700 }}>6 Months</span>
@@ -290,7 +290,7 @@ export default function ProprietorDashboard() {
             <div className="metric-value" style={{ color: '#fff', position: 'relative', zIndex: 1 }}>
               <AnimNum prefix="GH₵ " to={stats.revenue} />
             </div>
-            <div style={{ fontSize: 15, color: '#94a3b8', fontWeight: 500, position: 'relative', zIndex: 1 }}>Gross Revenue</div>
+            <div style={{ fontSize: 15, color: '#94a3b8', fontWeight: 600, position: 'relative', zIndex: 1 }}>Gross Revenue</div>
           </div>
 
         </div>
@@ -302,7 +302,7 @@ export default function ProprietorDashboard() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h3 style={{ fontSize: 20, fontWeight: 800, margin: '0 0 4px', color: '#0f172a' }}>Financial Health</h3>
-                <p style={{ margin: 0, color: '#64748b', fontSize: 14, fontWeight: 500 }}>Revenue vs Expenses (Last 6 Months)</p>
+                <p style={{ margin: 0, color: '#64748b', fontSize: 14, fontWeight: 600 }}>Revenue vs Expenses (Last 6 Months)</p>
               </div>
               <div style={{ display: 'flex', gap: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#64748b' }}>
@@ -345,7 +345,7 @@ export default function ProprietorDashboard() {
               ].map(link => (
                 <Link key={link.to} to={link.to} style={{ 
                   display: 'flex', alignItems: 'center', gap: 16, padding: '16px', 
-                  background: 'rgba(255,255,255,0.5)', borderRadius: 16, textDecoration: 'none',
+                  background: 'rgba(255,255,255,0.5)', borderRadius: 8, textDecoration: 'none',
                   border: '1px solid rgba(0,0,0,0.05)', transition: 'all 0.2s',
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.transform = 'translateX(4px)' }}

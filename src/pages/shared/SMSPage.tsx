@@ -339,7 +339,7 @@ export default function SMSPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 24, alignItems: 'start' }}>
           
           {/* Main Area: Recipient Selection */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
             
             {/* Toolbar */}
             <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
@@ -425,7 +425,7 @@ export default function SMSPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             
             {/* Template Hints */}
-            <div style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', borderRadius: 16, padding: '18px', color: '#fff', boxShadow: '0 4px 12px rgba(109,40,217,0.2)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', borderRadius: 8, padding: '18px', color: '#fff', boxShadow: '0 4px 12px rgba(109,40,217,0.2)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                 <Smartphone size={20} />
                 <h3 style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>Message Placeholders</h3>
@@ -446,7 +446,7 @@ export default function SMSPage() {
             </div>
 
             {/* Composer */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '18px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '18px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
               <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Compose Message</label>
               <textarea 
                 value={message}
@@ -464,7 +464,7 @@ export default function SMSPage() {
             </div>
 
             {/* Preview */}
-            <div style={{ background: '#f5f3ff', borderRadius: 16, border: '1.5px solid #ddd6fe', padding: '15px' }}>
+            <div style={{ background: '#f5f3ff', borderRadius: 8, border: '1.5px solid #ddd6fe', padding: '15px' }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: '#6d28d9', textTransform: 'uppercase', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
                 <Loader2 size={12} /> Personalized Preview
               </div>
@@ -483,7 +483,7 @@ export default function SMSPage() {
 
             {/* Progress / Send Button */}
             {isSending ? (
-              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '18px', textAlign: 'center' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '18px', textAlign: 'center' }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 10 }}>Sending Messages...</div>
                 <div style={{ height: 6, background: 'var(--bg-hover)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
                   <div style={{ height: '100%', background: '#7c3aed', width: `${(progress.current / progress.total) * 100}%`, transition: 'width 0.3s ease' }} />

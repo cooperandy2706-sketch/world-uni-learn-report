@@ -80,26 +80,26 @@ export default function ProprietorStudents() {
         <h1 style={{ fontSize: 32, fontWeight: 800, margin: '0 0 32px', color: '#0f172a' }}>Student Demographics</h1>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24, marginBottom: 32 }}>
-          <div style={{ background: 'var(--bg-card)', border: '1px solid #e2e8f0', borderRadius: 20, padding: 24 }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid #e2e8f0', borderRadius: 8, padding: 24 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Students</div>
             <div style={{ fontSize: 42, fontWeight: 800, color: '#0f172a', margin: '8px 0 0' }}>{studentStats.total}</div>
           </div>
-          <div style={{ background: 'var(--bg-card)', border: '1px solid #e2e8f0', borderRadius: 20, padding: 24 }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid #e2e8f0', borderRadius: 8, padding: 24 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Enrollment</div>
             <div style={{ fontSize: 42, fontWeight: 800, color: '#10b981', margin: '8px 0 0' }}>{studentStats.active}</div>
           </div>
-          <div style={{ background: 'var(--bg-card)', border: '1px solid #e2e8f0', borderRadius: 20, padding: 24 }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid #e2e8f0', borderRadius: 8, padding: 24 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Inactive / Alumni</div>
             <div style={{ fontSize: 42, fontWeight: 800, color: '#94a3b8', margin: '8px 0 0' }}>{studentStats.inactive}</div>
           </div>
         </div>
 
-        <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1px solid #e2e8f0', padding: 32 }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1px solid #e2e8f0', padding: 32 }}>
           <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 24px' }}>Distribution by Class</h3>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
             {studentStats.byClass.map(c => (
-              <div key={c.name} style={{ background: '#f8fafc', padding: '16px 20px', borderRadius: 16, border: '1px solid #f1f5f9' }}>
+              <div key={c.name} style={{ background: '#f8fafc', padding: '16px 20px', borderRadius: 8, border: '1px solid #f1f5f9' }}>
                 <div style={{ fontSize: 14, color: '#475569', fontWeight: 600, marginBottom: 4 }}>{c.name}</div>
                 <div style={{ fontSize: 24, fontWeight: 800, color: '#0f172a' }}>{c.count}</div>
               </div>

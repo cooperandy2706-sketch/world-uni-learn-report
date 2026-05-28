@@ -111,7 +111,7 @@ export default function TeacherLeavePage() {
 
         {/* Form */}
         {showForm && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '24px 32px', marginBottom: 32, boxShadow: '0 8px 32px rgba(0,0,0,0.04)', animation: 'fadeUp 0.3s ease both' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '24px 32px', marginBottom: 32, boxShadow: '0 8px 32px rgba(0,0,0,0.04)', animation: 'fadeUp 0.3s ease both' }}>
             <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24, borderBottom: '1px solid var(--border-light)', paddingBottom: 16 }}>New Leave Request</h2>
             <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 24 }}>
               
@@ -155,8 +155,8 @@ export default function TeacherLeavePage() {
 
         {/* Requests List */}
         {requests.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', border: '1.5px dashed var(--border-color)', borderRadius: 24, padding: '60px 20px', textAlign: 'center', animation: 'fadeUp 0.4s ease 0.1s both' }}>
-            <div style={{ width: 64, height: 64, background: '#f5f3ff', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1.5px dashed var(--border-color)', borderRadius: 12, padding: '60px 20px', textAlign: 'center', animation: 'fadeUp 0.4s ease 0.1s both' }}>
+            <div style={{ width: 64, height: 64, background: '#f5f3ff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <Calendar size={32} color="#7c3aed" />
             </div>
             <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' }}>No Leave Requests</h3>
@@ -167,7 +167,7 @@ export default function TeacherLeavePage() {
             {requests.map((req, i) => {
               const statusInfo = getStatusDisplay(req.status)
               return (
-                <div key={req.id} className="req-card" style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1px solid #f0eefe', padding: 20, display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'space-between', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', animation: `fadeUp 0.4s ease ${0.1 + i * 0.05}s both` }}>
+                <div key={req.id} className="req-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1px solid #f0eefe', padding: 20, display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'space-between', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', animation: `fadeUp 0.4s ease ${0.1 + i * 0.05}s both` }}>
                   
                   <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
                     <div style={{ width: 48, height: 48, borderRadius: 14, background: statusInfo.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: statusInfo.color, flexShrink: 0 }}>
@@ -193,7 +193,7 @@ export default function TeacherLeavePage() {
 
                   {/* Right side info (Substitute & Admin notes) */}
                   {(req.substitute || req.admin_notes) && (
-                    <div style={{ minWidth: 240, flex: 1, maxWidth: 400, background: '#f8fafc', borderRadius: 16, padding: 16, border: '1px solid #f1f5f9' }}>
+                    <div style={{ minWidth: 240, flex: 1, maxWidth: 400, background: '#f8fafc', borderRadius: 8, padding: 16, border: '1px solid #f1f5f9' }}>
                       {req.substitute && (
                         <div style={{ marginBottom: req.admin_notes ? 12 : 0 }}>
                           <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8', marginBottom: 4 }}>Assigned Substitute</div>

@@ -416,7 +416,7 @@ export default function BECEMasterPage() {
     <div style={{ fontFamily: '"DM Sans", sans-serif', animation: '_fadeIn 0.5s ease' }}>
       <style>{`
         @keyframes _fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .master-grid-container { overflow-x: auto; background: #fff; border-radius: 20px; border: 1.5px solid ${T.border}; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        .master-grid-container { overflow-x: auto; background: #fff; border-radius: 8px; border: 1.5px solid ${T.border}; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
         .grid-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .grid-table th, .grid-table td { border-bottom: 1px solid ${T.border}; border-right: 1px solid ${T.border}; padding: 10px 12px; }
         .grid-header-actions { width: 60px; text-align: center; background: ${T.bg}; position: sticky; left: 0; z-index: 5; border-right: 2px solid ${T.border}; }
@@ -521,7 +521,7 @@ export default function BECEMasterPage() {
       </div>
 
       {/* Selectors & Search */}
-      <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 20, border: `1.5px solid ${T.border}`, marginBottom: 24, display: 'flex', gap: 20, alignItems: 'center' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 20, border: `1.5px solid ${T.border}`, marginBottom: 24, display: 'flex', gap: 20, alignItems: 'center' }}>
         <div style={{ flex: 1 }}>
           <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: T.muted, textTransform: 'uppercase', marginBottom: 6 }}>Class</label>
           <select 
@@ -668,7 +668,7 @@ export default function BECEMasterPage() {
           </table>
         </div>
       ) : (
-        <div style={{ height: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', borderRadius: 20, border: `1.5px solid ${T.border}` }}>
+        <div style={{ height: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', borderRadius: 8, border: `1.5px solid ${T.border}` }}>
           <Grid size={48} color={T.muted} style={{ marginBottom: 16, opacity: 0.5 }} />
           <h3 style={{ fontSize: 18, fontWeight: 700, color: T.slate, margin: '0 0 8px' }}>Select a Class</h3>
           <p style={{ color: T.muted, fontSize: 14 }}>Pick a class to load the master entry grid.</p>

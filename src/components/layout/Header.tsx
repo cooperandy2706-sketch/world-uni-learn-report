@@ -309,7 +309,7 @@ function NavItem({ group }: { group: any }) {
               key={item.to}
               onClick={() => { navigate(item.to); setOpen(false) }}
               style={{
-                padding: '9px 14px', borderRadius: 10, fontSize: 13, fontWeight: 500,
+                padding: '9px 14px', borderRadius: 10, fontSize: 13, fontWeight: 600,
                 color: 'var(--text-main)', cursor: 'pointer', transition: 'all 0.15s',
               }}
               onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)'; e.currentTarget.style.color = '#1a56db' }}
@@ -743,7 +743,7 @@ export default function Header() {
             {showResults && (
               <div style={{
                 position: 'absolute', top: 48, right: 0, width: 340, background: 'var(--bg-card)',
-                borderRadius: 20, border: '1px solid var(--border-color)',
+                borderRadius: 8, border: '1px solid var(--border-color)',
                 boxShadow: '0 20px 40px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06)',
                 padding: '8px', zIndex: 9999, animation: 'fadeDown 0.15s ease',
                 overflow: 'hidden',
@@ -763,7 +763,7 @@ export default function Header() {
                         onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                       >
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, flexShrink: 0 }}>🕐</div>
-                        <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 500, flex: 1 }}>{r}</span>
+                        <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 600, flex: 1 }}>{r}</span>
                         <span style={{ fontSize: 11, color: '#d1d5db' }}>↵</span>
                       </div>
                     ))}
@@ -816,7 +816,7 @@ export default function Header() {
                               <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: `${r.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, border: `1px solid ${r.color}25` }}>{r.icon}</div>
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{r.label}</div>
-                                <div style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 500 }}>{r.subtitle}</div>
+                                <div style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 600 }}>{r.subtitle}</div>
                               </div>
                               <div style={{ fontSize: 10, color: r.color, fontWeight: 800, background: `${r.color}10`, padding: '2px 8px', borderRadius: 99 }}>Go</div>
                             </div>

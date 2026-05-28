@@ -122,7 +122,7 @@ export default function ParentAttendancePage() {
               <button key={ward.id} className="att-tab"
                 onClick={() => setSelectedWardId(ward.id)}
                 style={{
-                  padding: '9px 20px', borderRadius: 24, fontSize: 13, fontWeight: 600,
+                  padding: '9px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600,
                   background: selectedWardId === ward.id ? '#7c3aed' : '#fff',
                   color: selectedWardId === ward.id ? '#fff' : '#374151',
                   border: `1.5px solid ${selectedWardId === ward.id ? '#7c3aed' : '#e5e7eb'}`,
@@ -136,7 +136,7 @@ export default function ParentAttendancePage() {
         )}
 
         {wards.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: '50px 30px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '50px 30px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>👨‍👩‍👦</div>
             <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No children linked</h3>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Contact school administration to link your children.</p>
@@ -149,7 +149,7 @@ export default function ParentAttendancePage() {
           <>
             {/* Ward name */}
             {selectedWard && (
-              <div style={{ background: 'linear-gradient(135deg,#faf5ff,#ede9fe)', border: '1.5px solid #e9d5ff', borderRadius: 16, padding: '16px 20px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ background: 'linear-gradient(135deg,#faf5ff,#ede9fe)', border: '1.5px solid #e9d5ff', borderRadius: 8, padding: '16px 20px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
                 <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#fff', fontWeight: 800 }}>
                   {selectedWard.full_name.charAt(0)}
                 </div>
@@ -182,7 +182,7 @@ export default function ParentAttendancePage() {
             <div className="att-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 24 }}>
 
               {/* Calendar */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, border: '1.5px solid #f0eefe' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, border: '1.5px solid #f0eefe' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                   <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0 }}>Monthly View</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -228,7 +228,7 @@ export default function ParentAttendancePage() {
               </div>
 
               {/* Recent records */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column' }}>
                 <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: '0 0 16px' }}>Recent Records</h3>
                 <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {records.length === 0 ? (

@@ -87,7 +87,7 @@ export default function StudentAttendancePage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _sfu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        .att-card{background:#fff; border-radius:24px; border:1.5px solid #f0eefe; padding:24px; box-shadow:0 1px 4px rgba(109,40,217,.06)}
+        .att-card{background:#fff; border-radius: 12px; border:1.5px solid #f0eefe; padding:24px; box-shadow:0 1px 4px rgba(109,40,217,.06)}
         .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:8px}
         .cal-day{aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:12px; font-size:13px; font-weight:600; position:relative}
         .cal-header{font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; text-align:center; padding-bottom:8px}
@@ -197,7 +197,7 @@ export default function StudentAttendancePage() {
                   <p style={{ fontSize: 13 }}>No records found for this term</p>
                 </div>
               ) : attendance.slice(0, 10).map((a, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: '#f8fafc', borderRadius: 16, border: '1px solid #f1f5f9' }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: '#f8fafc', borderRadius: 8, border: '1px solid #f1f5f9' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 32, height: 32, borderRadius: 8, background: a.status === 'present' ? '#f0fdf4' : a.status === 'absent' ? '#fef2f2' : '#fffbeb', color: a.status === 'present' ? '#16a34a' : a.status === 'absent' ? '#dc2626' : '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {a.status === 'present' ? <CheckCircle size={16} /> : a.status === 'absent' ? <XCircle size={16} /> : <Clock size={16} />}

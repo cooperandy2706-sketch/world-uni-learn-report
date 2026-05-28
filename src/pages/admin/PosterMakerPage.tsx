@@ -1248,7 +1248,7 @@ export default function PosterMakerPage() {
         .tab-btn.active{background:#6d28d9;color:#fff}
         .tab-btn:not(.active){background:#f3f4f6;color:#6b7280}
         .tab-btn:not(.active):hover{background:#e9e9f0;color:#374151}
-        .ctrl-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;border:1px solid #e5e7eb;background:#fff;font-size:12px;cursor:pointer;font-weight:500;color:#374151;transition:all .12s}
+        .ctrl-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;border:1px solid #e5e7eb;background:#fff;font-size:12px;cursor:pointer;font-weight: 600;color:#374151;transition:all .12s}
         .ctrl-btn:hover{background:#f9fafb;border-color:#d1d5db}
         .ctrl-btn.danger:hover{background:#fef2f2;border-color:#fca5a5;color:#dc2626}
         .ctrl-btn.primary{background:#6d28d9;color:#fff;border-color:#6d28d9}

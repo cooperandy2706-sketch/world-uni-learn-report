@@ -53,7 +53,7 @@ export default function ParentDashboard() {
         </h2>
         
         {wards.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 30, textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 30, textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>👨‍👩‍👦</div>
             <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No children linked yet</h3>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
@@ -83,49 +83,49 @@ export default function ParentDashboard() {
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           <div className="action-card" onClick={() => navigate('/parent/billing')}
-            style={{ background: 'linear-gradient(135deg,#fdf4ff,#fae8ff)', borderRadius: 16, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #f5d0fe' }}>
+            style={{ background: 'linear-gradient(135deg,#fdf4ff,#fae8ff)', borderRadius: 8, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #f5d0fe' }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>💳</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#86198f' }}>Pay Fees</div>
             <div style={{ fontSize: 12, color: '#a21caf', marginTop: 2 }}>View outstanding</div>
           </div>
           
           <div className="action-card" onClick={() => navigate('/parent/academics')}
-            style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', borderRadius: 16, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #bfdbfe' }}>
+            style={{ background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', borderRadius: 8, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #bfdbfe' }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>📊</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#1e40af' }}>Results</div>
             <div style={{ fontSize: 12, color: '#1d4ed8', marginTop: 2 }}>Report cards</div>
           </div>
 
           <div className="action-card" onClick={() => navigate('/parent/messages')}
-            style={{ background: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', borderRadius: 16, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #bbf7d0' }}>
+            style={{ background: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', borderRadius: 8, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #bbf7d0' }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>💬</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#166534' }}>Messages</div>
             <div style={{ fontSize: 12, color: '#15803d', marginTop: 2 }}>Contact teachers</div>
           </div>
           
           <div className="action-card" onClick={() => navigate('/parent/calendar')}
-            style={{ background: 'linear-gradient(135deg,#fff7ed,#ffedd5)', borderRadius: 16, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #fed7aa' }}>
+            style={{ background: 'linear-gradient(135deg,#fff7ed,#ffedd5)', borderRadius: 8, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #fed7aa' }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>📅</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#9a3412' }}>Calendar</div>
             <div style={{ fontSize: 12, color: '#c2410c', marginTop: 2 }}>School events</div>
           </div>
 
           <div className="action-card" onClick={() => navigate('/parent/exeats')}
-            style={{ background: 'linear-gradient(135deg,#fef2f2,#fee2e2)', borderRadius: 16, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #fecaca' }}>
+            style={{ background: 'linear-gradient(135deg,#fef2f2,#fee2e2)', borderRadius: 8, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #fecaca' }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>🚪</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#b91c1c' }}>Exeats</div>
             <div style={{ fontSize: 12, color: '#dc2626', marginTop: 2 }}>Request leave</div>
           </div>
 
           <div className="action-card" onClick={() => navigate('/parent/attendance')}
-            style={{ background: 'linear-gradient(135deg,#f0f9ff,#e0f2fe)', borderRadius: 16, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #bae6fd' }}>
+            style={{ background: 'linear-gradient(135deg,#f0f9ff,#e0f2fe)', borderRadius: 8, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #bae6fd' }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>📋</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#0369a1' }}>Attendance</div>
             <div style={{ fontSize: 12, color: '#0284c7', marginTop: 2 }}>Track daily presence</div>
           </div>
           
           <div className="action-card" onClick={() => navigate('/parent/news')}
-            style={{ background: 'linear-gradient(135deg,#f8fafc,#f1f5f9)', borderRadius: 16, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #e2e8f0' }}>
+            style={{ background: 'linear-gradient(135deg,#f8fafc,#f1f5f9)', borderRadius: 8, padding: 20, cursor: 'pointer', transition: 'all 0.15s', border: '1.5px solid #e2e8f0' }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>📰</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#334155' }}>News</div>
             <div style={{ fontSize: 12, color: '#475569', marginTop: 2 }}>School updates</div>

@@ -45,7 +45,7 @@ export default function ExeatPage() {
         <p style={{ color: '#64748b', margin: 0, fontSize: 14 }}>Review and approve student leave requests.</p>
       </div>
 
-      <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#fcfaff', borderBottom: '1.5px solid #f0eefe' }}>

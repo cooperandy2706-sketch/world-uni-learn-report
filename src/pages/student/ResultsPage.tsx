@@ -216,7 +216,7 @@ export default function StudentResultsPage() {
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading results…</p>
           </div>
         ) : !studentData ? (
-            <div style={{ padding: '80px 20px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe' }}>
+            <div style={{ padding: '80px 20px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe' }}>
                <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
                <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>Student record not found</h3>
             </div>
@@ -254,7 +254,7 @@ export default function StudentResultsPage() {
                   sub: 'Term presence rate'
                 },
               ].map(stat => (
-                <div key={stat.label} style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: 20, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div key={stat.label} style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: 8, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column', gap: 12 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 40, height: 40, borderRadius: 12, background: stat.color + '12', color: stat.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
                       {stat.icon}
@@ -263,7 +263,7 @@ export default function StudentResultsPage() {
                   </div>
                   <div>
                     <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>{stat.value}</div>
-                    <div style={{ fontSize: 11, color: '#64748b', marginTop: 4, fontWeight: 500 }}>{stat.sub}</div>
+                    <div style={{ fontSize: 11, color: '#64748b', marginTop: 4, fontWeight: 600 }}>{stat.sub}</div>
                   </div>
                 </div>
               ))}
@@ -273,7 +273,7 @@ export default function StudentResultsPage() {
               
               {/* Left Column: Subject Analysis */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(109,40,217,.04)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(109,40,217,.04)' }}>
                   <div style={{ padding: '20px 24px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <span style={{ fontSize: 18 }}>📊</span>
@@ -299,7 +299,7 @@ export default function StudentResultsPage() {
                           return (
                             <div key={i} style={{ 
                               background: isExpanded ? '#fafaff' : '#fff', 
-                              borderRadius: 16, 
+                              borderRadius: 8, 
                               border: `1.5px solid ${isExpanded ? '#ddd6fe' : '#f0eefe'}`, 
                               padding: '16px',
                               cursor: 'pointer',
@@ -363,7 +363,7 @@ export default function StudentResultsPage() {
                 </div>
 
                 {/* Grade scale legend */}
-                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_rfade .5s ease .3s both' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', animation: '_rfade .5s ease .3s both' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <span>📖</span>
                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Grade Scale</h3>
@@ -406,7 +406,7 @@ export default function StudentResultsPage() {
                     />
                   </div>
                 ) : (
-                  <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, textAlign: 'center' }}>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', padding: 24, textAlign: 'center' }}>
                     <div style={{ fontSize: 32, marginBottom: 12 }}>📄</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>Report Card Pending</div>
                     <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 4 }}>Official positions will be released soon.</div>
@@ -414,7 +414,7 @@ export default function StudentResultsPage() {
                 )}
 
                 {/* Recommendations Section */}
-                <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
                     <span style={{ fontSize: 20 }}>💡</span>
                     <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0 }}>Action Plan</h3>
@@ -424,7 +424,7 @@ export default function StudentResultsPage() {
                     {actionPlans.length === 0 ? (
                       <div style={{ fontSize: 12, color: 'var(--text-subtle)' }}>Analysis steps will appear here.</div>
                     ) : actionPlans.map((plan, i) => (
-                      <div key={i} style={{ background: plan.color + '05', padding: '16px', borderRadius: 16, border: `1.5px solid ${plan.color}20` }}>
+                      <div key={i} style={{ background: plan.color + '05', padding: '16px', borderRadius: 8, border: `1.5px solid ${plan.color}20` }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
                           <span style={{ fontSize: 18 }}>{plan.icon}</span>
                           <div style={{ fontWeight: 700, fontSize: 13, color: plan.color }}>{plan.title}</div>

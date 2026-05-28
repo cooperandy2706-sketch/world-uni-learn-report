@@ -219,7 +219,7 @@ export default function StaffVaultPage() {
                             className="glass-modal"
                             style={{ 
                                 width: '100%', maxWidth: '1000px', height: '85vh', 
-                                borderRadius: 24, border: '1px solid rgba(255,255,255,0.5)',
+                                borderRadius: 12, border: '1px solid rgba(255,255,255,0.5)',
                                 display: 'flex', flexDirection: 'column', overflow: 'hidden',
                                 boxShadow: '0 24px 48px rgba(0,0,0,0.2)'
                             }}
@@ -227,7 +227,7 @@ export default function StaffVaultPage() {
                             {/* Modal Header */}
                             <div style={{ padding: '24px 32px', background: 'rgba(255,255,255,0.8)', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                                    <div style={{ background: '#7c3aed', color: 'white', padding: 12, borderRadius: 16 }}>
+                                    <div style={{ background: '#7c3aed', color: 'white', padding: 12, borderRadius: 8 }}>
                                         <FolderOpen size={28} />
                                     </div>
                                     <div>
@@ -261,7 +261,7 @@ export default function StaffVaultPage() {
                                                     style={{ 
                                                         background: isActive ? '#ede9fe' : 'white',
                                                         border: isActive ? '1.5px solid #c4b5fd' : '1.5px solid rgba(0,0,0,0.05)',
-                                                        borderRadius: 16, padding: '16px', cursor: 'pointer',
+                                                        borderRadius: 8, padding: '16px', cursor: 'pointer',
                                                         display: 'flex', alignItems: 'center', gap: 16,
                                                         transition: 'all 0.2s'
                                                     }}
@@ -366,7 +366,7 @@ export default function StaffVaultPage() {
                                         )}
 
                                         <div style={{ flex: 1, padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-                                            <div style={{ width: 100, height: 100, borderRadius: 24, background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginBottom: 24 }}>
+                                            <div style={{ width: 100, height: 100, borderRadius: 12, background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginBottom: 24 }}>
                                                 <FileText size={48} color="#94a3b8" />
                                             </div>
                                             <h4 style={{ fontSize: 18, fontWeight: 700, color: '#1e0646', margin: '0 0 8px' }}>File Preview Unavailable</h4>
@@ -383,7 +383,7 @@ export default function StaffVaultPage() {
             {/* Admin Upload Modal */}
             {showUploadModal && (
                 <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, backdropFilter: 'blur(8px)', padding: 16 }}>
-                    <div className="glass-modal" style={{ width: '100%', maxWidth: '450px', padding: '32px', borderRadius: 24, boxShadow: '0 24px 48px rgba(0,0,0,0.2)' }}>
+                    <div className="glass-modal" style={{ width: '100%', maxWidth: '450px', padding: '32px', borderRadius: 12, boxShadow: '0 24px 48px rgba(0,0,0,0.2)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24, borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: 16 }}>
                             <div>
                                 <h2 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: '#1e0646' }}>Upload Locked Document</h2>

@@ -95,7 +95,7 @@ export default function ScannerPage() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800;900&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'DM Sans', sans-serif; background: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .badge { width: 320px; border: 3px solid #0f172a; border-radius: 16px; overflow: hidden; page-break-inside: avoid; }
+        .badge { width: 320px; border: 3px solid #0f172a; border-radius: 8px; overflow: hidden; page-break-inside: avoid; }
         .badge-header { background: #0f172a; color: #fff; padding: 14px 18px; text-align: center; }
         .badge-header .school { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; opacity: .7; margin-bottom: 2px; }
         .badge-header .visitor-tag { font-size: 22px; font-weight: 900; letter-spacing: .05em; }
@@ -502,8 +502,8 @@ export default function ScannerPage() {
         .sc-card { animation: sc_pop .4s cubic-bezier(.34,1.56,.64,1) forwards; }
         .sc-err { animation: sc_shake .4s ease; }
         #qr-reader { border: none !important; width: 100% !important; background: #000; position: relative; }
-        #qr-reader video { border-radius: 16px !important; width: 100% !important; object-fit: cover; }
-        .qr-hud { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px solid rgba(255,255,255,0.2); border-radius: 16px; pointer-events: none; z-index: 10; display: flex; align-items: center; justify-content: center; }
+        #qr-reader video { border-radius: 8px !important; width: 100% !important; object-fit: cover; }
+        .qr-hud { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px solid rgba(255,255,255,0.2); border-radius: 8px; pointer-events: none; z-index: 10; display: flex; align-items: center; justify-content: center; }
         .qr-line { position: absolute; left: 10%; right: 10%; height: 2px; background: rgba(34,197,94,0.5); box-shadow: 0 0 8px rgba(34,197,94,0.8); animation: sc_scan 2s linear infinite; }
         #qr-reader__dashboard { display: none !important; }
         @media (max-width: 480px) {
@@ -526,7 +526,7 @@ export default function ScannerPage() {
         </div>
 
         {/* Mode Toggle */}
-        <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 16, padding: 4, marginBottom: 20, gap: 4 }}>
+        <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 8, padding: 4, marginBottom: 20, gap: 4 }}>
           {[{ id: 'camera', label: '📷 Camera', icon: Camera }, { id: 'usb', label: '🔌 USB Scanner', icon: Usb }].map(({ id, label }) => (
             <button key={id} onClick={() => setMode(id as any)} style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', fontFamily: '"DM Sans",sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all .15s', background: mode === id ? '#fff' : 'transparent', color: mode === id ? '#0f172a' : '#64748b', boxShadow: mode === id ? '0 2px 12px rgba(0,0,0,0.1)' : 'none' }}>
               {label}
@@ -536,7 +536,7 @@ export default function ScannerPage() {
 
         {/* Camera Mode */}
         {mode === 'camera' && (
-          <div style={{ background: '#000', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 20, boxShadow: '0 4px 24px rgba(0,0,0,0.1)', position: 'relative' }}>
+          <div style={{ background: '#000', borderRadius: 12, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 20, boxShadow: '0 4px 24px rgba(0,0,0,0.1)', position: 'relative' }}>
             {cameraError ? (
               <div style={{ padding: '60px 20px', textAlign: 'center', color: '#fca5a5' }}>
                 <AlertTriangle size={48} style={{ marginBottom: 12, opacity: 0.5 }} />
@@ -549,7 +549,7 @@ export default function ScannerPage() {
                 <div id="qr-reader" />
                 <div className="qr-hud">
                   <div className="qr-line" />
-                  <div className="sc-qrbox" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'min(250px, 65vw)', height: 'min(250px, 65vw)', border: '2px solid #22c55e', borderRadius: 16, boxShadow: '0 0 0 4000px rgba(0,0,0,0.4)' }} />
+                  <div className="sc-qrbox" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'min(250px, 65vw)', height: 'min(250px, 65vw)', border: '2px solid #22c55e', borderRadius: 8, boxShadow: '0 0 0 4000px rgba(0,0,0,0.4)' }} />
                 </div>
               </div>
             )}
@@ -561,9 +561,9 @@ export default function ScannerPage() {
 
         {/* USB Mode */}
         {mode === 'usb' && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f1f5f9', padding: '28px', marginBottom: 20, boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f1f5f9', padding: '28px', marginBottom: 20, boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
             <div style={{ textAlign: 'center', marginBottom: 24 }}>
-              <div style={{ width: 72, height: 72, borderRadius: 20, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', fontSize: 36 }}>🔌</div>
+              <div style={{ width: 72, height: 72, borderRadius: 8, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', fontSize: 36 }}>🔌</div>
               <div style={{ fontSize: 16, fontWeight: 800, color: '#0f172a' }}>USB / Bluetooth Scanner Ready</div>
               <div style={{ fontSize: 12, color: '#64748b', marginTop: 6 }}>Scan a barcode or type ID manually below. Auto-submits after scan.</div>
             </div>
@@ -593,7 +593,7 @@ export default function ScannerPage() {
 
         {/* Error Card */}
         {errorMsg && !processing && !card && (
-          <div className="sc-err" style={{ background: '#fef2f2', border: '2px solid #fca5a5', borderRadius: 20, padding: '20px', display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 16 }}>
+          <div className="sc-err" style={{ background: '#fef2f2', border: '2px solid #fca5a5', borderRadius: 8, padding: '20px', display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 16 }}>
             <div style={{ width: 44, height: 44, borderRadius: 14, background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <XCircle size={24} color="#dc2626" />
             </div>
@@ -608,7 +608,7 @@ export default function ScannerPage() {
         {/* Scan Result Card */}
         {card && !processing && (
           <div className="sc-card" style={{
-            borderRadius: 24, padding: '24px',
+            borderRadius: 12, padding: '24px',
             background: cardType === 'success' ? dirColor.bg : '#fef2f2',
             border: `2px solid ${cardType === 'success' ? dirColor.border : '#fca5a5'}`,
             boxShadow: `0 12px 40px ${cardType === 'success' ? 'rgba(0,0,0,0.08)' : 'rgba(220,38,38,0.15)'}`,
@@ -738,7 +738,7 @@ export default function ScannerPage() {
       {printingVisitor && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}
           onClick={e => { if (e.target === e.currentTarget) setPrintingVisitor(null) }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, maxWidth: 360, width: '100%', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.3)', animation: 'ss_pop .2s ease' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, maxWidth: 360, width: '100%', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.3)', animation: 'ss_pop .2s ease' }}>
             <div style={{ background: '#0f172a', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,.5)', letterSpacing: '.08em', textTransform: 'uppercase' }}>Badge Preview</div>
@@ -810,7 +810,7 @@ function TodayStats({ schoolId }: { schoolId: string }) {
   }, [schoolId])
 
   return (
-    <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: '16px 20px' }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9', padding: '16px 20px' }}>
       <div style={{ fontSize: 12, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 12 }}>Today's Stats</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
         {[

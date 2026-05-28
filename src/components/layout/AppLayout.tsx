@@ -92,7 +92,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
               : 'You have an unpaid invoice that is past its due date. Please settle the outstanding balance to restore access to your dashboard.'
             }
           </p>
-          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', marginBottom: 24, width: '100%', maxWidth: 400 }}>
+          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 8, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', marginBottom: 24, width: '100%', maxWidth: 400 }}>
             <div style={{ fontSize: 13, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, marginBottom: 8 }}>Payment Instructions</div>
             <div style={{ fontSize: 16, color: '#1e0646', fontWeight: 600, marginBottom: 4 }}>Pay via Mobile Money to:</div>
             <div style={{ fontSize: 28, fontWeight: 800, color: '#f59e0b', letterSpacing: '0.05em', marginBottom: 16 }}>0532416607</div>

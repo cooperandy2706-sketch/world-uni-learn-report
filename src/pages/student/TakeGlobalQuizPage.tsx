@@ -192,7 +192,7 @@ export default function TakeGlobalQuizPage() {
   // PREP SCREEN
   if (status === 'prep') {
     return (
-      <div style={{ maxWidth: 640, margin: '60px auto', background: 'var(--bg-card)', borderRadius: 24, padding: 40, border: '1.5px solid #f0eefe', textAlign: 'center', boxShadow: '0 20px 50px rgba(109,40,217,0.1)' }}>
+      <div style={{ maxWidth: 640, margin: '60px auto', background: 'var(--bg-card)', borderRadius: 12, padding: 40, border: '1.5px solid #f0eefe', textAlign: 'center', boxShadow: '0 20px 50px rgba(109,40,217,0.1)' }}>
         <style>{`@media (max-width: 640px) { .resp-grid-2 { grid-template-columns: 1fr !important; } }`}</style>
         <div style={{ fontSize: 13, fontWeight: 800, color: '#f59e0b', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>🌏 Global Challenge</div>
         <div style={{ fontSize: 54, marginBottom: 20 }}>🎯</div>
@@ -200,11 +200,11 @@ export default function TakeGlobalQuizPage() {
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginBottom: 32, lineHeight: 1.6 }}>{quiz.description || 'Welcome to this global interactive quiz! Do your best and see how you score.'}</p>
         
         <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
-          <div style={{ background: '#f5f3ff', borderRadius: 16, padding: '20px 16px' }}>
+          <div style={{ background: '#f5f3ff', borderRadius: 8, padding: '20px 16px' }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 4, letterSpacing: '0.05em' }}>Questions</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: '#7c3aed' }}>{questions.length} Items</div>
           </div>
-          <div style={{ background: '#fffbeb', borderRadius: 16, padding: '20px 16px' }}>
+          <div style={{ background: '#fffbeb', borderRadius: 8, padding: '20px 16px' }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 4, letterSpacing: '0.05em' }}>Time Limit</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: '#d97706' }}>{quiz.duration_minutes > 0 ? `${quiz.duration_minutes} Mins` : 'Unlimited'}</div>
           </div>
@@ -212,7 +212,7 @@ export default function TakeGlobalQuizPage() {
 
         <button onClick={startQuiz} style={{ 
           width: '100%', padding: '18px', background: 'linear-gradient(135deg,#7c3aed,#5b21b6)', color: '#fff', 
-          border: 'none', borderRadius: 16, fontSize: 16, fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 24px rgba(109,40,217,0.3)', transition: 'transform 0.2s'
+          border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 24px rgba(109,40,217,0.3)', transition: 'transform 0.2s'
         }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.02)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
           🚀 Play Now
         </button>
@@ -229,11 +229,11 @@ export default function TakeGlobalQuizPage() {
       <div style={{ maxWidth: 700, margin: '40px auto 100px', fontFamily: '"DM Sans",sans-serif' }}>
         <style>{`@media (max-width: 640px) { .resp-grid-2 { grid-template-columns: 1fr !important; } }`}</style>
         {/* Results Banner */}
-        <div style={{ background: feedback.bg, borderRadius: 24, padding: '40px 30px', textAlign: 'center', marginBottom: 40, border: `2px solid ${feedback.color}30` }}>
+        <div style={{ background: feedback.bg, borderRadius: 12, padding: '40px 30px', textAlign: 'center', marginBottom: 40, border: `2px solid ${feedback.color}30` }}>
           <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 800, color: feedback.color, marginBottom: 12, marginTop: 0 }}>{feedback.title}</h1>
           <p style={{ fontSize: 15, color: `${feedback.color}cc`, marginBottom: 32, maxWidth: 500, margin: '0 auto 32px' }}>{feedback.msg}</p>
           
-          <div style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--bg-card)', borderRadius: 20, padding: '20px 40px', boxShadow: `0 12px 30px ${feedback.color}20` }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--bg-card)', borderRadius: 8, padding: '20px 40px', boxShadow: `0 12px 30px ${feedback.color}20` }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Final Score</div>
               <div style={{ fontSize: 48, fontWeight: 900, color: feedback.color, lineHeight: 1 }}>{score.earned} <span style={{ fontSize: 24, color: '#d1d5db' }}>/ {score.total}</span></div>
@@ -256,7 +256,7 @@ export default function TakeGlobalQuizPage() {
             const isCorrect = userAnswer === correctAns
 
             return (
-              <div key={q.id} style={{ background: 'var(--bg-card)', border: `1.5px solid ${isCorrect ? '#a7f3d0' : '#fecaca'}`, borderRadius: 16, padding: '20px 24px', position: 'relative', overflow: 'hidden' }}>
+              <div key={q.id} style={{ background: 'var(--bg-card)', border: `1.5px solid ${isCorrect ? '#a7f3d0' : '#fecaca'}`, borderRadius: 8, padding: '20px 24px', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: 6, background: isCorrect ? '#10b981' : '#ef4444' }} />
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
@@ -300,7 +300,7 @@ export default function TakeGlobalQuizPage() {
     <>
       <style>{`
         @keyframes _fade { from{opacity:0;transform:scale(0.98)} to{opacity:1;transform:scale(1)} }
-        .option-btn { transition: all 0.2s; border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; cursor: pointer; background: #fff; width: 100%; text-align: left; font-family: inherit; font-size: 15px; font-weight: 500; color: #374151; }
+        .option-btn { transition: all 0.2s; border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; cursor: pointer; background: #fff; width: 100%; text-align: left; font-family: inherit; font-size: 15px; font-weight: 600; color: #374151; }
         .option-btn:hover { border-color: #7c3aed; background: #faf5ff; transform: translateX(4px); }
         .option-btn.selected { border-color: #7c3aed; background: #f5f3ff; box-shadow: 0 4px 14px rgba(109,40,217,0.12); color: #6d28d9; font-weight: 700; border-width: 2px; }
         @media (max-width: 640px) { .resp-grid-2 { grid-template-columns: 1fr !important; } }
@@ -366,7 +366,7 @@ export default function TakeGlobalQuizPage() {
                 placeholder="Type your answer here..."
                 value={userAnswers[q.id] || ''}
                 onChange={e => handleSelect(q.id, e.target.value)}
-                style={{ width: '100%', padding: '20px 24px', fontSize: 18, border: '2px solid #7c3aed', borderRadius: 16, outline: 'none', background: '#faf5ff', boxShadow: 'inset 0 2px 4px rgba(109,40,217,0.05)', color: '#4c1d95', fontWeight: 600 }}
+                style={{ width: '100%', padding: '20px 24px', fontSize: 18, border: '2px solid #7c3aed', borderRadius: 8, outline: 'none', background: '#faf5ff', boxShadow: 'inset 0 2px 4px rgba(109,40,217,0.05)', color: '#4c1d95', fontWeight: 600 }}
              />
            )}
         </div>

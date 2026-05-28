@@ -51,7 +51,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
 
 function FieldGroup({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
       <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 18 }}>{icon}</span>
         <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{title}</h3>
@@ -380,7 +380,7 @@ export default function SettingsPage() {
             onMouseEnter={() => setLogoHov(true)}
             onMouseLeave={() => setLogoHov(false)}
             onClick={() => logoRef.current?.click()}
-            style={{ width: 72, height: 72, borderRadius: 16, flexShrink: 0, background: logoUrl ? 'transparent' : 'rgba(255,255,255,0.1)', border: '2px dashed rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', transition: 'all 0.2s', boxShadow: logoHov ? '0 0 0 4px rgba(245,158,11,0.3)' : 'none', position: 'relative', zIndex: 1 }}>
+            style={{ width: 72, height: 72, borderRadius: 8, flexShrink: 0, background: logoUrl ? 'transparent' : 'rgba(255,255,255,0.1)', border: '2px dashed rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', transition: 'all 0.2s', boxShadow: logoHov ? '0 0 0 4px rgba(245,158,11,0.3)' : 'none', position: 'relative', zIndex: 1 }}>
             {logoUrl ? (
               <img src={logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             ) : (
@@ -556,7 +556,7 @@ export default function SettingsPage() {
 
                   {/* LIVE PREVIEW PANEL */}
                   <div style={{ position: 'sticky', top: 20, height: 'fit-content' }}>
-                    <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(109,40,217,0.1)' }}>
+                    <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 4px 20px rgba(109,40,217,0.1)' }}>
                       <div style={{ padding: '12px 20px', borderBottom: '1px solid #faf5ff', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontSize: 16 }}>👁️</span>

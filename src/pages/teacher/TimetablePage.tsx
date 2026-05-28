@@ -93,7 +93,7 @@ export default function TeacherTimetablePage(){
         </div>
 
         {/* Today's classes */}
-        <div style={{background:'linear-gradient(135deg,#2e1065,#4c1d95)',borderRadius:16,padding:'18px 20px',marginBottom:20,color:'#fff'}}>
+        <div style={{background:'linear-gradient(135deg,#2e1065,#4c1d95)',borderRadius: 8,padding:'18px 20px',marginBottom:20,color:'#fff'}}>
           <div style={{fontSize:11,fontWeight:700,opacity:.7,textTransform:'uppercase',letterSpacing:'.06em',marginBottom:8}}>
             Today — {DAYS[todayDay-1]}
           </div>
@@ -118,7 +118,7 @@ export default function TeacherTimetablePage(){
         </div>
 
         {/* Full week grid */}
-        <div className="t-table-scroll" style={{background: 'var(--bg-card)',borderRadius:16,border:'1.5px solid #f0eefe',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
+        <div className="t-table-scroll" style={{background: 'var(--bg-card)',borderRadius: 8,border:'1.5px solid #f0eefe',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
           <table style={{width:'100%',borderCollapse:'collapse',minWidth:600}}>
             <thead>
               <tr style={{background:'linear-gradient(135deg,#1e3a8a,#1e40af)'}}>

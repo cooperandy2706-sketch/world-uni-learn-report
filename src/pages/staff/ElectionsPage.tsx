@@ -116,7 +116,7 @@ export default function StaffElectionsPage() {
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text-main)' }}>
                       {cand.teacher?.full_name || cand.student?.full_name}
-                      <span style={{ fontWeight: 400, color: 'var(--text-muted)', marginLeft: 6 }}>
+                      <span style={{ fontWeight: 600, color: 'var(--text-muted)', marginLeft: 6 }}>
                         ({cand.teacher_id ? 'Teacher' : 'Student'})
                       </span>
                     </div>

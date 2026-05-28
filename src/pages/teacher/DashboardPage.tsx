@@ -300,7 +300,7 @@ export default function TeacherDashboardPage() {
             <h1 className="t-title">
               {timeGreeting}, {user?.full_name?.split(' ')[0]} 👋
             </h1>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4, fontWeight: 500 }}>{roleMessage}</p>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4, fontWeight: 600 }}>{roleMessage}</p>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
               {DAYS[now.getDay()]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit' })} · {(year as any)?.name} · {(term as any)?.name ?? 'No active term'}
             </p>
@@ -328,7 +328,7 @@ export default function TeacherDashboardPage() {
 
         {/* ── Active lesson banner ── */}
         {activeLesson && (
-          <div style={{ background: 'linear-gradient(135deg,#14532d,#16a34a)', borderRadius: 16, padding: '16px 20px', marginBottom: 16, color: '#fff', animation: '_pulse2 3s ease infinite', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ background: 'linear-gradient(135deg,#14532d,#16a34a)', borderRadius: 8, padding: '16px 20px', marginBottom: 16, color: '#fff', animation: '_pulse2 3s ease infinite', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: -20, right: -20, width: 90, height: 90, borderRadius: '50%', background: 'rgba(255,255,255,.06)' }} />
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', opacity: .8, marginBottom: 4 }}>🟢 CLASS IN PROGRESS</div>
             <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, margin: '0 0 2px' }}>{activeLesson.subject?.name}</h2>
@@ -353,7 +353,7 @@ export default function TeacherDashboardPage() {
         )}
 
         {assignments.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '56px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', animation: '_fu .5s ease both' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '56px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', animation: '_fu .5s ease both' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>📋</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No class assignments yet</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Ask your admin to assign classes and subjects for this term.</p>
@@ -399,7 +399,7 @@ export default function TeacherDashboardPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
                 {/* Today's Timetable */}
-                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span>📅</span>
@@ -444,7 +444,7 @@ export default function TeacherDashboardPage() {
                 </div>
 
                 {/* Class Performance */}
-                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span>🏫</span>
@@ -489,7 +489,7 @@ export default function TeacherDashboardPage() {
 
                 {/* Recent Quiz Submissions */}
                 {recentQuizSubs.length > 0 && (
-                  <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <span>📝</span>
@@ -517,7 +517,7 @@ export default function TeacherDashboardPage() {
 
                 {/* Recent Score Entries */}
                 {recentScores.length > 0 && (
-                  <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span>⚡</span>
                       <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Recent Score Entries</h3>
@@ -544,7 +544,7 @@ export default function TeacherDashboardPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
                 {/* Profile card */}
-                <div style={{ background: 'linear-gradient(145deg,#2e1065,#4c1d95,#5b21b6)', borderRadius: 16, padding: '18px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ background: 'linear-gradient(145deg,#2e1065,#4c1d95,#5b21b6)', borderRadius: 8, padding: '18px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ position: 'absolute', top: -18, right: -18, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,.05)' }} />
                   <div style={{ position: 'relative', zIndex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 14 }}>
@@ -572,7 +572,7 @@ export default function TeacherDashboardPage() {
 
                 {/* Announcements */}
                 {announcements.length > 0 && (
-                  <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                  <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                       <span>📢</span>
                       <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Announcements</h3>
@@ -591,7 +591,7 @@ export default function TeacherDashboardPage() {
                 )}
 
                 {/* Term info */}
-                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <span>📆</span>
                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Term Info</h3>
@@ -617,7 +617,7 @@ export default function TeacherDashboardPage() {
                 </div>
 
                 {/* Quick Actions — ALL teacher features */}
-                <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <span>⚡</span>
                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Quick Actions</h3>

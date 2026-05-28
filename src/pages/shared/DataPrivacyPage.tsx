@@ -136,7 +136,7 @@ export default function DataPrivacyPage() {
 
       <div style={{ display: 'grid', gap: 24 }}>
         {/* Core Processing */}
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
             <div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>Core Data Processing</h3>
@@ -160,7 +160,7 @@ export default function DataPrivacyPage() {
         </div>
 
         {/* Media & Photos */}
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>Media & Photography</h3>
@@ -179,7 +179,7 @@ export default function DataPrivacyPage() {
         </div>
 
         {/* Marketing */}
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>Marketing Communications</h3>
@@ -198,7 +198,7 @@ export default function DataPrivacyPage() {
         </div>
 
         {/* Right to be Forgotten */}
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #fee2e2' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #fee2e2' }}>
           <div style={{ display: 'flex', gap: 16 }}>
             <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Trash2 size={24} color="#dc2626" />

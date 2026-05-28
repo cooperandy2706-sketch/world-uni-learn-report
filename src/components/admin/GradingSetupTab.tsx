@@ -182,7 +182,7 @@ export default function GradingSetupTab() {
         const hasConfig = !!config?.scale || (config?.categories && config.categories.length > 0)
 
         return (
-          <div key={dept.id} style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid var(--border-color)', padding: '20px', display: 'flex', gap: 20, flexDirection: 'column' }}>
+          <div key={dept.id} style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1px solid var(--border-color)', padding: '20px', display: 'flex', gap: 20, flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h4 style={{ margin: 0, fontSize: 18, color: 'var(--text-main)' }}>{dept.name}</h4>
@@ -218,7 +218,7 @@ export default function GradingSetupTab() {
                   <h5 style={{ margin: '0 0 10px', fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Score Categories</h5>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {config.categories?.map((c: any) => (
-                      <div key={c.id} style={{ background: 'var(--bg-hover)', padding: '6px 12px', borderRadius: 6, fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>
+                      <div key={c.id} style={{ background: 'var(--bg-hover)', padding: '6px 12px', borderRadius: 6, fontSize: 13, color: 'var(--text-main)', fontWeight: 600 }}>
                         {c.name} <span style={{ color: '#6d28d9', fontWeight: 700 }}>({c.weight_percentage}%)</span>
                       </div>
                     ))}

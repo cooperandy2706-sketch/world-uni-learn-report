@@ -171,7 +171,7 @@ export default function ReportsPage() {
         </div>
 
         {/* Filters */}
-        <div className="no-print" style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 16, padding: '20px', marginBottom: 24, display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="no-print" style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 8, padding: '20px', marginBottom: 24, display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Filter size={16} color="#6d28d9" />
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Period:</span>
@@ -227,7 +227,7 @@ export default function ReportsPage() {
                   {school?.logo_url ? (
                     <img src={school.logo_url} alt="Logo" style={{ width: 80, height: 80, objectFit: 'contain' }} />
                   ) : (
-                    <div style={{ width: 80, height: 80, background: '#f5f3ff', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 80, height: 80, background: '#f5f3ff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <School size={40} color="#6d28d9" />
                     </div>
                   )}
@@ -259,7 +259,7 @@ export default function ReportsPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 30 }}>
               
               {/* Income Column */}
-              <div style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 20, overflow: 'hidden' }}>
+              <div style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 8, overflow: 'hidden' }}>
                 <div style={{ padding: '18px 24px', background: '#ecfdf5', borderBottom: '1px solid #d1fae5', display: 'flex', alignItems: 'center', gap: 10 }}>
                   <TrendingUp size={18} color="#059669" />
                   <span style={{ fontSize: 15, fontWeight: 800, color: '#065f46' }}>Statement of Revenue</span>
@@ -267,7 +267,7 @@ export default function ReportsPage() {
                 <div style={{ padding: '4px 0' }}>
                   {Object.entries(metrics.incomeByCategory).map(([cat, val]) => (
                     <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 24px', borderBottom: '1px solid #fafafa' }}>
-                      <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>{cat}</span>
+                      <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 600 }}>{cat}</span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{CUR(val)}</span>
                     </div>
                   ))}
@@ -279,7 +279,7 @@ export default function ReportsPage() {
               </div>
 
               {/* Expense Column */}
-              <div style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 20, overflow: 'hidden' }}>
+              <div style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 8, overflow: 'hidden' }}>
                 <div style={{ padding: '18px 24px', background: '#fef2f2', borderBottom: '1px solid #fee2e2', display: 'flex', alignItems: 'center', gap: 10 }}>
                   <TrendingDown size={18} color="#dc2626" />
                   <span style={{ fontSize: 15, fontWeight: 800, color: '#991b1b' }}>Statement of Expenditure</span>
@@ -287,7 +287,7 @@ export default function ReportsPage() {
                 <div style={{ padding: '4px 0' }}>
                   {Object.entries(metrics.expenseByCategory).map(([cat, val]) => (
                     <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 24px', borderBottom: '1px solid #fafafa' }}>
-                      <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>{cat}</span>
+                      <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 600 }}>{cat}</span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{CUR(val)}</span>
                     </div>
                   ))}
@@ -302,7 +302,7 @@ export default function ReportsPage() {
             {/* Final Net Summary */}
             <div style={{ 
               background: metrics.netSurplus >= 0 ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)' : 'linear-gradient(135deg, #dc2626 0%, #f14646 100%)',
-              borderRadius: 20, padding: '28px 36px', color: '#fff', marginBottom: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              borderRadius: 8, padding: '28px 36px', color: '#fff', marginBottom: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
               boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
             }}>
               <div>
@@ -318,7 +318,7 @@ export default function ReportsPage() {
             </div>
 
             {/* Itemized Ledger Table */}
-            <div style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 20, overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', borderRadius: 8, overflow: 'hidden' }}>
               <div style={{ padding: '18px 24px', borderBottom: '1.5px solid #f0eefe', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <TableIcon size={18} color="#1e0646" />

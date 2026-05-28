@@ -68,7 +68,7 @@ export default function StudentCalendarPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _sfu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        .cal-card{background:#fff; border-radius:24px; border:1.5px solid #f0eefe; padding:24px; box-shadow:0 1px 4px rgba(109,40,217,.06)}
+        .cal-card{background:#fff; border-radius: 12px; border:1.5px solid #f0eefe; padding:24px; box-shadow:0 1px 4px rgba(109,40,217,.06)}
         .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); border-top:1px solid #f1f5f9; border-left:1px solid #f1f5f9}
         .cal-cell{min-height:100px; padding:10px; border-right:1px solid #f1f5f9; border-bottom:1px solid #f1f5f9; background:#fff; transition:all .2s}
         .cal-cell:hover{background:#f8fafc}
@@ -150,7 +150,7 @@ export default function StudentCalendarPage() {
                 {upcomingEvents.length === 0 ? (
                   <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', padding: '20px 0' }}>No upcoming events scheduled</p>
                 ) : upcomingEvents.map((e, i) => (
-                  <div key={i} style={{ padding: '16px', background: '#f8fafc', borderRadius: 16, border: '1px solid #f1f5f9', position: 'relative', overflow: 'hidden' }}>
+                  <div key={i} style={{ padding: '16px', background: '#f8fafc', borderRadius: 8, border: '1px solid #f1f5f9', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', top: 0, left: 0, width: 4, height: '100%', background: e.category === 'holiday' ? '#dc2626' : e.category === 'exam' ? '#6d28d9' : '#2563eb' }} />
                     <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>{new Date(e.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', marginBottom: 8 }}>{e.title}</div>
@@ -163,7 +163,7 @@ export default function StudentCalendarPage() {
               </div>
             </div>
 
-            <div style={{ background: 'linear-gradient(135deg, #1e0646, #3b0764)', borderRadius: 24, padding: 24, color: '#fff' }}>
+            <div style={{ background: 'linear-gradient(135deg, #1e0646, #3b0764)', borderRadius: 12, padding: 24, color: '#fff' }}>
               <h4 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>Exam Season Approaching?</h4>
               <p style={{ fontSize: 13, opacity: 0.8, margin: '0 0 16px' }}>Don't forget to check the resources hub for study materials and past questions.</p>
               <Link to={ROUTES.STUDENT_RESOURCES} style={{ display: 'inline-flex', padding: '10px 20px', borderRadius: 10, background: '#fbbf24', color: '#1e0646', textDecoration: 'none', fontSize: 12, fontWeight: 800 }}>

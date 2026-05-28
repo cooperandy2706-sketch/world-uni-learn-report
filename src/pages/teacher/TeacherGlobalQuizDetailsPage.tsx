@@ -117,7 +117,7 @@ export default function TeacherGlobalQuizDetailsPage() {
     return (
       <div style={{ padding: 40, textAlign: 'center', fontFamily: '"DM Sans",sans-serif' }}>
         <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#7c3aed', animation: '_spin 0.8s linear infinite', margin: '0 auto 16px' }} />
-        <p style={{ color: 'var(--text-subtle)', fontSize: 13, fontWeight: 500 }}>Loading Submissions...</p>
+        <p style={{ color: 'var(--text-subtle)', fontSize: 13, fontWeight: 600 }}>Loading Submissions...</p>
         <style>{`@keyframes _spin { to { transform: rotate(360deg) } }`}</style>
       </div>
     )
@@ -158,7 +158,7 @@ export default function TeacherGlobalQuizDetailsPage() {
         </div>
 
         {/* Global Quiz Header */}
-        <div className="resp-header-box" style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 30, border: '1px solid #f0eefe', boxShadow: '0 4px 20px rgba(109,40,217,0.04)', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20 }}>
+        <div className="resp-header-box" style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 30, border: '1px solid #f0eefe', boxShadow: '0 4px 20px rgba(109,40,217,0.04)', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
               <span style={{ fontSize: 11, fontWeight: 800, background: '#f5f3ff', color: '#7c3aed', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -182,21 +182,21 @@ export default function TeacherGlobalQuizDetailsPage() {
 
         {/* Mini Stats */}
         <div className="resp-minmax-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 30 }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fdf4ff', color: '#c026d3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>👩‍🎓</div>
              <div>
                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Your Students</div>
                <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)' }}>{totalCount}</div>
              </div>
           </div>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>✅</div>
              <div>
                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Completed</div>
                <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)' }}>{submittedCount}</div>
              </div>
           </div>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px', border: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16 }}>
              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fffbeb', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📊</div>
              <div>
                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Avg Score</div>
@@ -209,7 +209,7 @@ export default function TeacherGlobalQuizDetailsPage() {
         <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16 }}>Student Breakdown</h3>
         
         {students.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
              <div style={{ fontSize: 40, marginBottom: 12 }}>🤷‍♀️</div>
              <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>No Students Found</div>
              <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>You do not have any classes assigned to you, so no student performance can be shown.</p>
@@ -218,7 +218,7 @@ export default function TeacherGlobalQuizDetailsPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {students.map(s => (
               <div key={s.id} className="s-card" style={{ 
-                background: 'var(--bg-card)', borderRadius: 16, padding: '16px 20px', border: '1px solid #f0eefe',
+                background: 'var(--bg-card)', borderRadius: 8, padding: '16px 20px', border: '1px solid #f0eefe',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>

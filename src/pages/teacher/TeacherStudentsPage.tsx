@@ -353,7 +353,7 @@ export default function TeacherStudentsPage() {
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading your students…</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>🎓</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No students found</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Ask your administrator to assign classes to you.</p>
@@ -456,7 +456,7 @@ export default function TeacherStudentsPage() {
                 ].map(({ label, value }) => value && (
                   <div key={label} style={{ background: '#faf5ff', borderRadius: 10, padding: '10px 12px' }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>{value}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 600 }}>{value}</div>
                   </div>
                 ))}
               </div>

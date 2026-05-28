@@ -85,7 +85,7 @@ export default function PastoralCarePage() {
 
       {viewMode === 'create' ? (
         /* ── INLINE NEW/EDIT LOG CARD FORM ── */
-        <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '24px 20px', animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '24px 20px', animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid #f1f5f9', paddingBottom: 16 }}>
             <div>
               <button onClick={() => setViewMode('list')} style={{ background: 'none', border: 'none', color: '#6d28d9', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Logs</button>
@@ -167,7 +167,7 @@ export default function PastoralCarePage() {
                 const canViewDetails = !log.is_private || log.counselor_id === user?.id || user?.role === 'admin'
                 
                 return (
-                  <div key={log.id} style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 20, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 200, animation: '_fadeUp 0.3s ease' }}>
+                  <div key={log.id} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 20, border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 200, animation: '_fadeUp 0.3s ease' }}>
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
                         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -192,7 +192,7 @@ export default function PastoralCarePage() {
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, borderTop: '1px solid #f1f5f9', paddingTop: 14 }}>
-                      <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>Counselor: {log.counselor?.full_name}</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>Counselor: {log.counselor?.full_name}</div>
                       {(log.counselor_id === user?.id || user?.role === 'admin') && (
                         <div style={{ display: 'flex', gap: 12 }}>
                           <button onClick={() => { setEditingLog(log); setForm({ student_id: log.student_id, category: log.category, notes: log.notes, follow_up_date: log.follow_up_date || '', is_private: log.is_private }); setViewMode('create') }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-subtle)', display: 'flex', alignItems: 'center', padding: 4 }}><Edit size={14} /></button>
@@ -207,7 +207,7 @@ export default function PastoralCarePage() {
           )}
 
           {!isLoading && logs.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '80px 0', background: 'var(--bg-card)', borderRadius: 20, border: '1.5px dashed #f0eefe', color: 'var(--text-subtle)', marginTop: 20 }}>
+            <div style={{ textAlign: 'center', padding: '80px 0', background: 'var(--bg-card)', borderRadius: 8, border: '1.5px dashed #f0eefe', color: 'var(--text-subtle)', marginTop: 20 }}>
               <div style={{ fontSize: 40, marginBottom: 12 }}>🌿</div>
               <p style={{ fontSize: 15, fontWeight: 700, color: '#1e0646', margin: 0 }}>No counseling logs found</p>
               <p style={{ fontSize: 12, color: '#64748b', margin: '4px 0 16px' }}>Start logging social-emotional progress tracking sessions.</p>

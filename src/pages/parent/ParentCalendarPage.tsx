@@ -165,7 +165,7 @@ export default function ParentCalendarPage() {
       rows.push(<div key={day.toString()} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>{days}</div>)
       days = []
     }
-    return <div style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden', border: '1.5px solid #f1f5f9' }}>{rows}</div>
+    return <div style={{ background: 'var(--bg-card)', borderRadius: 8, overflow: 'hidden', border: '1.5px solid #f1f5f9' }}>{rows}</div>
   }
 
   return (
@@ -197,13 +197,13 @@ export default function ParentCalendarPage() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81)', borderRadius: 24, padding: 24, color: '#fff', textAlign: 'center' }}>
+          <div style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81)', borderRadius: 12, padding: 24, color: '#fff', textAlign: 'center' }}>
             <Clock size={20} style={{ color: '#a5b4fc', marginBottom: 8, opacity: 0.8 }} />
             <div style={{ fontSize: 28, fontWeight: 800, fontFamily: 'monospace' }}>{format(time, 'HH:mm:ss')}</div>
             <div style={{ fontSize: 12, color: '#a5b4fc', marginTop: 4 }}>{format(time, 'EEEE, do MMMM')}</div>
           </div>
 
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 20, border: '1.5px solid #f1f5f9' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 20, border: '1.5px solid #f1f5f9' }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <PartyPopper size={16} color="#f59e0b" /> Upcoming
             </h3>

@@ -357,7 +357,7 @@ const formatDate = (str: string) => {
 
 function SkeletonCard() {
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid #e4e3de', borderRadius: 20, overflow: 'hidden', animation: 'np-shimmer 1.8s ease-in-out infinite' }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid #e4e3de', borderRadius: 8, overflow: 'hidden', animation: 'np-shimmer 1.8s ease-in-out infinite' }}>
       <div style={{ height: 176, background: '#f1f0ec' }} />
       <div style={{ padding: 18 }}>
         {[85, 65, 75, 55, 40].map((w, i) => (
@@ -380,7 +380,7 @@ function NewsCard({ item, index, cardBg, cardBorder, textPrimary, textMuted, boo
       transition={{ duration: 0.38, delay: index * 0.055, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -5, boxShadow: '0 20px 48px rgba(0,0,0,0.15)' }}
       layout
-      style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 20, overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'default', willChange: 'transform', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+      style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 8, overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'default', willChange: 'transform', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
     >
       <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
         <div style={{ height: 176, overflow: 'hidden', position: 'relative', background: '#1a1a2e', flexShrink: 0 }}>
@@ -440,7 +440,7 @@ function BreakingTicker({ headlines }: { headlines: string[] }) {
       <div style={{ flex: 1, overflow: 'hidden' }}>
         <div style={{ display: 'flex', animation: 'np-ticker 55s linear infinite', whiteSpace: 'nowrap' }}>
           {doubled.map((h, i) => (
-            <span key={i} style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.95)', padding: '0 6px' }}>
+            <span key={i} style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.95)', padding: '0 6px' }}>
               {h}<span style={{ color: 'rgba(255,255,255,0.35)', margin: '0 10px', fontSize: 9 }}>◆</span>
             </span>
           ))}
@@ -465,7 +465,7 @@ function LivePlayer({ channel, theaterMode, onEnterTheater, onExitTheater }: {
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--bg-card)', animation: 'np-pulse 1.4s ease-in-out infinite', display: 'inline-block' }} />
           LIVE
         </div>
-        <span style={{ flex: 1, fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.65)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span style={{ flex: 1, fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.65)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {channel.name}
         </span>
         <button
@@ -496,7 +496,7 @@ function ChannelGrid({ channels, activeChannel, onSelect }: {
   channels: Channel[]; activeChannel: Channel; onSelect: (ch: Channel) => void
 }) {
   return (
-    <div style={{ background: '#1e1e5c', borderRadius: 16, padding: 10, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 5 }}>
+    <div style={{ background: '#1e1e5c', borderRadius: 8, padding: 10, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 5 }}>
       {channels.map(ch => (
         <button
           key={ch.id} onClick={() => onSelect(ch)} title={ch.name}
@@ -650,7 +650,7 @@ export default function NewsPortalPage() {
         .np-nav::-webkit-scrollbar { display: none }
         .np-navbtn {
           display:flex; align-items:center; gap:5px;
-          padding:6px 11px; border:none; border-radius:20px;
+          padding:6px 11px; border:none; border-radius: 8px;
           font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600;
           cursor:pointer; white-space:nowrap; flex-shrink:0;
           transition:all .18s;
@@ -767,7 +767,7 @@ export default function NewsPortalPage() {
                 </motion.div>
               ) : error ? (
                 <motion.div key="err" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <div style={{ background: cardBg, border: `1px solid #fdd`, borderRadius: 20, padding: '52px 24px', textAlign: 'center' }}>
+                  <div style={{ background: cardBg, border: `1px solid #fdd`, borderRadius: 8, padding: '52px 24px', textAlign: 'center' }}>
                     <div style={{ fontSize: 36, marginBottom: 14 }}>📡</div>
                     <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 20, marginBottom: 8, color: textPrimary }}>Feed Unavailable</div>
                     <p style={{ fontSize: 13, color: textMuted, marginBottom: 22 }}>{error}</p>
@@ -810,7 +810,7 @@ export default function NewsPortalPage() {
               <AnimatePresence>
                 {showBookmarks && (
                   <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                    style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 20, padding: 16 }}>
+                    style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 8, padding: 16 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                       <div style={{ fontSize: 11, fontWeight: 700, color: textPrimary, display: 'flex', alignItems: 'center', gap: 6 }}>
                         <BookmarkCheck size={13} color="#f59e0b" /> Saved ({bookmarks.length})
@@ -831,7 +831,7 @@ export default function NewsPortalPage() {
               </AnimatePresence>
 
               {/* Status card */}
-              <div style={{ background: '#10103a', borderRadius: 20, padding: 20, color: '#fff' }}>
+              <div style={{ background: '#10103a', borderRadius: 8, padding: 20, color: '#fff' }}>
                 <div style={{ fontSize: 20, marginBottom: 10, opacity: 0.6 }}>📡</div>
                 <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 14, fontWeight: 700, marginBottom: 7 }}>Live Briefing</div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.75 }}>

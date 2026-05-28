@@ -296,7 +296,7 @@ export default function LibrarianDashboard() {
       {activeTab === 'scanner' && (
         <div className="scanner-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
           {/* Scanner Input Area */}
-          <div style={{ background: T.card, borderRadius: 16, border: `1px solid ${T.border}`, padding: 24, textAlign: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+          <div style={{ background: T.card, borderRadius: 8, border: `1px solid ${T.border}`, padding: 24, textAlign: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
             
             {/* Mode Toggle */}
             <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 12, padding: 4, marginBottom: 20, gap: 4 }}>
@@ -308,7 +308,7 @@ export default function LibrarianDashboard() {
             </div>
 
             {mode === 'camera' ? (
-              <div style={{ background: '#000', borderRadius: 16, overflow: 'hidden', position: 'relative', aspectRatio: '1/1', marginBottom: 16 }}>
+              <div style={{ background: '#000', borderRadius: 8, overflow: 'hidden', position: 'relative', aspectRatio: '1/1', marginBottom: 16 }}>
                 {cameraError ? (
                   <div style={{ padding: '40px 20px', color: '#fca5a5', fontSize: 13 }}>
                     <AlertTriangle size={32} style={{ marginBottom: 12, opacity: 0.5 }} />
@@ -349,7 +349,7 @@ export default function LibrarianDashboard() {
 
           {/* Action Area (Shows when book is scanned for checkout) */}
           {scannedBook && (
-            <div style={{ background: T.card, borderRadius: 16, border: `2px solid ${T.primary}`, padding: 32, boxShadow: `0 8px 24px ${T.primary}20` }}>
+            <div style={{ background: T.card, borderRadius: 8, border: `2px solid ${T.primary}`, padding: 32, boxShadow: `0 8px 24px ${T.primary}20` }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: T.primary, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Ready for Checkout</div>
@@ -386,7 +386,7 @@ export default function LibrarianDashboard() {
       )}
 
       {activeTab === 'inventory' && (
-        <div style={{ background: T.card, borderRadius: 16, border: `1px solid ${T.border}`, padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+        <div style={{ background: T.card, borderRadius: 8, border: `1px solid ${T.border}`, padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div style={{ position: 'relative', width: 300 }}>
               <Search size={16} color={T.muted} style={{ position: 'absolute', left: 12, top: 10 }} />
@@ -428,7 +428,7 @@ export default function LibrarianDashboard() {
       )}
 
       {activeTab === 'checkouts' && (
-        <div style={{ background: T.card, borderRadius: 16, border: `1px solid ${T.border}`, padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+        <div style={{ background: T.card, borderRadius: 8, border: `1px solid ${T.border}`, padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: T.text, margin: '0 0 20px 0' }}>Active Checkouts</h2>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
@@ -477,7 +477,7 @@ export default function LibrarianDashboard() {
       {/* Add Book Modal */}
       {addBookModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 20, overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 8, overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
             <div style={{ padding: '20px 24px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Add New Book</h3>
               <button onClick={() => setAddBookModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.muted }}><X size={20} /></button>

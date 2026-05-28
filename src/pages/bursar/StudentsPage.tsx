@@ -217,7 +217,7 @@ export default function BursarStudentsPage() {
             { label: 'Students with Arrears', value: String(arrearsCount), icon: AlertTriangle, color: '#dc2626', bg: '#fef2f2' },
             { label: 'Total Outstanding Arrears', value: CUR(totalArrears), icon: AlertTriangle, color: '#b91c1c', bg: '#fef2f2' },
           ].map((c, i) => (
-            <div key={c.label} className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '18px 20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', animation: `_bst_fu .35s ease ${i * 0.06}s both` }}>
+            <div key={c.label} className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '18px 20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', animation: `_bst_fu .35s ease ${i * 0.06}s both` }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                 <div style={{ width: 38, height: 38, borderRadius: 12, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <c.icon size={18} color={c.color} strokeWidth={2.5} />
@@ -467,7 +467,7 @@ export default function BursarStudentsPage() {
                       <Coffee size={16} />
                       {t === 'all' ? 'Standard (Feeding & Studies)' : t === 'feeding' ? 'Feeding Fee Only' : `Fully Exempt (${schoolCurrency} 0 Daily)`}
                     </div>
-                    <div style={{ fontSize: 11, fontWeight: 500, color: dailyFeeMode === t ? '#d97706' : '#9ca3af', marginTop: 4, paddingLeft: 24 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: dailyFeeMode === t ? '#d97706' : '#9ca3af', marginTop: 4, paddingLeft: 24 }}>
                       {t === 'all' ? 'Charges regular daily feeding and studies when marked present.' : t === 'feeding' ? 'Never charged for studies even if present; only expected to pay feeding.' : 'Completely exempt from daily fees. No deficit will accrue when present.'}
                     </div>
                   </button>

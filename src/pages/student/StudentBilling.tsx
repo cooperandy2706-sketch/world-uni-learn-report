@@ -132,7 +132,7 @@ export default function StudentBillingPage() {
 
         .billing-card {
           background: #fff;
-          border-radius: 24px;
+          border-radius: 12px;
           border: 1.5px solid #f1f5f9;
           overflow: hidden;
           box-shadow: 0 4px 20px rgba(0,0,0,0.03);
@@ -277,7 +277,7 @@ export default function StudentBillingPage() {
           
           <div className="balance-card" style={{ 
             background: 'linear-gradient(135deg, #1e1b4b, #312e81)', 
-            borderRadius: 24, 
+            borderRadius: 12, 
             padding: 32, 
             color: '#fff',
             boxShadow: '0 20px 40px rgba(30,27,75,0.2)',

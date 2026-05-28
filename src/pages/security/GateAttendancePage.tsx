@@ -8,7 +8,7 @@ import { boardingService } from '../../services/boarding.service'
 
 function StatCard({ icon: Icon, label, value, color, bg }: any) {
   return (
-    <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '14px', border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 12 }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '14px', border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 12 }}>
       <div style={{ width: 40, height: 40, borderRadius: 11, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color, flexShrink: 0 }}>
         <Icon size={20} />
       </div>
@@ -100,7 +100,7 @@ export default function GateAttendancePage() {
         <div style={{ 
           background: latestScan.direction === 'in' ? '#dcfce7' : '#f3e8ff',
           border: `2px solid ${latestScan.direction === 'in' ? '#10b981' : '#a855f7'}`,
-          borderRadius: 16, padding: '16px 20px', marginBottom: 20,
+          borderRadius: 8, padding: '16px 20px', marginBottom: 20,
           display: 'flex', alignItems: 'center', gap: 16,
           boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
           animation: '_slideIn 0.3s cubic-bezier(0.16,1,0.3,1)'
@@ -127,7 +127,7 @@ export default function GateAttendancePage() {
       </div>
 
       {/* Search + Filters */}
-      <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f1f5f9', padding: '14px 16px', marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9', padding: '14px 16px', marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div style={{ position: 'relative' }}>
           <Search size={13} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name…"
@@ -198,7 +198,7 @@ export default function GateAttendancePage() {
           <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', marginBottom: 16 }}>Approved Exeats (Expected Today)</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
             {exeats.map((ex: any) => (
-              <div key={ex.id} style={{ background: 'var(--bg-card)', padding: 16, borderRadius: 16, border: '1.5px solid #ffedd5' }}>
+              <div key={ex.id} style={{ background: 'var(--bg-card)', padding: 16, borderRadius: 8, border: '1.5px solid #ffedd5' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: '#1e0646' }}>{ex.student?.full_name}</div>
                   <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: ex.status === 'departed' ? '#f3e8ff' : '#d1fae5', color: ex.status === 'departed' ? '#7c3aed' : '#059669', textTransform: 'uppercase' }}>{ex.status}</span>

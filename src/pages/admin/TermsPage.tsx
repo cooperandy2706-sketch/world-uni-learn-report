@@ -202,7 +202,7 @@ export default function TermsPage() {
 
         {/* Empty */}
         {!isLoading && terms.length === 0 && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>📆</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No terms yet</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>Add terms for the selected academic year.</p>

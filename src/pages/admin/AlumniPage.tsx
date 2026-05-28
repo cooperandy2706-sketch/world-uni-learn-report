@@ -187,7 +187,7 @@ export default function AlumniPage() {
         {tab === 'directory' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
             {alumni.filter(a => a.full_name.toLowerCase().includes(search.toLowerCase())).map((a: any) => (
-              <div key={a.id} className="al-card" style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+              <div key={a.id} className="al-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9', padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
                   <div style={{ width: 48, height: 48, borderRadius: 14, background: 'linear-gradient(135deg,#f5f3ff,#ede9fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7c3aed' }}>
                     <GraduationCap size={24} />
@@ -225,7 +225,7 @@ export default function AlumniPage() {
         {tab === 'events' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 20 }}>
             {events.map((e: any) => (
-              <div key={e.id} className="al-card" style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+              <div key={e.id} className="al-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9', padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>{format(new Date(e.event_date), 'MMMM yyyy')}</div>
                 <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 12px' }}>{e.title}</h3>
                 <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6, marginBottom: 20 }}>{e.description}</p>
@@ -248,7 +248,7 @@ export default function AlumniPage() {
             {campaigns.map((c: any) => {
               const progress = Math.min((c.current_amount / c.goal_amount) * 100, 100)
               return (
-                <div key={c.id} className="al-card" style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f1f5f9', padding: 28, boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+                <div key={c.id} className="al-card" style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f1f5f9', padding: 28, boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                     <h3 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{c.title}</h3>
                     <span style={{ fontSize: 10, fontWeight: 800, background: c.is_active ? '#f0fdf4' : '#f1f5f9', color: c.is_active ? '#16a34a' : '#64748b', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase' }}>

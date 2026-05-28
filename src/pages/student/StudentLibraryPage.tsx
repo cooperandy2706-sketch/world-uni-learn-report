@@ -56,7 +56,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
       padding: '24px 16px', overflowY: 'auto',
     }} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div style={{
-        background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 820,
+        background: 'var(--bg-card)', borderRadius: 12, width: '100%', maxWidth: 820,
         boxShadow: '0 40px 80px rgba(0,0,0,0.3)', overflow: 'hidden',
         animation: '_libIn 0.3s cubic-bezier(0.16,1,0.3,1)',
         marginBottom: 40,
@@ -99,7 +99,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
 
           {/* Video */}
           {resource.content_type === 'video' && (
-            <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', background: '#000' }}>
+            <div style={{ borderRadius: 8, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', background: '#000' }}>
               {ytId ? (
                 <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
                   <iframe
@@ -111,7 +111,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
                 </div>
               ) : (
                 <a href={resource.content} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '20px', background: '#fff7ed', borderRadius: 16, textDecoration: 'none', color: '#ea580c', fontWeight: 700, fontSize: 14, border: '1.5px solid #fed7aa' }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '20px', background: '#fff7ed', borderRadius: 8, textDecoration: 'none', color: '#ea580c', fontWeight: 700, fontSize: 14, border: '1.5px solid #fed7aa' }}>
                   ▶ Open Video →
                 </a>
               )}
@@ -120,7 +120,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
 
           {/* Google Doc */}
           {resource.content_type === 'google_doc' && (
-            <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+            <div style={{ borderRadius: 8, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
               <iframe
                 src={resource.content.replace('/edit', '/preview')}
                 width="100%" height="540"
@@ -136,7 +136,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
             <a href={resource.content} target="_blank" rel="noopener noreferrer"
               style={{
                 display: 'flex', alignItems: 'center', gap: 14, padding: '20px 24px',
-                background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', borderRadius: 16,
+                background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', borderRadius: 8,
                 textDecoration: 'none', border: '1.5px solid #bfdbfe',
                 transition: 'transform 0.15s',
               }}
@@ -155,7 +155,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
           {/* Reading Passage */}
           {resource.content_type === 'passage' && (
             <div style={{
-              background: '#fafaf9', borderRadius: 16, padding: '24px',
+              background: '#fafaf9', borderRadius: 8, padding: '24px',
               border: '1.5px solid #f0eefe', lineHeight: 1.8,
               fontFamily: 'Georgia, "Times New Roman", serif',
             }}>
@@ -261,7 +261,7 @@ export default function StudentLibraryPage() {
         {/* ── Hero Header ── */}
         <div style={{
           background: 'linear-gradient(135deg, #1e0646 0%, #3b0764 40%, #5b21b6 100%)',
-          borderRadius: 20, padding: '36px 32px', marginBottom: 28, position: 'relative', overflow: 'hidden',
+          borderRadius: 8, padding: '36px 32px', marginBottom: 28, position: 'relative', overflow: 'hidden',
           animation: '_libFu 0.5s ease both',
         }}>
           <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
@@ -354,7 +354,7 @@ export default function StudentLibraryPage() {
             <p style={{ fontSize: 13, color: 'var(--text-subtle)', animation: '_libFu 0.5s ease .2s both' }}>Loading your library…</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 20px', background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', animation: '_libFu .5s ease both' }}>
+          <div style={{ textAlign: 'center', padding: '80px 20px', background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', animation: '_libFu .5s ease both' }}>
             <div style={{ fontSize: 56, marginBottom: 14 }}>📭</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
               {search || filterType !== 'all' || filterSubject !== 'all' ? 'No matching materials' : 'Library is empty'}

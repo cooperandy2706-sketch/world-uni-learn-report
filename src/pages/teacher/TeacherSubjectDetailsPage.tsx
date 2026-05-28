@@ -76,7 +76,7 @@ export default function TeacherSubjectDetailsPage() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _spin { to{transform:rotate(360deg)} }
         @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        .res-card { background: #fff; border-radius: 20px; border: 1.5px solid #f0eefe; transition: all 0.3s; overflow: hidden; display: flex; flexDirection: column; }
+        .res-card { background: #fff; border-radius: 8px; border: 1.5px solid #f0eefe; transition: all 0.3s; overflow: hidden; display: flex; flexDirection: column; }
         .res-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(109,40,217,0.12); border-color: #ddd6fe; }
         
         /* Markdown Styles */
@@ -111,7 +111,7 @@ export default function TeacherSubjectDetailsPage() {
             <div style={{ color: 'var(--text-subtle)', fontSize: 14, fontWeight: 600 }}>Syncing Library...</div>
           </div>
         ) : resources.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📂</div>
             <h3 className="t-title" style={{ fontSize: 18, marginBottom: 6 }}>No Resources Available</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>There are currently no published study materials for this subject.</p>
@@ -202,7 +202,7 @@ export default function TeacherSubjectDetailsPage() {
         {/* ── PASSAGE READING MODAL ── */}
         <Modal open={!!activePassage} onClose={() => setActivePassage(null)} title={activePassage?.title} size="lg">
           {activePassage && (
-            <div style={{ background: '#f8fafc', padding: '24px 32px', borderRadius: 16, border: '1px solid #e2e8f0', minHeight: '300px', maxHeight: '65vh', overflowY: 'auto' }}>
+            <div style={{ background: '#f8fafc', padding: '24px 32px', borderRadius: 8, border: '1px solid #e2e8f0', minHeight: '300px', maxHeight: '65vh', overflowY: 'auto' }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 12 }}>Curriculum Preview (Markdown)</div>
 
               <div className="markdown-content" style={{ fontFamily: 'Georgia, serif', fontSize: 17, lineHeight: 1.8, color: '#334155' }}>

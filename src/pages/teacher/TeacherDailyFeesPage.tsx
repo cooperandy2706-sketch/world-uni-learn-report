@@ -169,7 +169,7 @@ export default function TeacherDailyFeesPage() {
       </div>
 
       {!selectedClass ? (
-        <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: 16, border: '1.5px dashed var(--border-color)' }}>
+        <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: 8, border: '1.5px dashed var(--border-color)' }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>📋</div>
           <h3 style={{ fontSize: 18, margin: 0, color: 'var(--text-main)' }}>Select a Class</h3>
           <p style={{ color: 'var(--text-subtle)', fontSize: 14 }}>Choose a class above to begin recording daily fees.</p>
@@ -177,7 +177,7 @@ export default function TeacherDailyFeesPage() {
       ) : loadingStudents ? (
         <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-subtle)' }}>Loading students...</div>
       ) : (
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
           <div style={{ background: '#faf5ff', padding: '14px 20px', borderBottom: '1px solid #f0eefe', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, color: '#5b21b6', fontSize: 14 }}>Record {feeType === 'feeding' ? 'Feeding' : 'Studies'} Fee — {date}</span>
             <button onClick={() => {
@@ -194,7 +194,7 @@ export default function TeacherDailyFeesPage() {
                 <div key={stu.id} style={{ borderBottom: '1px solid #f8fafc', padding: '16px 20px', display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ flex: '1 1 150px' }}>
                     <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{stu.full_name}</div>
-                    {stu.student_id && <div style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 500, marginTop: 4 }}>{stu.student_id}</div>}
+                    {stu.student_id && <div style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 600, marginTop: 4 }}>{stu.student_id}</div>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700 }}>GH₵</span>

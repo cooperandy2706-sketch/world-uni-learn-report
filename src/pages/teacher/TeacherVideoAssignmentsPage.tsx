@@ -116,7 +116,7 @@ export default function TeacherVideoAssignmentsPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-subtle)' }}>Loading assignments...</div>
         ) : assignments.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>📹</div>
             <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' }}>No video assignments yet</h3>
             <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: '0 0 24px' }}>Share educational YouTube videos with your students.</p>
@@ -129,7 +129,7 @@ export default function TeacherVideoAssignmentsPage() {
             {assignments.map(a => {
               const watchedCount = a.progress?.filter((p: any) => p.is_completed).length || 0
               return (
-                <div key={a.id} style={{ background: 'var(--bg-card)', borderRadius: 20, overflow: 'hidden', border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column' }}>
+                <div key={a.id} style={{ background: 'var(--bg-card)', borderRadius: 8, overflow: 'hidden', border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ position: 'relative', height: 180, background: '#000' }}>
                     <img src={`https://img.youtube.com/vi/${a.youtube_id}/hqdefault.jpg`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7 }} />
                     <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(255,255,255,0.9)', padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 800, color: '#4c1d95' }}>
@@ -167,7 +167,7 @@ export default function TeacherVideoAssignmentsPage() {
       {/* New Assignment Modal */}
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 24, overflow: 'hidden', animation: '_slideUp 0.3s ease' }}>
+          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 12, overflow: 'hidden', animation: '_slideUp 0.3s ease' }}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Assign Video</h2>
               <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', fontSize: 24, cursor: 'pointer', color: '#94a3b8' }}>×</button>

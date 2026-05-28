@@ -765,7 +765,7 @@ export default function MessagingPage() {
         /* ── MOBILE: single-column, slide between list/chat ── */
         <div style={{
           display: 'flex', height: 'calc(100dvh - 150px)', fontFamily: '"DM Sans",sans-serif',
-          borderRadius: 20, overflow: 'hidden', flexDirection: 'column', background: '#f6f7fb',
+          borderRadius: 8, overflow: 'hidden', flexDirection: 'column', background: '#f6f7fb',
           border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
         }}>
           {mobileView === 'list' ? ConvList() : ChatPanel()}
@@ -774,7 +774,7 @@ export default function MessagingPage() {
         /* ── DESKTOP: side-by-side ── */
         <div style={{
           display: 'flex', height: 'calc(100vh - 68px)', fontFamily: '"DM Sans",sans-serif',
-          borderRadius: 20, overflow: 'hidden',
+          borderRadius: 8, overflow: 'hidden',
           border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 16px 50px rgba(0,0,0,0.1)',
         }}>
           {/* Left */}

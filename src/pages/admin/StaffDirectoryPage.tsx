@@ -215,7 +215,7 @@ export default function StaffDirectoryPage() {
         @keyframes _fadein { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
         .tab-btn { padding: 10px 20px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all .2s; border-bottom: 2px solid transparent; color: var(--text-muted); }
         .tab-btn.active { color: #4f46e5; border-bottom-color: #4f46e5; }
-        .staff-card { background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 16px; padding: 20px; transition: all .2s; position: relative; overflow: hidden; }
+        .staff-card { background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 8px; padding: 20px; transition: all .2s; position: relative; overflow: hidden; }
         .staff-card:hover { border-color: #c7d2fe; box-shadow: 0 8px 24px rgba(99,102,241,.08); transform: translateY(-2px); }
         .action-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; border: none; background: transparent; }
         .action-btn:hover { background: var(--bg-input); }
@@ -259,7 +259,7 @@ export default function StaffDirectoryPage() {
       {isLoading ? (
         <div style={{ padding: 60, textAlign: 'center', color: 'var(--text-muted)' }}>Loading directory...</div>
       ) : filteredStaff.length === 0 ? (
-        <div style={{ padding: 60, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 16, border: '1.5px dashed var(--border-color)' }}>
+        <div style={{ padding: 60, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 8, border: '1.5px dashed var(--border-color)' }}>
           <Users size={48} color="var(--text-muted)" style={{ marginBottom: 16, opacity: 0.5 }} />
           <h3 style={{ margin: '0 0 8px', color: 'var(--text-main)', fontSize: 18 }}>No Staff Found</h3>
           <p style={{ margin: 0, color: 'var(--text-muted)' }}>No personnel match the current filters.</p>

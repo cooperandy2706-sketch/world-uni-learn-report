@@ -117,13 +117,13 @@ export default function TeacherElectionsHub() {
   const styles = {
     btn: { padding: '10px 20px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(109,40,217,0.2)' },
     btnOutline: { padding: '10px 20px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' },
-    card: { background: 'var(--bg-card)', borderRadius: 16, padding: 28, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid var(--border-light)', transition: 'all 0.3s' },
+    card: { background: 'var(--bg-card)', borderRadius: 8, padding: 28, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid var(--border-light)', transition: 'all 0.3s' },
     tabBtn: (active: boolean) => ({ padding: '10px 20px', borderRadius: 12, border: 'none', background: active ? '#f5f3ff' : 'transparent', color: active ? '#6d28d9' : '#6b7280', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' })
   }
 
   if (!activeElection) {
     return (
-      <div style={{ padding: 60, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 16, border: '1px solid var(--border-light)', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', animation: '_fadeIn 0.4s ease' }}>
+      <div style={{ padding: 60, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 8, border: '1px solid var(--border-light)', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', animation: '_fadeIn 0.4s ease' }}>
         <style>{`@keyframes _fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: 'var(--text-main)' }}>No Active Elections</h2>
         <p style={{ color: 'var(--text-muted)', fontSize: 16 }}>There are currently no active elections running.</p>

@@ -242,7 +242,7 @@ export default function GlobalAdsPage() {
             <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
           </div>
         ) : ads.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid var(--border-color)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid var(--border-color)' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>🖼️</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No global ads yet</h3>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 18 }}>Create your first popup banner to broadcast across all user portals.</p>

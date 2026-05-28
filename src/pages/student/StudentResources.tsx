@@ -110,7 +110,7 @@ export default function StudentResourcesPage() {
           {dueTomorrow.length > 0 && (
             <div className="due-hero" style={{ 
               background: 'linear-gradient(135deg, #7c3aed, #4c1d95)', 
-              borderRadius: 24, 
+              borderRadius: 12, 
               padding: 32, 
               color: '#fff',
               position: 'relative',
@@ -137,7 +137,7 @@ export default function StudentResourcesPage() {
           )}
 
           {/* Resources List */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f1f5f9', overflow: 'hidden' }}>
             <div className="resources-card-padding" style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 10 }}>
               <FileText size={20} color="#059669" />
               <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Study Materials & Resources</h3>
@@ -151,7 +151,7 @@ export default function StudentResourcesPage() {
             ) : (
               <div className="resources-card-padding material-grid" style={{ padding: 24, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
                 {resources.map(r => (
-                  <div key={r.id} style={{ border: '1px solid #f1f5f9', borderRadius: 16, padding: 16, transition: 'all 0.2s', background: 'var(--bg-card)' }}>
+                  <div key={r.id} style={{ border: '1px solid #f1f5f9', borderRadius: 8, padding: 16, transition: 'all 0.2s', background: 'var(--bg-card)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                       <div style={{ width: 40, height: 40, borderRadius: 10, background: '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📚</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -188,7 +188,7 @@ export default function StudentResourcesPage() {
 
         {/* Right Column: Deadlines */}
         <div className="resources-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 24, border: '1.5px solid #f1f5f9' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, border: '1.5px solid #f1f5f9' }}>
             <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Clock size={16} color="#7c3aed" /> Upcoming Deadlines
             </h4>
@@ -212,9 +212,9 @@ export default function StudentResourcesPage() {
             </div>
           </div>
 
-          <div style={{ background: '#eff6ff', borderRadius: 24, padding: 24, border: '1.5px solid #dbeafe' }}>
+          <div style={{ background: '#eff6ff', borderRadius: 12, padding: 24, border: '1.5px solid #dbeafe' }}>
             <h4 style={{ fontSize: 14, fontWeight: 700, color: '#1e40af', marginBottom: 12 }}>Need Help?</h4>
-            <p style={{ fontSize: 12, color: '#3b82f6', fontWeight: 500, lineHeight: 1.6, margin: 0 }}>
+            <p style={{ fontSize: 12, color: '#3b82f6', fontWeight: 600, lineHeight: 1.6, margin: 0 }}>
               Can't find a resource? Message your subject teacher directly through the **Messages** portal.
             </p>
           </div>

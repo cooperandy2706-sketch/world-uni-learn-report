@@ -141,7 +141,7 @@ export default function AdminAgendaPage() {
         </div>
 
         {/* Term Selector */}
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '16px 20px', border: '1.5px solid #f0eefe', marginBottom: 22, display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 8px rgba(109,40,217,0.03)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '16px 20px', border: '1.5px solid #f0eefe', marginBottom: 22, display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 8px rgba(109,40,217,0.03)' }}>
           <Layout size={18} color="#7c3aed" />
           <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>Select Term:</span>
           <select value={selectedTermId} onChange={e => setSelectedTermId(e.target.value)}
@@ -155,7 +155,7 @@ export default function AdminAgendaPage() {
             <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: 'ap_spin .8s linear infinite' }} />
           </div>
         ) : agendas.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: '80px 40px', textAlign: 'center', border: '1.5px solid #f0eefe', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '80px 40px', textAlign: 'center', border: '1.5px solid #f0eefe', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
             <div style={{ fontSize: 56, marginBottom: 16 }}>🗓️</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>No agenda items yet</h3>
             <p style={{ fontSize: 14, color: 'var(--text-subtle)', marginBottom: 24, maxWidth: 320, marginInline: 'auto' }}>Create your first agenda item to start building the term roadmap for your teachers.</p>
@@ -165,13 +165,13 @@ export default function AdminAgendaPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {agendas.map((item, idx) => (
               <div key={item.id} className="agenda-card" style={{ 
-                background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '20px 24px', 
+                background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '20px 24px', 
                 boxShadow: '0 2px 10px rgba(109,40,217,0.04)', transition: 'all .25s ease',
                 display: 'flex', gap: 20, position: 'relative', overflow: 'hidden'
               }}>
                 {/* Week Indicator */}
                 <div style={{ 
-                  width: 54, height: 54, borderRadius: 16, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', 
+                  width: 54, height: 54, borderRadius: 8, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', 
                   color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0, boxShadow: '0 4px 15px rgba(109,40,217,0.2)'
                 }}>

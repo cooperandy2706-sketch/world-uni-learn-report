@@ -511,7 +511,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             
             {/* Sec 1: Identity */}
-            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 24, border: '1.5px solid #f1f5f9', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
+            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 12, border: '1.5px solid #f1f5f9', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
                <h2 style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
                  Core Identity & Mapping
@@ -537,11 +537,11 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
             </div>
 
             {/* Sec 2: Cover Image */}
-            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 24, border: '1.5px solid #f1f5f9' }}>
+            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 12, border: '1.5px solid #f1f5f9' }}>
                <h2 style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 20 }}>Visual Branding (Cover Page)</h2>
                
                <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-                  <div style={{ width: 200, height: 120, borderRadius: 16, background: '#f8fafc', border: '2px dashed #cbd5e1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                  <div style={{ width: 200, height: 120, borderRadius: 8, background: '#f8fafc', border: '2px dashed #cbd5e1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                     {form.cover_image_url ? (
                       <img src={form.cover_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
@@ -566,7 +566,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
             </div>
 
             {/* Sec 3: Content Builder */}
-            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 24, border: '1.5px solid #f1f5f9' }}>
+            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 12, border: '1.5px solid #f1f5f9' }}>
                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                  <h2 style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', margin: 0 }}>Immersive Content Builder</h2>
                  <StyledSelect style={{ width: 200 }} value={form.content_type} onChange={e => setForm(prev => ({ ...prev, content_type: e.target.value as any, content: '' }))}>
@@ -577,7 +577,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
                  </StyledSelect>
                </div>
 
-               <div style={{ padding: 24, background: '#f8fafc', borderRadius: 16 }}>
+               <div style={{ padding: 24, background: '#f8fafc', borderRadius: 8 }}>
                   {form.content_type === 'passage' ? (
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                        <Field label="Detailed Educational Passage (Broad writing area)">
@@ -588,7 +588,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
                             onChange={e => setForm(prev => ({ ...prev, content: e.target.value }))}
                             placeholder="Begin writing your detailed curriculum passage here... Supports broad formatting via Bold, H2, Lists, etc."
                             style={{ 
-                              width: '100%', minHeight: 600, padding: 40, borderRadius: 16, fontSize: 16, lineHeight: 1.8,
+                              width: '100%', minHeight: 600, padding: 40, borderRadius: 8, fontSize: 16, lineHeight: 1.8,
                               border: '1.5px solid #e2e8f0', fontFamily: 'Georgia, serif', resize: 'vertical', outline: 'none' 
                             }}
                           />
@@ -606,7 +606,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
                </div>
             </div>
             
-            <div style={{ background: '#ecfdf5', border: '1.5px solid #a7f3d0', padding: '24px', borderRadius: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ background: '#ecfdf5', border: '1.5px solid #a7f3d0', padding: '24px', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                <div>
                   <h3 style={{ fontSize: 14, fontWeight: 800, color: '#065f46', margin: 0 }}>Final Publication Status</h3>
                   <p style={{ fontSize: 12, color: '#059669', margin: 0 }}>Published materials are instantly visible to all students in the global library.</p>
@@ -625,7 +625,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
              <h2 style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 20 }}>Live Formatted Preview</h2>
              
              <div style={{ 
-                background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f1f5f9', overflow: 'hidden', 
+                background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f1f5f9', overflow: 'hidden', 
                 boxShadow: '0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.02)' 
              }}>
                 <div style={{ height: 180, background: '#f8fafc', position: 'relative' }}>
@@ -634,7 +634,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
                    ) : (
                      <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>📚</div>
                    )}
-                   <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: 20, color: '#fff', fontSize: 10, fontWeight: 800 }}>
+                   <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: 8, color: '#fff', fontSize: 10, fontWeight: 800 }}>
                       {form.content_type.replace('_', ' ').toUpperCase()}
                    </div>
                 </div>
@@ -700,7 +700,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading global resources…</p>
           </div>
         ) : resources.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📚</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No learning materials available</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>Publish your first video tutorial or study guide for students.</p>

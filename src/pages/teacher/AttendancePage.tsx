@@ -338,7 +338,7 @@ export default function TeacherAttendancePage() {
             align-items: stretch !important; 
             gap: 16px !important; 
             padding: 16px !important; 
-            border-radius: 16px !important;
+            border-radius: 8px !important;
             border: 1.5px solid #f0eefe !important;
             box-shadow: 0 2px 8px rgba(109,40,217,.04) !important;
             background: #fff !important;
@@ -368,7 +368,7 @@ export default function TeacherAttendancePage() {
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
             padding: 16px;
-            border-radius: 20px;
+            border-radius: 8px;
             border: 1.5px solid #ede9fe;
             box-shadow: 0 10px 30px rgba(109,40,217,0.15);
             margin: 20px 0;
@@ -425,7 +425,7 @@ export default function TeacherAttendancePage() {
 
         {/* No home class assigned */}
         {!loading && !myClass && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>🏫</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
               No class assigned
@@ -451,7 +451,7 @@ export default function TeacherAttendancePage() {
         {!loading && myClass && !isWeekend && (
           <>
             {/* Class info banner */}
-            <div style={{ background: 'linear-gradient(135deg,#2e1065,#4c1d95,#6d28d9)', borderRadius: 16, padding: '18px 22px', marginBottom: 18, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+            <div style={{ background: 'linear-gradient(135deg,#2e1065,#4c1d95,#6d28d9)', borderRadius: 8, padding: '18px 22px', marginBottom: 18, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.12em', opacity: .7, marginBottom: 4 }}>YOUR HOME CLASS</div>
                 <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 22, fontWeight: 700, margin: '0 0 4px' }}>{myClass.name}</h2>
@@ -476,7 +476,7 @@ export default function TeacherAttendancePage() {
                 <span style={{ fontSize: 20 }}>✅</span>
                 <div>
                   <div style={{ fontWeight: 800, marginBottom: 2 }}>Register complete for today</div>
-                  <div style={{ fontWeight: 500, opacity: 0.85 }}>
+                  <div style={{ fontWeight: 600, opacity: 0.85 }}>
                     {Object.keys(dbMarks).length > 0
                       ? `${Object.keys(dbMarks).length} of ${students.length} students were auto-marked via Gate Scanner. No further action needed.`
                       : `The morning register has been submitted. Term totals below are up to date.`
@@ -530,7 +530,7 @@ export default function TeacherAttendancePage() {
             )}
 
             {/* Students list */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 6px rgba(109,40,217,.06)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 6px rgba(109,40,217,.06)' }}>
               {/* Table header */}
               <div className="att-grid-header" style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom: '1.5px solid #ede9fe', padding: '10px 18px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.08em', flex: 1 }}>Student</span>

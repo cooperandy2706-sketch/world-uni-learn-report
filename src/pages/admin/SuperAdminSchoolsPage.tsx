@@ -129,7 +129,7 @@ export default function SuperAdminSchoolsPage() {
 
       {/* Pending Invoices */}
       {invoices.length > 0 && (
-        <div style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 16, padding: 24, marginBottom: 28 }}>
+        <div style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 8, padding: 24, marginBottom: 28 }}>
           <h3 style={{ fontSize: 16, fontWeight: 800, color: '#92400e', margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
             <Clock size={18} /> {invoices.length} Pending Invoice Approval{invoices.length > 1 ? 's' : ''}
           </h3>
@@ -185,7 +185,7 @@ export default function SuperAdminSchoolsPage() {
       </div>
 
       {/* Schools Table */}
-      <div style={{ background: 'var(--bg-card)', borderRadius: 20, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', overflow: 'hidden', border: '1px solid #f1f5f9' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', overflow: 'hidden', border: '1px solid #f1f5f9' }}>
         {isLoading ? (
           <div style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>Loading schools…</div>
         ) : filtered.length === 0 ? (

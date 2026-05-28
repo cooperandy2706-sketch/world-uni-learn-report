@@ -31,7 +31,7 @@ export default function Modal({ open, onClose, title, subtitle, children, size='
       >
         <div style={{
           width:'100%', maxWidth:sizeW[size], maxHeight:'90vh',
-          background: 'var(--bg-card)', borderRadius:16, display:'flex', flexDirection:'column',
+          background: 'var(--bg-card)', borderRadius: 8, display:'flex', flexDirection:'column',
           boxShadow:'0 24px 64px rgba(0,0,0,0.18)', animation:'_msu 0.2s ease',
           border:'1px solid #f0eefe', overflow:'hidden',
         }}>

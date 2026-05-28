@@ -110,7 +110,7 @@ function ComposePanel({ onClose, onSent }: { onClose: () => void; onSent: () => 
         .cp-btn:hover{filter:brightness(1.08);transform:scale(1.02)}
       `}</style>
       <div onClick={e => e.stopPropagation()} style={{
-        width: '100%', maxWidth: 560, background: 'var(--bg-card)', borderRadius: 24, overflow: 'hidden',
+        width: '100%', maxWidth: 560, background: 'var(--bg-card)', borderRadius: 12, overflow: 'hidden',
         boxShadow: '0 40px 100px rgba(0,0,0,0.3)',
         fontFamily: '"DM Sans",sans-serif',
         animation: 'cp_in 0.35s cubic-bezier(0.16,1,0.3,1)',
@@ -355,14 +355,14 @@ export default function GlobalMessagingPage() {
         {/* ── Page header ── */}
         <div style={{
           background: 'linear-gradient(135deg,#1e0646,#4c1d95)',
-          borderRadius: 20, padding: '28px 28px', marginBottom: 28,
+          borderRadius: 8, padding: '28px 28px', marginBottom: 28,
           display: 'flex', alignItems: 'center', gap: 20,
           position: 'relative', overflow: 'hidden',
         }}>
           <div style={{ position:'absolute', top:-40, right:-40, width:180, height:180,
             borderRadius:'50%', background:'rgba(255,255,255,0.04)', pointerEvents:'none'}}/>
           <div style={{
-            width: 56, height: 56, borderRadius: 16, flexShrink: 0,
+            width: 56, height: 56, borderRadius: 8, flexShrink: 0,
             background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
@@ -425,7 +425,7 @@ export default function GlobalMessagingPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div style={{
-            textAlign: 'center', padding: 60, background: 'var(--bg-card)', borderRadius: 20,
+            textAlign: 'center', padding: 60, background: 'var(--bg-card)', borderRadius: 8,
             border: '1px solid #e2e8f0',
           }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📭</div>
@@ -450,7 +450,7 @@ export default function GlobalMessagingPage() {
               const tCfg = TYPES.find(t => t.value === msg.type)!
               return (
                 <div key={msg.id} className="msg-row" style={{
-                  background: 'var(--bg-card)', borderRadius: 16, padding: '18px 20px',
+                  background: 'var(--bg-card)', borderRadius: 8, padding: '18px 20px',
                   border: '1px solid #e2e8f0', display: 'flex', gap: 16,
                   animationDelay: `${i * 0.04}s`,
                 }}>

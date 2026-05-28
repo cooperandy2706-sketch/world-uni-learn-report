@@ -134,7 +134,7 @@ function Modal({ open, onClose, title, subtitle, children, footer, width = 480 }
       zIndex: 9999, backdropFilter: 'blur(6px)', padding: 16,
     }}>
       <div style={{
-        background: T.white, borderRadius: 20, width, maxWidth: '96vw',
+        background: T.white, borderRadius: 8, width, maxWidth: '96vw',
         maxHeight: '92vh', display: 'flex', flexDirection: 'column',
         boxShadow: '0 32px 80px rgba(10,22,40,.3)', animation: '_ttsl .22s ease',
       }}>
@@ -731,7 +731,7 @@ export default function TimetablePage() {
         {activeSelection ? (
           <div
             id="tt-print-area"
-            style={{ background: T.white, borderRadius: 20, border: `1.5px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 4px 24px rgba(10,22,40,.07)' }}
+            style={{ background: T.white, borderRadius: 8, border: `1.5px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 4px 24px rgba(10,22,40,.07)' }}
           >
             <div style={{ padding: '18px 24px', borderBottom: `1px solid ${T.border}`, display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
@@ -841,7 +841,7 @@ export default function TimetablePage() {
             )}
           </div>
         ) : (
-          <div style={{ padding: '80px 20px', textAlign: 'center', background: T.white, borderRadius: 24, border: `1.5px solid ${T.border}`, boxShadow: '0 2px 8px rgba(10,22,40,.05)' }}>
+          <div style={{ padding: '80px 20px', textAlign: 'center', background: T.white, borderRadius: 12, border: `1.5px solid ${T.border}`, boxShadow: '0 2px 8px rgba(10,22,40,.05)' }}>
             <div style={{ fontSize: 56 }}>📅</div>
             <h2 style={{ fontFamily: '"Fraunces",serif', color: T.navy, margin: '12px 0 8px' }}>No {viewMode} selected</h2>
             <p style={{ color: T.muted, fontSize: 13 }}>Choose a {viewMode} above to view or edit the timetable.</p>
@@ -1311,7 +1311,7 @@ export default function TimetablePage() {
             <p style={{ fontSize: 11, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8, margin: '0 0 8px' }}>
               Reserve Extra-Curricular Slots
               {extracurricularSlots.length > 0 && (
-                <span style={{ fontWeight: 400, textTransform: 'none', color: T.green }}>
+                <span style={{ fontWeight: 600, textTransform: 'none', color: T.green }}>
                   {` (${extracurricularSlots.length} reserved)`}
                 </span>
               )}

@@ -206,7 +206,7 @@ export default function LibraryInventoryPage() {
         @keyframes inv_scan { 0%{top:0} 100%{top:100%} }
         .inv-row:hover { background: #f8fafc !important; }
         #inv-qr-reader { border: none !important; width: 100% !important; background: #000; }
-        #inv-qr-reader video { width: 100% !important; border-radius: 16px !important; object-fit: cover; }
+        #inv-qr-reader video { width: 100% !important; border-radius: 8px !important; object-fit: cover; }
         #inv-qr-reader__dashboard { display: none !important; }
         @media (max-width: 600px) { .inv-grid { grid-template-columns: 1fr !important; } }
       `}</style>
@@ -281,7 +281,7 @@ export default function LibraryInventoryPage() {
                   const onLoan = (b.copies_total ?? 0) - (b.copies_available ?? 0)
                   return (
                     <div key={b.id} onClick={() => toggleBook(b.id)}
-                      style={{ background: 'var(--bg-card)', borderRadius: 16, border: `2px solid ${isSelected ? '#7c3aed' : '#f1f5f9'}`, padding: '14px', cursor: 'pointer', display: 'flex', gap: 12, alignItems: 'center', transition: 'all .15s', boxShadow: isSelected ? '0 0 0 3px rgba(124,58,237,.15)' : 'none' }}>
+                      style={{ background: 'var(--bg-card)', borderRadius: 8, border: `2px solid ${isSelected ? '#7c3aed' : '#f1f5f9'}`, padding: '14px', cursor: 'pointer', display: 'flex', gap: 12, alignItems: 'center', transition: 'all .15s', boxShadow: isSelected ? '0 0 0 3px rgba(124,58,237,.15)' : 'none' }}>
                       {/* QR preview */}
                       <div style={{ flexShrink: 0 }}>
                         <BookQR barcode={b.barcode} title={b.title} size={64} />
@@ -314,7 +314,7 @@ export default function LibraryInventoryPage() {
         {/* ── SCAN INVENTORY MODE ── */}
         {mode === 'scan' && (
           <div style={{ maxWidth: 520, margin: '0 auto' }}>
-            <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 16 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 16 }}>
               <div style={{ padding: '14px 20px', borderBottom: '1px solid #f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Camera size={16} color="#7c3aed" />
                 <div>
@@ -349,7 +349,7 @@ export default function LibraryInventoryPage() {
 
             {/* Last scanned */}
             {lastScanned && (
-              <div style={{ background: '#f5f3ff', border: '2px solid #a78bfa', borderRadius: 16, padding: '14px 18px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 12, animation: 'inv_pop .3s ease' }}>
+              <div style={{ background: '#f5f3ff', border: '2px solid #a78bfa', borderRadius: 8, padding: '14px 18px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 12, animation: 'inv_pop .3s ease' }}>
                 <div style={{ width: 42, height: 42, borderRadius: 10, background: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 18 }}>📚</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>{lastScanned.title}</div>
@@ -361,7 +361,7 @@ export default function LibraryInventoryPage() {
 
             {/* Running count */}
             {scannedBooks.length > 0 && (
-              <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 14 }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9', overflow: 'hidden', marginBottom: 14 }}>
                 <div style={{ padding: '12px 18px', borderBottom: '1px solid #f8fafc', fontSize: 13, fontWeight: 800, color: '#0f172a' }}>
                   📊 Running Count ({scannedBooks.length} book{scannedBooks.length > 1 ? 's' : ''} scanned)
                 </div>

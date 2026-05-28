@@ -65,7 +65,7 @@ export default function BillingPage() {
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .billing-container { padding: 40px 32px; }
-        .glass-card { background: #fff; border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05); transition: all 0.3s ease; }
+        .glass-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05); transition: all 0.3s ease; }
         .glass-card:hover { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01); transform: translateY(-2px); }
         .btn-primary { background: #0f172a; color: #fff; transition: all 0.2s; border: none; cursor: pointer; }
         .btn-primary:hover { background: #1e293b; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
@@ -99,7 +99,7 @@ export default function BillingPage() {
           <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 32, fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0', lineHeight: 1.2 }}>Billing & Subscription</h1>
           <p style={{ fontSize: 15, color: '#64748b', margin: 0 }}>Manage your institution's onboarding, termly licenses, and cloud storage.</p>
         </div>
-        <div style={{ padding: '12px 24px', borderRadius: 16, background: 'var(--bg-card)', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+        <div style={{ padding: '12px 24px', borderRadius: 8, background: 'var(--bg-card)', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
           <div style={{ width: 10, height: 10, borderRadius: '50%', background: school?.status === 'active' ? '#10b981' : '#f59e0b', boxShadow: `0 0 0 4px ${school?.status === 'active' ? '#d1fae5' : '#fef3c7'}` }} />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>System Status</span>
@@ -118,7 +118,7 @@ export default function BillingPage() {
             {/* Onboarding Tier */}
             <div className="glass-card pricing-tier" style={{ padding: '32px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
-                <div style={{ width: 48, height: 48, borderRadius: 16, background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 48, height: 48, borderRadius: 8, background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <GraduationCap size={24} />
                 </div>
                 <span className="badge-premium">One-Time</span>
@@ -136,7 +136,7 @@ export default function BillingPage() {
                   'Student & PTA Orientations',
                   'Grace period: Use now, pay before term ends'
                 ].map((item, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#334155', fontWeight: 500 }}>
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#334155', fontWeight: 600 }}>
                     <CheckCircle2 size={18} color="#10b981" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ lineHeight: 1.4 }}>{item}</span>
                   </li>
@@ -149,7 +149,7 @@ export default function BillingPage() {
               <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#0f172a', color: '#fff', padding: '4px 16px', borderRadius: 99, fontSize: 12, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                 Recurring License
               </div>
-              <div style={{ width: 48, height: 48, borderRadius: 16, background: '#f5f3ff', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, marginTop: 8 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 8, background: '#f5f3ff', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, marginTop: 8 }}>
                 <Calendar size={24} />
               </div>
               <h3 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', margin: '0 0 8px 0' }}>Termly Subscription</h3>
@@ -166,7 +166,7 @@ export default function BillingPage() {
                   'Daily Backup & Security',
                   'Unlimited SMS Gateway Access'
                 ].map((item, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#334155', fontWeight: 500 }}>
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#334155', fontWeight: 600 }}>
                     <ShieldCheck size={18} color="#8b5cf6" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ lineHeight: 1.4 }}>{item}</span>
                   </li>
@@ -213,7 +213,7 @@ export default function BillingPage() {
                   <tbody>
                     {invoices.map((inv: any) => (
                       <tr key={inv.id} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}>
-                        <td style={{ padding: '20px 24px', fontSize: 14, fontWeight: 500, color: '#334155', whiteSpace: 'nowrap' }}>{formatDate(inv.created_at)}</td>
+                        <td style={{ padding: '20px 24px', fontSize: 14, fontWeight: 600, color: '#334155', whiteSpace: 'nowrap' }}>{formatDate(inv.created_at)}</td>
                         <td style={{ padding: '20px 24px', fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{inv.description || 'System Subscription'}</td>
                         <td style={{ padding: '20px 24px', fontSize: 15, fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap' }}>GHS {inv.amount}</td>
                         <td style={{ padding: '20px 24px' }}>{getStatusBadge(inv.status)}</td>
@@ -243,7 +243,7 @@ export default function BillingPage() {
           
           {/* Payment Instructions */}
           <div className="glass-card" style={{ padding: '32px 24px' }}>
-            <div style={{ width: 48, height: 48, borderRadius: 16, background: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 8, background: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
               <CreditCard size={24} />
             </div>
             <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', margin: '0 0 16px 0' }}>Payment Details</h3>
@@ -251,12 +251,12 @@ export default function BillingPage() {
               All payments for subscriptions and storage add-ons must be made via official Mobile Money channels.
             </p>
             
-            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 20, marginBottom: 24 }}>
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 20, marginBottom: 24 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>Official MoMo Number</div>
               <div style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', letterSpacing: '1px' }}>053 241 6607</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
                 <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} />
-                <span style={{ fontSize: 13, color: '#475569', fontWeight: 500 }}>MTN / Telecel / AT Money</span>
+                <span style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>MTN / Telecel / AT Money</span>
               </div>
             </div>
 
@@ -269,7 +269,7 @@ export default function BillingPage() {
           {/* Storage Upgrade Add-on */}
           <div className="glass-card" style={{ padding: '32px 24px', background: 'linear-gradient(145deg, #0f172a, #1e293b)', color: '#fff', border: 'none' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 16, background: 'rgba(255,255,255,0.1)', color: '#60a5fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 8, background: 'rgba(255,255,255,0.1)', color: '#60a5fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <HardDrive size={24} />
               </div>
               <span style={{ background: 'rgba(59, 130, 246, 0.2)', color: '#93c5fd', padding: '4px 10px', borderRadius: 99, fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Add-on</span>
@@ -286,7 +286,7 @@ export default function BillingPage() {
 
             <ul style={{ margin: '0 0 24px 0', padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {['Store thousands of student docs', 'High-res school assets', 'Automated secure backups'].map(item => (
-                <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#e2e8f0', fontWeight: 500 }}>
+                <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#e2e8f0', fontWeight: 600 }}>
                   <Server size={16} color="#60a5fa" /> {item}
                 </li>
               ))}

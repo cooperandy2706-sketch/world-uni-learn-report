@@ -81,7 +81,7 @@ export default function StudentAnnouncementsPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _sfu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        .ann-card{background:#fff; border-radius:24px; border:1.5px solid #f0eefe; padding:24px; box-shadow:0 1px 4px rgba(109,40,217,.06); transition:all .3s ease; cursor:pointer}
+        .ann-card{background:#fff; border-radius: 12px; border:1.5px solid #f0eefe; padding:24px; box-shadow:0 1px 4px rgba(109,40,217,.06); transition:all .3s ease; cursor:pointer}
         .ann-card:hover{box-shadow:0 12px 32px rgba(109,40,217,0.08); transform:translateY(-2px); border-color:#ddd6fe}
         .filter-btn{padding:8px 16px; borderRadius:12px; border:1.5px solid #e5e7eb; background:#fff; color:#64748b; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; white-space:nowrap}
         .filter-btn.active{background:#f5f3ff; color:#6d28d9; border-color:#6d28d9}
@@ -112,7 +112,7 @@ export default function StudentAnnouncementsPage() {
               placeholder="Search announcements..." 
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ width: '100%', padding: '14px 16px 14px 48px', borderRadius: 16, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none', background: 'var(--bg-card)', boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '14px 16px 14px 48px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none', background: 'var(--bg-card)', boxSizing: 'border-box' }}
             />
           </div>
           <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
@@ -131,7 +131,7 @@ export default function StudentAnnouncementsPage() {
         {/* Announcements List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, animation: '_sfu .5s ease .15s both' }}>
           {filtered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '80px 20px', background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe' }}>
+            <div style={{ textAlign: 'center', padding: '80px 20px', background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe' }}>
               <Megaphone size={48} color="#ddd6fe" style={{ marginBottom: 16 }} />
               <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e293b' }}>No notices found</h3>
               <p style={{ fontSize: 14, color: '#64748b' }}>Try adjusting your search or filters to find what you're looking for.</p>
@@ -159,7 +159,7 @@ export default function StudentAnnouncementsPage() {
                       <p style={{ fontSize: 14, color: '#475569', lineHeight: 1.6, margin: '0 0 16px', whiteSpace: 'pre-wrap' }}>{a.body}</p>
                       
                       {a.meeting_date && (
-                        <div style={{ background: '#eff6ff', borderRadius: 16, padding: '16px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                        <div style={{ background: '#eff6ff', borderRadius: 8, padding: '16px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                           <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-card)', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Calendar size={20} /></div>
                           <div>
                             <div style={{ fontSize: 11, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase' }}>Meeting Schedule</div>

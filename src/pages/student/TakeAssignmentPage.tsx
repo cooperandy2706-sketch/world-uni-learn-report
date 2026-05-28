@@ -153,18 +153,18 @@ export default function TakeAssignmentPage() {
 
   if (status === 'prep') {
     return (
-      <div style={{ maxWidth: 600, margin: '60px auto', background: 'var(--bg-card)', borderRadius: 24, padding: 40, border: '1.5px solid #f0eefe', textAlign: 'center', boxShadow: '0 20px 50px rgba(109,40,217,0.1)' }}>
+      <div style={{ maxWidth: 600, margin: '60px auto', background: 'var(--bg-card)', borderRadius: 12, padding: 40, border: '1.5px solid #f0eefe', textAlign: 'center', boxShadow: '0 20px 50px rgba(109,40,217,0.1)' }}>
         <style>{`@media (max-width: 640px) { .resp-grid-2 { grid-template-columns: 1fr !important; } }`}</style>
         <div style={{ fontSize: 48, marginBottom: 20 }}>🎯</div>
         <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>{assignment.title}</h1>
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginBottom: 32, lineHeight: 1.6 }}>{assignment.description || 'Follow instructions and complete all questions to the best of your ability.'}</p>
         
         <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
-          <div style={{ background: '#f5f3ff', borderRadius: 16, padding: '20px 16px' }}>
+          <div style={{ background: '#f5f3ff', borderRadius: 8, padding: '20px 16px' }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 4, letterSpacing: '0.05em' }}>Questions</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: '#7c3aed' }}>{questions.length} Items</div>
           </div>
-          <div style={{ background: '#fffbeb', borderRadius: 16, padding: '20px 16px' }}>
+          <div style={{ background: '#fffbeb', borderRadius: 8, padding: '20px 16px' }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 4, letterSpacing: '0.05em' }}>Time Limit</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: '#d97706' }}>{assignment.duration_minutes > 0 ? `${assignment.duration_minutes} Mins` : 'Unlimited'}</div>
           </div>
@@ -180,12 +180,12 @@ export default function TakeAssignmentPage() {
 
   if (status === 'finished') {
     return (
-      <div style={{ maxWidth: 500, margin: '80px auto', background: 'var(--bg-card)', borderRadius: 24, padding: 40, border: '1.5px solid #f0eefe', textAlign: 'center', boxShadow: '0 20px 50px rgba(16,185,129,0.1)' }}>
+      <div style={{ maxWidth: 500, margin: '80px auto', background: 'var(--bg-card)', borderRadius: 12, padding: 40, border: '1.5px solid #f0eefe', textAlign: 'center', boxShadow: '0 20px 50px rgba(16,185,129,0.1)' }}>
         <div style={{ width: 80, height: 80, background: '#ecfdf5', borderRadius: '50%', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, margin: '0 auto 24px' }}>✨</div>
         <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Well Done!</h1>
         <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 32 }}>You have successfully completed your assignment.</p>
         
-        <div style={{ background: 'linear-gradient(135deg,#f0fdf4,#d1fae5)', borderRadius: 20, padding: '30px 20px', marginBottom: 32 }}>
+        <div style={{ background: 'linear-gradient(135deg,#f0fdf4,#d1fae5)', borderRadius: 8, padding: '30px 20px', marginBottom: 32 }}>
           <div style={{ fontSize: 12, fontWeight: 800, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Your Final Score</div>
           <div style={{ fontSize: 48, fontWeight: 900, color: '#065f46' }}>{score.earned} / {score.total}</div>
         </div>
@@ -206,7 +206,7 @@ export default function TakeAssignmentPage() {
     <>
       <style>{`
         @keyframes _fade { from{opacity:0;transform:scale(0.98)} to{opacity:1;transform:scale(1)} }
-        .option-btn { transition: all 0.2s; border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; background: #fff; width: 100%; text-align: left; font-family: inherit; font-size: 14px; font-weight: 500; color: #374151; }
+        .option-btn { transition: all 0.2s; border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; background: #fff; width: 100%; text-align: left; font-family: inherit; font-size: 14px; font-weight: 600; color: #374151; }
         .option-btn:hover { border-color: #7c3aed; background: #f5f3ff; }
         .option-btn.selected { border-color: #7c3aed; background: #f5f3ff; box-shadow: 0 0 0 3px rgba(109,40,217,0.1); color: #7c3aed; font-weight: 700; }
         @media (max-width: 640px) { .resp-grid-2 { grid-template-columns: 1fr !important; } }

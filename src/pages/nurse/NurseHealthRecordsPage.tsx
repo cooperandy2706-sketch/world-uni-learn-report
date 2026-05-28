@@ -96,7 +96,7 @@ export default function NurseHealthRecordsPage() {
         </div>
       </div>
 
-      <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1px solid var(--border-color)', overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ background: '#f8fafc', borderBottom: '1.5px solid var(--border-color)' }}>
@@ -178,7 +178,7 @@ export default function NurseHealthRecordsPage() {
 
       {editingRecord && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 24, padding: 32, position: 'relative', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
+          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 12, padding: 32, position: 'relative', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
             <button onClick={() => setEditingRecord(null)} style={{ position: 'absolute', top: 24, right: 24, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)' }}>
               <X size={24} />
             </button>

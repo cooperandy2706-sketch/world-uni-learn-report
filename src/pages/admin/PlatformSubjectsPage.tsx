@@ -151,7 +151,7 @@ export default function PlatformSubjectsPage() {
           <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#7c3aed', animation: '_spin 0.8s linear infinite' }} />
         </div>
       ) : subjects.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '80px 20px', background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f1f5f9' }}>
+        <div style={{ textAlign: 'center', padding: '80px 20px', background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>🌍</div>
           <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1e293b' }}>No Global Subjects Yet</h3>
           <p style={{ fontSize: 13, color: '#64748b', marginBottom: 20 }}>Define subjects here that will be standard for all schools on the platform.</p>

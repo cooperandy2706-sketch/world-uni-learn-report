@@ -47,7 +47,7 @@ interface ClinicVisit {
 function StatCard({ icon: Icon, label, value, color, bg }: any) {
   return (
     <div style={{
-      background: T.card, borderRadius: 16, padding: '16px 20px', border: `1px solid ${T.border}`,
+      background: T.card, borderRadius: 8, padding: '16px 20px', border: `1px solid ${T.border}`,
       display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 4px 12px rgba(0,0,0,0.02)'
     }}>
       <div style={{ width: 48, height: 48, borderRadius: 12, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -199,7 +199,7 @@ export default function NurseDashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 24, alignItems: 'start' }}>
         
         {/* Left Column: Student Search & Selection */}
-        <div style={{ background: T.card, borderRadius: 16, border: `1px solid ${T.border}`, padding: 20, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+        <div style={{ background: T.card, borderRadius: 8, border: `1px solid ${T.border}`, padding: 20, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
             <Search size={18} color={T.primary} /> Find Patient
           </h2>
@@ -243,7 +243,7 @@ export default function NurseDashboard() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             
             {/* Quick Actions */}
-            <div style={{ background: T.card, borderRadius: 16, border: `1px solid ${T.border}`, padding: 20, boxShadow: '0 4px 12px rgba(0,0,0,0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ background: T.card, borderRadius: 8, border: `1px solid ${T.border}`, padding: 20, boxShadow: '0 4px 12px rgba(0,0,0,0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                 <img src={selectedStudent.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedStudent.full_name)}&background=0ea5e9&color=fff`} alt="" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
                 <div>
@@ -260,7 +260,7 @@ export default function NurseDashboard() {
             </div>
 
             {/* Medical Record Form */}
-            <div style={{ background: T.card, borderRadius: 16, border: `1px solid ${T.border}`, padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+            <div style={{ background: T.card, borderRadius: 8, border: `1px solid ${T.border}`, padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: '0 0 20px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Activity size={18} color={T.orange} /> Medical History
               </h3>
@@ -303,7 +303,7 @@ export default function NurseDashboard() {
             </div>
 
             {/* Visit History */}
-            <div style={{ background: T.card, borderRadius: 16, border: `1px solid ${T.border}`, padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+            <div style={{ background: T.card, borderRadius: 8, border: `1px solid ${T.border}`, padding: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: '0 0 20px 0' }}>Recent Clinic Visits</h3>
               
               {loadingVisits ? <p style={{ color: T.muted, fontSize: 14 }}>Loading...</p> : (
@@ -328,9 +328,9 @@ export default function NurseDashboard() {
 
           </div>
         ) : (
-          <div style={{ background: T.card, borderRadius: 16, border: `1px dashed ${T.border}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400, color: T.muted }}>
+          <div style={{ background: T.card, borderRadius: 8, border: `1px dashed ${T.border}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400, color: T.muted }}>
             <Stethoscope size={48} opacity={0.2} style={{ marginBottom: 16 }} />
-            <p style={{ fontSize: 15, fontWeight: 500 }}>Select a student to view their medical profile</p>
+            <p style={{ fontSize: 15, fontWeight: 600 }}>Select a student to view their medical profile</p>
           </div>
         )}
       </div>
@@ -338,7 +338,7 @@ export default function NurseDashboard() {
       {/* Log Visit Modal */}
       {visitModalOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 20, overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 8, overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
             <div style={{ padding: '20px 24px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Log Clinic Visit</h3>
               <button onClick={() => setVisitModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.muted }}><X size={20} /></button>

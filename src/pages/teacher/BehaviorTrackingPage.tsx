@@ -140,7 +140,7 @@ export default function BehaviorTrackingPage() {
         <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', animation: 'fadeIn 0.5s ease' }}>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .card { background: var(--bg-card); border-radius: 16px; border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+                .card { background: var(--bg-card); border-radius: 8px; border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
                 .type-btn { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--bg-card); color: var(--text-main); cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
                 .type-btn.active.merit { border-color: #10b981; background: #ecfdf5; color: #065f46; }
                 .type-btn.active.demerit { border-color: #ef4444; background: #fef2f2; color: #991b1b; }

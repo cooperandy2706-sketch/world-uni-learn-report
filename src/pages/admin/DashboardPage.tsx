@@ -15,6 +15,8 @@ import { AreaChart, Area, BarChart, Bar, Cell, Legend, XAxis, YAxis, CartesianGr
 import { motion, AnimatePresence } from 'framer-motion'
 import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare } from 'lucide-react'
 import { useThemeStore } from '../../store/themeStore'
+import { useExeats } from '../../hooks/useParents'
+import { useRecentActions } from '../../hooks/useAuditLogs'
 
 
 // ... interfaces and helper functions
@@ -131,6 +133,8 @@ export default function DashboardPage() {
   const [todayLessons, setTodayLessons] = useState<TimetableLesson[]>([])
   const [coverageStats, setCoverageStats] = useState<CoverageStats>({ activeClasses: 0, totalClasses: 0, percentage: 0 })
   const [pendingLeavesCount, setPendingLeavesCount] = useState<number>(0)
+  const { data: exeats = [], isLoading: loadingExeats } = useExeats()
+  const { data: recentActions = [], isLoading: loadingActions } = useRecentActions(user?.school?.id, 10)
   const [pendingExeatsCount, setPendingExeatsCount] = useState<number>(0)
   const [weeklyGoalsStats, setWeeklyGoalsStats] = useState<WeeklyGoalsStats>({ total: 0, completed: 0, percentage: 0 })
   const [locateClass, setLocateClass] = useState<any | null>(null)
@@ -594,7 +598,7 @@ export default function DashboardPage() {
         .glass-panel {
           background: #ffffff;
           border: 1px solid var(--border-color);
-          border-radius: 16px;
+          border-radius: 8px;
           overflow: hidden;
           position: relative;
           transition: background-color 0.3s ease, border-color 0.3s ease;
@@ -605,7 +609,7 @@ export default function DashboardPage() {
         }
         .kpi-card {
           background: var(--bg-card);
-          border-radius: 16px;
+          border-radius: 8px;
           padding: 24px;
           border: 1px solid var(--border-color);
           box-shadow: none;
@@ -820,7 +824,7 @@ export default function DashboardPage() {
         <motion.div variants={itemVariants} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32, flexWrap: 'wrap', gap: 20 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-              <div style={{ padding: '6px 12px', background: isDark ? 'rgba(79, 70, 229, 0.2)' : '#e0e7ff', color: isDark ? '#818cf8' : '#4f46e5', borderRadius: 20, fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ padding: '6px 12px', background: isDark ? 'rgba(79, 70, 229, 0.2)' : '#e0e7ff', color: isDark ? '#818cf8' : '#4f46e5', borderRadius: 8, fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Activity size={14} /> Live Monitor
               </div>
               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} • <DashboardClock /></span>
@@ -838,7 +842,7 @@ export default function DashboardPage() {
           
           <Link to={ROUTES.ADMIN_STUDENTS} className="kpi-card" style={{ '--theme-color': '#3b82f6' } as any}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 16, background: isDark ? 'rgba(59, 130, 246, 0.2)' : '#eff6ff', color: isDark ? '#60a5fa' : '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BookOpen size={24} /></div>
+              <div style={{ width: 48, height: 48, borderRadius: 8, background: isDark ? 'rgba(59, 130, 246, 0.2)' : '#eff6ff', color: isDark ? '#60a5fa' : '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BookOpen size={24} /></div>
               <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
             </div>
             <div>
@@ -849,7 +853,7 @@ export default function DashboardPage() {
 
           <Link to={ROUTES.ADMIN_STAFF_DIRECTORY} className="kpi-card" style={{ '--theme-color': '#8b5cf6' } as any}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 16, background: isDark ? 'rgba(139, 92, 246, 0.2)' : '#f5f3ff', color: isDark ? '#a78bfa' : '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Activity size={24} /></div>
+              <div style={{ width: 48, height: 48, borderRadius: 8, background: isDark ? 'rgba(139, 92, 246, 0.2)' : '#f5f3ff', color: isDark ? '#a78bfa' : '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Activity size={24} /></div>
               <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
             </div>
             <div>
@@ -860,7 +864,7 @@ export default function DashboardPage() {
 
           <Link to={ROUTES.ADMIN_ATTENDANCE} className="kpi-card" style={{ '--theme-color': '#10b981' } as any}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 16, background: isDark ? 'rgba(16, 185, 129, 0.2)' : '#ecfdf5', color: isDark ? '#34d399' : '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CheckCircle2 size={24} /></div>
+              <div style={{ width: 48, height: 48, borderRadius: 8, background: isDark ? 'rgba(16, 185, 129, 0.2)' : '#ecfdf5', color: isDark ? '#34d399' : '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CheckCircle2 size={24} /></div>
               <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
             </div>
             <div>
@@ -871,7 +875,7 @@ export default function DashboardPage() {
 
           <Link to={'/bursar/fees'} className="kpi-card" style={{ '--theme-color': '#f59e0b' } as any}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 16, background: isDark ? 'rgba(245, 158, 11, 0.2)' : '#fffbeb', color: isDark ? '#fbbf24' : '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 800 }}>₵</div>
+              <div style={{ width: 48, height: 48, borderRadius: 8, background: isDark ? 'rgba(245, 158, 11, 0.2)' : '#fffbeb', color: isDark ? '#fbbf24' : '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 800 }}>₵</div>
               <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
             </div>
             <div>
@@ -1032,11 +1036,11 @@ export default function DashboardPage() {
                 </div>
                 <div style={{ width: '60%', display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 16, border: '1.5px solid var(--border-color)' }}>
+                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 8, border: '1.5px solid var(--border-color)' }}>
                       <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Set</div>
                       <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginTop: 4 }}>{weeklyGoalsStats.total}</div>
                     </div>
-                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 16, border: '1.5px solid var(--border-color)' }}>
+                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 8, border: '1.5px solid var(--border-color)' }}>
                       <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Achieved</div>
                       <div style={{ fontSize: 24, fontWeight: 800, color: '#10b981', marginTop: 4 }}>{weeklyGoalsStats.completed}</div>
                     </div>
@@ -1119,93 +1123,87 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Live Classroom Coverage Monitor & Teacher Schedule Coverage */}
+        {/* Recent Actions / Activity Feed */}
         <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 32, marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
-                <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Live Classroom Monitor</h3>
+                <Activity size={24} color="#6d28d9" />
+                <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Recent Actions</h3>
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '4px 0 0' }}>
-                Active classes, schedules, and assigned teachers on campus today.
+                Real-time activity feed of actions across the campus.
               </p>
-            </div>
-            
-            <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)' }}>Classroom Coverage</div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: '#10b981', marginTop: 2 }}>
-                  {coverageStats.percentage}% <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>({coverageStats.activeClasses}/{coverageStats.totalClasses} Active)</span>
-                </div>
-              </div>
-              <div style={{ width: 100, height: 8, background: isDark ? 'rgba(255,255,255,0.06)' : '#e2e8f0', borderRadius: 99, overflow: 'hidden' }}>
-                <div style={{ width: `${coverageStats.percentage}%`, height: '100%', background: '#10b981', borderRadius: 99 }} />
-              </div>
             </div>
           </div>
 
-          {/* Weekend Mode Indicator */}
-          {(new Date().getDay() === 0 || new Date().getDay() === 6) && (
-            <div style={{ 
-              background: isDark ? 'rgba(99,102,241,0.1)' : '#e0e7ff',
-              border: '1px solid rgba(99,102,241,0.2)',
-              borderRadius: 14, padding: '12px 16px', fontSize: 13, color: isDark ? '#a5b4fc' : '#4f46e5',
-              display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontWeight: 600
-            }}>
-              💡 Weekend Mode: Currently displaying Monday's simulated class schedules for presentation purposes.
-            </div>
-          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {loadingActions ? (
+              <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-subtle)', fontSize: 14 }}>
+                Loading activity feed...
+              </div>
+            ) : recentActions.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-subtle)', fontSize: 14 }}>
+                No recent activity recorded yet.
+              </div>
+            ) : (
+              recentActions.map((action) => {
+                let icon = <User size={16} />
+                let color = '#6d28d9'
+                let actionDesc = 'Performed an action'
 
-          {/* Classroom Cards Grid */}
-          {todayLessons.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-subtle)', fontSize: 14 }}>
-              No timetable classes scheduled for today.
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
-              {todayLessons.map((l: any) => (
-                <div key={l.id} className="timetable-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                    <span style={{ 
-                      padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 800, textTransform: 'uppercase',
-                      background: l.isNow ? (isDark ? 'rgba(16,185,129,0.15)' : '#ecfdf5') : (isDark ? 'rgba(255,255,255,0.04)' : '#f1f5f9'),
-                      color: l.isNow ? '#10b981' : 'var(--text-muted)',
-                      display: 'inline-flex', alignItems: 'center', gap: 6
+                // Map table operations to human-readable text
+                if (action.table_name === 'attendance') {
+                  icon = <Clock size={16} />
+                  color = '#10b981'
+                  actionDesc = action.action === 'INSERT' ? 'Marked attendance' : 'Updated attendance'
+                } else if (action.table_name === 'lesson_notes') {
+                  icon = <BookOpen size={16} />
+                  color = '#3b82f6'
+                  actionDesc = 'Submitted a lesson note'
+                } else if (action.table_name === 'exeats') {
+                  icon = <Navigation size={16} />
+                  color = '#f59e0b'
+                  actionDesc = action.action === 'INSERT' ? 'Requested an exeat' : 'Updated exeat status'
+                } else if (action.table_name === 'users') {
+                  icon = <Users size={16} />
+                  color = '#8b5cf6'
+                  actionDesc = 'Updated user profile'
+                }
+
+                return (
+                  <div key={action.id} style={{ 
+                    display: 'flex', alignItems: 'flex-start', gap: 16, 
+                    padding: '16px 20px', borderRadius: 12,
+                    background: isDark ? 'rgba(255,255,255,0.03)' : '#f8fafc',
+                    border: '1px solid var(--border-light)'
+                  }}>
+                    <div style={{ 
+                      width: 40, height: 40, borderRadius: '50%', background: `${color}15`, color,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
                     }}>
-                      {l.isNow && <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', display: 'inline-block', animation: 'map-pulse 1.8s infinite' }} />}
-                      {l.isNow ? 'In Session' : 'Scheduled'}
-                    </span>
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{l.period?.name}</span>
-                  </div>
-
-                  <h4 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 4px' }}>{l.class?.name}</h4>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#6366f1', marginBottom: 14 }}>{l.subject?.name}</div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: 12 }}>
-                    <div>
-                      <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 700, textTransform: 'uppercase' }}>Teacher</div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginTop: 2 }}>{l.teacher?.user?.full_name ?? 'Substitute Assigned'}</div>
+                      {icon}
                     </div>
-                    
-                    <button 
-                      onClick={() => setLocateClass(l)}
-                      style={{ 
-                        display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 12px', 
-                        background: isDark ? 'rgba(99,102,241,0.15)' : '#e0e7ff', color: isDark ? '#a5b4fc' : '#4f46e5',
-                        border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                        transition: 'all 0.15s ease'
-                      }}
-                      onMouseOver={e => { e.currentTarget.style.transform = 'scale(1.03)' }}
-                      onMouseOut={e => { e.currentTarget.style.transform = 'scale(1)' }}
-                    >
-                      <MapPin size={12} /> Locate
-                    </button>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>
+                        {actionDesc}
+                      </div>
+                      <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4, display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{action.user_name || 'System User'}</span>
+                        • <span>{new Date(action.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}</span>
+                      </div>
+                    </div>
+                    <div style={{ 
+                      padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 800, textTransform: 'uppercase',
+                      background: 'var(--bg-app)', color: 'var(--text-subtle)', border: '1px solid var(--border-color)'
+                    }}>
+                      {action.table_name}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                )
+              })
+            )}
+          </div>
         </motion.div>
 
         {/* Tier 3: Campus Vital Signs Grid */}
@@ -1252,7 +1250,7 @@ export default function DashboardPage() {
                           <div style={{ width: 36, height: 36, borderRadius: 12, background: i === 0 ? (isDark ? '#854d0e' : '#fef3c7') : (isDark ? '#334155' : '#fff'), color: i === 0 ? (isDark ? '#fef08a' : '#d97706') : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, border: '1.5px solid var(--border-light)', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>#{i + 1}</div>
                           <div style={{ flex: 1 }}>
                             <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{s.full_name}</div>
-                            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>{s.class_name}</div>
+                            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{s.class_name}</div>
                           </div>
                           <div style={{ textAlign: 'right' }}>
                             <div style={{ fontSize: 16, fontWeight: 800, color: g.color }}>{(s.average_score / 20).toFixed(2)}</div>
@@ -1310,7 +1308,7 @@ export default function DashboardPage() {
           <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', minHeight: 380 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Absentee Alert</h3>
-              <span style={{ background: isDark ? 'rgba(239,68,68,0.2)' : '#fef2f2', color: '#ef4444', padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 800 }}>{absentStudents.length} Students</span>
+              <span style={{ background: isDark ? 'rgba(239,68,68,0.2)' : '#fef2f2', color: '#ef4444', padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 800 }}>{absentStudents.length} Students</span>
             </div>
             
             <div className="hide-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -1359,7 +1357,7 @@ export default function DashboardPage() {
             <div 
               onClick={e => e.stopPropagation()}
               style={{
-                background: 'var(--bg-card)', borderRadius: 24, width: '100%', maxWidth: 840,
+                background: 'var(--bg-card)', borderRadius: 12, width: '100%', maxWidth: 840,
                 maxHeight: 'calc(100vh - 48px)',
                 boxShadow: '0 24px 64px rgba(0,0,0,0.2)', border: '1.5px solid var(--border-color)',
                 display: 'flex', flexDirection: 'column', overflow: 'hidden',
@@ -1384,7 +1382,7 @@ export default function DashboardPage() {
                   {/* Outer Map Grid */}
                   <div style={{ 
                     background: isDark ? 'rgba(15,23,42,0.4)' : '#f8fafc',
-                    border: '1.5px dashed var(--border-color)', borderRadius: 16,
+                    border: '1.5px dashed var(--border-color)', borderRadius: 8,
                     padding: 24, minHeight: 260, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16,
                     position: 'relative'
                   }}>
@@ -1438,7 +1436,7 @@ export default function DashboardPage() {
                 <div style={{ flex: '1 1 280px', display: 'flex', flexDirection: 'column', gap: 20 }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>Class Details</div>
-                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 16, border: '1.5px solid var(--border-color)' }}>
+                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 8, border: '1.5px solid var(--border-color)' }}>
                       <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>{locateClass.class?.name}</div>
                       <div style={{ fontSize: 14, fontWeight: 600, color: '#6366f1', marginBottom: 12 }}>{locateClass.subject?.name}</div>
                       <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -1462,7 +1460,7 @@ export default function DashboardPage() {
 
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>Directions from Office</div>
-                    <div style={{ border: '1.5px solid var(--border-color)', padding: 16, borderRadius: 16, background: 'var(--bg-card)' }}>
+                    <div style={{ border: '1.5px solid var(--border-color)', padding: 16, borderRadius: 8, background: 'var(--bg-card)' }}>
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12 }}>
                         <div style={{ background: '#6366f1', color: 'white', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 'bold', flexShrink: 0 }}>1</div>
                         <div style={{ fontSize: 12, color: 'var(--text-main)', lineHeight: 1.4 }}>

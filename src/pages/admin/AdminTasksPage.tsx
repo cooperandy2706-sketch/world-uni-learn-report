@@ -119,7 +119,7 @@ export default function AdminTasksPage() {
         <div style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto', animation: 'fadeIn 0.5s ease' }}>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .card { background: white; border-radius: 16px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+                .card { background: white; border-radius: 8px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
                 .task-row:hover { background: #f9fafb; }
                 .priority-high { color: #ef4444; background: #fef2f2; }
                 .priority-medium { color: #f59e0b; background: #fffbeb; }
@@ -152,7 +152,7 @@ export default function AdminTasksPage() {
                 {filteredTasks.length === 0 ? (
                     <div style={{ padding: '80px 40px', textAlign: 'center' }}>
                         <CheckCircle2 size={48} color="#e5e7eb" style={{ marginBottom: 16 }} />
-                        <p style={{ color: 'var(--text-subtle)', fontWeight: 500 }}>No tasks found. Relax or create a new one!</p>
+                        <p style={{ color: 'var(--text-subtle)', fontWeight: 600 }}>No tasks found. Relax or create a new one!</p>
                     </div>
                 ) : filteredTasks.map((t, i) => (
                     <div key={i} className="task-row" style={{ padding: '20px 24px', borderBottom: i === filteredTasks.length - 1 ? 'none' : '1px solid #f0eefe', display: 'flex', gap: 20, alignItems: 'flex-start' }}>

@@ -118,7 +118,7 @@ export default function StudentVaultPage() {
         <div style={{ animation: 'fadeIn 0.5s ease' }}>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .card { background: white; border-radius: 16px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+                .card { background: white; border-radius: 8px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
                 .student-item:hover { background: #f5f3ff; cursor: pointer; }
                 .doc-card:hover { border-color: #c4b5fd; transform: translateY(-2px); transition: all 0.2s; }
             `}</style>
@@ -183,7 +183,7 @@ export default function StudentVaultPage() {
                                 {documents.length === 0 ? (
                                     <div className="card" style={{ gridColumn: '1/-1', padding: '100px', textAlign: 'center', borderStyle: 'dashed', background: 'var(--bg-input)' }}>
                                         <FileText size={48} color="#e5e7eb" style={{ marginBottom: 16 }} />
-                                        <p style={{ color: 'var(--text-subtle)', fontWeight: 500 }}>No documents in this student's vault yet.</p>
+                                        <p style={{ color: 'var(--text-subtle)', fontWeight: 600 }}>No documents in this student's vault yet.</p>
                                     </div>
                                 ) : documents.map((d, i) => (
                                     <div key={i} className="card doc-card" style={{ padding: '20px' }}>

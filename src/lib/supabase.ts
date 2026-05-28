@@ -19,7 +19,7 @@ if (MISSING_VARS) {
     if (root) {
       root.innerHTML = `
         <div style="font-family:system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f172a;padding:32px;box-sizing:border-box">
-          <div style="background:#1e293b;border:1px solid #dc2626;border-radius:16px;padding:40px;max-width:480px;width:100%;text-align:center">
+          <div style="background:#1e293b;border:1px solid #dc2626;border-radius: 8px;padding:40px;max-width:480px;width:100%;text-align:center">
             <div style="font-size:48px;margin-bottom:16px">⚙️</div>
             <h2 style="color:#f87171;font-size:22px;font-weight:800;margin:0 0 12px">Configuration Error</h2>
             <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin:0 0 20px">

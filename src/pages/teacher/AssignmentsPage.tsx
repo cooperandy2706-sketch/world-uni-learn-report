@@ -361,7 +361,7 @@ export default function AssignmentsPage() {
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', maxWidth: 900, margin: '0 auto', padding: '10px 4px' }}>
         {modalOpen ? (
           /* ── INLINE ASSIGNMENT BUILDER VIEW ── */
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid var(--border-color)', padding: 20, animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid var(--border-color)', padding: 20, animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid var(--border-light)', paddingBottom: 16 }}>
               <div>
                 <button onClick={() => setModalOpen(false)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Assignments</button>
@@ -544,14 +544,14 @@ export default function AssignmentsPage() {
             ) : viewMode === 'global' && !selectedGlobalSubject ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
                 {globalSubjects.length === 0 ? (
-                   <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
+                   <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
                      <div style={{ fontSize: 48, marginBottom: 12 }}>🌍</div>
                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No challenges yet!</h3>
                      <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>The school hasn't published any global quizzes.</p>
                    </div>
                 ) : globalSubjects.map(sub => (
                   <div key={sub.id} className="assign-card" onClick={() => setSelectedGlobalSubject(sub.id)} style={{ 
-                    background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
+                    background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: 24, 
                     boxShadow: '0 2px 8px rgba(109,40,217,0.05)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.2s'
                   }}>
                     <div style={{ width: 48, height: 48, borderRadius: 14, background: '#f5f3ff', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
@@ -567,7 +567,7 @@ export default function AssignmentsPage() {
             ) : viewMode === 'global' && selectedGlobalSubject ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
                  {filteredGlobal.length === 0 ? (
-                   <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1/-1' }}>No quizzes here.</div>
+                   <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1/-1' }}>No quizzes here.</div>
                  ) : filteredGlobal.map((g, i) => (
                    <div key={g.id} style={{ 
                      background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
@@ -601,7 +601,7 @@ export default function AssignmentsPage() {
                  ))}
               </div>
             ) : assignments.length === 0 ? (
-              <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>📝</div>
                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No assignments created</h3>
                 <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>Start by creating your first digital quiz for your students.</p>

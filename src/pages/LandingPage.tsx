@@ -269,7 +269,7 @@ const CSS = `
     .shape-circle-1 { width: 400px; height: 400px; top: -100px; right: -50px; }
     .shape-circle-2 { width: 300px; height: 300px; bottom: -50px; left: -100px; }
   }
-  .shape-rect { width: 150px; height: 150px; border-radius: 20px; top: 20%; right: 5%; animation: float1 18s infinite ease-in-out; transform: rotate(15deg); }
+  .shape-rect { width: 150px; height: 150px; border-radius: 8px; top: 20%; right: 5%; animation: float1 18s infinite ease-in-out; transform: rotate(15deg); }
   .shape-polygon { width: 100px; height: 100px; top: 15%; left: 5%; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); animation: float2 14s infinite ease-in-out; background: rgba(124,58,237,0.05); }
   @media (min-width: 768px) {
     .shape-rect { width: 250px; height: 250px; border-radius: 40px; top: 30%; right: 15%; }
@@ -292,7 +292,7 @@ const CSS = `
     font-family: var(--sans); font-size: clamp(2.5rem, 10vw, 4.5rem); line-height: 1.15; font-weight: 900; letter-spacing: -0.02em;
     margin-bottom: 1.25rem; color: white;
   }
-  .hero-subtitle { font-size: 1.05rem; color: rgba(255,255,255,0.7); margin-bottom: 2rem; line-height: 1.6; max-width: 600px; margin-inline: auto; font-weight: 400; padding: 0 0.5rem; }
+  .hero-subtitle { font-size: 1.05rem; color: rgba(255,255,255,0.7); margin-bottom: 2rem; line-height: 1.6; max-width: 600px; margin-inline: auto; font-weight: 600; padding: 0 0.5rem; }
   @media (min-width: 768px) { .hero-subtitle { font-size: 1.2rem; margin-bottom: 2.5rem; } }
   
   .hero-btns { display: flex; flex-direction: column; gap: 1rem; justify-content: center; width: 100%; padding: 0 1rem; }
@@ -330,10 +330,10 @@ const CSS = `
   @media (min-width: 1024px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
   
   .feature-card {
-    background: white; padding: 1.75rem; border-radius: 20px; border: 1px solid rgba(0,0,0,0.04);
+    background: white; padding: 1.75rem; border-radius: 8px; border: 1px solid rgba(0,0,0,0.04);
     transition: all 0.4s ease; box-shadow: var(--shadow); position: relative; overflow: hidden;
   }
-  @media (min-width: 768px) { .feature-card { padding: 2.5rem; border-radius: 24px; } }
+  @media (min-width: 768px) { .feature-card { padding: 2.5rem; border-radius: 12px; } }
   .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
   @media (min-width: 768px) { .feature-card:hover { transform: translateY(-8px); } }
   
@@ -343,7 +343,7 @@ const CSS = `
   .feature-title { font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-bottom: 0.75rem; }
   @media (min-width: 768px) { .feature-title { font-size: 1.35rem; margin-bottom: 1rem; } }
   
-  .feature-desc { color: var(--text-light); font-size: 0.9rem; line-height: 1.6; font-weight: 500; }
+  .feature-desc { color: var(--text-light); font-size: 0.9rem; line-height: 1.6; font-weight: 600; }
   @media (min-width: 768px) { .feature-desc { font-size: 0.95rem; line-height: 1.7; } }
 
   /* ── PILLARS ── */
@@ -385,12 +385,12 @@ const CSS = `
   @media (min-width: 1024px) { .pricing-cards-container { flex-direction: row; justify-content: center; gap: 2rem; padding: 1rem 0 3rem; } }
 
   .pricing-card {
-    background: white; border-radius: 20px; padding: 2rem 1.5rem;
+    background: white; border-radius: 8px; padding: 2rem 1.5rem;
     box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06);
     flex: 1; max-width: 100%; width: 100%; margin: 0 auto;
     transition: all 0.4s ease; display: flex; flex-direction: column;
   }
-  @media (min-width: 768px) { .pricing-card { padding: 3rem 2.5rem; border-radius: 24px; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); } }
+  @media (min-width: 768px) { .pricing-card { padding: 3rem 2.5rem; border-radius: 12px; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); } }
   @media (min-width: 1024px) { .pricing-card.featured { transform: scale(1.05); z-index: 10; border-color: var(--accent); box-shadow: 0 20px 50px rgba(124,58,237,0.1); } }
   
   .pricing-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0,0,0,0.06); }
@@ -426,11 +426,11 @@ const CSS = `
   
   .workflow-item {
     display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem;
-    padding: 1.75rem; background: white; border-radius: 20px; border: 1px solid rgba(0,0,0,0.04);
+    padding: 1.75rem; background: white; border-radius: 8px; border: 1px solid rgba(0,0,0,0.04);
     transition: all 0.3s; box-shadow: var(--shadow);
   }
   @media (min-width: 768px) {
-    .workflow-item { display: grid; grid-template-columns: 70px 1fr; gap: 1.5rem; align-items: start; text-align: left; padding: 2.5rem; border-radius: 24px; }
+    .workflow-item { display: grid; grid-template-columns: 70px 1fr; gap: 1.5rem; align-items: start; text-align: left; padding: 2.5rem; border-radius: 12px; }
     .workflow-item:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); transform: translateX(10px); }
   }
   
@@ -439,11 +439,11 @@ const CSS = `
     display: flex; align-items: center; justify-content: center;
     border-radius: 14px; font-weight: 900; font-family: var(--serif); font-size: 1.25rem; margin: 0 auto;
   }
-  @media (min-width: 768px) { .workflow-num { width: 70px; height: 70px; border-radius: 16px; font-size: 1.5rem; margin: 0; } }
+  @media (min-width: 768px) { .workflow-num { width: 70px; height: 70px; border-radius: 8px; font-size: 1.5rem; margin: 0; } }
   
   .workflow-content h4 { font-size: 1.15rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--primary); }
   @media (min-width: 768px) { .workflow-content h4 { font-size: 1.25rem; } }
-  .workflow-content p { font-size: 0.95rem; color: var(--text-light); font-weight: 500; }
+  .workflow-content p { font-size: 0.95rem; color: var(--text-light); font-weight: 600; }
   @media (min-width: 768px) { .workflow-content p { font-size: 1rem; } }
   .workflow-tag { 
     display: inline-block; margin-top: 1rem; font-size: 0.7rem; font-weight: 800;
@@ -472,11 +472,11 @@ const CSS = `
   
   .download-card {
     display: flex; align-items: center; gap: 1rem;
-    background: white; border: 1px solid rgba(0,0,0,0.07); border-radius: 16px;
+    background: white; border: 1px solid rgba(0,0,0,0.07); border-radius: 8px;
     padding: 1.25rem 1.5rem; text-decoration: none; color: var(--primary);
     box-shadow: var(--shadow); transition: all 0.3s; width: 100%; justify-content: center;
   }
-  @media (min-width: 640px) { .download-card { padding: 1.5rem 2.5rem; border-radius: 20px; width: auto; min-width: 240px; } }
+  @media (min-width: 640px) { .download-card { padding: 1.5rem 2.5rem; border-radius: 8px; width: auto; min-width: 240px; } }
   .download-card:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: var(--accent); }
   @media (min-width: 768px) { .download-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); } }
   
@@ -487,7 +487,7 @@ const CSS = `
   @media (min-width: 768px) { .download-card-label { font-size: 0.75rem; } }
   .download-card-name { font-size: 1.1rem; font-weight: 900; color: var(--primary); }
   @media (min-width: 768px) { .download-card-name { font-size: 1.2rem; } }
-  .download-note { margin-top: 1.5rem; font-size: 0.75rem; color: var(--text-light); font-weight: 500; padding: 0 1rem; }
+  .download-note { margin-top: 1.5rem; font-size: 0.75rem; color: var(--text-light); font-weight: 600; padding: 0 1rem; }
   @media (min-width: 768px) { .download-note { margin-top: 1.75rem; font-size: 0.85rem; padding: 0; } }
 
   /* ── CTA ── */
@@ -516,7 +516,7 @@ const CSS = `
   @media (min-width: 768px) { .footer-col h5 { font-size: 0.85rem; margin-bottom: 1.5rem; } }
   .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 768px) { .footer-links { display: grid; gap: 0.85rem; } }
-  .footer-link { color: rgba(255, 255, 255, 0.6); font-size: 0.95rem; text-decoration: none; transition: color 0.2s; font-weight: 500; display: block; padding: 0.25rem 0; }
+  .footer-link { color: rgba(255, 255, 255, 0.6); font-size: 0.95rem; text-decoration: none; transition: color 0.2s; font-weight: 600; display: block; padding: 0.25rem 0; }
   .footer-link:hover { color: white; }
   .footer-bottom { border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 3rem; padding-top: 2rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; text-align: center; font-size: 0.8rem; color: rgba(255, 255, 255, 0.4); }
   @media (min-width: 768px) { .footer-bottom { margin-top: 4rem; flex-direction: row; justify-content: space-between; text-align: left; font-size: 0.85rem; } }

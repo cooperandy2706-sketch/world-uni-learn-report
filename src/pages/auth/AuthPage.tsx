@@ -49,7 +49,7 @@ function UnderlineField({ label, error, ...props }: UnderlineFieldProps) {
         />
       </div>
       {error && (
-        <p style={{ fontSize: 12, color: '#fca5a5', marginTop: 6, fontWeight: 500 }}>
+        <p style={{ fontSize: 12, color: '#fca5a5', marginTop: 6, fontWeight: 600 }}>
           {error}
         </p>
       )}
@@ -248,7 +248,7 @@ export default function AuthPage() {
           border: 1px solid rgba(255, 255, 255, 0.1);
           box-shadow: 0 10px 30px rgba(0,0,0,0.3);
           padding: 18px;
-          border-radius: 16px;
+          border-radius: 8px;
           width: 100%;
           position: absolute;
           bottom: 15vh; /* Starts near bottom */
@@ -263,7 +263,7 @@ export default function AuthPage() {
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 24px;
+          border-radius: 12px;
           padding: 48px 40px;
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
           transition: height 0.3s ease;
@@ -291,7 +291,7 @@ export default function AuthPage() {
         .top-nav-links {
           display: none;
           gap: 32px;
-          font-weight: 500;
+          font-weight: 600;
           font-size: 14px;
           color: rgba(255,255,255,0.9);
         }
@@ -373,7 +373,7 @@ export default function AuthPage() {
            <Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>Contact</Link>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => setShowSupport(true)} style={{ fontSize: 14, fontWeight: 600, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'rgba(255,255,255,0.1)', borderRadius: 20, border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', transition: 'all 0.2s ease' }} onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.2)'} onMouseOut={e=>e.currentTarget.style.background='rgba(255,255,255,0.1)'}>
+          <button onClick={() => setShowSupport(true)} style={{ fontSize: 14, fontWeight: 600, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'rgba(255,255,255,0.1)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', transition: 'all 0.2s ease' }} onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.2)'} onMouseOut={e=>e.currentTarget.style.background='rgba(255,255,255,0.1)'}>
             <span>👤</span> Support
           </button>
         </div>
@@ -409,7 +409,7 @@ export default function AuthPage() {
             <h1 style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 8, color: '#fff' }}>
               {isLogin ? 'Sign In' : 'Sign Up'}
             </h1>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>
               {isLogin ? (
                 <>Not a member? <button onClick={() => switchMode('register')} className="form-link" style={{ background:'none', border:'none', cursor:'pointer', fontSize: 13, fontFamily: 'inherit' }}>Sign up now</button></>
               ) : (
@@ -437,7 +437,7 @@ export default function AuthPage() {
                 <UnderlineField label="Password" type="password" value={form.password} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('password',e.target.value)} required />
                 
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24, marginTop: -8 }}>
-                  <a href="#" className="form-link" style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.6)' }}>
+                  <a href="#" className="form-link" style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>
                     Forgot your password?
                   </a>
                 </div>
@@ -486,7 +486,7 @@ export default function AuthPage() {
             {/* Social Logins divider layout just like the image reference */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '32px 0 24px' }}>
               <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.2)' }} />
-              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>or sign complete with</span>
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>or sign complete with</span>
               <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.2)' }} />
             </div>
 
@@ -527,7 +527,7 @@ export default function AuthPage() {
         }}>
           <div style={{
             background: 'rgba(30, 6, 70, 0.8)', border: '1px solid rgba(245, 158, 11, 0.3)',
-            borderRadius: 24, padding: 40, width: '100%', maxWidth: 400,
+            borderRadius: 12, padding: 40, width: '100%', maxWidth: 400,
             boxShadow: '0 25px 50px rgba(0,0,0,0.6)', color: '#fff', position: 'relative'
           }}>
             <button onClick={() => setShowSupport(false)} style={{

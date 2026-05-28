@@ -144,7 +144,7 @@ export default function WhatsNewModal() {
 
             <div style={{
                 background: 'var(--bg-card)',
-                borderRadius: 24,
+                borderRadius: 12,
                 width: '100%',
                 maxWidth: 480,
                 boxShadow: '0 40px 100px rgba(0,0,0,.3)',

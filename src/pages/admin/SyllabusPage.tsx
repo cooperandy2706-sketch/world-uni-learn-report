@@ -138,7 +138,7 @@ export default function SyllabusPage(){
             <div style={{width:32,height:32,borderRadius:'50%',border:'3px solid #ede9fe',borderTopColor:'#6d28d9',animation:'_syl_spin .8s linear infinite'}}/>
           </div>
         ) : filtered.length===0 ? (
-          <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
+          <div style={{background: 'var(--bg-card)',borderRadius: 8,padding:'60px 20px',textAlign:'center',border:'1.5px solid #f0eefe'}}>
             <div style={{fontSize:52,marginBottom:12}}>📚</div>
             <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:18,fontWeight:700,color: 'var(--text-main)',marginBottom:6}}>No syllabuses uploaded yet</h3>
             <p style={{fontSize:13,color: 'var(--text-subtle)',marginBottom:18}}>Upload a syllabus PDF for any class and subject.</p>
@@ -196,7 +196,7 @@ export default function SyllabusPage(){
       {/* Upload modal */}
       {modalOpen&&(
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.45)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999,backdropFilter:'blur(4px)',padding:16}}>
-          <div style={{background: 'var(--bg-card)',borderRadius:16,padding:'24px',width:'100%',maxWidth:460,boxShadow:'0 24px 64px rgba(0,0,0,.18)',fontFamily:'"DM Sans",sans-serif'}}>
+          <div style={{background: 'var(--bg-card)',borderRadius: 8,padding:'24px',width:'100%',maxWidth:460,boxShadow:'0 24px 64px rgba(0,0,0,.18)',fontFamily:'"DM Sans",sans-serif'}}>
             <h3 style={{fontFamily:'"Playfair Display",serif',fontSize:19,fontWeight:700,color: 'var(--text-main)',marginBottom:18}}>📤 Upload Syllabus</h3>
             <div style={{display:'flex',flexDirection:'column',gap:14}}>
               {[

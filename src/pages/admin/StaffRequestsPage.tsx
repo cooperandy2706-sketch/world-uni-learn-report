@@ -93,8 +93,8 @@ export default function StaffRequestsPage() {
         <div style={{ animation: 'fadeIn 0.5s ease' }}>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .card { background: white; border-radius: 16px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-                .tab-btn { padding: 12px 24px; border-bottom: 2px solid transparent; color: #6b7280; font-weight: 500; cursor: pointer; background: none; border: none; transition: all 0.2s; }
+                .card { background: white; border-radius: 8px; border: 1.5px solid #f0eefe; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+                .tab-btn { padding: 12px 24px; border-bottom: 2px solid transparent; color: #6b7280; font-weight: 600; cursor: pointer; background: none; border: none; transition: all 0.2s; }
                 .tab-btn.active { color: #7c3aed; border-bottom-color: #7c3aed; font-weight: 700; }
                 .status-badge { padding: 4px 10px; border-radius: 99px; font-size: 11px; fontWeight: 700; text-transform: uppercase; }
                 .status-pending { background: #fef3c7; color: #d97706; }
@@ -155,7 +155,7 @@ export default function StaffRequestsPage() {
                                         </td>
                                         <td style={{ padding: '16px', fontSize: 14, textTransform: 'capitalize' }}>{l.leave_type}</td>
                                         <td style={{ padding: '16px' }}>
-                                            <div style={{ fontSize: 13, fontWeight: 500 }}>{format(new Date(l.start_date), 'MMM dd')} - {format(new Date(l.end_date), 'MMM dd')}</div>
+                                            <div style={{ fontSize: 13, fontWeight: 600 }}>{format(new Date(l.start_date), 'MMM dd')} - {format(new Date(l.end_date), 'MMM dd')}</div>
                                             <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{format(new Date(l.created_at), 'yyyy')}</div>
                                         </td>
                                         <td style={{ padding: '16px' }}>

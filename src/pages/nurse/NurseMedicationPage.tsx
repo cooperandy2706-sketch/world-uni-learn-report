@@ -177,7 +177,7 @@ export default function NurseMedicationPage() {
       {/* Add Modal */}
       {modal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 520, borderRadius: 20, overflow: 'hidden', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 520, borderRadius: 8, overflow: 'hidden', maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ padding: '20px 24px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Add Medication Schedule</h3>
               <button onClick={() => setModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.muted }}><X size={20} /></button>
@@ -261,7 +261,7 @@ function MedCard({ s, today, onDelete, T, expired }: any) {
   return (
     <div style={{
       background: expired ? '#f8fafc' : T.card,
-      borderRadius: 16, border: `1px solid ${expired ? T.border : T.primary + '30'}`,
+      borderRadius: 8, border: `1px solid ${expired ? T.border : T.primary + '30'}`,
       padding: 20, opacity: expired ? 0.7 : 1,
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>

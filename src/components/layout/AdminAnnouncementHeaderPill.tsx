@@ -49,7 +49,7 @@ export default function AdminAnnouncementHeaderPill() {
       <span style={{ fontSize: 12, fontWeight: 800, color: '#b91c1c', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
         {announcement.is_pinned ? '📌 Pinned' : '📢 Latest'}
       </span>
-      <span style={{ fontSize: 13, color: '#7f1d1d', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 500 }}>
+      <span style={{ fontSize: 13, color: '#7f1d1d', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>
         {announcement.title} {announcement.body ? `— ${announcement.body}` : ''}
       </span>
     </div>

@@ -220,7 +220,7 @@ export default function DepartmentsPage() {
 
         {/* Empty */}
         {!isLoading && filtered.length === 0 && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>🏛️</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>{search ? 'No departments found' : 'No departments yet'}</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>{search ? 'Try a different search.' : 'Create departments to organise your school structure.'}</p>
@@ -239,7 +239,7 @@ export default function DepartmentsPage() {
 
               return (
                 <div key={d.id} className="dept-card"
-                  style={{ background: 'var(--bg-card)', borderRadius: 20, border: `1.5px solid ${palette.color}22`, overflow: 'hidden', boxShadow: '0 2px 8px rgba(109,40,217,0.07)', animation: `_dfadeUp 0.35s ease ${i * 0.06}s both` }}>
+                  style={{ background: 'var(--bg-card)', borderRadius: 8, border: `1.5px solid ${palette.color}22`, overflow: 'hidden', boxShadow: '0 2px 8px rgba(109,40,217,0.07)', animation: `_dfadeUp 0.35s ease ${i * 0.06}s both` }}>
 
                   {/* Header band */}
                   <div style={{ background: `linear-gradient(135deg,${palette.bg},${palette.light})`, padding: '18px 20px 14px', borderBottom: `1px solid ${palette.color}18`, position: 'relative', overflow: 'hidden' }}>

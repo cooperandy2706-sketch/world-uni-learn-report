@@ -500,7 +500,7 @@ export default function AdminElectionsPage() {
   const styles = {
     btn: { padding: '10px 20px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(109,40,217,0.2)' },
     btnOutline: { padding: '10px 20px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' },
-    card: { background: 'var(--bg-card)', borderRadius: 16, padding: 28, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid var(--border-light)', transition: 'all 0.3s' },
+    card: { background: 'var(--bg-card)', borderRadius: 8, padding: 28, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid var(--border-light)', transition: 'all 0.3s' },
     tabBtn: (active: boolean) => ({ padding: '10px 20px', borderRadius: 12, border: 'none', background: active ? '#f5f3ff' : 'transparent', color: active ? '#6d28d9' : '#6b7280', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.2s' })
   }
 
@@ -635,7 +635,7 @@ export default function AdminElectionsPage() {
                   <tbody>
                     {currentPositions.map(pos => (
                       <tr key={pos.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
-                        <td style={{ padding: '12px 16px', fontWeight: 500 }}>{pos.title}</td>
+                        <td style={{ padding: '12px 16px', fontWeight: 600 }}>{pos.title}</td>
                         <td style={{ padding: '12px 16px' }}>{pos.max_winners}</td>
                         <td style={{ padding: '12px 16px' }}>
                           <span style={{ padding: '2px 8px', background: '#e0e7ff', color: '#4f46e5', borderRadius: 99, fontSize: 12, fontWeight: 600 }}>
@@ -671,7 +671,7 @@ export default function AdminElectionsPage() {
                     <div>
                       <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text-main)' }}>
                         {cand.teacher?.full_name || cand.student?.full_name} 
-                        <span style={{ fontWeight: 400, color: 'var(--text-muted)', marginLeft: 6 }}>
+                        <span style={{ fontWeight: 600, color: 'var(--text-muted)', marginLeft: 6 }}>
                           ({cand.teacher_id ? 'Teacher' : 'Student'})
                         </span>
                       </div>

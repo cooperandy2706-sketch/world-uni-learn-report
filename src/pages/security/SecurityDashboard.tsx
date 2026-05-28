@@ -221,7 +221,7 @@ export default function SecurityDashboard() {
         <div className="sec-main-grid">
 
           {/* Recent Scan Feed */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
             <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: 0 }}>Live Scan Feed</h2>
@@ -262,7 +262,7 @@ export default function SecurityDashboard() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
             {/* Quick Actions */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9', padding: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
               <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>Quick Actions</h3>
               <div className="sec-quick-grid" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
@@ -282,7 +282,7 @@ export default function SecurityDashboard() {
             </div>
 
             {/* Today Summary */}
-            <div style={{ background: 'linear-gradient(135deg,#0f172a,#1e293b)', borderRadius: 20, padding: '20px', color: '#fff' }}>
+            <div style={{ background: 'linear-gradient(135deg,#0f172a,#1e293b)', borderRadius: 8, padding: '20px', color: '#fff' }}>
               <h3 style={{ fontSize: 14, fontWeight: 800, color: '#fff', marginBottom: 4 }}>Today's Summary</h3>
               <p style={{ fontSize: 11, color: '#94a3b8', marginBottom: 16 }}>{format(new Date(), 'MMMM d, yyyy')}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -304,7 +304,7 @@ export default function SecurityDashboard() {
             </div>
 
             {/* Emergency Contacts */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f1f5f9', padding: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f1f5f9', padding: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
               <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0f172a', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 7 }}>
                 <Phone size={14} color="#dc2626" /> Emergency Contacts
               </h3>

@@ -105,7 +105,7 @@ export default function ProprietorAnalytics() {
 
         .stat-box {
           background: #fff;
-          border-radius: 20px;
+          border-radius: 8px;
           padding: 24px;
           border: 1px solid #e2e8f0;
           box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
@@ -115,7 +115,7 @@ export default function ProprietorAnalytics() {
         }
 
         .stat-icon {
-          width: 56px; height: 56px; border-radius: 16px;
+          width: 56px; height: 56px; border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
         }
 
@@ -175,7 +175,7 @@ export default function ProprietorAnalytics() {
           </div>
         </div>
 
-        <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 32, border: '1px solid #e2e8f0' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 32, border: '1px solid #e2e8f0' }}>
           <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <Award color="#f59e0b" /> Top Performing Classes
           </h3>

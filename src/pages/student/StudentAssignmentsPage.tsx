@@ -182,14 +182,14 @@ export default function StudentAssignmentsPage() {
         ) : viewMode === 'global' && !selectedGlobalSubject ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
             {globalSubjects.length === 0 ? (
-               <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
+               <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
                  <div style={{ fontSize: 48, marginBottom: 12 }}>🌍</div>
                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No challenges yet!</h3>
                  <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>The school hasn't published any global quizzes.</p>
                </div>
             ) : globalSubjects.map(sub => (
               <div key={sub.id} className="assign-card" onClick={() => setSelectedGlobalSubject(sub.id)} style={{ 
-                background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
+                background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: 24, 
                 boxShadow: '0 2px 8px rgba(109,40,217,0.05)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16
               }}>
                 <div style={{ width: 48, height: 48, borderRadius: 14, background: '#f5f3ff', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
@@ -203,7 +203,7 @@ export default function StudentAssignmentsPage() {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>{viewMode === 'global' ? '🌍' : '🎉'}</div>
             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>All caught up!</h3>
             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>You have no {filter !== 'all' ? filter : ''} {viewMode === 'global' ? 'global quizzes in this subject' : 'assignments'} at the moment.</p>
@@ -212,7 +212,7 @@ export default function StudentAssignmentsPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
             {filtered.map((a, i) => (
               <div key={a.id} className="assign-card" style={{ 
-                background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: 24, 
+                background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: 24, 
                 boxShadow: '0 2px 8px rgba(109,40,217,0.05)', transition: 'all 0.3s ease',
                 animation: `_fadeUp 0.4s ease ${i * 0.05}s both`,
                 cursor: a.status === 'completed' ? 'default' : 'pointer'

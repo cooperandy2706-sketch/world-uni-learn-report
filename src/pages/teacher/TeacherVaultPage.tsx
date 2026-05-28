@@ -122,7 +122,7 @@ export default function TeacherVaultPage() {
         <div style={{ animation: 'fadeIn 0.5s ease', padding: '16px 12px 100px', maxWidth: '1200px', margin: '0 auto', fontFamily: '"DM Sans",system-ui,sans-serif' }}>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .card { background: var(--bg-card); border-radius: 16px; border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+                .card { background: var(--bg-card); border-radius: 8px; border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
                 .doc-card:hover { border-color: #c4b5fd; transform: translateY(-2px); transition: all 0.2s; box-shadow: 0 10px 20px rgba(124, 58, 237, 0.08); }
                 .upload-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; alignItems: center; gap: 8px; font-size: 14px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25); }
                 .upload-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3); }
@@ -145,7 +145,7 @@ export default function TeacherVaultPage() {
                             <FileText size={32} />
                         </div>
                         <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' }}>Your Vault is Empty</h3>
-                        <p style={{ color: 'var(--text-subtle)', fontWeight: 500, fontSize: 14, maxWidth: 300, margin: '0 auto' }}>Upload your lesson plans, notes, and certificates to get started.</p>
+                        <p style={{ color: 'var(--text-subtle)', fontWeight: 600, fontSize: 14, maxWidth: 300, margin: '0 auto' }}>Upload your lesson plans, notes, and certificates to get started.</p>
                     </div>
                 ) : documents.map((d, i) => (
                     <div key={i} className="card doc-card" style={{ padding: '20px', position: 'relative' }}>

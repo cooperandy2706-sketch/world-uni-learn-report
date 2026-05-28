@@ -140,7 +140,7 @@ export default function PromotionPage() {
         .std-row:hover { background: #f9faff; }
         .promo-card { 
           background: #fff; 
-          border-radius: 16px; 
+          border-radius: 8px; 
           border: 1.5px solid #f0eefe; 
           box-shadow: 0 1px 4px rgba(109,40,217,0.06);
           padding: 24px;

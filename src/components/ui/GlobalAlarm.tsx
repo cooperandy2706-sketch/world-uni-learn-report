@@ -79,7 +79,7 @@ export default function GlobalAlarm() {
       <audio src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" autoPlay loop />
 
       <div style={{
-        background: 'var(--bg-card)', borderRadius: 24, padding: 40, maxWidth: 600, width: '100%',
+        background: 'var(--bg-card)', borderRadius: 12, padding: 40, maxWidth: 600, width: '100%',
         textAlign: 'center', boxShadow: '0 24px 64px rgba(220, 38, 38, 0.4)',
         animation: '_alarm_shake 0.5s ease-in-out'
       }}>

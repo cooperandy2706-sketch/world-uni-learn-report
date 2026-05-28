@@ -80,7 +80,7 @@ export default function TeacherSyllabusPage() {
 
                 {viewingFile ? (
                     /* ── INLINE SCHEME PREVIEW VIEW ── */
-                    <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid var(--border-color)', padding: 20, animation: '_syl_fu 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+                    <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid var(--border-color)', padding: 20, animation: '_syl_fu 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
                       <div style={{ paddingBottom: 16, borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
                         <div>
                           <button onClick={() => setViewingFile(null)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Syllabus</button>
@@ -128,7 +128,7 @@ export default function TeacherSyllabusPage() {
                                 <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_syl_fi .8s linear infinite' }} />
                             </div>
                         ) : filtered.length === 0 ? (
-                            <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+                            <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                                 <div style={{ fontSize: 52, marginBottom: 12 }}>📚</div>
                                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>
                                     {syllabus.length === 0 ? 'No syllabus uploaded yet' : 'No results found'}

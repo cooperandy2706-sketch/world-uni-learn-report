@@ -20,7 +20,7 @@ const BASE = `
 .ep-card{background:rgba(255,255,255,0.08);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.15);border-radius:32px;padding:40px 32px;max-width:420px;width:100%;animation:fadein .6s ease both;box-shadow:0 30px 80px rgba(0,0,0,0.3)}
 .ep-title{font-size:26px;font-weight:900;margin:16px 0 8px;line-height:1.2}
 .ep-sub{font-size:15px;font-weight:700;opacity:.7;line-height:1.6;margin-bottom:28px}
-.ep-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:16px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+.ep-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius: 8px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
 .ep-btn:hover{transform:translateY(-3px);filter:brightness(1.1)}
 .ep-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .blob{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none}

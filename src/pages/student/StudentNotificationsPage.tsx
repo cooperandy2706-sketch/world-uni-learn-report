@@ -110,7 +110,7 @@ export default function StudentNotificationsPage() {
               <div>
                 <h4 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: !n.is_read ? 700 : 600, color: 'var(--text-main)' }}>{n.title}</h4>
                 <p style={{ margin: '0 0 8px', fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.5 }}>{n.body}</p>
-                <div style={{ fontSize: 12, color: 'var(--text-subtle)', fontWeight: 500 }}>
+                <div style={{ fontSize: 12, color: 'var(--text-subtle)', fontWeight: 600 }}>
                   {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
                 </div>
               </div>

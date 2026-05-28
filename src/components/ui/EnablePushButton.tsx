@@ -64,7 +64,7 @@ export default function EnablePushButton({ compact = false }: { compact?: boolea
         fontFamily: '"DM Sans", sans-serif', animation: '_pb_fade 0.3s ease forwards'
       }}>
         <div style={{
-          background: 'var(--bg-card)', borderRadius: 24, padding: '32px 24px', width: '100%', maxWidth: 380,
+          background: 'var(--bg-card)', borderRadius: 12, padding: '32px 24px', width: '100%', maxWidth: 380,
           boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', position: 'relative', textAlign: 'center',
           animation: '_pb_slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards'
         }}>

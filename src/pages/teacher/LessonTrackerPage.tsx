@@ -189,7 +189,7 @@ function AILessonModal({
 
     return (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.55)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 999, backdropFilter: 'blur(6px)', padding: '16px', overflowY: 'auto' }}>
-            <div style={{ background: 'var(--bg-card)', borderRadius: 20, width: '100%', maxWidth: 720, boxShadow: '0 32px 80px rgba(0,0,0,.25)', fontFamily: '"DM Sans",system-ui,sans-serif', marginTop: 16, marginBottom: 32 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, width: '100%', maxWidth: 720, boxShadow: '0 32px 80px rgba(0,0,0,.25)', fontFamily: '"DM Sans",system-ui,sans-serif', marginTop: 16, marginBottom: 32 }}>
 
                 {/* Modal Header */}
                 <div style={{ background: 'linear-gradient(135deg,#4c1d95,#7c3aed)', borderRadius: '20px 20px 0 0', padding: '20px 24px', color: '#fff' }}>
@@ -614,7 +614,7 @@ export default function LessonTrackerPage() {
 
                 {/* Active lesson banner */}
                 {activeLesson && (
-                    <div style={{ background: 'linear-gradient(135deg,#14532d,#16a34a)', borderRadius: 16, padding: '18px 20px', marginBottom: 16, color: '#fff', animation: '_lt_pulse 3s ease infinite', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ background: 'linear-gradient(135deg,#14532d,#16a34a)', borderRadius: 8, padding: '18px 20px', marginBottom: 16, color: '#fff', animation: '_lt_pulse 3s ease infinite', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,.06)' }} />
                         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', opacity: .8, marginBottom: 6 }}>🟢 CLASS IN PROGRESS</div>
                         <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 22, fontWeight: 700, margin: '0 0 4px' }}>{activeLesson.subject}</h2>
@@ -630,7 +630,7 @@ export default function LessonTrackerPage() {
                 )}
 
                 {!activeLesson && nextLesson && (
-                    <div style={{ background: nextLesson.status === 'soon' ? 'linear-gradient(135deg,#78350f,#d97706)' : 'linear-gradient(135deg,#2e1065,#4c1d95)', borderRadius: 16, padding: '16px 20px', marginBottom: 16, color: '#fff' }}>
+                    <div style={{ background: nextLesson.status === 'soon' ? 'linear-gradient(135deg,#78350f,#d97706)' : 'linear-gradient(135deg,#2e1065,#4c1d95)', borderRadius: 8, padding: '16px 20px', marginBottom: 16, color: '#fff' }}>
                         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', opacity: .8, marginBottom: 6 }}>
                             {nextLesson.status === 'soon' ? '⏰ STARTING IN' : '📅 NEXT CLASS'}
                         </div>
@@ -667,7 +667,7 @@ export default function LessonTrackerPage() {
                 ) : tab === 'today' ? (
                     // ── TODAY ──
                     todayItems.length === 0 ? (
-                        <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+                        <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                             <div style={{ fontSize: 52, marginBottom: 12 }}>☀️</div>
                             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>No classes today</h3>
                             <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Check the Full Week tab to see your schedule.</p>
@@ -831,7 +831,7 @@ export default function LessonTrackerPage() {
                             })}
 
                         {computed.filter(l => l.dayOfWeek >= 1 && l.dayOfWeek <= 5).length === 0 && (
-                            <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+                            <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                                 <div style={{ fontSize: 52, marginBottom: 12 }}>📋</div>
                                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>No lessons in timetable</h3>
                                 <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Once your timetable is set up, lessons will appear here for AI planning.</p>

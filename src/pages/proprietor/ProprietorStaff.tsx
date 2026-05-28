@@ -59,7 +59,7 @@ export default function ProprietorStaff() {
           padding: 6px 12px; border-radius: 99px; font-size: 13px; font-weight: 700; text-transform: capitalize;
         }
         .role-card {
-          background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px 24px; display: flex; align-items: center; gap: 16px; flex: 1; min-width: 200px;
+          background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 24px; display: flex; align-items: center; gap: 16px; flex: 1; min-width: 200px;
         }
 
         @media (max-width: 768px) {
@@ -83,7 +83,7 @@ export default function ProprietorStaff() {
           ))}
         </div>
 
-        <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9' }}>
             <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>Staff Roster</h3>
           </div>

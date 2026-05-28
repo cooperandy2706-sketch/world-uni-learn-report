@@ -192,18 +192,18 @@ export default function PayrollPage() {
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
       <style>
         body{font-family:'DM Sans',sans-serif;padding:60px;color:#1e293b;background:#f8fafc;min-height:100vh;display:flex;justify-content:center;align-items:flex-start}
-        .container{width:100%;max-width:800px;background:#fff;padding:50px;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.04);position:relative;overflow:hidden}
+        .container{width:100%;max-width:800px;background:#fff;padding:50px;border-radius: 8px;box-shadow:0 10px 40px rgba(0,0,0,0.04);position:relative;overflow:hidden}
         .watermark{position:absolute;top:20%;left:50%;transform:translate(-50%,-20%) rotate(-15deg);font-size:100px;font-weight:900;color:rgba(76,29,149,0.02);white-space:nowrap;pointer-events:none;z-index:0}
         .content{position:relative;z-index:1}
         .header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #4c1d95;padding-bottom:25px;margin-bottom:40px}
         .school-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#1e0646;margin:0}
-        .box{border:1px solid #f1f5f9;border-radius:16px;padding:24px;margin-bottom:30px;background:#f8fafc;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+        .box{border:1px solid #f1f5f9;border-radius: 8px;padding:24px;margin-bottom:30px;background:#f8fafc;display:grid;grid-template-columns:1fr 1fr;gap:20px}
         .box div b{display:block;font-size:10px;text-transform:uppercase;color:#64748b;letter-spacing:0.1em;margin-bottom:6px}
         .box div span{font-size:18px;font-weight:800;color:#111827}
         table{width:100%;border-collapse:collapse}
         th{text-align:left;font-size:11px;text-transform:uppercase;color:#64748b;padding-bottom:15px;letter-spacing:0.1em;border-bottom:1px solid #e2e8f0}
         td{padding:15px 0;border-bottom:1px solid #f1f5f9;font-size:14px;color:#334155}
-        .total-row{margin-top:50px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#4c1d95,#2e1065);padding:24px 30px;border-radius:16px;color:#fff;box-shadow:0 8px 20px rgba(76,29,149,0.15)}
+        .total-row{margin-top:50px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#4c1d95,#2e1065);padding:24px 30px;border-radius: 8px;color:#fff;box-shadow:0 8px 20px rgba(76,29,149,0.15)}
         .total-row .val{font-size:28px;font-weight:900}
         .footer{margin-top:60px;text-align:center;font-size:10px;color:#94a3b8;border-top:1px dashed #e2e8f0;padding-top:20px}
         @media print{body{padding:0;background:#fff} .container{box-shadow:none;border-radius:0;padding:20px}}
@@ -276,7 +276,7 @@ export default function PayrollPage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24, background: 'var(--bg-input)', padding: 6, borderRadius: 16, width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24, background: 'var(--bg-input)', padding: 6, borderRadius: 8, width: 'fit-content' }}>
         {[
           { id: 'monthly', icon: Users, label: 'Monthly Pay' },
           { id: 'weekly', icon: Calendar, label: 'Weekly Allowances' },
@@ -291,7 +291,7 @@ export default function PayrollPage() {
 
       {/* TAB: MONTHLY */}
       {activeTab === 'monthly' && (
-        <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#fcfaff', borderBottom: '1.5px solid #f0eefe' }}>
@@ -345,7 +345,7 @@ export default function PayrollPage() {
                  {[...Array(5)].map((_, i) => <option key={i} value={currentWeekInfo - i}>Week {currentWeekInfo - i}</option>)}
               </select>
             </div>
-            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, marginBottom: 24 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', padding: 24, marginBottom: 24 }}>
               <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 16 }}>Record Weekly Top-up</h3>
               <div style={{ display: 'flex', gap: 12 }}>
                 <select value={weeklyConfigForm.user_id} onChange={e => setWeeklyConfigForm({...weeklyConfigForm, user_id: e.target.value})} style={{ flex: 1, padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)' }}>
@@ -359,7 +359,7 @@ export default function PayrollPage() {
                 }}>Add</Btn>
               </div>
             </div>
-            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ background: 'var(--bg-input)' }}>
@@ -391,7 +391,7 @@ export default function PayrollPage() {
               </table>
             </div>
           </div>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, height: 'fit-content' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', padding: 24, height: 'fit-content' }}>
             <h3 style={{ fontSize: 15, fontWeight: 800, marginBottom: 20 }}>Weekly Payout Trends</h3>
             <div style={{ height: 200 }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -409,7 +409,7 @@ export default function PayrollPage() {
             <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
               <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} style={{ padding: '10px 16px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', fontWeight: 700 }} />
             </div>
-            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, marginBottom: 24 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', padding: 24, marginBottom: 24 }}>
               <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 16 }}>Record Daily Cash/Allowance</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <select value={dailyForm.user_id} onChange={e => setDailyForm({...dailyForm, user_id: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)' }}>
@@ -424,7 +424,7 @@ export default function PayrollPage() {
                 }}>Save & Auto-Pay Cash</Btn>
               </div>
             </div>
-            <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ background: 'var(--bg-input)' }}>
@@ -456,7 +456,7 @@ export default function PayrollPage() {
               </table>
             </div>
           </div>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24, height: 'fit-content' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', padding: 24, height: 'fit-content' }}>
              <h3 style={{ fontSize: 15, fontWeight: 800, marginBottom: 20 }}>Today's Total Cashout</h3>
              <div style={{ fontSize: 32, fontWeight: 900, color: '#6d28d9' }}>{CUR(dailyData.reduce((s:any, x:any) => s + Number(x.amount), 0))}</div>
           </div>
@@ -467,20 +467,20 @@ export default function PayrollPage() {
       {activeTab === 'analytics' && (
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 20, marginBottom: 30 }}>
-             <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
+             <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 12, border: '1.5px solid #f0eefe' }}>
                <div style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 700 }}>Total Month Gross</div>
                <div style={{ fontSize: 28, fontWeight: 900, color: '#1e0646', marginTop: 8 }}>{CUR(payroll.reduce((s,x) => s + x.basic_salary + x.allowances, 0))}</div>
              </div>
-             <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
+             <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 12, border: '1.5px solid #f0eefe' }}>
                <div style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 700 }}>Total Paid to Date</div>
                <div style={{ fontSize: 28, fontWeight: 900, color: '#059669', marginTop: 8 }}>{CUR(payroll.filter(p=>p.is_paid).reduce((s,x) => s + x.net_salary, 0))}</div>
              </div>
-             <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, border: '1.5px solid #f0eefe' }}>
+             <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 12, border: '1.5px solid #f0eefe' }}>
                <div style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 700 }}>Outstanding Month Balance</div>
                <div style={{ fontSize: 28, fontWeight: 900, color: '#dc2626', marginTop: 8 }}>{CUR(payroll.filter(p=>!p.is_paid).reduce((s,x) => s + (x.net_salary - (x.adjustments_paid_total||0)), 0))}</div>
              </div>
           </div>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', padding: 24 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', padding: 24 }}>
             <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 30 }}>Staff Pay Breakdown</h3>
             <div style={{ height: 350 }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -527,19 +527,19 @@ export default function PayrollPage() {
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 24, marginTop: 4 }}>To {shareModal.staff?.full_name} via {shareModal.data.payment_method?.toUpperCase() || 'CASH'}</p>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-               <button onClick={() => printA4(shareModal.data, shareModal.type)} style={{ padding: 14, borderRadius: 16, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+               <button onClick={() => printA4(shareModal.data, shareModal.type)} style={{ padding: 14, borderRadius: 8, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <FileText size={24} color="#0284c7" /> <span style={{ fontSize: 12, fontWeight: 700 }}>A4 Payslip</span>
                </button>
-               <button onClick={() => printThermal(shareModal.data, shareModal.type)} style={{ padding: 14, borderRadius: 16, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+               <button onClick={() => printThermal(shareModal.data, shareModal.type)} style={{ padding: 14, borderRadius: 8, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <Receipt size={24} color="#a21caf" /> <span style={{ fontSize: 12, fontWeight: 700 }}>Thermal Rec.</span>
                </button>
                <button onClick={() => {
                    const txt = `Hello ${shareModal.staff.full_name}, your ${shareModal.type} pay of ${CUR(shareModal.type === 'monthly' ? shareModal.data.net_salary : shareModal.data.amount)} has been paid via ${(shareModal.data.payment_method||'Cash').toUpperCase()}. Ref: ${shareModal.data.bank_reference||'None'}.`
                    window.open(`https://wa.me/${shareModal.staff?.phone?.replace(/\D/g, '') || ''}?text=${encodeURIComponent(txt)}`, '_blank')
-               }} style={{ padding: 14, borderRadius: 16, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+               }} style={{ padding: 14, borderRadius: 8, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <MessageSquare size={24} color="#25d366" /> <span style={{ fontSize: 12, fontWeight: 700 }}>WhatsApp</span>
                </button>
-               <button onClick={() => toast.success('SMS Queued')} style={{ padding: 14, borderRadius: 16, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+               <button onClick={() => toast.success('SMS Queued')} style={{ padding: 14, borderRadius: 8, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <MessageSquare size={24} color="#2563eb" /> <span style={{ fontSize: 12, fontWeight: 700 }}>Send SMS</span>
                </button>
             </div>
@@ -565,7 +565,7 @@ function PaymentMethodForm({ onConfirm }: any) {
      <div>
        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
          {methods.map(m => (
-           <div key={m.id} onClick={() => setMd(m.id)} style={{ padding: '16px 10px', borderRadius: 16, border: md === m.id ? '2px solid #6d28d9' : '1.5px solid #e5e7eb', background: md === m.id ? '#fcfaff' : '#fff', textAlign: 'center', cursor: 'pointer', opacity: md === m.id ? 1 : 0.6, transition: 'all 0.15s' }}>
+           <div key={m.id} onClick={() => setMd(m.id)} style={{ padding: '16px 10px', borderRadius: 8, border: md === m.id ? '2px solid #6d28d9' : '1.5px solid #e5e7eb', background: md === m.id ? '#fcfaff' : '#fff', textAlign: 'center', cursor: 'pointer', opacity: md === m.id ? 1 : 0.6, transition: 'all 0.15s' }}>
              <m.icon size={24} color={md === m.id ? '#6d28d9' : '#6b7280'} style={{ margin: '0 auto 8px' }} />
              <div style={{ fontSize: 12, fontWeight: 800, color: md === m.id ? '#6d28d9' : '#4b5563' }}>{m.label}</div>
            </div>

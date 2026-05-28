@@ -245,7 +245,7 @@ export default function BursarDashboard() {
           width: 100%;
           height: 100%;
           backface-visibility: hidden;
-          border-radius: 20px;
+          border-radius: 8px;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -284,7 +284,7 @@ export default function BursarDashboard() {
         {/* Hero Section */}
         <div style={{ 
           background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)', 
-          borderRadius: 24, 
+          borderRadius: 12, 
           padding: '32px 40px', 
           marginBottom: 32,
           color: 'white',
@@ -297,16 +297,16 @@ export default function BursarDashboard() {
           
           <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#c7d2fe', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Financial Command Center</p>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#c7d2fe', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Financial Command Center</p>
               <h1 style={{ fontFamily: '"Outfit", sans-serif', fontSize: 36, fontWeight: 800, margin: '8px 0 12px', letterSpacing: '-0.02em' }}>
                 {timeGreeting}, {user?.full_name?.split(' ')[0]}
               </h1>
-              <p style={{ margin: 0, fontSize: 15, color: '#e0e7ff', fontWeight: 400, maxWidth: 450, lineHeight: 1.5 }}>
+              <p style={{ margin: 0, fontSize: 15, color: '#e0e7ff', fontWeight: 600, maxWidth: 450, lineHeight: 1.5 }}>
                 {roleMessage} Track {currentYear} performance, monitor arrears, and manage payroll across the platform.
               </p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 13, color: '#c7d2fe', fontWeight: 500, marginBottom: 4 }}>Net Term Balance</div>
+              <div style={{ fontSize: 13, color: '#c7d2fe', fontWeight: 600, marginBottom: 4 }}>Net Term Balance</div>
               <div style={{ fontFamily: '"Outfit", sans-serif', fontSize: 42, fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
                 {!loading ? formatCurrency(net, schoolCurrency) : '---'}
               </div>
@@ -337,7 +337,7 @@ export default function BursarDashboard() {
                       <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', fontFamily: '"Outfit", sans-serif', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                         {c.nativeValue}
                       </div>
-                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, fontWeight: 500 }}>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, fontWeight: 600 }}>
                         {c.label}
                       </div>
                     </div>
@@ -367,7 +367,7 @@ export default function BursarDashboard() {
                   <Link key={q.to} to={q.to} style={{ textDecoration: 'none', flexShrink: 0 }}>
                     <div className="ql-btn glass-card" style={{ 
                       background: 'var(--bg-card)', 
-                      borderRadius: 16, 
+                      borderRadius: 8, 
                       padding: '14px 20px', 
                       border: '1px solid var(--border-color)', 
                       display: 'flex', 
@@ -389,7 +389,7 @@ export default function BursarDashboard() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, marginBottom: 32 }}>
               
               {/* Income vs Expenses Bar Chart */}
-              <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '28px', border: '1px solid var(--border-color)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+              <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '28px', border: '1px solid var(--border-color)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
                 <div style={{ marginBottom: 24 }}>
                   <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Income vs Expenses</h3>
                   <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Monthly financial flow for {currentYear}</p>
@@ -407,14 +407,14 @@ export default function BursarDashboard() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="4 4" stroke="#f1f5f9" vertical={false} />
-                    <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dy={10} />
-                    <YAxis tick={{ fontSize: 12, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dx={-10} tickFormatter={v => `${v/1000}k`} />
+                    <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} axisLine={false} tickLine={false} dy={10} />
+                    <YAxis tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} axisLine={false} tickLine={false} dx={-10} tickFormatter={v => `${v/1000}k`} />
                     <Tooltip 
                       formatter={(v: any) => formatCurrency(v, schoolCurrency)} 
                       cursor={{ fill: 'var(--bg-hover)' }}
                       contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: 13, fontWeight: 600, padding: '12px 16px' }} 
                     />
-                    <Legend iconType="circle" wrapperStyle={{ paddingTop: 20, fontSize: 13, fontWeight: 500, color: 'var(--text-muted)' }} />
+                    <Legend iconType="circle" wrapperStyle={{ paddingTop: 20, fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }} />
                     <Bar dataKey="income" name="Income" fill="url(#colorInc)" radius={[6, 6, 0, 0]} />
                     <Bar dataKey="expenses" name="Expenses" fill="url(#colorExp)" radius={[6, 6, 0, 0]} />
                   </BarChart>
@@ -422,7 +422,7 @@ export default function BursarDashboard() {
               </div>
 
               {/* Expenses by category */}
-              <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 24, padding: '28px', border: '1px solid var(--border-color)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+              <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '28px', border: '1px solid var(--border-color)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
                 <div style={{ marginBottom: 24 }}>
                   <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Expense Distribution</h3>
                   <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Where is the money going?</p>
@@ -433,7 +433,7 @@ export default function BursarDashboard() {
                       <Pie data={expenseByCategory} cx="50%" cy="50%" innerRadius={70} outerRadius={100} dataKey="value" nameKey="name" paddingAngle={5}>
                         {expenseByCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="none" />)}
                       </Pie>
-                      <Legend iconType="circle" iconSize={8} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: 13, fontWeight: 500, color: 'var(--text-muted)' }} />
+                      <Legend iconType="circle" iconSize={8} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }} />
                       <Tooltip 
                         formatter={(v: any) => formatCurrency(v, schoolCurrency)} 
                         contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: 13, fontWeight: 600 }} 
@@ -441,13 +441,13 @@ export default function BursarDashboard() {
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div style={{ height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14, fontWeight: 500 }}>No expense data recorded</div>
+                  <div style={{ height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14, fontWeight: 600 }}>No expense data recorded</div>
                 )}
               </div>
             </div>
 
             {/* Recent payments Data Table */}
-            <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1px solid var(--border-color)', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
+            <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-color)', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
               <div style={{ padding: '24px 28px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0, fontFamily: '"Outfit", sans-serif' }}>Recent Transactions</h3>
                 <Link to={ROUTES.BURSAR_FEES} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#6366f1', textDecoration: 'none', padding: '6px 12px', background: 'var(--bg-accent-hover)', borderRadius: 99 }}>
@@ -455,7 +455,7 @@ export default function BursarDashboard() {
                 </Link>
               </div>
               {recentPayments.length === 0 ? (
-                <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 14, fontWeight: 500 }}>No recent transactions</div>
+                <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 14, fontWeight: 600 }}>No recent transactions</div>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', whiteSpace: 'nowrap' }}>
@@ -473,14 +473,14 @@ export default function BursarDashboard() {
                           <td style={{ padding: '16px 28px' }}>
                             <span style={{ fontSize: 12, background: 'var(--bg-input)', color: 'var(--text-main)', padding: '4px 10px', borderRadius: 6, fontWeight: 600 }}>{(p.student as any)?.class?.name ?? '—'}</span>
                           </td>
-                          <td style={{ padding: '16px 28px', fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>{p.fee_structure?.fee_name ?? 'General'}</td>
+                          <td style={{ padding: '16px 28px', fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{p.fee_structure?.fee_name ?? 'General'}</td>
                           <td style={{ padding: '16px 28px', fontSize: 14, fontWeight: 700, color: '#10b981' }}>{formatCurrency(p.amount_paid, schoolCurrency)}</td>
                           <td style={{ padding: '16px 28px' }}>
                             <span style={{ fontSize: 12, fontWeight: 600, background: '#ecfdf5', color: '#10b981', padding: '4px 10px', borderRadius: 99, textTransform: 'capitalize' }}>
                               {p.payment_method}
                             </span>
                           </td>
-                          <td style={{ padding: '16px 28px', fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>
+                          <td style={{ padding: '16px 28px', fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>
                             {new Date(p.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </td>
                         </tr>

@@ -119,7 +119,7 @@ export default function AdminTestAnalytics() {
       {/* Filters */}
       <div style={{ 
         background: 'var(--bg-card)', 
-        borderRadius: 16, 
+        borderRadius: 8, 
         padding: 20, 
         marginBottom: 24, 
         display: 'flex', 
@@ -155,13 +155,13 @@ export default function AdminTestAnalytics() {
       </div>
 
       {!selectedClass || !selectedSubject ? (
-        <div style={{ padding: '80px 20px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: 20, border: '1.5px dashed #e2e8f0' }}>
+        <div style={{ padding: '80px 20px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: 8, border: '1.5px dashed #e2e8f0' }}>
           <Search size={48} color="#94a3b8" style={{ marginBottom: 16 }} />
           <h3 style={{ color: '#1e293b', marginBottom: 8 }}>Ready to Analyze</h3>
           <p style={{ color: '#64748b' }}>Select a class and subject to view performance trends and student rankings.</p>
         </div>
       ) : testData.length === 0 ? (
-        <div style={{ padding: '80px 20px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: 20, border: '1.5px dashed #e2e8f0' }}>
+        <div style={{ padding: '80px 20px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: 8, border: '1.5px dashed #e2e8f0' }}>
           <AlertCircle size={48} color="#94a3b8" style={{ marginBottom: 16 }} />
           <h3 style={{ color: '#1e293b', marginBottom: 8 }}>No Tests Found</h3>
           <p style={{ color: '#64748b' }}>There are no class tests recorded for this subject in the current term.</p>
@@ -170,7 +170,7 @@ export default function AdminTestAnalytics() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: 24 }}>
           
           {/* Trend Chart */}
-          <div style={{ gridColumn: '1 / -1', background: 'var(--bg-card)', borderRadius: 20, padding: 24, border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+          <div style={{ gridColumn: '1 / -1', background: 'var(--bg-card)', borderRadius: 8, padding: 24, border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
               <div style={{ padding: 8, background: '#f5f3ff', borderRadius: 10, color: '#7c3aed' }}>
                 <TrendingUp size={20} />
@@ -194,7 +194,7 @@ export default function AdminTestAnalytics() {
           </div>
 
           {/* Student Performance Bar */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, border: '1px solid #e2e8f0' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, border: '1px solid #e2e8f0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
               <div style={{ padding: 8, background: '#ecfdf5', borderRadius: 10, color: '#059669' }}>
                 <Users size={20} />
@@ -223,7 +223,7 @@ export default function AdminTestAnalytics() {
           </div>
 
           {/* Test Summaries */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, border: '1px solid #e2e8f0' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, border: '1px solid #e2e8f0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
               <div style={{ padding: 8, background: '#eff6ff', borderRadius: 10, color: '#2563eb' }}>
                 <BookOpen size={20} />

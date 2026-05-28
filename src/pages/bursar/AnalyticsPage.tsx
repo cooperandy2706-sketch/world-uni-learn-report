@@ -142,7 +142,7 @@ export default function AnalyticsPage() {
             {/* KPI Row */}
             <div className="analytics-kpis">
               {kpis.map((k) => (
-                <div key={k.label} style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                <div key={k.label} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                   <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>{k.label}</div>
                   <div style={{ fontSize: 20, fontWeight: 900, color: k.color, fontFamily: '"Playfair Display",serif', marginBottom: 4 }}>{k.value}</div>
                   <div style={{ fontSize: 11, color: 'var(--text-subtle)', display: 'flex', alignItems: 'center', gap: 4 }}>

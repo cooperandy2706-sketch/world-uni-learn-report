@@ -395,7 +395,7 @@ export default function DriverDashboard() {
       {/* Header Info */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ width: 60, height: 60, borderRadius: 16, background: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 4px 12px rgba(30,58,138,0.2)' }}>
+          <div style={{ width: 60, height: 60, borderRadius: 8, background: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 4px 12px rgba(30,58,138,0.2)' }}>
             <Bus size={32} />
           </div>
           <div>
@@ -406,20 +406,20 @@ export default function DriverDashboard() {
           </div>
         </div>
         {isOffline && (
-          <div style={{ padding: '6px 12px', background: '#fef2f2', color: '#ef4444', borderRadius: 20, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ padding: '6px 12px', background: '#fef2f2', color: '#ef4444', borderRadius: 8, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
             <WifiOff size={14} /> Offline Mode
           </div>
         )}
       </div>
 
       {!vehicle ? (
-        <div style={{ padding: 32, textAlign: 'center', background: '#fee2e2', borderRadius: 16, color: '#b91c1c' }}>
+        <div style={{ padding: 32, textAlign: 'center', background: '#fee2e2', borderRadius: 8, color: '#b91c1c' }}>
           Please contact the Transport Manager to assign a vehicle to your account.
         </div>
       ) : (
         <>
           {/* Trip Controls */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: 24 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trip Status</div>
@@ -455,7 +455,7 @@ export default function DriverDashboard() {
 
           {/* Scanner Controls (Only if trip is active) */}
           {tripActive && (
-            <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
               
               <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
                 <button 
@@ -472,7 +472,7 @@ export default function DriverDashboard() {
                 </button>
               </div>
 
-              <div style={{ borderRadius: 16, overflow: 'hidden', background: '#000', position: 'relative', minHeight: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+              <div style={{ borderRadius: 8, overflow: 'hidden', background: '#000', position: 'relative', minHeight: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                 {!scannerActive ? (
                   <button onClick={toggleScanner} style={{ padding: '16px 32px', borderRadius: 12, border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 16 }}>
                     <Camera size={24} /> Tap to Open Scanner
@@ -484,7 +484,7 @@ export default function DriverDashboard() {
 
               {/* Scan Result */}
               {lastScan && lastScan.student && !lastScan.error && (
-                <div style={{ padding: 16, background: '#ecfdf5', borderRadius: 16, border: '2px solid #10b981', display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ padding: 16, background: '#ecfdf5', borderRadius: 8, border: '2px solid #10b981', display: 'flex', alignItems: 'center', gap: 16 }}>
                   {lastScan.student.photo_url ? (
                     <img src={lastScan.student.photo_url} alt="" style={{ width: 50, height: 50, borderRadius: 12, objectFit: 'cover' }} />
                   ) : (
@@ -509,7 +509,7 @@ export default function DriverDashboard() {
 
           {/* Expected Passengers Manifest */}
           {tripActive && expectedStudents.length > 0 && (
-            <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginTop: 24 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginTop: 24 }}>
               <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
                 <span>Expected Passengers</span>
                 <span style={{ fontSize: 14, color: '#64748b', fontWeight: 600 }}>
@@ -555,7 +555,7 @@ export default function DriverDashboard() {
           <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
             <button 
               onClick={() => setShowMaintenanceModal(true)}
-              style={{ flex: 1, padding: '16px', borderRadius: 16, border: '1px solid #e2e8f0', background: 'var(--bg-card)', color: '#475569', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}
+              style={{ flex: 1, padding: '16px', borderRadius: 8, border: '1px solid #e2e8f0', background: 'var(--bg-card)', color: '#475569', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}
             >
               <Wrench size={18} /> Report Issue
             </button>
@@ -608,7 +608,7 @@ export default function DriverDashboard() {
           70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
           100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
-        #driver-qr-reader video { border-radius: 16px !important; object-fit: cover !important; }
+        #driver-qr-reader video { border-radius: 8px !important; object-fit: cover !important; }
         #driver-qr-reader__dashboard { display: none !important; }
       `}</style>
     </div>

@@ -237,11 +237,11 @@ export default function FleetManagementPage() {
       {activeTab === 'vehicles' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
           {vehicles.length === 0 ? (
-            <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', background: '#f8fafc', borderRadius: 16, border: '2px dashed #cbd5e1', color: '#64748b' }}>
+            <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', background: '#f8fafc', borderRadius: 8, border: '2px dashed #cbd5e1', color: '#64748b' }}>
               No vehicles found. Add your first school bus!
             </div>
           ) : vehicles.map(v => (
-            <div key={v.id} style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+            <div key={v.id} style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 8, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                 <div style={{ width: 48, height: 48, borderRadius: 12, background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Bus size={24} />
@@ -251,7 +251,7 @@ export default function FleetManagementPage() {
                 </button>
               </div>
               <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>{v.plate_number}</div>
-              <div style={{ fontSize: 13, color: '#64748b', fontWeight: 500, marginBottom: 16 }}>{v.make_model || 'Standard Bus'} • {v.capacity} Seats</div>
+              <div style={{ fontSize: 13, color: '#64748b', fontWeight: 600, marginBottom: 16 }}>{v.make_model || 'Standard Bus'} • {v.capacity} Seats</div>
               
               <div style={{ padding: 12, background: '#f8fafc', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Users size={16} color="#64748b" />
@@ -266,7 +266,7 @@ export default function FleetManagementPage() {
 
       {/* ROUTES TAB */}
       {activeTab === 'routes' && (
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
@@ -302,7 +302,7 @@ export default function FleetManagementPage() {
 
       {/* ASSIGNMENTS TAB */}
       {activeTab === 'assignments' && (
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
@@ -343,7 +343,7 @@ export default function FleetManagementPage() {
 
       {/* MAINTENANCE TAB */}
       {activeTab === 'maintenance' && (
-        <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
               <tr>
@@ -377,7 +377,7 @@ export default function FleetManagementPage() {
                     </div>
                   </td>
                   <td style={{ padding: '16px 24px' }}>
-                    <span style={{ padding: '6px 12px', background: log.status === 'resolved' ? '#d1fae5' : '#fef3c7', color: log.status === 'resolved' ? '#059669' : '#d97706', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                    <span style={{ padding: '6px 12px', background: log.status === 'resolved' ? '#d1fae5' : '#fef3c7', color: log.status === 'resolved' ? '#059669' : '#d97706', borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
                       {log.status.toUpperCase()}
                     </span>
                   </td>
@@ -398,7 +398,7 @@ export default function FleetManagementPage() {
       {/* Modals */}
       {isVehicleModalOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}>
-          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 12, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             <h2 style={{ margin: '0 0 24px', fontSize: 24, fontWeight: 800 }}>Add New Vehicle</h2>
             <form onSubmit={handleSaveVehicle}>
               <div style={{ marginBottom: 16 }}>
@@ -431,7 +431,7 @@ export default function FleetManagementPage() {
 
       {isRouteModalOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}>
-          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 12, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             <h2 style={{ margin: '0 0 24px', fontSize: 24, fontWeight: 800 }}>Create Route</h2>
             <form onSubmit={handleSaveRoute}>
               <div style={{ marginBottom: 16 }}>
@@ -456,7 +456,7 @@ export default function FleetManagementPage() {
       )}
       {isAssignModalOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}>
-          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 24, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 12, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             <h2 style={{ margin: '0 0 24px', fontSize: 24, fontWeight: 800 }}>Assign Student to Transport</h2>
             <form onSubmit={handleSaveAssignment}>
               <div style={{ marginBottom: 16 }}>

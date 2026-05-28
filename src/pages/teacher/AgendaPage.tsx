@@ -127,7 +127,7 @@ export default function TeacherAgendaPage() {
         </div>
 
         {!term ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '40px 20px', textAlign: 'center', border: '1px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '40px 20px', textAlign: 'center', border: '1px solid #f0eefe' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📆</div>
             <p style={{ color: 'var(--text-muted)' }}>No active term detected. Agendas will appear here once a term is set.</p>
           </div>
@@ -136,7 +136,7 @@ export default function TeacherAgendaPage() {
             <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: 'tap_spin .8s linear infinite' }} />
           </div>
         ) : agendas.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
              <div style={{ fontSize: 48, marginBottom: 16 }}>🎯</div>
              <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>Welcome to {term.name}</h3>
              <p style={{ fontSize: 13, color: 'var(--text-subtle)', maxWidth: 300, marginInline: 'auto' }}>The school agenda hasn't been published yet. Check back soon for milestones and goals.</p>
@@ -163,7 +163,7 @@ export default function TeacherAgendaPage() {
 
                   {/* Card */}
                   <div className="agenda-card-teacher" style={{ 
-                    flex: 1, background: 'var(--bg-card)', borderRadius: 20, border: '1.5px solid #f0eefe', padding: '20px 24px', 
+                    flex: 1, background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '20px 24px', 
                     boxShadow: '0 2px 8px rgba(0,0,0,0.03)', transition: 'all .25s ease'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
@@ -195,7 +195,7 @@ export default function TeacherAgendaPage() {
                                <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 10 }}>A</div>
                                <span style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase' }}>Admin Guidance</span>
                             </div>
-                            <p style={{ fontSize: 13, color: '#4c1d95', margin: 0, fontWeight: 500 }}>"{resp.admin_reply}"</p>
+                            <p style={{ fontSize: 13, color: '#4c1d95', margin: 0, fontWeight: 600 }}>"{resp.admin_reply}"</p>
                          </div>
                        )}
 

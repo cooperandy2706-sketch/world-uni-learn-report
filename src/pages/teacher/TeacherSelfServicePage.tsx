@@ -118,7 +118,7 @@ export default function TeacherSelfServicePage() {
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .tab-btn { transition: all 0.2s ease; border-bottom: 2px solid transparent; }
                 .tab-btn.active { color: #7c3aed; border-bottom-color: #7c3aed; }
-                .card { background: var(--bg-card); border-radius: 16px; border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+                .card { background: var(--bg-card); border-radius: 8px; border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
                 .status-badge { padding: 4px 10px; border-radius: 99px; font-size: 11px; fontWeight: 700; text-transform: uppercase; }
                 .status-pending { background: #fef3c7; color: #d97706; }
                 .status-approved { background: #dcfce7; color: #16a34a; }
@@ -153,7 +153,7 @@ export default function TeacherSelfServicePage() {
                         display: block !important; 
                         background: var(--bg-card) !important; 
                         border: 1.5px solid var(--border-color) !important; 
-                        border-radius: 16px !important; 
+                        border-radius: 8px !important; 
                         padding: 16px !important; 
                         margin-bottom: 14px !important; 
                         box-shadow: 0 2px 4px rgba(0,0,0,0.01) !important;

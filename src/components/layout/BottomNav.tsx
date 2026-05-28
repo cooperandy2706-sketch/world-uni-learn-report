@@ -310,7 +310,7 @@ export default function BottomNav() {
               }}>
               
               <div className="bn-icon-box" style={{
-                width: 52, height: 32, borderRadius: 16,
+                width: 52, height: 32, borderRadius: 8,
                 background: 'transparent',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -338,7 +338,7 @@ export default function BottomNav() {
               </div>
 
               <span className="bn-label" style={{
-                fontSize: 11, fontWeight: 500,
+                fontSize: 11, fontWeight: 600,
                 color: isActive ? '#6d28d9' : '#64748b',
                 transition: 'all 0.2s',
                 letterSpacing: '-0.01em',

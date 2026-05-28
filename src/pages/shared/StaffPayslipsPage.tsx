@@ -53,18 +53,18 @@ export default function StaffPayslipsPage() {
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
       <style>
         body{font-family:'DM Sans',sans-serif;padding:60px;color:#1e293b;background:#f8fafc;min-height:100vh;display:flex;justify-content:center;align-items:flex-start}
-        .container{width:100%;max-width:800px;background:#fff;padding:50px;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.04);position:relative;overflow:hidden}
+        .container{width:100%;max-width:800px;background:#fff;padding:50px;border-radius: 8px;box-shadow:0 10px 40px rgba(0,0,0,0.04);position:relative;overflow:hidden}
         .watermark{position:absolute;top:20%;left:50%;transform:translate(-50%,-20%) rotate(-15deg);font-size:100px;font-weight:900;color:rgba(76,29,149,0.02);white-space:nowrap;pointer-events:none;z-index:0}
         .content{position:relative;z-index:1}
         .header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #4c1d95;padding-bottom:25px;margin-bottom:40px}
         .school-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#1e0646;margin:0}
-        .box{border:1px solid #f1f5f9;border-radius:16px;padding:24px;margin-bottom:30px;background:#f8fafc;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+        .box{border:1px solid #f1f5f9;border-radius: 8px;padding:24px;margin-bottom:30px;background:#f8fafc;display:grid;grid-template-columns:1fr 1fr;gap:20px}
         .box div b{display:block;font-size:10px;text-transform:uppercase;color:#64748b;letter-spacing:0.1em;margin-bottom:6px}
         .box div span{font-size:18px;font-weight:800;color:#111827}
         table{width:100%;border-collapse:collapse; margin-bottom: 30px;}
         th{text-align:left;font-size:11px;text-transform:uppercase;color:#64748b;padding-bottom:15px;letter-spacing:0.1em;border-bottom:1px solid #e2e8f0}
         td{padding:12px 0;border-bottom:1px solid #f1f5f9;font-size:14px;color:#334155}
-        .total-row{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#4c1d95,#2e1065);padding:24px 30px;border-radius:16px;color:#fff;box-shadow:0 8px 20px rgba(76,29,149,0.15)}
+        .total-row{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#4c1d95,#2e1065);padding:24px 30px;border-radius: 8px;color:#fff;box-shadow:0 8px 20px rgba(76,29,149,0.15)}
         .total-row .val{font-size:28px;font-weight:900}
         .footer{margin-top:60px;text-align:center;font-size:10px;color:#94a3b8;border-top:1px dashed #e2e8f0;padding-top:20px}
         @media print{body{padding:0;background:#fff} .container{box-shadow:none;border-radius:0;padding:20px}}
@@ -159,14 +159,14 @@ export default function StaffPayslipsPage() {
 
       <div style={{ display: 'grid', gap: 16 }}>
         {payslips.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 20, border: '2px dashed #e2e8f0', padding: 60, textAlign: 'center' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '2px dashed #e2e8f0', padding: 60, textAlign: 'center' }}>
             <FileText size={48} color="#cbd5e1" style={{ margin: '0 auto 16px' }} />
             <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e293b', margin: '0 0 8px' }}>No payslips found for {selectedYear}</h3>
             <p style={{ fontSize: 14, color: '#64748b', margin: 0 }}>When payroll is processed by the bursar, your payslips will appear here.</p>
           </div>
         ) : (
           payslips.map(ps => (
-            <div key={ps.id} className="payslip-card" style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div key={ps.id} className="payslip-card" style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                 <div style={{ width: 56, height: 56, background: '#f5f3ff', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6d28d9' }}>
                    <DollarSign size={28} />

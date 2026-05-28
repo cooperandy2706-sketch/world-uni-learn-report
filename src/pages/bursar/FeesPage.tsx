@@ -626,12 +626,12 @@ export default function FeesPage() {
             <div class="info-box">
               <h3>Student Details</h3>
               <p>${data.student.full_name}</p>
-              <p style="font-size: 12px; color: #64748b; font-weight: 400;">ID: ${data.student.student_id} • Grade: ${(data.student.class as any)?.name}</p>
+              <p style="font-size: 12px; color: #64748b; font-weight: 600;">ID: ${data.student.student_id} • Grade: ${(data.student.class as any)?.name}</p>
             </div>
             <div class="info-box" style="text-align: right;">
               <h3>Payment Details</h3>
               <p>Method: ${data.method.toUpperCase()}</p>
-              <p style="font-size: 12px; color: #64748b; font-weight: 400;">Status: Paid & Released</p>
+              <p style="font-size: 12px; color: #64748b; font-weight: 600;">Status: Paid & Released</p>
             </div>
           </div>
           <table>
@@ -748,7 +748,7 @@ export default function FeesPage() {
               </div>
               <div>
                 <div style="font-size:19px; font-weight:900; color:#1e0646; margin-bottom:1px; font-family:'Playfair Display',serif; line-height: 1.1;">${school?.name || 'OFFICIAL RECEIPT'}</div>
-                ${school?.motto ? `<div style="font-size:10px; color:#6d28d9; margin-bottom:6px; font-style: italic; font-weight: 500; opacity: 0.8;">&ldquo;${school.motto}&rdquo;</div>` : ''}
+                ${school?.motto ? `<div style="font-size:10px; color:#6d28d9; margin-bottom:6px; font-style: italic; font-weight: 600; opacity: 0.8;">&ldquo;${school.motto}&rdquo;</div>` : ''}
                 <div style="display: flex; flex-direction: column; gap: 2px;">
                   ${school?.address ? `<div style="font-size:9.5px; color:#6b7280; display: flex; align-items: center; gap: 4px;"><span>📍</span> ${school.address}</div>` : ''}
                   ${school?.phone ? `<div style="font-size:9.5px; color:#6b7280; display: flex; align-items: center; gap: 4px;"><span>📞</span> ${school.phone}</div>` : ''}
@@ -901,7 +901,7 @@ export default function FeesPage() {
       : CREST_SVG
 
     const buildReceiptHTML = (type: string) => `
-      <div style="padding: 24px; max-width: 420px; margin: 0 auto; background: #ffffff; box-sizing: border-box; border: 1.5px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); position: relative; overflow: hidden; height: 130mm; display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="padding: 24px; max-width: 420px; margin: 0 auto; background: #ffffff; box-sizing: border-box; border: 1.5px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); position: relative; overflow: hidden; height: 130mm; display: flex; flex-direction: column; justify-content: space-between;">
         <!-- Watermark -->
         <div style="position: absolute; top: 10%; left: 50%; transform: translate(-50%, -10%) rotate(-10deg); font-size: 60px; font-weight: 900; color: rgba(76, 29, 149, 0.02); white-space: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
 
@@ -966,7 +966,7 @@ export default function FeesPage() {
             ${payment.notes ? `
             <div style="background: #fdfbf7; border: 1.5px solid #fef3c7; border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; font-size: 10px; color: #78350f;">
               <span style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px;">Payment Notes</span>
-              <div style="line-height: 1.4; font-weight: 500;">${payment.notes}</div>
+              <div style="line-height: 1.4; font-weight: 600;">${payment.notes}</div>
             </div>` : ''}
           </div>
 
@@ -1069,7 +1069,7 @@ export default function FeesPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr 360px', gap: 24, alignItems: 'start', position: 'relative', minHeight: '680px' }}>
             
             {/* COLUMN 1: STUDENT FINDER */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 20, boxShadow: '0 2px 12px rgba(109,40,217,.04)', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: 20, boxShadow: '0 2px 12px rgba(109,40,217,.04)', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ background: '#f5f3ff', borderRadius: 8, padding: 8, color: '#6d28d9' }}>
                   <Users size={18} />
@@ -1172,7 +1172,7 @@ export default function FeesPage() {
             </div>
 
             {/* COLUMN 2: FEE ALLOCATION CHECKLIST */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 2px 12px rgba(109,40,217,.04)', minHeight: '520px' }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 2px 12px rgba(109,40,217,.04)', minHeight: '520px' }}>
               {!pf.student_id ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: '400px', color: 'var(--text-subtle)', textAlign: 'center', gap: 16, padding: '0 20px' }}>
                   <div style={{ background: '#f5f3ff', borderRadius: '50%', padding: 20, color: '#6d28d9' }}>
@@ -1363,7 +1363,7 @@ export default function FeesPage() {
             </div>
 
             {/* COLUMN 3: CHECKOUT SUMMARY SLIP */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 4px 20px rgba(109,40,217,.06)', display: 'flex', flexDirection: 'column', gap: 18, position: 'sticky', top: 20 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 4px 20px rgba(109,40,217,.06)', display: 'flex', flexDirection: 'column', gap: 18, position: 'sticky', top: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1.5px solid #f5f3ff', paddingBottom: 14 }}>
                 <div style={{ background: '#faf5ff', borderRadius: 8, padding: 8, color: '#6d28d9' }}>
                   <CreditCard size={18} />
@@ -1582,7 +1582,7 @@ export default function FeesPage() {
                   }}>
                     <Shield size={14} style={{ color: '#059669', flexShrink: 0 }} />
                     <span style={{ flexGrow: 1 }}>🔒 Transaction PIN Active</span>
-                    <span style={{ fontSize: 10, background: '#10b981', color: '#fff', padding: '2px 6px', borderRadius: 20, fontWeight: 700, textTransform: 'uppercase' }}>SECURE</span>
+                    <span style={{ fontSize: 10, background: '#10b981', color: '#fff', padding: '2px 6px', borderRadius: 8, fontWeight: 700, textTransform: 'uppercase' }}>SECURE</span>
                   </div>
                 ) : (
                   <div style={{
@@ -1600,7 +1600,7 @@ export default function FeesPage() {
                   }}>
                     <AlertTriangle size={14} style={{ color: '#d97706', flexShrink: 0 }} />
                     <span style={{ flexGrow: 1 }}>⚠️ PIN Lock Bypassed</span>
-                    <span style={{ fontSize: 10, background: '#f59e0b', color: '#fff', padding: '2px 6px', borderRadius: 20, fontWeight: 700, textTransform: 'uppercase' }}>BYPASS</span>
+                    <span style={{ fontSize: 10, background: '#f59e0b', color: '#fff', padding: '2px 6px', borderRadius: 8, fontWeight: 700, textTransform: 'uppercase' }}>BYPASS</span>
                   </div>
                 );
               })()}
@@ -1678,7 +1678,7 @@ export default function FeesPage() {
                 <div>
                   <h3 style={{ fontSize: 16, fontWeight: 800, color: '#1e0646', margin: 0 }}>Available Items</h3>
                   {pf.student_id && (
-                    <span style={{ fontSize: 10, color: '#6d28d9', fontWeight: 700, background: '#f5f3ff', padding: '2px 8px', borderRadius: 20 }}>
+                    <span style={{ fontSize: 10, color: '#6d28d9', fontWeight: 700, background: '#f5f3ff', padding: '2px 8px', borderRadius: 8 }}>
                       Filtered for {(students.find((s:any) => s.id === pf.student_id) as any)?.class?.name}
                     </span>
                   )}
@@ -1700,7 +1700,7 @@ export default function FeesPage() {
                     const inCart = storeCart.find(x => x.id === item.id)
                     return (
                       <div key={item.id} style={{ 
-                        padding: '16px', borderRadius: 16, border: '1.5px solid var(--border-light)', transition: 'all .2s',
+                        padding: '16px', borderRadius: 8, border: '1.5px solid var(--border-light)', transition: 'all .2s',
                         opacity: item.current_stock > 0 ? 1 : 0.6
                       }}>
                         <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>{item.category}</div>
@@ -1733,7 +1733,7 @@ export default function FeesPage() {
             {/* Floating Cart Panel */}
             {storeCart.length > 0 && (
               <div style={{ 
-                position: 'fixed', bottom: 30, right: 30, width: 320, background: 'var(--bg-card)', borderRadius: 24, 
+                position: 'fixed', bottom: 30, right: 30, width: 320, background: 'var(--bg-card)', borderRadius: 12, 
                 boxShadow: '0 20px 50px rgba(0,0,0,0.15)', border: '1.5px solid #f0eefe', zIndex: 100,
                 display: 'flex', flexDirection: 'column', overflow: 'hidden', animation: '_an_fi .3s ease-out'
               }}>
@@ -1810,7 +1810,7 @@ export default function FeesPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* Summary Cards */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
-                <div style={{ background: 'linear-gradient(135deg, #1e0646, #4c1d95)', borderRadius: 24, padding: 24, color: '#fff' }}>
+                <div style={{ background: 'linear-gradient(135deg, #1e0646, #4c1d95)', borderRadius: 12, padding: 24, color: '#fff' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.8 }}>Total Collection Today</span>
                     <div style={{ background: 'rgba(255,255,255,0.1)', padding: 8, borderRadius: 12 }}><CreditCard size={18} /></div>
@@ -1819,7 +1819,7 @@ export default function FeesPage() {
                   <div style={{ fontSize: 12, opacity: 0.7 }}>Combined Tuition & Store Sales</div>
                 </div>
 
-                <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 24, border: '1.5px solid #f0eefe' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, border: '1.5px solid #f0eefe' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: '#64748b' }}>Tuition Payments</span>
                     <div style={{ background: '#f5f3ff', padding: 8, borderRadius: 12, color: '#6d28d9' }}><Users size={18} /></div>
@@ -1830,7 +1830,7 @@ export default function FeesPage() {
                   </div>
                 </div>
 
-                <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 24, border: '1.5px solid #f0eefe' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, border: '1.5px solid #f0eefe' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: '#64748b' }}>Store Sales</span>
                     <div style={{ background: '#ecfdf5', padding: 8, borderRadius: 12, color: '#059669' }}><ShoppingCart size={18} /></div>
@@ -1843,11 +1843,11 @@ export default function FeesPage() {
               </div>
 
               {/* Payment Methods */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 24, padding: 24, border: '1.5px solid #f0eefe' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, border: '1.5px solid #f0eefe' }}>
                 <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1e0646', marginBottom: 20 }}>Payment Method Distribution (Today)</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                   {Object.entries(byMethod).map(([m, val]) => (
-                    <div key={m} style={{ padding: '16px', borderRadius: 16, background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                    <div key={m} style={{ padding: '16px', borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0' }}>
                       <div style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: 4 }}>{m}</div>
                       <div style={{ fontSize: 18, fontWeight: 900, color: '#1e293b' }}>{CUR(val)}</div>
                     </div>
@@ -1856,7 +1856,7 @@ export default function FeesPage() {
               </div>
 
               {/* Combined Transaction Log */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 24, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid #f0eefe', overflow: 'hidden' }}>
                 <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1e0646', margin: 0 }}>Recent Transactions (All Channels)</h3>
                   <Btn variant="secondary" onClick={() => window.print()}><Printer size={14} /> Print Report</Btn>
@@ -1879,7 +1879,7 @@ export default function FeesPage() {
                           <td style={{ padding: '14px', fontSize: 12, color: '#64748b' }}>{new Date(t._time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                           <td style={{ padding: '14px', fontSize: 13, fontWeight: 600 }}>{t.student?.full_name || 'Walking Customer'}</td>
                           <td style={{ padding: '14px' }}>
-                            <span style={{ fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 20, background: t._type === 'Tuition' ? '#f5f3ff' : '#ecfdf5', color: t._type === 'Tuition' ? '#6d28d9' : '#059669' }}>{t._type.toUpperCase()}</span>
+                            <span style={{ fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 8, background: t._type === 'Tuition' ? '#f5f3ff' : '#ecfdf5', color: t._type === 'Tuition' ? '#6d28d9' : '#059669' }}>{t._type.toUpperCase()}</span>
                           </td>
                           <td style={{ padding: '14px', fontSize: 13, color: '#1e293b' }}>{t._name}</td>
                           <td style={{ padding: '14px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#64748b' }}>{t.payment_method}</td>
@@ -2058,7 +2058,7 @@ export default function FeesPage() {
             {loadingStructures ? (
               <div style={{ padding: '40px', color: 'var(--text-subtle)', fontSize: 13, textAlign: 'center' }}>Loading…</div>
             ) : (structures as any[]).length === 0 ? (
-              <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '60px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                 <Settings size={40} color="#d1d5db" style={{ marginBottom: 12 }} />
                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No fee structures yet</h3>
                 <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>Create fee types for each class and term</p>
@@ -2083,7 +2083,7 @@ export default function FeesPage() {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
                     {g.items.map((s: any) => (
-                      <div key={s.id} style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', position: 'relative', overflow: 'hidden' }}>
+                      <div key={s.id} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '20px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, position: 'relative', zIndex: 1 }}>
                           <div>
                             <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{s.fee_name}</div>
