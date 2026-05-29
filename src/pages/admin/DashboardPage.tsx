@@ -13,7 +13,7 @@ import FlaskLoader from '../../components/ui/FlaskLoader'
 import WelcomeOnboarding from '../../components/ui/WelcomeOnboarding'
 import { AreaChart, Area, BarChart, Bar, Cell, Legend, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare, Users } from 'lucide-react'
+import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare, Users, FolderLock, Settings, Bed, HeartHandshake, ClipboardCheck, PencilLine } from 'lucide-react'
 import { useThemeStore } from '../../store/themeStore'
 import { useRecentActions } from '../../hooks/useAuditLogs'
 
@@ -34,7 +34,7 @@ interface AbsentStudent { student_id: string; full_name: string; guardian_name: 
 interface GateActivity { id: string; name: string; type: string; time: string; direction: string }
 interface Message { id: string; body: string; created_at: string; is_read: boolean; sender?: { full_name: string } }
 interface ClassStat { id: string; name: string; student_count: number; avg_score: number | null; reports_done: number }
-interface RecentActivity { type: string; label: string; sub: string; time: string; icon: string; color: string }
+interface RecentActivity { type: string; label: string; sub: string; time: string; icon: React.ReactNode; color: string }
 
 interface TimetableLesson {
   id: string
@@ -393,9 +393,9 @@ export default function DashboardPage() {
       supabase.from('students').select('created_at, full_name').eq('school_id', sid).order('created_at', { ascending: false }).limit(3),
     ])
     const activities: RecentActivity[] = []
-    recentSubs?.forEach((s: any) => activities.push({ type: 'quiz', label: `${s.student?.full_name} submitted "${s.assignment?.title}"`, sub: 'Quiz submission', time: s.submitted_at, icon: '📝', color: '#6d28d9' }))
-    recentScores?.slice(0, 3).forEach((s: any) => activities.push({ type: 'score', label: `Score entered for ${s.student?.full_name} — ${s.subject?.name}`, sub: `${s.total_score?.toFixed(1)}%`, time: s.updated_at, icon: '✏️', color: '#0891b2' }))
-    recentStudents?.forEach((s: any) => activities.push({ type: 'student', label: `New student: ${s.full_name}`, sub: 'Enrolled', time: s.created_at, icon: '👤', color: '#16a34a' }))
+    recentSubs?.forEach((s: any) => activities.push({ type: 'quiz', label: `${s.student?.full_name} submitted "${s.assignment?.title}"`, sub: 'Quiz submission', time: s.submitted_at, icon: <ClipboardCheck size={16} />, color: '#6d28d9' }))
+    recentScores?.slice(0, 3).forEach((s: any) => activities.push({ type: 'score', label: `Score entered for ${s.student?.full_name} — ${s.subject?.name}`, sub: `${s.total_score?.toFixed(1)}%`, time: s.updated_at, icon: <PencilLine size={16} />, color: '#0891b2' }))
+    recentStudents?.forEach((s: any) => activities.push({ type: 'student', label: `New student: ${s.full_name}`, sub: 'Enrolled', time: s.created_at, icon: <UserCheck size={16} />, color: '#16a34a' }))
     activities.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
     setRecentActivities(activities.slice(0, 8))
   }
@@ -1104,15 +1104,15 @@ export default function DashboardPage() {
               <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 16px', color: 'var(--text-main)' }}>Operations</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                 {[
-                  { icon: '📁', label: 'Vault', to: '/admin/staff-vault', color: '#facc15' },
-                  { icon: '📅', label: 'Calendar', to: ROUTES.ADMIN_CALENDAR, color: '#ef4444' },
-                  { icon: '📱', label: 'SMS', to: ROUTES.ADMIN_SMS, color: '#14b8a6' },
-                  { icon: '⚙️', label: 'Settings', to: ROUTES.ADMIN_SETTINGS, color: '#64748b' },
-                  { icon: '🛏️', label: 'Boarding', to: '/admin/boarding', color: '#10b981' },
-                  { icon: '❤️', label: 'Pastoral', to: '/admin/pastoral', color: '#ef4444' },
+                  { icon: <FolderLock size={20} color="#facc15" />, label: 'Vault', to: '/admin/staff-vault', color: '#facc15' },
+                  { icon: <Calendar size={20} color="#ef4444" />, label: 'Calendar', to: ROUTES.ADMIN_CALENDAR, color: '#ef4444' },
+                  { icon: <MessageSquare size={20} color="#14b8a6" />, label: 'SMS', to: ROUTES.ADMIN_SMS, color: '#14b8a6' },
+                  { icon: <Settings size={20} color="#64748b" />, label: 'Settings', to: ROUTES.ADMIN_SETTINGS, color: '#64748b' },
+                  { icon: <Bed size={20} color="#10b981" />, label: 'Boarding', to: '/admin/boarding', color: '#10b981' },
+                  { icon: <HeartHandshake size={20} color="#ef4444" />, label: 'Pastoral', to: '/admin/pastoral', color: '#ef4444' },
                 ].map(({ icon, label, to, color }) => (
                   <Link key={label} to={to} className="ops-action-card">
-                    <div style={{ width: 40, height: 40, borderRadius: 12, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{icon}</div>
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</div>
                     <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-main)' }}>{label}</span>
                   </Link>
                 ))}

@@ -12,6 +12,8 @@ import { getGradeInfo, calculateAverage, calculatePassRate } from '../../utils/g
 import { formatDate, getEngagingGreeting } from '../../lib/utils'
 import { ROUTES } from '../../constants/routes'
 import FlaskLoader from '../../components/ui/FlaskLoader'
+import Button from '../../components/ui/Button'
+import { School, BookOpen, Calendar, CheckCircle, Clock, ClipboardCheck, Users, Book, Bell, Gamepad2, FileSpreadsheet, PencilLine, MessageSquare } from 'lucide-react'
 
 function AnimNum({ to }: { to: number }) {
   const [val, setVal] = useState(0); const ref = useRef(false)
@@ -363,13 +365,13 @@ export default function TeacherDashboardPage() {
             {/* ── KPIs ── */}
             <div className="t-kpi-grid" style={{ marginBottom: 20, animation: '_fu .5s ease .1s both' }}>
               {[
-                { label: 'My Classes', value: uniqueClasses.length, icon: '🏫', color: '#6d28d9', bg: '#f5f3ff' },
-                { label: 'My Subjects', value: uniqueSubjects.length, icon: '📚', color: '#0891b2', bg: '#ecfeff' },
-                { label: "Today's Lessons", value: todayLessons.length, icon: '📅', color: '#16a34a', bg: '#f0fdf4' },
-                { label: 'Scores Entered', value: submittedCount, icon: '✅', color: '#16a34a', bg: '#f0fdf4' },
-                { label: 'Pending Entry', value: pendingCount, icon: '⏳', color: pendingCount > 0 ? '#d97706' : '#16a34a', bg: pendingCount > 0 ? '#fffbeb' : '#f0fdf4', pulse: pendingCount > 0 },
-                { label: 'My Quizzes', value: myQuizCount, icon: '📝', color: '#7c3aed', bg: '#f5f3ff' },
-                { label: 'Nitro Typer', value: 'Play', icon: '🏎️', color: '#00f3ff', bg: '#0a0a1f', isLink: true, to: ROUTES.TEACHER_TYPING_GAME },
+                { label: 'My Classes', value: uniqueClasses.length, icon: <School size={16} />, color: '#6d28d9', bg: '#f5f3ff' },
+                { label: 'My Subjects', value: uniqueSubjects.length, icon: <BookOpen size={16} />, color: '#0891b2', bg: '#ecfeff' },
+                { label: "Today's Lessons", value: todayLessons.length, icon: <Calendar size={16} />, color: '#16a34a', bg: '#f0fdf4' },
+                { label: 'Scores Entered', value: submittedCount, icon: <CheckCircle size={16} />, color: '#16a34a', bg: '#f0fdf4' },
+                { label: 'Pending Entry', value: pendingCount, icon: <Clock size={16} />, color: pendingCount > 0 ? '#d97706' : '#16a34a', bg: pendingCount > 0 ? '#fffbeb' : '#f0fdf4', pulse: pendingCount > 0 },
+                { label: 'My Quizzes', value: myQuizCount, icon: <ClipboardCheck size={16} />, color: '#7c3aed', bg: '#f5f3ff' },
+                { label: 'Nitro Typer', value: 'Play', icon: <Gamepad2 size={16} />, color: '#00f3ff', bg: '#0a0a1f', isLink: true, to: ROUTES.TEACHER_TYPING_GAME },
               ].map((s, i) => {
                 const CardInner = (
                   <div style={{
@@ -402,7 +404,7 @@ export default function TeacherDashboardPage() {
                 <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span>📅</span>
+                      <Calendar size={18} color="#6d28d9" />
                       <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Today's Schedule</h3>
                       <span style={{ fontSize: 11, background: '#f5f3ff', color: '#6d28d9', padding: '2px 8px', borderRadius: 99, fontWeight: 700 }}>{DAYS[now.getDay()]}</span>
                     </div>
@@ -447,7 +449,7 @@ export default function TeacherDashboardPage() {
                 <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span>🏫</span>
+                      <School size={18} color="#6d28d9" />
                       <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>My Classes</h3>
                     </div>
                     <Link to={ROUTES.TEACHER_MY_CLASSES} style={{ fontSize: 12, fontWeight: 600, color: '#6d28d9', textDecoration: 'none' }}>View all →</Link>
@@ -492,7 +494,7 @@ export default function TeacherDashboardPage() {
                   <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span>📝</span>
+                        <ClipboardCheck size={18} color="#6d28d9" />
                         <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Quiz Submissions</h3>
                       </div>
                       <Link to={ROUTES.TEACHER_ASSIGNMENTS} style={{ fontSize: 12, fontWeight: 600, color: '#6d28d9', textDecoration: 'none' }}>Manage quizzes →</Link>
@@ -519,7 +521,7 @@ export default function TeacherDashboardPage() {
                 {recentScores.length > 0 && (
                   <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                     <div style={{ padding: '14px 20px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span>⚡</span>
+                      <CheckCircle size={18} color="#6d28d9" />
                       <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Recent Score Entries</h3>
                     </div>
                     {recentScores.map((a: any, i: number) => {
@@ -619,21 +621,21 @@ export default function TeacherDashboardPage() {
                 {/* Quick Actions — ALL teacher features */}
                 <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                    <span>⚡</span>
+                    <CheckCircle size={18} color="#6d28d9" />
                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Quick Actions</h3>
                   </div>
                   <div className="t-quick-grid">
                     {[
-                      { icon: '✏️', label: 'Enter Scores', to: ROUTES.TEACHER_SCORE_ENTRY },
-                      { icon: '📋', label: 'Attendance', to: ROUTES.TEACHER_ATTENDANCE },
-                      { icon: '🏫', label: 'My Classes', to: ROUTES.TEACHER_MY_CLASSES },
-                      { icon: '📄', label: 'Reports', to: ROUTES.TEACHER_REPORTS },
-                      { icon: '📅', label: 'Timetable', to: ROUTES.TEACHER_TIMETABLE },
-                      { icon: '📖', label: 'Lesson Plan', to: ROUTES.TEACHER_LESSON_TRACKER },
-                      { icon: '📝', label: 'Quizzes', to: ROUTES.TEACHER_ASSIGNMENTS },
-                      { icon: '👥', label: 'Students', to: ROUTES.TEACHER_STUDENTS },
-                      { icon: '📚', label: 'Syllabus', to: ROUTES.TEACHER_SYLLABUS },
-                      { icon: '🔔', label: 'Notifications', to: ROUTES.TEACHER_NOTIFICATIONS },
+                      { icon: <PencilLine size={14} />, label: 'Enter Scores', to: ROUTES.TEACHER_SCORE_ENTRY },
+                      { icon: <ClipboardCheck size={14} />, label: 'Attendance', to: ROUTES.TEACHER_ATTENDANCE },
+                      { icon: <School size={14} />, label: 'My Classes', to: ROUTES.TEACHER_MY_CLASSES },
+                      { icon: <FileSpreadsheet size={14} />, label: 'Reports', to: ROUTES.TEACHER_REPORTS },
+                      { icon: <Calendar size={14} />, label: 'Timetable', to: ROUTES.TEACHER_TIMETABLE },
+                      { icon: <BookOpen size={14} />, label: 'Lesson Plan', to: ROUTES.TEACHER_LESSON_TRACKER },
+                      { icon: <ClipboardCheck size={14} />, label: 'Quizzes', to: ROUTES.TEACHER_ASSIGNMENTS },
+                      { icon: <Users size={14} />, label: 'Students', to: ROUTES.TEACHER_STUDENTS },
+                      { icon: <Book size={14} />, label: 'Syllabus', to: ROUTES.TEACHER_SYLLABUS },
+                      { icon: <Bell size={14} />, label: 'Notifications', to: ROUTES.TEACHER_NOTIFICATIONS },
                     ].map(({ icon, label, to }) => (
                       <Link key={label} to={to} className="ql"
                         style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', borderRadius: 9, background: '#faf5ff', textDecoration: 'none', transition: 'all .15s' }}>
@@ -641,11 +643,10 @@ export default function TeacherDashboardPage() {
                         <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-main)' }}>{label}</span>
                       </Link>
                     ))}
-                    <button onClick={() => setMsgOpen(true)} className="ql"
-                      style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', borderRadius: 9, background: '#faf5ff', border: 'none', cursor: 'pointer', transition: 'all .15s', gridColumn: 'span 2' }}>
-                      <span style={{ fontSize: 13 }}>💬</span>
-                      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-main)' }}>Message Admin</span>
-                    </button>
+                    <Button onClick={() => setMsgOpen(true)} className="ql" variant="outline" style={{ gridColumn: 'span 2' }}>
+                      <span style={{ fontSize: 13, display: 'flex' }}><MessageSquare size={14} /></span>
+                      Message Admin
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -691,12 +692,10 @@ export default function TeacherDashboardPage() {
                 onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb' }} />
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setMsgOpen(false)} style={{ flex: 1, padding: '9px', borderRadius: 9, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={sendMessage} disabled={sendingMsg || !msgSubject.trim() || !msgBody.trim()}
-                style={{ flex: 2, padding: '9px', borderRadius: 9, border: 'none', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: sendingMsg || !msgSubject.trim() || !msgBody.trim() ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
-                {sendingMsg && <span style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid rgba(255,255,255,.3)', borderTopColor: '#fff', animation: '_sp .7s linear infinite' }} />}
-                💬 Send to Admin
-              </button>
+              <Button variant="outline" onClick={() => setMsgOpen(false)} style={{ flex: 1 }}>Cancel</Button>
+              <Button variant="primary" onClick={sendMessage} disabled={sendingMsg || !msgSubject.trim() || !msgBody.trim()} isLoading={sendingMsg} style={{ flex: 2 }}>
+                <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><MessageSquare size={16} /> Send to Admin</span>
+              </Button>
             </div>
           </div>
         </div>

@@ -520,7 +520,7 @@ export default function LessonTrackerPage() {
                     duration: 8000, style: { background: '#f59e0b', color: '#fff', fontWeight: 600 }, icon: '⏰',
                 })
                 if (Notification.permission === 'granted') {
-                    new Notification(`⏰ Class in 5 minutes!`, { body: `${l.subject} — ${l.class} (${l.startTime})`, icon: '/icon-192.png', tag: `lesson_${l.id}` })
+                    new Notification(`⏰ Class in 5 minutes!`, { body: `${l.subject} — ${l.class} (${l.startTime})`, icon: '/app-icon.svg', tag: `lesson_${l.id}` })
                 }
             }
             if (l.status === 'now' && l.progress < 2 && !alerted.has(`start_${l.id}`)) {
@@ -529,7 +529,7 @@ export default function LessonTrackerPage() {
                     duration: 10000, style: { background: '#16a34a', color: '#fff', fontWeight: 600 }, icon: '🏫',
                 })
                 if (Notification.permission === 'granted') {
-                    new Notification(`🏫 Class starting now!`, { body: `${l.subject} — ${l.class}`, icon: '/icon-192.png', tag: `lesson_start_${l.id}` })
+                    new Notification(`🏫 Class starting now!`, { body: `${l.subject} — ${l.class}`, icon: '/app-icon.svg', tag: `lesson_start_${l.id}` })
                 }
             }
         })

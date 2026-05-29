@@ -209,28 +209,28 @@ const SECURITY_NAV = [
   { label: 'Dashboard', to: ROUTES.SECURITY_DASHBOARD, single: true },
   {
     label: 'Operations', items: [
-      { label: '🔍 Gate Scanner', to: '/security/scanner' },
-      { label: '📋 Attendance Log', to: '/security/gate-attendance' },
-      { label: '🚪 Visitor Logs', to: '/security/visitors' },
-      { label: '🪪 Visitor Badges', to: '/security/visitor-badges' },
-      { label: '⚠️ Incident Reports', to: '/security/incidents' },
+      { label: 'Gate Scanner', to: '/security/scanner' },
+      { label: 'Attendance Log', to: '/security/gate-attendance' },
+      { label: 'Visitor Logs', to: '/security/visitors' },
+      { label: 'Visitor Badges', to: '/security/visitor-badges' },
+      { label: 'Incident Reports', to: '/security/incidents' },
     ]
   },
 ]
 
 const DRIVER_NAV = [
-  { label: '🚌 Dashboard', to: '/driver/dashboard', single: true },
-  { label: '📋 Trip Logs', to: '/driver/logs', single: true },
-  { label: '🗺️ Assigned Routes', to: '/driver/routes', single: true },
+  { label: 'Dashboard', to: '/driver/dashboard', single: true },
+  { label: 'Trip Logs', to: '/driver/logs', single: true },
+  { label: 'Assigned Routes', to: '/driver/routes', single: true },
 ]
 
 const NURSE_NAV = [
   { label: 'Dashboard', to: '/nurse/dashboard', single: true },
   {
     label: 'Clinic', items: [
-      { label: '📋 Visits Log', to: '/nurse/visits' },
-      { label: '💊 Medication Tracker', to: '/nurse/medication' },
-      { label: '🩺 Health Records', to: '/nurse/records' },
+      { label: 'Visits Log', to: '/nurse/visits' },
+      { label: 'Medication Tracker', to: '/nurse/medication' },
+      { label: 'Health Records', to: '/nurse/records' },
     ]
   },
 ]
@@ -239,9 +239,9 @@ const LIBRARIAN_NAV = [
   { label: 'Dashboard', to: '/librarian/dashboard', single: true },
   {
     label: 'Management', items: [
-      { label: '⚠️ Overdue & Fines', to: '/librarian/fines' },
-      { label: '📜 Checkout History', to: '/librarian/history' },
-      { label: '📦 QR Inventory', to: '/librarian/inventory' },
+      { label: 'Overdue & Fines', to: '/librarian/fines' },
+      { label: 'Checkout History', to: '/librarian/history' },
+      { label: 'QR Inventory', to: '/librarian/inventory' },
     ]
   },
 ]
@@ -520,7 +520,7 @@ export default function Header() {
             resultKind: 'person', type: 'Student',
             label: s.full_name,
             subtitle: `Student · ${(s as any).class?.name ?? 'No Class'}`,
-            icon: '👨‍🎓', color: '#1a56db',
+            icon: <GraduationCap size={16} />, color: '#1a56db',
             path: isAdmin ? `/admin/students` : `/teacher/students`,
           }))
         }
@@ -538,7 +538,7 @@ export default function Header() {
             resultKind: 'person', type: 'Staff',
             label: t.full_name,
             subtitle: `Staff · ${t.role}`,
-            icon: '👩‍🏫', color: '#7c3aed',
+            icon: <UserCheck size={16} />, color: '#7c3aed',
             path: `/admin/teachers`,
           }))
         }
@@ -555,7 +555,7 @@ export default function Header() {
             resultKind: 'intent', type: 'Class',
             label: `View Class — ${c.name}`,
             subtitle: 'Academics → Classes',
-            icon: '🏫', color: '#0891b2',
+            icon: <School size={16} />, color: '#0891b2',
             path: `/admin/classes?search=${encodeURIComponent(c.name)}`,
           }))
         }
@@ -572,7 +572,7 @@ export default function Header() {
             resultKind: 'intent', type: 'Subject',
             label: `View Subject — ${s.name}`,
             subtitle: 'Academics → Subjects',
-            icon: '📚', color: '#7c3aed',
+            icon: <BookOpen size={16} />, color: '#7c3aed',
             path: `/admin/subjects?search=${encodeURIComponent(s.name)}`,
           }))
         }
@@ -589,7 +589,7 @@ export default function Header() {
             resultKind: 'intent', type: 'Inventory',
             label: `Inventory — ${i.item_name}`,
             subtitle: 'Operations → Assets',
-            icon: '📦', color: 'var(--text-main)',
+            icon: <Package size={16} />, color: 'var(--text-main)',
             path: `/bursar/inventory?search=${encodeURIComponent(i.item_name)}`,
           }))
         }
@@ -606,7 +606,7 @@ export default function Header() {
             resultKind: 'intent', type: 'News',
             label: `Read — ${n.title}`,
             subtitle: 'Notice Board',
-            icon: '📰', color: '#f59e0b',
+            icon: <Newspaper size={16} />, color: '#f59e0b',
             path: `/student/announcements?id=${n.id}`,
           }))
         }
@@ -762,7 +762,7 @@ export default function Header() {
                         onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)' }}
                         onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                       >
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, flexShrink: 0 }}>🕐</div>
+                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Clock size={14} /></div>
                         <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 600, flex: 1 }}>{r}</span>
                         <span style={{ fontSize: 11, color: '#d1d5db' }}>↵</span>
                       </div>
@@ -906,29 +906,29 @@ export default function Header() {
                   const isStud = selectedPerson.type === 'Student'
 
                   const adminStudentActions = [
-                    { icon: '👤', label: 'View Profile', subtitle: 'Student directory', color: '#1a56db', path: `/admin/students?student=${enc}` },
-                    { icon: '📊', label: 'View Results / Scores', subtitle: 'Score entry', color: '#0891b2', path: `/admin/score-entry?student=${enc}` },
-                    { icon: '✅', label: 'Attendance Record', subtitle: 'Attendance page', color: '#16a34a', path: `/admin/attendance?student=${enc}` },
-                    { icon: '📄', label: 'Report Card', subtitle: 'Report cards', color: '#7c3aed', path: `/admin/reports?student=${enc}` },
-                    { icon: '💳', label: 'Pay Fees', subtitle: 'Fees & billing', color: '#16a34a', path: `/bursar/fees?student=${enc}` },
-                    { icon: '📋', label: 'Bill Sheet', subtitle: 'Full bill breakdown', color: '#b45309', path: `/bursar/bill-sheet?student=${enc}` },
+                    { icon: <User size={16} color="#1a56db" />, label: 'View Profile', subtitle: 'Student directory', color: '#1a56db', path: `/admin/students?student=${enc}` },
+                    { icon: <BarChart3 size={16} color="#0891b2" />, label: 'View Results / Scores', subtitle: 'Score entry', color: '#0891b2', path: `/admin/score-entry?student=${enc}` },
+                    { icon: <CheckCircle size={16} color="#16a34a" />, label: 'Attendance Record', subtitle: 'Attendance page', color: '#16a34a', path: `/admin/attendance?student=${enc}` },
+                    { icon: <FileText size={16} color="#7c3aed" />, label: 'Report Card', subtitle: 'Report cards', color: '#7c3aed', path: `/admin/reports?student=${enc}` },
+                    { icon: <CreditCard size={16} color="#16a34a" />, label: 'Pay Fees', subtitle: 'Fees & billing', color: '#16a34a', path: `/bursar/fees?student=${enc}` },
+                    { icon: <ClipboardList size={16} color="#b45309" />, label: 'Bill Sheet', subtitle: 'Full bill breakdown', color: '#b45309', path: `/bursar/bill-sheet?student=${enc}` },
                   ]
                   const bursarStudentActions = [
-                    { icon: '💳', label: 'Pay Fees', subtitle: 'Record a payment', color: '#16a34a', path: `/bursar/fees?student=${enc}` },
-                    { icon: '📋', label: 'Get Bill Sheet', subtitle: 'Full fee breakdown', color: '#b45309', path: `/bursar/bill-sheet?student=${enc}` },
-                    { icon: '📊', label: 'Check Balance', subtitle: 'Debtors overview', color: '#ef4444', path: `/bursar/debtors?student=${enc}` },
-                    { icon: '🧾', label: 'Payment History', subtitle: 'Past payments', color: '#6d28d9', path: `/bursar/fees?student=${enc}&tab=history` },
+                    { icon: <CreditCard size={16} color="#16a34a" />, label: 'Pay Fees', subtitle: 'Record a payment', color: '#16a34a', path: `/bursar/fees?student=${enc}` },
+                    { icon: <ClipboardList size={16} color="#b45309" />, label: 'Get Bill Sheet', subtitle: 'Full fee breakdown', color: '#b45309', path: `/bursar/bill-sheet?student=${enc}` },
+                    { icon: <BarChart3 size={16} color="#ef4444" />, label: 'Check Balance', subtitle: 'Debtors overview', color: '#ef4444', path: `/bursar/debtors?student=${enc}` },
+                    { icon: <History size={16} color="#6d28d9" />, label: 'Payment History', subtitle: 'Past payments', color: '#6d28d9', path: `/bursar/fees?student=${enc}&tab=history` },
                   ]
                   const teacherStudentActions = [
-                    { icon: '📊', label: 'View Scores', subtitle: 'Score entry', color: '#0891b2', path: `/teacher/score-entry?student=${enc}` },
-                    { icon: '✅', label: 'Attendance', subtitle: 'Attendance record', color: '#16a34a', path: `/teacher/attendance?student=${enc}` },
-                    { icon: '👤', label: 'Student Profile', subtitle: 'Student info', color: '#1a56db', path: `/teacher/students?student=${enc}` },
+                    { icon: <BarChart3 size={16} color="#0891b2" />, label: 'View Scores', subtitle: 'Score entry', color: '#0891b2', path: `/teacher/score-entry?student=${enc}` },
+                    { icon: <CheckCircle size={16} color="#16a34a" />, label: 'Attendance', subtitle: 'Attendance record', color: '#16a34a', path: `/teacher/attendance?student=${enc}` },
+                    { icon: <User size={16} color="#1a56db" />, label: 'Student Profile', subtitle: 'Student info', color: '#1a56db', path: `/teacher/students?student=${enc}` },
                   ]
                   const adminStaffActions = [
-                    { icon: '👤', label: 'View Profile', subtitle: 'Staff directory', color: '#7c3aed', path: `/admin/teachers?teacher=${enc}` },
-                    { icon: '🕐', label: 'View Timetable', subtitle: 'Timetable', color: '#6d28d9', path: `/admin/timetable?teacher=${enc}` },
-                    { icon: '💼', label: 'Payroll Record', subtitle: 'Staff payroll', color: '#0891b2', path: `/bursar/payroll?teacher=${enc}` },
-                    { icon: '📱', label: 'Send SMS', subtitle: 'Message staff', color: '#16a34a', path: `/admin/sms?to=${enc}` },
+                    { icon: <User size={16} color="#7c3aed" />, label: 'View Profile', subtitle: 'Staff directory', color: '#7c3aed', path: `/admin/teachers?teacher=${enc}` },
+                    { icon: <Clock size={16} color="#6d28d9" />, label: 'View Timetable', subtitle: 'Timetable', color: '#6d28d9', path: `/admin/timetable?teacher=${enc}` },
+                    { icon: <Wallet size={16} color="#0891b2" />, label: 'Payroll Record', subtitle: 'Staff payroll', color: '#0891b2', path: `/bursar/payroll?teacher=${enc}` },
+                    { icon: <Smartphone size={16} color="#16a34a" />, label: 'Send SMS', subtitle: 'Message staff', color: '#16a34a', path: `/admin/sms?to=${enc}` },
                   ]
 
                   const actions = isStud
