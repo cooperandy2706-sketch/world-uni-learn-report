@@ -564,6 +564,7 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
           </div>
 
           <div className="nav-actions">
+            <Link to="/schools" className="btn-login">Explore Schools</Link>
             <Link to="/login" className="btn-login">Sign In</Link>
             <Link to="/register-school" className="btn-primary">Register School</Link>
           </div>

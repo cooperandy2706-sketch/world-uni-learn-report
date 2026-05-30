@@ -11,6 +11,9 @@ import { ROUTES } from '../../constants/routes'
 import { feeStructuresService, feePaymentsService } from '../../services/bursar.service'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import WelcomeOnboarding from '../../components/ui/WelcomeOnboarding'
+import SchoolSetupWizard from '../../components/ui/SchoolSetupWizard'
+import { useSettings } from '../../hooks/useSettings'
+import { useBranches } from '../../hooks/useBranches'
 import { AreaChart, Area, BarChart, Bar, Cell, Legend, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare, Users, FolderLock, Settings, Bed, HeartHandshake, ClipboardCheck, PencilLine } from 'lucide-react'
@@ -109,6 +112,8 @@ export default function DashboardPage() {
   const navigate = useNavigate()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
+  const { data: settings } = useSettings()
+  const { data: branches = [] } = useBranches()
 
   const [stats, setStats] = useState<Stats | null>(null)
   const [topStudents, setTopStudents] = useState<TopStudent[]>([])
@@ -582,6 +587,7 @@ export default function DashboardPage() {
 
   return (
     <>
+      <SchoolSetupWizard />
       {showOnboarding && <WelcomeOnboarding userName={user?.full_name?.split(' ')[0] || 'Admin'} onComplete={handleOnboardingComplete} />}
 
       <style>{`
@@ -883,6 +889,38 @@ export default function DashboardPage() {
           </Link>
 
         </motion.div>
+
+        {/* BRANCHES WIDGET */}
+        {settings?.has_branches && branches.length > 0 && (
+          <motion.div variants={itemVariants} style={{ marginBottom: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div>
+                <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  🏢 School Branches ({branches.length})
+                </h3>
+              </div>
+              <Link to="/admin/branches" style={{ fontSize: 13, fontWeight: 700, color: '#6366f1', textDecoration: 'none' }}>Manage Branches →</Link>
+            </div>
+            <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 8, margin: '0 -4px', paddingLeft: 4 }} className="hide-scroll">
+              {branches.map((branch, i) => (
+                <Link
+                  key={branch.id}
+                  to="/admin/branches"
+                  style={{
+                    flexShrink: 0, width: 280, padding: 20, borderRadius: 16, background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)', textDecoration: 'none', display: 'flex',
+                    flexDirection: 'column', position: 'relative', overflow: 'hidden',
+                  }}
+                >
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: `hsl(${(i * 55) % 360}, 70%, 60%)` }} />
+                  <span style={{ fontSize: 24, marginBottom: 8 }}>🏫</span>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>{branch.branch_name || branch.name}</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{branch.address || 'No location set'}</span>
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* MAIN DASHBOARD STRUCTURED GRID */}
         {/* Tier 2: Analytical & Operations Deck */}

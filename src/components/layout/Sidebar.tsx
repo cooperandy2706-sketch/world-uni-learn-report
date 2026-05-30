@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '../../hooks/useAuth'
 import { useSchoolStorage } from '../../hooks/useSchoolStorage'
+import { useSettings } from '../../hooks/useSettings'
 import { dailyFeesService } from '../../services/bursar.service'
 import { supabase } from '../../lib/supabase'
 import { ROUTES } from '../../constants/routes'
@@ -17,7 +18,7 @@ import {
   Package, ShoppingCart, RefreshCcw, Gamepad2, Library, GraduationCap,
   Smartphone, Calculator, Grid, Vote, Image, UserPlus, Heart, Search, ArrowUpRight,
   Plus, Monitor, Truck, Armchair, Box, Tv, MonitorPlay, Pill, History,
-  ScanLine, Printer, AlertTriangle, MapPin, Navigation
+  ScanLine, Printer, AlertTriangle, MapPin, Navigation, Globe
 } from 'lucide-react'
 
 const adminLinks = [
@@ -63,6 +64,8 @@ const adminLinks = [
 
   { header: 'Insights & Setup' },
   { to: '/admin/audit-logs', label: 'Audit Logs', icon: ShieldCheck },
+  { to: '/admin/branches', label: 'Branches', icon: Building2, requiresBranches: true },
+  { to: '/admin/public-profile', label: 'Public Profile', icon: Globe },
   { to: ROUTES.ADMIN_ACADEMIC_YEARS, label: 'Academic Years', icon: Calendar },
   { to: ROUTES.ADMIN_TERMS, label: 'Academic Periods', icon: Calendar },
   { to: ROUTES.ADMIN_ANALYTICS, label: 'School Analytics', icon: BarChart3 },
@@ -242,6 +245,7 @@ export default function Sidebar() {
   // Only calculate storage for Admins — avoids unnecessary DB queries for other roles
   const schoolId = isAdmin ? (user?.school_id ?? undefined) : undefined
   const storage  = useSchoolStorage(schoolId)
+  const { data: settings } = useSettings()
 
   // Check if teacher is allowed to collect daily fees
   const { data: collectorAuth, isLoading: loadingAuth } = useQuery({
@@ -287,6 +291,12 @@ export default function Sidebar() {
   if (isTeacher && !loadingAuth && !collectorAuth) {
     links = links.filter(l => !('label' in l) || (l as any).label !== 'Daily Collections')
   }
+
+  // Filter out branches if disabled
+  links = links.filter(l => {
+    if ((l as any).requiresBranches && !settings?.has_branches) return false;
+    return true;
+  })
 
   const [hovered, setHovered] = useState<string | null>(null)
 

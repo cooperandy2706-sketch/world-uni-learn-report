@@ -292,10 +292,18 @@ export default function FeesPage() {
   }, [filteredStudents])
 
   // ── Structure form ─────────────────────────────────────────────
-  const [sf, setSf] = useState({ class_id: '', fee_name: '', amount: '', currency_code: 'GHS', description: '', is_discountable: true })
+  const [sf, setSf] = useState({ class_id: '', fee_name: '', amount: '', currency_code: 'GHS', description: '', is_discountable: true, charge_type: 'flat_rate' as 'flat_rate' | 'per_subject' })
+
+  // School settings for adaptive UI
+  const { data: schoolSettings } = useQuery({
+    queryKey: ['school-settings-fees', schoolId],
+    queryFn: async () => { const { data } = await supabase.from('school_settings').select('school_type, has_evening_classes').eq('school_id', schoolId).maybeSingle(); return data },
+    enabled: !!schoolId,
+  })
+  const isRemedialOrMixed = schoolSettings?.school_type === 'remedial' || schoolSettings?.school_type === 'mixed' || schoolSettings?.school_type === 'shs'
   const createStructure = useMutation({
     mutationFn: (d: any) => feeStructuresService.create(d),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['fee-structures'] }); setStructureModal(false); setSf({ class_id: '', fee_name: '', amount: '', currency_code: schoolCurrency, description: '', is_discountable: true }); toast.success('Fee structure created') },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['fee-structures'] }); setStructureModal(false); setSf({ class_id: '', fee_name: '', amount: '', currency_code: schoolCurrency, description: '', is_discountable: true, charge_type: 'flat_rate' }); toast.success('Fee structure created') },
     onError: (e: any) => toast.error(e.message),
   })
 
@@ -2101,6 +2109,11 @@ export default function FeesPage() {
                           ) : (
                             <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', background: '#f1f5f9', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>🚫 NO DISCOUNT</div>
                           )}
+                          {s.charge_type === 'per_subject' ? (
+                            <div style={{ fontSize: 10, fontWeight: 800, color: '#d97706', background: '#fffbeb', padding: '2px 8px', borderRadius: 6, display: 'inline-block', border: '1px solid #fde68a' }}>📚 PER SUBJECT</div>
+                          ) : (
+                            <div style={{ fontSize: 10, fontWeight: 800, color: '#059669', background: '#f0fdf4', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>📋 FLAT RATE</div>
+                          )}
                         </div>
                         {s.description && <p style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 6, position: 'relative', zIndex: 1 }}>{s.description}</p>}
                         {/* Subtle background decoration */}
@@ -2116,29 +2129,55 @@ export default function FeesPage() {
       </div>
 
       {/* ── Create Structure Modal ── */}
-      <Modal open={structureModal} onClose={() => setStructureModal(false)} title="New Fee Structure" subtitle="Define a fee for a class and term" size="sm"
-        footer={<><Btn variant="secondary" onClick={() => setStructureModal(false)}>Cancel</Btn><Btn onClick={() => { if (!sf.class_id || !sf.fee_name || !sf.amount) { toast.error('Fill required fields'); return } createStructure.mutate({ school_id: schoolId, class_id: sf.class_id, term_id: term?.id, academic_year_id: (year as any)?.id, fee_name: sf.fee_name, amount: parseFloat(sf.amount), currency_code: sf.currency_code, description: sf.description || null, is_discountable: sf.is_discountable !== false }) }} loading={createStructure.isPending}>Create</Btn></>}>
+      <Modal open={structureModal} onClose={() => { setStructureModal(false); setSf({ class_id: '', fee_name: '', amount: '', currency_code: 'GHS', description: '', is_discountable: true, charge_type: 'flat_rate' }) }} title="New Fee Structure" subtitle="Define a fee for a class and term" size="sm"
+        footer={<><Btn variant="secondary" onClick={() => setStructureModal(false)}>Cancel</Btn><Btn onClick={() => { if (!sf.class_id || !sf.fee_name || !sf.amount) { toast.error('Fill required fields'); return } createStructure.mutate({ school_id: schoolId, class_id: sf.class_id, term_id: term?.id, academic_year_id: (year as any)?.id, fee_name: sf.fee_name, amount: parseFloat(sf.amount), currency_code: sf.currency_code, description: sf.description || null, is_discountable: sf.is_discountable !== false, charge_type: sf.charge_type }) }} loading={createStructure.isPending}>Create</Btn></>}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[
             { label: 'Class *', children: <select value={sf.class_id} onChange={e => setSf(p => ({ ...p, class_id: e.target.value }))} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none' }}><option value="">Select class…</option>{(classes as any[]).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</select> },
             { label: 'Fee Name *', children: <input value={sf.fee_name} onChange={e => setSf(p => ({ ...p, fee_name: e.target.value }))} placeholder="e.g. Tuition Fee" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
             { label: 'Amount *', children: <div style={{ display: 'flex', gap: 8 }}><select value={sf.currency_code} onChange={e => setSf(p => ({ ...p, currency_code: e.target.value }))} style={{ padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', background: '#f8fafc' }}><option value="GHS">GHS</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select><input type="number" value={sf.amount} onChange={e => setSf(p => ({ ...p, amount: e.target.value }))} placeholder="0.00" style={{ flex: 1, padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /></div> },
             { label: 'Description', children: <input value={sf.description} onChange={e => setSf(p => ({ ...p, description: e.target.value }))} placeholder="Optional note" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} /> },
-            { label: 'Discount Policy', children: (
-              <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#f8fafc', borderRadius: 10, border: '1.5px solid #e2e8f0', cursor: 'pointer' }}>
-                <input type="checkbox" checked={sf.is_discountable !== false} onChange={e => setSf(p => ({ ...p, is_discountable: e.target.checked }))} style={{ accentColor: '#7c3aed' }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>Allow Scholarship Discount</div>
-                  <div style={{ fontSize: 11, color: '#64748b' }}>Check if scholarships (e.g. 50% off) should apply to this fee. Uncheck for uniforms, books, etc.</div>
-                </div>
-              </label>
-            )},
           ].map(f => (
             <div key={f.label}>
               <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>{f.label}</label>
               {f.children}
             </div>
           ))}
+
+          {/* Charge Type — shown for SHS, Remedial, Mixed schools */}
+          {isRemedialOrMixed && (
+            <div>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Billing Mode</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                {[{ val: 'flat_rate', label: 'Flat Rate', desc: 'Fixed fee per class, regardless of subjects taken.' }, { val: 'per_subject', label: 'Per Subject', desc: 'Fee multiplied by number of subjects student is taking.' }].map(opt => (
+                  <label key={opt.val} onClick={() => setSf(p => ({ ...p, charge_type: opt.val as any }))} style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '12px 14px', borderRadius: 10, border: `2px solid ${sf.charge_type === opt.val ? '#7c3aed' : '#e2e8f0'}`, background: sf.charge_type === opt.val ? '#f5f3ff' : '#f8fafc', cursor: 'pointer', transition: 'all .15s' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 14, height: 14, borderRadius: '50%', border: `2px solid ${sf.charge_type === opt.val ? '#7c3aed' : '#cbd5e1'}`, background: sf.charge_type === opt.val ? '#7c3aed' : 'transparent', flexShrink: 0 }} />
+                      <span style={{ fontSize: 13, fontWeight: 800, color: sf.charge_type === opt.val ? '#5b21b6' : '#1e293b' }}>{opt.label}</span>
+                    </div>
+                    <span style={{ fontSize: 11, color: '#64748b', paddingLeft: 22 }}>{opt.desc}</span>
+                  </label>
+                ))}
+              </div>
+              {sf.charge_type === 'per_subject' && (
+                <div style={{ marginTop: 10, padding: '10px 14px', background: '#fffbeb', borderRadius: 8, border: '1.5px solid #fde68a', fontSize: 12, color: '#92400e' }}>
+                  💡 The <strong>Amount</strong> above will be used as the <em>rate per subject</em>. A student taking 5 subjects will be billed {sf.amount ? `${sf.currency_code} ${(parseFloat(sf.amount || '0') * 5).toFixed(2)}` : '5× the rate'}.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Discount Policy */}
+          <div>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>Discount Policy</label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#f8fafc', borderRadius: 10, border: '1.5px solid #e2e8f0', cursor: 'pointer' }}>
+              <input type="checkbox" checked={sf.is_discountable !== false} onChange={e => setSf(p => ({ ...p, is_discountable: e.target.checked }))} style={{ accentColor: '#7c3aed' }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>Allow Scholarship Discount</div>
+                <div style={{ fontSize: 11, color: '#64748b' }}>Check if scholarships (e.g. 50% off) should apply to this fee. Uncheck for uniforms, books, etc.</div>
+              </div>
+            </label>
+          </div>
         </div>
       </Modal>
 

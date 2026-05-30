@@ -62,6 +62,7 @@ export default function PayrollPage() {
 
   const [weeklyConfigForm, setWeeklyConfigForm] = useState({ user_id: '', amount: '' })
   const [dailyForm, setDailyForm] = useState({ user_id: '', amount: '', description: '', method: 'cash' })
+  const [addEmpType, setAddEmpType] = useState<'full_time' | 'part_time' | 'contract'>('full_time')
 
   // Data fetching
   const { data: staff = [] } = useQuery({
@@ -71,6 +72,22 @@ export default function PayrollPage() {
       return data ?? []
     }, enabled: !!schoolId
   })
+
+  // Fetch teachers table to get employment_type for each user
+  const { data: teacherRows = [] } = useQuery({
+    queryKey: ['teachers-payroll', schoolId],
+    queryFn: async () => {
+      const { data } = await supabase.from('teachers').select('user_id, employment_type, staff_id').eq('school_id', schoolId)
+      return data ?? []
+    }, enabled: !!schoolId
+  })
+
+  // Map user_id -> employment_type for quick lookup
+  const employmentMap = useMemo(() => {
+    const m: Record<string, 'full_time' | 'part_time' | 'contract'> = {}
+    teacherRows.forEach((t: any) => { if (t.user_id) m[t.user_id] = t.employment_type || 'full_time' })
+    return m
+  }, [teacherRows])
 
   const { data: payroll = [], isLoading } = useQuery({
     queryKey: ['payroll', schoolId, month],
@@ -310,7 +327,15 @@ export default function PayrollPage() {
                 <tr key={row.id} style={{ borderBottom: '1px solid #f9fafb' }}>
                   <td style={{ padding: '14px 20px' }}>
                     <div style={{ fontSize: 15, fontWeight: 800 }}>{row.user?.full_name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'capitalize' }}>{row.user?.designation || row.user?.role}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'capitalize' }}>{row.user?.designation || row.user?.role}</span>
+                      {(() => {
+                        const et = employmentMap[row.user_id] || 'full_time'
+                        const colors: any = { full_time: { bg: '#f0fdf4', color: '#15803d', label: 'Full Time' }, part_time: { bg: '#fffbeb', color: '#b45309', label: 'Part Time' }, contract: { bg: '#f5f3ff', color: '#6d28d9', label: 'Contract' } }
+                        const c = colors[et]
+                        return <span style={{ fontSize: 9, fontWeight: 800, background: c.bg, color: c.color, padding: '2px 8px', borderRadius: 6, textTransform: 'uppercase', letterSpacing: '.04em' }}>{c.label}</span>
+                      })()}
+                    </div>
                   </td>
                   <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 700 }}>{CUR(row.basic_salary)}</td>
                   <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 700, color: '#059669' }}>+{CUR(row.allowances)}</td>
@@ -506,8 +531,33 @@ export default function PayrollPage() {
             <option value="">Select Staff...</option>
             {staff.map((s:any) => <option key={s.id} value={s.id}>{s.full_name} {s.designation ? `(${s.designation})` : ''}</option>)}
           </select>
-          <input type="number" placeholder="Monthly Basic Salary" value={form.basic_salary} onChange={e => setForm({...form, basic_salary: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)', width: '100%' }} />
-          <Btn onClick={() => upsertMonthly.mutate({ school_id: schoolId, user_id: form.user_id, month, basic_salary: Number(form.basic_salary) })}>Save Staff Payroll</Btn>
+
+          {/* Employment Type */}
+          <div>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#6b7280', marginBottom: 8 }}>Employment Type</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+              {[{ val: 'full_time', label: 'Full Time', icon: '🏢' }, { val: 'part_time', label: 'Part Time', icon: '🕐' }, { val: 'contract', label: 'Contract', icon: '📄' }].map(opt => (
+                <div key={opt.val} onClick={() => setAddEmpType(opt.val as any)}
+                  style={{ padding: '12px 8px', borderRadius: 10, border: `2px solid ${addEmpType === opt.val ? '#6d28d9' : '#e5e7eb'}`, background: addEmpType === opt.val ? '#f5f3ff' : '#fff', textAlign: 'center', cursor: 'pointer', transition: 'all .15s' }}>
+                  <div style={{ fontSize: 20, marginBottom: 4 }}>{opt.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: addEmpType === opt.val ? '#5b21b6' : '#374151' }}>{opt.label}</div>
+                </div>
+              ))}
+            </div>
+            {addEmpType === 'part_time' && (
+              <div style={{ marginTop: 10, padding: '10px 14px', background: '#fffbeb', borderRadius: 8, border: '1.5px solid #fde68a', fontSize: 12, color: '#92400e' }}>
+                💡 <strong>Part-time staff</strong> can also be paid via the <em>Weekly</em> or <em>Daily</em> tabs based on classes taught. The monthly salary here acts as a guaranteed floor/base.
+              </div>
+            )}
+            {addEmpType === 'contract' && (
+              <div style={{ marginTop: 10, padding: '10px 14px', background: '#f5f3ff', borderRadius: 8, border: '1.5px solid #ddd6fe', fontSize: 12, color: '#5b21b6' }}>
+                📄 <strong>Contract staff</strong> are paid a fixed contract amount. Enter the agreed contract fee below.
+              </div>
+            )}
+          </div>
+
+          <input type="number" placeholder={addEmpType === 'contract' ? 'Contract Fee / Total Agreed Amount' : 'Monthly Basic Salary'} value={form.basic_salary} onChange={e => setForm({...form, basic_salary: e.target.value})} style={{ padding: 12, borderRadius: 12, border: '1.5px solid var(--border-color)', width: '100%' }} />
+          <Btn onClick={() => upsertMonthly.mutate({ school_id: schoolId, user_id: form.user_id, month, basic_salary: Number(form.basic_salary), notes: addEmpType !== 'full_time' ? `[${addEmpType.replace('_',' ').toUpperCase()}]` : undefined })}>Save Staff Payroll</Btn>
         </div>
       </Modal>
 

@@ -29,6 +29,9 @@ export const router = createRouter([
     errorElement: <RouteErrorPage />,
     children: [
       { index: true, element: <LandingPage /> },
+      { path: '/schools', element: lazyPage(() => import('./pages/public/SchoolDirectoryPage')) },
+      { path: '/@:slug', element: lazyPage(() => import('./pages/public/SchoolProfilePage')) },
+      
       { path: '/privacy-policy', element: lazyPage(() => import('./pages/legal/PrivacyPolicyPage')) },
       { path: '/terms-of-service', element: lazyPage(() => import('./pages/legal/TermsOfServicePage')) },
 
@@ -81,7 +84,9 @@ export const router = createRouter([
           { path: 'fleet/live', element: lazyPage(() => import('./pages/admin/LiveFleetTrackingPage')) },
           { path: 'messages', element: lazyPage(() => import('./pages/messaging/MessagingPage')) },
           { path: 'agenda', element: lazyPage(() => import('./pages/admin/AgendaPage')) },
-
+          
+          { path: 'branches', element: lazyPage(() => import('./pages/admin/BranchesPage')) },
+          { path: 'public-profile', element: lazyPage(() => import('./pages/admin/PublicProfilePage')) },
           { path: 'admissions', element: lazyPage(() => import('./pages/admin/AdminAdmissions')) },
           { path: 'sms', element: lazyPage(() => import('./pages/shared/SMSPage')) },
           { path: 'test-analytics', element: lazyPage(() => import('./pages/admin/AdminTestAnalytics')) },

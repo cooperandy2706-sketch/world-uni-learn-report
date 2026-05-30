@@ -12,6 +12,7 @@ export interface FeeStructure {
   amount: number
   currency_code?: string
   description?: string
+  charge_type?: 'flat_rate' | 'per_subject'
   created_at: string
   // joined
   class?: { id: string; name: string }
@@ -98,6 +99,12 @@ export interface School {
   // Storage allocation
   storage_limit_gb: number     // Quota in GB (default: 5)
   storage_used_bytes: number   // Real-time total footprint in bytes
+  // Public profile
+  slug?: string                // Public URL slug e.g. /@estevroyalschool
+  // Branch / campus
+  parent_school_id?: string    // If set, this school is a branch of another
+  branch_name?: string         // e.g. "Kumasi Campus"
+  is_branch?: boolean
 }
 
 export interface SchoolSettings {
@@ -115,6 +122,15 @@ export interface SchoolSettings {
   // Security / Scanner
   late_arrival_time?: string
   scan_cooldown_seconds?: number
+  // Operating Models
+  school_type?: 'basic' | 'shs' | 'remedial' | 'mixed'
+  has_evening_classes?: boolean
+  setup_completed?: boolean
+  // Curriculum tracking
+  curriculums?: string[]         // e.g. ['ges_basic', 'wassce']
+  shs_programmes?: string[]      // e.g. ['general_arts', 'science', 'business']
+  // Branch management
+  has_branches?: boolean
   created_at: string
   updated_at: string
 }
@@ -198,6 +214,7 @@ export interface Teacher {
   staff_id?: string
   department_id?: string
   qualification?: string
+  employment_type?: 'full_time' | 'part_time' | 'contract'
   created_at: string
   // joined
   user?: User
@@ -236,6 +253,7 @@ export interface Student {
   photo_url?: string
   scholarship_type?: 'none' | 'full' | 'partial'
   scholarship_percentage?: number
+  session_type?: 'day' | 'evening' | 'weekend'
   is_active: boolean
   user_id?: string
   created_at: string

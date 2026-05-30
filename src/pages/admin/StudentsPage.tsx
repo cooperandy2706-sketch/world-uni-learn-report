@@ -22,6 +22,7 @@ const schema = z.object({
   student_id:     z.string().optional().or(z.literal('')),
   class_id:       z.string().optional().or(z.literal('')),
   gender:         z.enum(['male', 'female']).optional().or(z.literal('')),
+  session_type:   z.enum(['day', 'evening', 'weekend']).optional().or(z.literal('')),
   date_of_birth:  z.string().optional().or(z.literal('')),
   house:          z.string().optional().or(z.literal('')),
   guardian_name:  z.string().optional().or(z.literal('')),
@@ -662,7 +663,7 @@ export default function StudentsPage() {
   function openCreate() { setEditingStudent(null); reset({}); setFormPhotoFile(null); setModalOpen(true) }
   function openEdit(s: any) {
     setEditingStudent(s)
-    reset({ full_name: s.full_name, student_id: s.student_id ?? '', class_id: s.class_id ?? '', gender: s.gender ?? undefined, date_of_birth: s.date_of_birth ?? '', house: s.house ?? '', guardian_name: s.guardian_name ?? '', guardian_phone: s.guardian_phone ?? '', guardian_email: s.guardian_email ?? '', address: s.address ?? '' })
+    reset({ full_name: s.full_name, student_id: s.student_id ?? '', class_id: s.class_id ?? '', gender: s.gender ?? undefined, session_type: s.session_type ?? 'day', date_of_birth: s.date_of_birth ?? '', house: s.house ?? '', guardian_name: s.guardian_name ?? '', guardian_phone: s.guardian_phone ?? '', guardian_email: s.guardian_email ?? '', address: s.address ?? '' })
     setFormPhotoFile(null)
     setModalOpen(true)
   }
@@ -1316,6 +1317,15 @@ export default function StudentsPage() {
                   <option value="female">♀ Female</option>
                 </StyledSelect>
               </Field>
+              {(!settings || settings.has_evening_classes) && (
+                <Field label="Session Mode">
+                  <StyledSelect {...register('session_type')}>
+                    <option value="day">☀️ Day Session</option>
+                    <option value="evening">🌙 Evening Session</option>
+                    <option value="weekend">📅 Weekend Session</option>
+                  </StyledSelect>
+                </Field>
+              )}
               <Field label="Date of Birth"><StyledInput {...register('date_of_birth')} type="date" /></Field>
               <Field label="House"><StyledInput {...register('house')} placeholder="e.g. Blue House" /></Field>
             </div>

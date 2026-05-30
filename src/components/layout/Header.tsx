@@ -2,7 +2,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
+import { useCurrentTerm, useCurrentAcademicYear, useSettings } from '../../hooks/useSettings'
+import { useBranches } from '../../hooks/useBranches'
 import { useSchoolInvoices } from '../../hooks/useBilling'
 import { supabase } from '../../lib/supabase'
 import NotificationBell from './NotificationBell'
@@ -12,7 +13,7 @@ import {
   Search, Settings, ChevronDown, ChevronLeft, ChevronRight,
   LogOut, User, Shield, Calendar, AlertTriangle, CreditCard,
   FileText, BarChart3, MessageSquare, Command, BookOpen, Users,
-  GraduationCap, LayoutDashboard, Zap, Tv
+  GraduationCap, LayoutDashboard, Zap, Tv, ExternalLink, Building2
 } from 'lucide-react'
 import { ROUTES } from '../../constants/routes'
 import { resolveIntents, extractClassHint, extractPersonIntent, intentToPath } from '../../lib/commandSearch'
@@ -67,6 +68,7 @@ const ADMIN_NAV = [
       { label: 'Performance Tracker', to: ROUTES.ADMIN_PERFORMANCE },
       { label: 'Academic Calendar', to: '/admin/academic-calendar' },
       { label: 'Audit Logs', to: '/admin/audit-logs' },
+      { label: 'Public Profile', to: '/admin/public-profile' },
       { label: 'Settings', to: ROUTES.ADMIN_SETTINGS },
     ]
   },
@@ -330,6 +332,8 @@ export default function Header() {
   const isStaff = user?.role === 'staff'
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
+  const { data: settings } = useSettings()
+  const { data: branches = [] } = useBranches()
   const navigate = useNavigate()
   const [profileOpen, setProfileOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -674,8 +678,13 @@ export default function Header() {
             </div>
           )}
           <div className="school-branding-text" style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', whiteSpace: 'nowrap', maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em' }}>
+            <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', whiteSpace: 'nowrap', maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: 6 }}>
               {userSchool?.name || 'Nexora'}
+              {userSchool?.slug && (
+                <a href={`/@${userSchool.slug}`} target="_blank" rel="noreferrer" title="View Public Profile" style={{ color: '#6366f1', display: 'flex', alignItems: 'center' }}>
+                  <ExternalLink size={14} />
+                </a>
+              )}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               {year && term ? (
@@ -684,6 +693,11 @@ export default function Header() {
                 </span>
               ) : (
                 <span style={{ fontSize: 11, fontWeight: 600, color: '#ef4444' }}>No Active Period</span>
+              )}
+              {settings?.has_branches && branches.length > 0 && (
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#10b981', display: 'flex', alignItems: 'center', gap: 4, background: '#ecfdf5', padding: '2px 6px', borderRadius: 6 }}>
+                  <Building2 size={10} /> {branches.length} Branches
+                </span>
               )}
             </div>
           </div>

@@ -62,7 +62,7 @@ export default function StaffDirectoryPage() {
   
   const [selectedStaff, setSelectedStaff] = useState<any>(null)
   const [newPw, setNewPw] = useState('')
-  const [form, setForm] = useState({ full_name: '', email: '', phone: '', designation: '', password: '', role: 'teacher' })
+  const [form, setForm] = useState({ full_name: '', email: '', phone: '', designation: '', password: '', role: 'teacher', employment_type: 'full_time' })
 
   // HR Letter State
   const [lType, setLType] = useState<LetterTypeId>('appointment')
@@ -76,7 +76,7 @@ export default function StaffDirectoryPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('teachers')
-        .select('id, staff_id, qualification, user:users(id, full_name, email, phone, role)')
+        .select('id, staff_id, qualification, employment_type, user:users(id, full_name, email, phone, role)')
         .eq('school_id', schoolId)
       if (error) throw error
       // Map to flat structure for unified viewing
@@ -85,6 +85,7 @@ export default function StaffDirectoryPage() {
         teacher_id: t.id,
         staff_id: t.staff_id,
         qualification: t.qualification,
+        employment_type: t.employment_type || 'full_time',
         designation: 'Teacher',
         category: 'teaching'
       }))
@@ -280,6 +281,11 @@ export default function StaffDirectoryPage() {
                       {s.designation || s.role.toUpperCase()}
                     </span>
                     <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.staff_id}</span>
+                    {s.employment_type && s.employment_type !== 'full_time' && (
+                      <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 8px', borderRadius: 6, textTransform: 'uppercase', letterSpacing: '.04em', background: s.employment_type === 'part_time' ? '#fffbeb' : '#f5f3ff', color: s.employment_type === 'part_time' ? '#b45309' : '#6d28d9' }}>
+                        {s.employment_type === 'part_time' ? 'Part Time' : 'Contract'}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -343,6 +349,21 @@ export default function StaffDirectoryPage() {
               </div>
             )}
           </div>
+
+          {form.role === 'teacher' && (
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>Employment Type</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+                {[{ val: 'full_time', label: 'Full Time', icon: '🏢' }, { val: 'part_time', label: 'Part Time', icon: '🕐' }, { val: 'contract', label: 'Contract', icon: '📄' }].map(opt => (
+                  <div key={opt.val} onClick={() => setForm(p => ({ ...p, employment_type: opt.val }))}
+                    style={{ padding: '10px 6px', borderRadius: 10, border: `2px solid ${form.employment_type === opt.val ? '#4f46e5' : '#e5e7eb'}`, background: form.employment_type === opt.val ? '#eef2ff' : '#fff', textAlign: 'center', cursor: 'pointer', transition: 'all .15s' }}>
+                    <div style={{ fontSize: 18, marginBottom: 3 }}>{opt.icon}</div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: form.employment_type === opt.val ? '#4338ca' : '#374151' }}>{opt.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </Modal>
 

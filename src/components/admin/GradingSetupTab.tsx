@@ -60,6 +60,49 @@ const GRADING_TEMPLATES = {
     categories: [
       { name: 'Observational Assessment', weight_percentage: 100, max_score: 100 }
     ]
+  },
+  WASSCE: {
+    name: 'WASSCE (SHS Standard)',
+    description: '30% Continuous Assessment, 70% Final Exam',
+    scale: {
+      name: 'WASSCE A1-F9',
+      levels: [
+        { label: 'A1', min_score: 80, max_score: 100, color_code: '#16a34a' },
+        { label: 'B2', min_score: 75, max_score: 79.99, color_code: '#22c55e' },
+        { label: 'B3', min_score: 70, max_score: 74.99, color_code: '#3b82f6' },
+        { label: 'C4', min_score: 65, max_score: 69.99, color_code: '#8b5cf6' },
+        { label: 'C5', min_score: 60, max_score: 64.99, color_code: '#a855f7' },
+        { label: 'C6', min_score: 55, max_score: 59.99, color_code: '#d946ef' },
+        { label: 'D7', min_score: 50, max_score: 54.99, color_code: '#f59e0b' },
+        { label: 'E8', min_score: 45, max_score: 49.99, color_code: '#ea580c' },
+        { label: 'F9', min_score: 0, max_score: 44.99, color_code: '#dc2626' },
+      ]
+    },
+    categories: [
+      { name: 'Continuous Assessment', weight_percentage: 30, max_score: 30 },
+      { name: 'Final Exam', weight_percentage: 70, max_score: 70 }
+    ]
+  },
+  WASSCE_REMEDIAL: {
+    name: 'WASSCE (Remedial / Mock)',
+    description: '100% Mock / Final Exam Score',
+    scale: {
+      name: 'WASSCE A1-F9',
+      levels: [
+        { label: 'A1', min_score: 80, max_score: 100, color_code: '#16a34a' },
+        { label: 'B2', min_score: 75, max_score: 79.99, color_code: '#22c55e' },
+        { label: 'B3', min_score: 70, max_score: 74.99, color_code: '#3b82f6' },
+        { label: 'C4', min_score: 65, max_score: 69.99, color_code: '#8b5cf6' },
+        { label: 'C5', min_score: 60, max_score: 64.99, color_code: '#a855f7' },
+        { label: 'C6', min_score: 55, max_score: 59.99, color_code: '#d946ef' },
+        { label: 'D7', min_score: 50, max_score: 54.99, color_code: '#f59e0b' },
+        { label: 'E8', min_score: 45, max_score: 49.99, color_code: '#ea580c' },
+        { label: 'F9', min_score: 0, max_score: 44.99, color_code: '#dc2626' },
+      ]
+    },
+    categories: [
+      { name: 'Exam Score', weight_percentage: 100, max_score: 100 }
+    ]
   }
 }
 
