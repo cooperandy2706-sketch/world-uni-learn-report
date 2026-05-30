@@ -12,7 +12,7 @@ import { getGradeInfo, calculateAverage, calculatePassRate } from '../../utils/g
 import { formatDate, getEngagingGreeting } from '../../lib/utils'
 import { ROUTES } from '../../constants/routes'
 import FlaskLoader from '../../components/ui/FlaskLoader'
-import Button from '../../components/ui/Button'
+import { Button } from '../../components/ui/Button'
 import { School, BookOpen, Calendar, CheckCircle, Clock, ClipboardCheck, Users, Book, Bell, Gamepad2, FileSpreadsheet, PencilLine, MessageSquare } from 'lucide-react'
 
 function AnimNum({ to }: { to: number }) {

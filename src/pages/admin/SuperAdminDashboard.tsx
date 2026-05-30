@@ -6,7 +6,7 @@ import { supabase } from '../../lib/supabase'
 import { toast } from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 import Modal from '../../components/ui/Modal'
-import Button from '../../components/ui/Button'
+import { Button } from '../../components/ui/Button'
 
 // ─── types ────────────────────────────────────────────────
 interface PlatformStats {
