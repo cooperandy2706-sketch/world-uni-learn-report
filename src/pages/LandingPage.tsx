@@ -532,6 +532,9 @@ const CSS = `
   .mobile-link { font-size: 1.8rem; font-family: var(--serif); font-weight: 600; color: white; text-decoration: none; padding: 0.5rem; }
   @media (min-width: 400px) { .mobile-link { font-size: 2rem; } }
   .mobile-close { position: absolute; top: 1rem; right: 1rem; color: white; background: rgba(255,255,255,0.1); border: none; font-size: 1.2rem; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .mobile-search { display: flex; width: 100%; max-width: 300px; gap: 8px; margin: 1rem 0; }
+  .mobile-search input { flex: 1; padding: 12px 16px; border-radius: 10px; border: none; outline: none; font-size: 1rem; }
+  .mobile-search button { padding: 0 16px; border-radius: 10px; background: var(--accent); color: white; border: none; font-weight: bold; cursor: pointer; }
 `;
 
 // ─── SUBCOMPONENTS ─────────────────────────────────────────────────────────

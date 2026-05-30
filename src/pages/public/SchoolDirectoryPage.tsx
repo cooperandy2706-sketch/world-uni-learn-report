@@ -1,6 +1,6 @@
 // src/pages/public/SchoolDirectoryPage.tsx
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
 import { Search, MapPin, Building2, GraduationCap, ExternalLink, Heart, Users, Eye, School } from 'lucide-react'
@@ -51,11 +51,21 @@ const DIR_PHOTOS = [
 ]
 
 export default function SchoolDirectoryPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [schools, setSchools] = useState<School[]>([])
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(searchParams.get('q') || '')
   const [activeFilter, setActiveFilter] = useState('All')
   const [bgIdx, setBgIdx] = useState(0)
+
+  // Update URL when search changes
+  useEffect(() => {
+    if (search) {
+      setSearchParams({ q: search }, { replace: true })
+    } else {
+      setSearchParams({}, { replace: true })
+    }
+  }, [search, setSearchParams])
 
   useEffect(() => {
     const timer = setInterval(() => setBgIdx(i => (i + 1) % DIR_PHOTOS.length), 6000)

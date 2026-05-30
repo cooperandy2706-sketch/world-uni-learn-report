@@ -49,6 +49,16 @@ export default function SchoolProfilePage() {
       const { data: m } = await supabase.from('school_profile_media').select('*').eq('school_id', s.id).order('sort_order')
       setMedia(m || [])
 
+      // Update SEO tags for Google
+      document.title = `${s.name} - Nexora School Profile`
+      let metaDesc = document.querySelector('meta[name="description"]')
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta')
+        metaDesc.setAttribute('name', 'description')
+        document.head.appendChild(metaDesc)
+      }
+      metaDesc.setAttribute('content', s.description || `View ${s.name}'s official profile, academics, and gallery on Nexora.`)
+
       // Check if current user liked / followed
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
