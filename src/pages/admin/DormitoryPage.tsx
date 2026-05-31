@@ -72,7 +72,6 @@ export default function DormitoryPage() {
     },
     enabled: !!schoolId
   })
-  })
 
   // ── Dorm mutations ────────────────────────────────────────────────────────
   const createDorm = useMutation({ mutationFn: (d: any) => boardingService.createDormitory(d), onSuccess: () => { qc.invalidateQueries({ queryKey: ['dormitories'] }); setDormModal(false); toast.success('Dormitory created') } })
