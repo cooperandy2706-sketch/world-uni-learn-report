@@ -1,11 +1,15 @@
 {
   "compilerOptions": {
     "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
     "module": "ESNext",
-    "lib": ["ESNext"],
-    "strict": false,
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "isolatedModules": true,
+    "allowImportingTsExtensions": true
   },
+  "include": ["./**/*.ts", "./deno-globals.d.ts"],
   "exclude": ["node_modules"]
 }

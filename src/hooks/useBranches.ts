@@ -88,6 +88,49 @@ export function useCreateBranch() {
 /**
  * Mutation to delete a branch school.
  */
+export function useUpdateBranch() {
+  const qc = useQueryClient()
+  const { user } = useAuth()
+  const schoolId = user?.school_id ?? ''
+
+  return useMutation({
+    mutationFn: async (branch: {
+      id: string
+      branch_name: string
+      address?: string
+      phone?: string
+      email?: string
+    }) => {
+      const { data: parentSchool } = await supabase.from('schools').select('name').eq('id', schoolId).single()
+      const parentName = parentSchool?.name ?? 'School'
+
+      const { data, error } = await supabase
+        .from('schools')
+        .update({
+          name: `${parentName} — ${branch.branch_name}`,
+          branch_name: branch.branch_name,
+          address: branch.address || null,
+          phone: branch.phone || null,
+          email: branch.email || null,
+        })
+        .eq('id', branch.id)
+        .eq('parent_school_id', schoolId)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['branches', schoolId] })
+      toast.success('Branch updated')
+    },
+    onError: (err: any) => {
+      toast.error(err.message || 'Failed to update branch')
+    },
+  })
+}
+
 export function useDeleteBranch() {
   const qc = useQueryClient()
   const { user } = useAuth()

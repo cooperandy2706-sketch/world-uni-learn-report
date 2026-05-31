@@ -107,13 +107,13 @@ export default function TeacherSelfServicePage() {
     ]
 
     if (loading) return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+        <div className="t-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
             <div className="animate-spin" style={{ width: 40, height: 40, border: '4px solid #f3f3f3', borderTop: '4px solid #7c3aed', borderRadius: '50%' }} />
         </div>
     )
 
     return (
-        <div style={{ padding: '16px 12px 100px', maxWidth: '1200px', margin: '0 auto', fontFamily: '"DM Sans",system-ui,sans-serif' }}>
+        <div className="t-page">
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .tab-btn { transition: all 0.2s ease; border-bottom: 2px solid transparent; }

@@ -341,7 +341,7 @@ export default function AssignmentsPage() {
   }
 
   return (
-    <>
+    <div className="t-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _spin { to{transform:rotate(360deg)} }
@@ -358,7 +358,7 @@ export default function AssignmentsPage() {
         }
       `}</style>
 
-      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', maxWidth: 900, margin: '0 auto', padding: '10px 4px' }}>
+      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
         {modalOpen ? (
           /* ── INLINE ASSIGNMENT BUILDER VIEW ── */
           <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid var(--border-color)', padding: 20, animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
@@ -658,6 +658,6 @@ export default function AssignmentsPage() {
           </>
         )}
       </div>
-    </>
+    </div>
   )
 }

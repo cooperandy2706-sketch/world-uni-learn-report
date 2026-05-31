@@ -9,6 +9,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm } from '../../hooks/useSettings'
 import { generateLessonPlan, type GeneratedLessonPlan } from '../../lib/groq'
 import toast from 'react-hot-toast'
+import { X } from 'lucide-react'
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -188,38 +189,39 @@ function AILessonModal({
     }
 
     return (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.55)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 999, backdropFilter: 'blur(6px)', padding: '16px', overflowY: 'auto' }}>
-            <div style={{ background: 'var(--bg-card)', borderRadius: 8, width: '100%', maxWidth: 720, boxShadow: '0 32px 80px rgba(0,0,0,.25)', fontFamily: '"DM Sans",system-ui,sans-serif', marginTop: 16, marginBottom: 32 }}>
-
-                {/* Modal Header */}
-                <div style={{ background: 'linear-gradient(135deg,#4c1d95,#7c3aed)', borderRadius: '20px 20px 0 0', padding: '20px 24px', color: '#fff' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div>
-                            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.12em', opacity: .7, marginBottom: 4 }}>✨ AI LESSON PLANNER</div>
-                            <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, margin: 0 }}>
-                                {lesson.subject} — {lesson.class}
-                            </h2>
-                            <p style={{ fontSize: 12, opacity: .75, margin: '4px 0 0' }}>{DAYS[lesson.dayOfWeek]} · {lesson.period} · {lesson.startTime}–{lesson.endTime}</p>
+        <div className="t-modal-overlay open" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+            <div className="t-modal-box t-modal-box--lg">
+                <div className="t-modal-head t-modal-head--vivid">
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                            <div>
+                                <p className="t-modal-sub" style={{ letterSpacing: '.12em', textTransform: 'uppercase', opacity: 0.7, marginBottom: 4 }}>✨ AI Lesson Planner</p>
+                                <h2 className="t-modal-title">{lesson.subject} — {lesson.class}</h2>
+                                <p className="t-modal-sub">{DAYS[lesson.dayOfWeek]} · {lesson.period} · {lesson.startTime}–{lesson.endTime}</p>
+                            </div>
+                            <button type="button" className="t-modal-close" onClick={onClose} aria-label="Close"><X size={18} strokeWidth={2.5} /></button>
                         </div>
-                        <button onClick={onClose} style={{ background: 'rgba(255,255,255,.15)', border: 'none', borderRadius: 10, color: '#fff', fontSize: 20, cursor: 'pointer', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-                    </div>
-
-                    {/* Step tabs */}
-                    <div style={{ display: 'flex', gap: 4, marginTop: 16, background: 'rgba(0,0,0,.2)', borderRadius: 10, padding: 4, width: 'fit-content' }}>
-                        {[
-                            { k: 'input', label: '1. Plan Input' },
-                            { k: 'plan', label: '2. Generated Plan', disabled: !plan },
-                        ].map(s => (
-                            <button key={s.k} onClick={() => !s.disabled && setStep(s.k as any)}
-                                disabled={s.disabled}
-                                style={{ padding: '5px 14px', borderRadius: 7, border: 'none', fontSize: 12, fontWeight: 600, cursor: s.disabled ? 'default' : 'pointer', opacity: s.disabled ? .4 : 1, fontFamily: '"DM Sans",sans-serif', background: step === s.k ? '#fff' : 'transparent', color: step === s.k ? '#6d28d9' : '#fff' }}>
-                                {s.label}
-                            </button>
-                        ))}
+                        <div className="t-step-tabs">
+                            {[
+                                { k: 'input', label: '1. Plan Input' },
+                                { k: 'plan', label: '2. Generated Plan', disabled: !plan },
+                            ].map(s => (
+                                <button
+                                    key={s.k}
+                                    type="button"
+                                    className={`t-step-tab${step === s.k ? ' is-active' : ''}`}
+                                    onClick={() => !s.disabled && setStep(s.k as 'input' | 'plan')}
+                                    disabled={s.disabled}
+                                    style={s.disabled ? { opacity: 0.4, cursor: 'default' } : undefined}
+                                >
+                                    {s.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                <div style={{ padding: '24px' }}>
+                <div className="t-modal-body">
 
                     {step === 'input' ? (
                         // ── Input Step ────────────────────────────────────────
@@ -235,33 +237,27 @@ function AILessonModal({
                             </div>
 
                             {/* Topic */}
-                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>
-                                📌 Lesson Topic *
-                            </label>
+                            <label className="t-label">📌 Lesson Topic *</label>
                             <input
+                                className="t-input"
                                 value={topic}
                                 onChange={e => setTopic(e.target.value)}
                                 placeholder="e.g. Photosynthesis, The Pythagorean Theorem, World War II causes…"
-                                style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: '"DM Sans",sans-serif', marginBottom: 20 }}
-                                onFocus={e => (e.target.style.borderColor = '#7c3aed')}
-                                onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                                style={{ marginBottom: 20 }}
                             />
 
                             {/* Bullets */}
-                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>
-                                📋 Key Points / Objectives to Cover
-                            </label>
+                            <label className="t-label">📋 Key Points / Objectives to Cover</label>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
                                 {bullets.map((b, i) => (
                                     <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                                         <span style={{ color: 'var(--text-subtle)', fontSize: 16, flexShrink: 0 }}>•</span>
                                         <input
+                                            className="t-input"
                                             value={b}
                                             onChange={e => updateBullet(i, e.target.value)}
                                             placeholder={`Key point ${i + 1}…`}
-                                            style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif' }}
-                                            onFocus={e => (e.target.style.borderColor = '#7c3aed')}
-                                            onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                                            style={{ flex: 1 }}
                                             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addBullet() } }}
                                         />
                                         {bullets.length > 1 && (
@@ -276,15 +272,13 @@ function AILessonModal({
                             </button>
 
                             {/* Teacher Notes */}
-                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>
-                                📝 Personal Notes (optional, saved privately)
-                            </label>
+                            <label className="t-label">📝 Personal Notes (optional, saved privately)</label>
                             <textarea
+                                className="t-textarea"
                                 value={notes}
                                 onChange={e => setNotes(e.target.value)}
                                 rows={3}
                                 placeholder="Personal reminders, observations, what to emphasize…"
-                                style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', boxSizing: 'border-box' }}
                             />
 
                             {error && <p style={{ fontSize: 12, color: '#dc2626', marginTop: 8 }}>⚠️ {error}</p>}
@@ -582,7 +576,7 @@ export default function LessonTrackerPage() {
     }
 
     return (
-        <>
+        <div className="t-page">
             <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _lt_fi{from{opacity:0}to{opacity:1}}
@@ -593,10 +587,6 @@ export default function LessonTrackerPage() {
           .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 16px !important; }
           .resp-tabs { width: 100% !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch; padding: 4px !important; }
           .lt-card { padding: 14px !important; }
-          .modal-container { padding: 8px !important; }
-          .modal-content { border-radius: 12px !important; margin-top: 0 !important; }
-          .modal-header { padding: 16px !important; }
-          .modal-body { padding: 16px !important; }
           .resp-btn-group { flex-direction: column !important; width: 100% !important; }
         }
       `}</style>
@@ -851,6 +841,6 @@ export default function LessonTrackerPage() {
                     onClose={() => setActiveModal(null)}
                 />
             )}
-        </>
+        </div>
     )
 }

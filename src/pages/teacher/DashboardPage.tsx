@@ -13,7 +13,7 @@ import { formatDate, getEngagingGreeting } from '../../lib/utils'
 import { ROUTES } from '../../constants/routes'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { Button } from '../../components/ui/Button'
-import { School, BookOpen, Calendar, CheckCircle, Clock, ClipboardCheck, Users, Book, Bell, Gamepad2, FileSpreadsheet, PencilLine, MessageSquare } from 'lucide-react'
+import { School, BookOpen, Calendar, CheckCircle, Clock, ClipboardCheck, Users, Book, Bell, Gamepad2, FileSpreadsheet, PencilLine, MessageSquare, X } from 'lucide-react'
 
 function AnimNum({ to }: { to: number }) {
   const [val, setVal] = useState(0); const ref = useRef(false)
@@ -266,7 +266,7 @@ export default function TeacherDashboardPage() {
   if (loading) return <FlaskLoader fullScreen={false} label="Loading your dashboard…" />
 
   return (
-    <>
+    <div className="t-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _sp{to{transform:rotate(360deg)}}
@@ -656,50 +656,49 @@ export default function TeacherDashboardPage() {
       </div>
 
       {/* Message modal — full-screen sheet on mobile */}
-      <div className={`t-modal-overlay ${msgOpen ? 'open' : ''}`} onClick={e => { if (e.target === e.currentTarget) setMsgOpen(false) }}>
-        <div className="t-modal-box">
-          <div style={{ padding: '16px 20px', borderBottom: '1px solid #f5f3ff', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className={`t-modal-overlay${msgOpen ? ' open' : ''}`} onClick={e => { if (e.target === e.currentTarget) setMsgOpen(false) }}>
+        <div className="t-modal-box t-modal-box--md">
+          <div className="t-modal-head">
             <div>
-              <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Message Admin</h3>
-              <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Send a message directly to the school administrator</p>
+              <h2 className="t-modal-title">Message Admin</h2>
+              <p className="t-modal-sub">Send a message directly to the school administrator</p>
             </div>
-            <button onClick={() => setMsgOpen(false)} style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: '#ede9fe', cursor: 'pointer', fontSize: 14, color: '#6d28d9', fontWeight: 700 }}>✕</button>
+            <button type="button" className="t-modal-close" onClick={() => setMsgOpen(false)} aria-label="Close"><X size={18} strokeWidth={2.5} /></button>
           </div>
-          <div style={{ padding: '18px 20px' }}>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>Priority</label>
-              <div style={{ display: 'flex', gap: 6 }}>
+          <div className="t-modal-body">
+            <div className="t-field">
+              <label className="t-label">Priority</label>
+              <div className="t-priority-row">
                 {[{ v: 'low', label: '🔵 Low', color: '#0891b2' }, { v: 'normal', label: '🟣 Normal', color: '#6d28d9' }, { v: 'high', label: '🟠 High', color: '#ea580c' }, { v: 'urgent', label: '🔴 Urgent', color: '#dc2626' }].map(p => (
-                  <button key={p.v} onClick={() => setMsgPriority(p.v)}
-                    style={{ flex: 1, padding: '5px 0', borderRadius: 7, border: `1.5px solid ${msgPriority === p.v ? p.color : '#e5e7eb'}`, background: msgPriority === p.v ? p.color + '15' : '#fff', fontSize: 10, fontWeight: 700, color: msgPriority === p.v ? p.color : '#6b7280', cursor: 'pointer' }}>
+                  <button
+                    key={p.v}
+                    type="button"
+                    className={`t-priority-btn${msgPriority === p.v ? ' is-active' : ''}`}
+                    style={{ '--priority-color': p.color } as React.CSSProperties}
+                    onClick={() => setMsgPriority(p.v)}
+                  >
                     {p.label}
                   </button>
                 ))}
               </div>
             </div>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>Subject *</label>
-              <input value={msgSubject} onChange={e => setMsgSubject(e.target.value)} placeholder="e.g. Score entry issue in Class 6A"
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid var(--border-color)', outline: 'none', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' as const }}
-                onFocus={e => { e.currentTarget.style.borderColor = '#7c3aed' }}
-                onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb' }} />
+            <div className="t-field">
+              <label className="t-label">Subject *</label>
+              <input className="t-input" value={msgSubject} onChange={e => setMsgSubject(e.target.value)} placeholder="e.g. Score entry issue in Class 6A" />
             </div>
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>Message *</label>
-              <textarea value={msgBody} onChange={e => setMsgBody(e.target.value)} placeholder="Describe the issue or message…" rows={4}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid var(--border-color)', outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', boxSizing: 'border-box' as const }}
-                onFocus={e => { e.currentTarget.style.borderColor = '#7c3aed' }}
-                onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb' }} />
+            <div className="t-field">
+              <label className="t-label">Message *</label>
+              <textarea className="t-textarea" value={msgBody} onChange={e => setMsgBody(e.target.value)} placeholder="Describe the issue or message…" rows={4} />
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Button variant="outline" onClick={() => setMsgOpen(false)} style={{ flex: 1 }}>Cancel</Button>
-              <Button variant="primary" onClick={sendMessage} disabled={sendingMsg || !msgSubject.trim() || !msgBody.trim()} isLoading={sendingMsg} style={{ flex: 2 }}>
-                <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><MessageSquare size={16} /> Send to Admin</span>
-              </Button>
-            </div>
+          </div>
+          <div className="t-modal-foot t-modal-foot--split">
+            <Button variant="outline" onClick={() => setMsgOpen(false)}>Cancel</Button>
+            <Button variant="primary" onClick={sendMessage} disabled={sendingMsg || !msgSubject.trim() || !msgBody.trim()} isLoading={sendingMsg}>
+              <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><MessageSquare size={16} /> Send to Admin</span>
+            </Button>
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }

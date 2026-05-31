@@ -81,7 +81,7 @@ export default function TeacherLeavePage() {
   }
 
   return (
-    <>
+    <div className="t-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
@@ -91,7 +91,7 @@ export default function TeacherLeavePage() {
         .input-field { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1.5px solid #e5e7eb; font-size: 14px; outline: none; font-family: "DM Sans", sans-serif; transition: all 0.2s ease; background: #fff; box-sizing: border-box; }
         .input-field:focus { border-color: #7c3aed; box-shadow: 0 0 0 4px rgba(124,58,237,0.1); }
       `}</style>
-      <div style={{ fontFamily: '"DM Sans", system-ui, sans-serif', animation: 'fadeIn 0.4s ease', paddingBottom: 40 }}>
+      <div style={{ fontFamily: '"DM Sans", system-ui, sans-serif', animation: 'fadeIn 0.4s ease' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 32, animation: 'fadeUp 0.4s ease both' }}>
@@ -221,6 +221,6 @@ export default function TeacherLeavePage() {
         )}
 
       </div>
-    </>
+    </div>
   )
 }

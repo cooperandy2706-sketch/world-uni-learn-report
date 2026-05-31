@@ -24,66 +24,74 @@ import {
 const S = {
   overlay: {
     position: 'fixed' as const, inset: 0, zIndex: 99999,
-    background: 'rgba(15, 23, 42, 0.88)', backdropFilter: 'blur(16px)',
+    background: '#0a0a0f', backdropFilter: 'none',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontFamily: '"DM Sans", sans-serif', padding: 16,
+    fontFamily: '"DM Sans", sans-serif', padding: 0,
   },
   card: {
-    background: 'var(--bg-card, #ffffff)', width: '100%', maxWidth: 680,
-    maxHeight: '92vh', borderRadius: 24, boxShadow: '0 24px 48px rgba(0,0,0,0.25)',
+    background: '#0f0f1a', width: '100%', maxWidth: 900,
+    height: '100vh', borderRadius: 0, boxShadow: 'none',
     position: 'relative' as const, overflow: 'hidden', display: 'flex', flexDirection: 'column' as const,
   },
   topBar: {
-    position: 'absolute' as const, top: 0, left: 0, right: 0, height: 6,
+    position: 'absolute' as const, top: 0, left: 0, right: 0, height: 4,
     background: 'linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899)', zIndex: 2,
   },
   body: {
-    padding: '44px 36px 28px', overflowY: 'auto' as const, flex: 1,
+    padding: '60px 80px 40px', overflowY: 'auto' as const, flex: 1,
+    maxWidth: 1200, margin: '0 auto', width: '100%',
   },
   h2: {
-    fontSize: 22, fontWeight: 800, color: 'var(--text-main, #0f172a)', marginBottom: 8,
+    fontSize: 32, fontWeight: 800, color: '#ffffff', marginBottom: 12,
+    letterSpacing: '-0.02em',
   },
   subtitle: {
-    color: 'var(--text-muted, #64748b)', lineHeight: 1.6, marginBottom: 24, fontSize: 14,
+    color: '#94a3b8', lineHeight: 1.7, marginBottom: 40, fontSize: 16,
+    maxWidth: 600,
   },
   footer: {
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    padding: '16px 36px 24px', borderTop: '1px solid var(--border-color, #e2e8f0)',
+    padding: '24px 80px 40px', borderTop: '1px solid rgba(255,255,255,0.05)',
+    maxWidth: 1200, margin: '0 auto', width: '100%',
   },
   btnPrimary: (disabled = false) => ({
-    padding: '12px 28px', background: disabled ? '#94a3b8' : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+    padding: '14px 32px', background: disabled ? '#374151' : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
     color: 'white', border: 'none', borderRadius: 12, fontWeight: 700,
-    cursor: disabled ? 'not-allowed' : 'pointer', fontSize: 14, transition: 'all .2s',
+    cursor: disabled ? 'not-allowed' : 'pointer', fontSize: 15, transition: 'all .2s',
+    boxShadow: disabled ? 'none' : '0 4px 20px rgba(99, 102, 241, 0.4)',
   }),
   btnGhost: {
-    padding: '12px 24px', background: 'transparent', color: '#64748b', border: 'none',
-    fontWeight: 700, cursor: 'pointer', fontSize: 14,
+    padding: '14px 28px', background: 'transparent', color: '#94a3b8', border: '1.5px solid rgba(255,255,255,0.1)',
+    fontWeight: 700, cursor: 'pointer', fontSize: 15, borderRadius: 12,
+    transition: 'all .2s',
   },
   optionCard: (selected: boolean, color?: string) => ({
-    padding: 14, borderRadius: 14,
-    border: `2px solid ${selected ? (color || '#6366f1') : 'var(--border-color, #e2e8f0)'}`,
-    background: selected ? `${color || '#6366f1'}10` : 'transparent',
-    cursor: 'pointer', display: 'flex', flexDirection: 'column' as const, gap: 3, transition: 'all 0.2s',
+    padding: 20, borderRadius: 16,
+    border: `2px solid ${selected ? (color || '#6366f1') : 'rgba(255,255,255,0.08)'}`,
+    background: selected ? `${color || '#6366f1'}15` : 'rgba(255,255,255,0.02)',
+    cursor: 'pointer', display: 'flex', flexDirection: 'column' as const, gap: 6, transition: 'all 0.2s',
   }),
   chip: (selected: boolean, color?: string) => ({
-    display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px',
-    borderRadius: 20, border: `1.5px solid ${selected ? (color || '#6366f1') : '#e2e8f0'}`,
-    background: selected ? `${color || '#6366f1'}15` : 'transparent', cursor: 'pointer',
-    fontSize: 13, fontWeight: 600, color: selected ? (color || '#6366f1') : '#64748b',
+    display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px',
+    borderRadius: 24, border: `1.5px solid ${selected ? (color || '#6366f1') : 'rgba(255,255,255,0.1)'}`,
+    background: selected ? `${color || '#6366f1'}20` : 'rgba(255,255,255,0.02)', cursor: 'pointer',
+    fontSize: 14, fontWeight: 600, color: selected ? (color || '#6366f1') : '#94a3b8',
     transition: 'all .15s',
   }),
   input: {
-    width: '100%', padding: '10px 14px', borderRadius: 10, fontSize: 14, fontWeight: 500,
-    border: '1.5px solid var(--border-color, #e2e8f0)', background: 'var(--bg-input, #f8fafc)',
-    color: 'var(--text-main, #0f172a)', outline: 'none', fontFamily: 'inherit',
+    width: '100%', padding: '14px 16px', borderRadius: 12, fontSize: 15, fontWeight: 500,
+    border: '1.5px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)',
+    color: '#ffffff', outline: 'none', fontFamily: 'inherit',
+    transition: 'all .2s',
   },
-  label: { fontSize: 13, fontWeight: 700, color: 'var(--text-main, #0f172a)', marginBottom: 6, display: 'block' as const },
+  label: { fontSize: 14, fontWeight: 700, color: '#e2e8f0', marginBottom: 8, display: 'block' as const },
   progress: {
-    display: 'flex', gap: 4, padding: '8px 36px',
+    display: 'flex', gap: 6, padding: '0 80px 24px',
+    maxWidth: 1200, margin: '0 auto', width: '100%',
   },
   progressDot: (active: boolean, done: boolean) => ({
-    flex: 1, height: 4, borderRadius: 4,
-    background: done ? '#6366f1' : active ? '#8b5cf6' : 'var(--border-color, #e2e8f0)',
+    flex: 1, height: 3, borderRadius: 3,
+    background: done ? '#6366f1' : active ? '#8b5cf6' : 'rgba(255,255,255,0.1)',
     transition: 'all .3s',
   }),
 }
@@ -124,12 +132,12 @@ export default function SchoolSetupWizard() {
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([])
   const [customDepartment, setCustomDepartment] = useState('')
 
-  // Auto-open when settings say setup_completed === false
+  // Auto-open for admins on every visit until they explicitly click done
   useEffect(() => {
-    if (!isLoading && settings && settings.setup_completed === false && user?.role === 'admin') {
+    if (!isLoading && user?.role === 'admin') {
       setIsOpen(true)
     }
-  }, [settings, isLoading, user])
+  }, [isLoading, user?.role])
 
   // Pre-fill school data
   useEffect(() => {
@@ -359,7 +367,7 @@ export default function SchoolSetupWizard() {
             </div>
 
             {/* Step counter */}
-            <div style={{ textAlign: 'center', padding: '0 0 16px', fontSize: 12, color: '#94a3b8', fontWeight: 600 }}>
+            <div style={{ textAlign: 'center', padding: '0 0 20px', fontSize: 13, color: '#64748b', fontWeight: 600 }}>
               Step {step} of {TOTAL_STEPS}
             </div>
           </motion.div>
@@ -376,11 +384,11 @@ export default function SchoolSetupWizard() {
 function Step1_Profile({ schoolName, setSchoolName, motto, setMotto, address, setAddress, phone, setPhone, slug, setSlug }: any) {
   return (
     <>
-      <div style={{ fontSize: 44, marginBottom: 12 }}>🏫</div>
+      <div style={{ fontSize: 56, marginBottom: 16, filter: 'drop-shadow(0 0 30px rgba(99, 102, 241, 0.3))' }}>🏫</div>
       <h2 style={S.h2}>Welcome! Let's set up your school.</h2>
       <p style={S.subtitle}>Confirm your school details. These appear on report cards, receipts, and your public profile.</p>
 
-      <div style={{ display: 'grid', gap: 16 }}>
+      <div style={{ display: 'grid', gap: 20 }}>
         <div>
           <label style={S.label}>School Name *</label>
           <input style={S.input} value={schoolName} onChange={e => { setSchoolName(e.target.value); setSlug(generateSlug(e.target.value)) }} placeholder="e.g. Estev Royal School" />
@@ -389,7 +397,7 @@ function Step1_Profile({ schoolName, setSchoolName, motto, setMotto, address, se
           <label style={S.label}>Motto</label>
           <input style={S.input} value={motto} onChange={e => setMotto(e.target.value)} placeholder="e.g. Excellence in Education" />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div>
             <label style={S.label}>Address</label>
             <input style={S.input} value={address} onChange={e => setAddress(e.target.value)} placeholder="Kumasi, Ashanti" />
@@ -401,16 +409,16 @@ function Step1_Profile({ schoolName, setSchoolName, motto, setMotto, address, se
         </div>
         <div>
           <label style={S.label}>Public URL Slug</label>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ color: '#94a3b8', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>nexora.app/@</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,255,255,0.02)', padding: '14px 16px', borderRadius: 12, border: '1.5px solid rgba(255,255,255,0.1)' }}>
+            <span style={{ color: '#6366f1', fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' }}>nexora.app/@</span>
             <input
-              style={{ ...S.input, flex: 1, fontFamily: 'monospace' }}
+              style={{ ...S.input, flex: 1, background: 'transparent', border: 'none', padding: 0, fontFamily: 'monospace' }}
               value={slug}
               onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''))}
               placeholder="estevroyalschool"
             />
           </div>
-          <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>This is your school's public profile URL. Use only lowercase letters and numbers.</p>
+          <p style={{ fontSize: 12, color: '#64748b', marginTop: 8 }}>This is your school's public profile URL. Use only lowercase letters and numbers.</p>
         </div>
       </div>
     </>
@@ -431,15 +439,15 @@ function Step2_InstitutionType({ schoolType, setSchoolType }: any) {
 
   return (
     <>
-      <div style={{ fontSize: 44, marginBottom: 12 }}>🎒</div>
+      <div style={{ fontSize: 56, marginBottom: 16, filter: 'drop-shadow(0 0 30px rgba(99, 102, 241, 0.3))' }}>🎒</div>
       <h2 style={S.h2}>What type of institution is this?</h2>
       <p style={S.subtitle}>This configures grading scales, class structures, and available curriculums.</p>
 
-      <div style={{ display: 'grid', gap: 10 }}>
+      <div style={{ display: 'grid', gap: 12 }}>
         {types.map(t => (
           <div key={t.id} onClick={() => setSchoolType(t.id)} style={S.optionCard(schoolType === t.id)}>
-            <span style={{ fontWeight: 700, color: 'var(--text-main, #0f172a)' }}>{t.icon} {t.label}</span>
-            <span style={{ fontSize: 13, color: 'var(--text-muted, #64748b)' }}>{t.desc}</span>
+            <span style={{ fontWeight: 700, color: '#ffffff', fontSize: 16 }}>{t.icon} {t.label}</span>
+            <span style={{ fontSize: 14, color: '#94a3b8' }}>{t.desc}</span>
           </div>
         ))}
       </div>
@@ -454,32 +462,32 @@ function Step2_InstitutionType({ schoolType, setSchoolType }: any) {
 function Step3_OperatingModel({ hasEvening, setHasEvening, hasBranches, setHasBranches }: any) {
   return (
     <>
-      <div style={{ fontSize: 44, marginBottom: 12 }}>🌙</div>
+      <div style={{ fontSize: 56, marginBottom: 16, filter: 'drop-shadow(0 0 30px rgba(99, 102, 241, 0.3))' }}>🌙</div>
       <h2 style={S.h2}>Operating Model</h2>
       <p style={S.subtitle}>Tell us how your school runs so we can configure session types and features.</p>
 
-      <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>
+      <div style={{ display: 'grid', gap: 12, marginBottom: 32 }}>
         <div onClick={() => setHasEvening(false)} style={S.optionCard(!hasEvening)}>
-          <span style={{ fontWeight: 700 }}>☀️ Standard Day School</span>
-          <span style={{ fontSize: 13, color: '#64748b' }}>Classes run during regular daytime hours only.</span>
+          <span style={{ fontWeight: 700, color: '#ffffff', fontSize: 16 }}>☀️ Standard Day School</span>
+          <span style={{ fontSize: 14, color: '#94a3b8' }}>Classes run during regular daytime hours only.</span>
         </div>
         <div onClick={() => setHasEvening(true)} style={S.optionCard(hasEvening)}>
-          <span style={{ fontWeight: 700 }}>🌙 Evening & Weekend Classes</span>
-          <span style={{ fontSize: 13, color: '#64748b' }}>Tag students and staff as Day, Evening, or Weekend session.</span>
+          <span style={{ fontWeight: 700, color: '#ffffff', fontSize: 16 }}>🌙 Evening & Weekend Classes</span>
+          <span style={{ fontSize: 14, color: '#94a3b8' }}>Tag students and staff as Day, Evening, or Weekend session.</span>
         </div>
       </div>
 
-      <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, color: 'var(--text-main, #0f172a)' }}>🏢 Multi-Campus / Branches</h3>
-      <p style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>Does your school have multiple branches or campuses?</p>
+      <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: '#ffffff' }}>🏢 Multi-Campus / Branches</h3>
+      <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16 }}>Does your school have multiple branches or campuses?</p>
 
-      <div style={{ display: 'grid', gap: 10 }}>
+      <div style={{ display: 'grid', gap: 12 }}>
         <div onClick={() => setHasBranches(false)} style={S.optionCard(!hasBranches)}>
-          <span style={{ fontWeight: 700 }}>Single Campus</span>
-          <span style={{ fontSize: 13, color: '#64748b' }}>Just one school location.</span>
+          <span style={{ fontWeight: 700, color: '#ffffff', fontSize: 16 }}>Single Campus</span>
+          <span style={{ fontSize: 14, color: '#94a3b8' }}>Just one school location.</span>
         </div>
         <div onClick={() => setHasBranches(true)} style={S.optionCard(hasBranches)}>
-          <span style={{ fontWeight: 700 }}>Multiple Branches</span>
-          <span style={{ fontSize: 13, color: '#64748b' }}>You manage several campuses from this main admin portal. You'll be able to add branches after setup.</span>
+          <span style={{ fontWeight: 700, color: '#ffffff', fontSize: 16 }}>Multiple Branches</span>
+          <span style={{ fontSize: 14, color: '#94a3b8' }}>You manage several campuses from this main admin portal. You'll be able to add branches after setup.</span>
         </div>
       </div>
     </>
@@ -495,16 +503,16 @@ function Step4_Curriculum({ schoolType, selectedCurriculums, setSelectedCurricul
 
   return (
     <>
-      <div style={{ fontSize: 44, marginBottom: 12 }}>📖</div>
+      <div style={{ fontSize: 56, marginBottom: 16, filter: 'drop-shadow(0 0 30px rgba(99, 102, 241, 0.3))' }}>📖</div>
       <h2 style={S.h2}>Curriculum & Subjects</h2>
       <p style={S.subtitle}>Select the curriculums your school follows. We'll auto-populate your subject list.</p>
 
       {/* Curriculum selection */}
-      <div style={{ display: 'grid', gap: 8, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gap: 12, marginBottom: 28 }}>
         {relevantCurriculums.map(c => (
           <div key={c.id} onClick={() => setSelectedCurriculums(toggleArr(selectedCurriculums, c.id))} style={S.optionCard(selectedCurriculums.includes(c.id))}>
-            <span style={{ fontWeight: 700 }}>{c.icon} {c.label}</span>
-            <span style={{ fontSize: 12, color: '#64748b' }}>{c.description}</span>
+            <span style={{ fontWeight: 700, color: '#ffffff', fontSize: 16 }}>{c.icon} {c.label}</span>
+            <span style={{ fontSize: 14, color: '#94a3b8' }}>{c.description}</span>
           </div>
         ))}
       </div>
@@ -512,23 +520,23 @@ function Step4_Curriculum({ schoolType, selectedCurriculums, setSelectedCurricul
       {/* SHS Programme Picker */}
       {needsSHSPicker && (
         <>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, color: 'var(--text-main, #0f172a)' }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: '#ffffff' }}>
             🎓 SHS Programmes Offered
           </h3>
-          <p style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>Select which programmes your school offers. You can then pick which elective subjects you teach per programme.</p>
+          <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16 }}>Select which programmes your school offers. You can then pick which elective subjects you teach per programme.</p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 8, marginBottom: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12, marginBottom: 24 }}>
             {SHS_PROGRAMMES.map(p => (
               <div
                 key={p.id}
                 onClick={() => setSelectedProgrammes(toggleArr(selectedProgrammes, p.id))}
                 style={{
                   ...S.optionCard(selectedProgrammes.includes(p.id), p.color),
-                  padding: 12, textAlign: 'center' as const, background: selectedProgrammes.includes(p.id) ? p.bg : 'transparent',
+                  padding: 16, textAlign: 'center' as const, background: selectedProgrammes.includes(p.id) ? p.bg : 'transparent',
                 }}
               >
-                <span style={{ fontSize: 28 }}>{p.icon}</span>
-                <span style={{ fontWeight: 700, fontSize: 13, color: selectedProgrammes.includes(p.id) ? p.color : '#475569' }}>{p.label}</span>
+                <span style={{ fontSize: 32 }}>{p.icon}</span>
+                <span style={{ fontWeight: 700, fontSize: 14, color: selectedProgrammes.includes(p.id) ? p.color : '#94a3b8' }}>{p.label}</span>
               </div>
             ))}
           </div>
@@ -540,11 +548,11 @@ function Step4_Curriculum({ schoolType, selectedCurriculums, setSelectedCurricul
             const selected = selectedElectives[progId] ?? prog.electives.map(e => e.code)
 
             return (
-              <div key={progId} style={{ marginBottom: 20, padding: 16, borderRadius: 14, border: `1.5px solid ${prog.color}30`, background: prog.bg }}>
-                <h4 style={{ fontSize: 14, fontWeight: 700, color: prog.color, marginBottom: 10 }}>
+              <div key={progId} style={{ marginBottom: 24, padding: 20, borderRadius: 16, border: `1.5px solid ${prog.color}40`, background: prog.bg }}>
+                <h4 style={{ fontSize: 16, fontWeight: 700, color: prog.color, marginBottom: 12 }}>
                   {prog.icon} {prog.label} — Electives
                 </h4>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {prog.electives.map(e => (
                     <span
                       key={e.code}
@@ -560,8 +568,8 @@ function Step4_Curriculum({ schoolType, selectedCurriculums, setSelectedCurricul
           })}
 
           {/* Core subjects notice */}
-          <div style={{ padding: 12, borderRadius: 10, background: '#f0f9ff', border: '1px solid #bae6fd', marginBottom: 8 }}>
-            <p style={{ fontSize: 12, color: '#0369a1', fontWeight: 600, margin: 0 }}>
+          <div style={{ padding: 16, borderRadius: 12, background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)', marginBottom: 8 }}>
+            <p style={{ fontSize: 13, color: '#a5b4fc', fontWeight: 600, margin: 0 }}>
               ℹ️ Core subjects (Core Maths, English, Integrated Science, Social Studies) are automatically included for all SHS programmes.
             </p>
           </div>
@@ -578,49 +586,49 @@ function Step4_Curriculum({ schoolType, selectedCurriculums, setSelectedCurricul
 function Step5_Classes({ classTheme, setClassTheme, streamCount, setStreamCount, previewClasses, selectedDepartments, setSelectedDepartments, customDepartment, setCustomDepartment, addCustomDepartment, toggleArr, schoolType }: any) {
   return (
     <>
-      <div style={{ fontSize: 44, marginBottom: 12 }}>🏷️</div>
+      <div style={{ fontSize: 56, marginBottom: 16, filter: 'drop-shadow(0 0 30px rgba(99, 102, 241, 0.3))' }}>🏷️</div>
       <h2 style={S.h2}>Classes & Departments</h2>
       <p style={S.subtitle}>Choose how your classes are named and which departments to create.</p>
 
       {/* Naming theme */}
       <label style={S.label}>Class Naming Theme</label>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, marginBottom: 24 }}>
         {CLASS_NAMING_THEMES.map(t => (
           <div
             key={t.id}
             onClick={() => setClassTheme(t.id)}
             style={{
               ...S.optionCard(classTheme === t.id),
-              padding: 10, textAlign: 'center' as const,
+              padding: 14, textAlign: 'center' as const,
             }}
           >
-            <span style={{ fontSize: 24 }}>{t.icon}</span>
-            <span style={{ fontWeight: 700, fontSize: 12, color: classTheme === t.id ? '#6366f1' : '#475569' }}>{t.label}</span>
-            {t.preview && <span style={{ fontSize: 10, color: '#94a3b8' }}>{t.preview}</span>}
+            <span style={{ fontSize: 28 }}>{t.icon}</span>
+            <span style={{ fontWeight: 700, fontSize: 13, color: classTheme === t.id ? '#6366f1' : '#94a3b8' }}>{t.label}</span>
+            {t.preview && <span style={{ fontSize: 11, color: '#64748b' }}>{t.preview}</span>}
           </div>
         ))}
       </div>
 
       {/* Streams per year */}
       <label style={S.label}>Streams per Year Group</label>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <button onClick={() => setStreamCount(Math.max(1, streamCount - 1))} style={{ width: 36, height: 36, borderRadius: 10, border: '1.5px solid #e2e8f0', background: 'white', fontSize: 18, cursor: 'pointer', fontWeight: 700 }}>−</button>
-        <span style={{ fontSize: 22, fontWeight: 800, color: '#6366f1', minWidth: 24, textAlign: 'center' }}>{streamCount}</span>
-        <button onClick={() => setStreamCount(Math.min(10, streamCount + 1))} style={{ width: 36, height: 36, borderRadius: 10, border: '1.5px solid #e2e8f0', background: 'white', fontSize: 18, cursor: 'pointer', fontWeight: 700 }}>+</button>
-        <span style={{ fontSize: 13, color: '#64748b' }}>stream{streamCount !== 1 ? 's' : ''}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+        <button onClick={() => setStreamCount(Math.max(1, streamCount - 1))} style={{ width: 44, height: 44, borderRadius: 12, border: '1.5px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', fontSize: 20, cursor: 'pointer', fontWeight: 700, color: '#ffffff' }}>−</button>
+        <span style={{ fontSize: 28, fontWeight: 800, color: '#6366f1', minWidth: 32, textAlign: 'center' }}>{streamCount}</span>
+        <button onClick={() => setStreamCount(Math.min(10, streamCount + 1))} style={{ width: 44, height: 44, borderRadius: 12, border: '1.5px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', fontSize: 20, cursor: 'pointer', fontWeight: 700, color: '#ffffff' }}>+</button>
+        <span style={{ fontSize: 14, color: '#94a3b8' }}>stream{streamCount !== 1 ? 's' : ''}</span>
       </div>
 
       {/* Class preview */}
       <label style={S.label}>Preview — {previewClasses.length} classes</label>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 24, padding: 14, borderRadius: 12, background: 'var(--bg-input, #f8fafc)', border: '1px solid var(--border-color, #e2e8f0)', maxHeight: 120, overflowY: 'auto' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 28, padding: 16, borderRadius: 12, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', maxHeight: 140, overflowY: 'auto' }}>
         {previewClasses.map((name: string, i: number) => (
-          <span key={i} style={{ padding: '4px 10px', borderRadius: 8, background: '#e0e7ff', color: '#4338ca', fontSize: 12, fontWeight: 600 }}>{name}</span>
+          <span key={i} style={{ padding: '6px 12px', borderRadius: 8, background: 'rgba(99, 102, 241, 0.2)', color: '#a5b4fc', fontSize: 13, fontWeight: 600 }}>{name}</span>
         ))}
       </div>
 
       {/* Departments */}
       <label style={S.label}>Departments</label>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
         {(DEFAULT_DEPARTMENTS[schoolType] ?? ['General Studies']).map((dept: string) => (
           <span
             key={dept}
@@ -631,7 +639,7 @@ function Step5_Classes({ classTheme, setClassTheme, streamCount, setStreamCount,
           </span>
         ))}
       </div>
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 12 }}>
         <input
           style={{ ...S.input, flex: 1 }}
           value={customDepartment}
@@ -639,17 +647,17 @@ function Step5_Classes({ classTheme, setClassTheme, streamCount, setStreamCount,
           placeholder="Add custom department…"
           onKeyDown={e => e.key === 'Enter' && addCustomDepartment()}
         />
-        <button onClick={addCustomDepartment} style={{ padding: '8px 16px', borderRadius: 10, border: '1.5px solid #6366f1', background: '#eef2ff', color: '#6366f1', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>
+        <button onClick={addCustomDepartment} style={{ padding: '12px 20px', borderRadius: 12, border: '1.5px solid #6366f1', background: 'rgba(99, 102, 241, 0.1)', color: '#6366f1', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>
           + Add
         </button>
       </div>
       {/* Show custom departments */}
       {selectedDepartments.filter((d: string) => !(DEFAULT_DEPARTMENTS[schoolType] ?? []).includes(d)).length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
           {selectedDepartments.filter((d: string) => !(DEFAULT_DEPARTMENTS[schoolType] ?? []).includes(d)).map((dept: string) => (
-            <span key={dept} style={{ ...S.chip(true), paddingRight: 6 }}>
+            <span key={dept} style={{ ...S.chip(true), paddingRight: 8 }}>
               {dept}
-              <span onClick={() => setSelectedDepartments((prev: string[]) => prev.filter(d => d !== dept))} style={{ marginLeft: 6, cursor: 'pointer', opacity: 0.7, fontWeight: 800 }}>×</span>
+              <span onClick={() => setSelectedDepartments((prev: string[]) => prev.filter(d => d !== dept))} style={{ marginLeft: 8, cursor: 'pointer', opacity: 0.7, fontWeight: 800 }}>×</span>
             </span>
           ))}
         </div>
@@ -668,9 +676,9 @@ function Step6_Review({ schoolName, slug, schoolType, hasEvening, hasBranches, s
   resolvedSubjects: SubjectDef[]; previewClasses: string[]; selectedDepartments: string[];
 }) {
   const row = (label: string, value: string | number) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border-color, #f1f5f9)' }}>
-      <span style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>{label}</span>
-      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main, #0f172a)', textAlign: 'right', maxWidth: '60%' }}>{value}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <span style={{ fontSize: 14, color: '#94a3b8', fontWeight: 600 }}>{label}</span>
+      <span style={{ fontSize: 14, fontWeight: 700, color: '#ffffff', textAlign: 'right', maxWidth: '60%' }}>{value}</span>
     </div>
   )
 
@@ -680,11 +688,11 @@ function Step6_Review({ schoolName, slug, schoolType, hasEvening, hasBranches, s
 
   return (
     <>
-      <div style={{ fontSize: 44, marginBottom: 12 }}>🚀</div>
+      <div style={{ fontSize: 56, marginBottom: 16, filter: 'drop-shadow(0 0 30px rgba(99, 102, 241, 0.3))' }}>🚀</div>
       <h2 style={S.h2}>Review & Launch</h2>
       <p style={S.subtitle}>Double-check everything below. You can always change settings later.</p>
 
-      <div style={{ background: 'var(--bg-input, #f8fafc)', borderRadius: 16, padding: 20, border: '1px solid var(--border-color, #e2e8f0)' }}>
+      <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 16, padding: 24, border: '1px solid rgba(255,255,255,0.08)' }}>
         {row('School', schoolName)}
         {row('Public URL', `/@${slug}`)}
         {row('Type', typeLabel[schoolType] || schoolType)}
@@ -698,26 +706,26 @@ function Step6_Review({ schoolName, slug, schoolType, hasEvening, hasBranches, s
       </div>
 
       {/* Quick preview chips */}
-      <div style={{ marginTop: 16 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#64748b', display: 'block', marginBottom: 6 }}>Classes:</span>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxHeight: 60, overflowY: 'auto' }}>
+      <div style={{ marginTop: 20 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: 8 }}>Classes:</span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, maxHeight: 80, overflowY: 'auto' }}>
           {previewClasses.slice(0, 20).map((c: string, i: number) => (
-            <span key={i} style={{ padding: '3px 8px', borderRadius: 6, background: '#e0e7ff', color: '#4338ca', fontSize: 11, fontWeight: 600 }}>{c}</span>
+            <span key={i} style={{ padding: '4px 10px', borderRadius: 8, background: 'rgba(99, 102, 241, 0.2)', color: '#a5b4fc', fontSize: 12, fontWeight: 600 }}>{c}</span>
           ))}
           {previewClasses.length > 20 && <span style={{ fontSize: 11, color: '#94a3b8', padding: '3px 8px' }}>+{previewClasses.length - 20} more</span>}
         </div>
       </div>
       <div style={{ marginTop: 12 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#64748b', display: 'block', marginBottom: 6 }}>Departments:</span>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: 8 }}>Departments:</span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {selectedDepartments.map((d: string, i: number) => (
-            <span key={i} style={{ padding: '3px 8px', borderRadius: 6, background: '#fef3c7', color: '#92400e', fontSize: 11, fontWeight: 600 }}>{d}</span>
+            <span key={i} style={{ padding: '4px 10px', borderRadius: 8, background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', fontSize: 12, fontWeight: 600 }}>{d}</span>
           ))}
         </div>
       </div>
 
-      <div style={{ marginTop: 20, padding: 12, borderRadius: 10, background: '#ecfdf5', border: '1px solid #a7f3d0' }}>
-        <p style={{ fontSize: 12, color: '#065f46', fontWeight: 600, margin: 0 }}>
+      <div style={{ marginTop: 24, padding: 16, borderRadius: 12, background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
+        <p style={{ fontSize: 13, color: '#86efac', fontWeight: 600, margin: 0 }}>
           ✅ Clicking "Complete Setup" will create {resolvedSubjects.length} subjects, {previewClasses.length} classes, and {selectedDepartments.length} departments in your school.
         </p>
       </div>

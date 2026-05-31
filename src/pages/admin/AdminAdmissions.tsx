@@ -250,7 +250,8 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
 
   const { data: scholarships = [] } = useQuery({
     queryKey: ['scholarships', schoolId],
-    queryFn: async () => { const { data } = await scholarshipsService.list(schoolId); return data || [] }
+    queryFn: async () => { const { data } = await scholarshipsService.list(schoolId); return data || [] },
+    enabled: !!schoolId
   })
 
   // Cross-tab: fetch supplies for the same filter to show the banner
@@ -263,7 +264,8 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
       }
       const { data } = await suppliesService.listForClass(schoolId, selClass, selYear || null)
       return data || []
-    }
+    },
+    enabled: !!schoolId
   })
 
   const saveMutation = useMutation({
@@ -496,7 +498,8 @@ function ScholarshipsSection({ schoolId }: { schoolId: string }) {
 
   const { data: scholarships = [] } = useQuery({
     queryKey: ['scholarships', schoolId],
-    queryFn: async () => { const { data } = await scholarshipsService.list(schoolId); return data || [] }
+    queryFn: async () => { const { data } = await scholarshipsService.list(schoolId); return data || [] },
+    enabled: !!schoolId
   })
 
   const saveMutation = useMutation({
@@ -576,12 +579,14 @@ function EnquiriesTab({ schoolId, classes, academicYears }: any) {
 
   const { data: enquiries = [] } = useQuery({
     queryKey: ['enquiries', schoolId, statusFilter],
-    queryFn: async () => { const { data } = await enquiriesService.list(schoolId, statusFilter ? { status: statusFilter as EnquiryStatus } : {}); return data || [] }
+    queryFn: async () => { const { data } = await enquiriesService.list(schoolId, statusFilter ? { status: statusFilter as EnquiryStatus } : {}); return data || [] },
+    enabled: !!schoolId
   })
 
   const { data: scholarships = [] } = useQuery({
     queryKey: ['scholarships', schoolId],
-    queryFn: async () => { const { data } = await scholarshipsService.list(schoolId); return data || [] }
+    queryFn: async () => { const { data } = await scholarshipsService.list(schoolId); return data || [] },
+    enabled: !!schoolId
   })
 
   const saveMutation = useMutation({
@@ -749,12 +754,14 @@ function AdmissionFormTab({ schoolId, classes, academicYears, school }: any) {
 
   const { data: applications = [] } = useQuery({
     queryKey: ['applications', schoolId],
-    queryFn: async () => { const { data } = await applicationsService.list(schoolId); return data || [] }
+    queryFn: async () => { const { data } = await applicationsService.list(schoolId); return data || [] },
+    enabled: !!schoolId
   })
 
   const { data: scholarships = [] } = useQuery({
     queryKey: ['scholarships', schoolId],
-    queryFn: async () => { const { data } = await scholarshipsService.list(schoolId); return data || [] }
+    queryFn: async () => { const { data } = await scholarshipsService.list(schoolId); return data || [] },
+    enabled: !!schoolId
   })
 
   const saveMutation = useMutation({
@@ -958,12 +965,14 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
       if (!selClass) return []
       const { data } = await billsService.listForClass(schoolId, selClass, selYear || null)
       return data || []
-    }
+    },
+    enabled: !!schoolId
   })
 
   const { data: scholarships = [] } = useQuery({
     queryKey: ['scholarships', schoolId],
-    queryFn: async () => { const { data } = await scholarshipsService.list(schoolId); return data || [] }
+    queryFn: async () => { const { data } = await scholarshipsService.list(schoolId); return data || [] },
+    enabled: !!schoolId
   })
 
   const saveMutation = useMutation({

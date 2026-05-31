@@ -30,7 +30,6 @@ export const router = createRouter([
     children: [
       { index: true, element: <LandingPage /> },
       { path: '/schools', element: lazyPage(() => import('./pages/public/SchoolDirectoryPage')) },
-      { path: '/@:slug', element: lazyPage(() => import('./pages/public/SchoolProfilePage')) },
       
       { path: '/privacy-policy', element: lazyPage(() => import('./pages/legal/PrivacyPolicyPage')) },
       { path: '/terms-of-service', element: lazyPage(() => import('./pages/legal/TermsOfServicePage')) },
@@ -323,6 +322,7 @@ export const router = createRouter([
           { path: 'messages', element: lazyPage(() => import('./pages/messaging/MessagingPage')) },
         ],
       },
+      { path: '/:handle', element: lazyPage(() => import('./pages/public/SchoolProfilePage')) },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

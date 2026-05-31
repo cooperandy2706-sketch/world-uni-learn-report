@@ -521,7 +521,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
   const COL_SUBJECT = (gradingCategories.length * 56) + 52 + 38
 
   return (
-    <div style={{ fontFamily:'"DM Sans",system-ui,sans-serif', paddingBottom: 60 }}>
+    <div className="t-page">
       <style>{`
         @keyframes _spin{to{transform:rotate(360deg)}}
         input[type=number]::-webkit-inner-spin-button{opacity:0}

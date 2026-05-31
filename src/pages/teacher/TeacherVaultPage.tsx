@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { format } from 'date-fns'
 import toast from 'react-hot-toast'
 import { 
-  FileText, Plus, Download, Trash2, Shield, FileCheck, BookOpen, User, Lock, Clock, XCircle, CheckCircle2
+  FileText, Plus, Download, Trash2, Shield, FileCheck, BookOpen, User, Lock, Clock, XCircle, CheckCircle2, X
 } from 'lucide-react'
 
 export default function TeacherVaultPage() {
@@ -113,13 +113,13 @@ export default function TeacherVaultPage() {
     }
 
     if (loading) return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+        <div className="t-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
             <div className="animate-spin" style={{ width: 40, height: 40, border: '4px solid #f3f3f3', borderTop: '4px solid #7c3aed', borderRadius: '50%' }} />
         </div>
     )
 
     return (
-        <div style={{ animation: 'fadeIn 0.5s ease', padding: '16px 12px 100px', maxWidth: '1200px', margin: '0 auto', fontFamily: '"DM Sans",system-ui,sans-serif' }}>
+        <div className="t-page">
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .card { background: var(--bg-card); border-radius: 8px; border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
@@ -187,25 +187,24 @@ export default function TeacherVaultPage() {
             </div>
 
             {/* Upload Modal */}
-            {showUploadModal && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(8px)', padding: 16 }}>
-                    <div className="card" style={{ width: '100%', maxWidth: '450px', padding: '32px', animation: 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24, borderBottom: '1px solid var(--border-color)', paddingBottom: 16 }}>
-                            <div>
-                                <h2 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Upload Document</h2>
-                                <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--text-muted)' }}>Add to your secure vault</p>
-                            </div>
-                            <button onClick={() => setShowUploadModal(false)} style={{ background: 'var(--bg-input)', border: 'none', width: 32, height: 32, borderRadius: '50%', color: 'var(--text-main)', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            <div className={`t-modal-overlay${showUploadModal ? ' open' : ''}`} onClick={e => { if (e.target === e.currentTarget) setShowUploadModal(false) }}>
+                <div className="t-modal-box t-modal-box--md">
+                    <div className="t-modal-head">
+                        <div>
+                            <h2 className="t-modal-title">Upload Document</h2>
+                            <p className="t-modal-sub">Add to your secure vault</p>
                         </div>
-
-                        <form onSubmit={handleUpload} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                            <div>
-                                <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>Document Title</label>
-                                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Week 1 Lesson Plan" style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', boxSizing: 'border-box' }} required />
+                        <button type="button" className="t-modal-close" onClick={() => setShowUploadModal(false)} aria-label="Close"><X size={18} strokeWidth={2.5} /></button>
+                    </div>
+                    <form onSubmit={handleUpload}>
+                        <div className="t-modal-body">
+                            <div className="t-field">
+                                <label className="t-label">Document Title</label>
+                                <input className="t-input" type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Week 1 Lesson Plan" required />
                             </div>
-                            <div>
-                                <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>Document Type</label>
-                                <select value={docType} onChange={(e) => setDocType(e.target.value)} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', boxSizing: 'border-box' }}>
+                            <div className="t-field">
+                                <label className="t-label">Document Type</label>
+                                <select className="t-select" value={docType} onChange={(e) => setDocType(e.target.value)}>
                                     <option value="lesson_plan">Lesson Plan</option>
                                     <option value="lesson_note">Lesson Note</option>
                                     <option value="appointment_letter">Appointment Letter</option>
@@ -213,21 +212,20 @@ export default function TeacherVaultPage() {
                                     <option value="other">Other</option>
                                 </select>
                             </div>
-                            <div>
-                                <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>File URL (Drive / Cloud Link)</label>
-                                <input type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="https://drive.google.com/..." style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', boxSizing: 'border-box' }} required />
+                            <div className="t-field">
+                                <label className="t-label">File URL (Drive / Cloud Link)</label>
+                                <input className="t-input" type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="https://drive.google.com/..." required />
                             </div>
-                            
-                            <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-                                <button type="button" onClick={() => setShowUploadModal(false)} style={{ flex: 1, padding: '14px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>Cancel</button>
-                                <button type="submit" disabled={submitting} className="upload-btn" style={{ flex: 2, display: 'flex', justifyContent: 'center' }}>
-                                    {submitting ? 'Uploading...' : 'Save Document'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        </div>
+                        <div className="t-modal-foot t-modal-foot--split">
+                            <button type="button" onClick={() => setShowUploadModal(false)} style={{ padding: '14px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>Cancel</button>
+                            <button type="submit" disabled={submitting} className="upload-btn" style={{ display: 'flex', justifyContent: 'center' }}>
+                                {submitting ? 'Uploading...' : 'Save Document'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            )}
+            </div>
         </div>
     )
 }

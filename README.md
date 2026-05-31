@@ -59,6 +59,47 @@ When a parent pays **GH₵ 100** via the Parent Portal:
 # Install dependencies
 npm install
 
+# Copy environment template and fill in values
+cp .env.example .env
+
 # Start development server
 npm run dev
 ```
+
+---
+
+## Deployment
+
+### Web (Vercel — recommended)
+
+1. Connect the GitHub repo to [Vercel](https://vercel.com).
+2. Set **Environment Variables** (Production + Preview):
+   - `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+   - `VITE_PAYSTACK_PUBLIC_KEY` (master `pk_test_` / `pk_live_`)
+   - Optional: `VITE_GEMINI_API_KEY`, `VITE_GROQ_API_KEY`, `VITE_HUGGINGFACE_API_KEY`, `VITE_VAPID_PUBLIC_KEY`
+3. Build command: `npm run build` — output: `dist`
+4. SPA routing is handled by `vercel.json` (all routes → `index.html`).
+
+### Supabase
+
+1. Link project: `npx supabase link --project-ref <ref>`
+2. Apply migrations: `npx supabase db push`
+3. Deploy edge functions: `npx supabase functions deploy`
+4. Set **Edge Function secrets** (Dashboard → Edge Functions → Secrets):
+   - `PAYSTACK_SECRET_KEY`
+   - `ARKESEL_API_KEY` (SMS)
+   - `VAPID_PRIVATE_KEY` (push)
+   - `ALLOW_PAYMENT_SANDBOX=true` — **development only** (enables `sandbox_*` payment refs)
+
+### Desktop & mobile (CI)
+
+- Tag releases (`v*`) trigger `.github/workflows/build.yml` (Electron Mac/Win + Android debug APK).
+- PRs and pushes to `main` run `.github/workflows/ci.yml` (lint + web build).
+
+---
+
+## Security notes
+
+- **Never** put `SUPABASE_SERVICE_ROLE_KEY` in `.env` for the Vite app — use Edge Function secrets only.
+- Rotate any API keys that were ever committed to git (check `.env.example` history).
+- School **Paystack subaccount** codes (`ACCT_...`) are stored per school in Admin → Settings; the master `pk_*` key stays in platform env.

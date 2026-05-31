@@ -87,7 +87,7 @@ export default function MyClassesPage() {
   )
 
   return (
-    <>
+    <div className="t-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _sp{to{transform:rotate(360deg)}}
@@ -261,6 +261,6 @@ export default function MyClassesPage() {
           </div>
         )}
       </div>
-    </>
+    </div>
   )
 }

@@ -200,7 +200,7 @@ export default function ClassTestsPage() {
   )
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '20px 16px', fontFamily: '"DM Sans", sans-serif' }}>
+    <div className="t-page">
       <style>{`
         @keyframes _fi { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card { background: var(--bg-card); border-radius: 8px; border: 1.5px solid var(--border-color); color: var(--text-main); padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); animation: _fi 0.3s ease; }

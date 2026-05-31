@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { SchoolSearchInput } from '../components/public/SchoolSearchInput';
+import { usePublicSchools } from '../hooks/usePublicSchools';
+import '../styles/school-directory.css';
 
 // ─── HOOKS ────────────────────────────────────────────────────────────────────
 
@@ -277,7 +280,7 @@ const CSS = `
   }
 
   .hero .container { position: relative; z-index: 10; }
-  .hero-content { max-width: 700px; margin: 0 auto; text-align: center; }
+  .hero-content { max-width: 700px; margin: 0 auto; text-align: center; overflow: visible; }
   
   .hero-badge {
     display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.8rem;
@@ -295,6 +298,12 @@ const CSS = `
   .hero-subtitle { font-size: 1.05rem; color: rgba(255,255,255,0.7); margin-bottom: 2rem; line-height: 1.6; max-width: 600px; margin-inline: auto; font-weight: 600; padding: 0 0.5rem; }
   @media (min-width: 768px) { .hero-subtitle { font-size: 1.2rem; margin-bottom: 2.5rem; } }
   
+  .hero-search {
+    display: block; width: 100%; max-width: 420px; margin: 0 auto 1.5rem; padding: 0 1rem;
+  }
+  @media (min-width: 768px) { .hero-search { display: none; } }
+  .mobile-search-wrap { width: 100%; max-width: 340px; margin: 0 0 0.5rem; }
+
   .hero-btns { display: flex; flex-direction: column; gap: 1rem; justify-content: center; width: 100%; padding: 0 1rem; }
   .hero-btns .btn-primary, .hero-btns .btn-login { width: 100%; }
   @media (min-width: 640px) { 
@@ -532,12 +541,35 @@ const CSS = `
   .mobile-link { font-size: 1.8rem; font-family: var(--serif); font-weight: 600; color: white; text-decoration: none; padding: 0.5rem; }
   @media (min-width: 400px) { .mobile-link { font-size: 2rem; } }
   .mobile-close { position: absolute; top: 1rem; right: 1rem; color: white; background: rgba(255,255,255,0.1); border: none; font-size: 1.2rem; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  .mobile-search { display: flex; width: 100%; max-width: 300px; gap: 8px; margin: 1rem 0; }
-  .mobile-search input { flex: 1; padding: 12px 16px; border-radius: 10px; border: none; outline: none; font-size: 1rem; }
-  .mobile-search button { padding: 0 16px; border-radius: 10px; background: var(--accent); color: white; border: none; font-weight: bold; cursor: pointer; }
 `;
 
 // ─── SUBCOMPONENTS ─────────────────────────────────────────────────────────
+
+function LandingSchoolSearch({
+  variant,
+  placeholder = 'Search schools by name or city…',
+  onNavigate,
+}: {
+  variant: 'hero' | 'menu'
+  placeholder?: string
+  onNavigate?: () => void
+}) {
+  const { data: schools = [] } = usePublicSchools()
+  const [query, setQuery] = useState('')
+
+  return (
+    <div className={variant === 'hero' ? 'hero-search' : 'mobile-search-wrap'}>
+      <SchoolSearchInput
+        schools={schools}
+        value={query}
+        onChange={setQuery}
+        variant="hero"
+        placeholder={placeholder}
+        onSubmit={onNavigate}
+      />
+    </div>
+  )
+}
 
 function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v: boolean) => void }) {
   // If not scrolled, we are at the top of the hero (which is dark purple)
@@ -612,6 +644,7 @@ function Hero() {
             Empower students, equip educators, and automate administrative GES reporting
             from a single unified platform built specifically for Ghanaian and West African schools.
           </p>
+          <LandingSchoolSearch variant="hero" placeholder="Find a school…" />
           <div className="hero-btns">
             <a href="/register-school" className="btn-primary" style={{ padding: '1.2rem 2.5rem', fontSize: '1.05rem', borderRadius: '14px' }}>Get Started Free</a>
             <a href="/login" className="btn-login" style={{ fontSize: '1.05rem', padding: '1.2rem 2.5rem', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', transition: 'all 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}>Sign In to Portal</a>
@@ -744,6 +777,10 @@ export default function LandingPage() {
       {/* Mobile Menu */}
       <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
         <button className="mobile-close" onClick={() => setMenuOpen(false)}>✕</button>
+        <LandingSchoolSearch
+          variant="menu"
+          onNavigate={() => setMenuOpen(false)}
+        />
         {['Features', 'Pillars', 'Workflow', 'Pricing', 'Download'].map(item => (
           <button
             key={item}

@@ -54,22 +54,6 @@ export default function App() {
     }
   }, [])
 
-  // ── Browser visibility (tab switching / screen sleep) ────────────────────
-  // When the user returns to the tab, validate the session is still alive
-  // BEFORE triggering any refetches. This prevents a race where queries fire
-  // with an expired token and get 401s right before TOKEN_REFRESHED fires.
-  // We also only refetch queries that are actively mounted AND already stale —
-  // avoids the flashing loading spinners that `invalidateQueries()` causes.
-  useEffect(() => {
-    const handleVisibilityChange = async () => {
-      if (document.visibilityState !== 'visible') return
-      const { data } = await supabase.auth.getSession()
-      if (!data.session) return // Auth listener will handle redirect to login
-      queryClient.refetchQueries({ type: 'active', stale: true })
-    }
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
-  }, [])
 
   // Exit splash once auth is initialized and minimum branding time has elapsed.
   const isReady = minTimeElapsed && initialized

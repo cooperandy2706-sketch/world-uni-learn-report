@@ -139,12 +139,13 @@ export default function TeacherTakeGlobalQuizPage() {
   // RENDERING
   // -------------------------------------------------------------
 
-  if (status === 'loading') return <div style={{ textAlign: 'center', padding: '100px' }}>Loading Challenge...</div>
+  if (status === 'loading') return <div className="t-page" style={{ textAlign: 'center', padding: '100px' }}>Loading Challenge...</div>
 
   // PREP SCREEN
   if (status === 'prep') {
     return (
-      <div style={{ maxWidth: 640, margin: '60px auto', background: 'var(--bg-card)', borderRadius: 12, padding: 40, border: '1.5px solid #f0eefe', textAlign: 'center', boxShadow: '0 20px 50px rgba(109,40,217,0.1)' }}>
+      <div className="t-page">
+      <div style={{ maxWidth: 640, margin: '0 auto', background: 'var(--bg-card)', borderRadius: 12, padding: 40, border: '1.5px solid #f0eefe', textAlign: 'center', boxShadow: '0 20px 50px rgba(109,40,217,0.1)' }}>
         <div style={{ fontSize: 13, fontWeight: 800, color: '#f59e0b', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>🌏 Teacher Preview</div>
         <div style={{ fontSize: 54, marginBottom: 20 }}>👁️</div>
         <h1 className="t-title">{quiz.title}</h1>
@@ -168,6 +169,7 @@ export default function TeacherTakeGlobalQuizPage() {
           🚀 Start Preview
         </button>
       </div>
+      </div>
     )
   }
 
@@ -177,7 +179,8 @@ export default function TeacherTakeGlobalQuizPage() {
     const feedback = getFeedbackMessage(pct)
 
     return (
-      <div style={{ maxWidth: 700, margin: '40px auto 100px', fontFamily: '"DM Sans",sans-serif' }}>
+      <div className="t-page">
+      <div style={{ maxWidth: 700, margin: '0 auto', fontFamily: '"DM Sans",sans-serif' }}>
         {/* Results Banner */}
         <div style={{ background: feedback.bg, borderRadius: 12, padding: '40px 30px', textAlign: 'center', marginBottom: 40, border: `2px solid ${feedback.color}30` }}>
           <h1 className="t-title" style={{ color: feedback.color, marginBottom: 12, marginTop: 0 }}>{feedback.title}</h1>
@@ -239,6 +242,7 @@ export default function TeacherTakeGlobalQuizPage() {
           })}
         </div>
       </div>
+      </div>
     )
   }
 
@@ -247,7 +251,7 @@ export default function TeacherTakeGlobalQuizPage() {
   const progress = ((currentIdx + 1) / questions.length) * 100
 
   return (
-    <>
+    <div className="t-page">
       <style>{`
         @keyframes _fade { from{opacity:0;transform:scale(0.98)} to{opacity:1;transform:scale(1)} }
         .option-btn { transition: all 0.2s; border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; cursor: pointer; background: #fff; width: 100%; text-align: left; font-family: inherit; font-size: 15px; font-weight: 600; color: #374151; }
@@ -349,6 +353,6 @@ export default function TeacherTakeGlobalQuizPage() {
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }

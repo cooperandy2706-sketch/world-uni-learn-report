@@ -115,7 +115,7 @@ export default function TeacherGlobalQuizDetailsPage() {
 
   if (isLoading) {
     return (
-      <div style={{ padding: 40, textAlign: 'center', fontFamily: '"DM Sans",sans-serif' }}>
+      <div className="t-page" style={{ textAlign: 'center' }}>
         <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#7c3aed', animation: '_spin 0.8s linear infinite', margin: '0 auto 16px' }} />
         <p style={{ color: 'var(--text-subtle)', fontSize: 13, fontWeight: 600 }}>Loading Submissions...</p>
         <style>{`@keyframes _spin { to { transform: rotate(360deg) } }`}</style>
@@ -134,7 +134,7 @@ export default function TeacherGlobalQuizDetailsPage() {
   }
 
   return (
-    <>
+    <div className="t-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
         .s-card { transition: all 0.2s; }
@@ -148,7 +148,7 @@ export default function TeacherGlobalQuizDetailsPage() {
         }
       `}</style>
 
-      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', maxWidth: 1000, margin: '0 auto', paddingBottom: 60 }}>
+      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
         
         {/* Header Breadcrumb */}
         <div style={{ marginBottom: 24 }}>
@@ -258,6 +258,6 @@ export default function TeacherGlobalQuizDetailsPage() {
           </div>
         )}
       </div>
-    </>
+    </div>
   )
 }

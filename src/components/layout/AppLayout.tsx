@@ -120,7 +120,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
           <NewsTicker />
           <Header />
-                    <main className="app-main" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                    <main className={`app-main${requiredRole === 'teacher' ? ' t-portal' : ''}`} style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
             <EnablePushButton />
             <Outlet key={refreshKey} />
           </main>

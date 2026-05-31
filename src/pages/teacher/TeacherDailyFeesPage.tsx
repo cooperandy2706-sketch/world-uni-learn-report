@@ -57,7 +57,8 @@ export default function TeacherDailyFeesPage() {
   // Config amounts
   const { data: config } = useQuery({
     queryKey: ['daily-fee-config', schoolId, term?.id],
-    queryFn: async () => { const { data } = await dailyFeesService.getConfig(schoolId, term?.id!); return data }
+    queryFn: async () => { const { data } = await dailyFeesService.getConfig(schoolId, term?.id!); return data },
+    enabled: !!schoolId && !!term?.id
   })
 
   // Prepare ledger state for fast entry
@@ -121,9 +122,9 @@ export default function TeacherDailyFeesPage() {
     onError: (e: any) => toast.error(e.message)
   })
 
-  if (loadingAuth || !term) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>Loading...</div>
+  if (loadingAuth || !term) return <div className="t-page" style={{ textAlign: 'center', color: 'var(--text-subtle)' }}>Loading...</div>
   if (!collectorAuth) return (
-    <div style={{ padding: 60, textAlign: 'center' }}>
+    <div className="t-page" style={{ textAlign: 'center' }}>
       <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
       <h2 style={{ fontSize: 20, color: 'var(--text-main)', margin: '0 0 8px' }}>Not Authorized</h2>
       <p style={{ color: 'var(--text-muted)' }}>You have not been assigned to collect daily fees.</p>
@@ -133,7 +134,7 @@ export default function TeacherDailyFeesPage() {
   const allowedTypes = collectorAuth.collection_type
 
   return (
-    <div style={{ fontFamily: '"DM Sans",sans-serif', animation: '_fadeIn .4s ease', paddingBottom: 60 }}>
+    <div className="t-page" style={{ animation: '_fadeIn .4s ease' }}>
       {/* (Styles injected locally for ease) */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');

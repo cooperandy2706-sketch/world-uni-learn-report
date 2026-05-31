@@ -11,7 +11,7 @@ interface CachedQuery {
 
 /**
  * Hydrates the query client with cached data from localStorage.
- * Enables 0ms load times on slow networks or when offline.
+ * Only hydrates data that is less than 2 minutes old to prevent serving stale data.
  */
 export function hydrateQueryClient(queryClient: QueryClient) {
   try {
@@ -21,20 +21,29 @@ export function hydrateQueryClient(queryClient: QueryClient) {
     const cachedQueries: CachedQuery[] = JSON.parse(saved)
     if (!Array.isArray(cachedQueries)) return
 
-    console.log(`[NetworkCache] Hydrating ${cachedQueries.length} query cache entries...`)
-    
+    const now = Date.now()
+    const maxAge = 1000 * 60 * 2 // 2 minutes
+    let hydratedCount = 0
+
     cachedQueries.forEach((q) => {
       // Validate key structure and data existence
       if (q && Array.isArray(q.queryKey) && q.data !== undefined) {
-        queryClient.setQueryData(q.queryKey, q.data)
-        
-        // Match the original update timestamp so React Query knows its stale state
-        const query = queryClient.getQueryCache().find({ queryKey: q.queryKey })
-        if (query) {
-          query.state.dataUpdatedAt = q.updatedAt || Date.now()
+        // Only hydrate if data is less than 2 minutes old
+        const age = now - (q.updatedAt || 0)
+        if (age < maxAge) {
+          queryClient.setQueryData(q.queryKey, q.data)
+          
+          // Set the update timestamp to now so data is considered fresh
+          const query = queryClient.getQueryCache().find({ queryKey: q.queryKey })
+          if (query) {
+            query.state.dataUpdatedAt = now
+          }
+          hydratedCount++
         }
       }
     })
+
+    console.log(`[NetworkCache] Hydrated ${hydratedCount}/${cachedQueries.length} fresh query cache entries...`)
   } catch (err) {
     console.warn('[NetworkCache] Failed to hydrate query client cache:', err)
   }

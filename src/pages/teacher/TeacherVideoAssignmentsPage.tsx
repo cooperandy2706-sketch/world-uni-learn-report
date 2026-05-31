@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import toast from 'react-hot-toast'
-import { Play, Plus, Trash2, Users } from 'lucide-react'
+import { Play, Plus, Trash2, Users, X } from 'lucide-react'
 
 function extractYouTubeId(url: string) {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s?]+)/)
@@ -97,12 +97,12 @@ export default function TeacherVideoAssignmentsPage() {
   }
 
   return (
-    <>
+    <div className="t-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
       `}</style>
 
-      <div style={{ padding: '32px 40px', maxWidth: 1200, margin: '0 auto', fontFamily: '"DM Sans",sans-serif' }}>
+      <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
           <div>
             <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px' }}>Video Assignments</h1>
@@ -165,70 +165,79 @@ export default function TeacherVideoAssignmentsPage() {
       </div>
 
       {/* New Assignment Modal */}
-      {showModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: 'var(--bg-card)', width: '100%', maxWidth: 500, borderRadius: 12, overflow: 'hidden', animation: '_slideUp 0.3s ease' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Assign Video</h2>
-              <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', fontSize: 24, cursor: 'pointer', color: '#94a3b8' }}>×</button>
+      <div className={`t-modal-overlay${showModal ? ' open' : ''}`} onClick={e => { if (e.target === e.currentTarget) setShowModal(false) }}>
+        <div className="t-modal-box t-modal-box--md">
+          <div className="t-modal-head">
+            <div>
+              <h2 className="t-modal-title">Assign Video</h2>
             </div>
-            
-            <form onSubmit={handleSubmit} style={{ padding: 24 }}>
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6 }}>YouTube URL *</label>
-                <input 
-                  autoFocus required 
-                  placeholder="https://youtube.com/watch?v=..." 
-                  value={url} onChange={e => setUrl(e.target.value)}
-                  style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
+            <button type="button" className="t-modal-close" onClick={() => setShowModal(false)} aria-label="Close"><X size={18} strokeWidth={2.5} /></button>
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="t-modal-body">
+              <div className="t-field">
+                <label className="t-label">YouTube URL *</label>
+                <input
+                  className="t-input"
+                  autoFocus
+                  required
+                  placeholder="https://youtube.com/watch?v=..."
+                  value={url}
+                  onChange={e => setUrl(e.target.value)}
                 />
               </div>
 
               {previewId && (
-                <div style={{ marginBottom: 16, borderRadius: 12, overflow: 'hidden', height: 160, background: '#000', position: 'relative' }}>
-                  <img src={`https://img.youtube.com/vi/${previewId}/mqdefault.jpg`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div className="t-field" style={{ borderRadius: 12, overflow: 'hidden', height: 160, background: '#000' }}>
+                  <img src={`https://img.youtube.com/vi/${previewId}/mqdefault.jpg`} alt="Video preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               )}
 
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6 }}>Video Title *</label>
-                <input 
-                  required placeholder="e.g. History of Rome - Part 1" 
-                  value={title} onChange={e => setTitle(e.target.value)}
-                  style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
+              <div className="t-field">
+                <label className="t-label">Video Title *</label>
+                <input
+                  className="t-input"
+                  required
+                  placeholder="e.g. History of Rome - Part 1"
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6 }}>Target Class *</label>
-                  <select required value={classId} onChange={e => setClassId(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', background: 'var(--bg-card)' }}>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <div className="t-field" style={{ flex: 1 }}>
+                  <label className="t-label">Target Class *</label>
+                  <select className="t-select" required value={classId} onChange={e => setClassId(e.target.value)}>
                     <option value="">Select a class...</option>
                     {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6 }}>Due Date (Optional)</label>
-                  <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
+                <div className="t-field" style={{ flex: 1 }}>
+                  <label className="t-label">Due Date (Optional)</label>
+                  <input className="t-input" type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
                 </div>
               </div>
 
-              <div style={{ marginBottom: 24 }}>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 6 }}>Instructions</label>
-                <textarea 
-                  placeholder="What should students look out for?" rows={3}
-                  value={instructions} onChange={e => setInstructions(e.target.value)}
-                  style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', boxSizing: 'border-box', resize: 'none' }}
+              <div className="t-field">
+                <label className="t-label">Instructions</label>
+                <textarea
+                  className="t-textarea"
+                  placeholder="What should students look out for?"
+                  rows={3}
+                  value={instructions}
+                  onChange={e => setInstructions(e.target.value)}
+                  style={{ resize: 'none' }}
                 />
               </div>
-
+            </div>
+            <div className="t-modal-foot">
               <button disabled={saving || !previewId} type="submit" style={{ width: '100%', padding: '14px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: (saving || !previewId) ? 0.5 : 1 }}>
                 {saving ? 'Assigning...' : 'Assign Video'}
               </button>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
-      )}
-    </>
+      </div>
+    </div>
   )
 }

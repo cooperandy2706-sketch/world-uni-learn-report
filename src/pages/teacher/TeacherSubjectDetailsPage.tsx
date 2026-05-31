@@ -71,7 +71,7 @@ export default function TeacherSubjectDetailsPage() {
   }, [resources])
 
   return (
-    <>
+    <div className="t-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _spin { to{transform:rotate(360deg)} }
@@ -88,7 +88,7 @@ export default function TeacherSubjectDetailsPage() {
         .markdown-content hr { border: none; border-top: 1.5px solid #e2e8f0; margin: 32px 0; }
       `}</style>
 
-      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
 
         <button onClick={() => navigate('/teacher/subjects')} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontWeight: 700, cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 99, transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#f3f4f6'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
           ← Back to Library
@@ -217,6 +217,6 @@ export default function TeacherSubjectDetailsPage() {
         </Modal>
 
       </div>
-    </>
+    </div>
   )
 }

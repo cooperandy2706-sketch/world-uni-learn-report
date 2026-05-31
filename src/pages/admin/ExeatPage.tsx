@@ -27,7 +27,11 @@ export default function ExeatPage() {
   const schoolId = user?.school_id || ''
   const qc = useQueryClient()
 
-  const { data: exeats = [], isLoading } = useQuery({ queryKey: ['exeats'], queryFn: async () => { const { data } = await boardingService.getExeats(schoolId); return data || [] } })
+  const { data: exeats = [], isLoading } = useQuery({ 
+    queryKey: ['exeats', schoolId], 
+    queryFn: async () => { const { data } = await boardingService.getExeats(schoolId); return data || [] },
+    enabled: !!schoolId
+  })
 
   const updateStatus = useMutation({
     mutationFn: ({ id, status, notes }: any) => boardingService.updateExeatStatus(id, status, user?.id, notes),

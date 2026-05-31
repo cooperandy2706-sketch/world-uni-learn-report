@@ -28,11 +28,12 @@ export default function PastoralCarePage() {
   const { data: students = [] } = useStudents()
 
   const { data: logs = [], isLoading } = useQuery({ 
-    queryKey: ['pastoral_logs'], 
+    queryKey: ['pastoral_logs', schoolId], 
     queryFn: async () => { 
       const { data } = await pastoralService.getLogs(schoolId)
       return data || [] 
-    } 
+    },
+    enabled: !!schoolId
   })
 
   const [viewMode, setViewMode] = useState<'list' | 'create'>('list')

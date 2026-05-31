@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
+import { X } from 'lucide-react'
 import { Election, ElectionPosition, ElectionCandidate, ElectionVote } from '../../types/database.types'
 
 export default function TeacherElectionsHub() {
@@ -123,10 +124,12 @@ export default function TeacherElectionsHub() {
 
   if (!activeElection) {
     return (
+      <div className="t-page">
       <div style={{ padding: 60, textAlign: 'center', background: 'var(--bg-card)', borderRadius: 8, border: '1px solid var(--border-light)', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', animation: '_fadeIn 0.4s ease' }}>
         <style>{`@keyframes _fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: 'var(--text-main)' }}>No Active Elections</h2>
         <p style={{ color: 'var(--text-muted)', fontSize: 16 }}>There are currently no active elections running.</p>
+      </div>
       </div>
     )
   }
@@ -136,7 +139,7 @@ export default function TeacherElectionsHub() {
   const myNominations = elCandidates.filter(c => c.teacher_id === user!.id)
 
   return (
-    <div style={{ paddingBottom: 80, animation: '_fadeIn 0.4s ease' }}>
+    <div className="t-page">
       <style>{`
         @keyframes _fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes _slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -295,16 +298,21 @@ export default function TeacherElectionsHub() {
       </div>
 
       {/* Nominate Modal */}
-      {showNominateModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, width: '100%', maxWidth: 450 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Nominate Yourself</h3>
-            
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Select Position</label>
-              <select 
-                value={selectedPositionId} onChange={e => setSelectedPositionId(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #d1d5db' }}
+      <div className={`t-modal-overlay${showNominateModal ? ' open' : ''}`} onClick={e => { if (e.target === e.currentTarget) setShowNominateModal(false) }}>
+        <div className="t-modal-box t-modal-box--md">
+          <div className="t-modal-head">
+            <div>
+              <h2 className="t-modal-title">Nominate Yourself</h2>
+            </div>
+            <button type="button" className="t-modal-close" onClick={() => setShowNominateModal(false)} aria-label="Close"><X size={18} strokeWidth={2.5} /></button>
+          </div>
+          <div className="t-modal-body">
+            <div className="t-field">
+              <label className="t-label">Select Position</label>
+              <select
+                className="t-select"
+                value={selectedPositionId}
+                onChange={e => setSelectedPositionId(e.target.value)}
               >
                 <option value="">-- Select a position --</option>
                 {elPositions.map(pos => (
@@ -312,24 +320,23 @@ export default function TeacherElectionsHub() {
                 ))}
               </select>
             </div>
-            
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Your Manifesto</label>
-              <textarea 
+            <div className="t-field">
+              <label className="t-label">Your Manifesto</label>
+              <textarea
+                className="t-textarea"
                 rows={5}
-                value={manifesto} onChange={e => setManifesto(e.target.value)}
+                value={manifesto}
+                onChange={e => setManifesto(e.target.value)}
                 placeholder="Why should people vote for you?"
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #d1d5db', resize: 'vertical' }}
               />
             </div>
-            
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-              <button style={styles.btnOutline} onClick={() => setShowNominateModal(false)}>Cancel</button>
-              <button style={styles.btn} onClick={submitNomination}>Submit Nomination</button>
-            </div>
+          </div>
+          <div className="t-modal-foot t-modal-foot--split">
+            <button type="button" style={styles.btnOutline} onClick={() => setShowNominateModal(false)}>Cancel</button>
+            <button type="button" style={styles.btn} onClick={submitNomination}>Submit Nomination</button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }

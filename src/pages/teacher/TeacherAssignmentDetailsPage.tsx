@@ -88,7 +88,7 @@ export default function TeacherAssignmentDetailsPage() {
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '100px 0' }}>
+      <div className="t-page" style={{ display: 'flex', justifyContent: 'center', padding: '100px 0' }}>
         <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
         <style>{`@keyframes _spin { to { transform: rotate(360deg); } }`}</style>
       </div>
@@ -100,7 +100,7 @@ export default function TeacherAssignmentDetailsPage() {
   const questions: Question[] = assignment.content?.questions || []
 
   return (
-    <>
+    <div className="t-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
@@ -255,6 +255,6 @@ export default function TeacherAssignmentDetailsPage() {
           </div>
         )}
       </Modal>
-    </>
+    </div>
   )
 }

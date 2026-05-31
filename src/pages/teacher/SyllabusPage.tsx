@@ -68,7 +68,7 @@ export default function TeacherSyllabusPage() {
     grouped.forEach(g => groupedGroups.push(g))
 
     return (
-        <>
+        <div className="t-page">
             <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _syl_fi{from{opacity:0}to{opacity:1}}
@@ -76,7 +76,7 @@ export default function TeacherSyllabusPage() {
         .syl-card:hover{box-shadow:0 6px 20px rgba(109,40,217,.1)!important;transform:translateY(-1px)}
         .syl-card{transition:all .2s}
       `}</style>
-            <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_syl_fi .4s ease', maxWidth: 900, margin: '0 auto', padding: '10px 4px' }}>
+            <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_syl_fi .4s ease' }}>
 
                 {viewingFile ? (
                     /* ── INLINE SCHEME PREVIEW VIEW ── */
@@ -199,6 +199,6 @@ export default function TeacherSyllabusPage() {
                     </>
                 )}
             </div>
-        </>
+        </div>
     )
 }

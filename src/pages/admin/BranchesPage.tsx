@@ -3,22 +3,51 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useBranches, useCreateBranch, useDeleteBranch } from '../../hooks/useBranches'
+import { useBranches, useCreateBranch, useDeleteBranch, useUpdateBranch, type BranchRow } from '../../hooks/useBranches'
 import toast from 'react-hot-toast'
 
 export default function BranchesPage() {
   const { data: branches = [], isLoading } = useBranches()
   const createBranch = useCreateBranch()
+  const updateBranch = useUpdateBranch()
   const deleteBranch = useDeleteBranch()
 
   const [showModal, setShowModal] = useState(false)
+  const [editingBranch, setEditingBranch] = useState<BranchRow | null>(null)
   const [form, setForm] = useState({ branch_name: '', address: '', phone: '', email: '' })
+
+  const openEdit = (branch: BranchRow) => {
+    setEditingBranch(branch)
+    setForm({
+      branch_name: branch.branch_name || branch.name,
+      address: branch.address || '',
+      phone: branch.phone || '',
+      email: branch.email || '',
+    })
+  }
+
+  const closeEdit = () => {
+    setEditingBranch(null)
+    setForm({ branch_name: '', address: '', phone: '', email: '' })
+  }
 
   const handleCreate = async () => {
     if (!form.branch_name.trim()) return toast.error('Branch name is required')
     await createBranch.mutateAsync(form)
     setForm({ branch_name: '', address: '', phone: '', email: '' })
     setShowModal(false)
+  }
+
+  const handleUpdate = async () => {
+    if (!editingBranch || !form.branch_name.trim()) return toast.error('Branch name is required')
+    await updateBranch.mutateAsync({
+      id: editingBranch.id,
+      branch_name: form.branch_name,
+      address: form.address,
+      phone: form.phone,
+      email: form.email,
+    })
+    closeEdit()
   }
 
   const handleDelete = (id: string, name: string) => {
@@ -114,7 +143,7 @@ export default function BranchesPage() {
 
               <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
                 <button
-                  onClick={() => toast('Branch management coming soon!', { icon: '🚧' })}
+                  onClick={() => openEdit(branch)}
                   style={{
                     flex: 1, padding: '8px 14px', borderRadius: 10, border: '1.5px solid #6366f1',
                     background: '#eef2ff', color: '#6366f1', fontWeight: 700, fontSize: 12, cursor: 'pointer',
@@ -136,6 +165,89 @@ export default function BranchesPage() {
           ))}
         </div>
       )}
+
+      {/* Edit Branch Modal */}
+      <AnimatePresence>
+        {editingBranch && (
+          <div
+            onClick={closeEdit}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 99999,
+              background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(8px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+            }}
+          >
+            <motion.div
+              onClick={e => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92 }}
+              style={{
+                background: 'var(--bg-card, #fff)', borderRadius: 20, padding: 32,
+                width: '100%', maxWidth: 440, boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+              }}
+            >
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main, #0f172a)', marginBottom: 20 }}>
+                ✏️ Edit Branch
+              </h2>
+
+              <div style={{ display: 'grid', gap: 14 }}>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 700, color: '#334155', display: 'block', marginBottom: 4 }}>Branch Name *</label>
+                  <input
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
+                    value={form.branch_name}
+                    onChange={e => setForm(f => ({ ...f, branch_name: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 700, color: '#334155', display: 'block', marginBottom: 4 }}>Address</label>
+                  <input
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
+                    value={form.address}
+                    onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: '#334155', display: 'block', marginBottom: 4 }}>Phone</label>
+                    <input
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
+                      value={form.phone}
+                      onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: '#334155', display: 'block', marginBottom: 4 }}>Email</label>
+                    <input
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
+                      value={form.email}
+                      onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24 }}>
+                <button onClick={closeEdit} style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: 'transparent', color: '#64748b', fontWeight: 700, cursor: 'pointer' }}>
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdate}
+                  disabled={updateBranch.isPending}
+                  style={{
+                    padding: '10px 24px', borderRadius: 12, border: 'none',
+                    background: updateBranch.isPending ? '#94a3b8' : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                    color: '#fff', fontWeight: 700, fontSize: 14, cursor: updateBranch.isPending ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {updateBranch.isPending ? 'Saving…' : 'Save Changes'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Add Branch Modal */}
       <AnimatePresence>

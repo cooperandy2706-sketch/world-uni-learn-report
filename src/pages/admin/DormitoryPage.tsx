@@ -43,8 +43,9 @@ export default function DormitoryPage() {
 
   // ── Queries ──────────────────────────────────────────────────────────────
   const { data: dorms = [] } = useQuery({
-    queryKey: ['dormitories'],
+    queryKey: ['dormitories', schoolId],
     queryFn: async () => { const { data } = await boardingService.getDormitories(schoolId); return data || [] },
+    enabled: !!schoolId
   })
   const { data: rooms = [] } = useQuery({
     queryKey: ['dorm_rooms', schoolId],
@@ -58,16 +59,19 @@ export default function DormitoryPage() {
     enabled: dorms.length > 0,
   })
   const { data: assignments = [] } = useQuery({
-    queryKey: ['dorm_assignments'],
+    queryKey: ['dorm_assignments', schoolId],
     queryFn: async () => { const { data } = await boardingService.getAssignmentsByDorm(schoolId); return data || [] },
+    enabled: !!schoolId
   })
   const { data: staffUsers = [] } = useQuery({
-    queryKey: ['staff_users'],
+    queryKey: ['staff_users', schoolId],
     queryFn: async () => {
       const { data } = await supabase.from('users').select('id, full_name, role')
         .eq('school_id', schoolId).in('role', ['teacher', 'staff', 'admin'])
       return data || []
     },
+    enabled: !!schoolId
+  })
   })
 
   // ── Dorm mutations ────────────────────────────────────────────────────────

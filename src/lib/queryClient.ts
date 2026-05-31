@@ -5,23 +5,22 @@ import { hydrateQueryClient, persistQueryCache } from './networkCache'
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Data is considered fresh for 5 minutes. After that it will
-      // be re-fetched in the background the next time it's needed.
-      staleTime: 1000 * 60 * 5,
+      // Data is considered fresh for 30 seconds. This ensures data stays
+      // relatively fresh without excessive refetching.
+      staleTime: 1000 * 30,
 
-      // Keep unused data in the cache for 30 minutes so navigating
+      // Keep unused data in the cache for 5 minutes so navigating
       // back to a page feels instant while a background refetch runs.
-      gcTime: 1000 * 60 * 30,
+      gcTime: 1000 * 60 * 5,
 
       // Retry failed requests up to 3 times with exponential back-off
       // (1 s, 2 s, 4 s) — essential for flaky mobile networks.
       retry: 3,
       retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
 
-      // App.tsx owns window-focus refetching via a session-validity check
-      // (prevents 401 race with an expired JWT). Disable the built-in one
-      // so we don't double-refetch on every tab switch.
-      refetchOnWindowFocus: false,
+      // Enable window focus refetching with a check for stale data only
+      // This ensures data is refreshed when user returns to the tab
+      refetchOnWindowFocus: true,
       refetchOnReconnect: true,
       refetchOnMount: true,
     },

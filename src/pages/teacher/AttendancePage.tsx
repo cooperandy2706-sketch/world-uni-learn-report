@@ -315,7 +315,7 @@ export default function TeacherAttendancePage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <>
+    <div className="t-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _att_fi { from{opacity:0} to{opacity:1} }
@@ -664,6 +664,6 @@ export default function TeacherAttendancePage() {
           </>
         )}
       </div>
-    </>
+    </div>
   )
 }

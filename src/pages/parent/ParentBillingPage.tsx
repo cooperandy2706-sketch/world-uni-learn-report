@@ -84,7 +84,9 @@ export default function ParentBillingPage() {
       if (schoolErr) throw new Error('Could not fetch school configuration.')
 
       const masterPublicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
-      const isSandboxKey = !masterPublicKey || masterPublicKey.includes('your_actual') || masterPublicKey.includes('placeholder')
+      const isSandboxKey = import.meta.env.DEV && (
+        !masterPublicKey || masterPublicKey.includes('your_actual') || masterPublicKey.includes('placeholder')
+      )
 
       const subaccountCode = school?.paystack_public_key
       if (!subaccountCode && !isSandboxKey) {
@@ -114,7 +116,9 @@ export default function ParentBillingPage() {
       const subaccountCode = schoolInfo.subaccount
 
       const masterPublicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
-      const isSandboxKey = !masterPublicKey || masterPublicKey.includes('your_actual') || masterPublicKey.includes('placeholder')
+      const isSandboxKey = import.meta.env.DEV && (
+        !masterPublicKey || masterPublicKey.includes('your_actual') || masterPublicKey.includes('placeholder')
+      )
       
       if (isSandboxKey) {
         // Sandbox Flow (Local / Development Simulator)

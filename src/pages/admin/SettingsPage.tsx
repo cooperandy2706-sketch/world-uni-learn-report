@@ -466,8 +466,8 @@ export default function SettingsPage() {
                       </Field>
                     </div>
                     <div style={{ gridColumn: '1 / -1' }}>
-                      <Field label="Paystack Public Key" hint="Used for secure online fee payments. Starts with 'pk_test_' or 'pk_live_'">
-                        <StyledInput {...register('paystack_public_key')} placeholder="pk_test_..." />
+                      <Field label="Paystack Subaccount Code" hint="From Paystack → Subaccounts (e.g. ACCT_xxxx). Routes school fee payouts. Master pk_* key lives in platform .env.">
+                        <StyledInput {...register('paystack_public_key')} placeholder="ACCT_xxxxxxx" />
                       </Field>
                       <Field label="School Currency" hint="Default currency for all billing displays">
                         <select {...register('currency_code')} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid var(--border-color)', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', boxSizing: 'border-box' }}>

@@ -143,11 +143,11 @@ export default function DashboardPage() {
   const [locateClass, setLocateClass] = useState<any | null>(null)
 
   useEffect(() => {
-    const hasSeenOnboarding = localStorage.getItem(`onboarding_seen_${user?.id}`)
-    if (!hasSeenOnboarding && user) {
+    // Show onboarding for admins on every visit until they explicitly click done
+    if (user?.role === 'admin') {
       setShowOnboarding(true)
     }
-  }, [user?.id])
+  }, [user?.role])
 
   const handleOnboardingComplete = () => {
     localStorage.setItem(`onboarding_seen_${user?.id}`, 'true')

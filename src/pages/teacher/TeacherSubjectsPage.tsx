@@ -71,7 +71,7 @@ export default function TeacherSubjectsPage() {
   }, [subjects])
 
   return (
-    <>
+    <div className="t-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
@@ -138,6 +138,6 @@ export default function TeacherSubjectsPage() {
           </div>
         )}
       </div>
-    </>
+    </div>
   )
 }

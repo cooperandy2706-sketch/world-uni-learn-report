@@ -1,62 +1,82 @@
 // src/components/ui/Modal.tsx
 import { useEffect, type ReactNode } from 'react'
+import { X } from 'lucide-react'
 
 interface ModalProps {
-  open: boolean; onClose: () => void; title?: string; subtitle?: string
-  children: ReactNode; size?: 'sm'|'md'|'lg'|'xl'; footer?: ReactNode
+  open: boolean
+  onClose: () => void
+  title?: string
+  subtitle?: string
+  children: ReactNode
+  size?: 'sm' | 'md' | 'lg' | 'xl'
+  footer?: ReactNode
 }
 
-const sizeW = { sm:460, md:560, lg:720, xl:960 }
+const sizeClass = {
+  sm: 't-ui-modal-box--sm',
+  md: 't-ui-modal-box--md',
+  lg: 't-ui-modal-box--lg',
+  xl: 't-ui-modal-box--xl',
+}
 
-export default function Modal({ open, onClose, title, subtitle, children, size='md', footer }: ModalProps) {
-  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; return () => { document.body.style.overflow = '' } }, [open])
-  useEffect(() => { const h = (e: KeyboardEvent) => { if(e.key==='Escape') onClose() }; window.addEventListener('keydown',h); return () => window.removeEventListener('keydown',h) }, [onClose])
+export default function Modal({
+  open,
+  onClose,
+  title,
+  subtitle,
+  children,
+  size = 'md',
+  footer,
+}: ModalProps) {
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [open])
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [onClose])
 
   if (!open) return null
 
   return (
-    <>
-      <style>{`
-        @keyframes _mfi { from{opacity:0} to{opacity:1} }
-        @keyframes _msu { from{opacity:0;transform:translateY(14px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
-      `}</style>
-      <div
-        onClick={e => { if(e.target===e.currentTarget) onClose() }}
-        style={{
-          position:'fixed', inset:0, zIndex:2000,
-          display:'flex', alignItems:'center', justifyContent:'center', padding:16,
-          background:'rgba(17,24,39,0.55)', backdropFilter:'blur(4px)',
-          animation:'_mfi 0.15s ease', fontFamily:'"DM Sans",sans-serif',
-        }}
-      >
-        <div style={{
-          width:'100%', maxWidth:sizeW[size], maxHeight:'90vh',
-          background: 'var(--bg-card)', borderRadius: 8, display:'flex', flexDirection:'column',
-          boxShadow:'0 24px 64px rgba(0,0,0,0.18)', animation:'_msu 0.2s ease',
-          border:'1px solid #f0eefe', overflow:'hidden',
-        }}>
-          {title && (
-            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', padding:'20px 24px 16px', borderBottom:'1px solid #f5f3ff', flexShrink:0 }}>
-              <div>
-                <h2 style={{ fontFamily:'"Playfair Display",serif', fontSize:19, fontWeight:700, color: 'var(--text-main)', margin:0 }}>{title}</h2>
-                {subtitle && <p style={{ fontSize:12, color: 'var(--text-muted)', marginTop:3 }}>{subtitle}</p>}
-              </div>
-              <button
-                onClick={onClose}
-                style={{ width:30, height:30, borderRadius:8, border:'none', background: 'var(--bg-input)', cursor:'pointer', fontSize:16, color: 'var(--text-muted)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginLeft:12 }}
-                onMouseEnter={e => { e.currentTarget.style.background='#f5f3ff'; e.currentTarget.style.color='#6d28d9' }}
-                onMouseLeave={e => { e.currentTarget.style.background='#f9fafb'; e.currentTarget.style.color='#6b7280' }}
-              >✕</button>
+    <div
+      className="t-ui-modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={title ? 'modal-title' : undefined}
+    >
+      <div className={`t-ui-modal-box ${sizeClass[size]}`}>
+        {title && (
+          <div className="t-modal-head">
+            <div>
+              <h2 id="modal-title" className="t-modal-title">
+                {title}
+              </h2>
+              {subtitle && <p className="t-modal-sub">{subtitle}</p>}
             </div>
-          )}
-          <div style={{ flex:1, overflowY:'auto', padding:'20px 24px' }}>{children}</div>
-          {footer && (
-            <div style={{ flexShrink:0, borderTop:'1px solid #f5f3ff', padding:'14px 24px', display:'flex', alignItems:'center', justifyContent:'flex-end', gap:10, background:'#fafafa' }}>
-              {footer}
-            </div>
-          )}
-        </div>
+            <button
+              type="button"
+              className="t-modal-close"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <X size={18} strokeWidth={2.5} />
+            </button>
+          </div>
+        )}
+        <div className="t-modal-body">{children}</div>
+        {footer && <div className="t-modal-foot">{footer}</div>}
       </div>
-    </>
+    </div>
   )
 }

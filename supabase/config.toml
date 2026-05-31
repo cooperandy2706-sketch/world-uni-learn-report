@@ -1,0 +1,41 @@
+# Nexora Supabase local/CI config
+# https://supabase.com/docs/guides/cli/config
+
+project_id = "nexora"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+
+[functions.verify-payment]
+verify_jwt = true
+
+[functions.admin-ops]
+verify_jwt = true
+
+[functions.send-sms]
+verify_jwt = true
+
+[functions.send-push]
+verify_jwt = true
+
+[functions.create-student-account]
+verify_jwt = true
+
+[functions.attendance-reminder]
+verify_jwt = false

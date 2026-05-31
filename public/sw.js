@@ -82,12 +82,26 @@ self.addEventListener('fetch', (e) => {
     return
   }
 
-  // 3. Network-First (with cache fallback) for the main shell index page
-  if (
-    e.request.mode === 'navigate' ||
-    url.pathname === '/' ||
-    url.pathname === '/index.html'
-  ) {
+  // 3. SPA navigations — always serve index.html so client router handles /@slug, /schools, etc.
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request)
+        .then((networkResponse) => {
+          if (networkResponse?.status === 404) {
+            return caches.match('/index.html').then((cached) => cached || networkResponse)
+          }
+          if (networkResponse?.status === 200) {
+            const cacheCopy = networkResponse.clone()
+            caches.open(CACHE_NAME).then((cache) => cache.put('/index.html', cacheCopy))
+          }
+          return networkResponse
+        })
+        .catch(() => caches.match('/index.html'))
+    )
+    return
+  }
+
+  if (url.pathname === '/' || url.pathname === '/index.html') {
     e.respondWith(
       fetch(e.request)
         .then((networkResponse) => {
