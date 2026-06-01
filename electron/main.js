@@ -11,8 +11,16 @@ autoUpdater.logger = log
 autoUpdater.logger.transports.file.level = 'info'
 // Allow pre-release channels (electron-builder publishes as pre-release by default)
 autoUpdater.allowPrerelease = true
-// Don't auto-download — ask user first when an update is ready
-autoUpdater.autoDownload = false
+// Auto-download updates silently in background
+autoUpdater.autoDownload = true
+// Check for updates every 4 hours
+setInterval(() => {
+  if (!process.env.VITE_DEV_SERVER_URL) {
+    autoUpdater.checkForUpdates().catch((err) => {
+      log.error('Failed to check for updates:', err)
+    })
+  }
+}, 4 * 60 * 60 * 1000)
 log.info('App starting...')
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -90,20 +98,43 @@ function createWindow() {
 }
 
 // Updater Events
-autoUpdater.on('update-available', () => {
-  log.info('Update available.')
-})
-
-autoUpdater.on('update-downloaded', () => {
-  log.info('Update downloaded')
+autoUpdater.on('update-available', (info) => {
+  log.info('Update available:', info.version)
+  // Notify user that update is downloading in background
   dialog.showMessageBox({
     type: 'info',
-    title: 'Update Ready',
-    message: 'A new version of Nexora has been downloaded. The app will automatically restart and install the update.',
-    buttons: ['Restart Now']
-  }).then(() => {
-    autoUpdater.quitAndInstall()
+    title: 'Update Available',
+    message: `A new version (${info.version}) is available. Downloading in the background...`,
+    buttons: ['OK']
   })
+})
+
+autoUpdater.on('update-not-available', () => {
+  log.info('No update available')
+})
+
+autoUpdater.on('download-progress', (progress) => {
+  log.info(`Download progress: ${Math.round(progress.percent)}%`)
+})
+
+autoUpdater.on('update-downloaded', (info) => {
+  log.info('Update downloaded:', info.version)
+  // Show notification that update is ready to install
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Update Ready to Install',
+    message: `Version ${info.version} has been downloaded. Restart now to install?`,
+    detail: 'The app will close and restart automatically to apply the update.',
+    buttons: ['Restart Now', 'Later']
+  }).then(({ response }) => {
+    if (response === 0) {
+      autoUpdater.quitAndInstall()
+    }
+  })
+})
+
+autoUpdater.on('error', (err) => {
+  log.error('Update error:', err)
 })
 
 app.whenReady().then(() => {

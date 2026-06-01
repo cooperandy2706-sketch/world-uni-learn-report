@@ -1,7 +1,7 @@
 {
   "name": "nexora",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
@@ -35,13 +35,6 @@
       "icon": "public/icon-512.png",
       "target": [
         {
-          "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        },
-        {
           "target": "zip",
           "arch": [
             "x64",
@@ -68,6 +61,7 @@
     "@supabase/supabase-js": "^2.99.1",
     "@tanstack/react-query": "^5.90.21",
     "@types/leaflet": "^1.9.21",
+    "ansi-styles": "^6.2.3",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
