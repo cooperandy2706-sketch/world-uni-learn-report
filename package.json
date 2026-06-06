@@ -1,7 +1,7 @@
 {
   "name": "acadera",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.1.1",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
@@ -34,6 +34,7 @@
     "mac": {
       "icon": "public/icon-512.png",
       "target": [
+        "dmg",
         {
           "target": "zip",
           "arch": [
