@@ -10,7 +10,6 @@ import { formatDate, ordinal, getEngagingGreeting } from '../../lib/utils'
 import { ROUTES } from '../../constants/routes'
 import { feeStructuresService, feePaymentsService } from '../../services/bursar.service'
 import FlaskLoader from '../../components/ui/FlaskLoader'
-import WelcomeOnboarding from '../../components/ui/WelcomeOnboarding'
 import SchoolOnboardingWizard from '../../components/ui/SchoolOnboardingWizard'
 import { useSettings } from '../../hooks/useSettings'
 import { useBranches } from '../../hooks/useBranches'
@@ -130,7 +129,6 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false)
   const [financeData, setFinanceData] = useState<{ month: string, amount: number }[]>([])
   const [activeMsg, setActiveMsg] = useState<Message | null>(null)
-  const [showOnboarding, setShowOnboarding] = useState(false)
   const [showOnboardingWizard, setShowOnboardingWizard] = useState(false)
   const [topTab, setTopTab] = useState<'students' | 'subjects'>('students')
 
@@ -151,18 +149,8 @@ export default function DashboardPage() {
       if (seenWizard !== 'true') {
         setShowOnboardingWizard(true)
       }
-
-      const seen = localStorage.getItem(`onboarding_seen_${user?.id}`)
-      if (seen !== 'true') {
-        setShowOnboarding(true)
-      }
     }
   }, [user?.role, user?.id])
-
-  const handleOnboardingComplete = () => {
-    localStorage.setItem(`onboarding_seen_${user?.id}`, 'true')
-    setShowOnboarding(false)
-  }
 
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
 
@@ -598,7 +586,6 @@ export default function DashboardPage() {
   return (
     <>
       {showOnboardingWizard && <SchoolOnboardingWizard onClose={() => setShowOnboardingWizard(false)} />}
-      {showOnboarding && !showOnboardingWizard && <WelcomeOnboarding userName={user?.full_name?.split(' ')[0] || 'Admin'} onComplete={handleOnboardingComplete} />}
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
