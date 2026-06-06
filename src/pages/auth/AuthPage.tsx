@@ -1,6 +1,6 @@
-// src/pages/auth/AuthPage.tsx
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { toast } from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../store/authStore'
 import { ROUTES } from '../../constants/routes'
@@ -122,6 +122,10 @@ export default function AuthPage() {
     }
 
     const dest = roleRedirects[u.role] || ROUTES.TEACHER_DASHBOARD
+    
+    // Fire the new WhatsApp-style welcome toast
+    toast.success(`Welcome back, ${u.full_name || 'User'}! 👋`)
+    
     navigate(dest, { replace: true })
   }
 
