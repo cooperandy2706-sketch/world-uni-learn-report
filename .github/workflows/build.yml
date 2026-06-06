@@ -25,13 +25,19 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build macOS App
-        run: npx cross-env BUILD_TARGET=electron vite build && npx electron-builder --mac --publish never
+      - name: Build macOS App (Intel x64)
+        run: npx cross-env BUILD_TARGET=electron vite build && npx electron-builder --mac --x64 --publish never
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
-      - name: Upload macOS App to Release
+      - name: Build macOS App (Apple Silicon arm64)
+        run: npx electron-builder --mac --arm64 --publish never
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Upload macOS Apps to Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
