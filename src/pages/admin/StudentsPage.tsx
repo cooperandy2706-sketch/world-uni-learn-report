@@ -1279,7 +1279,7 @@ export default function StudentsPage() {
         >
           <form id="student-form" onSubmit={handleSubmit(onSubmit)}>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20, padding: '16px', background: '#faf5ff', borderRadius: 12, border: '1px dashed #c4b5fd' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20, padding: '16px', background: 'var(--bg-input)', borderRadius: 12, border: '1px dashed var(--border-color)' }}>
               <div style={{ position: 'relative', width: 64, height: 64 }}>
                 <Avatar name={editingStudent?.full_name || 'Student'} size={64} />
                 {formPhotoFile ? (
@@ -1330,8 +1330,8 @@ export default function StudentsPage() {
               <Field label="House"><StyledInput {...register('house')} placeholder="e.g. Blue House" /></Field>
             </div>
 
-            <div style={{ margin: '18px 0 14px', height: 1, background: '#f5f3ff' }} />
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>👨‍👩‍👦 Guardian Information</p>
+            <div style={{ margin: '18px 0 14px', height: 1, background: 'var(--border-color)' }} />
+            <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>👨‍👩‍👦 Guardian Information</p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               <Field label="Guardian Name"><StyledInput {...register('guardian_name')} placeholder="e.g. Mr. Kwame Mensah" /></Field>

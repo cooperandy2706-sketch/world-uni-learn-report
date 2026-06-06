@@ -26,8 +26,8 @@ html.dark {
   --bg-hover: #2a3942;
   --bg-accent-hover: #1e1b4b;
   --text-main: #e9edef;    /* WhatsApp dark text */
-  --text-muted: #8696a0;
-  --text-subtle: #667781;
+  --text-muted: #aebac1;   /* Increased contrast for readability */
+  --text-subtle: #8696a0;  /* Increased contrast */
   --border-color: #2a3942;
   --border-light: #202c33;
 }
@@ -191,25 +191,21 @@ html.dark [style*="border: 1px solid var(--border-color)"], html.dark [style*="b
   border-color: var(--border-color) !important;
 }
 
-/* Input, select and textarea glassmorphism in dark theme */
-html.dark input,
-html.dark select,
-html.dark textarea {
-  background: rgba(15, 23, 42, 0.45) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+/* Input, select and textarea styling for better contrast (removing 'liquid' translucency) */
+input, select, textarea {
+  background: var(--bg-input) !important;
+  border: 1.5px solid var(--border-color) !important;
   color: var(--text-main) !important;
   transition: all 0.2s ease;
 }
 
-html.dark input::placeholder {
-  color: rgba(255, 255, 255, 0.35) !important;
+input::placeholder, textarea::placeholder {
+  color: var(--text-subtle) !important;
 }
 
-html.dark input:focus,
-html.dark select:focus,
-html.dark textarea:focus {
-  border-color: rgba(139, 92, 246, 0.6) !important;
-  background: rgba(15, 23, 42, 0.6) !important;
+input:focus, select:focus, textarea:focus {
+  border-color: #8b5cf6 !important;
+  background: var(--bg-card) !important;
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important;
 }
 
