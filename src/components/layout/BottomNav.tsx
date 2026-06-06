@@ -11,24 +11,22 @@ import {
   Megaphone, PencilLine, Calendar, Timer, BookOpen, 
   ShieldCheck, Shield, ClipboardList, MessageSquare, Home, BarChart3, UserCheck, Book, School,
   CreditCard, Wallet, Gamepad2, Library, Bell, Tv, ScanLine, AlertTriangle, MapPin,
-  Printer, Package, FolderLock
+  Printer, Package, FolderLock, MoreHorizontal, X
 } from 'lucide-react'
 import NotificationsModal from '../ui/NotificationsModal'
 
 const adminLinks = [
-  { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Home' },
-  { to: '/admin/students', icon: Users, label: 'Students' },
-  { to: '/admin/attendance', icon: ClipboardCheck, label: 'Register' },
-  { to: '/admin/announcements', icon: Megaphone, label: 'Posts' },
-  { to: '/admin/messages', icon: MessageSquare, label: 'Messages', notify: true },
-  { to: '/admin/billing', icon: CreditCard, label: 'Billing' },
-  { to: '/admin/reports', icon: FileSpreadsheet, label: 'Reports' },
-  { to: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
-  { to: '/admin/boarding', icon: MapPin, label: 'Boarding' },
-  { to: '/admin/staff-vault', icon: FolderLock, label: 'Vault' },
-  { to: '/admin/settings', icon: ShieldCheck, label: 'Settings' },
-  { to: '/privacy', icon: Shield, label: 'Privacy' },
-  { to: '/admin/news', icon: Tv, label: 'News' },
+  { to: '/admin/dashboard',          icon: LayoutDashboard, label: 'Home' },
+  { to: '/admin/academic-hub',       icon: BookOpen,        label: 'Academics' },
+  { to: '/admin/student-hub',        icon: Users,           label: 'Students' },
+  { to: '/admin/assessment-hub',     icon: FileSpreadsheet, label: 'Grades' },
+  { to: '/admin/attendance',         icon: ClipboardCheck,  label: 'Register' },
+  { to: '/admin/communications-hub', icon: MessageSquare,   label: 'Messages', notify: true },
+  { to: '/admin/staff-hub',          icon: UserCheck,       label: 'Staff' },
+  { to: '/admin/campus-hub',         icon: MapPin,          label: 'Campus' },
+  { to: '/admin/billing',            icon: CreditCard,      label: 'Billing' },
+  { to: '/admin/analytics',          icon: BarChart3,       label: 'Analytics' },
+  { to: '/admin/settings-hub',       icon: ShieldCheck,     label: 'Settings' },
 ]
 
 const teacherLinks = [

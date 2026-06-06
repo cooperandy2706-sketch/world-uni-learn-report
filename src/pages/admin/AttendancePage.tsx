@@ -386,9 +386,28 @@ export default function AdminAttendancePage() {
             {selectedClass && absentRows.length === 0 && <EmptyPrompt icon="🎉" title="Full attendance!" sub="No absent students found for this class today." />}
             {selectedClass && filteredAbsent.length > 0 && (
               <>
-                <div style={{ padding: '10px 14px', background: '#fef2f2', borderRadius: 10, border: '1px solid #fca5a5', marginBottom: 14, fontSize: 13, color: '#dc2626', fontWeight: 600 }}>
-                  ❌ {absentRows.length} student{absentRows.length !== 1 ? 's' : ''} absent — not scanned in and no register entry
+                {/* Summary + Bulk Actions */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, padding: '10px 14px', background: '#fef2f2', borderRadius: 10, border: '1px solid #fca5a5', marginBottom: 14 }}>
+                  <span style={{ fontSize: 13, color: '#dc2626', fontWeight: 600 }}>
+                    ❌ {absentRows.length} student{absentRows.length !== 1 ? 's' : ''} absent today
+                  </span>
+                  <button
+                    onClick={() => {
+                      const withPhone = filteredAbsent.filter(s => s.guardian_phone)
+                      if (withPhone.length === 0) { toast.error('No guardians have phone numbers recorded'); return }
+                      // Open each WhatsApp in sequence (first one)
+                      withPhone.forEach((s, i) => {
+                        const msg = encodeURIComponent(`Hello ${s.guardian_name || 'Guardian'}, this is a message from the school. ${s.full_name} was marked absent today (${date}). Please contact the school office if this was unexpected.`)
+                        setTimeout(() => window.open(`https://wa.me/${s.guardian_phone?.replace(/\D/g, '')}?text=${msg}`, '_blank'), i * 600)
+                      })
+                      toast.success(`Opening WhatsApp for ${withPhone.length} guardian${withPhone.length !== 1 ? 's' : ''}…`)
+                    }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 9, border: 'none', background: '#25D366', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    💬 Notify All via WhatsApp ({filteredAbsent.filter(s => s.guardian_phone).length})
+                  </button>
                 </div>
+
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {filteredAbsent.map(s => (
                     <div key={s.id} style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #fca5a5', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -400,12 +419,20 @@ export default function AdminAttendancePage() {
                         <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{s.student_id}</div>
                         {s.guardian_name && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>👤 {s.guardian_name}</div>}
                       </div>
-                      <div style={{ flexShrink: 0 }}>
+                      <div style={{ flexShrink: 0, display: 'flex', gap: 6, alignItems: 'center' }}>
                         {s.guardian_phone ? (
-                          <a href={`tel:${s.guardian_phone}`}
-                            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 10, background: '#0f172a', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
-                            <Phone size={13} /> {s.guardian_phone}
-                          </a>
+                          <>
+                            <a href={`tel:${s.guardian_phone}`}
+                              style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '8px 12px', borderRadius: 9, background: '#0f172a', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
+                              <Phone size={13} /> Call
+                            </a>
+                            <a
+                              href={`https://wa.me/${s.guardian_phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hello ${s.guardian_name || 'Guardian'}, ${s.full_name} was marked absent today (${date}). Please contact the school office.`)}`}
+                              target="_blank" rel="noreferrer"
+                              style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '8px 12px', borderRadius: 9, background: '#25D366', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
+                              💬 WA
+                            </a>
+                          </>
                         ) : (
                           <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, background: '#f1f5f9', padding: '6px 10px', borderRadius: 8 }}>No phone</span>
                         )}
@@ -415,6 +442,7 @@ export default function AdminAttendancePage() {
                 </div>
               </>
             )}
+
           </>
         )}
       </div>

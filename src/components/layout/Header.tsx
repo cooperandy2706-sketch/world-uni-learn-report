@@ -25,54 +25,20 @@ const ADMIN_NAV = [
     label: 'Dashboard', to: ROUTES.ADMIN_DASHBOARD, single: true,
   },
   {
-    label: 'Academics', items: [
-      { label: 'Academic Structure', to: '/admin/academic-structure' },
+    label: 'Core Hubs', items: [
+      { label: 'Academic Hub', to: '/admin/academic-hub' },
       { label: 'Assessment Hub', to: '/admin/assessment-hub' },
-      { label: 'Attendance', to: ROUTES.ADMIN_ATTENDANCE },
-      { label: 'Timetable', to: ROUTES.ADMIN_TIMETABLE },
-      { label: 'Syllabus', to: ROUTES.ADMIN_SYLLABUS },
-      { label: 'Weekly Goals', to: ROUTES.ADMIN_WEEKLY_GOALS },
-      { label: 'Lesson Plans', to: '/admin/lesson-plans' },
+      { label: 'Student Hub', to: '/admin/student-hub' },
     ]
   },
   {
-    label: 'People', items: [
-      { label: 'Student Directory', to: '/admin/student-directory' },
-      { label: 'Staff Directory', to: ROUTES.ADMIN_STAFF_DIRECTORY },
-      { label: 'Parent Logins', to: '/admin/parents' },
-      { label: 'Alumni', to: ROUTES.ADMIN_ALUMNI },
-      { label: 'Boarding & Dorms', to: '/admin/boarding' },
-      { label: 'Exeat Requests', to: '/admin/exeats' },
-      { label: 'Pastoral Care', to: '/admin/pastoral' },
-      { label: 'SMS Messaging', to: ROUTES.ADMIN_SMS },
+    label: 'Ops Hubs', items: [
+      { label: 'Staff & HR Hub', to: '/admin/staff-hub' },
+      { label: 'Campus & Logistics', to: '/admin/campus-hub' },
+      { label: 'Communications Hub', to: '/admin/communications-hub' },
     ]
   },
-  {
-    label: 'Operations', items: [
-      { label: 'Admin Tasks', to: '/admin/tasks' },
-      { label: 'Announcements', to: ROUTES.ADMIN_ANNOUNCEMENTS },
-      { label: 'Calendar', to: ROUTES.ADMIN_CALENDAR },
-      { label: 'Messages', to: ROUTES.ADMIN_MESSAGES },
-      { label: 'Staff Operations', to: '/admin/staff-operations' },
-      { label: 'Staff Vault', to: '/admin/staff-vault' },
-      { label: 'Asset Register', to: '/admin/assets' },
-      { label: 'Billing', to: '/admin/billing' },
-      { label: 'Fleet Management', to: ROUTES.ADMIN_FLEET },
-      { label: 'Live Tracking', to: ROUTES.ADMIN_FLEET_LIVE },
-      { label: 'Poster Maker', to: '/admin/poster-maker' },
-      { label: 'Elections (PEC)', to: '/admin/elections' },
-    ]
-  },
-  {
-    label: 'Insights', items: [
-      { label: 'Analytics', to: ROUTES.ADMIN_ANALYTICS },
-      { label: 'Performance Tracker', to: ROUTES.ADMIN_PERFORMANCE },
-      { label: 'Academic Calendar', to: '/admin/academic-calendar' },
-      { label: 'Audit Logs', to: '/admin/audit-logs' },
-      { label: 'Public Profile', to: '/admin/public-profile' },
-      { label: 'Settings', to: ROUTES.ADMIN_SETTINGS },
-    ]
-  },
+  { label: 'System Settings', to: '/admin/settings-hub', single: true },
 ]
 
 const TEACHER_NAV = [
@@ -674,9 +640,10 @@ export default function Header() {
               style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-hover)', padding: 3, border: '1px solid var(--border-color)' }}
             />
           ) : (
-            <div style={{ width: 38, height: 38, borderRadius: 10, background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <GraduationCap size={20} color="#1a56db" />
-            </div>
+            <img
+              src="/icon-192.png" alt="Acadera"
+              style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-hover)', padding: 3, border: '1px solid var(--border-color)' }}
+            />
           )}
           <div className="school-branding-text" style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', whiteSpace: 'nowrap', maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: 6 }}>

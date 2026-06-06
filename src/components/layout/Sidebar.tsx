@@ -23,55 +23,33 @@ import {
 
 const adminLinks = [
   { header: 'General' },
-  { to: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/admin/tasks', label: 'Admin Tasks', icon: ClipboardCheck },
-  { to: ROUTES.ADMIN_CALENDAR, label: 'School Calendar', icon: Calendar },
-  { to: ROUTES.ADMIN_MESSAGES, label: 'Messages', icon: MessageSquare },
+  { to: ROUTES.ADMIN_DASHBOARD,        label: 'Dashboard',         icon: LayoutDashboard },
+  { to: '/admin/tasks',                label: 'Admin Tasks',        icon: ClipboardCheck },
+  { to: ROUTES.ADMIN_CALENDAR,         label: 'School Calendar',    icon: Calendar },
+  { to: '/admin/communications-hub',   label: 'Communications',     icon: MessageSquare },
 
   { header: 'Academics' },
-  { to: ROUTES.ADMIN_DEPARTMENTS, label: 'Departments', icon: Box },
-  { to: ROUTES.ADMIN_CLASSES, label: 'Classes', icon: School },
-  { to: ROUTES.ADMIN_SUBJECTS, label: 'Subjects', icon: BookOpen },
-  { to: ROUTES.ADMIN_ATTENDANCE, label: 'Attendance', icon: ClipboardCheck },
-  { to: ROUTES.ADMIN_TIMETABLE, label: 'Timetable', icon: Timer },
-  { to: ROUTES.ADMIN_SYLLABUS, label: 'Syllabus', icon: Book },
-  { to: ROUTES.ADMIN_WEEKLY_GOALS, label: 'Weekly Goals', icon: Target },
-  { to: ROUTES.ADMIN_REPORTS, label: 'Report Cards', icon: FileSpreadsheet },
-  { to: '/admin/batch-promotion', label: 'Batch Promotion', icon: ArrowUpRight },
-  { to: '/admin/bece-processor', label: 'BECE CA Processor', icon: Calculator },
-  { to: '/admin/lesson-plans', label: 'Lesson Plans', icon: BookOpen },
+  { to: '/admin/academic-hub',         label: 'Academic Hub',       icon: Box },
+  { to: '/admin/assessment-hub',       label: 'Assessment Hub',     icon: FileSpreadsheet },
+  { to: ROUTES.ADMIN_ATTENDANCE,       label: 'Attendance',         icon: ClipboardCheck },
+  { to: ROUTES.ADMIN_TIMETABLE,        label: 'Timetable',          icon: Timer },
+  { to: ROUTES.ADMIN_WEEKLY_GOALS,     label: 'Weekly Goals',       icon: Target },
 
   { header: 'People' },
-  { to: ROUTES.ADMIN_STUDENTS, label: 'Student Directory', icon: Users },
-  { to: '/admin/student-vault', label: 'Student Vault', icon: ShieldCheck },
-  { to: ROUTES.ADMIN_STAFF_DIRECTORY, label: 'Staff Directory', icon: UserCheck },
-  { to: '/admin/parents', label: 'Parent Logins', icon: UserPlus },
-  { to: '/admin/admissions', label: 'Admissions', icon: GraduationCap },
-  { to: ROUTES.ADMIN_SMS, label: 'SMS Messaging', icon: Smartphone },
+  { to: '/admin/student-hub',          label: 'Student Hub',        icon: Users },
+  { to: '/admin/staff-hub',            label: 'Staff Hub',          icon: UserCheck },
 
   { header: 'HR & Operations' },
-  { to: '/admin/staff-requests', label: 'Staff Requests', icon: MessageSquare },
-  { to: '/admin/assets', label: 'Asset Register', icon: Package },
-  { to: '/admin/billing', label: 'Billing & Subscription', icon: CreditCard },
-  { to: '/admin/poster-maker', label: 'Poster Maker', icon: Image },
-  { to: '/admin/elections', label: 'Elections (PEC)', icon: Vote },
-  { to: ROUTES.ADMIN_ALUMNI, label: 'Alumni & Fundraising', icon: Heart },
-  { to: '/admin/boarding', label: 'Boarding & Dorms', icon: Building2 },
-  { to: '/admin/exeats', label: 'Exeat Requests', icon: MapPin },
-  { to: '/admin/pastoral', label: 'Pastoral Care', icon: ShieldCheck },
-  { to: ROUTES.ADMIN_FLEET, label: 'Fleet Management', icon: Truck },
-  { to: ROUTES.ADMIN_FLEET_LIVE, label: 'Live Tracking', icon: Navigation },
+  { to: '/admin/campus-hub',           label: 'Campus & Logistics', icon: Building2 },
+  { to: '/admin/billing',              label: 'Billing',            icon: CreditCard },
+  { to: '/admin/poster-maker',         label: 'Poster Maker',       icon: Image },
+  { to: '/admin/elections',            label: 'Elections (PEC)',    icon: Vote },
 
   { header: 'Insights & Setup' },
-  { to: '/admin/audit-logs', label: 'Audit Logs', icon: ShieldCheck },
-  { to: '/admin/branches', label: 'Branches', icon: Building2, requiresBranches: true },
-  { to: '/admin/public-profile', label: 'Public Profile', icon: Globe },
-  { to: ROUTES.ADMIN_ACADEMIC_YEARS, label: 'Academic Years', icon: Calendar },
-  { to: ROUTES.ADMIN_TERMS, label: 'Academic Periods', icon: Calendar },
-  { to: ROUTES.ADMIN_ANALYTICS, label: 'School Analytics', icon: BarChart3 },
-  { to: ROUTES.ADMIN_PERFORMANCE, label: 'Performance Tracker', icon: BarChart3 },
-  { to: ROUTES.ADMIN_ANNOUNCEMENTS, label: 'Announcements', icon: Megaphone },
-  { to: ROUTES.ADMIN_SETTINGS, label: 'System Settings', icon: Settings },
+  { to: ROUTES.ADMIN_ANALYTICS,        label: 'School Analytics',   icon: BarChart3 },
+  { to: ROUTES.ADMIN_PERFORMANCE,      label: 'Performance Tracker',icon: BarChart3 },
+  { to: '/admin/reports',              label: 'Reports',            icon: FileText },
+  { to: '/admin/settings-hub',         label: 'System Settings',    icon: Settings },
 ]
 
 const teacherLinks = [
@@ -371,7 +349,7 @@ export default function Sidebar() {
              {school?.logo_url ? (
                 <img src={school.logo_url} alt="School" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-card)', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
              ) : (
-                <img src="./wula.png" alt="Acadera" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-card)', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
+                <img src="/icon-192.png" alt="Acadera" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-card)', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
              )}
             {!collapsed && (
               <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -460,7 +438,7 @@ export default function Sidebar() {
                             color={isActive ? '#fff' : 'rgba(255,255,255,0.7)'}
                             style={{ transition: 'all 0.2s', display: 'block' }}
                           />
-                          {label === 'Messages' && unreadMsgs > 0 && (
+                          {(label === 'Messages' || label === 'Communications') && unreadMsgs > 0 && (
                             <span style={{
                               position: 'absolute', top: -5, right: -6,
                               background: '#ef4444', color: '#fff',

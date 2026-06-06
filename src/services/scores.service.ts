@@ -41,18 +41,63 @@ export const scoresService = {
     term_id: string
     academic_year_id: string
   }) {
-    return supabase
+    // Check if score already exists
+    const { data: existing } = await supabase
       .from('scores')
-      .upsert(score, { onConflict: 'student_id,subject_id,term_id' })
-      .select()
-      .single()
+      .select('id')
+      .eq('student_id', score.student_id)
+      .eq('subject_id', score.subject_id)
+      .eq('term_id', score.term_id)
+      .maybeSingle()
+
+    if (existing) {
+      return supabase.from('scores').update(score).eq('id', existing.id).select().single()
+    } else {
+      return supabase.from('scores').insert(score).select().single()
+    }
   },
 
   async bulkUpsert(scores: Partial<Score>[]) {
-    return supabase
+    if (!scores.length) return { data: [] }
+    
+    // Grab all existing IDs for the affected students/subjects/term
+    // We assume the batch shares the same term for efficiency
+    const termId = scores[0].term_id
+    const studentIds = [...new Set(scores.map(s => s.student_id).filter(Boolean))] as string[]
+    
+    const { data: existing } = await supabase
       .from('scores')
-      .upsert(scores, { onConflict: 'student_id,subject_id,term_id' })
-      .select()
+      .select('id, student_id, subject_id, term_id')
+      .in('student_id', studentIds)
+      .eq('term_id', termId!)
+
+    const existingMap = new Map((existing || []).map(r => [`${r.student_id}_${r.subject_id}_${r.term_id}`, r.id]))
+
+    const toUpdate: any[] = []
+    const toInsert: any[] = []
+
+    scores.forEach(s => {
+      const existingId = existingMap.get(`${s.student_id}_${s.subject_id}_${s.term_id}`)
+      if (existingId) {
+        toUpdate.push({ ...s, id: existingId })
+      } else {
+        toInsert.push(s)
+      }
+    })
+
+    let results: any[] = []
+    if (toUpdate.length > 0) {
+      const { data: updData, error: updErr } = await supabase.from('scores').upsert(toUpdate, { onConflict: 'id' }).select()
+      if (updErr) throw updErr
+      results = results.concat(updData || [])
+    }
+    if (toInsert.length > 0) {
+      const { data: insData, error: insErr } = await supabase.from('scores').insert(toInsert).select()
+      if (insErr) throw insErr
+      results = results.concat(insData || [])
+    }
+
+    return { data: results }
   },
 
   async submitScores(schoolId: string, classId: string, subjectId: string, termId: string) {

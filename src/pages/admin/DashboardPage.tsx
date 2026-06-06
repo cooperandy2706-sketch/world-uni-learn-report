@@ -17,7 +17,7 @@ import { AreaChart, Area, BarChart, Bar, Cell, Legend, XAxis, YAxis, CartesianGr
 import { motion, AnimatePresence } from 'framer-motion'
 import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare, Users, FolderLock, Settings, Bed, HeartHandshake, ClipboardCheck, PencilLine } from 'lucide-react'
 import { useThemeStore } from '../../store/themeStore'
-import { useRecentActions } from '../../hooks/useAuditLogs'
+
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 // ... interfaces and helper functions
@@ -137,7 +137,7 @@ export default function DashboardPage() {
   const [todayLessons, setTodayLessons] = useState<TimetableLesson[]>([])
   const [coverageStats, setCoverageStats] = useState<CoverageStats>({ activeClasses: 0, totalClasses: 0, percentage: 0 })
   const [pendingLeavesCount, setPendingLeavesCount] = useState<number>(0)
-  const { data: recentActions = [], isLoading: loadingActions } = useRecentActions(user?.school?.id, 10)
+
   const [pendingExeatsCount, setPendingExeatsCount] = useState<number>(0)
   const [weeklyGoalsStats, setWeeklyGoalsStats] = useState<WeeklyGoalsStats>({ total: 0, completed: 0, percentage: 0 })
   const [locateClass, setLocateClass] = useState<any | null>(null)
@@ -1156,88 +1156,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Recent Actions / Activity Feed */}
-        <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 32, marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Activity size={24} color="#6d28d9" />
-                <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Recent Actions</h3>
-              </div>
-              <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '4px 0 0' }}>
-                Real-time activity feed of actions across the campus.
-              </p>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {loadingActions ? (
-              <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-subtle)', fontSize: 14 }}>
-                Loading activity feed...
-              </div>
-            ) : recentActions.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-subtle)', fontSize: 14 }}>
-                No recent activity recorded yet.
-              </div>
-            ) : (
-              recentActions.map((action) => {
-                let icon = <Users size={16} />
-                let color = '#6d28d9'
-                let actionDesc = 'Performed an action'
-
-                // Map table operations to human-readable text
-                if (action.table_name === 'attendance') {
-                  icon = <Clock size={16} />
-                  color = '#10b981'
-                  actionDesc = action.action === 'INSERT' ? 'Marked attendance' : 'Updated attendance'
-                } else if (action.table_name === 'lesson_notes') {
-                  icon = <BookOpen size={16} />
-                  color = '#3b82f6'
-                  actionDesc = 'Submitted a lesson note'
-                } else if (action.table_name === 'exeats') {
-                  icon = <Navigation size={16} />
-                  color = '#f59e0b'
-                  actionDesc = action.action === 'INSERT' ? 'Requested an exeat' : 'Updated exeat status'
-                } else if (action.table_name === 'users') {
-                  icon = <Users size={16} />
-                  color = '#8b5cf6'
-                  actionDesc = 'Updated user profile'
-                }
-
-                return (
-                  <div key={action.id} style={{
-                    display: 'flex', alignItems: 'flex-start', gap: 16,
-                    padding: '16px 20px', borderRadius: 12,
-                    background: isDark ? 'rgba(255,255,255,0.03)' : '#f8fafc',
-                    border: '1px solid var(--border-light)'
-                  }}>
-                    <div style={{
-                      width: 40, height: 40, borderRadius: '50%', background: `${color}15`, color,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-                    }}>
-                      {icon}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>
-                        {actionDesc}
-                      </div>
-                      <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4, display: 'flex', gap: 6, alignItems: 'center' }}>
-                        <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{action.user_name || 'System User'}</span>
-                        • <span>{new Date(action.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}</span>
-                      </div>
-                    </div>
-                    <div style={{
-                      padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 800, textTransform: 'uppercase',
-                      background: 'var(--bg-app)', color: 'var(--text-subtle)', border: '1px solid var(--border-color)'
-                    }}>
-                      {action.table_name}
-                    </div>
-                  </div>
-                )
-              })
-            )}
-          </div>
-        </motion.div>
 
         {/* Tier 3: Campus Vital Signs Grid */}
         <div className="tier3-grid">

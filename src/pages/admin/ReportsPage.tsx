@@ -226,7 +226,7 @@ async function downloadBulkPDF(reports: any[], className: string) {
 
 // ═══════════════════════════════════════════════════════════
 export default function ReportsPage() {
-    useAutoRefresh(loadCategories);
+  // loadCategories is defined below and hoisted via useCallback
   const { data: classes = [] } = useClasses()
   const { data: term }     = useCurrentTerm()
   const { data: year }     = useCurrentAcademicYear()
@@ -256,34 +256,37 @@ export default function ReportsPage() {
   const [gradingCategories, setGradingCategories] = useState<any[]>([])
   const [gradingScale, setGradingScale] = useState<any[]>([])
 
-  useEffect(() => {
-    async function loadCategories() {
-      if (!selectedClass) return
-      const cls = (classes as any[]).find(c => c.id === selectedClass)
-      if (cls?.department_id) {
-        const [catsRes, scaleRes] = await Promise.all([
-          supabase.from('department_grading_categories').select('*').eq('department_id', cls.department_id).order('created_at'),
-          supabase.from('grading_scales').select('*, levels:grading_scale_levels(*)').eq('department_id', cls.department_id).maybeSingle()
+  const loadCategories = useCallback(async () => {
+    if (!selectedClass) return
+    const cls = (classes as any[]).find((c: any) => c.id === selectedClass)
+    if (cls?.department_id) {
+      const [catsRes, scaleRes] = await Promise.all([
+        supabase.from('department_grading_categories').select('*').eq('department_id', cls.department_id).order('created_at'),
+        supabase.from('grading_scales').select('*, levels:grading_scale_levels(*)').eq('department_id', cls.department_id).maybeSingle()
+      ])
+
+      if (catsRes.data && catsRes.data.length > 0) {
+        setGradingCategories(catsRes.data)
+      } else {
+        setGradingCategories([
+          { id: 'cs', name: 'Class Score', weight_percentage: 30, max_score: 30 },
+          { id: 'es', name: 'Exam Score', weight_percentage: 70, max_score: 70 }
         ])
+      }
 
-        if (catsRes.data && catsRes.data.length > 0) {
-          setGradingCategories(catsRes.data)
-        } else {
-          setGradingCategories([
-            { id: 'cs', name: 'Class Score', weight_percentage: 30, max_score: 30 },
-            { id: 'es', name: 'Exam Score', weight_percentage: 70, max_score: 70 }
-          ])
-        }
-
-        if (scaleRes.data?.levels) {
-          setGradingScale(scaleRes.data.levels.sort((a: any, b: any) => b.min_score - a.min_score))
-        } else {
-          setGradingScale([])
-        }
+      if (scaleRes.data?.levels) {
+        setGradingScale(scaleRes.data.levels.sort((a: any, b: any) => b.min_score - a.min_score))
+      } else {
+        setGradingScale([])
       }
     }
-    loadCategories()
   }, [selectedClass, classes])
+
+  useAutoRefresh(loadCategories)
+
+  useEffect(() => {
+    loadCategories()
+  }, [loadCategories])
 
   const generateReports = useGenerateReports()
   const approveReport   = useApproveReport()

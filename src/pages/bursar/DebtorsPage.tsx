@@ -43,7 +43,7 @@ export default function DebtorsPage() {
   const { data: students = [] } = useQuery({
     queryKey: ['students-class-debt', selectedClass, schoolId],
     queryFn: async () => {
-      let q = supabase.from('students').select('id, full_name, student_id, scholarship_type, scholarship_percentage, fees_arrears, daily_fee_mode, class:classes(id,name)').eq('school_id', schoolId).eq('is_active', true).order('full_name')
+      let q = supabase.from('students').select('id, full_name, student_id, scholarship_type, scholarship_percentage, fees_arrears, daily_fee_mode, guardian_name, guardian_phone, class:classes(id,name)').eq('school_id', schoolId).eq('is_active', true).order('full_name')
       if (selectedClass) q = q.eq('class_id', selectedClass)
       const { data } = await q
       return data ?? []
@@ -232,6 +232,20 @@ export default function DebtorsPage() {
             <button onClick={() => navigate(ROUTES.BURSAR_STUDENTS)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', background: '#f5f3ff', color: '#6d28d9', fontSize: 13, fontWeight: 700, cursor: 'pointer', borderBottom: '2px solid #ddd6fe' }}>
               <Award size={16} /> Manage Student Financials
             </button>
+            <button
+              onClick={() => {
+                const debtors = filtered.filter(r => r.status !== 'paid' && r.guardian_phone)
+                if (debtors.length === 0) { toast.error('No debtors found with phone numbers'); return }
+                debtors.forEach((s, i) => {
+                  const msg = encodeURIComponent(`Hello ${s.guardian_name || 'Guardian'}, this is a fee reminder from the school. ${s.full_name} has an outstanding balance of ${CUR(s.totalOwed)}. Please settle this at your earliest convenience to avoid interruptions.`)
+                  setTimeout(() => window.open(`https://wa.me/${s.guardian_phone?.replace(/\D/g, '')}?text=${msg}`, '_blank'), i * 600)
+                })
+                toast.success(`Opening WhatsApp for ${debtors.length} guardian${debtors.length !== 1 ? 's' : ''}…`)
+              }}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', background: '#25D366', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+            >
+              💬 Notify via WhatsApp
+            </button>
             <button onClick={printDebtors} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', background: '#1e0646', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
               <Printer size={14} /> Print Debtors List
             </button>
@@ -325,9 +339,20 @@ export default function DebtorsPage() {
                           <span style={{ fontSize: 11, fontWeight: 700, background: si.bg, color: si.color, padding: '3px 10px', borderRadius: 99 }}>{si.label}</span>
                         </td>
                         <td style={{ padding: '11px 14px' }}>
-                          <button onClick={() => navigate(ROUTES.BURSAR_BILL_SHEET)} title="View Bill Sheet" style={{ width: 28, height: 28, borderRadius: 7, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}>
-                            <FileText size={13} />
-                          </button>
+                          <div style={{ display: 'flex', gap: 6 }}>
+                            {r.status !== 'paid' && r.guardian_phone && (
+                              <a
+                                href={`https://wa.me/${r.guardian_phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hello ${r.guardian_name || 'Guardian'}, this is a fee reminder. ${r.full_name} has an outstanding balance of ${CUR(r.totalOwed)}.`)}`}
+                                target="_blank" rel="noreferrer" title="Send WhatsApp Reminder"
+                                style={{ width: 28, height: 28, borderRadius: 7, background: '#dcfce7', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}
+                              >
+                                💬
+                              </a>
+                            )}
+                            <button onClick={() => navigate(ROUTES.BURSAR_BILL_SHEET)} title="View Bill Sheet" style={{ width: 28, height: 28, borderRadius: 7, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}>
+                              <FileText size={13} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     )

@@ -324,8 +324,37 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
         })
       })
       if (upserts.length === 0) { if (showToast) toast('No scores to save'); return }
-      const { error } = await supabase.from('scores').upsert(upserts, { onConflict: 'student_id,subject_id,term_id' })
-      if (error) throw error
+      
+      // Check for existing records because Supabase lacks a UNIQUE constraint on these columns
+      const { data: existing } = await supabase
+        .from('scores')
+        .select('id, student_id, subject_id, term_id')
+        .eq('class_id', selectedClass)
+        .eq('term_id', term!.id)
+        
+      const existingMap = new Map((existing || []).map(r => [`${r.student_id}_${r.subject_id}_${r.term_id}`, r.id]))
+      
+      const toUpdate: any[] = []
+      const toInsert: any[] = []
+      
+      upserts.forEach(r => {
+        const existingId = existingMap.get(`${r.student_id}_${r.subject_id}_${r.term_id}`)
+        if (existingId) {
+          toUpdate.push({ ...r, id: existingId })
+        } else {
+          toInsert.push(r)
+        }
+      })
+
+      if (toUpdate.length > 0) {
+        const { error: updErr } = await supabase.from('scores').upsert(toUpdate, { onConflict: 'id' })
+        if (updErr) throw updErr
+      }
+      if (toInsert.length > 0) {
+        const { error: insErr } = await supabase.from('scores').insert(toInsert)
+        if (insErr) throw insErr
+      }
+      
       setDirty(false)
       if (showToast) toast.success(`${upserts.length} scores saved ✓`)
     } catch (e: any) {

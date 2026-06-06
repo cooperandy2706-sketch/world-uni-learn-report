@@ -98,11 +98,36 @@ export const reportsService = {
       return { ...r, overall_position: currentOverallRank }
     })
 
-    // Upsert all reports
-    return supabase
+    // Check for existing reports
+    const { data: existing } = await supabase
       .from('report_cards')
-      .upsert(withPositions, { onConflict: 'student_id,term_id' })
-      .select()
+      .select('id, student_id, term_id')
+      .in('student_id', students.map(s => s.id))
+      .eq('term_id', termId)
+
+    const existingMap = new Map((existing || []).map(r => [`${r.student_id}_${r.term_id}`, r.id]))
+
+    const toUpdate: any[] = []
+    const toInsert: any[] = []
+
+    withPositions.forEach(r => {
+      const existingId = existingMap.get(`${r.student_id}_${r.term_id}`)
+      if (existingId) {
+        toUpdate.push({ ...r, id: existingId })
+      } else {
+        toInsert.push(r)
+      }
+    })
+
+    if (toUpdate.length > 0) {
+      await supabase.from('report_cards').upsert(toUpdate, { onConflict: 'id' })
+    }
+    
+    if (toInsert.length > 0) {
+      await supabase.from('report_cards').insert(toInsert)
+    }
+
+    return { data: withPositions, error: null }
   },
 
   async getByClassAndTerm(schoolId: string, classId: string, termId: string) {
