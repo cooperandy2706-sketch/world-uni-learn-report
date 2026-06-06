@@ -45,6 +45,21 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
     return () => document.removeEventListener('visibilitychange', handleVis)
   }, [])
 
+  // ── Safety watchdog: if auth is STILL pending after 12 s, go to login ──
+  // This catches: slow network, Supabase cold-start, fetchProfile hang, etc.
+  useEffect(() => {
+    // If already resolved, nothing to watch
+    if (initialized && !loading) return
+
+    const timer = setTimeout(() => {
+      console.warn('[Acadera] Auth initialization stuck after 12 s — redirecting to login')
+      navigate(ROUTES.LOGIN, { replace: true })
+    }, 12_000)
+
+    // Cancel the watchdog as soon as auth resolves normally
+    return () => clearTimeout(timer)
+  }, [initialized, loading, navigate])
+
   if (!initialized || loading) {
     return <FlaskLoader label="Authenticating..." />
   }
