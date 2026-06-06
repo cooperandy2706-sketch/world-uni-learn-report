@@ -3,8 +3,10 @@ import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { Calendar, Search, LogIn, LogOut, Clock, Filter, MapPin } from 'lucide-react'
 import { format } from 'date-fns'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function DriverTripLogsPage() {
+    useAutoRefresh(loadLogs);
   const { user } = useAuth()
   const [logs, setLogs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)

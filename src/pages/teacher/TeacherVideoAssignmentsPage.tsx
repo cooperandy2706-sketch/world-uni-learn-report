@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import toast from 'react-hot-toast'
 import { Play, Plus, Trash2, Users, X } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 function extractYouTubeId(url: string) {
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s?]+)/)
@@ -11,6 +12,7 @@ function extractYouTubeId(url: string) {
 }
 
 export default function TeacherVideoAssignmentsPage() {
+    useAutoRefresh(loadData);
   const { user } = useAuth()
   const [assignments, setAssignments] = useState<any[]>([])
   const [classes, setClasses] = useState<any[]>([])

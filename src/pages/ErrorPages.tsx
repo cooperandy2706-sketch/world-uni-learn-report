@@ -65,7 +65,7 @@ export function OfflinePage() {
             <path d="M74 78 Q80 74 86 78" stroke="#94a3b8" strokeWidth="2" fill="none" strokeLinecap="round" />
           </svg>
           <div className="ep-title" style={{ color: '#e2e8f0' }}>No Connection</div>
-          <p className="ep-sub" style={{ color: '#94a3b8' }}>Nexora can't reach the internet right now. Check your WiFi or mobile data.</p>
+          <p className="ep-sub" style={{ color: '#94a3b8' }}>Acadera can't reach the internet right now. Check your WiFi or mobile data.</p>
           <div className="ep-btns">
             <Btn onClick={() => window.location.reload()} primary>🔄 Try Again</Btn>
             <Btn onClick={() => window.history.back()}>← Go Back</Btn>
@@ -262,7 +262,7 @@ export function LoadingPage() {
               strokeDasharray="60 180" strokeLinecap="round" style={{ animation: 'spin 1s linear infinite', transformOrigin: '50px 50px' }} />
             <text x="50" y="56" textAnchor="middle" fontSize="28">🎓</text>
           </svg>
-          <div style={{ fontSize: 20, fontWeight: 900, color: '#1e1b4b', marginBottom: 8 }}>Nexora Reports</div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: '#1e1b4b', marginBottom: 8 }}>Acadera Reports</div>
           <p style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 700 }}>Loading your workspace…</p>
         </div>
       </div>

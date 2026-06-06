@@ -76,7 +76,7 @@ export default function StaffDirectoryPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('teachers')
-        .select('id, staff_id, qualification, employment_type, user:users(id, full_name, email, phone, role)')
+        .select('id, staff_id, qualification, user:users!inner(id, full_name, email, phone, role)')
         .eq('school_id', schoolId)
       if (error) throw error
       // Map to flat structure for unified viewing
@@ -160,7 +160,7 @@ export default function StaffDirectoryPage() {
       qc.invalidateQueries({ queryKey: ['staff-teachers'] })
       qc.invalidateQueries({ queryKey: ['staff-non-teachers'] })
       setCreateModal(false)
-      setForm({ full_name: '', email: '', phone: '', designation: '', password: '', role: 'teacher' })
+      setForm({ full_name: '', email: '', phone: '', designation: '', password: '', role: 'teacher', employment_type: 'full_time' })
     } catch (e: any) {
       toast.error(e.message || 'Failed to create staff', { id: toastId })
     }

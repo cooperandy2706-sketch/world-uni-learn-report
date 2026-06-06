@@ -132,7 +132,7 @@ const studentLinks = [
   { to: ROUTES.STUDENT_SCHEDULE, label: 'My Timetable', icon: Timer },
 
   { header: 'Resources & Billing' },
-  { to: '/student/nexora-tv', label: 'Nexora TV', icon: Tv },
+  { to: '/student/acadera-tv', label: 'Acadera TV', icon: Tv },
   { to: ROUTES.STUDENT_RESOURCES, label: 'Resources Hub', icon: BookOpen },
   { to: ROUTES.STUDENT_LIBRARY, label: 'Global Library', icon: Library },
   { to: ROUTES.STUDENT_BILLING, label: 'Fees & Billing', icon: Wallet },
@@ -371,11 +371,11 @@ export default function Sidebar() {
              {school?.logo_url ? (
                 <img src={school.logo_url} alt="School" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-card)', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
              ) : (
-                <img src="./wula.png" alt="Nexora" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-card)', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
+                <img src="./wula.png" alt="Acadera" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-card)', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
              )}
             {!collapsed && (
               <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {school?.name || 'Nexora'}
+                {school?.name || 'Acadera'}
               </div>
             )}
           </div>

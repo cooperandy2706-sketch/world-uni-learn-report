@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 // ── subject metadata ──────────────────────────────────────
 const SUBJECT_META: Record<string, { icon: string; color: string; bg: string; category: string }> = {
@@ -65,6 +66,7 @@ function StyledInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputEle
 
 // ═══════════════════════════════════════════════════════════
 export default function PlatformSubjectsPage() {
+    useAutoRefresh(loadSubjects);
   const [subjects, setSubjects] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)

@@ -10,7 +10,7 @@ if (MISSING_VARS) {
   // In production Electron builds, if the env vars weren't injected at build
   // time, we surface a visible error page instead of crashing silently.
   console.error(
-    '[Nexora] FATAL: Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY.\n' +
+    '[Acadera] FATAL: Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY.\n' +
     'Ensure these are set as GitHub Actions secrets and listed in build.yml env: block.'
   )
   // Inject a user-visible error page directly into #root so it's never just blank.
@@ -24,7 +24,7 @@ if (MISSING_VARS) {
             <h2 style="color:#f87171;font-size:22px;font-weight:800;margin:0 0 12px">Configuration Error</h2>
             <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin:0 0 20px">
               This build is missing its database credentials.<br/>
-              Please re-download the latest version of <strong style="color:#e2e8f0">Nexora</strong> from the releases page.
+              Please re-download the latest version of <strong style="color:#e2e8f0">Acadera</strong> from the releases page.
             </p>
             <p style="color:#475569;font-size:12px;margin:0;font-family:monospace">Error: VITE_SUPABASE_URL not set</p>
           </div>
@@ -52,7 +52,7 @@ export const supabase = MISSING_VARS
         autoRefreshToken: true,
         // Detect magic-link / OAuth tokens in the URL on load
         detectSessionInUrl: true,
-        // Unique storage key so multiple Nexora tabs don't clobber each other's sessions
+        // Unique storage key so multiple Acadera tabs don't clobber each other's sessions
         storageKey: 'wula-auth-token',
         // Use localStorage (default) – works in PWA/offline scenarios better than cookies
         storage: window.localStorage,

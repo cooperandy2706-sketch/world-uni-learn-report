@@ -8,8 +8,10 @@ import { Wallet, Receipt, CreditCard, Download, Clock, Info, FileText, ChevronDo
 import { jsPDF } from 'jspdf'
 import 'jspdf-autotable'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function StudentBillingPage() {
+    useAutoRefresh(loadBilling);
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const [loading, setLoading] = useState(true)

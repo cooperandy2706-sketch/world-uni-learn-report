@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 interface Question {
   id: string
@@ -15,6 +16,7 @@ interface Question {
 }
 
 export default function TakeAssignmentPage() {
+    useAutoRefresh(loadAssignment);
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()

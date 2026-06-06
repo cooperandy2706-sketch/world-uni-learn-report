@@ -16,8 +16,10 @@ import {
   Check,
   X
 } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function BatchPromotionPage() {
+    useAutoRefresh(loadClasses);
     const { user } = useAuth()
     const [classes, setClasses] = useState<any[]>([])
     const [fromClass, setFromClass] = useState('')

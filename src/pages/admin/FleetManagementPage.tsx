@@ -5,8 +5,10 @@ import { supabase } from '../../lib/supabase'
 import { Plus, Bus, MapPin, Edit2, Trash2, Users, Wrench } from 'lucide-react'
 import toast from 'react-hot-toast'
 import type { TransportVehicle, TransportRoute } from '../../types/database.types'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function FleetManagementPage() {
+    useAutoRefresh(loadData);
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<'vehicles' | 'routes' | 'assignments' | 'maintenance'>('vehicles')
   

@@ -580,8 +580,8 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
       <div className="container">
         <div className="nav-inner">
           <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="logo" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: 0 }}>
-            <img src="/icon-512.png" alt="Nexora Logo" className="logo-icon" style={{ background: 'transparent' }} />
-            <span>Nexora</span>
+            <img src="/icon-512.png" alt="Acadera Logo" className="logo-icon" style={{ background: 'transparent' }} />
+            <span>Acadera</span>
           </button>
 
           <div className="nav-links">
@@ -879,7 +879,7 @@ export default function LandingPage() {
       <section className="section download-section" id="download">
         <div className="container">
           <Reveal>
-            <SectionHeader eyebrow="Desktop App" title="Take Nexora with you, everywhere." />
+            <SectionHeader eyebrow="Desktop App" title="Take Acadera with you, everywhere." />
             <p style={{ color: 'var(--text-light)', fontSize: '1.1rem', maxWidth: 560, margin: '0 auto' }}>
               Download the native desktop app for a faster, always-available experience — even with limited internet.
             </p>
@@ -938,7 +938,7 @@ export default function LandingPage() {
             <div className="footer-col">
               <div className="logo footer-logo">
                 <img src="/icon-512.png" alt="Logo" className="logo-icon" style={{ background: 'none' }} />
-                <span style={{ color: 'white' }}>Nexora</span>
+                <span style={{ color: 'white' }}>Acadera</span>
               </div>
               <p className="footer-desc">The all-in-one School Management System built for Ghanaian schools. Empowering administrators, teachers, bursars, and students.</p>
             </div>
@@ -957,14 +957,14 @@ export default function LandingPage() {
             <div className="footer-col">
               <h5>Contact</h5>
               <ul className="footer-links">
-                <li><a href="mailto:hello@nexxora.com" className="footer-link">hello@nexxora.com</a></li>
+                <li><a href="mailto:hello@acadera.com" className="footer-link">hello@acadera.com</a></li>
                 <li><a href="tel:+233537996934" className="footer-link">+233 537 996 934</a></li>
-                <li><a href="https://novaratech.com" className="footer-link" target="_blank" rel="noreferrer">nexxora.com</a></li>
+                <li><a href="https://novaratech.com" className="footer-link" target="_blank" rel="noreferrer">acadera.com</a></li>
               </ul>
             </div>
           </div>
           <div className="footer-bottom">
-            <p>© {new Date().getFullYear()} Nexora Platform. Built by NovaraTech for Africa.</p>
+            <p>© {new Date().getFullYear()} Acadera Platform. Built by NovaraTech for Africa.</p>
             <div style={{ display: 'flex', gap: '1.5rem' }}>
               <span>GES Compliant</span>
               <span>Secure Cloud Storage</span>

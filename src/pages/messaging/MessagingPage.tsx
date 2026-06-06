@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { Send, Search, Plus, Users, MessageSquare, X, ArrowLeft, User } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface DBConv {
@@ -92,6 +93,7 @@ function useIsMobile() {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function MessagingPage() {
+    useAutoRefresh(loadConversations);
   const { user, isSuperAdmin, isAdmin, isTeacher } = useAuth()
   const isMobile = useIsMobile()
 

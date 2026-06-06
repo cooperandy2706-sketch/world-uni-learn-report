@@ -25,7 +25,7 @@ serve(async (req) => {
 
     // Initialize Web Push
     webpush.setVapidDetails(
-      "mailto:admin@nexora.app",
+      "mailto:admin@acadera.app",
       vapidPublicKey,
       vapidPrivateKey
     )

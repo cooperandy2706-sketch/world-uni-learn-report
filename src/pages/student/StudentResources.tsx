@@ -5,8 +5,10 @@ import { useAuth } from '../../hooks/useAuth'
 import { BookOpen, Clock, FileText, Download, Star, ExternalLink, Calendar } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ROUTES } from '../../constants/routes'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function StudentResourcesPage() {
+    useAutoRefresh(loadResources);
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   useStuckLoadingReload(loading)

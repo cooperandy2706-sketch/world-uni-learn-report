@@ -7,8 +7,10 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { getGradeInfo, calculateAverage, calculatePassRate } from '../../utils/grading'
 import { ROUTES } from '../../constants/routes'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function MyClassesPage() {
+    useAutoRefresh(loadMyClasses);
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()

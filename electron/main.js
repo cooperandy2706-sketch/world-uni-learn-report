@@ -76,7 +76,7 @@ function createWindow() {
       log.error('Renderer process gone:', details)
       dialog.showMessageBox(win, {
         type: 'error',
-        title: 'Nexora Crashed',
+        title: 'Acadera Crashed',
         message: 'The app encountered an unexpected error and needs to restart.',
         detail: `Reason: ${details.reason}`,
         buttons: ['Restart', 'Quit']

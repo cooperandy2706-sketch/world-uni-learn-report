@@ -5,8 +5,10 @@ import { useAuth } from '../../hooks/useAuth'
 import { Bell, CheckCircle2, Circle } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function StudentNotificationsPage() {
+    useAutoRefresh(loadNotifications);
   const { user } = useAuth()
   const [notifications, setNotifications] = useState<any[]>([])
   const [loading, setLoading] = useState(true)

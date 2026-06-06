@@ -11,7 +11,7 @@ import { getGradeInfo } from '../../utils/grading'
 import { ROUTES } from '../../constants/routes'
 import { ordinal } from '../../lib/utils'
 import ReportCard from '../../components/reports/ReportCard'
-
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 function timeAgo(ts: string) {
   const d = Math.floor((Date.now() - new Date(ts).getTime()) / 86400000)
@@ -19,6 +19,7 @@ function timeAgo(ts: string) {
 }
 
 export default function StudentResultsPage() {
+    useAutoRefresh(loadStudent);
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()

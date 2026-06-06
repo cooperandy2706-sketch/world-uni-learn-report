@@ -30,14 +30,9 @@ export function useStuckLoadingReload(isLoading: boolean, options: Options = {})
 
     // Loading started – set a timeout
     timerRef.current = setTimeout(() => {
-      if (retryCountRef.current < maxRetries) {
-        retryCountRef.current += 1
-        // Reload in place (keeps URL + query string intact)
-        window.location.reload()
-      } else {
-        // Exceeded retries – surface the manual button instead of looping
-        setShowManualRetry(true)
-      }
+      // Instead of forcing a hard reload, we gracefully show a manual retry button
+      // so we don't interrupt the user's workflow.
+      setShowManualRetry(true)
     }, timeoutMs)
 
     return () => {

@@ -23,6 +23,7 @@ import {
   Bookmark,
   PartyPopper
 } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 interface CalendarEvent {
   id: string
@@ -34,6 +35,7 @@ interface CalendarEvent {
 }
 
 export default function ParentCalendarPage() {
+    useAutoRefresh(loadEvents);
   const { user } = useAuth()
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [events, setEvents] = useState<CalendarEvent[]>([])

@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase'
 import { useClasses } from '../../hooks/useClasses'
 import { useAuth } from '../../hooks/useAuth'
 import { Phone, RefreshCw } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 type Tab = 'students' | 'teachers' | 'absent'
 
@@ -50,6 +51,7 @@ function TabBtn({ label, active, onClick, count }: any) {
 }
 
 export default function AdminAttendancePage() {
+    useAutoRefresh(loadStudents);
   const { user } = useAuth()
   const { data: classes = [] } = useClasses()
   const schoolId = user?.school_id ?? ''

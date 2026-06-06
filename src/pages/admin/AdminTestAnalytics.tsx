@@ -6,8 +6,10 @@ import { useCurrentTerm } from '../../hooks/useSettings'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts'
 import { Search, Filter, TrendingUp, Users, BookOpen, AlertCircle } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function AdminTestAnalytics() {
+    useAutoRefresh(loadMetadata);
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const [loading, setLoading] = useState(true)

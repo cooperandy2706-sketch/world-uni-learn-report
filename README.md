@@ -1,4 +1,4 @@
-# Nexora Platform
+# Acadera Platform
 
 A comprehensive school management system featuring multi-tenant architecture, integrated student/parent/teacher portals, and an automated fee collection system.
 
@@ -7,7 +7,7 @@ A comprehensive school management system featuring multi-tenant architecture, in
 This platform uses an **Aggregator Payment Model** with Paystack. This means all school fee payments are securely routed through a single Master Developer Account, which automatically extracts a 1.5% commission before routing the remaining funds to the respective school's Mobile Money or Bank account.
 
 ### Security Architecture
-For maximum security, actual bank accounts and Momo numbers are **never** stored in the application database or dashboard UI. They are handled completely securely by Paystack's servers. The Nexora code only handles the routing keys.
+For maximum security, actual bank accounts and Momo numbers are **never** stored in the application database or dashboard UI. They are handled completely securely by Paystack's servers. The Acadera code only handles the routing keys.
 
 ---
 
@@ -30,7 +30,7 @@ For maximum security, actual bank accounts and Momo numbers are **never** stored
 5. Paystack will generate a unique Subaccount Code for that school (e.g., `ACCT_xxxxxxx`).
 
 ### Step 3: Dashboard Integration
-1. Log into the Nexora **Super Admin Dashboard**.
+1. Log into the Acadera **Super Admin Dashboard**.
 2. Locate the specific school in the grid.
 3. In the **System Config** section of that school's card, paste the `ACCT_xxxxxxx` code into the **Paystack SubAcct** field.
 4. The system will automatically save it.

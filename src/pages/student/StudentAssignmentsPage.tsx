@@ -5,8 +5,10 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { formatDate } from '../../lib/utils'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function StudentAssignmentsPage() {
+    useAutoRefresh(loadData);
   const { user } = useAuth()
   const navigate = useNavigate()
   

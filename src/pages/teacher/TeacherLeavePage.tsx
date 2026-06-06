@@ -5,8 +5,10 @@ import { useAuth } from '../../hooks/useAuth'
 import { LeaveService } from '../../services/leave.service'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function TeacherLeavePage() {
+    useAutoRefresh(loadRequests);
   const { user } = useAuth()
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)

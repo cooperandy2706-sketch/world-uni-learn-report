@@ -18,8 +18,10 @@ import {
   Circle,
   Filter
 } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function AdminTasksPage() {
+    useAutoRefresh(loadData);
     const { user } = useAuth()
     const [tasks, setTasks] = useState<any[]>([])
     const [staff, setStaff] = useState<any[]>([])

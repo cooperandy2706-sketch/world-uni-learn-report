@@ -29,6 +29,7 @@ import {
   Bookmark
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 interface CalendarEvent {
   id: string
@@ -40,6 +41,7 @@ interface CalendarEvent {
 }
 
 export default function CalendarPage() {
+    useAutoRefresh(loadEvents);
   const { user } = useAuth()
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [events, setEvents] = useState<CalendarEvent[]>([])

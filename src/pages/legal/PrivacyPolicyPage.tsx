@@ -5,7 +5,7 @@ export default function PrivacyPolicyPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: '"DM Sans", sans-serif' }}>
       <header style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontSize: 24, fontWeight: 800, color: '#4c1d95', letterSpacing: '-0.5px' }}>Nexora</div>
+        <div style={{ fontSize: 24, fontWeight: 800, color: '#4c1d95', letterSpacing: '-0.5px' }}>Acadera</div>
         <Link to="/" style={{ color: '#4c1d95', textDecoration: 'none', fontWeight: 600 }}>Back to Home</Link>
       </header>
       <main style={{ maxWidth: 800, margin: '60px auto', background: '#fff', padding: 60, borderRadius: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
 
         <div style={{ color: '#334155', lineHeight: 1.8, fontSize: 16 }}>
           <h2 style={{ fontSize: 24, color: '#1e293b', marginTop: 40, marginBottom: 16 }}>1. Introduction</h2>
-          <p>Welcome to Nexora. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website or use our application.</p>
+          <p>Welcome to Acadera. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website or use our application.</p>
 
           <h2 style={{ fontSize: 24, color: '#1e293b', marginTop: 40, marginBottom: 16 }}>2. The Data We Collect About You</h2>
           <p>We may collect, use, store and transfer different kinds of personal data about you, which we have grouped together as follows:</p>
@@ -46,11 +46,11 @@ export default function PrivacyPolicyPage() {
           </ul>
           
           <h2 style={{ fontSize: 24, color: '#1e293b', marginTop: 40, marginBottom: 16 }}>6. Contact Us</h2>
-          <p>If you have any questions about this privacy policy or our privacy practices, please contact our Data Protection Officer at privacy@nexora.com.</p>
+          <p>If you have any questions about this privacy policy or our privacy practices, please contact our Data Protection Officer at privacy@acadera.com.</p>
         </div>
       </main>
       <footer style={{ textAlign: 'center', padding: '40px', color: '#94a3b8', fontSize: 14 }}>
-        &copy; {new Date().getFullYear()} Nexora. All rights reserved.
+        &copy; {new Date().getFullYear()} Acadera. All rights reserved.
       </footer>
     </div>
   );

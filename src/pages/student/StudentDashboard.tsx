@@ -18,12 +18,14 @@ import {
   Tooltip, 
   ResponsiveContainer
 } from 'recharts'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 function timeToMins(t: string) { const [h, m] = (t ?? '00:00').split(':').map(Number); return h * 60 + m }
 
 export default function StudentDashboard() {
+    useAutoRefresh(loadAll);
   const { setFirstLoadComplete } = useAuthStore()
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()

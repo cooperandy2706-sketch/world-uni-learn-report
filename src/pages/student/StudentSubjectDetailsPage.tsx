@@ -4,8 +4,10 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
 import ReactMarkdown from 'react-markdown'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function StudentSubjectDetailsPage() {
+    useAutoRefresh(loadDetails);
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()

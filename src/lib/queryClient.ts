@@ -23,6 +23,11 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
       refetchOnMount: true,
+      
+      // Auto-sync: silently fetch latest data in the background every 60 seconds
+      // so the user never has to manually refresh to see updates from others.
+      refetchInterval: 1000 * 60,
+      refetchIntervalInBackground: false, // Don't poll if the tab is hidden
     },
     mutations: {
       // Retry failed mutations up to 3 times with exponential backoff

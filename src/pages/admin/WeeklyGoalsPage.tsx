@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useClasses } from '../../hooks/useClasses'
 import { useCurrentTerm } from '../../hooks/useSettings'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 function Btn({children,onClick,variant='primary',disabled,loading,style}:any){
   const [hov,setHov]=useState(false)
@@ -26,6 +27,7 @@ function Btn({children,onClick,variant='primary',disabled,loading,style}:any){
 }
 
 export default function WeeklyGoalsPage(){
+    useAutoRefresh(loadMeta);
   const {user}=useAuth()
   const {data:classes=[]}=useClasses()
   const {data:term}=useCurrentTerm()

@@ -5,7 +5,7 @@ export default function TermsOfServicePage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: '"DM Sans", sans-serif' }}>
       <header style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontSize: 24, fontWeight: 800, color: '#4c1d95', letterSpacing: '-0.5px' }}>Nexora</div>
+        <div style={{ fontSize: 24, fontWeight: 800, color: '#4c1d95', letterSpacing: '-0.5px' }}>Acadera</div>
         <Link to="/" style={{ color: '#4c1d95', textDecoration: 'none', fontWeight: 600 }}>Back to Home</Link>
       </header>
       <main style={{ maxWidth: 800, margin: '60px auto', background: '#fff', padding: 60, borderRadius: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
@@ -14,10 +14,10 @@ export default function TermsOfServicePage() {
 
         <div style={{ color: '#334155', lineHeight: 1.8, fontSize: 16 }}>
           <h2 style={{ fontSize: 24, color: '#1e293b', marginTop: 40, marginBottom: 16 }}>1. Acceptance of Terms</h2>
-          <p>By accessing and using the Nexora platform, you accept and agree to be bound by the terms and provision of this agreement. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.</p>
+          <p>By accessing and using the Acadera platform, you accept and agree to be bound by the terms and provision of this agreement. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.</p>
 
           <h2 style={{ fontSize: 24, color: '#1e293b', marginTop: 40, marginBottom: 16 }}>2. Description of Service</h2>
-          <p>Nexora provides a comprehensive school management system, including but not limited to student information systems, fee management, academic grading, and communication tools. We reserve the right to modify or discontinue, temporarily or permanently, the service (or any part thereof) with or without notice.</p>
+          <p>Acadera provides a comprehensive school management system, including but not limited to student information systems, fee management, academic grading, and communication tools. We reserve the right to modify or discontinue, temporarily or permanently, the service (or any part thereof) with or without notice.</p>
 
           <h2 style={{ fontSize: 24, color: '#1e293b', marginTop: 40, marginBottom: 16 }}>3. User Conduct</h2>
           <p>You agree to not use the service to:</p>
@@ -39,7 +39,7 @@ export default function TermsOfServicePage() {
         </div>
       </main>
       <footer style={{ textAlign: 'center', padding: '40px', color: '#94a3b8', fontSize: 14 }}>
-        &copy; {new Date().getFullYear()} Nexora. All rights reserved.
+        &copy; {new Date().getFullYear()} Acadera. All rights reserved.
       </footer>
     </div>
   );

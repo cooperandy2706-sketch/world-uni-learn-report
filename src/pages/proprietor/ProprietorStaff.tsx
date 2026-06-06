@@ -3,8 +3,10 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { Users, UserCheck } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function ProprietorStaff() {
+    useAutoRefresh(loadStaff);
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)

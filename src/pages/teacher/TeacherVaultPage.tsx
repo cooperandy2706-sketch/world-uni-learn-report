@@ -7,8 +7,10 @@ import toast from 'react-hot-toast'
 import { 
   FileText, Plus, Download, Trash2, Shield, FileCheck, BookOpen, User, Lock, Clock, XCircle, CheckCircle2, X
 } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function TeacherVaultPage() {
+    useAutoRefresh(loadData);
     const { user } = useAuth()
     const [loading, setLoading] = useState(true)
   useStuckLoadingReload(loading)

@@ -4,8 +4,10 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import PageHeader from '../../components/layout/PageHeader'
 import { Shield, FileText, ToggleLeft, ToggleRight, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function DataPrivacyPage() {
+    useAutoRefresh(loadConsents);
   const { user } = useAuth()
   const schoolId = user?.school_id
 
@@ -165,7 +167,7 @@ export default function DataPrivacyPage() {
             <div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>Media & Photography</h3>
               <p style={{ fontSize: 14, color: 'var(--text-muted)', maxWidth: 500 }}>
-                Consent to use your (or your ward's) image/video in internal school news, Nexora TV, and marketing materials.
+                Consent to use your (or your ward's) image/video in internal school news, Acadera TV, and marketing materials.
               </p>
             </div>
             <button

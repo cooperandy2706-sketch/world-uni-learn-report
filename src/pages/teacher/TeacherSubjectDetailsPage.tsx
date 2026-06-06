@@ -5,8 +5,10 @@ import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
 import ReactMarkdown from 'react-markdown'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function TeacherSubjectDetailsPage() {
+    useAutoRefresh(loadDetails);
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()

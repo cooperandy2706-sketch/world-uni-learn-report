@@ -8,8 +8,10 @@ import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { testService } from '../../services/test.service'
 import { ClassTest, ClassTestScore, Student } from '../../types/database.types'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function ClassTestsPage() {
+    useAutoRefresh(loadTests);
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()

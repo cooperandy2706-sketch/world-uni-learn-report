@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { formatDate } from '../../lib/utils'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 interface Question {
   id: string
@@ -118,6 +119,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
 // ═══════════════════════════════════════════════════════════
 
 export default function AssignmentsPage() {
+    useAutoRefresh(loadData);
   const { user } = useAuth()
   const navigate = useNavigate()
   const [assignments, setAssignments] = useState<any[]>([])

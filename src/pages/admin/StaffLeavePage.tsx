@@ -5,8 +5,10 @@ import { useAuth } from '../../hooks/useAuth'
 import { LeaveService } from '../../services/leave.service'
 import { supabase } from '../../lib/supabase'
 import FlaskLoader from '../../components/ui/FlaskLoader'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function AdminStaffLeavePage() {
+    useAutoRefresh(loadData);
   const { user } = useAuth()
   const [requests, setRequests] = useState<any[]>([])
   const [teachers, setTeachers] = useState<any[]>([])

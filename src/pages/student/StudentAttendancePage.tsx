@@ -7,8 +7,10 @@ import { ROUTES } from '../../constants/routes'
 import { Link } from 'react-router-dom'
 import { CheckCircle, XCircle, Clock, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function StudentAttendancePage() {
+    useAutoRefresh(loadAttendance);
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   

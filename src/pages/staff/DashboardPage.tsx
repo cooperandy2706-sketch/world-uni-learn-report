@@ -7,8 +7,10 @@ import {
   TrendingUp, Clock, CheckCircle, XCircle, Megaphone
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function StaffDashboard() {
+    useAutoRefresh(loadDashboard);
   const { user, signOut } = useAuth()
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)

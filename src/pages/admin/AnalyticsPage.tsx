@@ -8,6 +8,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { getGradeInfo, gradeDistribution, calculateAverage, calculatePassRate } from '../../utils/grading'
 import { GRADE_SCALE } from '../../constants/grading'
 import { ordinal } from '../../lib/utils'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 // ── Animated bar ──────────────────────────────────────────
 function Bar({ pct, color, delay = 0 }: { pct: number; color: string; delay?: number }) {
@@ -45,6 +46,7 @@ function AnimNum({ to, suffix = '' }: { to: number; suffix?: string }) {
 }
 
 export default function AnalyticsPage() {
+    useAutoRefresh(loadAnalytics);
   const { user } = useAuth()
   const { data: classes = [] } = useClasses()
   const { data: term } = useCurrentTerm()

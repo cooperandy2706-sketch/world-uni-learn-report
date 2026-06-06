@@ -10,8 +10,10 @@ import { ChevronDown, ChevronUp, BarChart3, Trophy, BookOpen, Calendar } from 'l
 import { useQuery } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { formatCurrency } from '../../utils/currency'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function ParentAcademicsPage() {
+    useAutoRefresh(loadAcademics);
   const navigate = useNavigate()
   const { user } = useAuth()
   const { data: wards = [], isLoading: loadingWards } = useParentWards()

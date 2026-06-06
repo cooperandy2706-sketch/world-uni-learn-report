@@ -6,11 +6,12 @@ import { useCurrentTerm } from '../../hooks/useSettings'
 import ReactMarkdown from 'react-markdown'
 import toast from 'react-hot-toast'
 import { CheckCircle, XCircle, Clock, Eye, MessageSquare, ChevronRight } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 interface LessonPlan {
   id: string
   teacher_id: string
-  teacher: { user: { first_name: string; last_name: string } }
+  teacher: { user: { full_name: string } }
   class: { name: string }
   subject: { name: string }
   topic: string
@@ -21,6 +22,7 @@ interface LessonPlan {
 }
 
 export default function LessonPlansPage() {
+    useAutoRefresh(loadPlans);
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const [plans, setPlans] = useState<LessonPlan[]>([])
@@ -41,7 +43,7 @@ export default function LessonPlansPage() {
       .from('lesson_plans')
       .select(`
         id, teacher_id, topic, content, status, feedback, submitted_at,
-        teacher:teachers(user:users(first_name, last_name)),
+        teacher:teachers(user:users(full_name)),
         class:classes(name),
         subject:subjects(name)
       `)
@@ -139,7 +141,7 @@ export default function LessonPlansPage() {
                     </span>
                   </div>
                   <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>
-                    Submitted by <strong>{plan.teacher?.user?.first_name} {plan.teacher?.user?.last_name}</strong> on {new Date(plan.submitted_at).toLocaleDateString()}
+                    Submitted by <strong>{plan.teacher?.user?.full_name}</strong> on {new Date(plan.submitted_at).toLocaleDateString()}
                   </p>
                 </div>
               </div>
@@ -192,7 +194,7 @@ function ReviewModal({ plan, onClose, onUpdate }: { plan: LessonPlan, onClose: (
               </span>
             </div>
             <p style={{ fontSize: 14, color: '#64748b', margin: 0 }}>
-              {plan.subject?.name} • {plan.class?.name} | Submitted by {plan.teacher?.user?.first_name} {plan.teacher?.user?.last_name}
+              {plan.subject?.name} • {plan.class?.name} | Submitted by {plan.teacher?.user?.full_name}
             </p>
           </div>
           <button onClick={onClose} style={{ background: '#e2e8f0', border: 'none', width: 36, height: 36, borderRadius: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569' }}>

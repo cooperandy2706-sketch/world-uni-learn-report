@@ -4,8 +4,10 @@ import { useAuth } from '../../hooks/useAuth'
 import { Search, HeartPulse, AlertTriangle, Phone, Save, X, User } from 'lucide-react'
 import toast from 'react-hot-toast'
 import FlaskLoader from '../../components/ui/FlaskLoader'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function NurseHealthRecordsPage() {
+    useAutoRefresh(loadStudents);
   const { user } = useAuth()
   const [students, setStudents] = useState<any[]>([])
   const [loading, setLoading] = useState(true)

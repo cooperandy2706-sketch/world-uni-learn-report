@@ -20,10 +20,12 @@ import {
   Wallet,
   Briefcase
 } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 type Tab = 'profile' | 'payroll' | 'leave' | 'docs'
 
 export default function TeacherSelfServicePage() {
+    useAutoRefresh(loadData);
     const { user } = useAuth()
     const { data: term } = useCurrentTerm()
     const [activeTab, setActiveTab] = useState<Tab>('profile')

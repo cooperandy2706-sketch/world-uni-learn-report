@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 import Modal from '../../components/ui/Modal'
 import { Button } from '../../components/ui/Button'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 // ─── types ────────────────────────────────────────────────
 interface PlatformStats {
@@ -78,6 +79,7 @@ function StatCard({ icon, label, value, color, bg, pulse }: any) {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════
 export default function SuperAdminDashboard() {
+    useAutoRefresh(loadPlatformData);
   const [stats, setStats] = useState<PlatformStats | null>(null)
   const [schools, setSchools] = useState<School[]>([])
   const [loading, setLoading] = useState(true)
@@ -549,7 +551,7 @@ export default function SuperAdminDashboard() {
       </div>
 
       <p style={{ textAlign: 'center', marginTop: 40, fontSize: 13, color: '#94a3b8' }}>
-        Nexora Platform Management Dashboard v1.0
+        Acadera Platform Management Dashboard v1.0
       </p>
 
       <Modal

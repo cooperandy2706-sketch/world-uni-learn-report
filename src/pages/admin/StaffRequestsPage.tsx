@@ -18,8 +18,10 @@ import {
   MessageSquare,
   Award
 } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function StaffRequestsPage() {
+    useAutoRefresh(loadData);
     const { user: adminUser } = useAuth()
     const [loading, setLoading] = useState(true)
   useStuckLoadingReload(loading)

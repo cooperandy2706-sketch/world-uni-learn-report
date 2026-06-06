@@ -11,7 +11,7 @@ import { ROUTES } from '../../constants/routes'
 import { feeStructuresService, feePaymentsService } from '../../services/bursar.service'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import WelcomeOnboarding from '../../components/ui/WelcomeOnboarding'
-import SchoolSetupWizard from '../../components/ui/SchoolSetupWizard'
+import SchoolOnboardingWizard from '../../components/ui/SchoolOnboardingWizard'
 import { useSettings } from '../../hooks/useSettings'
 import { useBranches } from '../../hooks/useBranches'
 import { AreaChart, Area, BarChart, Bar, Cell, Legend, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -19,7 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare, Users, FolderLock, Settings, Bed, HeartHandshake, ClipboardCheck, PencilLine } from 'lucide-react'
 import { useThemeStore } from '../../store/themeStore'
 import { useRecentActions } from '../../hooks/useAuditLogs'
-
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 // ... interfaces and helper functions
 
@@ -92,6 +92,7 @@ function DashboardClock() {
 
 // ═══════════════════════════════════════════════════════════
 export default function DashboardPage() {
+    useAutoRefresh(loadAll);
   const { setFirstLoadComplete } = useAuthStore()
   const { user } = useAuth()
 
@@ -130,6 +131,7 @@ export default function DashboardPage() {
   const [financeData, setFinanceData] = useState<{ month: string, amount: number }[]>([])
   const [activeMsg, setActiveMsg] = useState<Message | null>(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showOnboardingWizard, setShowOnboardingWizard] = useState(false)
   const [topTab, setTopTab] = useState<'students' | 'subjects'>('students')
 
   // New State variables
@@ -145,9 +147,17 @@ export default function DashboardPage() {
   useEffect(() => {
     // Show onboarding for admins on every visit until they explicitly click done
     if (user?.role === 'admin') {
-      setShowOnboarding(true)
+      const seenWizard = localStorage.getItem(`onboarding_wizard_complete_${user?.id}`)
+      if (seenWizard !== 'true') {
+        setShowOnboardingWizard(true)
+      }
+
+      const seen = localStorage.getItem(`onboarding_seen_${user?.id}`)
+      if (seen !== 'true') {
+        setShowOnboarding(true)
+      }
     }
-  }, [user?.role])
+  }, [user?.role, user?.id])
 
   const handleOnboardingComplete = () => {
     localStorage.setItem(`onboarding_seen_${user?.id}`, 'true')
@@ -587,8 +597,8 @@ export default function DashboardPage() {
 
   return (
     <>
-      <SchoolSetupWizard />
-      {showOnboarding && <WelcomeOnboarding userName={user?.full_name?.split(' ')[0] || 'Admin'} onComplete={handleOnboardingComplete} />}
+      {showOnboardingWizard && <SchoolOnboardingWizard onClose={() => setShowOnboardingWizard(false)} />}
+      {showOnboarding && !showOnboardingWizard && <WelcomeOnboarding userName={user?.full_name?.split(' ')[0] || 'Admin'} onComplete={handleOnboardingComplete} />}
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');

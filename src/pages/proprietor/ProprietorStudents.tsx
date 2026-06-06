@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import FlaskLoader from '../../components/ui/FlaskLoader'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function ProprietorStudents() {
+    useAutoRefresh(loadStudents);
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)

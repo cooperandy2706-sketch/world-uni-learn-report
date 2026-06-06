@@ -19,8 +19,10 @@ import {
   Stethoscope,
   BookOpen
 } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function StudentVaultPage() {
+    useAutoRefresh(loadStudents);
     const { user } = useAuth()
     const [loading, setLoading] = useState(true)
   useStuckLoadingReload(loading)

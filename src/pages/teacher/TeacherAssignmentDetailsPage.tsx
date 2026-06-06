@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import Modal from '../../components/ui/Modal'
 import { formatDate } from '../../lib/utils'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 interface Question {
   id: string
@@ -36,6 +37,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, style }: any) {
 }
 
 export default function TeacherAssignmentDetailsPage() {
+    useAutoRefresh(loadData);
   const { id } = useParams()
   const navigate = useNavigate()
   

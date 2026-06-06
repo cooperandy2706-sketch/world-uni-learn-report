@@ -22,10 +22,12 @@ import {
   Lock,
   Globe
 } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 type LogType = 'merit' | 'demerit' | 'counseling'
 
 export default function BehaviorTrackingPage() {
+    useAutoRefresh(loadData);
     const { user } = useAuth()
     const { data: term } = useCurrentTerm()
     const [loading, setLoading] = useState(true)

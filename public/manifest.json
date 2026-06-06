@@ -1,7 +1,7 @@
 {
-  "name": "Nexora",
-  "short_name": "Nexora",
-  "description": "Nexora — GES School Report Card Management System",
+  "name": "Acadera",
+  "short_name": "Acadera",
+  "description": "Acadera — GES School Report Card Management System",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

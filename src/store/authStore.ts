@@ -66,7 +66,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       supabase.auth.getSession(),
       new Promise<{ data: { session: null } }>((resolve) =>
         setTimeout(() => {
-          console.warn('[Nexora Auth] getSession() timed out after 8s — proceeding to login')
+          console.warn('[Acadera Auth] getSession() timed out after 8s — proceeding to login')
           resolve({ data: { session: null } })
         }, 8_000)
       ),
@@ -92,7 +92,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     //  PASSWORD_RECOVERY  - Magic link / reset flow
     //
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.debug('[Nexora Auth]', event, session?.user?.id ?? 'no-user')
+      console.debug('[Acadera Auth]', event, session?.user?.id ?? 'no-user')
 
       if (event === 'SIGNED_OUT' || !session?.user) {
         // Clear all cached data so the next user gets a clean slate

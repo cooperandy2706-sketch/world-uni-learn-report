@@ -14,6 +14,7 @@ import { ROUTES } from '../../constants/routes'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { Button } from '../../components/ui/Button'
 import { School, BookOpen, Calendar, CheckCircle, Clock, ClipboardCheck, Users, Book, Bell, Gamepad2, FileSpreadsheet, PencilLine, MessageSquare, X } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 function AnimNum({ to }: { to: number }) {
   const [val, setVal] = useState(0); const ref = useRef(false)
@@ -37,6 +38,7 @@ function timeAgo(ts: string) {
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 export default function TeacherDashboardPage() {
+    useAutoRefresh(loadDashboard);
   const { setFirstLoadComplete } = useAuthStore()
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()

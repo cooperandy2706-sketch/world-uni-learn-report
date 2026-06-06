@@ -15,8 +15,10 @@ import {
 } from 'lucide-react'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { getEngagingGreeting } from '../../lib/utils'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function BursarDashboard() {
+    useAutoRefresh(loadDashboard);
   const { setFirstLoadComplete } = useAuthStore()
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()

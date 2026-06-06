@@ -6,8 +6,10 @@ import { ROUTES } from '../../constants/routes'
 import { Link } from 'react-router-dom'
 import { User, Shield, Phone, Mail, MapPin, Calendar, Briefcase, GraduationCap } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function StudentProfilePage() {
+    useAutoRefresh(loadProfile);
   const { user } = useAuth()
   const [studentData, setStudentData] = useState<any>(null)
   const [loading, setLoading] = useState(true)

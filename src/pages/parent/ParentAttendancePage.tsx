@@ -5,11 +5,13 @@ import { useParentWards } from '../../hooks/useParents'
 import { supabase } from '../../lib/supabase'
 import { useCurrentTerm } from '../../hooks/useSettings'
 import { CheckCircle, XCircle, Clock, Calendar, ChevronLeft, ChevronRight, Users } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 type AttRecord = { date: string; status: 'present' | 'absent' | 'late' }
 type WardAttData = { studentId: string; records: AttRecord[] }
 
 export default function ParentAttendancePage() {
+    useAutoRefresh(loadAttendance);
   const { user } = useAuth()
   const { data: wards = [], isLoading: wardsLoading } = useParentWards()
   const { data: term } = useCurrentTerm()

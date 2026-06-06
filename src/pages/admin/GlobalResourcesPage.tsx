@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import toast from 'react-hot-toast'
 import AIQuizGenerator from '../../components/admin/AIQuizGenerator'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 interface GlobalResourceData {
   title: string
@@ -143,6 +144,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
 // ═══════════════════════════════════════════════════════════
 
 export default function GlobalResourcesPage() {
+    useAutoRefresh(loadData);
   const { user } = useAuth()
   const [resources, setResources] = useState<any[]>([])
   const [subjects, setSubjects] = useState<any[]>([])

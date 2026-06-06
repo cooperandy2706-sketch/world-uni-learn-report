@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
 import { formatDate } from '../../lib/utils'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 // ── helpers ───────────────────────────────────────────────
 function Avatar({ name, size = 36 }: { name: string; size?: number }) {
@@ -110,6 +111,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
 
 // ═══════════════════════════════════════════════════════════
 export default function TeacherStudentsPage() {
+    useAutoRefresh(loadStudents);
   const { user } = useAuth()
   const qc = useQueryClient()
   

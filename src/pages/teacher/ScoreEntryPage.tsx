@@ -8,6 +8,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { TEACHER_REMARKS, getRandomRemark, GRADE_REMARKS } from '../../constants/remarks'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 // ── types ─────────────────────────────────────────────────
 interface Subject { id: string; name: string; code?: string }
@@ -50,6 +51,7 @@ function TinyInput({ value, max, onChange, disabled }: {
 }
 
 export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: boolean }) {
+    useAutoRefresh(loadClassData);
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()

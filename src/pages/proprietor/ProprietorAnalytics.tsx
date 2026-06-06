@@ -4,8 +4,10 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm } from '../../hooks/useSettings'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { GraduationCap, TrendingUp, Award, Target } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function ProprietorAnalytics() {
+    useAutoRefresh(loadTerms);
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const [loading, setLoading] = useState(true)

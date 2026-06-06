@@ -50,53 +50,20 @@ function StatusBadge({ status }: { status: string }) {
   const m = STATUS_META[status] || STATUS_META.pending
   return (
     <span style={{
-      padding: '3px 10px', borderRadius: 99, fontSize: 11, fontWeight: 700,
-      color: m.color, background: m.bg, border: `1px solid ${m.color}33`
-    }}>{m.label}</span>
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      padding: '4px 12px', borderRadius: 99, fontSize: 11, fontWeight: 700,
+      color: m.color, background: m.bg, border: `1px solid ${m.color}22`,
+      letterSpacing: '0.02em', transition: 'all 0.2s ease',
+    }}>
+      <span style={{
+        width: 6, height: 6, borderRadius: '50%', background: m.color,
+        boxShadow: `0 0 6px ${m.color}55`, flexShrink: 0,
+      }} />
+      {m.label}
+    </span>
   )
 }
 
-// ── Shared filter bar ─────────────────────────────────────────
-// Rendered inside both Bills and Supplies tabs so the UI looks native,
-// but the state lives in the parent (AdminAdmissions) and is passed down.
-
-interface FilterBarProps {
-  classes: any[]
-  academicYears: any[]
-  selClass: string
-  selYear: string
-  onClassChange: (v: string) => void
-  onYearChange: (v: string) => void
-  rightSlot?: React.ReactNode
-}
-
-function FilterBar({ classes, academicYears, selClass, selYear, onClassChange, onYearChange, rightSlot }: FilterBarProps) {
-  return (
-    <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
-      <select style={{ ...selectStyle, maxWidth: 200 }} value={selClass} onChange={e => onClassChange(e.target.value)}>
-        <option value="">All Classes</option>
-        {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-      </select>
-      <select style={{ ...selectStyle, maxWidth: 200 }} value={selYear} onChange={e => onYearChange(e.target.value)}>
-        <option value="">All Years</option>
-        {academicYears.map((y: any) => <option key={y.id} value={y.id}>{y.name}</option>)}
-      </select>
-      {selClass && (
-        <span style={{
-          display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700,
-          color: '#1e0646', background: '#ede9fe', padding: '4px 12px', borderRadius: 99,
-          border: '1px solid #c4b5fd'
-        }}>
-          <Link2 size={12} />
-          Synced across Fees &amp; Supplies
-        </span>
-      )}
-      <div style={{ marginLeft: 'auto', display: 'flex', gap: 10 }}>
-        {rightSlot}
-      </div>
-    </div>
-  )
-}
 
 // ── Modal shell ──────────────────────────────────────────────
 
@@ -104,18 +71,33 @@ function Modal({ title, onClose, children, wide }: any) {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 1000,
-      background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24
+      background: 'rgba(10, 2, 30, 0.6)', backdropFilter: 'blur(12px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+      animation: 'admModalOverlay 0.2s ease-out',
     }}>
       <div style={{
-        background: 'var(--bg-card)', borderRadius: 8, width: '100%',
-        maxWidth: wide ? 860 : 560, maxHeight: '90vh', overflow: 'hidden',
+        background: 'var(--bg-card)', borderRadius: 20, width: '100%',
+        maxWidth: wide ? 880 : 560, maxHeight: '90vh', overflow: 'hidden',
         display: 'flex', flexDirection: 'column',
-        boxShadow: '0 25px 60px rgba(0,0,0,0.25)'
+        boxShadow: '0 32px 80px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06)',
+        animation: 'admModalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        border: '1px solid rgba(255,255,255,0.08)',
       }}>
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#1e0646' }}>{title}</h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={20} /></button>
+        <div style={{
+          padding: '18px 24px', borderBottom: '1px solid var(--border-color)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: 'linear-gradient(135deg, #f8f7ff 0%, #fefefe 100%)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 4, height: 20, borderRadius: 4, background: 'linear-gradient(180deg, #f59e0b, #1e0646)' }} />
+            <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#1e0646', letterSpacing: '-0.01em' }}>{title}</h3>
+          </div>
+          <button onClick={onClose} style={{
+            background: 'var(--bg-hover)', border: 'none', cursor: 'pointer',
+            color: 'var(--text-muted)', width: 32, height: 32, borderRadius: 8,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.2s',
+          }}><X size={18} /></button>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: 24 }}>{children}</div>
       </div>
@@ -137,9 +119,10 @@ function Field({ label, children, required }: any) {
 }
 
 const inputStyle: React.CSSProperties = {
-  width: '100%', padding: '9px 12px', borderRadius: 10, border: '1.5px solid var(--border-color)',
-  fontSize: 14, outline: 'none', fontFamily: 'inherit', background: '#fafafa',
-  boxSizing: 'border-box', transition: 'border-color 0.2s'
+  width: '100%', padding: '10px 14px', borderRadius: 12, border: '1.5px solid var(--border-color)',
+  fontSize: 14, outline: 'none', fontFamily: 'inherit', background: 'var(--bg-input, #fafafa)',
+  boxSizing: 'border-box', transition: 'all 0.2s ease',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
 }
 const selectStyle: React.CSSProperties = { ...inputStyle, cursor: 'pointer' }
 
@@ -316,27 +299,12 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
 
   return (
     <div>
-      <FilterBar
-        classes={classes}
-        academicYears={academicYears}
-        selClass={selClass}
-        selYear={selYear}
-        onClassChange={onClassChange}
-        onYearChange={onYearChange}
-        rightSlot={
-          <>
-            <button onClick={() => { setEditing(null); setForm({ category: 'books', amount: 0, is_optional: false }); setShowForm(true) }}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 18px', background: '#1e0646', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>
-              <Plus size={16} /> Add Bill Item
-            </button>
-            <button
-              onClick={() => printWelcomePack({ bills: items, supplies: suppliesForBanner as any[], scholarships, feeStructures: feeStructures as any[], className: selClass ? classes.find((c: any) => c.id === selClass)?.name : 'All Classes', billTotal: total, suppliesEstimate, school })}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 18px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>
-              <Printer size={16} /> Print Welcome Pack
-            </button>
-          </>
-        }
-      />
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+        <button onClick={() => { setEditing(null); setForm({ category: 'books', amount: 0, is_optional: false }); setShowForm(true) }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: 'linear-gradient(135deg, #1e0646 0%, #4c1d95 100%)', color: '#fff', border: 'none', borderRadius: 12, fontWeight: 700, cursor: 'pointer', fontSize: 13, boxShadow: '0 4px 12px rgba(30,6,70,0.2)' }}>
+          <Plus size={16} /> Add Bill Item
+        </button>
+      </div>
 
       {/* Cross-tab supplies banner */}
       <CrossTabBanner
@@ -349,16 +317,24 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
       />
 
       {/* Total summary */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14, marginBottom: 24 }}>
         {[
-          { label: 'Total Compulsory Fees', value: GHS(total), color: '#1e0646' },
-          { label: 'Optional Items', value: items.filter((i: any) => i.is_optional).length, color: '#f59e0b' },
-          { label: 'Total Bill Items', value: items.length, color: '#10b981' },
-          { label: 'Est. Supplies Cost', value: suppliesEstimate > 0 ? GHS(suppliesEstimate) : '—', color: '#3b82f6' },
+          { label: 'Total Compulsory Fees', value: GHS(total), color: '#1e0646', gradient: 'linear-gradient(135deg, #f8f7ff 0%, #ede9fe 100%)', borderColor: '#c4b5fd' },
+          { label: 'Optional Items', value: items.filter((i: any) => i.is_optional).length, color: '#f59e0b', gradient: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)', borderColor: '#fde68a' },
+          { label: 'Total Bill Items', value: items.length, color: '#10b981', gradient: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)', borderColor: '#bbf7d0' },
+          { label: 'Est. Supplies Cost', value: suppliesEstimate > 0 ? GHS(suppliesEstimate) : '—', color: '#3b82f6', gradient: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)', borderColor: '#bfdbfe' },
         ].map(s => (
-          <div key={s.label} style={{ flex: 1, minWidth: 140, background: '#fafafa', border: '1.5px solid var(--border-color)', borderRadius: 14, padding: '14px 18px' }}>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{s.label}</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: s.color, marginTop: 4 }}>{s.value}</div>
+          <div key={s.label} style={{
+            background: (s as any).gradient, border: `1.5px solid ${(s as any).borderColor}`,
+            borderRadius: 16, padding: '16px 20px',
+            transition: 'all 0.2s ease', position: 'relative', overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'absolute', top: -10, right: -10, width: 50, height: 50,
+              borderRadius: '50%', background: `${s.color}08`, pointerEvents: 'none',
+            }} />
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s.label}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: s.color, marginTop: 6, letterSpacing: '-0.02em' }}>{s.value}</div>
           </div>
         ))}
       </div>
@@ -451,9 +427,20 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
       })}
 
       {!items.length && (
-        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>
-          <DollarSign size={40} style={{ opacity: 0.3, marginBottom: 12 }} />
-          <p style={{ fontSize: 15, fontWeight: 600 }}>No bill items yet. Add items to build the fee schedule.</p>
+        <div style={{
+          textAlign: 'center', padding: '60px 40px', color: 'var(--text-muted)',
+          background: 'linear-gradient(135deg, #f8f7ff 0%, #fafafa 100%)',
+          borderRadius: 20, border: '2px dashed var(--border-color)',
+        }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 20, margin: '0 auto 16px',
+            background: 'linear-gradient(135deg, #ede9fe 0%, #dbeafe 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <DollarSign size={28} color="#8b5cf6" style={{ opacity: 0.7 }} />
+          </div>
+          <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No bill items yet</p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 300, margin: '0 auto' }}>Add items to build the fee schedule for this class.</p>
         </div>
       )}
 
@@ -613,18 +600,26 @@ function EnquiriesTab({ schoolId, classes, academicYears }: any) {
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 10, marginBottom: 20 }}>
         {[
-          { status: '', label: 'All', count: enquiries.length, color: '#1e0646' },
-          { status: 'enquiry', label: 'Enquiries', count: enquiries.filter((e: any) => e.status === 'enquiry').length, color: 'var(--text-muted)' },
-          { status: 'applied', label: 'Applied', count: enquiries.filter((e: any) => e.status === 'applied').length, color: '#f59e0b' },
-          { status: 'admitted', label: 'Admitted', count: enquiries.filter((e: any) => e.status === 'admitted').length, color: '#10b981' },
-          { status: 'rejected', label: 'Rejected', count: enquiries.filter((e: any) => e.status === 'rejected').length, color: '#ef4444' },
+          { status: '', label: 'All', count: enquiries.length, color: '#1e0646', gradient: 'linear-gradient(135deg, #f8f7ff, #ede9fe)' },
+          { status: 'enquiry', label: 'Enquiries', count: enquiries.filter((e: any) => e.status === 'enquiry').length, color: '#6b7280', gradient: 'linear-gradient(135deg, #f9fafb, #f3f4f6)' },
+          { status: 'applied', label: 'Applied', count: enquiries.filter((e: any) => e.status === 'applied').length, color: '#f59e0b', gradient: 'linear-gradient(135deg, #fffbeb, #fef3c7)' },
+          { status: 'admitted', label: 'Admitted', count: enquiries.filter((e: any) => e.status === 'admitted').length, color: '#10b981', gradient: 'linear-gradient(135deg, #f0fdf4, #dcfce7)' },
+          { status: 'rejected', label: 'Rejected', count: enquiries.filter((e: any) => e.status === 'rejected').length, color: '#ef4444', gradient: 'linear-gradient(135deg, #fef2f2, #fee2e2)' },
         ].map(s => (
           <button key={s.status} onClick={() => setStatusFilter(s.status as any)}
-            style={{ flex: 1, minWidth: 110, padding: '12px 10px', borderRadius: 14, border: `2px solid ${statusFilter === s.status ? s.color : '#e5e7eb'}`, background: statusFilter === s.status ? `${s.color}11` : '#fff', cursor: 'pointer', textAlign: 'center' }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.count}</div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginTop: 2 }}>{s.label}</div>
+            style={{
+              padding: '14px 12px', borderRadius: 16,
+              border: statusFilter === s.status ? `2px solid ${s.color}` : '2px solid transparent',
+              background: statusFilter === s.status ? (s as any).gradient : 'var(--bg-card)',
+              cursor: 'pointer', textAlign: 'center',
+              transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+              boxShadow: statusFilter === s.status ? `0 4px 14px ${s.color}20` : '0 1px 4px rgba(0,0,0,0.04)',
+              position: 'relative', overflow: 'hidden',
+            }}>
+            <div style={{ fontSize: 24, fontWeight: 800, color: s.color, letterSpacing: '-0.02em' }}>{s.count}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s.label}</div>
           </button>
         ))}
       </div>
@@ -1033,46 +1028,16 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
 
   return (
     <div>
-      <FilterBar
-        classes={classes}
-        academicYears={academicYears}
-        selClass={selClass}
-        selYear={selYear}
-        onClassChange={onClassChange}
-        onYearChange={onYearChange}
-        rightSlot={
-          <>
-            {canManage && (
-              <button
-                onClick={() => { setEditing(null); setForm({ category: 'textbook', quantity: 1, unit: 'copy', is_required: true }); setShowForm(true) }}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 18px', background: '#1e0646', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}
-              >
-                <Plus size={16} /> Add Item
-              </button>
-            )}
-            <button
-              onClick={() => {
-                const className = selClass ? classes.find((c: any) => c.id === selClass)?.name : undefined
-                const yearName = selYear ? academicYears.find((y: any) => y.id === selYear)?.name : undefined
-                printWelcomePack({
-                  bills: billsForBanner as any[],
-                  supplies: allSupplies,
-                  scholarships,
-                  feeStructures: feeStructures as any[],
-                  className: className || 'All Classes',
-                  billTotal: billsTotal,
-                  suppliesEstimate: estimatedTotal,
-                  school,
-                })
-              }}
-              disabled={!allSupplies.length && !(billsForBanner as any[]).length}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 18px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 13, opacity: (allSupplies.length || (billsForBanner as any[]).length) ? 1 : 0.5 }}
-            >
-              <Printer size={16} /> Print Welcome Pack
-            </button>
-          </>
-        }
-      />
+      {canManage && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+          <button
+            onClick={() => { setEditing(null); setForm({ category: 'textbook', quantity: 1, unit: 'copy', is_required: true }); setShowForm(true) }}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: 'linear-gradient(135deg, #1e0646 0%, #4c1d95 100%)', color: '#fff', border: 'none', borderRadius: 12, fontWeight: 700, cursor: 'pointer', fontSize: 13, boxShadow: '0 4px 12px rgba(30,6,70,0.2)' }}
+          >
+            <Plus size={16} /> Add Supply Item
+          </button>
+        </div>
+      )}
 
       {/* Cross-tab bills banner */}
       <CrossTabBanner
@@ -1085,16 +1050,24 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
       />
 
       {/* Summary cards */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14, marginBottom: 24 }}>
         {[
-          { label: 'Total Supply Items', value: allSupplies.length, color: '#1e0646' },
-          { label: 'Required', value: allSupplies.filter((i: any) => i.is_required).length, color: '#10b981' },
-          { label: 'Optional', value: allSupplies.filter((i: any) => !i.is_required).length, color: '#f59e0b' },
-          { label: 'Est. Supplies Cost', value: estimatedTotal > 0 ? GHS(estimatedTotal) : '—', color: '#3b82f6' },
+          { label: 'Total Supply Items', value: allSupplies.length, color: '#1e0646', gradient: 'linear-gradient(135deg, #f8f7ff 0%, #ede9fe 100%)', borderColor: '#c4b5fd' },
+          { label: 'Required', value: allSupplies.filter((i: any) => i.is_required).length, color: '#10b981', gradient: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)', borderColor: '#bbf7d0' },
+          { label: 'Optional', value: allSupplies.filter((i: any) => !i.is_required).length, color: '#f59e0b', gradient: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)', borderColor: '#fde68a' },
+          { label: 'Est. Supplies Cost', value: estimatedTotal > 0 ? GHS(estimatedTotal) : '—', color: '#3b82f6', gradient: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)', borderColor: '#bfdbfe' },
         ].map(s => (
-          <div key={s.label} style={{ flex: 1, minWidth: 140, background: '#fafafa', border: '1.5px solid var(--border-color)', borderRadius: 14, padding: '14px 18px' }}>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{s.label}</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: s.color, marginTop: 4 }}>{s.value}</div>
+          <div key={s.label} style={{
+            background: (s as any).gradient, border: `1.5px solid ${(s as any).borderColor}`,
+            borderRadius: 16, padding: '16px 20px',
+            transition: 'all 0.2s ease', position: 'relative', overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'absolute', top: -10, right: -10, width: 50, height: 50,
+              borderRadius: '50%', background: `${s.color}08`, pointerEvents: 'none',
+            }} />
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s.label}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: s.color, marginTop: 6, letterSpacing: '-0.02em' }}>{s.value}</div>
           </div>
         ))}
       </div>
@@ -1174,10 +1147,20 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
       })}
 
       {!allSupplies.length && (
-        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>
-          <BookOpen size={40} style={{ opacity: 0.3, marginBottom: 12 }} />
-          <p style={{ fontSize: 15, fontWeight: 600 }}>No items yet. Add textbooks and stationery for each class.</p>
-          <p style={{ fontSize: 13, marginTop: 6, color: 'var(--text-subtle)' }}>Select a class above and start adding items to generate a parent packing list.</p>
+        <div style={{
+          textAlign: 'center', padding: '60px 40px', color: 'var(--text-muted)',
+          background: 'linear-gradient(135deg, #f0fdf4 0%, #fafafa 100%)',
+          borderRadius: 20, border: '2px dashed var(--border-color)',
+        }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 20, margin: '0 auto 16px',
+            background: 'linear-gradient(135deg, #dcfce7 0%, #dbeafe 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <BookOpen size={28} color="#10b981" style={{ opacity: 0.7 }} />
+          </div>
+          <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No items yet</p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 340, margin: '0 auto' }}>Add textbooks and stationery for each class to generate a parent packing list.</p>
         </div>
       )}
 
@@ -1832,14 +1815,72 @@ export default function AdminAdmissions() {
   return (
     <div style={{ fontFamily: '"DM Sans", system-ui, sans-serif', maxWidth: 1200, margin: '0 auto' }}>
 
+      {/* CSS Keyframes for animations */}
+      <style>{`
+        @keyframes admModalOverlay { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes admModalSlide { from { opacity: 0; transform: translateY(16px) scale(0.97) } to { opacity: 1; transform: translateY(0) scale(1) } }
+        @keyframes toast-in { from { opacity: 0; transform: translateX(20px) } to { opacity: 1; transform: translateX(0) } }
+      `}</style>
+
+      {/* ── Page Hero Header ── */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        marginBottom: 24, flexWrap: 'wrap', gap: 16,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{
+            width: 46, height: 46, borderRadius: 14,
+            background: 'linear-gradient(135deg, #1e0646 0%, #4c1d95 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 14px rgba(30,6,70,0.25)',
+          }}>
+            <GraduationCap size={24} color="#fbbf24" />
+          </div>
+          <div>
+            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#1e0646', letterSpacing: '-0.02em' }}>
+              Admissions
+            </h1>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>
+              Manage fees, enquiries, applications & supply lists
+            </p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <button
+            onClick={() => printBlankAdmissionForm(school)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              padding: '10px 18px', borderRadius: 12,
+              border: '1.5px solid var(--border-color)',
+              background: 'var(--bg-card)', color: 'var(--text-main)', fontWeight: 700,
+              fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
+            }}
+          >
+            <FileText size={16} color="#6b7280" /> Blank Admission Form
+          </button>
+        </div>
+      </div>
+
       {/* ── Quick Print Panel ── */}
       <div style={{
-        background: 'linear-gradient(135deg, #1e0646 0%, #4c1d95 100%)',
-        borderRadius: 18, padding: '20px 24px', marginBottom: 28,
-        display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16
+        background: 'linear-gradient(135deg, #1e0646 0%, #312164 40%, #4c1d95 100%)',
+        borderRadius: 20, padding: '22px 28px', marginBottom: 28,
+        display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16,
+        boxShadow: '0 8px 32px rgba(30,6,70,0.25), inset 0 1px 0 rgba(255,255,255,0.06)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        position: 'relative', overflow: 'hidden',
       }}>
+        {/* Decorative glow */}
+        <div style={{
+          position: 'absolute', top: -40, right: -40,
+          width: 160, height: 160, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(251,191,36,0.12) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
         {/* Class/Year selector */}
-        <div style={{ flex: 1, minWidth: 220 }}>
+        <div style={{ flex: 1, minWidth: 220, position: 'relative', zIndex: 1 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#c4b5fd', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
             Select Class to Print
           </div>
@@ -1877,26 +1918,26 @@ export default function AdminAdmissions() {
 
         {/* Stats pills for selected class */}
         {sharedClass && (
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <div style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10, padding: '8px 16px', textAlign: 'center' }}>
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#fbbf24' }}>{(quickBills as any[]).length}</div>
-              <div style={{ fontSize: 10, color: '#c4b5fd', fontWeight: 700, textTransform: 'uppercase' }}>Fee Items</div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
+            <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 14, padding: '10px 18px', textAlign: 'center', backdropFilter: 'blur(8px)' }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#fbbf24', letterSpacing: '-0.02em' }}>{(quickBills as any[]).length}</div>
+              <div style={{ fontSize: 9, color: '#c4b5fd', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>Fee Items</div>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10, padding: '8px 16px', textAlign: 'center' }}>
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#fbbf24' }}>{(quickSupplies as any[]).length}</div>
-              <div style={{ fontSize: 10, color: '#c4b5fd', fontWeight: 700, textTransform: 'uppercase' }}>Supply Items</div>
+            <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 14, padding: '10px 18px', textAlign: 'center', backdropFilter: 'blur(8px)' }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#fbbf24', letterSpacing: '-0.02em' }}>{(quickSupplies as any[]).length}</div>
+              <div style={{ fontSize: 9, color: '#c4b5fd', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>Supply Items</div>
             </div>
             {quickBillTotal > 0 && (
-              <div style={{ background: 'rgba(251,191,36,0.15)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: 10, padding: '8px 16px', textAlign: 'center' }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: '#fbbf24' }}>{GHS(quickBillTotal)}</div>
-                <div style={{ fontSize: 10, color: '#c4b5fd', fontWeight: 700, textTransform: 'uppercase' }}>Total Fees</div>
+              <div style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.25)', borderRadius: 14, padding: '10px 18px', textAlign: 'center', backdropFilter: 'blur(8px)' }}>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#fbbf24', letterSpacing: '-0.02em' }}>{GHS(quickBillTotal)}</div>
+                <div style={{ fontSize: 9, color: '#c4b5fd', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>Total Fees</div>
               </div>
             )}
           </div>
         )}
 
         {/* Print action buttons */}
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginLeft: 'auto' }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginLeft: 'auto', position: 'relative', zIndex: 1 }}>
           <button
             onClick={() => printWelcomePack({
               bills: quickBills as any[],
@@ -1911,45 +1952,51 @@ export default function AdminAdmissions() {
             disabled={!(quickBills as any[]).length && !(quickSupplies as any[]).length}
             style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              padding: '11px 20px', borderRadius: 12, border: 'none',
-              background: '#fbbf24', color: '#1e0646', fontWeight: 800,
+              padding: '12px 22px', borderRadius: 14, border: 'none',
+              background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+              color: '#1e0646', fontWeight: 800,
               fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
               opacity: (!(quickBills as any[]).length && !(quickSupplies as any[]).length) ? 0.5 : 1,
-              boxShadow: '0 4px 12px rgba(251,191,36,0.3)',
+              boxShadow: '0 4px 16px rgba(251,191,36,0.35), inset 0 1px 0 rgba(255,255,255,0.3)',
+              transition: 'all 0.2s ease',
+              letterSpacing: '-0.01em',
             }}
           >
             <BookOpen size={16} />
             Print Booklist{selectedClassName ? ` — ${selectedClassName}` : ''}
           </button>
-          <button
-            onClick={() => printBlankAdmissionForm(school)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              padding: '11px 20px', borderRadius: 12,
-              border: '2px solid rgba(196,181,253,0.5)',
-              background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 700,
-              fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
-            }}
-          >
-            <FileText size={16} /> Print Blank Admission Form
-          </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 4, background: 'var(--bg-hover)', padding: 5, borderRadius: 14, marginBottom: 28, width: 'fit-content', flexWrap: 'wrap' }}>
+      <div style={{
+        display: 'flex', gap: 3, background: 'var(--bg-hover)',
+        padding: 4, borderRadius: 16, marginBottom: 28, width: 'fit-content', flexWrap: 'wrap',
+        border: '1px solid var(--border-color)',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+      }}>
         {TABS.map(({ id, label, icon: Icon }) => (
           <button key={id} onClick={() => setActiveTab(id)}
             style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer',
-              fontFamily: 'inherit', fontWeight: 600, fontSize: 13, transition: 'all 0.2s',
+              padding: '11px 22px', borderRadius: 12, border: 'none', cursor: 'pointer',
+              fontFamily: 'inherit', fontWeight: activeTab === id ? 700 : 500,
+              fontSize: 13, transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
               background: activeTab === id ? '#fff' : 'transparent',
               color: activeTab === id ? '#1e0646' : '#6b7280',
-              boxShadow: activeTab === id ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
+              boxShadow: activeTab === id ? '0 2px 12px rgba(30,6,70,0.1), 0 0 0 1px rgba(30,6,70,0.04)' : 'none',
+              letterSpacing: '-0.01em',
+              position: 'relative',
             }}>
-            <Icon size={16} color={activeTab === id ? '#f59e0b' : '#9ca3af'} />
+            <Icon size={16} color={activeTab === id ? '#f59e0b' : '#9ca3af'} style={{ transition: 'color 0.2s' }} />
             {label}
+            {activeTab === id && (
+              <span style={{
+                position: 'absolute', bottom: 4, left: '50%', transform: 'translateX(-50%)',
+                width: 16, height: 3, borderRadius: 2,
+                background: 'linear-gradient(90deg, #f59e0b, #1e0646)',
+              }} />
+            )}
           </button>
         ))}
       </div>

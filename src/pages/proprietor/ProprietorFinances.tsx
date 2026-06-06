@@ -4,8 +4,10 @@ import { useAuth } from '../../hooks/useAuth'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { Wallet, CreditCard, ArrowDownRight, ArrowUpRight, Calendar, Download } from 'lucide-react'
 import { format, subMonths } from 'date-fns'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function ProprietorFinances() {
+    useAutoRefresh(loadFinances);
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)

@@ -9,6 +9,7 @@ import { Wallet, ChevronDown, ChevronUp, CreditCard, X, ShieldCheck } from 'luci
 import { formatCurrency } from '../../utils/currency'
 import { feePaymentsService } from '../../services/bursar.service'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SECURE REVENUE SHARE CONFIGURATION
@@ -17,6 +18,7 @@ const DEV_FEE_PERCENT = 0.015; // 1.5%
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function ParentBillingPage() {
+    useAutoRefresh(loadBilling);
   const { user } = useAuth()
   const { data: wards = [], isLoading: loadingWards } = useParentWards()
   const { data: term } = useCurrentTerm()

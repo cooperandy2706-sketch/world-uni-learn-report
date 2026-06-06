@@ -9,6 +9,7 @@ import {
   Folder, FolderOpen, FileText, Plus, Download, Trash2, 
   Shield, FileCheck, BookOpen, User, CheckCircle2, XCircle, Search, Clock, Lock
 } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 const FOLDER_CATEGORIES = [
     { id: 'lesson_plan', label: 'Lesson Plans', icon: BookOpen, color: '#3b82f6' },
@@ -19,6 +20,7 @@ const FOLDER_CATEGORIES = [
 ]
 
 export default function StaffVaultPage() {
+    useAutoRefresh(loadStaff);
     const { user } = useAuth()
     const [loading, setLoading] = useState(true)
   useStuckLoadingReload(loading)

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 const SUBJECT_META: Record<string, { icon: string; color: string; bg: string; category: string }> = {
   'mathematics':   { icon: '📐', color: '#2563eb', bg: '#eff6ff',  category: 'STEM' },
@@ -33,6 +34,7 @@ function getSubjectMeta(name: string) {
 }
 
 export default function StudentSubjectsPage() {
+    useAutoRefresh(loadSubjects);
   const { user } = useAuth()
   const navigate = useNavigate()
   const [subjects, setSubjects] = useState<any[]>([])

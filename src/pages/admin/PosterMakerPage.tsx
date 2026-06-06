@@ -498,7 +498,7 @@ const defaultSide = (isPrimary: boolean): TagSide => ({
 export default function PosterMakerPage() {
   const { user } = useAuth()
   const school = user?.school as any
-  const defaultSchoolName = school?.name || 'Nexora Portal'
+  const defaultSchoolName = school?.name || 'Acadera Portal'
   const defaultLogo = school?.logo_url || ''
 
   const [searchParams] = useSearchParams()

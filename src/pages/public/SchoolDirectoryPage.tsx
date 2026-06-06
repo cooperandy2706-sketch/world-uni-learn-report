@@ -131,11 +131,11 @@ export default function SchoolDirectoryPage() {
           </Link>
 
           <div className="schools-hero-badge">
-            <School size={15} strokeWidth={2.5} /> Nexora Directory
+            <School size={15} strokeWidth={2.5} /> Acadera Directory
           </div>
 
           <h1 className="schools-hero-title">
-            Find Schools on <span>Nexora</span>
+            Find Schools on <span>Acadera</span>
           </h1>
           <p className="schools-hero-desc">
             Search by name, city, or motto. Results update as you type.

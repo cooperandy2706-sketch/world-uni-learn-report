@@ -8,6 +8,7 @@ import { agendaService } from '../../services'
 import toast from 'react-hot-toast'
 import Modal from '../../components/ui/Modal'
 import { Send, Plus, Trash2, Edit2, MessageSquare, AlertTriangle, CheckCircle, Clock, ChevronRight, Layout } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 function Btn({ children, onClick, variant = 'primary', disabled, loading, style }: any) {
   const [hov, setHov] = useState(false)
@@ -29,6 +30,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
 }
 
 export default function AdminAgendaPage() {
+    useAutoRefresh(loadAgendas);
   const { user } = useAuth()
   const { data: currentYear } = useCurrentAcademicYear()
   const { data: terms = [] } = useTerms(currentYear?.id || '')

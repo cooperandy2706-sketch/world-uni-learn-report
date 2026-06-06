@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 import confetti from 'canvas-confetti'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 interface Question {
   id: string
@@ -22,6 +23,7 @@ function getFeedbackMessage(pct: number) {
 }
 
 export default function TeacherTakeGlobalQuizPage() {
+    useAutoRefresh(loadQuiz);
   const { id } = useParams()
   const navigate = useNavigate()
 

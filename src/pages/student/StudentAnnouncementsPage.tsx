@@ -6,6 +6,7 @@ import { ROUTES } from '../../constants/routes'
 import { Link } from 'react-router-dom'
 import { Megaphone, Calendar, Clock, Search, Filter, Pin, ChevronRight, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 const TYPE_CONFIG: any = {
   announcement: { icon: '📢', color: '#6d28d9', bg: '#f5f3ff', label: 'Announcement' },
@@ -16,6 +17,7 @@ const TYPE_CONFIG: any = {
 }
 
 export default function StudentAnnouncementsPage() {
+    useAutoRefresh(loadAnnouncements);
   const { user } = useAuth()
   const [announcements, setAnnouncements] = useState<any[]>([])
   const [loading, setLoading] = useState(true)

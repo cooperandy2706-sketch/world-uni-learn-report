@@ -142,7 +142,7 @@ export default function SchoolProfilePage() {
         .order('sort_order')
       setMedia(m || [])
 
-      document.title = `${s.name} — Nexora`
+      document.title = `${s.name} — Acadera`
       let metaDesc = document.querySelector('meta[name="description"]')
       if (!metaDesc) {
         metaDesc = document.createElement('meta')
@@ -151,7 +151,7 @@ export default function SchoolProfilePage() {
       }
       metaDesc.setAttribute(
         'content',
-        s.description || `Official profile for ${s.name} on Nexora.`,
+        s.description || `Official profile for ${s.name} on Acadera.`,
       )
 
       const {
@@ -355,7 +355,7 @@ export default function SchoolProfilePage() {
                 )}
                 <span className="sp-badge">
                   <Zap size={12} />
-                  Nexora
+                  Acadera
                 </span>
               </div>
             </div>
@@ -541,12 +541,12 @@ export default function SchoolProfilePage() {
               <div className="sp-cta-icon">
                 <Zap size={24} fill="currentColor" />
               </div>
-              <p className="sp-cta-title">Powered by Nexora</p>
+              <p className="sp-cta-title">Powered by Acadera</p>
               <p className="sp-cta-text">
                 Academics, fees, and operations — managed on one platform.
               </p>
               <Link to="/" className="sp-cta-link">
-                Explore Nexora
+                Explore Acadera
                 <ChevronRight size={16} />
               </Link>
             </div>

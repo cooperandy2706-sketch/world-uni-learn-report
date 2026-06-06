@@ -9,6 +9,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm } from '../../hooks/useSettings'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const TODAY_KEY = (userId: string, classId: string) => `wula_att_submitted_${userId}_${classId}_${new Date().toISOString().slice(0, 10)}`
@@ -29,6 +30,7 @@ interface AttendanceRow {
 
 // ══════════════════════════════════════════════════════════════════════════════
 export default function TeacherAttendancePage() {
+    useAutoRefresh(loadStudents);
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
 

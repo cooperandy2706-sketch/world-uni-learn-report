@@ -61,7 +61,7 @@ const superAdminLinks = [
 const studentLinks = [
   { to: '/student/dashboard', icon: Home, label: 'Portal' },
   { to: '/student/assignments', icon: ClipboardList, label: 'Tasks' },
-  { to: '/student/nexora-tv', icon: Tv, label: 'Nexora TV' },
+  { to: '/student/acadera-tv', icon: Tv, label: 'Acadera TV' },
   { to: '/student/library', icon: Library, label: 'Library' },
   { to: '/student/results', icon: BarChart3, label: 'Results' },
   { to: '/student/schedule', icon: Calendar, label: 'Schedule' },

@@ -5,6 +5,7 @@ import Modal from '../../components/ui/Modal'
 import { formatDate } from '../../lib/utils'
 import toast from 'react-hot-toast'
 import { GlobalAd } from '../../types/database.types'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 // ── Helpers ───────────────────────────────────────────────
 function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -73,6 +74,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
 // ═══════════════════════════════════════════════════════════
 
 export default function GlobalAdsPage() {
+    useAutoRefresh(loadAds);
   const { user } = useAuth()
   const [ads, setAds] = useState<GlobalAd[]>([])
   const [isLoading, setIsLoading] = useState(true)

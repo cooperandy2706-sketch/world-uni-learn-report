@@ -13,7 +13,8 @@ import {
   Search, Settings, ChevronDown, ChevronLeft, ChevronRight,
   LogOut, User, Shield, Calendar, AlertTriangle, CreditCard,
   FileText, BarChart3, MessageSquare, Command, BookOpen, Users,
-  GraduationCap, LayoutDashboard, Zap, Tv, ExternalLink, Building2
+  GraduationCap, LayoutDashboard, Zap, Tv, ExternalLink, Building2,
+  Clock, Package, Newspaper, History, ClipboardList, Smartphone, Wallet, CheckCircle, School, UserCheck
 } from 'lucide-react'
 import { ROUTES } from '../../constants/routes'
 import { resolveIntents, extractClassHint, extractPersonIntent, intentToPath } from '../../lib/commandSearch'
@@ -122,7 +123,7 @@ const STUDENT_NAV = [
   },
   {
     label: 'Explore', items: [
-      { label: 'Nexora TV', to: '/student/nexora-tv' },
+      { label: 'Acadera TV', to: '/student/acadera-tv' },
       { label: 'Global Library', to: ROUTES.STUDENT_LIBRARY },
       { label: 'Resources', to: ROUTES.STUDENT_RESOURCES },
       { label: 'Typing Nitro', to: ROUTES.STUDENT_TYPING_GAME },
@@ -679,7 +680,7 @@ export default function Header() {
           )}
           <div className="school-branding-text" style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', whiteSpace: 'nowrap', maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: 6 }}>
-              {userSchool?.name || 'Nexora'}
+              {userSchool?.name || 'Acadera'}
               {userSchool?.slug && (
                 <a href={`/@${userSchool.slug}`} target="_blank" rel="noreferrer" title="View Public Profile" style={{ color: '#6366f1', display: 'flex', alignItems: 'center' }}>
                   <ExternalLink size={14} />

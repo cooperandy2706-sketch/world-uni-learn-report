@@ -4,8 +4,10 @@ import { supabase } from '../../lib/supabase'
 import { MapPin, Navigation, Info, Bus, Play, Square, Users, CheckCircle, XCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import FlaskLoader from '../../components/ui/FlaskLoader'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function DriverRoutesPage() {
+    useAutoRefresh(loadRoutes);
   const { user } = useAuth()
   const [routes, setRoutes] = useState<any[]>([])
   const [vehicle, setVehicle] = useState<any>(null)

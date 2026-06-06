@@ -19,8 +19,10 @@ import {
   Box,
   AlertTriangle
 } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function AssetManagerPage() {
+    useAutoRefresh(loadData);
     const { user } = useAuth()
     const [assets, setAssets] = useState<any[]>([])
     const [loading, setLoading] = useState(true)

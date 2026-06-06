@@ -8,6 +8,7 @@ import { useClasses } from '../../hooks/useClasses'
 import { useCurrentTerm, useSettings, useUpdateSettings } from '../../hooks/useSettings'
 import { TimetableService } from '../../services/timetable.service'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 const DAY_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
@@ -186,6 +187,7 @@ const labelStyle: React.CSSProperties = {
 // Main Component
 // ─────────────────────────────────────────────────────────────────────────────
 export default function TimetablePage() {
+    useAutoRefresh(loadPeriods);
   const { user } = useAuth()
   const qc = useQueryClient()
   const { data: classes = [] } = useClasses()

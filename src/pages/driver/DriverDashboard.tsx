@@ -5,8 +5,10 @@ import { Html5Qrcode } from 'html5-qrcode'
 import { Camera, MapPin, Bus, UserCheck, Play, Square, LogIn, LogOut, CheckCircle, AlertTriangle, Wrench, WifiOff, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Modal from '../../components/ui/Modal'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function DriverDashboard() {
+    useAutoRefresh(loadVehicle);
   const { user } = useAuth()
   const [vehicle, setVehicle] = useState<any>(null)
   const [loading, setLoading] = useState(true)

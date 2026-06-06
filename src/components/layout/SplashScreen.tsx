@@ -179,7 +179,7 @@ export default function SplashScreen() {
           <div className="logo-box">
             <img
               src="/icon-512.png"
-              alt="Nexora Logo"
+              alt="Acadera Logo"
               style={{
                 width: '100%',
                 height: '100%',
@@ -188,7 +188,7 @@ export default function SplashScreen() {
             />
           </div>
 
-          <h1 className="brand-title">Nexora</h1>
+          <h1 className="brand-title">Acadera</h1>
           <p className="brand-subtitle">School Platform</p>
 
           <div className="progress-container">

@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { Users, UserCheck, TrendingUp, TrendingDown, Wallet, BookOpen, GraduationCap, LayoutDashboard, Target } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 function AnimNum({ to, duration = 900, prefix = '', suffix = '' }: { to: number; duration?: number; prefix?: string; suffix?: string }) {
   const [val, setVal] = useState(0)
@@ -27,6 +28,7 @@ function AnimNum({ to, duration = 900, prefix = '', suffix = '' }: { to: number;
 }
 
 export default function ProprietorDashboard() {
+    useAutoRefresh(loadDashboardData);
   const { user } = useAuth()
   const userSchool = user?.school as any
   const { data: term } = useCurrentTerm()
@@ -242,7 +244,7 @@ export default function ProprietorDashboard() {
             Executive Overview
           </h1>
           <p style={{ fontSize: 16, color: '#64748b', margin: 0, fontWeight: 600 }}>
-            {userSchool?.name || 'Nexora'} • {year?.name} • {term?.name}
+            {userSchool?.name || 'Acadera'} • {year?.name} • {term?.name}
           </p>
         </div>
 

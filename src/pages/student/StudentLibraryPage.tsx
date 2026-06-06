@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 type ContentType = 'video' | 'link' | 'passage' | 'google_doc'
 
@@ -179,6 +180,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
 }
 
 export default function StudentLibraryPage() {
+    useAutoRefresh(loadResources);
   const navigate = useNavigate()
   const [resources, setResources] = useState<Resource[]>([])
   const [loading, setLoading] = useState(true)

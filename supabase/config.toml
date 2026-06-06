@@ -1,7 +1,7 @@
-# Nexora Supabase local/CI config
+# Acadera Supabase local/CI config
 # https://supabase.com/docs/guides/cli/config
 
-project_id = "nexora"
+project_id = "acadera"
 
 [api]
 enabled = true

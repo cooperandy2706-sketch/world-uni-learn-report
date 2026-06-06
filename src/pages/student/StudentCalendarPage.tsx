@@ -6,8 +6,10 @@ import { ROUTES } from '../../constants/routes'
 import { Link } from 'react-router-dom'
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, MapPin, Tag } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 export default function StudentCalendarPage() {
+    useAutoRefresh(loadEvents);
   const { user } = useAuth()
   const [events, setEvents] = useState<any[]>([])
   const [loading, setLoading] = useState(true)

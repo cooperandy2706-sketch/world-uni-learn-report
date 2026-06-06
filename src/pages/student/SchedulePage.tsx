@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useCurrentTerm } from '../../hooks/useSettings'
 import { ROUTES } from '../../constants/routes'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const WEEKDAYS = [1, 2, 3, 4, 5]
@@ -28,6 +29,7 @@ const SUBJECT_COLORS = [
 ]
 
 export default function StudentSchedulePage() {
+    useAutoRefresh(loadSchedule);
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
 

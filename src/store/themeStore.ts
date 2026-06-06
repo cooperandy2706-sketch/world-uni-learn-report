@@ -18,7 +18,7 @@ export const useThemeStore = create<ThemeState>()(
       },
     }),
     {
-      name: 'nexora-theme',
+      name: 'acadera-theme',
       onRehydrateStorage: () => (state) => {
         if (state) {
           updateDocumentClass(state.theme)

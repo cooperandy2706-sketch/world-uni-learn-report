@@ -17,6 +17,7 @@ import Modal from '../../components/ui/Modal'
 import ReportCard from '../../components/reports/ReportCard'
 import { printReportCard, downloadReportPDF, buildReportHTML } from '../../lib/pdf'
 import toast from 'react-hot-toast'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 // ── Grade helpers ──────────────────────────────────────────────────────────
 const GRADE_SCALE = [
@@ -68,6 +69,7 @@ function Btn({ children, onClick, variant = 'primary', disabled, loading, style 
 
 // ══════════════════════════════════════════════════════════════════════════════
 export default function TeacherReportsPage() {
+    useAutoRefresh(loadStudents);
   const { user }           = useAuth()
   const { data: term }     = useCurrentTerm()
   const { data: year }     = useCurrentAcademicYear()

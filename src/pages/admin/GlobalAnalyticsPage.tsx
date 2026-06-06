@@ -18,10 +18,12 @@ import {
   AreaChart,
   Area,
 } from 'recharts'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 const COLORS = ['#0ea5e9', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981']
 
 export default function GlobalAnalyticsPage() {
+    useAutoRefresh(loadStats);
   const { setFirstLoadComplete } = useAuthStore()
   const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)

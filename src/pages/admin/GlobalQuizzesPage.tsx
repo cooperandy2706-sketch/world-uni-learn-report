@@ -5,6 +5,7 @@ import Modal from '../../components/ui/Modal'
 import { formatDate } from '../../lib/utils'
 import toast from 'react-hot-toast'
 import AIQuizGenerator from '../../components/admin/AIQuizGenerator'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 interface Question {
   id: string
@@ -116,6 +117,7 @@ function Btn({ children, onClick, variant = 'primary', type = 'button', disabled
 // ═══════════════════════════════════════════════════════════
 
 export default function AdminGlobalQuizzesPage() {
+    useAutoRefresh(loadData);
   const { user } = useAuth()
   const [quizzes, setQuizzes] = useState<any[]>([])
   const [subjects, setSubjects] = useState<any[]>([])

@@ -10,6 +10,7 @@ import 'leaflet/dist/leaflet.css'
 // Fix for default marker icons in Leaflet with Vite
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
@@ -42,6 +43,7 @@ type ActiveTrip = {
 }
 
 export default function LiveFleetTrackingPage() {
+    useAutoRefresh(loadActiveTrips);
   const { user } = useAuth()
   const [activeTrips, setActiveTrips] = useState<ActiveTrip[]>([])
   const [loading, setLoading] = useState(true)

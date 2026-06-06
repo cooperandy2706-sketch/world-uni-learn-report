@@ -114,7 +114,7 @@ export default function ScannerPage() {
       <body>
         <div class="badge">
           <div class="badge-header">
-            <div class="school">Nexora Platform — ${schoolName}</div>
+            <div class="school">Acadera Platform — ${schoolName}</div>
             <div class="visitor-tag">🪪 VISITOR PASS</div>
           </div>
           <div class="badge-body">

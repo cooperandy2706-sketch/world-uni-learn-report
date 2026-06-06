@@ -181,7 +181,7 @@ export default function PublicProfilePage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28, gap: 16, flexWrap: 'wrap' }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: 'var(--text-main, #0f172a)', margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 8 }}><Globe size={26} color="#6366f1" /> Public Profile</h1>
-          <p style={{ color: '#64748b', fontSize: 14, margin: 0 }}>Control how your school appears on the Nexora directory and your public page.</p>
+          <p style={{ color: '#64748b', fontSize: 14, margin: 0 }}>Control how your school appears on the Acadera directory and your public page.</p>
         </div>
         {profileUrl && (
           <a href={profileUrl} target="_blank" rel="noreferrer"
