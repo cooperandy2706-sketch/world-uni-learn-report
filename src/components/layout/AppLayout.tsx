@@ -14,6 +14,7 @@ import FloatingClock from '../shared/FloatingClock'
 import FlaskLoader from '../ui/FlaskLoader'
 import NetworkStatusHUD from '../ui/NetworkStatusHUD'
 import GlobalAdOverlay from '../ui/GlobalAdOverlay'
+import AppUpdaterBanner from '../ui/AppUpdaterBanner'
 import { ROUTES } from '../../constants/routes'
 
 interface AppLayoutProps { requiredRole?: 'super_admin' | 'admin' | 'proprietor' | 'teacher' | 'student' | 'bursar' | 'staff' | 'parent' | 'security' | 'driver' | 'nurse' | 'librarian' }
@@ -133,6 +134,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
       <FloatingClock />
       <NetworkStatusHUD />
       <GlobalAdOverlay />
+      <AppUpdaterBanner />
     </>
   )
 }

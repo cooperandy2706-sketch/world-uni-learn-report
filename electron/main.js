@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
@@ -25,6 +25,9 @@ log.info('App starting...')
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+// Keep a global reference to the window so we can send IPC messages to it
+let mainWindow = null
+
 function createWindow() {
   const isDev = !!process.env.VITE_DEV_SERVER_URL
   
@@ -38,7 +41,7 @@ function createWindow() {
     app.dock.setIcon(iconPath)
   }
 
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     minWidth: 900,
@@ -53,28 +56,28 @@ function createWindow() {
   })
 
   // Hide the default menu bar for a cleaner "app" feel
-  win.setMenuBarVisibility(false)
-  win.autoHideMenuBar = true
+  mainWindow.setMenuBarVisibility(false)
+  mainWindow.autoHideMenuBar = true
 
   if (isDev) {
     // Development mode
-    win.loadURL(process.env.VITE_DEV_SERVER_URL)
-    win.webContents.openDevTools()
+    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL)
+    mainWindow.webContents.openDevTools()
   } else {
     // Production mode
-    win.loadFile(path.join(__dirname, '../dist/index.html'))
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
     
     // If the main page fails to load, show an error screen
-    win.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+    mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
       if (!isMainFrame) return // Ignore missing background images, favicons, or service workers
       log.error('Main page failed to load:', errorCode, errorDescription, validatedURL)
-      win.webContents.loadURL(`data:text/html,<html><body style="font-family:sans-serif;padding:40px;background:#111;color:#fff"><h2>⚠️ App Failed to Load</h2><p>${errorDescription}</p><p style="color:#aaa;font-size:13px">Error code: ${errorCode}</p></body></html>`)
+      mainWindow.webContents.loadURL(`data:text/html,<html><body style="font-family:sans-serif;padding:40px;background:#111;color:#fff"><h2>⚠️ App Failed to Load</h2><p>${errorDescription}</p><p style="color:#aaa;font-size:13px">Error code: ${errorCode}</p></body></html>`)
     })
 
     // Catch renderer JS crashes and show a friendly dialog
-    win.webContents.on('render-process-gone', (event, details) => {
+    mainWindow.webContents.on('render-process-gone', (event, details) => {
       log.error('Renderer process gone:', details)
-      dialog.showMessageBox(win, {
+      dialog.showMessageBox(mainWindow, {
         type: 'error',
         title: 'Acadera Crashed',
         message: 'The app encountered an unexpected error and needs to restart.',
@@ -90,23 +93,26 @@ function createWindow() {
       })
     })
 
-    win.webContents.on('console-message', (event, level, message) => {
+    mainWindow.webContents.on('console-message', (event, level, message) => {
       if (level >= 2) log.error('[Renderer]', message) // 2=warning, 3=error
       else log.info('[Renderer]', message)
     })
   }
 }
 
-// Updater Events
+// ── IPC: Renderer asks to install the ready update ────────────────────────────
+ipcMain.on('install-update', () => {
+  log.info('User triggered update install')
+  autoUpdater.quitAndInstall()
+})
+
+// ── Updater Events ─────────────────────────────────────────────────────────────
 autoUpdater.on('update-available', (info) => {
   log.info('Update available:', info.version)
-  // Notify user that update is downloading in background
-  dialog.showMessageBox({
-    type: 'info',
-    title: 'Update Available',
-    message: `A new version (${info.version}) is available. Downloading in the background...`,
-    buttons: ['OK']
-  })
+  // Silently notify the UI — NO native OS dialog popup
+  if (mainWindow) {
+    mainWindow.webContents.send('update-available', { version: info.version })
+  }
 })
 
 autoUpdater.on('update-not-available', () => {
@@ -114,23 +120,20 @@ autoUpdater.on('update-not-available', () => {
 })
 
 autoUpdater.on('download-progress', (progress) => {
-  log.info(`Download progress: ${Math.round(progress.percent)}%`)
+  const percent = Math.round(progress.percent)
+  log.info(`Download progress: ${percent}%`)
+  // Push progress to the UI banner
+  if (mainWindow) {
+    mainWindow.webContents.send('download-progress', percent)
+  }
 })
 
 autoUpdater.on('update-downloaded', (info) => {
   log.info('Update downloaded:', info.version)
-  // Show notification that update is ready to install
-  dialog.showMessageBox({
-    type: 'info',
-    title: 'Update Ready to Install',
-    message: `Version ${info.version} has been downloaded. Restart now to install?`,
-    detail: 'The app will close and restart automatically to apply the update.',
-    buttons: ['Restart Now', 'Later']
-  }).then(({ response }) => {
-    if (response === 0) {
-      autoUpdater.quitAndInstall()
-    }
-  })
+  // Notify the UI that the update is ready to install — NO native OS dialog
+  if (mainWindow) {
+    mainWindow.webContents.send('update-ready', { version: info.version })
+  }
 })
 
 autoUpdater.on('error', (err) => {
