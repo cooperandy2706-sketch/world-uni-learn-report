@@ -229,23 +229,6 @@ export default function BottomNav() {
   }
 
 
-  const [moreMenuOpen, setMoreMenuOpen] = useState(false)
-
-  // Split links
-  const MAX_VISIBLE = 4
-  const hasMore = links.length > MAX_VISIBLE + 1
-  const visibleLinks = hasMore ? links.slice(0, MAX_VISIBLE) : links
-  const moreLinks = hasMore ? links.slice(MAX_VISIBLE) : []
-
-  useEffect(() => {
-    if (moreMenuOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'auto'
-    }
-    return () => { document.body.style.overflow = 'auto' }
-  }, [moreMenuOpen])
-
   return (
     <>
 
@@ -255,7 +238,7 @@ export default function BottomNav() {
         bottom: 'calc(max(12px, env(safe-area-inset-bottom)) + 74px)',
         right: 18,
         zIndex: 1001,
-        display: (visible && !isGameFullScreen && !moreMenuOpen) ? 'block' : 'none'
+        display: (visible && !isGameFullScreen) ? 'block' : 'none'
       }}>
         <button 
           onClick={() => setModalOpen(true)}
@@ -296,102 +279,73 @@ export default function BottomNav() {
         onRead={loadUnread}
       />
 
-      {/* MORE MENU BOTTOM SHEET */}
-      {moreMenuOpen && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 1002,
-          background: 'rgba(0,0,0,0.5)',
-          backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'flex-end',
-          animation: '_fi 0.2s ease forwards'
-        }} onClick={() => setMoreMenuOpen(false)}>
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            style={{
-              width: '100%',
-              background: 'var(--bg-app)',
-              borderTopLeftRadius: 24, borderTopRightRadius: 24,
-              padding: '24px 20px',
-              paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
-              boxShadow: '0 -10px 40px rgba(0,0,0,0.1)',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'var(--text-main)', fontFamily: '"Playfair Display",serif' }}>More Options</h3>
-              <button onClick={() => setMoreMenuOpen(false)} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-                <X size={16} />
-              </button>
-            </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px 12px' }}>
-              {moreLinks.map(({ to, icon: Icon, label, notify }: any) => {
-                const isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to))
-                return (
-                  <NavLink key={to} to={to} onClick={() => setMoreMenuOpen(false)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
-                    <div style={{
-                      width: 54, height: 54, borderRadius: 16,
-                      background: isActive ? '#f5f3ff' : 'var(--bg-card)',
-                      border: isActive ? '1px solid #ddd6fe' : '1px solid var(--border-light)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      position: 'relative'
-                    }}>
-                      <Icon size={24} strokeWidth={isActive ? 2.5 : 2} color={isActive ? '#6d28d9' : 'var(--text-muted)'} />
-                      {notify && unread > 0 && (
-                        <span style={{ position: 'absolute', top: -4, right: -4, minWidth: 18, height: 18, borderRadius: 99, background: '#ef4444', color: '#fff', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #fff' }}>
-                          {unread > 9 ? '9+' : unread}
-                        </span>
-                      )}
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: isActive ? 700 : 500, color: isActive ? '#6d28d9' : 'var(--text-main)', textAlign: 'center' }}>{label}</span>
-                  </NavLink>
-                )
-              })}
-            </div>
-          </motion.div>
-        </div>
-      )}
-
       <nav style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000,
         background: 'rgba(255,255,255,0.9)',
-        backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
         borderTop: '1px solid rgba(109,40,217,0.08)',
         boxShadow: '0 -8px 30px rgba(0,0,0,0.04)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-around',
+        display: 'flex', alignItems: 'center',
         padding: '8px 12px',
+        gap: 4,
         paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
         animation: '_bn_in 0.5s ease',
         fontFamily: '"DM Sans", sans-serif',
+        overflowX: 'auto',
+        scrollbarWidth: 'none',
       }}>
-        {visibleLinks.map(({ to, icon: Icon, label, notify }: any) => {
+        {links.map(({ to, icon: Icon, label, notify }: any) => {
           const isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to))
+
           return (
-            <NavLink key={to} to={to} className={isActive ? 'bn-item bn-active' : 'bn-item'} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, textDecoration: 'none', flex: 1 }}>
-              <div className="bn-icon-box" style={{ width: 52, height: 32, borderRadius: 8, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', position: 'relative' }}>
-                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} color={isActive ? '#6d28d9' : '#64748b'} />
+            <NavLink key={to} to={to}
+              className={isActive ? 'bn-item bn-active' : 'bn-item'}
+              style={{
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                gap: 4, textDecoration: 'none',
+              }}>
+              
+              <div className="bn-icon-box" style={{
+                width: 52, height: 32, borderRadius: 8,
+                background: 'transparent',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                position: 'relative',
+              }}>
+                <Icon 
+                  size={22} 
+                  strokeWidth={isActive ? 2.5 : 2} 
+                  color={isActive ? '#6d28d9' : '#64748b'} 
+                />
+                
                 {notify && unread > 0 && (
-                  <span style={{ position: 'absolute', top: -2, right: 10, minWidth: 16, height: 16, borderRadius: 99, background: '#ef4444', color: '#fff', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #fff', padding: '0 4px', boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)' }}>
+                  <span style={{
+                    position: 'absolute', top: -2, right: 10,
+                    minWidth: 16, height: 16, borderRadius: 99,
+                    background: '#ef4444', color: '#fff',
+                    fontSize: 10, fontWeight: 800,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    border: '2px solid #fff', padding: '0 4px',
+                    boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)',
+                  }}>
                     {unread > 9 ? '9+' : unread}
                   </span>
                 )}
               </div>
-              <span className="bn-label" style={{ fontSize: 11, fontWeight: 600, color: isActive ? '#6d28d9' : '#64748b', transition: 'all 0.2s', letterSpacing: '-0.01em' }}>{label}</span>
+
+              <span className="bn-label" style={{
+                fontSize: 11, fontWeight: 600,
+                color: isActive ? '#6d28d9' : '#64748b',
+                transition: 'all 0.2s',
+                letterSpacing: '-0.01em',
+              }}>
+                {label}
+              </span>
             </NavLink>
           )
         })}
-
-        {hasMore && (
-          <button onClick={() => setMoreMenuOpen(true)} className="bn-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, textDecoration: 'none', flex: 1, background: 'none', border: 'none', cursor: 'pointer' }}>
-            <div className="bn-icon-box" style={{ width: 52, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-              <MoreHorizontal size={22} strokeWidth={2} color="#64748b" />
-            </div>
-            <span className="bn-label" style={{ fontSize: 11, fontWeight: 600, color: '#64748b' }}>More</span>
-          </button>
-        )}
       </nav>
     </>
   )
