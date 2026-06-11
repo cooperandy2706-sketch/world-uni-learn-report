@@ -1,5 +1,5 @@
 // src/pages/admin/ReportsPage.tsx
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useClasses } from '../../hooks/useClasses'
