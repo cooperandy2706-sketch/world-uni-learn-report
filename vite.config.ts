@@ -16,7 +16,8 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: ['bail'],
+      // 'bail' must NOT be external — it's an ESM dep of unified/react-markdown
+      // and browsers cannot resolve bare module specifiers at runtime.
     },
   },
 })

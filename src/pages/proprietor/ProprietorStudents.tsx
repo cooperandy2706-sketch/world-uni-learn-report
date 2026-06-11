@@ -69,19 +69,32 @@ export default function ProprietorStudents() {
           transition: opacity 0.5s ease;
           max-width: 1440px;
           margin: 0 auto;
-          padding: 20px 40px 60px;
+          padding: 16px 20px 100px;
+          min-height: 100vh;
+          min-height: 100dvh;
+        }
+
+        @media (min-width: 641px) {
+          .students-wrap { padding: 20px 40px 60px; }
+        }
+
+        @media (min-width: 769px) {
+          .stats-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important; gap: 24px !important; }
         }
 
         @media (max-width: 768px) {
-          .students-wrap { padding: 16px 20px 80px; }
           .students-wrap > div:last-child { padding: 20px !important; }
+        }
+
+        @media (max-width: 480px) {
+          .students-wrap { padding: 12px 16px 100px; }
         }
       `}</style>
 
       <div className="students-wrap">
-        <h1 style={{ fontSize: 32, fontWeight: 800, margin: '0 0 32px', color: '#0f172a' }}>Student Demographics</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 24px', color: '#0f172a' }}>Student Demographics</h1>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24, marginBottom: 32 }}>
+        <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginBottom: 24 }}>
           <div style={{ background: 'var(--bg-card)', border: '1px solid #e2e8f0', borderRadius: 8, padding: 24 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Students</div>
             <div style={{ fontSize: 42, fontWeight: 800, color: '#0f172a', margin: '8px 0 0' }}>{studentStats.total}</div>

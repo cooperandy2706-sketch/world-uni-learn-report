@@ -140,7 +140,9 @@ export default function ProprietorDashboard() {
           max-width: 1440px;
           margin: 0 auto;
           color: #0f172a;
-          padding: 20px 40px 60px;
+          padding: 16px 20px 100px;
+          min-height: 100vh;
+          min-height: 100dvh;
         }
 
         @keyframes slideUp {
@@ -225,31 +227,46 @@ export default function ProprietorDashboard() {
 
         .charts-grid {
           display: grid;
-          grid-template-columns: 2fr 1fr;
-          gap: 24px;
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        @media (min-width: 641px) {
+          .proprietor-portal { padding: 20px 40px 60px; }
+        }
+
+        @media (min-width: 769px) {
+          .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important; gap: 24px !important; }
+          .charts-grid { grid-template-columns: 2fr 1fr !important; gap: 24px !important; }
         }
 
         @media (max-width: 768px) {
-          .proprietor-portal { padding: 16px 20px 80px; }
-          .exec-card { padding: 24px; }
+          .exec-card { padding: 20px; }
           .metric-value { font-size: 32px; }
-          .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+          .proprietor-portal { padding: 12px 16px 100px; }
+          .exec-card { padding: 16px; }
+          .metric-value { font-size: 28px; }
+          .chart-container { height: 160px; gap: 8px; }
+          .bar { width: 12px; }
         }
       `}</style>
 
       <div className="proprietor-portal">
         {/* Header */}
-        <div style={{ marginBottom: 48, animation: 'slideUp 0.4s ease both' }}>
-          <h1 style={{ fontSize: 36, fontWeight: 800, color: '#0f172a', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
+        <div style={{ marginBottom: 32, animation: 'slideUp 0.4s ease both' }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
             Executive Overview
           </h1>
-          <p style={{ fontSize: 16, color: '#64748b', margin: 0, fontWeight: 600 }}>
+          <p style={{ fontSize: 14, color: '#64748b', margin: 0, fontWeight: 600 }}>
             {userSchool?.name || 'Acadera'} • {year?.name} • {term?.name}
           </p>
         </div>
 
         {/* Top KPIs */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24, marginBottom: 24 }}>
+        <div className="kpi-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginBottom: 24 }}>
           
           <div className="exec-card" style={{ animationDelay: '0.1s' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

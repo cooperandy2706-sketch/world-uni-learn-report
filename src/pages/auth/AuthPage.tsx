@@ -368,7 +368,7 @@ export default function AuthPage() {
       {/* Top Navbar overlaying background */}
       <div className="top-nav">
         <Link to="/">
-           <img src="./icon-512.png" alt="Logo" style={{ width: 42, height: 42, borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)' }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
+           <img src="/icon-192.png" alt="Logo" style={{ width: 42, height: 42, borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)' }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
         </Link>
         <div className="top-nav-links">
            <Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>Home</Link>

@@ -318,8 +318,14 @@ export default function DashboardPage() {
       supabase.from('classes').select('*', { count: 'exact', head: true }).eq('school_id', sid),
       supabase.from('subjects').select('*', { count: 'exact', head: true }).eq('school_id', sid),
       supabase.from('departments').select('*', { count: 'exact', head: true }).eq('school_id', sid),
-      supabase.from('chat_messages').select('*', { count: 'exact', head: true }).eq('school_id', sid)
-        .gt('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+      // chat_messages has no school_id — count via conversations this school belongs to
+      (async () => {
+        const { data: convIds } = await supabase.from('chat_conversations').select('id').eq('school_id', sid)
+        if (!convIds?.length) return { count: 0 }
+        return supabase.from('chat_messages').select('*', { count: 'exact', head: true })
+          .in('conversation_id', convIds.map((c: any) => c.id))
+          .gt('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+      })(),
       supabase.from('assignments').select('*', { count: 'exact', head: true }).eq('school_id', sid),
       supabase.from('assignment_submissions').select('*, assignment:assignments!inner(*)', { count: 'exact', head: true }).eq('assignments.school_id', sid),
       supabase.from('announcements').select('*', { count: 'exact', head: true }).eq('school_id', sid),
@@ -543,12 +549,16 @@ export default function DashboardPage() {
 
   async function loadPendingOperations() {
     if (!user?.school_id) return
-    const [leavesRes, exeatsRes] = await Promise.all([
-      supabase.from('leave_requests').select('id', { count: 'exact', head: true }).eq('school_id', user.school_id).eq('status', 'pending'),
-      supabase.from('exeat_requests').select('id', { count: 'exact', head: true }).eq('school_id', user.school_id).eq('status', 'pending')
-    ])
-    setPendingLeavesCount(leavesRes.count ?? 0)
-    setPendingExeatsCount(exeatsRes.count ?? 0)
+    try {
+      const [leavesRes, exeatsRes] = await Promise.all([
+        supabase.from('leave_requests').select('id', { count: 'exact', head: true }).eq('school_id', user.school_id).eq('status', 'pending'),
+        supabase.from('exeat_requests').select('id', { count: 'exact', head: true }).eq('school_id', user.school_id).eq('status', 'pending')
+      ])
+      setPendingLeavesCount(leavesRes.count ?? 0)
+      setPendingExeatsCount(exeatsRes.count ?? 0)
+    } catch {
+      // Tables may not exist yet — fail silently
+    }
   }
 
   async function loadWeeklyGoalsStats() {
