@@ -4,12 +4,15 @@ import { useAuth } from '../../hooks/useAuth'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { Users, UserCheck } from 'lucide-react'
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import { useProprietorScope } from '../../hooks/useProprietorScope'
+import ProprietorBranchSelector from './ProprietorBranchSelector'
 
 export default function ProprietorStaff() {
     useAutoRefresh(loadStaff);
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const { activeSchoolIds } = useProprietorScope()
 
   const [staffList, setStaffList] = useState<any[]>([])
   const [roleCounts, setRoleCounts] = useState<Record<string, number>>({})
@@ -17,17 +20,16 @@ export default function ProprietorStaff() {
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
 
   useEffect(() => {
-    if (!user?.school_id) return
+    if (activeSchoolIds.length === 0) return
     loadStaff()
-  }, [user?.school_id])
+  }, [activeSchoolIds])
 
   async function loadStaff() {
-    const sid = user!.school_id
     try {
       const { data } = await supabase
         .from('users')
         .select('full_name, role, created_at')
-        .eq('school_id', sid)
+        .in('school_id', activeSchoolIds)
         .neq('role', 'student')
         .neq('role', 'parent')
         .order('role')
@@ -55,23 +57,26 @@ export default function ProprietorStaff() {
           transition: opacity 0.5s ease;
           max-width: 1440px;
           margin: 0 auto;
-          padding: 20px 40px 60px;
+          padding: 16px 20px 80px;
         }
         .role-pill {
-          padding: 6px 12px; border-radius: 99px; font-size: 13px; font-weight: 700; text-transform: capitalize;
+          padding: 6px 12px; border-radius: 99px; font-size: 13px; font-weight: 700; text-transform: capitalize; white-space: nowrap;
         }
         .role-card {
-          background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 24px; display: flex; align-items: center; gap: 16px; flex: 1; min-width: 200px;
+          background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 24px; display: flex; align-items: center; gap: 16px; flex: 1; min-width: 100%;
         }
 
-        @media (max-width: 768px) {
-          .staff-wrap { padding: 16px 20px 80px; }
-          .role-card { min-width: 100%; }
+        @media (min-width: 768px) {
+          .staff-wrap { padding: 20px 40px 60px; }
+          .role-card { min-width: 200px; }
         }
       `}</style>
       
       <div className="staff-wrap">
-        <h1 style={{ fontSize: 32, fontWeight: 800, margin: '0 0 32px', color: '#0f172a' }}>Staff & Payroll Demographics</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
+          <h1 style={{ fontSize: 32, fontWeight: 800, margin: 0, color: '#0f172a' }}>Staff & Payroll Demographics</h1>
+          <ProprietorBranchSelector />
+        </div>
 
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 32 }}>
           {Object.entries(roleCounts).map(([role, count]) => (

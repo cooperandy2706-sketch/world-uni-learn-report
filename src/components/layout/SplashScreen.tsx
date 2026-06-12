@@ -35,7 +35,7 @@ export default function SplashScreen() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
         .splash-wrapper {
           position: fixed;
@@ -45,18 +45,33 @@ export default function SplashScreen() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          background: #09090b;
-          font-family: 'Plus Jakarta Sans', sans-serif;
+          background: #020617;
+          font-family: 'Outfit', system-ui, sans-serif;
           overflow: hidden;
         }
 
         .splash-glow {
           position: absolute;
+          top: -10%;
+          left: -10%;
+          width: 600px;
+          height: 600px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, rgba(56, 189, 248, 0) 60%);
+          filter: blur(80px);
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .splash-glow-2 {
+          position: absolute;
+          bottom: -20%;
+          right: -10%;
           width: 500px;
           height: 500px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, rgba(124, 58, 237, 0) 70%);
-          filter: blur(60px);
+          background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, rgba(124, 58, 237, 0) 60%);
+          filter: blur(80px);
           pointer-events: none;
           z-index: 1;
         }
@@ -68,117 +83,114 @@ export default function SplashScreen() {
           flex-direction: column;
           align-items: center;
           text-align: center;
-          max-width: 320px;
+          max-width: 380px;
           width: 100%;
-          padding: 20px;
+          padding: 32px;
         }
 
         .logo-box {
           position: relative;
-          width: 80px;
-          height: 80px;
-          background: #ffffff;
-          border-radius: 8px;
-          padding: 14px;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+          width: 96px;
+          height: 96px;
+          background: rgba(255, 255, 255, 0.03);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 28px;
+          padding: 22px;
+          box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-bottom: 24px;
-          animation: logoEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-        .logo-box::after {
-          content: '';
-          position: absolute;
-          inset: -1px;
-          border-radius: 8px;
-          background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.05));
-          pointer-events: none;
+          margin-bottom: 32px;
+          animation: scaleUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         .brand-title {
-          font-size: 32px;
+          font-size: 42px;
           font-weight: 800;
-          letter-spacing: -0.03em;
+          letter-spacing: -0.04em;
           color: #ffffff;
-          margin: 0 0 6px 0;
-          background: linear-gradient(135deg, #ffffff 30%, #a78bfa 100%);
+          margin: 0 0 8px 0;
+          background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-          animation: textEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+          animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
         }
 
         .brand-subtitle {
-          font-size: 11px;
-          font-weight: 600;
+          font-size: 13px;
+          font-weight: 700;
           text-transform: uppercase;
-          letter-spacing: 0.25em;
-          color: #a1a1aa;
-          margin-bottom: 40px;
-          animation: textEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+          letter-spacing: 0.3em;
+          color: #64748b;
+          margin-bottom: 48px;
+          animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
         }
 
         .progress-container {
-          width: 180px;
-          margin-bottom: 12px;
-          animation: textEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+          width: 220px;
+          margin-bottom: 16px;
+          animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
         }
 
         .progress-track {
-          height: 2px;
+          height: 4px;
           width: 100%;
-          background: #27272a;
-          border-radius: 1px;
+          background: rgba(255, 255, 255, 0.06);
+          border-radius: 4px;
           overflow: hidden;
+          position: relative;
         }
 
         .progress-bar {
           height: 100%;
-          background: linear-gradient(90deg, #7c3aed, #a78bfa);
-          border-radius: 1px;
-          transition: width 0.3s ease;
+          background: linear-gradient(90deg, #38bdf8, #818cf8);
+          border-radius: 4px;
+          transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
         }
 
         .status-text {
-          font-size: 11px;
-          font-weight: 600;
-          color: #71717a;
-          letter-spacing: 0.02em;
-          animation: textEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
-          height: 16px;
+          font-size: 13px;
+          font-weight: 500;
+          color: #94a3b8;
+          letter-spacing: 0.01em;
+          animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+          height: 20px;
         }
 
         .credits {
           position: absolute;
-          bottom: 32px;
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.2em;
-          color: #3f3f46;
+          bottom: 40px;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.25em;
+          color: #334155;
           text-transform: uppercase;
           z-index: 2;
-          animation: textEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+          animation: fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
         }
 
-        @keyframes logoEntrance {
-          0% { opacity: 0; transform: scale(0.8) translateY(20px); filter: blur(5px); }
+        @keyframes scaleUp {
+          0% { opacity: 0; transform: scale(0.85) translateY(20px); filter: blur(12px); }
           100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
         }
 
-        @keyframes textEntrance {
-          0% { opacity: 0; transform: translateY(10px); filter: blur(3px); }
+        @keyframes fadeUp {
+          0% { opacity: 0; transform: translateY(15px); filter: blur(6px); }
           100% { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
       `}</style>
 
       <div className="splash-wrapper">
         <div className="splash-glow" />
+        <div className="splash-glow-2" />
 
         <div className="splash-content">
           <div className="logo-box">
             <img
-              src="/icon-192.png"
+              src="/icon-512.png"
               alt="Acadera Logo"
               style={{
                 width: '100%',

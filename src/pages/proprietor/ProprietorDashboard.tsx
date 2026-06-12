@@ -6,6 +6,8 @@ import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { Users, UserCheck, TrendingUp, TrendingDown, Wallet, BookOpen, GraduationCap, LayoutDashboard, Target } from 'lucide-react'
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import { useProprietorScope } from '../../hooks/useProprietorScope'
+import ProprietorBranchSelector from './ProprietorBranchSelector'
 
 function AnimNum({ to, duration = 900, prefix = '', suffix = '' }: { to: number; duration?: number; prefix?: string; suffix?: string }) {
   const [val, setVal] = useState(0)
@@ -35,6 +37,7 @@ export default function ProprietorDashboard() {
   const { data: year } = useCurrentAcademicYear()
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const { activeSchoolIds } = useProprietorScope()
 
   // Metrics
   const [stats, setStats] = useState({
@@ -51,12 +54,11 @@ export default function ProprietorDashboard() {
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
 
   useEffect(() => {
-    if (!user?.school_id) return
+    if (activeSchoolIds.length === 0) return
     loadDashboardData()
-  }, [user?.school_id, term?.id])
+  }, [activeSchoolIds, term?.id])
 
   async function loadDashboardData() {
-    const sid = user!.school_id
     
     try {
       // Basic counts
@@ -65,9 +67,9 @@ export default function ProprietorDashboard() {
         { count: teachers },
         { count: staff },
       ] = await Promise.all([
-        supabase.from('students').select('*', { count: 'exact', head: true }).eq('school_id', sid).eq('is_active', true),
-        supabase.from('users').select('*', { count: 'exact', head: true }).eq('school_id', sid).eq('role', 'teacher'),
-        supabase.from('users').select('*', { count: 'exact', head: true }).eq('school_id', sid).in('role', ['bursar', 'security', 'driver', 'nurse', 'librarian', 'staff']),
+        supabase.from('students').select('*', { count: 'exact', head: true }).in('school_id', activeSchoolIds).eq('is_active', true),
+        supabase.from('users').select('*', { count: 'exact', head: true }).in('school_id', activeSchoolIds).eq('role', 'teacher'),
+        supabase.from('users').select('*', { count: 'exact', head: true }).in('school_id', activeSchoolIds).in('role', ['bursar', 'security', 'driver', 'nurse', 'librarian', 'staff']),
       ])
 
       // High-level financials for the current year (simplified)
@@ -79,8 +81,8 @@ export default function ProprietorDashboard() {
         { data: payments },
         { data: expenses }
       ] = await Promise.all([
-        supabase.from('fee_payments').select('amount_paid, payment_date').eq('school_id', sid).gte('payment_date', sixMonthsAgo.toISOString()),
-        supabase.from('expense_records').select('amount, date').eq('school_id', sid).gte('date', sixMonthsAgo.toISOString())
+        supabase.from('fee_payments').select('amount_paid, payment_date').in('school_id', activeSchoolIds).gte('payment_date', sixMonthsAgo.toISOString()),
+        supabase.from('expense_records').select('amount, date').in('school_id', activeSchoolIds).gte('date', sixMonthsAgo.toISOString())
       ])
 
       let totalRev = 0
@@ -140,7 +142,7 @@ export default function ProprietorDashboard() {
           max-width: 1440px;
           margin: 0 auto;
           color: #0f172a;
-          padding: 16px 20px 100px;
+          padding: 12px 16px 100px;
           min-height: 100vh;
           min-height: 100dvh;
         }
@@ -157,7 +159,7 @@ export default function ProprietorDashboard() {
           border: 1px solid rgba(255, 255, 255, 0.8);
           border-radius: 12px;
           box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1);
-          padding: 32px;
+          padding: 16px;
           animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
           position: relative;
           overflow: hidden;
@@ -177,7 +179,7 @@ export default function ProprietorDashboard() {
         }
 
         .metric-value {
-          font-size: 42px;
+          font-size: 28px;
           font-weight: 800;
           letter-spacing: -0.03em;
           line-height: 1.1;
@@ -187,8 +189,8 @@ export default function ProprietorDashboard() {
         .chart-container {
           display: flex;
           align-items: flex-end;
-          height: 200px;
-          gap: 16px;
+          height: 160px;
+          gap: 8px;
           margin-top: 32px;
           padding-top: 20px;
           border-top: 1px dashed rgba(0,0,0,0.1);
@@ -214,7 +216,7 @@ export default function ProprietorDashboard() {
         }
 
         .bar {
-          width: 16px;
+          width: 12px;
           border-radius: 8px 8px 0 0;
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -231,38 +233,35 @@ export default function ProprietorDashboard() {
           gap: 16px;
         }
 
-        @media (min-width: 641px) {
-          .proprietor-portal { padding: 20px 40px 60px; }
-        }
-
-        @media (min-width: 769px) {
-          .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important; gap: 24px !important; }
-          .charts-grid { grid-template-columns: 2fr 1fr !important; gap: 24px !important; }
-        }
-
-        @media (max-width: 768px) {
+        @media (min-width: 480px) {
+          .proprietor-portal { padding: 20px; }
           .exec-card { padding: 20px; }
           .metric-value { font-size: 32px; }
         }
 
-        @media (max-width: 480px) {
-          .proprietor-portal { padding: 12px 16px 100px; }
-          .exec-card { padding: 16px; }
-          .metric-value { font-size: 28px; }
-          .chart-container { height: 160px; gap: 8px; }
-          .bar { width: 12px; }
+        @media (min-width: 768px) {
+          .proprietor-portal { padding: 20px 40px 60px; }
+          .exec-card { padding: 32px; }
+          .metric-value { font-size: 42px; }
+          .chart-container { height: 200px; gap: 16px; }
+          .bar { width: 16px; }
+          .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important; gap: 24px !important; }
+          .charts-grid { grid-template-columns: 2fr 1fr !important; gap: 24px !important; }
         }
       `}</style>
 
       <div className="proprietor-portal">
         {/* Header */}
-        <div style={{ marginBottom: 32, animation: 'slideUp 0.4s ease both' }}>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
-            Executive Overview
-          </h1>
-          <p style={{ fontSize: 14, color: '#64748b', margin: 0, fontWeight: 600 }}>
-            {userSchool?.name || 'Acadera'} • {year?.name} • {term?.name}
-          </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32, animation: 'slideUp 0.4s ease both', flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
+              Executive Overview
+            </h1>
+            <p style={{ fontSize: 14, color: '#64748b', margin: 0, fontWeight: 600 }}>
+              {userSchool?.name || 'Acadera'} • {year?.name} • {term?.name}
+            </p>
+          </div>
+          <ProprietorBranchSelector />
         </div>
 
         {/* Top KPIs */}

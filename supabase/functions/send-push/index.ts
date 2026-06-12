@@ -103,7 +103,7 @@ serve(async (req) => {
       title, 
       body, 
       url: '/teacher/notifications', // Default target
-      icon: '/icon-192.png',
+      icon: '/icon-512.png',
       badge: '/badge-72.png'
     })
 

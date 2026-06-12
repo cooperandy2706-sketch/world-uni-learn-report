@@ -3,12 +3,15 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import { useProprietorScope } from '../../hooks/useProprietorScope'
+import ProprietorBranchSelector from './ProprietorBranchSelector'
 
 export default function ProprietorStudents() {
     useAutoRefresh(loadStudents);
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const { activeSchoolIds } = useProprietorScope()
 
   const [studentStats, setStudentStats] = useState({
     total: 0,
@@ -20,17 +23,16 @@ export default function ProprietorStudents() {
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
 
   useEffect(() => {
-    if (!user?.school_id) return
+    if (activeSchoolIds.length === 0) return
     loadStudents()
-  }, [user?.school_id])
+  }, [activeSchoolIds])
 
   async function loadStudents() {
-    const sid = user!.school_id
     try {
       const { data: students } = await supabase
         .from('students')
         .select('is_active, class:classes(name)')
-        .eq('school_id', sid)
+        .in('school_id', activeSchoolIds)
 
       if (students) {
         let active = 0
@@ -69,32 +71,34 @@ export default function ProprietorStudents() {
           transition: opacity 0.5s ease;
           max-width: 1440px;
           margin: 0 auto;
-          padding: 16px 20px 100px;
+          padding: 12px 16px 100px;
           min-height: 100vh;
           min-height: 100dvh;
+        }
+        
+        .stats-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 16px;
+          margin-bottom: 24px;
         }
 
         @media (min-width: 641px) {
           .students-wrap { padding: 20px 40px 60px; }
         }
 
-        @media (min-width: 769px) {
-          .stats-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important; gap: 24px !important; }
-        }
-
-        @media (max-width: 768px) {
-          .students-wrap > div:last-child { padding: 20px !important; }
-        }
-
-        @media (max-width: 480px) {
-          .students-wrap { padding: 12px 16px 100px; }
+        @media (min-width: 768px) {
+          .stats-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
         }
       `}</style>
 
       <div className="students-wrap">
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 24px', color: '#0f172a' }}>Student Demographics</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: '#0f172a' }}>Student Demographics</h1>
+          <ProprietorBranchSelector />
+        </div>
 
-        <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginBottom: 24 }}>
+        <div className="stats-grid">
           <div style={{ background: 'var(--bg-card)', border: '1px solid #e2e8f0', borderRadius: 8, padding: 24 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Students</div>
             <div style={{ fontSize: 42, fontWeight: 800, color: '#0f172a', margin: '8px 0 0' }}>{studentStats.total}</div>

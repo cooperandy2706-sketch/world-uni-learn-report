@@ -5,12 +5,15 @@ import FlaskLoader from '../../components/ui/FlaskLoader'
 import { Wallet, CreditCard, ArrowDownRight, ArrowUpRight, Calendar, Download } from 'lucide-react'
 import { format, subMonths } from 'date-fns'
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import { useProprietorScope } from '../../hooks/useProprietorScope'
+import ProprietorBranchSelector from './ProprietorBranchSelector'
 
 export default function ProprietorFinances() {
     useAutoRefresh(loadFinances);
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const { activeSchoolIds } = useProprietorScope()
 
   const [finances, setFinances] = useState({
     totalCollected: 0,
@@ -26,12 +29,11 @@ export default function ProprietorFinances() {
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
 
   useEffect(() => {
-    if (!user?.school_id) return
+    if (activeSchoolIds.length === 0) return
     loadFinances()
-  }, [user?.school_id, dateRange])
+  }, [activeSchoolIds, dateRange])
 
   async function loadFinances() {
-    const sid = user!.school_id
     setLoading(true)
     try {
       const [
@@ -40,13 +42,13 @@ export default function ProprietorFinances() {
       ] = await Promise.all([
         supabase.from('fee_payments')
           .select('amount_paid, payment_date, student:students(full_name)')
-          .eq('school_id', sid)
+          .in('school_id', activeSchoolIds)
           .gte('payment_date', dateRange.start)
           .lte('payment_date', dateRange.end)
           .order('payment_date', { ascending: false }),
         supabase.from('expense_records')
           .select('amount, date, description')
-          .eq('school_id', sid)
+          .in('school_id', activeSchoolIds)
           .gte('date', dateRange.start)
           .lte('date', dateRange.end)
           .order('date', { ascending: false })
@@ -90,13 +92,13 @@ export default function ProprietorFinances() {
           transition: opacity 0.5s ease;
           max-width: 1440px;
           margin: 0 auto;
-          padding: 20px 40px 60px;
+          padding: 16px 20px 80px;
         }
 
         .fin-card {
           background: #fff;
           border-radius: 8px;
-          padding: 32px;
+          padding: 20px;
           border: 1px solid #e2e8f0;
           box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
@@ -109,21 +111,22 @@ export default function ProprietorFinances() {
 
         .finances-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+          grid-template-columns: 1fr;
           gap: 24px;
         }
 
-        @media (max-width: 768px) {
-          .finances-wrap { padding: 16px 20px 80px; }
-          .fin-card { padding: 20px; }
-          .finances-grid { grid-template-columns: 1fr; }
+        @media (min-width: 768px) {
+          .finances-wrap { padding: 20px 40px 60px; }
+          .fin-card { padding: 32px; }
+          .finances-grid { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
         }
       `}</style>
 
       <div className="finances-wrap">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
           <h1 style={{ fontSize: 32, fontWeight: 800, margin: 0, color: '#0f172a' }}>Financial Health</h1>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            <ProprietorBranchSelector />
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: 'var(--bg-card)', padding: '6px 12px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
               <Calendar size={14} color="#64748b" />
               <input type="date" value={dateRange.start} onChange={e => setDateRange({...dateRange, start: e.target.value})} style={{ border: 'none', fontSize: 13, fontWeight: 600, outline: 'none' }} />

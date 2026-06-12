@@ -38,6 +38,22 @@ const ADMIN_NAV = [
       { label: 'Communications Hub', to: '/admin/communications-hub' },
     ]
   },
+  {
+    label: 'Insights', items: [
+      { label: 'School Analytics', to: ROUTES.ADMIN_ANALYTICS },
+      { label: 'Performance Tracker', to: ROUTES.ADMIN_PERFORMANCE },
+    ]
+  },
+  {
+    label: 'Admin Tools', items: [
+      { label: 'Attendance', to: ROUTES.ADMIN_ATTENDANCE },
+      { label: 'Timetable', to: ROUTES.ADMIN_TIMETABLE },
+      { label: 'Weekly Goals', to: ROUTES.ADMIN_WEEKLY_GOALS },
+      { label: 'Billing', to: '/admin/billing' },
+      { label: 'Poster Maker', to: '/admin/poster-maker' },
+      { label: 'Elections (PEC)', to: '/admin/elections' },
+    ]
+  },
   { label: 'System Settings', to: '/admin/settings-hub', single: true },
 ]
 
@@ -641,7 +657,7 @@ export default function Header() {
             />
           ) : (
             <img
-              src="/icon-192.png" alt="Acadera"
+              src="/icon-512.png" alt="Acadera"
               style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-hover)', padding: 3, border: '1px solid var(--border-color)' }}
             />
           )}

@@ -5,6 +5,8 @@ import { useCurrentTerm } from '../../hooks/useSettings'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { GraduationCap, TrendingUp, Award, Target } from 'lucide-react'
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import { useProprietorScope } from '../../hooks/useProprietorScope'
+import ProprietorBranchSelector from './ProprietorBranchSelector'
 
 export default function ProprietorAnalytics() {
     useAutoRefresh(loadTerms);
@@ -12,6 +14,7 @@ export default function ProprietorAnalytics() {
   const { data: term } = useCurrentTerm()
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const { activeSchoolIds } = useProprietorScope()
 
   const [topClasses, setTopClasses] = useState<{name: string, avg: number}[]>([])
   const [passRate, setPassRate] = useState(0)
@@ -23,21 +26,21 @@ export default function ProprietorAnalytics() {
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
 
   useEffect(() => {
-    if (user?.school_id) {
+    if (activeSchoolIds.length > 0) {
       loadTerms()
       loadEnrollment()
     }
-  }, [user?.school_id])
+  }, [activeSchoolIds])
 
   useEffect(() => {
     if (term?.id && !selectedTermId) setSelectedTermId(term.id)
   }, [term])
 
   useEffect(() => {
-    if (user?.school_id && selectedTermId) {
+    if (activeSchoolIds.length > 0 && selectedTermId) {
       loadAnalytics()
     }
-  }, [user?.school_id, selectedTermId])
+  }, [activeSchoolIds, selectedTermId])
 
   async function loadTerms() {
     const { data } = await supabase.from('terms').select('*').eq('school_id', user!.school_id).order('start_date', { ascending: false })
@@ -45,20 +48,19 @@ export default function ProprietorAnalytics() {
   }
 
   async function loadEnrollment() {
-    const { count } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('school_id', user!.school_id)
+    const { count } = await supabase.from('students').select('*', { count: 'exact', head: true }).in('school_id', activeSchoolIds)
     setEnrollment(count || 0)
   }
 
   async function loadAnalytics() {
     setLoading(true)
     try {
-      const sid = user!.school_id
       const tid = selectedTermId
 
       const { data: reports } = await supabase
         .from('report_cards')
         .select('average_score, class:classes(name)')
-        .eq('school_id', sid)
+        .in('school_id', activeSchoolIds)
         .eq('term_id', tid)
 
       if (reports && reports.length > 0) {
@@ -102,18 +104,20 @@ export default function ProprietorAnalytics() {
           transition: opacity 0.5s ease;
           max-width: 1440px;
           margin: 0 auto;
-          padding: 20px 40px 60px;
+          padding: 16px 20px 80px;
         }
 
         .stat-box {
           background: #fff;
           border-radius: 8px;
-          padding: 24px;
+          padding: 20px;
           border: 1px solid #e2e8f0;
           box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
           display: flex;
+          flex-direction: column;
+          text-align: center;
           align-items: center;
-          gap: 20px;
+          gap: 12px;
         }
 
         .stat-icon {
@@ -125,25 +129,27 @@ export default function ProprietorAnalytics() {
           display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;
         }
 
-        @media (max-width: 768px) {
-          .analytics-wrap { padding: 16px 20px 80px; }
-          .stat-box { flex-direction: column; text-align: center; gap: 12px; padding: 20px; }
-          .stat-box > div:last-child { display: flex; flex-direction: column; align-items: center; }
+        @media (min-width: 768px) {
+          .analytics-wrap { padding: 20px 40px 60px; }
+          .stat-box { flex-direction: row; text-align: left; gap: 20px; padding: 24px; }
         }
       `}</style>
       
       <div className="analytics-wrap">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
           <h1 style={{ fontSize: 32, fontWeight: 800, margin: 0, color: '#0f172a' }}>Academic Performance</h1>
-          <select 
-            value={selectedTermId} 
-            onChange={e => setSelectedTermId(e.target.value)}
-            style={{ padding: '10px 16px', borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 14, fontWeight: 600, outline: 'none', cursor: 'pointer' }}
-          >
-            {allTerms.map(t => (
-              <option key={t.id} value={t.id}>{t.name} ({t.academic_year})</option>
-            ))}
-          </select>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            <ProprietorBranchSelector />
+            <select 
+              value={selectedTermId} 
+              onChange={e => setSelectedTermId(e.target.value)}
+              style={{ padding: '10px 16px', borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 14, fontWeight: 600, outline: 'none', cursor: 'pointer' }}
+            >
+              {allTerms.map(t => (
+                <option key={t.id} value={t.id}>{t.name} ({t.academic_year})</option>
+              ))}
+            </select>
+          </div>
         </div>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 32 }}>
