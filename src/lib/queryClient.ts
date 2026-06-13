@@ -5,34 +5,33 @@ import { hydrateQueryClient, persistQueryCache } from './networkCache'
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Data is considered fresh for 30 seconds. This ensures data stays
-      // relatively fresh without excessive refetching.
-      staleTime: 1000 * 30,
+      // Data is considered fresh for 2 minutes. Navigating back to a page
+      // shows cached data instantly while a background refetch runs.
+      staleTime: 1000 * 60 * 2,
 
-      // Keep unused data in the cache for 5 minutes so navigating
+      // Keep unused data in the cache for 10 minutes so navigating
       // back to a page feels instant while a background refetch runs.
-      gcTime: 1000 * 60 * 5,
+      gcTime: 1000 * 60 * 10,
 
-      // Retry failed requests up to 3 times with exponential back-off
-      // (1 s, 2 s, 4 s) — essential for flaky mobile networks.
-      retry: 3,
+      // Retry failed queries up to 2 times with exponential back-off
+      // (1 s, 2 s) — essential for flaky mobile networks.
+      retry: 2,
       retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
 
-      // Enable window focus refetching with a check for stale data only
-      // This ensures data is refreshed when user returns to the tab
+      // Refetch when user returns to the tab or reconnects — keeps data
+      // fresh without polling. No blanket timer to avoid hammering Supabase.
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
       refetchOnMount: true,
-      
-      // Auto-sync: silently fetch latest data in the background every 60 seconds
-      // so the user never has to manually refresh to see updates from others.
-      refetchInterval: 1000 * 60,
-      refetchIntervalInBackground: false, // Don't poll if the tab is hidden
+
+      // ⛔ NO refetchInterval — per-query polling is set only where needed
+      // (e.g. live fleet tracking). A global 60s poll causes hundreds of
+      // unnecessary Supabase calls/min across all logged-in users.
     },
     mutations: {
-      // Retry failed mutations up to 3 times with exponential backoff
-      retry: 3,
-      retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
+      // ⛔ NEVER retry mutations — a failed payment/attendance write
+      // retried 3x would create 3 duplicate database records.
+      retry: false,
     },
   },
 })

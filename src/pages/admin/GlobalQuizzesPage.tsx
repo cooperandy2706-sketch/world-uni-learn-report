@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
 import { formatDate } from '../../lib/utils'
 import toast from 'react-hot-toast'
-import AIQuizGenerator from '../../components/admin/AIQuizGenerator'
+// Lazy-load so pdfjs-dist + groq only download when user opens AI generator
+const AIQuizGenerator = lazy(() => import('../../components/admin/AIQuizGenerator'))
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 interface Question {
@@ -674,11 +675,13 @@ export default function AdminGlobalQuizzesPage() {
         </Modal>
 
         {/* ── AI GENERATOR MODAL ── */}
-        <AIQuizGenerator
-          open={aiModalOpen}
-          onClose={() => setAiModalOpen(false)}
-          onQuizCreated={loadQuizzes}
-        />
+        <Suspense fallback={null}>
+          <AIQuizGenerator
+            open={aiModalOpen}
+            onClose={() => setAiModalOpen(false)}
+            onQuizCreated={loadQuizzes}
+          />
+        </Suspense>
 
       </div>
     </>

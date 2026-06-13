@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
@@ -6,7 +6,8 @@ import { formatDate } from '../../lib/utils'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import toast from 'react-hot-toast'
-import AIQuizGenerator from '../../components/admin/AIQuizGenerator'
+// Lazy-load so pdfjs-dist + groq only download when user opens AI generator
+const AIQuizGenerator = lazy(() => import('../../components/admin/AIQuizGenerator'))
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 interface GlobalResourceData {
@@ -822,13 +823,15 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
 
       {/* ── AI QUIZ GENERATOR MODAL ── */}
       {quizGenResource && (
-        <AIQuizGenerator
-          open={!!quizGenResource}
-          onClose={() => setQuizGenResource(null)}
-          initialText={quizGenResource.content_type === 'passage' ? quizGenResource.content : ''}
-          subjectId={quizGenResource.subject_id}
-          titlePrefix={quizGenResource.title}
-        />
+        <Suspense fallback={null}>
+          <AIQuizGenerator
+            open={!!quizGenResource}
+            onClose={() => setQuizGenResource(null)}
+            initialText={quizGenResource.content_type === 'passage' ? quizGenResource.content : ''}
+            subjectId={quizGenResource.subject_id}
+            titlePrefix={quizGenResource.title}
+          />
+        </Suspense>
       )}
     </>
   )

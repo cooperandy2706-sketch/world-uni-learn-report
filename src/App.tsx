@@ -8,6 +8,7 @@ import { supabase } from './lib/supabase'
 import SplashScreen from './components/layout/SplashScreen'
 import GlobalAlarm from './components/ui/GlobalAlarm'
 import { useAuthStore } from './store/authStore'
+import { ErrorBoundary } from './components/ui/ErrorBoundary'
 
 // ── WhatsApp-style toast renderer ─────────────────────────────────────────────
 const TOAST_STYLES = `
@@ -182,7 +183,9 @@ export default function App() {
             </div>
           )}
 
-          <RouterProvider router={router} />
+          <ErrorBoundary>
+            <RouterProvider router={router} />
+          </ErrorBoundary>
           <GlobalAlarm />
 
           {/* ── WhatsApp-style toast styles ─────────────────────────── */}

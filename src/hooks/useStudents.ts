@@ -80,11 +80,35 @@ export function useUpdateStudent() {
       if (error) throw error
       return res
     },
+    // ── Optimistic update: patch the in-memory cache immediately ──────────
+    onMutate: async ({ id, ...data }: any) => {
+      // Cancel any in-flight refetches so they don't overwrite our optimistic data
+      await qc.cancelQueries({ queryKey: ['students'] })
+      // Snapshot the current value so we can roll back on failure
+      const prev = qc.getQueriesData({ queryKey: ['students'] })
+      // Optimistically update the student in all matching paginated caches
+      qc.setQueriesData({ queryKey: ['students'] }, (old: any) => {
+        if (!old?.pages) return old
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            data: page.data.map((s: any) => s.id === id ? { ...s, ...data } : s)
+          }))
+        }
+      })
+      return { prev }
+    },
+    onError: (_err, _vars, ctx) => {
+      // Roll back to snapshot on failure
+      ctx?.prev?.forEach(([key, val]: any) => qc.setQueryData(key, val))
+      toast.error('Failed to update student')
+    },
     onSuccess: () => {
+      // Quietly refetch to sync with server truth
       qc.invalidateQueries({ queryKey: ['students'] })
       toast.success('Student updated successfully')
     },
-    onError: (err: any) => toast.error(err.message || 'Failed to update student'),
   })
 }
 
@@ -98,10 +122,29 @@ export function useDeleteStudent() {
       if (error) throw error
       return data
     },
+    // ── Optimistic removal: vanish from list instantly, roll back on error ──
+    onMutate: async (id: string) => {
+      await qc.cancelQueries({ queryKey: ['students'] })
+      const prev = qc.getQueriesData({ queryKey: ['students'] })
+      qc.setQueriesData({ queryKey: ['students'] }, (old: any) => {
+        if (!old?.pages) return old
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            data: page.data.filter((s: any) => s.id !== id)
+          }))
+        }
+      })
+      return { prev }
+    },
+    onError: (_err, _id, ctx) => {
+      ctx?.prev?.forEach(([key, val]: any) => qc.setQueryData(key, val))
+      toast.error('Failed to remove student')
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['students'] })
       toast.success('Student removed')
     },
-    onError: (err: any) => toast.error(err.message || 'Failed to remove student'),
   })
 }
