@@ -145,6 +145,7 @@ export default function TeacherSelfServicePage() {
                 @media (max-width: 640px) {
                     .stats-grid { grid-template-columns: 1fr !important; }
                     .profile-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+                    .resp-grid-2 { grid-template-columns: 1fr !important; }
                 }
 
                 /* ── RESPONSIVE DYNAMIC TABLE TO CARD CONVERSION ── */
@@ -213,7 +214,7 @@ export default function TeacherSelfServicePage() {
                                 <option value="other">Other</option>
                             </select>
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                        <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                             <div>
                                 <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, letterSpacing: '0.05em' }}>Start Date</label>
                                 <input 

@@ -87,19 +87,23 @@ export default function ProprietorFinances() {
     <>
       <style>{`
         .finances-wrap {
-          font-family: 'Outfit', system-ui, sans-serif;
+          font-family: 'DM Sans', system-ui, sans-serif;
           opacity: ${mounted ? 1 : 0};
           transition: opacity 0.5s ease;
           max-width: 1440px;
           margin: 0 auto;
-          padding: 16px 20px 80px;
+          padding: 16px 12px 80px;
         }
 
         .fin-card {
           background: #fff;
-          border-radius: 8px;
+          border-radius: 0;
+          margin: 0 -12px;
+          border-left: none;
+          border-right: none;
           padding: 20px;
-          border: 1px solid #e2e8f0;
+          border-top: 1px solid #e2e8f0;
+          border-bottom: 1px solid #e2e8f0;
           box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
 
@@ -117,14 +121,19 @@ export default function ProprietorFinances() {
 
         @media (min-width: 768px) {
           .finances-wrap { padding: 20px 40px 60px; }
-          .fin-card { padding: 32px; }
+          .fin-card { 
+            padding: 32px; 
+            border-radius: 8px; 
+            margin: 0; 
+            border: 1px solid #e2e8f0; 
+          }
           .finances-grid { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
         }
       `}</style>
 
       <div className="finances-wrap">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 800, margin: 0, color: '#0f172a' }}>Financial Health</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0, color: '#0f172a' }}>Financial Health</h1>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
             <ProprietorBranchSelector />
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: 'var(--bg-card)', padding: '6px 12px', borderRadius: 12, border: '1px solid #e2e8f0' }}>

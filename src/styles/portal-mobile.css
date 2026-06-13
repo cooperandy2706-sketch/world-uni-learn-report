@@ -1,0 +1,189 @@
+/* ============================================================
+   portal-mobile.css — Shared mobile-first design tokens
+   For Proprietor and Parent portals (and general app use)
+   ============================================================ */
+
+/* ── Mobile-first layout classes ── */
+.p-portal, .parent-portal {
+  --p-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --p-bg: var(--bg-app);
+  --p-surface: var(--bg-card);
+  --p-text: var(--text-main);
+  --p-text-muted: var(--text-muted);
+  --p-text-subtle: var(--text-subtle);
+  --p-border: var(--border-color);
+  
+  font-family: var(--p-font);
+  color: var(--p-text);
+}
+
+.portal-page {
+  padding: 12px;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: pFadeUp 0.35s ease both;
+}
+
+@media (min-width: 640px) {
+  .portal-page {
+    padding: 20px;
+    padding-bottom: 32px;
+  }
+}
+
+@keyframes pFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Grid Layouts ── */
+.portal-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 640px) {
+  .portal-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .portal-kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+.portal-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .portal-action-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+}
+
+/* ── Cards ── */
+.portal-card {
+  background: var(--p-surface);
+  border-radius: 12px;
+  border: 1.5px solid var(--p-border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  padding: 16px;
+  margin-bottom: 16px;
+  color: var(--p-text);
+  overflow: hidden;
+}
+
+/* Edge-to-edge on very small screens */
+@media (max-width: 480px) {
+  .mobile-fullbleed {
+    margin-left: -12px;
+    margin-right: -12px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}
+
+/* ── Typography ── */
+.portal-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--p-text);
+  margin: 0 0 16px 0;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 640px) {
+  .portal-section-title {
+    font-size: 24px;
+  }
+}
+
+.portal-page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--p-text);
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .portal-page-title {
+    font-size: 32px;
+  }
+}
+
+.bold-text {
+  font-weight: 800;
+}
+
+/* ── Modals & Overlays ── */
+.portal-fullscreen-modal {
+  position: fixed;
+  inset: 0;
+  background: var(--p-surface);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  animation: pSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (min-width: 640px) {
+  .portal-fullscreen-modal {
+    inset: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 560px;
+    max-height: 90vh;
+    border-radius: 16px;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+    border: 1px solid var(--p-border);
+    animation: pPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes pSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes pPopIn {
+  from { opacity: 0; transform: translate(-50%, -45%) scale(0.95); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Touch friendly elements */
+.portal-touch-target {
+  min-height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .mobile-stack {
+    flex-direction: row;
+    align-items: center;
+  }
+}

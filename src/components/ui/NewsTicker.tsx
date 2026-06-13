@@ -134,7 +134,7 @@ export const NewsTicker: React.FC = () => {
   const fullTickerText = tickerItems.join('        |        ')
 
   return (
-    <div style={{
+    <div className="hide-on-mobile" style={{
       width: '100%',
       height: '32px',
       background: '#111827',

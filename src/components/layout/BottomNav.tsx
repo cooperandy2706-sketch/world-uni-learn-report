@@ -305,17 +305,26 @@ export default function BottomNav() {
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
                 gap: 4, textDecoration: 'none',
+                minWidth: '72px', position: 'relative',
               }}>
               
+              {/* Active Indicator Pill */}
+              {isActive && (
+                <motion.div layoutId="bn-active-indicator" style={{
+                  position: 'absolute', top: -8, width: 24, height: 3,
+                  borderRadius: 99, background: 'linear-gradient(90deg, #7c3aed, #4c1d95)'
+                }} />
+              )}
+              
               <div className="bn-icon-box" style={{
-                width: 52, height: 32, borderRadius: 8,
+                width: 56, height: 36, borderRadius: 10,
                 background: 'transparent',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 position: 'relative',
               }}>
                 <Icon 
-                  size={22} 
+                  size={24} 
                   strokeWidth={isActive ? 2.5 : 2} 
                   color={isActive ? '#6d28d9' : '#64748b'} 
                 />
@@ -336,7 +345,7 @@ export default function BottomNav() {
               </div>
 
               <span className="bn-label" style={{
-                fontSize: 11, fontWeight: 600,
+                fontSize: 13, fontWeight: isActive ? 700 : 600,
                 color: isActive ? '#6d28d9' : '#64748b',
                 transition: 'all 0.2s',
                 letterSpacing: '-0.01em',

@@ -1,7 +1,7 @@
 /* School directory — mobile-first, iOS-vivid, dark-theme ready */
 
 .schools-page {
-  --sd-font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --sd-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --sd-bg: #f2f2f7;
   --sd-surface: #ffffff;
   --sd-surface-2: #f8f9fc;

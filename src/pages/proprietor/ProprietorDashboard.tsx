@@ -133,16 +133,16 @@ export default function ProprietorDashboard() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
         
         .proprietor-portal {
-          font-family: 'Outfit', system-ui, sans-serif;
+          font-family: 'DM Sans', system-ui, sans-serif;
           opacity: ${mounted ? 1 : 0};
           transition: opacity 0.5s ease-out;
           max-width: 1440px;
           margin: 0 auto;
           color: #0f172a;
-          padding: 12px 16px 100px;
+          padding: 12px 12px 100px;
           min-height: 100vh;
           min-height: 100dvh;
         }
@@ -157,9 +157,12 @@ export default function ProprietorDashboard() {
           backdrop-filter: blur(24px);
           -webkit-backdrop-filter: blur(24px);
           border: 1px solid rgba(255, 255, 255, 0.8);
-          border-radius: 12px;
+          border-radius: 0;
+          margin: 0 -12px;
+          border-left: none;
+          border-right: none;
           box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1);
-          padding: 16px;
+          padding: 20px;
           animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
           position: relative;
           overflow: hidden;
@@ -179,8 +182,8 @@ export default function ProprietorDashboard() {
         }
 
         .metric-value {
-          font-size: 28px;
-          font-weight: 800;
+          font-size: 36px;
+          font-weight: 900;
           letter-spacing: -0.03em;
           line-height: 1.1;
           margin: 12px 0 4px;
@@ -235,7 +238,13 @@ export default function ProprietorDashboard() {
 
         @media (min-width: 480px) {
           .proprietor-portal { padding: 20px; }
-          .exec-card { padding: 20px; }
+          .exec-card { 
+            padding: 20px; 
+            border-radius: 12px;
+            margin: 0;
+            border-left: 1px solid rgba(255, 255, 255, 0.8);
+            border-right: 1px solid rgba(255, 255, 255, 0.8);
+          }
           .metric-value { font-size: 32px; }
         }
 
@@ -254,7 +263,7 @@ export default function ProprietorDashboard() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32, animation: 'slideUp 0.4s ease both', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
+            <h1 style={{ fontSize: 32, fontWeight: 900, color: '#0f172a', margin: '0 0 8px', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
               Executive Overview
             </h1>
             <p style={{ fontSize: 14, color: '#64748b', margin: 0, fontWeight: 600 }}>

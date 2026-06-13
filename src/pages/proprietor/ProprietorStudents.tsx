@@ -66,12 +66,12 @@ export default function ProprietorStudents() {
     <>
       <style>{`
         .students-wrap {
-          font-family: 'Outfit', system-ui, sans-serif;
+          font-family: 'DM Sans', system-ui, sans-serif;
           opacity: ${mounted ? 1 : 0};
           transition: opacity 0.5s ease;
           max-width: 1440px;
           margin: 0 auto;
-          padding: 12px 16px 100px;
+          padding: 16px 12px 80px;
           min-height: 100vh;
           min-height: 100dvh;
         }
@@ -83,8 +83,28 @@ export default function ProprietorStudents() {
           margin-bottom: 24px;
         }
 
+        .stat-card {
+          background: var(--bg-card);
+          border-top: 1px solid #e2e8f0;
+          border-bottom: 1px solid #e2e8f0;
+          border-radius: 0;
+          margin: 0 -12px;
+          padding: 24px;
+        }
+
+        .dist-card {
+          background: var(--bg-card);
+          border-radius: 0;
+          border-top: 1px solid #e2e8f0;
+          border-bottom: 1px solid #e2e8f0;
+          margin: 0 -12px;
+          padding: 24px;
+        }
+
         @media (min-width: 641px) {
           .students-wrap { padding: 20px 40px 60px; }
+          .stat-card { border: 1px solid #e2e8f0; border-radius: 8px; margin: 0; }
+          .dist-card { border-radius: 12px; border: 1px solid #e2e8f0; margin: 0; padding: 32px; }
         }
 
         @media (min-width: 768px) {
@@ -94,26 +114,26 @@ export default function ProprietorStudents() {
 
       <div className="students-wrap">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: '#0f172a' }}>Student Demographics</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0, color: '#0f172a' }}>Student Demographics</h1>
           <ProprietorBranchSelector />
         </div>
 
         <div className="stats-grid">
-          <div style={{ background: 'var(--bg-card)', border: '1px solid #e2e8f0', borderRadius: 8, padding: 24 }}>
+          <div className="stat-card">
             <div style={{ fontSize: 14, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Students</div>
-            <div style={{ fontSize: 42, fontWeight: 800, color: '#0f172a', margin: '8px 0 0' }}>{studentStats.total}</div>
+            <div style={{ fontSize: 42, fontWeight: 900, color: '#0f172a', margin: '8px 0 0', letterSpacing: '-0.02em' }}>{studentStats.total}</div>
           </div>
-          <div style={{ background: 'var(--bg-card)', border: '1px solid #e2e8f0', borderRadius: 8, padding: 24 }}>
+          <div className="stat-card">
             <div style={{ fontSize: 14, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Enrollment</div>
-            <div style={{ fontSize: 42, fontWeight: 800, color: '#10b981', margin: '8px 0 0' }}>{studentStats.active}</div>
+            <div style={{ fontSize: 42, fontWeight: 900, color: '#10b981', margin: '8px 0 0', letterSpacing: '-0.02em' }}>{studentStats.active}</div>
           </div>
-          <div style={{ background: 'var(--bg-card)', border: '1px solid #e2e8f0', borderRadius: 8, padding: 24 }}>
+          <div className="stat-card">
             <div style={{ fontSize: 14, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Inactive / Alumni</div>
-            <div style={{ fontSize: 42, fontWeight: 800, color: '#94a3b8', margin: '8px 0 0' }}>{studentStats.inactive}</div>
+            <div style={{ fontSize: 42, fontWeight: 900, color: '#94a3b8', margin: '8px 0 0', letterSpacing: '-0.02em' }}>{studentStats.inactive}</div>
           </div>
         </div>
 
-        <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1px solid #e2e8f0', padding: 32 }}>
+        <div className="dist-card">
           <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 24px' }}>Distribution by Class</h3>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>

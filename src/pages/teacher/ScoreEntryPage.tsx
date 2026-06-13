@@ -76,6 +76,9 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
   const [gradingCategories, setGradingCategories] = useState<GradingCategory[]>([])
   const [gradingScaleLevels, setGradingScaleLevels] = useState<GradingScaleLevel[]>([])
   const [syncTargetCatId, setSyncTargetCatId] = useState('')  // which category to sync tests/assignments into
+  
+  // Wizard state for mobile
+  const [mobileStudentIndex, setMobileStudentIndex] = useState(0)
 
   const isLocked = (term as any)?.is_locked
   const classOptions = [...new Map(assignments.map((a:any) => [a.class?.id, a.class])).values()].filter(Boolean)
@@ -101,6 +104,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
       .select('*, class:classes(id,name,department_id), subject:subjects(id,name,code)')
       .eq('teacher_id', t.id).eq('term_id', term.id)
     setAssignments(a ?? [])
+    setMobileStudentIndex(0)
     setLoading(false)
   }
 
@@ -198,6 +202,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
     setStudents(stds ?? [])
     setSubjects(assignedSubjects)
     setScoreMap(map)
+    setMobileStudentIndex(0)
     setDirty(false)
     setLoading(false)
   }
@@ -677,7 +682,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
       {!loading && selectedClass && students.length > 0 && subjects.length > 0 && (() => {
         const subjectsToRender = selectedSubjectId === 'all' ? subjects : subjects.filter(s => s.id === selectedSubjectId)
         return (
-          <div style={{ overflowX: 'auto', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 14 }}>
+          <div className="se-desktop-table" style={{ overflowX: 'auto', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 14 }}>
              <table className="sba-table" style={{ minWidth: COL_STUDENT + subjectsToRender.length * COL_SUBJECT + (selectedSubjectId === 'all' ? 160 : 0) }}>
                 <thead style={{ position:'sticky', top:0, zIndex:10 }}>
                   <tr>
@@ -753,64 +758,139 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
         )
       })()}
 
-      {/* Mobile card view: per-student score entry (shown only below 640px) */}
+      {/* Mobile wizard view: one student at a time (shown only below 640px) */}
       {!loading && selectedClass && students.length > 0 && subjects.length > 0 && (
-        <div className="se-mobile-card">
+        <div className="se-mobile-card" style={{ paddingBottom: 80 }}>
           {(() => {
             const subjectsToRender = selectedSubjectId === 'all' ? subjects : subjects.filter(s => s.id === selectedSubjectId)
-            return students.map(stu => (
-              <div key={stu.id} className="t-student-card">
-                <div className="t-student-card-header">
-                  <div className="t-student-avatar" style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)' }}>
-                    {stu.full_name.charAt(0)}
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{stu.full_name}</div>
-                    {stu.student_id && <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{stu.student_id}</div>}
-                  </div>
-                  {(() => { const avg = getStudentAvg(stu.id); const g = avg > 0 ? getGrade(avg) : null; return g ? <span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 800, background: g.color + '18', color: g.color, padding: '3px 8px', borderRadius: 6 }}>{g.grade} {avg.toFixed(1)}%</span> : null })()}
-                </div>
-                {subjectsToRender.map(sub => {
-                  const sc = scoreMap[stu.id]?.[sub.id]
-                  const total = getTotal(stu.id, sub.id)
-                  const g = total > 0 ? getGrade(total) : null
-                  return (
-                    <div key={sub.id} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f0eefe' }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.06em' }}>{sub.name}</div>
-                      <div className="t-score-card-grid">
-                        {gradingCategories.map(c => (
-                          <div key={c.id}>
-                            <div style={{ fontSize: 10, color: 'var(--text-subtle)', marginBottom: 4, fontWeight: 600 }}>{c.name} <span style={{ color: '#d1d5db' }}>/{c.max_score}</span></div>
-                            <TinyInput value={sc?.scores[c.id] ?? ''} max={c.max_score} disabled={isLocked} onChange={v => updateScore(stu.id, sub.id, c.id, v)} />
-                          </div>
-                        ))}
-                        {total > 0 && (
-                          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                            <div style={{ fontSize: 10, color: 'var(--text-subtle)', marginBottom: 4, fontWeight: 600 }}>Total</div>
-                            <div style={{ fontSize: 16, fontWeight: 800, color: g?.color ?? '#111827' }}>{total.toFixed(1)}{g && <span style={{ fontSize: 11, marginLeft: 4 }}>{g.grade}</span>}</div>
-                          </div>
-                        )}
-                      </div>
+            const currentStudent = students[mobileStudentIndex]
+            if (!currentStudent) return null
+
+            const avg = getStudentAvg(currentStudent.id)
+            const g = avg > 0 ? getGrade(avg) : null
+
+            return (
+              <div className="t-student-card" style={{ animation: '_spin 0s', padding: 0, overflow: 'hidden' }}>
+                
+                {/* Wizard Header (Progress + Navigation) */}
+                <div style={{ background: 'linear-gradient(135deg, #2e1065, #4c1d95)', padding: '16px 20px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <button 
+                    onClick={() => setMobileStudentIndex(i => Math.max(0, i - 1))}
+                    disabled={mobileStudentIndex === 0}
+                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: mobileStudentIndex === 0 ? 'default' : 'pointer', opacity: mobileStudentIndex === 0 ? 0.3 : 1 }}
+                  >
+                    ←
+                  </button>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.08em', opacity: 0.8, textTransform: 'uppercase' }}>
+                      Student {mobileStudentIndex + 1} of {students.length}
                     </div>
-                  )
-                })}
+                    <div style={{ width: 100, height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: 99, margin: '6px auto 0', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${((mobileStudentIndex + 1) / students.length) * 100}%`, background: '#34d399', borderRadius: 99, transition: 'width 0.3s ease' }} />
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setMobileStudentIndex(i => Math.min(students.length - 1, i + 1))}
+                    disabled={mobileStudentIndex === students.length - 1}
+                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: mobileStudentIndex === students.length - 1 ? 'default' : 'pointer', opacity: mobileStudentIndex === students.length - 1 ? 0.3 : 1 }}
+                  >
+                    →
+                  </button>
+                </div>
+
+                {/* Student Info */}
+                <div style={{ padding: '20px', borderBottom: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ width: 52, height: 52, borderRadius: 16, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, color: '#fff', flexShrink: 0, boxShadow: '0 4px 12px rgba(109,40,217,0.2)' }}>
+                    {currentStudent.full_name.charAt(0)}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.2 }}>{currentStudent.full_name}</div>
+                    {currentStudent.student_id && <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 2 }}>ID: {currentStudent.student_id}</div>}
+                  </div>
+                  {g && (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: g.color }}>{g.grade}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)' }}>{avg.toFixed(1)}%</div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Subjects & Inputs */}
+                <div style={{ padding: '0 20px 20px', maxHeight: '60vh', overflowY: 'auto' }}>
+                  {subjectsToRender.map((sub, idx) => {
+                    const sc = scoreMap[currentStudent.id]?.[sub.id]
+                    const total = getTotal(currentStudent.id, sub.id)
+                    const sg = total > 0 ? getGrade(total) : null
+                    return (
+                      <div key={sub.id} style={{ marginTop: 20, paddingBottom: 20, borderBottom: idx < subjectsToRender.length - 1 ? '1px dashed #e5e7eb' : 'none' }}>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: '#4c1d95', marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          {sub.name}
+                          {sg && <span style={{ fontSize: 12, background: sg.color + '15', color: sg.color, padding: '2px 8px', borderRadius: 6 }}>{total.toFixed(1)}</span>}
+                        </div>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 12 }}>
+                          {gradingCategories.map(c => (
+                            <div key={c.id} style={{ background: '#fafafa', border: '1px solid #f3f4f6', borderRadius: 12, padding: '12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                              <div style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 600, display: 'flex', justifyContent: 'space-between' }}>
+                                <span>{c.name}</span>
+                                <span>/{c.max_score}</span>
+                              </div>
+                              <input
+                                type="number" min={0} step={0.5}
+                                value={sc?.scores[c.id] ?? ''}
+                                disabled={isLocked}
+                                onChange={e => updateScore(currentStudent.id, sub.id, c.id, e.target.value)}
+                                placeholder="—"
+                                style={{
+                                  width: '100%', height: 44, textAlign: 'center', fontSize: 16, fontWeight: 800,
+                                  borderRadius: 8, outline: 'none', transition: 'all .12s',
+                                  fontFamily: '"DM Sans",sans-serif',
+                                  border: `2px solid ${(parseFloat(sc?.scores[c.id] ?? '0') > c.max_score) ? '#f87171' : sc?.scores[c.id] ? '#86efac' : '#e5e7eb'}`,
+                                  background: (parseFloat(sc?.scores[c.id] ?? '0') > c.max_score) ? '#fef2f2' : sc?.scores[c.id] ? '#f0fdf4' : '#fff',
+                                  color: (parseFloat(sc?.scores[c.id] ?? '0') > c.max_score) ? '#dc2626' : '#111827',
+                                  cursor: isLocked ? 'not-allowed' : 'number',
+                                  opacity: isLocked ? 0.6 : 1
+                                }}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                  
+                  {/* Next Student Button at bottom of scroll */}
+                  {mobileStudentIndex < students.length - 1 && (
+                    <button 
+                      onClick={() => {
+                        setMobileStudentIndex(i => i + 1);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#f5f3ff', color: '#6d28d9', border: '1.5px solid #ddd6fe', fontWeight: 700, fontSize: 14, cursor: 'pointer', marginTop: 10, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}
+                    >
+                      Next Student →
+                    </button>
+                  )}
+                </div>
+
               </div>
-            ))
+            )
           })()}
+
           {/* Sticky save bar for mobile */}
           {!isLocked && students.length > 0 && (
-            <div className="t-sticky-bar">
-              <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>
+            <div className="t-sticky-bar" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', padding: '12px 16px', borderTop: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, textAlign: 'center' }}>
                 {dirty ? '● Unsaved changes' : '✓ All saved'}
               </span>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={() => handleSave(true)} disabled={saving || !dirty}
-                  style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+                  style={{ flex: 1, padding: '12px', borderRadius: 10, background: '#fff', border: '1.5px solid var(--border-color)', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
                   {saving ? 'Saving…' : '💾 Save'}
                 </button>
                 <button onClick={handleSubmit} disabled={submitting || enteredCount === 0}
-                  style={{ flex: 2, padding: '12px', borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
-                  📤 Submit to Admin
+                  style={{ flex: 2, padding: '12px', borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 12px rgba(109,40,217,0.2)' }}>
+                  📤 Submit All
                 </button>
               </div>
             </div>

@@ -10,6 +10,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm } from '../../hooks/useSettings'
 import toast from 'react-hot-toast'
+import { useSearchParams } from 'react-router-dom'
 
 // ── Score Submission Status Board ──────────────────────────
 interface ScoreRow {
@@ -255,7 +256,9 @@ function ScoreStatusBoard() {
 
 // ── Main Hub ───────────────────────────────────────────────
 export default function AssessmentHubPage() {
-  const [activeTab, setActiveTab] = useState<'status' | 'scores' | 'reports' | 'promotion' | 'bece' | 'analytics' | 'assessments'>('status')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const initialTab = (searchParams.get('tab') as any) || 'status'
+  const [activeTab, setActiveTab] = useState<'status' | 'scores' | 'reports' | 'promotion' | 'bece' | 'analytics' | 'assessments'>(initialTab)
 
   const tabs = [
     { key: 'status',      label: 'Score Status',     icon: <ClipboardCheck size={16} /> },
@@ -266,6 +269,21 @@ export default function AssessmentHubPage() {
     { key: 'promotion',   label: 'Batch Promotion',  icon: <Users size={16} /> },
     { key: 'bece',        label: 'BECE Processor',   icon: <Calculator size={16} /> },
   ] as const
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab && tabs.some(t => t.key === tab)) {
+      setActiveTab(tab as any)
+    }
+  }, [searchParams])
+
+  const handleTabChange = (tab: any) => {
+    setActiveTab(tab)
+    setSearchParams(prev => {
+      prev.set('tab', tab)
+      return prev
+    }, { replace: true })
+  }
 
   return (
     <div style={{ padding: '28px 32px', maxWidth: 1200, margin: '0 auto', fontFamily: '"DM Sans", sans-serif' }}>
@@ -283,7 +301,7 @@ export default function AssessmentHubPage() {
         {tabs.map(t => (
           <button
             key={t.key}
-            onClick={() => setActiveTab(t.key)}
+            onClick={() => handleTabChange(t.key)}
             style={{
               padding: '10px 18px', border: 'none', background: 'transparent', fontWeight: 700,
               fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7,

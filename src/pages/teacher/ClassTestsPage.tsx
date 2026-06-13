@@ -214,6 +214,7 @@ export default function ClassTestsPage() {
         .input:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); }
         .test-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
         @media (min-width: 768px) { .test-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 640px) { .resp-grid-2 { grid-template-columns: 1fr !important; } }
       `}</style>
 
       {/* ── SCORE ENTRY INLINE VIEW ── */}
@@ -291,7 +292,7 @@ export default function ClassTestsPage() {
                    <label style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>Test Title</label>
                    <input type="text" required placeholder="e.g. Week 1 Quiz" className="input" style={{ fontSize: 15 }} value={newTest.title} onChange={e => setNewTest({ ...newTest, title: e.target.value })} />
                  </div>
-                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                 <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                    <div>
                      <label style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>Max Marks</label>
                      <input type="number" required placeholder="e.g. 20" className="input" style={{ fontSize: 15 }} value={newTest.max_score} onChange={e => setNewTest({ ...newTest, max_score: e.target.value })} />

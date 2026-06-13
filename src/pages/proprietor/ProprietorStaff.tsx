@@ -52,29 +52,33 @@ export default function ProprietorStaff() {
     <>
       <style>{`
         .staff-wrap {
-          font-family: 'Outfit', system-ui, sans-serif;
+          font-family: 'DM Sans', system-ui, sans-serif;
           opacity: ${mounted ? 1 : 0};
           transition: opacity 0.5s ease;
           max-width: 1440px;
           margin: 0 auto;
-          padding: 16px 20px 80px;
+          padding: 16px 12px 80px;
         }
         .role-pill {
           padding: 6px 12px; border-radius: 99px; font-size: 13px; font-weight: 700; text-transform: capitalize; white-space: nowrap;
         }
         .role-card {
-          background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 24px; display: flex; align-items: center; gap: 16px; flex: 1; min-width: 100%;
+          background: #fff; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; border-radius: 0; padding: 20px 24px; display: flex; align-items: center; gap: 16px; flex: 1; min-width: 100%; margin: 0 -12px;
+        }
+        .staff-table-wrap {
+          background: var(--bg-card); border-radius: 0; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; margin: 0 -12px; overflow: hidden;
         }
 
         @media (min-width: 768px) {
           .staff-wrap { padding: 20px 40px 60px; }
-          .role-card { min-width: 200px; }
+          .role-card { min-width: 200px; border-radius: 8px; border: 1px solid #e2e8f0; margin: 0; }
+          .staff-table-wrap { border-radius: 12px; border: 1px solid #e2e8f0; margin: 0; }
         }
       `}</style>
       
       <div className="staff-wrap">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 800, margin: 0, color: '#0f172a' }}>Staff & Payroll Demographics</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0, color: '#0f172a' }}>Staff & Payroll Demographics</h1>
           <ProprietorBranchSelector />
         </div>
 
@@ -90,7 +94,7 @@ export default function ProprietorStaff() {
           ))}
         </div>
 
-        <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div className="staff-table-wrap">
           <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9' }}>
             <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>Staff Roster</h3>
           </div>

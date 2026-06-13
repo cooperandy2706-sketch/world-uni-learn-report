@@ -10,7 +10,7 @@ import NotificationBell from './NotificationBell'
 import AdminAnnouncementHeaderPill from './AdminAnnouncementHeaderPill'
 import ThemeToggle from '../ui/ThemeToggle'
 import {
-  Search, Settings, ChevronDown, ChevronLeft, ChevronRight,
+  Search, Settings, ChevronDown, ChevronLeft, ChevronRight, X,
   LogOut, User, Shield, Calendar, AlertTriangle, CreditCard,
   FileText, BarChart3, MessageSquare, Command, BookOpen, Users,
   GraduationCap, LayoutDashboard, Zap, Tv, ExternalLink, Building2,
@@ -326,7 +326,11 @@ export default function Header() {
   const [searching, setSearching] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [pushEnabled, setPushEnabled] = useState(false)
-  const [selectedPerson, setSelectedPerson] = useState<{ label: string, subtitle: string, type: string, name: string } | null>(null)
+  const [selectedPerson, setSelectedPerson] = useState<{ 
+    label: string, subtitle: string, type: string, name: string,
+    id?: string, parent_name?: string, parent_phone?: string, fees_arrears?: number, gender?: string, student_id?: string,
+    phone?: string, email?: string
+  } | null>(null)
   const [highlightedIdx, setHighlightedIdx] = useState(-1)
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem('wul_recent_searches') || '[]') } catch { return [] }
@@ -395,7 +399,11 @@ export default function Header() {
         e.preventDefault()
         const r = allResults[highlightedIdx]
         if (r.resultKind === 'person') {
-          setSelectedPerson({ label: r.label, subtitle: r.subtitle, type: r.type, name: r.label })
+          setSelectedPerson({ 
+            label: r.label, subtitle: r.subtitle, type: r.type, name: r.label,
+            id: r.id, parent_name: r.parent_name, parent_phone: r.parent_phone, fees_arrears: r.fees_arrears, gender: r.gender, student_id: r.student_id,
+            phone: r.phone, email: r.email
+          })
         } else {
           saveRecent(searchQuery)
           navigate(r.path)
@@ -452,7 +460,7 @@ export default function Header() {
             // Query teachers/staff
             const { data: teachers } = await supabase
               .from('users')
-              .select('id, full_name, role')
+              .select('id, full_name, role, phone, email')
               .eq('school_id', sid)
               .in('role', ['teacher', 'bursar', 'staff'])
               .ilike('full_name', `%${rawName}%`)
@@ -499,7 +507,7 @@ export default function Header() {
         if (!personIntent && (isAdmin || isTeacher || isBursar)) {
           const { data: st } = await supabase
             .from('students')
-            .select('id, full_name, class:classes(name)')
+            .select('id, full_name, fees_arrears, guardian_name, guardian_phone, gender, student_id, class:classes(name)')
             .eq('school_id', sid)
             .ilike('full_name', `%${q}%`)
             .limit(4)
@@ -509,6 +517,7 @@ export default function Header() {
             subtitle: `Student · ${(s as any).class?.name ?? 'No Class'}`,
             icon: <GraduationCap size={16} />, color: '#1a56db',
             path: isAdmin ? `/admin/students` : `/teacher/students`,
+            id: s.id, parent_name: s.guardian_name, parent_phone: s.guardian_phone, fees_arrears: s.fees_arrears, gender: s.gender, student_id: s.student_id
           }))
         }
 
@@ -516,7 +525,7 @@ export default function Header() {
         if (!personIntent && (isAdmin || isBursar)) {
           const { data: tr } = await supabase
             .from('users')
-            .select('id, full_name, role')
+            .select('id, full_name, role, phone, email')
             .eq('school_id', sid)
             .in('role', ['teacher', 'bursar', 'staff'])
             .ilike('full_name', `%${q}%`)
@@ -526,7 +535,8 @@ export default function Header() {
             label: t.full_name,
             subtitle: `Staff · ${t.role}`,
             icon: <UserCheck size={16} />, color: '#7c3aed',
-            path: `/admin/teachers`,
+            path: `/admin/staff-directory`,
+            id: t.id, phone: t.phone, email: t.email
           }))
         }
 
@@ -618,6 +628,9 @@ export default function Header() {
         .top-nav-pill { display: flex; align-items: center; gap: 2px; overflow: visible; flex-shrink: 1; min-width: 0; }
         .top-nav-pill::-webkit-scrollbar { display: none; }
         .mobile-menu-btn { display: none; }
+        .app-header-container { height: 60px; padding: 0 20px; }
+        .profile-avatar-btn { width: 36px; height: 36px; }
+        .mobile-menu-overlay { width: 85%; max-width: 360px; }
         @media (max-width: 1024px) {
           .top-nav-pill { display: none !important; }
           .mobile-menu-btn { display: flex !important; }
@@ -629,11 +642,17 @@ export default function Header() {
           .search-input-pill input { display: none; }
           .search-input-pill svg { position: static !important; }
         }
+        @media (max-width: 480px) {
+          .app-header-container { height: 48px !important; padding: 0 12px !important; gap: 8px !important; }
+          .profile-avatar-btn { width: 44px !important; height: 44px !important; }
+          .mobile-menu-btn { width: 44px !important; height: 44px !important; }
+          .mobile-menu-overlay { width: 100% !important; max-width: 100% !important; }
+        }
       `}</style>
 
-      <header style={{
-        height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 20px', background: 'var(--bg-card)', flexShrink: 0,
+      <header className="app-header-container" style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'var(--bg-card)', flexShrink: 0,
         borderBottom: '1px solid var(--border-color)',
         fontFamily: '"DM Sans", system-ui, sans-serif',
         position: 'sticky', top: 0, zIndex: 200,
@@ -905,7 +924,7 @@ export default function Header() {
 
                   const adminStudentActions = [
                     { icon: <User size={16} color="#1a56db" />, label: 'View Profile', subtitle: 'Student directory', color: '#1a56db', path: `/admin/students?student=${enc}` },
-                    { icon: <BarChart3 size={16} color="#0891b2" />, label: 'View Results / Scores', subtitle: 'Score entry', color: '#0891b2', path: `/admin/score-entry?student=${enc}` },
+                    { icon: <BarChart3 size={16} color="#0891b2" />, label: 'View Results / Scores', subtitle: 'Score entry', color: '#0891b2', path: `/admin/assessment-hub?tab=scores&student=${enc}` },
                     { icon: <CheckCircle size={16} color="#16a34a" />, label: 'Attendance Record', subtitle: 'Attendance page', color: '#16a34a', path: `/admin/attendance?student=${enc}` },
                     { icon: <FileText size={16} color="#7c3aed" />, label: 'Report Card', subtitle: 'Report cards', color: '#7c3aed', path: `/admin/reports?student=${enc}` },
                     { icon: <CreditCard size={16} color="#16a34a" />, label: 'Pay Fees', subtitle: 'Fees & billing', color: '#16a34a', path: `/bursar/fees?student=${enc}` },
@@ -923,7 +942,7 @@ export default function Header() {
                     { icon: <User size={16} color="#1a56db" />, label: 'Student Profile', subtitle: 'Student info', color: '#1a56db', path: `/teacher/students?student=${enc}` },
                   ]
                   const adminStaffActions = [
-                    { icon: <User size={16} color="#7c3aed" />, label: 'View Profile', subtitle: 'Staff directory', color: '#7c3aed', path: `/admin/teachers?teacher=${enc}` },
+                    { icon: <User size={16} color="#7c3aed" />, label: 'View Profile', subtitle: 'Staff directory', color: '#7c3aed', path: `/admin/staff-directory?teacher=${enc}` },
                     { icon: <Clock size={16} color="#6d28d9" />, label: 'View Timetable', subtitle: 'Timetable', color: '#6d28d9', path: `/admin/timetable?teacher=${enc}` },
                     { icon: <Wallet size={16} color="#0891b2" />, label: 'Payroll Record', subtitle: 'Staff payroll', color: '#0891b2', path: `/bursar/payroll?teacher=${enc}` },
                     { icon: <Smartphone size={16} color="#16a34a" />, label: 'Send SMS', subtitle: 'Message staff', color: '#16a34a', path: `/admin/sms?to=${enc}` },
@@ -948,6 +967,63 @@ export default function Header() {
                           <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{selectedPerson.subtitle}</div>
                         </div>
                       </div>
+
+                      {/* Detailed Profile Summary */}
+                      <div style={{ padding: '12px', borderBottom: '1px solid var(--border-light)', background: 'var(--bg-card)' }}>
+                        <div style={{ display: 'flex', gap: 12 }}>
+                          <div style={{ width: 48, height: 48, borderRadius: '50%', background: isStud ? '#eff6ff' : '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 20, color: isStud ? '#3b82f6' : '#8b5cf6', fontWeight: 700, border: `2px solid ${isStud ? '#bfdbfe' : '#ddd6fe'}` }}>
+                            {selectedPerson.label.charAt(0).toUpperCase()}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px' }}>
+                              {selectedPerson.student_id && (
+                                <div>
+                                  <div style={{ fontSize: 9, textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.05em' }}>Student ID</div>
+                                  <div style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>{selectedPerson.student_id}</div>
+                                </div>
+                              )}
+                              {selectedPerson.gender && (
+                                <div>
+                                  <div style={{ fontSize: 9, textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.05em' }}>Gender</div>
+                                  <div style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>{selectedPerson.gender}</div>
+                                </div>
+                              )}
+                              {selectedPerson.parent_name && (
+                                <div>
+                                  <div style={{ fontSize: 9, textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.05em' }}>Parent/Guardian</div>
+                                  <div style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedPerson.parent_name}</div>
+                                </div>
+                              )}
+                              {selectedPerson.parent_phone && (
+                                <div>
+                                  <div style={{ fontSize: 9, textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.05em' }}>Parent Phone</div>
+                                  <div style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>{selectedPerson.parent_phone}</div>
+                                </div>
+                              )}
+                              {selectedPerson.phone && (
+                                <div>
+                                  <div style={{ fontSize: 9, textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.05em' }}>Phone</div>
+                                  <div style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>{selectedPerson.phone}</div>
+                                </div>
+                              )}
+                              {selectedPerson.email && (
+                                <div>
+                                  <div style={{ fontSize: 9, textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.05em' }}>Email</div>
+                                  <div style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedPerson.email}</div>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {isStud && selectedPerson.fees_arrears !== undefined && (
+                              <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 8, background: selectedPerson.fees_arrears > 0 ? '#fef2f2' : '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <span style={{ fontSize: 11, color: selectedPerson.fees_arrears > 0 ? '#991b1b' : '#166534', fontWeight: 600 }}>Fees Arrears</span>
+                                <span style={{ fontSize: 12, color: selectedPerson.fees_arrears > 0 ? '#dc2626' : '#15803d', fontWeight: 800 }}>GH₵{Number(selectedPerson.fees_arrears || 0).toLocaleString()}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
                       <div style={{ padding: '6px 4px 4px', fontSize: 10, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', paddingLeft: 12, paddingTop: 10 }}>
                         What do you want to do?
                       </div>
@@ -991,9 +1067,10 @@ export default function Header() {
           {/* Profile Avatar */}
           <div ref={profileRef} style={{ position: 'relative', flexShrink: 0 }}>
             <div
+              className="profile-avatar-btn"
               onClick={() => setProfileOpen(!profileOpen)}
               style={{
-                width: 36, height: 36, borderRadius: '50%', background: 'var(--bg-card)',
+                borderRadius: '50%', background: 'var(--bg-card)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
                 fontSize: 14, fontWeight: 700, color: '#1a56db', cursor: 'pointer',
                 border: '2px solid var(--border-color)', transition: 'box-shadow 0.2s',
@@ -1083,21 +1160,24 @@ export default function Header() {
             onClick={() => setMobileMenuOpen(false)}
             style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 1000, animation: 'fadeIn 0.3s ease' }} 
           />
-          <div style={{
-            position: 'fixed', top: 0, right: 0, bottom: 0, width: '85%', maxWidth: 360,
+          <div className="mobile-menu-overlay" style={{
+            position: 'fixed', top: 0, right: 0, bottom: 0,
             background: 'var(--bg-card)', zIndex: 1001, boxShadow: '-10px 0 30px rgba(0,0,0,0.1)',
-            padding: '24px', display: 'flex', flexDirection: 'column', gap: 24,
+            padding: '24px',
+            paddingTop: 'max(24px, env(safe-area-inset-top))',
+            paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
+            display: 'flex', flexDirection: 'column', gap: 24,
             animation: 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 36, height: 36, background: '#eff6ff', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Command size={18} color="#1a56db" />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 16, borderBottom: '1px solid var(--border-light)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 40, height: 40, background: '#eff6ff', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Command size={20} color="#1a56db" />
                 </div>
-                <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>Navigation</span>
+                <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>Navigation</span>
               </div>
-              <button onClick={() => setMobileMenuOpen(false)} style={{ border: 'none', background: 'var(--bg-hover)', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                <ChevronRight size={18} />
+              <button onClick={() => setMobileMenuOpen(false)} style={{ border: 'none', background: 'var(--bg-hover)', width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <X size={20} color="var(--text-main)" />
               </button>
             </div>
 

@@ -102,15 +102,20 @@ export default function TeacherVideoAssignmentsPage() {
     <div className="t-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+        @media (max-width: 640px) {
+          .assign-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; }
+          .resp-flex-col { flex-direction: column !important; align-items: stretch !important; gap: 16px !important; }
+          .resp-btn { width: 100%; justify-content: center; }
+        }
       `}</style>
 
       <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
+        <div className="resp-flex-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
           <div>
             <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px' }}>Video Assignments</h1>
             <p style={{ fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>Assign YouTube videos to your classes and track who watched them.</p>
           </div>
-          <button onClick={() => setShowModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(124,58,237,0.2)' }}>
+          <button className="resp-btn" onClick={() => setShowModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(124,58,237,0.2)' }}>
             <Plus size={18} /> New Assignment
           </button>
         </div>
@@ -127,7 +132,7 @@ export default function TeacherVideoAssignmentsPage() {
             </button>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
+          <div className="assign-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
             {assignments.map(a => {
               const watchedCount = a.progress?.filter((p: any) => p.is_completed).length || 0
               return (
@@ -206,7 +211,7 @@ export default function TeacherVideoAssignmentsPage() {
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: 12 }}>
+              <div className="resp-flex-col" style={{ display: 'flex', gap: 12 }}>
                 <div className="t-field" style={{ flex: 1 }}>
                   <label className="t-label">Target Class *</label>
                   <select className="t-select" required value={classId} onChange={e => setClassId(e.target.value)}>

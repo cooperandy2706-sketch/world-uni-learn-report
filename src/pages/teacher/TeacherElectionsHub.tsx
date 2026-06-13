@@ -226,7 +226,7 @@ export default function TeacherElectionsHub() {
             )}
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24 }}>
             {elPositions.map(pos => {
               const posCands = elCandidates.filter(c => c.position_id === pos.id && c.status === 'approved')
               const myVoteForPos = myVotes.find(v => v.position_id === pos.id)

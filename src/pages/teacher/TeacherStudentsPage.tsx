@@ -300,6 +300,7 @@ export default function TeacherStudentsPage() {
         @media (max-width: 768px) {
           .resp-table-wrap { overflow-x: auto !important; padding-bottom: 12px; }
           .resp-table-min { min-width: 800px; display: table; width: 100%; }
+          .resp-grid-2 { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
@@ -448,7 +449,7 @@ export default function TeacherStudentsPage() {
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{viewingStudent.class?.name ?? 'No class assigned'}</div>
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 {[
                   { label: 'Date of Birth', value: formatDate(viewingStudent.date_of_birth) },
                   { label: 'Guardian', value: viewingStudent.guardian_name },

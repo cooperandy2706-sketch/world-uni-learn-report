@@ -1,7 +1,7 @@
 /* Public school profile — mobile-first, iOS-vivid, dark-theme ready */
 
 .school-profile {
-  --sp-font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --sp-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --sp-bg: #f2f2f7;
   --sp-surface: #ffffff;
   --sp-surface-2: #f8f9fc;

@@ -357,13 +357,15 @@ export default function AssignmentsPage() {
           .assign-card { padding: 16px !important; }
           .q-card { padding: 14px !important; }
           .modal-content-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+          .resp-grid-2 { grid-template-columns: 1fr !important; }
+          .modal-wrapper { padding: 12px !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; margin: 0 -16px !important; }
         }
       `}</style>
 
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
         {modalOpen ? (
           /* ── INLINE ASSIGNMENT BUILDER VIEW ── */
-          <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid var(--border-color)', padding: 20, animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+          <div className="modal-wrapper" style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid var(--border-color)', padding: 24, animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid var(--border-light)', paddingBottom: 16 }}>
               <div>
                 <button onClick={() => setModalOpen(false)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Assignments</button>
@@ -390,7 +392,7 @@ export default function AssignmentsPage() {
                   />
                 </Field>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                   <Field label="Target Class *">
                     <StyledSelect value={form.class_id} onChange={e => setForm(prev => ({ ...prev, class_id: e.target.value }))} style={{ fontSize: 15 }}>
                       <option value="">Select class...</option>
@@ -405,7 +407,7 @@ export default function AssignmentsPage() {
                   </Field>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                   <Field label="Due Date">
                     <StyledInput type="datetime-local" value={form.due_date} onChange={e => setForm(prev => ({ ...prev, due_date: e.target.value }))} style={{ fontSize: 15 }} />
                   </Field>
@@ -443,7 +445,7 @@ export default function AssignmentsPage() {
                         <StyledInput value={q.text} onChange={e => updateQuestion(q.id, { text: e.target.value })} placeholder="Enter your question..." style={{ fontSize: 15 }} />
                       </Field>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 10, marginBottom: 12 }}>
+                      <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 10, marginBottom: 12 }}>
                         <Field label="Type">
                           <StyledSelect value={q.type} onChange={e => updateQuestion(q.id, { type: e.target.value as any })}>
                             <option value="mcq">Multiple Choice</option>
@@ -544,7 +546,7 @@ export default function AssignmentsPage() {
                 <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading assignments…</p>
               </div>
             ) : viewMode === 'global' && !selectedGlobalSubject ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
                 {globalSubjects.length === 0 ? (
                    <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
                      <div style={{ fontSize: 48, marginBottom: 12 }}>🌍</div>
@@ -567,7 +569,7 @@ export default function AssignmentsPage() {
                 ))}
               </div>
             ) : viewMode === 'global' && selectedGlobalSubject ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 18 }}>
                  {filteredGlobal.length === 0 ? (
                    <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1/-1' }}>No quizzes here.</div>
                  ) : filteredGlobal.map((g, i) => (
@@ -610,7 +612,7 @@ export default function AssignmentsPage() {
                 <Btn onClick={() => setModalOpen(true)}>➕ Create First Assignment</Btn>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 18 }}>
                 {assignments.map((a, i) => (
                   <div key={a.id} style={{ 
                     background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 

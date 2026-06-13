@@ -105,14 +105,12 @@ export default function NotificationsModal({ open, onClose, onRead }: Notificati
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 100, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="portal-fullscreen-modal"
             style={{
-              position: 'fixed', bottom: 20, left: 20, right: 20,
-              zIndex: 10002, margin: '0 auto', maxWidth: 480,
-              background: 'var(--bg-card)', borderRadius: 12, overflow: 'hidden',
-              boxShadow: '0 40px 100px rgba(0,0,0,0.4)',
+              zIndex: 10002, margin: '0 auto',
+              background: 'var(--bg-card)', overflow: 'hidden',
               fontFamily: '"DM Sans", sans-serif',
               display: 'flex', flexDirection: 'column',
-              maxHeight: '80vh',
             }}
           >
             {/* Header */}
@@ -131,8 +129,8 @@ export default function NotificationsModal({ open, onClose, onRead }: Notificati
                   </div>
                   <div>
                     <h2 style={{ 
-                      fontFamily: '"Playfair Display", serif', fontSize: 20, 
-                      fontWeight: 700, color: '#fff', margin: 0 
+                      fontFamily: '"Playfair Display", serif', fontSize: 22, 
+                      fontWeight: 800, color: '#fff', margin: 0 
                     }}>Notifications</h2>
                     <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: 0 }}>
                       Latest updates from admin

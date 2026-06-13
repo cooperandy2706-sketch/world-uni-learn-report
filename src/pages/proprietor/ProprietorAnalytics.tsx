@@ -99,19 +99,23 @@ export default function ProprietorAnalytics() {
     <>
       <style>{`
         .analytics-wrap {
-          font-family: 'Outfit', system-ui, sans-serif;
+          font-family: 'DM Sans', system-ui, sans-serif;
           opacity: ${mounted ? 1 : 0};
           transition: opacity 0.5s ease;
           max-width: 1440px;
           margin: 0 auto;
-          padding: 16px 20px 80px;
+          padding: 16px 12px 80px;
         }
 
         .stat-box {
           background: #fff;
-          border-radius: 8px;
+          border-radius: 0;
+          margin: 0 -12px;
+          border-left: none;
+          border-right: none;
           padding: 20px;
-          border: 1px solid #e2e8f0;
+          border-top: 1px solid #e2e8f0;
+          border-bottom: 1px solid #e2e8f0;
           box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
           display: flex;
           flex-direction: column;
@@ -131,13 +135,16 @@ export default function ProprietorAnalytics() {
 
         @media (min-width: 768px) {
           .analytics-wrap { padding: 20px 40px 60px; }
-          .stat-box { flex-direction: row; text-align: left; gap: 20px; padding: 24px; }
+          .stat-box { 
+            flex-direction: row; text-align: left; gap: 20px; padding: 24px;
+            border-radius: 8px; margin: 0; border: 1px solid #e2e8f0;
+          }
         }
       `}</style>
       
       <div className="analytics-wrap">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 800, margin: 0, color: '#0f172a' }}>Academic Performance</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0, color: '#0f172a' }}>Academic Performance</h1>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
             <ProprietorBranchSelector />
             <select 
@@ -183,7 +190,7 @@ export default function ProprietorAnalytics() {
           </div>
         </div>
 
-        <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 32, border: '1px solid #e2e8f0' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 0, margin: '0 -12px', borderLeft: 'none', borderRight: 'none', padding: 24, borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
           <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <Award color="#f59e0b" /> Top Performing Classes
           </h3>

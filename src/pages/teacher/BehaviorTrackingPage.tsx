@@ -148,7 +148,7 @@ export default function BehaviorTrackingPage() {
                 .type-btn.active.demerit { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
                 .type-btn.active.counseling { border-color: #6366f1; background: #eef2ff; color: #3730a3; }
                 .student-row:hover { background: var(--bg-input); cursor: pointer; }
-                @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr !important; } }
+                @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr !important; } .resp-grid-2 { grid-template-columns: 1fr !important; } }
             `}</style>
 
             <div className="t-header" style={{ marginBottom: 32 }}>
@@ -242,7 +242,7 @@ export default function BehaviorTrackingPage() {
                                         </div>
                                     </div>
 
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                                    <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
                                         <div>
                                             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Category</label>
                                             <select 
