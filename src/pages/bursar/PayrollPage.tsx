@@ -200,7 +200,7 @@ export default function PayrollPage() {
     const win = window.open('', '_blank', 'width=800,height=900')
     if (!win) return
     const logoHtml = school?.logo_url 
-      ? `<img src="${school.logo_url}" style="width: 72px; height: 72px; border-radius: 50%; object-fit: contain; border: 1.5px solid #ede9fe; padding: 4px; background: #fff;" />`
+      ? `<img loading="lazy" src="${school.logo_url}" style="width: 72px; height: 72px; border-radius: 50%; object-fit: contain; border: 1.5px solid #ede9fe; padding: 4px; background: #fff;" />`
       : CREST_SVG
 
     win.document.write(`<html><head><title>Payslip - ${row.user?.full_name}</title>

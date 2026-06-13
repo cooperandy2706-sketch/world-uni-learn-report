@@ -141,7 +141,7 @@ export default function TeacherSubjectDetailsPage() {
                                 'linear-gradient(135deg, #e0e7ff, #c7d2fe)')
                       }}>
                         {res.cover_image_url ? (
-                          <img src={res.cover_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img loading="lazy" src={res.cover_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : res.content_type === 'video' ? (
                           res.content.includes('youtube') || res.content.includes('youtu.be') ? (
                             <iframe

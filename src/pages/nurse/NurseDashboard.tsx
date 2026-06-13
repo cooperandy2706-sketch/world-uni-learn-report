@@ -245,7 +245,7 @@ export default function NurseDashboard() {
             {/* Quick Actions */}
             <div style={{ background: T.card, borderRadius: 8, border: `1px solid ${T.border}`, padding: 20, boxShadow: '0 4px 12px rgba(0,0,0,0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <img src={selectedStudent.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedStudent.full_name)}&background=0ea5e9&color=fff`} alt="" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
+                <img loading="lazy" src={selectedStudent.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedStudent.full_name)}&background=0ea5e9&color=fff`} alt="" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
                 <div>
                   <h2 style={{ fontSize: 20, fontWeight: 800, color: T.text, margin: 0 }}>{selectedStudent.full_name}</h2>
                   <div style={{ fontSize: 14, color: T.muted, marginTop: 4 }}>{selectedStudent.class?.name} • {selectedStudent.gender}</div>

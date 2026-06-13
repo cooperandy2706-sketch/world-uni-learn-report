@@ -12,8 +12,7 @@ function BookQR({ barcode, title, size = 70 }: { barcode: string; title: string;
   const encoded = encodeURIComponent(barcode)
   return (
     <div style={{ textAlign: 'center', breakInside: 'avoid' }}>
-      <img
-        src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}&margin=2`}
+      <img loading="lazy" src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}&margin=2`}
         width={size} height={size}
         style={{ imageRendering: 'pixelated', display: 'block', margin: '0 auto' }}
         alt={barcode}
@@ -144,7 +143,7 @@ export default function LibraryInventoryPage() {
       const numCopies = Math.max(1, b.copies_available || 1)
       return Array.from({ length: numCopies }).map(() => `
         <div class="label">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(b.barcode)}&margin=1" width="80" height="80" />
+          <img loading="lazy" src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(b.barcode)}&margin=1" width="80" height="80" />
           <div class="book-title">${b.title.length > 22 ? b.title.slice(0, 22) + '…' : b.title}</div>
           <div class="book-sub">${b.barcode}</div>
           <div class="book-sub">${b.location || b.category || ''}</div>

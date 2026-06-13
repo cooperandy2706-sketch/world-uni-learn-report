@@ -869,7 +869,7 @@ export default function PosterMakerPage() {
 
     const elHtml = [...elements].sort((a, b) => a.zIndex - b.zIndex).map(el => {
       const base = `position:absolute;left:${el.x}%;top:${el.y}%;transform:translate(-50%,-50%);width:${el.width}%;opacity:${el.opacity};z-index:${el.zIndex};`
-      if (el.type === 'image') return `<img src="${el.imageUrl}" style="${base}max-width:100%;object-fit:contain;" />`
+      if (el.type === 'image') return `<img loading="lazy" src="${el.imageUrl}" style="${base}max-width:100%;object-fit:contain;" />`
       if (el.type === 'shape') return `<div style="${base}height:${el.width * 0.6}%;background:${el.bgColor};border:${el.borderWidth}px solid ${el.borderColor};border-radius:8px;"></div>`
       const ts = `font-size:${el.fontSize}pt;font-family:${el.fontFamily};color:${el.color};font-weight:${el.bold ? '900' : '400'};font-style:${el.italic ? 'italic' : 'normal'};text-align:${el.align};background:${el.bgColor};border:${el.borderWidth}px solid ${el.borderColor};padding:${el.bgColor !== 'transparent' ? '6px 16px' : '0'};border-radius:${el.bgColor !== 'transparent' ? '40px' : '0'};line-height:1.2;white-space:pre-wrap;word-break:break-word;`
       return `<div style="${base}${ts}">${el.content}</div>`
@@ -880,7 +880,7 @@ export default function PosterMakerPage() {
       <div style="position:absolute;width:60%;padding-top:60%;background:${primaryColor};border-radius:50%;opacity:0.05;bottom:-20%;left:-20%;"></div>
     ` : ''
     const schHtml = showSchoolName ? `<div style="position:absolute;top:6%;left:50%;transform:translateX(-50%);font-size:11pt;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:2px;white-space:nowrap;">${schoolName}</div>` : ''
-    const logoHtml = logoUrl ? `<img src="${logoUrl}" style="position:absolute;left:${logoX}%;top:${logoY}%;transform:translate(-50%,-50%);max-height:${logoSize}%;max-width:20%;object-fit:contain;" />` : ''
+    const logoHtml = logoUrl ? `<img loading="lazy" src="${logoUrl}" style="position:absolute;left:${logoX}%;top:${logoY}%;transform:translate(-50%,-50%);max-height:${logoSize}%;max-width:20%;object-fit:contain;" />` : ''
     const bgImgHtml = bgImageUrl ? `<div style="position:absolute;inset:0;background-image:url('${bgImageUrl}');background-size:cover;background-position:center;opacity:${bgImageOpacity};"></div>` : ''
 
     return `<html><head><title>Poster</title>
@@ -940,13 +940,13 @@ export default function PosterMakerPage() {
     if (tc.style === 'sticker') {
       return `<div style="width:${tagW}px;height:${tagH}px;border-radius:50%;background:${side.bgColor};${patternStyle}border:3px solid ${side.primaryColor};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;flex-shrink:0;">
         ${isFront ? `
-          ${side.showLogo && tc.logoUrl ? `<img src="${tc.logoUrl}" style="height:${tagH * 0.18}px;object-fit:contain;margin-bottom:4px;" />` : ''}
+          ${side.showLogo && tc.logoUrl ? `<img loading="lazy" src="${tc.logoUrl}" style="height:${tagH * 0.18}px;object-fit:contain;margin-bottom:4px;" />` : ''}
           ${side.showName ? `<div style="font-size:${Math.max(9, tagW * 0.085)}px;font-weight:700;color:${side.primaryColor};font-family:${tc.fontFamily};line-height:1.1;padding:0 8px;">${s.name}</div>` : ''}
           ${side.showRole ? `<div style="font-size:${Math.max(7, tagW * 0.06)}px;color:#666;font-family:${tc.fontFamily};">${s.role}</div>` : ''}
           ${side.showStudentId && s.studentId ? `<div style="font-size:${Math.max(6, tagW * 0.055)}px;color:#888;font-family:${tc.fontFamily};margin-top:2px;">${s.studentId}</div>` : ''}
         ` : `
           <div style="font-size:${Math.max(6, tagW * 0.06)}px;color:${side.primaryColor};font-family:${tc.fontFamily};padding:8px;text-align:center;line-height:1.4;">
-            ${side.showQRCode ? `<div style="margin-bottom:8px;"><img src="${generateQRCodeURL(`WUL:ID:${s.id}`, 120)}" style="width:${tagW * 0.4}px;height:${tagW * 0.4}px;background:#fff;padding:4px;border-radius:4px;" /></div>` : ''}
+            ${side.showQRCode ? `<div style="margin-bottom:8px;"><img loading="lazy" src="${generateQRCodeURL(`WUL:ID:${s.id}`, 120)}" style="width:${tagW * 0.4}px;height:${tagW * 0.4}px;background:#fff;padding:4px;border-radius:4px;" /></div>` : ''}
             ${side.customText || tc.schoolName}
           </div>
         `}
@@ -958,21 +958,21 @@ export default function PosterMakerPage() {
         <div style="width:20px;height:8px;background:#aaa;border-radius:0 0 4px 4px;"></div>
         ${isFront ? `
           <div style="width:100%;background:${side.primaryColor};padding:8px 0;display:flex;align-items:center;justify-content:center;gap:6px;">
-            ${side.showLogo && tc.logoUrl ? `<img src="${tc.logoUrl}" style="height:${tagW * 0.18}px;object-fit:contain;" />` : ''}
+            ${side.showLogo && tc.logoUrl ? `<img loading="lazy" src="${tc.logoUrl}" style="height:${tagW * 0.18}px;object-fit:contain;" />` : ''}
             <div style="font-size:${Math.max(6, tagW * 0.07)}px;font-weight:700;color:#fff;font-family:${tc.fontFamily};">${tc.schoolName}</div>
           </div>
-          ${side.showPhoto && s.photoUrl ? `<img src="${s.photoUrl}" style="width:${tagW * 0.5}px;height:${tagW * 0.5}px;object-fit:cover;border-radius:50%;margin:8px 0;border:2px solid ${side.primaryColor};" />` : `<div style="width:${tagW * 0.5}px;height:${tagW * 0.5}px;border-radius:50%;background:${side.accentColor}20;border:2px solid ${side.primaryColor};margin:8px 0;display:flex;align-items:center;justify-content:center;font-size:${tagW * 0.15}px;font-weight:700;color:${side.primaryColor};">${s.name.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>`}
+          ${side.showPhoto && s.photoUrl ? `<img loading="lazy" src="${s.photoUrl}" style="width:${tagW * 0.5}px;height:${tagW * 0.5}px;object-fit:cover;border-radius:50%;margin:8px 0;border:2px solid ${side.primaryColor};" />` : `<div style="width:${tagW * 0.5}px;height:${tagW * 0.5}px;border-radius:50%;background:${side.accentColor}20;border:2px solid ${side.primaryColor};margin:8px 0;display:flex;align-items:center;justify-content:center;font-size:${tagW * 0.15}px;font-weight:700;color:${side.primaryColor};">${s.name.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>`}
           ${side.showName ? `<div style="font-size:${Math.max(8, tagW * 0.09)}px;font-weight:700;color:${side.primaryColor};font-family:${tc.fontFamily};text-align:center;padding:0 6px;line-height:1.2;">${s.name}</div>` : ''}
           ${side.showRole ? `<div style="font-size:${Math.max(6, tagW * 0.065)}px;color:#666;font-family:${tc.fontFamily};margin-top:2px;">${s.role}</div>` : ''}
           ${side.showClass ? `<div style="font-size:${Math.max(6, tagW * 0.06)}px;color:#888;font-family:${tc.fontFamily};margin-top:1px;">${s.className}</div>` : ''}
           ${side.showStudentId && s.studentId ? `<div style="font-size:${Math.max(6, tagW * 0.06)}px;color:${side.primaryColor};font-family:${tc.fontFamily};margin-top:2px;font-weight:600;">${s.studentId}</div>` : ''}
-          ${side.showBarcode && s.studentId ? `<div style="margin-top:auto;margin-bottom:6px;text-align:center;"><img src="${generateBarcodeSVG(s.studentId, 24, 1)}" style="max-width:${tagW * 0.8}px;height:24px;" /><div style="font-size:${Math.max(5, tagW * 0.04)}px;color:#333;font-family:monospace;margin-top:1px;">${s.studentId}</div></div>` : ''}
+          ${side.showBarcode && s.studentId ? `<div style="margin-top:auto;margin-bottom:6px;text-align:center;"><img loading="lazy" src="${generateBarcodeSVG(s.studentId, 24, 1)}" style="max-width:${tagW * 0.8}px;height:24px;" /><div style="font-size:${Math.max(5, tagW * 0.04)}px;color:#333;font-family:monospace;margin-top:1px;">${s.studentId}</div></div>` : ''}
         ` : `
           <div style="width:100%;background:${side.primaryColor};padding:8px 0;display:flex;align-items:center;justify-content:center;">
-            ${side.showLogo && tc.logoUrl ? `<img src="${tc.logoUrl}" style="height:${tagW * 0.15}px;object-fit:contain;opacity:0.9;" />` : `<div style="font-size:${Math.max(6, tagW * 0.08)}px;font-weight:700;color:#fff;font-family:${tc.fontFamily};">${tc.schoolName}</div>`}
+            ${side.showLogo && tc.logoUrl ? `<img loading="lazy" src="${tc.logoUrl}" style="height:${tagW * 0.15}px;object-fit:contain;opacity:0.9;" />` : `<div style="font-size:${Math.max(6, tagW * 0.08)}px;font-weight:700;color:#fff;font-family:${tc.fontFamily};">${tc.schoolName}</div>`}
           </div>
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;text-align:center;">
-            ${side.showQRCode ? `<div style="margin-bottom:10px;"><img src="${generateQRCodeURL(`WUL:ID:${s.id}`, 120)}" style="width:${tagW * 0.45}px;height:${tagW * 0.45}px;background:#fff;padding:5px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.1);" /></div>` : ''}
+            ${side.showQRCode ? `<div style="margin-bottom:10px;"><img loading="lazy" src="${generateQRCodeURL(`WUL:ID:${s.id}`, 120)}" style="width:${tagW * 0.45}px;height:${tagW * 0.45}px;background:#fff;padding:5px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.1);" /></div>` : ''}
             <div style="font-size:${Math.max(6, tagW * 0.06)}px;color:${side.primaryColor};font-family:${tc.fontFamily};line-height:1.5;">${side.customText || 'This ID card must be worn at all times while on school premises.'}</div>
           </div>
           <div style="width:100%;height:4px;background:${side.accentColor};"></div>
@@ -984,12 +984,12 @@ export default function PosterMakerPage() {
       return `<div style="width:${tagW}px;height:${tagH}px;background:${side.bgColor};${patternStyle}border-radius:${tc.cornerRadius}px;border:1.5px solid #ddd;overflow:hidden;display:flex;flex-direction:column;flex-shrink:0;">
         ${isFront ? `
           <div style="background:${side.primaryColor};padding:6px 10px;display:flex;align-items:center;gap:6px;">
-            ${side.showLogo && tc.logoUrl ? `<img src="${tc.logoUrl}" style="height:${tagH * 0.2}px;object-fit:contain;" />` : ''}
+            ${side.showLogo && tc.logoUrl ? `<img loading="lazy" src="${tc.logoUrl}" style="height:${tagH * 0.2}px;object-fit:contain;" />` : ''}
             <div style="font-size:${Math.max(6, tagH * 0.07)}px;font-weight:700;color:#fff;font-family:${tc.fontFamily};">${tc.schoolName}</div>
           </div>
           <div style="flex:1;display:flex;align-items:center;padding:6px 10px;gap:8px;">
             <div style="width:${tagH * 0.35}px;height:${tagH * 0.35}px;border-radius:50%;background:${side.primaryColor}20;border:2px solid ${side.primaryColor};display:flex;align-items:center;justify-content:center;font-size:${tagH * 0.12}px;font-weight:700;color:${side.primaryColor};flex-shrink:0;overflow:hidden;">
-              ${side.showPhoto && s.photoUrl ? `<img src="${s.photoUrl}" style="width:100%;height:100%;object-fit:cover;" />` : s.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+              ${side.showPhoto && s.photoUrl ? `<img loading="lazy" src="${s.photoUrl}" style="width:100%;height:100%;object-fit:cover;" />` : s.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
             </div>
             <div>
               ${side.showName ? `<div style="font-size:${Math.max(8, tagH * 0.1)}px;font-weight:700;color:${side.primaryColor};font-family:${tc.fontFamily};line-height:1.1;">${s.name}</div>` : ''}
@@ -1002,9 +1002,9 @@ export default function PosterMakerPage() {
         ` : `
           <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;text-align:center;box-sizing:border-box;">
             <div style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;">
-              ${side.showQRCode ? `<img src="${generateQRCodeURL(`WUL:ID:${s.id}`, 100)}" style="width:${tagH * 0.3}px;height:${tagH * 0.3}px;background:#fff;padding:3px;border-radius:3px;" />` : ''}
+              ${side.showQRCode ? `<img loading="lazy" src="${generateQRCodeURL(`WUL:ID:${s.id}`, 100)}" style="width:${tagH * 0.3}px;height:${tagH * 0.3}px;background:#fff;padding:3px;border-radius:3px;" />` : ''}
               <div style="flex:1;text-align:${side.showQRCode ? 'left' : 'center'};">
-                ${side.showLogo && tc.logoUrl ? `<img src="${tc.logoUrl}" style="height:${tagH * 0.18}px;object-fit:contain;margin-bottom:6px;opacity:0.7;" />` : ''}
+                ${side.showLogo && tc.logoUrl ? `<img loading="lazy" src="${tc.logoUrl}" style="height:${tagH * 0.18}px;object-fit:contain;margin-bottom:6px;opacity:0.7;" />` : ''}
                 <div style="font-size:${Math.max(6, tagH * 0.06)}px;color:${side.primaryColor};font-family:${tc.fontFamily};line-height:1.4;">${side.customText || 'Return to school office if found.'}</div>
               </div>
             </div>
@@ -1023,11 +1023,11 @@ export default function PosterMakerPage() {
           ${side.showStudentId && s.studentId ? `<div style="font-size:${Math.max(6, tagW * 0.06)}px;color:#888;font-family:${tc.fontFamily};margin-top:2px;">${s.studentId}</div>` : ''}
         </div>
         <div style="flex:1;display:flex;align-items:center;justify-content:center;background:${side.primaryColor}08;">
-          ${side.showLogo && tc.logoUrl ? `<img src="${tc.logoUrl}" style="max-height:${tagH * 0.2}px;object-fit:contain;opacity:0.4;" />` : `<div style="font-size:${Math.max(6, tagW * 0.06)}px;color:#aaa;font-family:${tc.fontFamily};">${tc.schoolName}</div>`}
+          ${side.showLogo && tc.logoUrl ? `<img loading="lazy" src="${tc.logoUrl}" style="max-height:${tagH * 0.2}px;object-fit:contain;opacity:0.4;" />` : `<div style="font-size:${Math.max(6, tagW * 0.06)}px;color:#aaa;font-family:${tc.fontFamily};">${tc.schoolName}</div>`}
         </div>
       ` : `
         <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;">
-          ${side.showQRCode ? `<div style="margin-bottom:6px;"><img src="${generateQRCodeURL(`WUL:ID:${s.id}`, 100)}" style="width:${tagW * 0.35}px;height:${tagW * 0.35}px;background:#fff;padding:3px;border-radius:3px;" /></div>` : ''}
+          ${side.showQRCode ? `<div style="margin-bottom:6px;"><img loading="lazy" src="${generateQRCodeURL(`WUL:ID:${s.id}`, 100)}" style="width:${tagW * 0.35}px;height:${tagW * 0.35}px;background:#fff;padding:3px;border-radius:3px;" /></div>` : ''}
           <div style="font-size:${Math.max(6, tagW * 0.065)}px;color:${side.primaryColor};font-family:${tc.fontFamily};text-align:center;line-height:1.5;">${side.customText || tc.schoolName}</div>
         </div>
       `}
@@ -1037,7 +1037,7 @@ export default function PosterMakerPage() {
   // ─────────────────────────────────────────────
   // Print tags (front + back on separate sheets or interleaved)
   // ─────────────────────────────────────────────
-  const printTags = () => {
+  const printTags = (studentsToPrint?: Student[]) => {
     const tc = tagConfig
     const tagW = mmToPx(tc.width)
     const tagH = mmToPx(tc.height)
@@ -1061,7 +1061,8 @@ export default function PosterMakerPage() {
         </div>`).join('')
     }
 
-    const displayStudents = students.length > 0 ? students : [{ id: uid(), name: 'Sample Student', role: 'Student', className: 'Class 1A', studentId: 'STU-001' }]
+    const targetStudents = studentsToPrint && studentsToPrint.length > 0 ? studentsToPrint : students
+    const displayStudents = targetStudents.length > 0 ? targetStudents : [{ id: uid(), name: 'Sample Student', role: 'Student', className: 'Class 1A', studentId: 'STU-001' }]
 
     const html = `<html><head><title>Print Tags</title>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -1130,12 +1131,12 @@ export default function PosterMakerPage() {
       if (tc.style === 'sticker') return (
         <div style={{ width: pw, height: ph, borderRadius: '50%', background: side.bgColor, ...patternBg, border: `2px solid ${side.primaryColor}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', overflow: 'hidden', cursor: showBothSides ? 'pointer' : 'default' }} onClick={() => showBothSides && setFlip(f => !f)}>
           {isFront ? <>
-            {side.showLogo && tc.logoUrl && <img src={tc.logoUrl} style={{ height: ph * 0.2, objectFit: 'contain', marginBottom: 2 }} />}
+            {side.showLogo && tc.logoUrl && <img loading="lazy" src={tc.logoUrl} style={{ height: ph * 0.2, objectFit: 'contain', marginBottom: 2 }} />}
             {side.showName && <div style={{ fontSize: fs(11), fontWeight: 700, color: side.primaryColor, fontFamily: tc.fontFamily, lineHeight: 1.1, padding: '0 4px' }}>{s.name}</div>}
             {side.showRole && <div style={{ fontSize: fs(8), color: '#666', fontFamily: tc.fontFamily }}>{s.role}</div>}
             {side.showStudentId && s.studentId && <div style={{ fontSize: fs(7), color: '#888', fontFamily: tc.fontFamily, marginTop: 2 }}>{s.studentId}</div>}
           </> : <div style={{ fontSize: fs(7), color: side.primaryColor, fontFamily: tc.fontFamily, padding: 8, textAlign: 'center', lineHeight: 1.4 }}>
-            {side.showQRCode && <div style={{ marginBottom: 6 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: pw * 0.4, height: pw * 0.4, background: 'var(--bg-card)', padding: 3, borderRadius: 4 }} /></div>}
+            {side.showQRCode && <div style={{ marginBottom: 6 }}><img loading="lazy" src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: pw * 0.4, height: pw * 0.4, background: 'var(--bg-card)', padding: 3, borderRadius: 4 }} /></div>}
             {side.customText || tc.schoolName}
           </div>}
         </div>
@@ -1146,11 +1147,11 @@ export default function PosterMakerPage() {
           <div style={{ width: pw * 0.25, height: 6 * scale, background: '#aaa', borderRadius: '0 0 3px 3px' }} />
           {isFront ? <>
             <div style={{ width: '100%', background: side.primaryColor, padding: '5px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-              {side.showLogo && tc.logoUrl && <img src={tc.logoUrl} style={{ height: pw * 0.18, objectFit: 'contain' }} />}
+              {side.showLogo && tc.logoUrl && <img loading="lazy" src={tc.logoUrl} style={{ height: pw * 0.18, objectFit: 'contain' }} />}
               <div style={{ fontSize: fs(7), fontWeight: 700, color: '#fff', fontFamily: tc.fontFamily }}>{tc.schoolName}</div>
             </div>
             <div style={{ width: pw * 0.5, height: pw * 0.5, borderRadius: '50%', background: `${side.primaryColor}20`, border: `2px solid ${side.primaryColor}`, margin: '6px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: pw * 0.14, fontWeight: 700, color: side.primaryColor, overflow: 'hidden' }}>
-              {side.showPhoto && s.photoUrl ? <img src={s.photoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : s.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+              {side.showPhoto && s.photoUrl ? <img loading="lazy" src={s.photoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : s.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
             </div>
             {side.showName && <div style={{ fontSize: fs(9), fontWeight: 700, color: side.primaryColor, fontFamily: tc.fontFamily, textAlign: 'center', padding: '0 4px', lineHeight: 1.1 }}>{s.name}</div>}
             {side.showRole && <div style={{ fontSize: fs(7), color: '#666', fontFamily: tc.fontFamily }}>{s.role}</div>}
@@ -1158,10 +1159,10 @@ export default function PosterMakerPage() {
             {side.showStudentId && s.studentId && <div style={{ fontSize: fs(6.5), color: side.primaryColor, fontFamily: tc.fontFamily, marginTop: 2, fontWeight: 600 }}>{s.studentId}</div>}
           </> : <>
             <div style={{ width: '100%', background: side.primaryColor, padding: '5px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {side.showLogo && tc.logoUrl ? <img src={tc.logoUrl} style={{ height: pw * 0.15, objectFit: 'contain', opacity: 0.9 }} /> : <div style={{ fontSize: fs(7), fontWeight: 700, color: '#fff', fontFamily: tc.fontFamily }}>{tc.schoolName}</div>}
+              {side.showLogo && tc.logoUrl ? <img loading="lazy" src={tc.logoUrl} style={{ height: pw * 0.15, objectFit: 'contain', opacity: 0.9 }} /> : <div style={{ fontSize: fs(7), fontWeight: 700, color: '#fff', fontFamily: tc.fontFamily }}>{tc.schoolName}</div>}
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 8, textAlign: 'center' }}>
-              {side.showQRCode && <div style={{ marginBottom: 8 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 120)} style={{ width: pw * 0.45, height: pw * 0.45, background: 'var(--bg-card)', padding: 4, borderRadius: 4, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }} /></div>}
+              {side.showQRCode && <div style={{ marginBottom: 8 }}><img loading="lazy" src={generateQRCodeURL(`WUL:ID:${s.id}`, 120)} style={{ width: pw * 0.45, height: pw * 0.45, background: 'var(--bg-card)', padding: 4, borderRadius: 4, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }} /></div>}
               <div style={{ fontSize: fs(6.5), color: side.primaryColor, fontFamily: tc.fontFamily, lineHeight: 1.5 }}>{side.customText || 'This ID card must be worn at all times while on school premises.'}</div>
             </div>
             <div style={{ width: '100%', height: 3 * scale, background: side.accentColor }} />
@@ -1173,12 +1174,12 @@ export default function PosterMakerPage() {
         <div style={{ width: pw, height: ph, background: side.bgColor, ...patternBg, borderRadius: tc.cornerRadius * scale, border: '1px solid #ddd', overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: showBothSides ? 'pointer' : 'default' }} onClick={() => showBothSides && setFlip(f => !f)}>
           {isFront ? <>
             <div style={{ background: side.primaryColor, padding: '5px 8px', display: 'flex', alignItems: 'center', gap: 4 }}>
-              {side.showLogo && tc.logoUrl && <img src={tc.logoUrl} style={{ height: ph * 0.2, objectFit: 'contain' }} />}
+              {side.showLogo && tc.logoUrl && <img loading="lazy" src={tc.logoUrl} style={{ height: ph * 0.2, objectFit: 'contain' }} />}
               <div style={{ fontSize: fs(7), fontWeight: 700, color: '#fff', fontFamily: tc.fontFamily }}>{tc.schoolName}</div>
             </div>
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '4px 8px', gap: 6 }}>
               <div style={{ width: ph * 0.32, height: ph * 0.32, borderRadius: '50%', background: `${side.primaryColor}20`, border: `1.5px solid ${side.primaryColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: ph * 0.1, fontWeight: 700, color: side.primaryColor, flexShrink: 0, overflow: 'hidden' }}>
-                {side.showPhoto && s.photoUrl ? <img src={s.photoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : s.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                {side.showPhoto && s.photoUrl ? <img loading="lazy" src={s.photoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : s.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
               </div>
               <div>
                 {side.showName && <div style={{ fontSize: fs(9), fontWeight: 700, color: side.primaryColor, fontFamily: tc.fontFamily, lineHeight: 1.1 }}>{s.name}</div>}
@@ -1190,9 +1191,9 @@ export default function PosterMakerPage() {
             <div style={{ height: 3 * scale, background: side.accentColor }} />
           </> : <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 10, textAlign: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-              {side.showQRCode && <img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: ph * 0.3, height: ph * 0.3, background: 'var(--bg-card)', padding: 3, borderRadius: 3 }} />}
+              {side.showQRCode && <img loading="lazy" src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: ph * 0.3, height: ph * 0.3, background: 'var(--bg-card)', padding: 3, borderRadius: 3 }} />}
               <div style={{ textAlign: side.showQRCode ? 'left' : 'center' }}>
-                {side.showLogo && tc.logoUrl && <img src={tc.logoUrl} style={{ height: ph * 0.18, objectFit: 'contain', marginBottom: 4, opacity: 0.7 }} />}
+                {side.showLogo && tc.logoUrl && <img loading="lazy" src={tc.logoUrl} style={{ height: ph * 0.18, objectFit: 'contain', marginBottom: 4, opacity: 0.7 }} />}
                 <div style={{ fontSize: fs(6.5), color: side.primaryColor, fontFamily: tc.fontFamily, lineHeight: 1.5 }}>{side.customText || 'Return to school office if found.'}</div>
               </div>
             </div>
@@ -1210,10 +1211,10 @@ export default function PosterMakerPage() {
               {side.showStudentId && s.studentId && <div style={{ fontSize: fs(6.5), color: '#888', fontFamily: tc.fontFamily, marginTop: 2 }}>{s.studentId}</div>}
             </div>
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {side.showLogo && tc.logoUrl ? <img src={tc.logoUrl} style={{ maxHeight: ph * 0.2, objectFit: 'contain', opacity: 0.4 }} /> : <div style={{ fontSize: fs(6), color: '#aaa', fontFamily: tc.fontFamily }}>{tc.schoolName}</div>}
+              {side.showLogo && tc.logoUrl ? <img loading="lazy" src={tc.logoUrl} style={{ maxHeight: ph * 0.2, objectFit: 'contain', opacity: 0.4 }} /> : <div style={{ fontSize: fs(6), color: '#aaa', fontFamily: tc.fontFamily }}>{tc.schoolName}</div>}
             </div>
           </> : <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 8 }}>
-            {side.showQRCode && <div style={{ marginBottom: 6 }}><img src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: pw * 0.35, height: pw * 0.35, background: 'var(--bg-card)', padding: 3, borderRadius: 3 }} /></div>}
+            {side.showQRCode && <div style={{ marginBottom: 6 }}><img loading="lazy" src={generateQRCodeURL(`WUL:ID:${s.id}`, 100)} style={{ width: pw * 0.35, height: pw * 0.35, background: 'var(--bg-card)', padding: 3, borderRadius: 3 }} /></div>}
             <div style={{ fontSize: fs(6.5), color: side.primaryColor, fontFamily: tc.fontFamily, textAlign: 'center', lineHeight: 1.5 }}>{side.customText || tc.schoolName}</div>
           </div>}
         </div>
@@ -1292,9 +1293,9 @@ export default function PosterMakerPage() {
             </>
           )}
           {activeTab === 'tags' && (
-            <button onClick={printTags}
+            <button onClick={() => printTags()}
               style={{ padding: '9px 20px', borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13.5 }}>
-              <Printer size={15} /> Print Tags (Front + Back)
+              <Printer size={15} /> Print Tags (Bulk)
             </button>
           )}
           {activeTab === 'flyer' && (
@@ -1560,7 +1561,7 @@ export default function PosterMakerPage() {
               {showSchoolName && <div style={{ position: 'absolute', top: '5%', left: '50%', transform: 'translateX(-50%)', fontSize: '1.1vw', fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: 2, whiteSpace: 'nowrap', pointerEvents: 'none', zIndex: 1 }}>{schoolName}</div>}
 
               {logoUrl && (
-                <img src={logoUrl} onMouseDown={onLogoDragStart}
+                <img loading="lazy" src={logoUrl} onMouseDown={onLogoDragStart}
                   style={{ position: 'absolute', left: `${logoX}%`, top: `${logoY}%`, transform: 'translate(-50%,-50%)', maxHeight: `${logoSize}%`, maxWidth: '25%', objectFit: 'contain', cursor: 'move', zIndex: 5, userSelect: 'none' }}
                   draggable={false} alt="Logo" />
               )}
@@ -1573,7 +1574,7 @@ export default function PosterMakerPage() {
                   onClick={e => { e.stopPropagation(); setSelectedId(el.id) }}
                   style={{ position: 'absolute', left: `${el.x}%`, top: `${el.y}%`, transform: 'translate(-50%,-50%)', width: `${el.width}%`, zIndex: el.zIndex, opacity: el.opacity, cursor: el.locked ? 'not-allowed' : 'move', outline: el.id === selectedId ? '2px solid #7c3aed' : '2px solid transparent', outlineOffset: 3, borderRadius: 4, userSelect: 'none' }}>
                   {el.type === 'image'
-                    ? <img src={el.imageUrl} style={{ width: '100%', display: 'block', objectFit: 'contain', pointerEvents: 'none' }} draggable={false} />
+                    ? <img loading="lazy" src={el.imageUrl} style={{ width: '100%', display: 'block', objectFit: 'contain', pointerEvents: 'none' }} draggable={false} />
                     : el.type === 'shape'
                       ? <div style={{ width: '100%', paddingTop: '60%', background: el.bgColor, border: `${el.borderWidth}px solid ${el.borderColor}`, borderRadius: 8 }} />
                       : <div style={{ fontFamily: el.fontFamily, fontSize: `${el.fontSize * 0.045}vw`, fontWeight: el.bold ? 700 : 400, fontStyle: el.italic ? 'italic' : 'normal', color: el.color, textAlign: el.align, background: el.bgColor, padding: el.bgColor !== 'transparent' ? '0.3em 0.8em' : 0, borderRadius: el.bgColor !== 'transparent' ? '40px' : 0, lineHeight: 1.2, pointerEvents: 'none', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{el.content}</div>
@@ -1812,7 +1813,10 @@ export default function PosterMakerPage() {
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{s.name}</div>
                           <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{s.role}{s.className ? ` · ${s.className}` : ''}</div>
                         </div>
-                        <button className="ctrl-btn danger" style={{ padding: '3px 7px', flexShrink: 0 }} onClick={() => setStudents(st => st.filter(x => x.id !== s.id))}><Trash2 size={11} /></button>
+                        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                          <button className="ctrl-btn" style={{ padding: '3px 7px' }} onClick={() => printTags([s])} title="Print this tag"><Printer size={11} /></button>
+                          <button className="ctrl-btn danger" style={{ padding: '3px 7px' }} onClick={() => setStudents(st => st.filter(x => x.id !== s.id))} title="Remove student"><Trash2 size={11} /></button>
+                        </div>
                       </div>
                     ))}
                     {students.length === 0 && <div style={{ textAlign: 'center', fontSize: 13, color: '#d1d5db', padding: '16px 0' }}>No students added yet</div>}
@@ -1948,13 +1952,13 @@ export default function PosterMakerPage() {
                     {showSchoolName && <div style={{ position: 'absolute', top: '5%', left: '50%', transform: 'translateX(-50%)', fontSize: `${flyerFormat.w * 0.018}px`, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: 2, whiteSpace: 'nowrap', pointerEvents: 'none', zIndex: 1 }}>{schoolName}</div>}
 
                     {/* Logo */}
-                    {logoUrl && <img src={logoUrl} style={{ position: 'absolute', left: `${logoX}%`, top: `${logoY}%`, transform: 'translate(-50%,-50%)', maxHeight: `${logoSize}%`, maxWidth: '20%', objectFit: 'contain', zIndex: 5, userSelect: 'none', pointerEvents: 'none' }} draggable={false} alt="" />}
+                    {logoUrl && <img loading="lazy" src={logoUrl} style={{ position: 'absolute', left: `${logoX}%`, top: `${logoY}%`, transform: 'translate(-50%,-50%)', maxHeight: `${logoSize}%`, maxWidth: '20%', objectFit: 'contain', zIndex: 5, userSelect: 'none', pointerEvents: 'none' }} draggable={false} alt="" />}
 
                     {/* Elements */}
                     {[...elements].sort((a, b) => a.zIndex - b.zIndex).map(el => (
                       <div key={el.id} style={{ position: 'absolute', left: `${el.x}%`, top: `${el.y}%`, transform: 'translate(-50%,-50%)', width: `${el.width}%`, zIndex: el.zIndex, opacity: el.opacity, userSelect: 'none' }}>
                         {el.type === 'image'
-                          ? <img src={el.imageUrl} style={{ width: '100%', display: 'block', objectFit: 'contain' }} draggable={false} />
+                          ? <img loading="lazy" src={el.imageUrl} style={{ width: '100%', display: 'block', objectFit: 'contain' }} draggable={false} />
                           : el.type === 'shape'
                             ? <div style={{ width: '100%', paddingTop: '60%', background: el.bgColor, border: `${el.borderWidth}px solid ${el.borderColor}`, borderRadius: 8 }} />
                             : <div style={{ fontSize: `${el.fontSize * (flyerFormat.w / 800)}pt`, fontFamily: el.fontFamily, color: el.color, fontWeight: el.bold ? 900 : 400, fontStyle: el.italic ? 'italic' : 'normal', textAlign: el.align, background: el.bgColor, border: `${el.borderWidth}px solid ${el.borderColor}`, padding: el.bgColor !== 'transparent' ? '6px 16px' : 0, borderRadius: el.bgColor !== 'transparent' ? 40 : 0, lineHeight: 1.2, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{el.content}</div>}

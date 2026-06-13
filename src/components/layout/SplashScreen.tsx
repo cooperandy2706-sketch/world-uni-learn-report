@@ -189,8 +189,7 @@ export default function SplashScreen() {
 
         <div className="splash-content">
           <div className="logo-box">
-            <img
-              src="/icon-512.png"
+            <img loading="lazy" src="/icon-512.png"
               alt="Acadera Logo"
               style={{
                 width: '100%',

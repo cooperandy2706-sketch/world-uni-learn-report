@@ -149,7 +149,7 @@ export function SchoolSearchInput({
                 >
                   <span className="school-search-option-logo">
                     {school.logo_url ? (
-                      <img src={school.logo_url} alt="" />
+                      <img loading="lazy" src={school.logo_url} alt="" />
                     ) : (
                       <GraduationCap size={18} />
                     )}

@@ -232,7 +232,7 @@ export default function ReportCard({
           {/* ── HEADER ── */}
           <div className="rc-header">
             {school?.logo_url && (
-              <img src={school.logo_url} alt="Logo" style={{ width: isClassic ? 100 : 80, height: isClassic ? 100 : 80, objectFit: 'contain' }} />
+              <img loading="lazy" src={school.logo_url} alt="Logo" style={{ width: isClassic ? 100 : 80, height: isClassic ? 100 : 80, objectFit: 'contain' }} />
             )}
             <div style={{ flex: 1 }}>
               <h1 style={{ fontSize: isClassic ? 28 : 22, fontWeight: 800, color: isBW || isClassic ? '#000' : primary, margin: 0, textTransform: isProf ? 'uppercase' : 'none', letterSpacing: isProf ? '1px' : 'normal' }}>

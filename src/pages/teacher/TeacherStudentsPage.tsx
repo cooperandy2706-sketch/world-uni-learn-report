@@ -378,7 +378,7 @@ export default function TeacherStudentsPage() {
                     <td data-label="Student" style={{ padding: '12px 16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         {s.photo_url ? (
-                          <img src={s.photo_url} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
+                          <img loading="lazy" src={s.photo_url} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
                         ) : (
                           <Avatar name={s.full_name} size={34} />
                         )}
@@ -430,7 +430,7 @@ export default function TeacherStudentsPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderRadius: 12, marginBottom: 18 }}>
                 <div style={{ position: 'relative' }}>
                   {viewingStudent.photo_url ? (
-                    <img src={viewingStudent.photo_url} alt="Profile" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
+                    <img loading="lazy" src={viewingStudent.photo_url} alt="Profile" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
                   ) : (
                     <Avatar name={viewingStudent.full_name} size={56} />
                   )}

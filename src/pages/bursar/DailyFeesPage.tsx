@@ -130,7 +130,7 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
     const w = window.open('', '_blank')
     if (!w) return
     const logoHtml = school?.logo_url 
-      ? `<img src="${school.logo_url}" style="height: 50px; border-radius: 8px;" />`
+      ? `<img loading="lazy" src="${school.logo_url}" style="height: 50px; border-radius: 8px;" />`
       : CREST_SVG
 
     w.document.write(`

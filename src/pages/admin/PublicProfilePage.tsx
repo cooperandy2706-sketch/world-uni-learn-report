@@ -294,7 +294,7 @@ export default function PublicProfilePage() {
                     {photos.map(p => (
                       <motion.div key={p.id} layout initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                         style={{ borderRadius: 14, overflow: 'hidden', position: 'relative', paddingBottom: '75%', background: '#f1f5f9' }}>
-                        <img src={p.url} alt={p.caption || ''} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img loading="lazy" src={p.url} alt={p.caption || ''} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                         <button onClick={() => deleteMedia(p.id)}
                           style={{ position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <Trash2 size={13} />

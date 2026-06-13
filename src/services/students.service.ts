@@ -3,13 +3,28 @@ import { supabase } from '../lib/supabase'
 import type { Student } from '../types'
 
 export const studentsService = {
-  async getAll(schoolId: string) {
-    return supabase
+  async getAll(schoolId: string, opts?: { page?: number, limit?: number, search?: string, classId?: string, gender?: string }) {
+    let query = supabase
       .from('students')
-      .select('*, class:classes(id, name)')
+      .select('*, class:classes(id, name)', { count: 'exact' })
       .eq('school_id', schoolId)
       .eq('is_active', true)
-      .order('full_name')
+
+    if (opts?.classId) query = query.eq('class_id', opts.classId)
+    if (opts?.gender) query = query.eq('gender', opts.gender)
+    if (opts?.search) {
+      query = query.or(`full_name.ilike.%${opts.search}%,student_id.ilike.%${opts.search}%`)
+    }
+
+    query = query.order('full_name')
+
+    if (opts?.page !== undefined && opts?.limit !== undefined) {
+      const from = opts.page * opts.limit
+      const to = from + opts.limit - 1
+      query = query.range(from, to)
+    }
+
+    return query
   },
 
   async getByClass(schoolId: string, classId: string) {

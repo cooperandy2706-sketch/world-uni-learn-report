@@ -227,7 +227,7 @@ export default function SchoolDirectoryPage() {
                     <div className="schools-card-head">
                       <div className="schools-card-logo">
                         {school.logo_url ? (
-                          <img src={school.logo_url} alt="" />
+                          <img loading="lazy" src={school.logo_url} alt="" />
                         ) : (
                           <GraduationCap size={24} strokeWidth={1.75} />
                         )}

@@ -225,7 +225,7 @@ export default function ReportsPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                   {school?.logo_url ? (
-                    <img src={school.logo_url} alt="Logo" style={{ width: 80, height: 80, objectFit: 'contain' }} />
+                    <img loading="lazy" src={school.logo_url} alt="Logo" style={{ width: 80, height: 80, objectFit: 'contain' }} />
                   ) : (
                     <div style={{ width: 80, height: 80, background: '#f5f3ff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <School size={40} color="#6d28d9" />

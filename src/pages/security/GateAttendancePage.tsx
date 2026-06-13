@@ -164,7 +164,7 @@ export default function GateAttendancePage() {
                 {/* Mobile card */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   {s.photo_url ? (
-                    <img src={s.photo_url} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                    <img loading="lazy" src={s.photo_url} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   ) : (
                     <div style={{ width: 40, height: 40, borderRadius: '50%', background: s.direction === 'in' ? '#dcfce7' : '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 800, color: s.direction === 'in' ? '#059669' : '#2563eb', flexShrink: 0 }}>
                       {s.person_name.charAt(0)}

@@ -13,8 +13,7 @@ const PURPOSES = ['Parent Visit', 'Delivery', 'Official Meeting', 'Interview', '
 function QRImg({ value, size = 80 }: { value: string; size?: number }) {
   const encoded = encodeURIComponent(value)
   return (
-    <img
-      src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}&margin=2`}
+    <img loading="lazy" src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}&margin=2`}
       width={size} height={size}
       style={{ imageRendering: 'pixelated', display: 'block' }}
       alt="QR"
@@ -127,7 +126,7 @@ export default function VisitorBadgePage() {
             ${printing.id_number ? `<div class="row"><span class="label">ID</span><span class="val">${printing.id_number}</span></div>` : ''}
             ${printing.phone ? `<div class="row"><span class="label">Phone</span><span class="val">${printing.phone}</span></div>` : ''}
             <div class="qr-wrap">
-              <img src="${qrUrl}" width="100" height="100" />
+              <img loading="lazy" src="${qrUrl}" width="100" height="100" />
               <div class="qr-note">SCAN TO SIGN OUT</div>
             </div>
           </div>

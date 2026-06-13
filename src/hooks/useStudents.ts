@@ -1,20 +1,30 @@
-// src/hooks/useStudents.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { studentsService } from '../services/students.service'
 import { useAuth } from './useAuth'
 import toast from 'react-hot-toast'
 
-export function useStudents() {
+export function useStudents(opts?: { search?: string, classId?: string, gender?: string }) {
   const { user } = useAuth()
   const schoolId = user?.school_id ?? ''
+  const limit = 50
 
-  return useQuery({
-    queryKey: ['students', schoolId],
-    queryFn: async () => {
-      const { data, error } = await studentsService.getAll(schoolId)
+  return useInfiniteQuery({
+    queryKey: ['students', schoolId, opts],
+    queryFn: async ({ pageParam = 0 }) => {
+      const { data, count, error } = await studentsService.getAll(schoolId, {
+        page: pageParam,
+        limit,
+        ...opts
+      })
       if (error) throw error
-      return data ?? []
+      return {
+        data: data ?? [],
+        nextPage: (data?.length === limit) ? pageParam + 1 : undefined,
+        total: count ?? 0
+      }
     },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
     enabled: !!schoolId,
   })
 }

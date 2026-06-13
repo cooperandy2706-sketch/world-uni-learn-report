@@ -65,8 +65,7 @@ export default function GlobalAdOverlay() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ borderRadius: 12, overflow: 'hidden', background: 'rgba(0,0,0,0.02)' }}>
           {activeAd.media_type === 'image' ? (
-            <img 
-              src={activeAd.media_url} 
+            <img loading="lazy" src={activeAd.media_url} 
               alt={activeAd.title} 
               style={{ width: '100%', display: 'block', objectFit: 'contain', maxHeight: '60vh' }} 
             />

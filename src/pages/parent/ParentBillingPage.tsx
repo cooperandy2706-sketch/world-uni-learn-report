@@ -393,8 +393,7 @@ export default function ParentBillingPage() {
             ) : (
               <div style={{ padding: '32px 24px', textAlign: 'center', animation: '_modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
                  {schoolInfo?.logo_url ? (
-                   <img 
-                     src={schoolInfo.logo_url} 
+                   <img loading="lazy" src={schoolInfo.logo_url} 
                      alt="School Logo" 
                      style={{ width: 80, height: 80, borderRadius: 8, objectFit: 'contain', margin: '0 auto 16px', border: '1.5px solid var(--border-color)', padding: 4, background: '#fff', boxShadow: '0 4px 12px rgba(0,0,0,0.04)' }} 
                    />

@@ -6,7 +6,6 @@ import { useSubjects } from '../../hooks/useSubjects'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import { useAuth } from '../../hooks/useAuth'
 import Modal from '../../components/ui/Modal'
-import { utils, writeFile } from 'xlsx'
 import toast from 'react-hot-toast'
 import { 
   Calculator, 
@@ -179,7 +178,7 @@ export default function BECEProcessorPage() {
   }, [selectedClass, selectedSubject, term?.id, students])
 
   // ── Handlers ──────────────────────────────────────────────
-  const handleExport = () => {
+  const handleExport = async () => {
     if (processedData.length === 0) return
     
     const wsData = processedData.map(d => ({
@@ -189,6 +188,7 @@ export default function BECEProcessorPage() {
       'CA Score': d.finalCA
     }))
 
+    const { utils, writeFile } = await import('xlsx')
     const ws = utils.json_to_sheet(wsData)
     const wb = utils.book_new()
     utils.book_append_sheet(wb, ws, 'BECE CA Scores')

@@ -147,7 +147,7 @@ export default function BillSheetPage() {
     }
 
     const logoHtml = school?.logo_url
-      ? `<img src="${school.logo_url}" alt="School Logo" style="width: 72px; height: 72px; border-radius: 12px; object-fit: contain; border: 1.5px solid #ede9fe; padding: 4px; background: #fff;" />`
+      ? `<img loading="lazy" src="${school.logo_url}" alt="School Logo" style="width: 72px; height: 72px; border-radius: 12px; object-fit: contain; border: 1.5px solid #ede9fe; padding: 4px; background: #fff;" />`
       : `<div style="width:72px;height:72px;border-radius:12px;background:#f5f3ff;display:flex;align-items:center;justify-content:center;border:1.5px solid #ede9fe;">${CREST_SVG}</div>`
 
     const scholarshipBadge = d.scholarship.type !== 'none'

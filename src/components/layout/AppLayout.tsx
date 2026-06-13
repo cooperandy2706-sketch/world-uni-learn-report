@@ -142,6 +142,7 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
           </main>
         </div>
       </div>
+
       <BottomNav />
       <WhatsNewModal />
       <AnnouncementPopup />

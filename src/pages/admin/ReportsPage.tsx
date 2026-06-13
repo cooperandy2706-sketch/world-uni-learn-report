@@ -1001,7 +1001,7 @@ function buildClassHTML(reports: any[], className: string, school: any, term: an
     
     return `<div style="page-break-after:${idx<reports.length-1?'always':'auto'};padding:12px 16px;font-family:'DM Sans',sans-serif;max-width:800px;margin:0 auto;font-size:13.5px;color:#000;background:#fff;filter:${isBW?'grayscale(100%)':'none'}" class="rc-wrap">
       <div style="text-align:center;border-bottom:${isBW?'3px solid #000':'2.5px solid #1e3a8a'};padding-bottom:10px;margin-bottom:12px">
-        ${(school?.logo_url)?`<img src="${school.logo_url}" style="height:48px;object-fit:contain;margin-bottom:4px;filter:${isBW?'grayscale(100%)':'none'}"/>`:'' }
+        ${(school?.logo_url)?`<img loading="lazy" src="${school.logo_url}" style="height:48px;object-fit:contain;margin-bottom:4px;filter:${isBW?'grayscale(100%)':'none'}"/>`:'' }
         <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:${isBW?'#000':'#1e3a8a'}">${school?.name??'School'}</div>
         ${school?.motto?`<div style="font-size:10.5px;color:${isBW?'#000':'#64748b'};font-style:italic">${school.motto}</div>`:''}
         <div style="margin-top:7px;background:${isBW?'#000':'#1e3a8a'};color:#fff;padding:4px;border-radius:3px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em">

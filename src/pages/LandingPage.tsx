@@ -580,7 +580,7 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
       <div className="container">
         <div className="nav-inner">
           <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="logo" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: 0 }}>
-            <img src="/icon-512.png" alt="Acadera Logo" className="logo-icon" style={{ background: 'transparent' }} />
+            <img loading="lazy" src="/icon-512.png" alt="Acadera Logo" className="logo-icon" style={{ background: 'transparent' }} />
             <span>Acadera</span>
           </button>
 
@@ -937,7 +937,7 @@ export default function LandingPage() {
           <div className="footer-grid">
             <div className="footer-col">
               <div className="logo footer-logo">
-                <img src="/icon-512.png" alt="Logo" className="logo-icon" style={{ background: 'none' }} />
+                <img loading="lazy" src="/icon-512.png" alt="Logo" className="logo-icon" style={{ background: 'none' }} />
                 <span style={{ color: 'white' }}>Acadera</span>
               </div>
               <p className="footer-desc">The all-in-one School Management System built for Ghanaian schools. Empowering administrators, teachers, bursars, and students.</p>

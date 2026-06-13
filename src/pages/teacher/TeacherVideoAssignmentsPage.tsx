@@ -138,7 +138,7 @@ export default function TeacherVideoAssignmentsPage() {
               return (
                 <div key={a.id} style={{ background: 'var(--bg-card)', borderRadius: 8, overflow: 'hidden', border: '1.5px solid #f0eefe', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ position: 'relative', height: 180, background: '#000' }}>
-                    <img src={`https://img.youtube.com/vi/${a.youtube_id}/hqdefault.jpg`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7 }} />
+                    <img loading="lazy" src={`https://img.youtube.com/vi/${a.youtube_id}/hqdefault.jpg`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7 }} />
                     <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(255,255,255,0.9)', padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 800, color: '#4c1d95' }}>
                       {a.class?.name}
                     </div>
@@ -196,7 +196,7 @@ export default function TeacherVideoAssignmentsPage() {
 
               {previewId && (
                 <div className="t-field" style={{ borderRadius: 12, overflow: 'hidden', height: 160, background: '#000' }}>
-                  <img src={`https://img.youtube.com/vi/${previewId}/mqdefault.jpg`} alt="Video preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img loading="lazy" src={`https://img.youtube.com/vi/${previewId}/mqdefault.jpg`} alt="Video preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               )}
 

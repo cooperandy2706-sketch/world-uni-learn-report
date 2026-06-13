@@ -266,7 +266,7 @@ export default function GlobalAdsPage() {
                 }}>
                   <div style={{ position: 'relative', height: 160, background: '#f3f4f6' }}>
                     {ad.media_type === 'image' ? (
-                      <img src={ad.media_url} alt={ad.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img loading="lazy" src={ad.media_url} alt={ad.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <video src={ad.media_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     )}
@@ -348,7 +348,7 @@ export default function GlobalAdsPage() {
                 {file.type.startsWith('video/') ? (
                   <video src={previewUrl} controls style={{ maxHeight: 200, maxWidth: '100%', borderRadius: 8 }} />
                 ) : (
-                  <img src={previewUrl} alt="Preview" style={{ maxHeight: 200, maxWidth: '100%', borderRadius: 8, objectFit: 'contain' }} />
+                  <img loading="lazy" src={previewUrl} alt="Preview" style={{ maxHeight: 200, maxWidth: '100%', borderRadius: 8, objectFit: 'contain' }} />
                 )}
               </div>
             )}

@@ -165,7 +165,7 @@ export default function ManageAccountPage() {
           <div style={{ position: 'relative', width: 120, height: 120, margin: '0 auto 20px' }}>
             <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, fontWeight: 700, color: '#fff', overflow: 'hidden', border: '4px solid #fff', boxShadow: '0 8px 24px rgba(99,102,241,0.2)' }}>
               {user?.avatar_url ? (
-                <img src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img loading="lazy" src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 user?.full_name?.charAt(0).toUpperCase() || <User size={40} />
               )}

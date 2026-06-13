@@ -67,7 +67,7 @@ function ScanFeedItem({ scan }: { scan: GateScan }) {
       borderBottom: '1px solid #f8fafc', animation: 'sc_slide .3s ease',
     }}>
       {scan.photo_url ? (
-        <img src={scan.photo_url} style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #f1f5f9' }} />
+        <img loading="lazy" src={scan.photo_url} style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #f1f5f9' }} />
       ) : (
         <div style={{ width: 38, height: 38, borderRadius: '50%', flexShrink: 0, background: scan.direction === 'in' ? '#dcfce7' : '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 800, color: scan.direction === 'in' ? '#059669' : '#2563eb' }}>
           {scan.person_name.charAt(0)}

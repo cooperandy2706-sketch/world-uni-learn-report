@@ -7,7 +7,6 @@ import { useCurrentTerm, useCurrentAcademicYear, useSettings } from '../../hooks
 import { useBulkUpsertScores } from '../../hooks/useScores'
 import Modal from '../../components/ui/Modal'
 import BECEReportCard from '../../components/reports/BECEReportCard'
-import { utils, writeFile } from 'xlsx'
 import toast from 'react-hot-toast'
 import { 
   Grid, 
@@ -327,7 +326,7 @@ export default function BECEMasterPage() {
   }
 
   // ── WAEC Portal Export (Narrow Format) ────────────────────
-  const handleExportPortal = () => {
+  const handleExportPortal = async () => {
     if (students.length === 0 || subjects.length === 0) {
       toast.error('No data to export. Select a class and ensure scores are entered.')
       return
@@ -362,6 +361,7 @@ export default function BECEMasterPage() {
       return
     }
 
+    const { utils, writeFile } = await import('xlsx')
     const ws = utils.json_to_sheet(rows)
     const wb = utils.book_new()
     utils.book_append_sheet(wb, ws, 'BECE Portal Upload')
@@ -373,7 +373,7 @@ export default function BECEMasterPage() {
   }
 
   // ── Master Summary Export (Wide Format) ──────────────────
-  const handleExportMasterSummary = () => {
+  const handleExportMasterSummary = async () => {
     if (students.length === 0 || subjects.length === 0) {
       toast.error('No data to export.')
       return
@@ -397,6 +397,7 @@ export default function BECEMasterPage() {
       return row
     })
 
+    const { utils, writeFile } = await import('xlsx')
     const ws = utils.json_to_sheet(rows)
     const wb = utils.book_new()
     utils.book_append_sheet(wb, ws, 'BECE Master Summary')

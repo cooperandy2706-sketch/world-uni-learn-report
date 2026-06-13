@@ -382,7 +382,7 @@ export default function SettingsPage() {
             onClick={() => logoRef.current?.click()}
             style={{ width: 72, height: 72, borderRadius: 8, flexShrink: 0, background: logoUrl ? 'transparent' : 'rgba(255,255,255,0.1)', border: '2px dashed rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', transition: 'all 0.2s', boxShadow: logoHov ? '0 0 0 4px rgba(245,158,11,0.3)' : 'none', position: 'relative', zIndex: 1 }}>
             {logoUrl ? (
-              <img src={logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <img loading="lazy" src={logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             ) : (
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 22, marginBottom: 2 }}>🏫</div>
@@ -532,7 +532,7 @@ export default function SettingsPage() {
                           <Field label="Background Watermark" hint="Faint image shown behind the report content (e.g. school crest)">
                              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
                                 <div style={{ width: 60, height: 60, borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-input)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                                   {watermarkUrl ? <img src={watermarkUrl} style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: 0.5 }} /> : <span style={{ fontSize: 20 }}>📜</span>}
+                                   {watermarkUrl ? <img loading="lazy" src={watermarkUrl} style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: 0.5 }} /> : <span style={{ fontSize: 20 }}>📜</span>}
                                 </div>
                                 <div style={{ flex: 1 }}>
                                    <Btn variant="secondary" style={{ padding: '6px 12px', fontSize: 11 }} onClick={() => watermarkRef.current?.click()} loading={watermarkUploading}>

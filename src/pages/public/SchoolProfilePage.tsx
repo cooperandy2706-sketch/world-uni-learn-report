@@ -331,7 +331,7 @@ export default function SchoolProfilePage() {
           <div className="sp-identity-row">
             <div className="sp-avatar">
               {school.logo_url ? (
-                <img src={school.logo_url} alt="" />
+                <img loading="lazy" src={school.logo_url} alt="" />
               ) : (
                 <GraduationCap size={36} strokeWidth={1.75} color="var(--sp-text-3)" />
               )}

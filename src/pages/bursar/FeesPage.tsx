@@ -11,7 +11,6 @@ import { supabase } from '../../lib/supabase'
 import Modal from '../../components/ui/Modal'
 import toast from 'react-hot-toast'
 import { Plus, Trash2, Printer, CreditCard, Settings, GraduationCap, MessageCircle, Mail, Smartphone, AlertTriangle, CheckCircle2, Send, Loader2, Download, Bell, ShoppingCart, History, Trash, Minus, Search, Users, Check, Lock, Shield, X, Coins } from 'lucide-react'
-import * as XLSX from 'xlsx'
 import { formatCurrency } from '../../utils/currency'
 
 const METHODS = ['cash', 'momo', 'bank', 'cheque'] as const
@@ -584,7 +583,7 @@ export default function FeesPage() {
     if (!win) return
     const schoolObj = school
     const logoHtml = schoolObj?.logo_url 
-      ? `<img src="${schoolObj.logo_url}" style="width: 80px; height: 80px; object-fit: contain;" />`
+      ? `<img loading="lazy" src="${schoolObj.logo_url}" style="width: 80px; height: 80px; object-fit: contain;" />`
       : `<div style="width:80px; height:80px; background:#f3f4f6; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#9ca3af;">LOGO</div>`
 
     win.document.write(`
@@ -684,7 +683,7 @@ export default function FeesPage() {
     win.document.close()
   }
 
-  function exportHistoryData() {
+  async function exportHistoryData() {
     if (!payments || (payments as any[]).length === 0) {
       toast.error('No payments found to export')
       return
@@ -700,6 +699,7 @@ export default function FeesPage() {
       'Reference': p.reference_number || '',
       'Date': new Date(p.payment_date).toLocaleDateString('en-GB')
     }))
+    const XLSX = await import('xlsx')
     const ws = XLSX.utils.json_to_sheet(data)
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Payments')
@@ -738,7 +738,7 @@ export default function FeesPage() {
     const finalBalance = totalBill - totalPaidToDate
 
     const logoHtml = school?.logo_url 
-      ? `<img src="${school.logo_url}" alt="Logo" style="width: 70px; height: 70px; object-fit: contain; border-radius: 12px; background: #ffffff; padding: 4px; border: 1.5px solid #ede9fe;" />`
+      ? `<img loading="lazy" src="${school.logo_url}" alt="Logo" style="width: 70px; height: 70px; object-fit: contain; border-radius: 12px; background: #ffffff; padding: 4px; border: 1.5px solid #ede9fe;" />`
       : CREST_SVG
 
     const buildReceiptHTML = (type: string) => `
@@ -905,7 +905,7 @@ export default function FeesPage() {
     const finalBalance = totalBill - totalPaidToDate
 
     const logoHtml = school?.logo_url 
-      ? `<img src="${school.logo_url}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #ffffff; padding: 2px; border: 1px solid #ede9fe;" />`
+      ? `<img loading="lazy" src="${school.logo_url}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #ffffff; padding: 2px; border: 1px solid #ede9fe;" />`
       : CREST_SVG
 
     const buildReceiptHTML = (type: string) => `

@@ -670,13 +670,11 @@ export default function Header() {
           </button>
 
           {userSchool?.logo_url ? (
-            <img
-              src={userSchool.logo_url} alt="School"
+            <img loading="lazy" src={userSchool.logo_url} alt="School"
               style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-hover)', padding: 3, border: '1px solid var(--border-color)' }}
             />
           ) : (
-            <img
-              src="/icon-512.png" alt="Acadera"
+            <img loading="lazy" src="/icon-512.png" alt="Acadera"
               style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-hover)', padding: 3, border: '1px solid var(--border-color)' }}
             />
           )}
@@ -1078,9 +1076,9 @@ export default function Header() {
               }}
             >
               {user?.avatar_url
-                ? <img src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', background: 'var(--bg-card)' }} />
+                ? <img loading="lazy" src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', background: 'var(--bg-card)' }} />
                 : userSchool?.logo_url
-                  ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: 'var(--bg-card)' }} />
+                  ? <img loading="lazy" src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: 'var(--bg-card)' }} />
                   : (user?.full_name?.charAt(0).toUpperCase() || <Shield size={16} />)
               }
             </div>
@@ -1098,9 +1096,9 @@ export default function Header() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid var(--border-light)' }}>
                   <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', fontSize: 18, fontWeight: 700, color: '#1a56db', flexShrink: 0, border: '1px solid var(--border-color)' }}>
                     {user?.avatar_url
-                      ? <img src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', background: 'var(--bg-card)' }} />
+                      ? <img loading="lazy" src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', background: 'var(--bg-card)' }} />
                       : userSchool?.logo_url
-                        ? <img src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: 'var(--bg-card)' }} />
+                        ? <img loading="lazy" src={userSchool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', background: 'var(--bg-card)' }} />
                         : (user?.full_name?.charAt(0).toUpperCase() || <Shield size={20} />)
                     }
                   </div>

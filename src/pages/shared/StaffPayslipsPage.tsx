@@ -36,7 +36,7 @@ export default function StaffPayslipsPage() {
     const win = window.open('', '_blank', 'width=800,height=900')
     if (!win) return
     const logoHtml = school?.logo_url 
-      ? `<img src="${school.logo_url}" style="width: 72px; height: 72px; border-radius: 50%; object-fit: contain; border: 1.5px solid #ede9fe; padding: 4px; background: #fff;" />`
+      ? `<img loading="lazy" src="${school.logo_url}" style="width: 72px; height: 72px; border-radius: 50%; object-fit: contain; border: 1.5px solid #ede9fe; padding: 4px; background: #fff;" />`
       : `<div style="width: 72px; height: 72px; border-radius: 50%; background: #4c1d95; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 24px;">W</div>`
 
     const allowancesHtml = (row.allowances || []).map((a: any) => `

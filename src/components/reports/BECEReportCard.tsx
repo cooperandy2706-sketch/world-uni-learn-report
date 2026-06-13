@@ -52,7 +52,7 @@ export default function BECEReportCard({ student, school, term, year, scores, is
       {/* Official Header */}
       <div style={{ textAlign: 'center', marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 20, marginBottom: 15 }}>
-          {school?.logo_url && <img src={school.logo_url} alt="logo" style={{ height: 60, width: 60, objectFit: 'contain' }} />}
+          {school?.logo_url && <img loading="lazy" src={school.logo_url} alt="logo" style={{ height: 60, width: 60, objectFit: 'contain' }} />}
           <div style={{ textAlign: 'left' }}>
             <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: 24, fontWeight: 900, color: T.primary, margin: 0, textTransform: 'uppercase' }}>
               {school?.name || 'School Name'}

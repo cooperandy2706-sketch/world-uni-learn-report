@@ -1258,7 +1258,7 @@ function printWelcomePack({ bills, supplies, scholarships, feeStructures = [], c
   const date = new Date().toLocaleDateString('en-GH', { day: '2-digit', month: 'long', year: 'numeric' })
   const schoolName = school?.name || 'School Portal'
   const logoHtml = school?.logo_url
-    ? `<img src="${school.logo_url}" alt="Logo" style="height:64px;width:64px;object-fit:contain;border-radius:12px;background:#fff;padding:4px;flex-shrink:0;"/>`
+    ? `<img loading="lazy" src="${school.logo_url}" alt="Logo" style="height:64px;width:64px;object-fit:contain;border-radius:12px;background:#fff;padding:4px;flex-shrink:0;"/>`
     : `<div style="height:64px;width:64px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;">🎓</div>`
 
   // Group bills by category
@@ -1551,7 +1551,7 @@ function printBlankAdmissionForm(school: any) {
     @media print{body{padding:16px}}
   </style></head><body>
   <div class="header">
-    ${school?.logo_url ? `<img src="${school.logo_url}" alt="Logo" style="height:72px;width:72px;object-fit:contain;border-radius:10px;margin-bottom:8px;"/>` : ''}
+    ${school?.logo_url ? `<img loading="lazy" src="${school.logo_url}" alt="Logo" style="height:72px;width:72px;object-fit:contain;border-radius:10px;margin-bottom:8px;"/>` : ''}
     <div class="school-name">${school?.name || 'School Name'}</div>
     ${school?.motto ? `<div style="font-size:11px;color:#6b7280;font-style:italic;margin-top:2px;">&ldquo;${school.motto}&rdquo;</div>` : ''}
     ${school?.address ? `<div style="font-size:10px;color:#6b7280;margin:2px 0 6px;">📍 ${school.address} ${school?.phone ? `&nbsp;|&nbsp; 📞 ${school.phone}` : ''}</div>` : ''}
@@ -1682,7 +1682,7 @@ function printApplicationForm(app: any, school: any) {
     @media print{body{padding:16px}}
   </style></head><body>
   <div class="header">
-    ${school?.logo_url ? `<img src="${school.logo_url}" alt="Logo" style="height:72px;width:72px;object-fit:contain;border-radius:10px;margin-bottom:8px;"/>` : ''}
+    ${school?.logo_url ? `<img loading="lazy" src="${school.logo_url}" alt="Logo" style="height:72px;width:72px;object-fit:contain;border-radius:10px;margin-bottom:8px;"/>` : ''}
     <div class="school-name">${school?.name || 'School Portal'}</div>
     ${school?.motto ? `<div style="font-size:11px;color:#6b7280;font-style:italic;margin-top:2px;">&ldquo;${school.motto}&rdquo;</div>` : ''}
     ${school?.address ? `<div style="font-size:10px;color:#6b7280;margin:2px 0 6px;">📍 ${school.address}</div>` : ''}

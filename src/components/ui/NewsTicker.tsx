@@ -134,12 +134,11 @@ export const NewsTicker: React.FC = () => {
   const fullTickerText = tickerItems.join('        |        ')
 
   return (
-    <div className="hide-on-mobile" style={{
+    <div className="news-ticker-bar" style={{
       width: '100%',
       height: '32px',
       background: '#111827',
       color: '#fff',
-      display: 'flex',
       alignItems: 'center',
       overflow: 'hidden',
       position: 'relative',
@@ -147,6 +146,10 @@ export const NewsTicker: React.FC = () => {
       borderBottom: '1px solid rgba(255,255,255,0.05)',
       fontFamily: '"DM Sans", sans-serif',
     }}>
+      <style>{`
+        .news-ticker-bar { display: none !important; }
+        @media (min-width: 769px) { .news-ticker-bar { display: flex !important; } }
+      `}</style>
       {/* "Breaking" Label */}
       <Link 
         to={`/${user?.role || 'admin'}/news`}

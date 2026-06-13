@@ -65,7 +65,7 @@ function ResourceReader({ resource, onClose }: { resource: Resource; onClose: ()
         {/* Hero */}
         <div className="lib-reader-hero" style={{ position: 'relative', minHeight: resource.cover_image_url ? 240 : 120, background: 'linear-gradient(135deg,#1e0646,#4c1d95)' }}>
           {resource.cover_image_url && (
-            <img src={resource.cover_image_url} alt=""
+            <img loading="lazy" src={resource.cover_image_url} alt=""
               style={{ width: '100%', height: 240, objectFit: 'cover', display: 'block', opacity: 0.6 }} />
           )}
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(17,7,46,0.9) 0%, transparent 60%)' }} />
@@ -390,7 +390,7 @@ export default function StudentLibraryPage() {
                 {/* Cover */}
                 <div style={{ height: 150, background: 'linear-gradient(135deg,#1e0646,#4c1d95)', position: 'relative', overflow: 'hidden' }}>
                   {res.cover_image_url ? (
-                    <img src={res.cover_image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img loading="lazy" src={res.cover_image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44 }}>
                       {typeIcons[res.content_type] ?? '📚'}

@@ -16,8 +16,7 @@ const PURPOSES = ['Parent Visit', 'Delivery', 'Official Meeting', 'Interview', '
 function QRImg({ value, size = 80 }: { value: string; size?: number }) {
   const encoded = encodeURIComponent(value)
   return (
-    <img
-      src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}&margin=2`}
+    <img loading="lazy" src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}&margin=2`}
       width={size} height={size}
       style={{ imageRendering: 'pixelated', display: 'block' }}
       alt="QR"
@@ -127,7 +126,7 @@ export default function ScannerPage() {
             ${printingVisitor.id_number ? `<div class="row"><span class="label">ID</span><span class="val">${printingVisitor.id_number}</span></div>` : ''}
             ${printingVisitor.phone ? `<div class="row"><span class="label">Phone</span><span class="val">${printingVisitor.phone}</span></div>` : ''}
             <div class="qr-wrap">
-              <img src="${qrUrl}" width="100" height="100" />
+              <img loading="lazy" src="${qrUrl}" width="100" height="100" />
               <div class="qr-note">SCAN TO SIGN OUT</div>
             </div>
           </div>
@@ -617,7 +616,7 @@ export default function ScannerPage() {
             {/* Person info row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
               {card.photoUrl ? (
-                <img src={card.photoUrl} style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '3px solid #fff', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', flexShrink: 0 }} />
+                <img loading="lazy" src={card.photoUrl} style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '3px solid #fff', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', flexShrink: 0 }} />
               ) : (
                 <div style={{ width: 72, height: 72, borderRadius: '50%', background: card.direction === 'in' ? '#059669' : '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, fontWeight: 900, color: '#fff', flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
                   {card.name.charAt(0).toUpperCase()}

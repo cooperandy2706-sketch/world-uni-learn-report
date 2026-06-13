@@ -545,7 +545,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
                <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
                   <div style={{ width: 200, height: 120, borderRadius: 8, background: '#f8fafc', border: '2px dashed #cbd5e1', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                     {form.cover_image_url ? (
-                      <img src={form.cover_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img loading="lazy" src={form.cover_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>No Image Selected</span>
                     )}
@@ -632,7 +632,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
              }}>
                 <div style={{ height: 180, background: '#f8fafc', position: 'relative' }}>
                    {form.cover_image_url ? (
-                     <img src={form.cover_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                     <img loading="lazy" src={form.cover_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                    ) : (
                      <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>📚</div>
                    )}
@@ -721,7 +721,7 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
               }}>
                 <div style={{ height: 140, background: '#f8fafc', position: 'relative' }}>
                    {res.cover_image_url ? (
-                     <img src={res.cover_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                     <img loading="lazy" src={res.cover_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                    ) : (
                      <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>📚</div>
                    )}

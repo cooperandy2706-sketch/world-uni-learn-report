@@ -488,7 +488,7 @@ export default function DriverDashboard() {
               {lastScan && lastScan.student && !lastScan.error && (
                 <div style={{ padding: 16, background: '#ecfdf5', borderRadius: 8, border: '2px solid #10b981', display: 'flex', alignItems: 'center', gap: 16 }}>
                   {lastScan.student.photo_url ? (
-                    <img src={lastScan.student.photo_url} alt="" style={{ width: 50, height: 50, borderRadius: 12, objectFit: 'cover' }} />
+                    <img loading="lazy" src={lastScan.student.photo_url} alt="" style={{ width: 50, height: 50, borderRadius: 12, objectFit: 'cover' }} />
                   ) : (
                     <div style={{ width: 50, height: 50, borderRadius: 12, background: '#d1fae5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
                       <UserCheck size={24} />

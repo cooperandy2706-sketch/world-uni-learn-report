@@ -152,7 +152,7 @@ export default function AdminStaffLeavePage() {
                   <div style={{ display: 'flex', gap: 20, flex: 1, minWidth: 300 }}>
                     <div style={{ flexShrink: 0 }}>
                       {req.user?.avatar_url ? (
-                        <img src={req.user.avatar_url} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', background: 'var(--bg-hover)' }} />
+                        <img loading="lazy" src={req.user.avatar_url} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', background: 'var(--bg-hover)' }} />
                       ) : (
                         <div style={{ width: 56, height: 56, borderRadius: 8, background: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, color: '#4f46e5' }}>
                           {req.user?.full_name?.charAt(0) || 'S'}

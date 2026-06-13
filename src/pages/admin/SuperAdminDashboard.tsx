@@ -427,7 +427,7 @@ export default function SuperAdminDashboard() {
                   <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', gap: 14 }}>
                       {school.logo_url ? (
-                        <img src={school.logo_url} alt={school.name} style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'cover', border: '1.5px solid #f1f5f9', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }} />
+                        <img loading="lazy" src={school.logo_url} alt={school.name} style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'cover', border: '1.5px solid #f1f5f9', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }} />
                       ) : (
                         <div style={{ width: 48, height: 48, borderRadius: 12, background: 'linear-gradient(135deg, #1e0646, #5b21b6)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, boxShadow: '0 2px 8px rgba(91,33,182,0.2)' }}>
                           {school.name.charAt(0)}

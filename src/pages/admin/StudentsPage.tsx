@@ -5,7 +5,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as XLSX from 'xlsx'
 import {
   useStudents, useCreateStudent, useUpdateStudent, useDeleteStudent,
 } from '../../hooks/useStudents'
@@ -16,6 +15,7 @@ import { studentsService } from '../../services/students.service'
 import Modal from '../../components/ui/Modal'
 import { formatDate } from '../../lib/utils'
 import toast from 'react-hot-toast'
+import { TableVirtuoso, VirtuosoGrid } from 'react-virtuoso'
 
 const schema = z.object({
   full_name:      z.string().min(2, 'Name is required'),
@@ -136,7 +136,7 @@ function docHeader(school: any, student: any, letterDate: string, letterType = '
     <!-- ═══ BASE HEADER ═══ -->
     <div class="lh-top">
       <div class="lh-logo-row">
-        <div class="lh-crest">${school?.logo_url ? `<img src="${school.logo_url}" alt="Logo" style="width: 56px; height: 56px; object-fit: contain; border-radius: 50%; background: #ffffff; padding: 4px;" />` : CREST_SVG}</div>
+        <div class="lh-crest">${school?.logo_url ? `<img loading="lazy" src="${school.logo_url}" alt="Logo" style="width: 56px; height: 56px; object-fit: contain; border-radius: 50%; background: #ffffff; padding: 4px;" />` : CREST_SVG}</div>
         <div class="lh-school-block">
           <div class="lh-school-name">${sName}</div>
           <div class="lh-motto">${sMotto}</div>
@@ -310,7 +310,7 @@ function generateStudentDocHTML(type: StudentLetterTypeId, student: any, fields:
       <div class="id-card-page">
         <div class="id-card">
           <div class="id-card-header">
-            ${school?.logo_url ? `<img src="${school.logo_url}" alt="Logo" style="width: 42px; height: 42px; object-fit: contain; border-radius: 50%; background: #ffffff; padding: 3px;" />` : CREST_SVG.replace('width="56" height="56"', 'width="42" height="42" stroke="#ffffff"').replace(/stroke="#2563eb"/g, 'stroke="#ffffff"').replace(/fill="#2563eb"/g, 'fill="#ffffff"')}
+            ${school?.logo_url ? `<img loading="lazy" src="${school.logo_url}" alt="Logo" style="width: 42px; height: 42px; object-fit: contain; border-radius: 50%; background: #ffffff; padding: 3px;" />` : CREST_SVG.replace('width="56" height="56"', 'width="42" height="42" stroke="#ffffff"').replace(/stroke="#2563eb"/g, 'stroke="#ffffff"').replace(/fill="#2563eb"/g, 'fill="#ffffff"')}
             <div class="id-card-school">${school?.name || 'School Name'}</div>
           </div>
           <div class="id-card-gold"></div>
@@ -580,15 +580,11 @@ function Textarea({ error, ...props }: React.TextareaHTMLAttributes<HTMLTextArea
 }
 
 // ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 export default function StudentsPage() {
   const { user } = useAuth()
   const qc = useQueryClient()
-  const { data: students = [], isLoading } = useStudents()
-  const { data: classes = [] } = useClasses()
-  const createStudent = useCreateStudent()
-  const updateStudent = useUpdateStudent()
-  const deleteStudent = useDeleteStudent()
-
+  
   const [modalOpen, setModalOpen] = useState(false)
   const [viewModal, setViewModal] = useState(false)
   const [editingStudent, setEditingStudent] = useState<any>(null)
@@ -596,6 +592,16 @@ export default function StudentsPage() {
   const [search, setSearch] = useState('')
   const [filterClass, setFilterClass] = useState('')
   const [filterGender, setFilterGender] = useState('')
+  
+  const { data: studentsPageData, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useStudents({ search, classId: filterClass, gender: filterGender })
+  const students = useMemo(() => studentsPageData?.pages.flatMap(p => p.data) || [], [studentsPageData])
+  const totalStudents = studentsPageData?.pages[0]?.total || 0
+
+  const { data: classes = [] } = useClasses()
+  const createStudent = useCreateStudent()
+  const updateStudent = useUpdateStudent()
+  const deleteStudent = useDeleteStudent()
+
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
   const [importLoading, setImportLoading] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
@@ -651,14 +657,6 @@ export default function StudentsPage() {
   const { data: settings } = useSettings()
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({ resolver: zodResolver(schema) })
-
-  const filtered = useMemo(() => students.filter(s => {
-    const q = search.toLowerCase()
-    const matchSearch = !q || s.full_name.toLowerCase().includes(q) || s.student_id?.toLowerCase().includes(q)
-    const matchClass = !filterClass || s.class_id === filterClass
-    const matchGender = !filterGender || s.gender === filterGender
-    return matchSearch && matchClass && matchGender
-  }), [students, search, filterClass, filterGender])
 
   function openCreate() { setEditingStudent(null); reset({}); setFormPhotoFile(null); setModalOpen(true) }
   function openEdit(s: any) {
@@ -820,6 +818,7 @@ export default function StudentsPage() {
     const file = e.target.files?.[0]; if (!file) return
     setImportLoading(true)
     try {
+      const XLSX = await import('xlsx')
       const wb = XLSX.read(await file.arrayBuffer())
       const rows: any[] = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]])
 
@@ -863,7 +862,8 @@ export default function StudentsPage() {
     finally { setImportLoading(false); if (fileRef.current) fileRef.current.value = '' }
   }
 
-  function downloadTemplate() {
+  async function downloadTemplate() {
+    const XLSX = await import('xlsx')
     const ws = XLSX.utils.json_to_sheet([{
       'Full Name': 'John Doe',
       'Student ID': 'STU-001',
@@ -878,12 +878,12 @@ export default function StudentsPage() {
     XLSX.writeFile(wb, 'student_import_template.xlsx')
   }
 
-  function exportData() {
-    if (filtered.length === 0) {
+  async function exportData() {
+    if (students.length === 0) {
       toast.error('No students found to export')
       return
     }
-    const data = filtered.map((s: any) => ({
+    const data = students.map((s: any) => ({
       'Full Name': s.full_name,
       'Student ID': s.student_id || '',
       'Gender': s.gender || '',
@@ -894,6 +894,7 @@ export default function StudentsPage() {
       'Guardian Email': s.guardian_email || '',
       'Arrears': s.fees_arrears || 0
     }))
+    const XLSX = await import('xlsx')
     const ws = XLSX.utils.json_to_sheet(data)
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Students')
@@ -910,6 +911,12 @@ export default function StudentsPage() {
         @keyframes _spin { to{transform:rotate(360deg)} }
         @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         @keyframes _fadeIn { from{opacity:0} to{opacity:1} }
+        .std-grid-list {
+          display: grid;
+          grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
+          gap: 16px;
+          width: 100%;
+        }
         .std-row:hover { background:#faf5ff !important; }
         .std-card:hover { box-shadow:0 8px 28px rgba(109,40,217,0.13) !important; transform:translateY(-2px) !important; }
         .action-btn:hover { background:#f5f3ff !important; color:#6d28d9 !important; }
@@ -1009,7 +1016,7 @@ export default function StudentsPage() {
 
               {/* Results count */}
               <span style={{ fontSize: 12, color: 'var(--text-subtle)', whiteSpace: 'nowrap' }}>
-                {filtered.length} result{filtered.length !== 1 ? 's' : ''}
+                {totalStudents} result{totalStudents !== 1 ? 's' : ''}
               </span>
             </div>
 
@@ -1022,7 +1029,7 @@ export default function StudentsPage() {
             )}
 
             {/* ── Empty state ── */}
-            {!isLoading && filtered.length === 0 && (
+            {!isLoading && students.length === 0 && (
               <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>🎓</div>
                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>
@@ -1036,88 +1043,93 @@ export default function StudentsPage() {
             )}
 
             {/* ── TABLE VIEW ── */}
-            {!isLoading && filtered.length > 0 && viewMode === 'table' && (
-              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
+            {!isLoading && students.length > 0 && viewMode === 'table' && (
+              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', height: '70vh' }}>
+                <TableVirtuoso
+                  data={students}
+                  endReached={() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage() }}
+                  style={{ height: '100%' }}
+                  fixedHeaderContent={() => (
                     <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom: '1.5px solid #ede9fe' }}>
                       {['Student', 'ID', 'Class', 'Gender', 'House', 'Guardian', 'Actions'].map(h => (
                         <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
                       ))}
                     </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map((s, i) => (
-                      <tr key={s.id} className="std-row"
-                        style={{ borderBottom: i < filtered.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background 0.12s', animation: `_fadeUp 0.3s ease ${i * 0.03}s both` }}>
-                        <td style={{ padding: '12px 16px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            {s.photo_url ? (
-                              <img src={s.photo_url} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
-                            ) : (
-                              <Avatar name={s.full_name} size={34} />
-                            )}
-                            <div>
-                              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{s.full_name}</div>
-                              {s.date_of_birth && <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{formatDate(s.date_of_birth)}</div>}
-                            </div>
+                  )}
+                  itemContent={(i, s) => (
+                    <>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid #faf5ff' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          {s.photo_url ? (
+                            <img loading="lazy" src={s.photo_url} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
+                          ) : (
+                            <Avatar name={s.full_name} size={34} />
+                          )}
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{s.full_name}</div>
+                            {s.date_of_birth && <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{formatDate(s.date_of_birth)}</div>}
                           </div>
-                        </td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <span style={{ fontSize: 12, fontFamily: 'monospace', background: '#f5f3ff', color: '#6d28d9', padding: '2px 7px', borderRadius: 5 }}>{s.student_id ?? '—'}</span>
-                        </td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <span style={{ fontSize: 12, fontWeight: 600, background: '#ede9fe', color: '#5b21b6', padding: '3px 9px', borderRadius: 99 }}>{(s as any).class?.name ?? 'Unassigned'}</span>
-                        </td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <span style={{ fontSize: 12, fontWeight: 600, background: s.gender === 'male' ? '#eff6ff' : s.gender === 'female' ? '#fdf2f8' : '#f3f4f6', color: s.gender === 'male' ? '#2563eb' : s.gender === 'female' ? '#db2777' : '#6b7280', padding: '3px 9px', borderRadius: 99 }}>
-                            {s.gender === 'male' ? '♂ Male' : s.gender === 'female' ? '♀ Female' : '—'}
-                          </span>
-                        </td>
-                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-muted)' }}>{s.house ?? '—'}</td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <div style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>{s.guardian_name ?? '—'}</div>
-                          {s.guardian_phone && <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{s.guardian_phone}</div>}
-                        </td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <div style={{ display: 'flex', gap: 4 }}>
-                            <button className="action-btn" onClick={() => { setViewingStudent(s); setViewModal(true) }}
-                              style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="View Profile">👁️</button>
-                            
-                            {!s.user_id && (
-                              <button className="action-btn" onClick={() => { setAccountStudent(s); setAccountData(prev => ({ ...prev, email: s.guardian_email || '' })); setAccountModalOpen(true) }}
-                                style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#ecfdf5', color: '#059669', cursor: 'pointer', fontSize: 13, transition: 'all 0.15s' }} title="Create Student Login">🔑</button>
-                            )}
-                            {s.user_id && (
-                              <div style={{ width: 30, height: 30, borderRadius: 8, background: '#f0fdf4', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }} title="Account Linked">✅</div>
-                            )}
-                            
-                            <button className="action-btn" onClick={() => { setAccountStudent(s); setParentData(prev => ({ ...prev, email: s.guardian_email || '' })); setParentModalOpen(true) }}
-                              style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#e0f2fe', color: '#0284c7', cursor: 'pointer', fontSize: 13, transition: 'all 0.15s' }} title="Create Parent Login">👨‍👩‍👦</button>
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid #faf5ff' }}>
+                        <span style={{ fontSize: 12, fontFamily: 'monospace', background: '#f5f3ff', color: '#6d28d9', padding: '2px 7px', borderRadius: 5 }}>{s.student_id ?? '—'}</span>
+                      </td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid #faf5ff' }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, background: '#ede9fe', color: '#5b21b6', padding: '3px 9px', borderRadius: 99 }}>{(s as any).class?.name ?? 'Unassigned'}</span>
+                      </td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid #faf5ff' }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, background: s.gender === 'male' ? '#eff6ff' : s.gender === 'female' ? '#fdf2f8' : '#f3f4f6', color: s.gender === 'male' ? '#2563eb' : s.gender === 'female' ? '#db2777' : '#6b7280', padding: '3px 9px', borderRadius: 99 }}>
+                          {s.gender === 'male' ? '♂ Male' : s.gender === 'female' ? '♀ Female' : '—'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-muted)', borderBottom: '1px solid #faf5ff' }}>{s.house ?? '—'}</td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid #faf5ff' }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>{s.guardian_name ?? '—'}</div>
+                        {s.guardian_phone && <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{s.guardian_phone}</div>}
+                      </td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid #faf5ff' }}>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          <button className="action-btn" onClick={() => { setViewingStudent(s); setViewModal(true) }}
+                            style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="View Profile">👁️</button>
+                          
+                          {!s.user_id && (
+                            <button className="action-btn" onClick={() => { setAccountStudent(s); setAccountData(prev => ({ ...prev, email: s.guardian_email || '' })); setAccountModalOpen(true) }}
+                              style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#ecfdf5', color: '#059669', cursor: 'pointer', fontSize: 13, transition: 'all 0.15s' }} title="Create Student Login">🔑</button>
+                          )}
+                          {s.user_id && (
+                            <div style={{ width: 30, height: 30, borderRadius: 8, background: '#f0fdf4', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }} title="Account Linked">✅</div>
+                          )}
+                          
+                          <button className="action-btn" onClick={() => { setAccountStudent(s); setParentData(prev => ({ ...prev, email: s.guardian_email || '' })); setParentModalOpen(true) }}
+                            style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#e0f2fe', color: '#0284c7', cursor: 'pointer', fontSize: 13, transition: 'all 0.15s' }} title="Create Parent Login">👨‍👩‍👦</button>
 
-
-                            <button className="action-btn" onClick={() => openEdit(s)}
-                              style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="Edit Details">✏️</button>
-                            <button className="del-btn" onClick={() => handleDelete(s.id, s.full_name)}
-                              style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="Remove Student">🗑️</button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                          <button className="action-btn" onClick={() => openEdit(s)}
+                            style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="Edit Details">✏️</button>
+                          <button className="del-btn" onClick={() => handleDelete(s.id, s.full_name)}
+                            style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', fontSize: 14, transition: 'all 0.15s' }} title="Remove Student">🗑️</button>
+                        </div>
+                      </td>
+                    </>
+                  )}
+                />
               </div>
             )}
 
             {/* ── GRID VIEW ── */}
-            {!isLoading && filtered.length > 0 && viewMode === 'grid' && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 16 }}>
-                {filtered.map((s, i) => (
+            {!isLoading && students.length > 0 && viewMode === 'grid' && (
+              <VirtuosoGrid
+                data={students}
+                endReached={() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage() }}
+                useWindowScroll
+                listClassName="std-grid-list"
+                itemClassName="std-grid-item"
+                style={{ width: '100%' }}
+                itemContent={(i, s) => (
                   <div key={s.id} className="std-card"
                     style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '20px', boxShadow: '0 1px 4px rgba(109,40,217,0.07)', transition: 'all 0.2s', animation: `_fadeUp 0.35s ease ${i * 0.04}s both` }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
                       {s.photo_url ? (
-                        <img src={s.photo_url} alt="" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }} />
+                        <img loading="lazy" src={s.photo_url} alt="" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }} />
                       ) : (
                         <Avatar name={s.full_name} size={44} />
                       )}
@@ -1142,8 +1154,8 @@ export default function StudentsPage() {
                         style={{ width: 32, padding: '7px 0', borderRadius: 8, border: 'none', background: '#fef2f2', color: '#dc2626', fontSize: 13, cursor: 'pointer' }}>🗑️</button>
                     </div>
                   </div>
-                ))}
-              </div>
+                )}
+              />
             )}
           </>
         )}
@@ -1283,9 +1295,9 @@ export default function StudentsPage() {
               <div style={{ position: 'relative', width: 64, height: 64 }}>
                 <Avatar name={editingStudent?.full_name || 'Student'} size={64} />
                 {formPhotoFile ? (
-                  <img src={URL.createObjectURL(formPhotoFile)} alt="Preview" style={{ position: 'absolute', inset: 0, width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
+                  <img loading="lazy" src={URL.createObjectURL(formPhotoFile)} alt="Preview" style={{ position: 'absolute', inset: 0, width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
                 ) : editingStudent?.photo_url ? (
-                  <img src={editingStudent.photo_url} alt="Current" style={{ position: 'absolute', inset: 0, width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
+                  <img loading="lazy" src={editingStudent.photo_url} alt="Current" style={{ position: 'absolute', inset: 0, width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
                 ) : null}
               </div>
               <div>
@@ -1353,7 +1365,7 @@ export default function StudentsPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderRadius: 12, marginBottom: 18 }}>
                 <div style={{ position: 'relative' }}>
                   {viewingStudent.photo_url ? (
-                    <img src={viewingStudent.photo_url} alt="Profile" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
+                    <img loading="lazy" src={viewingStudent.photo_url} alt="Profile" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
                   ) : (
                     <Avatar name={viewingStudent.full_name} size={56} />
                   )}

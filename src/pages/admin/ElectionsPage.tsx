@@ -266,7 +266,7 @@ export default function AdminElectionsPage() {
     if (!selectedElection) return toast.error('No election selected')
     
     const school = user?.school as any
-    const logoHtml = school?.logo_url ? `<img src="${school.logo_url}" alt="School Logo" style="max-height: 80px; margin-bottom: 10px;" />` : ''
+    const logoHtml = school?.logo_url ? `<img loading="lazy" src="${school.logo_url}" alt="School Logo" style="max-height: 80px; margin-bottom: 10px;" />` : ''
     const schoolName = school?.name || 'Prefectorial Electoral Commission'
     
     let html = `
@@ -335,7 +335,7 @@ export default function AdminElectionsPage() {
     if (!selectedElection) return toast.error('No election selected')
     
     const school = user?.school as any
-    const logoHtml = school?.logo_url ? `<img src="${school.logo_url}" alt="School Logo" style="max-height: 80px; margin-bottom: 10px;" />` : ''
+    const logoHtml = school?.logo_url ? `<img loading="lazy" src="${school.logo_url}" alt="School Logo" style="max-height: 80px; margin-bottom: 10px;" />` : ''
     const schoolName = school?.name || 'Prefectorial Electoral Commission'
     
     let html = `
@@ -397,7 +397,7 @@ export default function AdminElectionsPage() {
     if (!selectedElection) return toast.error('No election selected')
     
     const school = user?.school as any
-    const logoHtml = school?.logo_url ? `<img src="${school.logo_url}" alt="School Logo" style="max-height: 80px; margin-bottom: 10px;" />` : ''
+    const logoHtml = school?.logo_url ? `<img loading="lazy" src="${school.logo_url}" alt="School Logo" style="max-height: 80px; margin-bottom: 10px;" />` : ''
     const schoolName = school?.name || 'Prefectorial Electoral Commission'
     
     let html = `

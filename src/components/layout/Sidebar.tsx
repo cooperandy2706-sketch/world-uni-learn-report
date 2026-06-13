@@ -347,9 +347,9 @@ export default function Sidebar() {
         <div style={{ padding: '32px 20px 24px', position: 'relative', zIndex: 1, overflow: 'visible' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: collapsed ? 'center' : 'flex-start', marginBottom: collapsed ? 0 : 24 }}>
              {school?.logo_url ? (
-                <img src={school.logo_url} alt="School" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-card)', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
+                <img loading="lazy" src={school.logo_url} alt="School" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-card)', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
              ) : (
-                <img src="/icon-512.png" alt="Acadera" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-card)', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
+                <img loading="lazy" src="/icon-512.png" alt="Acadera" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'contain', background: 'var(--bg-card)', padding: 2, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
              )}
             {!collapsed && (
               <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

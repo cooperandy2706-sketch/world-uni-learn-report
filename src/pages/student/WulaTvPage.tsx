@@ -131,8 +131,7 @@ export default function WulaTvPage() {
         onMouseLeave={e => e.currentTarget.style.transform = 'scale(1) translateY(0)'}
       >
         <div style={{ height: 145, position: 'relative', background: '#000' }}>
-          <img 
-            src={`https://img.youtube.com/vi/${video.id || video.youtube_id}/mqdefault.jpg`} 
+          <img loading="lazy" src={`https://img.youtube.com/vi/${video.id || video.youtube_id}/mqdefault.jpg`} 
             alt="" 
             style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} 
           />
