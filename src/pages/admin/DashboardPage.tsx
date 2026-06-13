@@ -331,7 +331,8 @@ export default function DashboardPage() {
       supabase.from('announcements').select('*', { count: 'exact', head: true }).eq('school_id', sid),
     ])
 
-    let reports = 0, totalForReports = students ?? 0, pendingScores = 0, totalDebt = 0, pendingApproval = 0
+    const totalForReports = students ?? 0
+    let reports = 0, pendingScores = 0, totalDebt = 0, pendingApproval = 0
     if (term?.id) {
       const [{ count: r }, { count: p }, { count: pa }] = await Promise.all([
         supabase.from('report_cards').select('*', { count: 'exact', head: true }).eq('school_id', sid).eq('term_id', term.id),
