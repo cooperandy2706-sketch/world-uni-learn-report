@@ -249,7 +249,7 @@ export default function BECEMasterPage() {
     if (!printArea) return
 
     setIsPrintModalOpen(false)
-    const toastId = toast.loading(`Generating PDF for ${students.length} student(s)…`)
+    const toastId = toast.loading(`Generating PDF for ${(Array.isArray(students) ? students : []).length} student(s)…`)
 
     try {
       const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
@@ -280,7 +280,7 @@ export default function BECEMasterPage() {
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
       }
 
-      const className = classes.find(c => c.id === selectedClass)?.name || 'Class'
+      const className = (Array.isArray(classes) ? classes : []).find(c => c.id === selectedClass)?.name || 'Class'
       pdf.save(`BECE_Reports_${className}_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.pdf`)
       toast.success('PDF downloaded successfully!', { id: toastId })
     } catch (err: any) {
@@ -290,7 +290,7 @@ export default function BECEMasterPage() {
   }
 
   const handleDownloadIndividualPDF = async (studentId: string) => {
-    const student = students.find(s => s.id === studentId)
+    const student = (Array.isArray(students) ? students : []).find(s => s.id === studentId)
     if (!student) return
     
     const printArea = document.getElementById(`print-slip-${studentId}`)
@@ -327,14 +327,14 @@ export default function BECEMasterPage() {
 
   // ── WAEC Portal Export (Narrow Format) ────────────────────
   const handleExportPortal = async () => {
-    if (students.length === 0 || subjects.length === 0) {
+    if ((Array.isArray(students) ? students : []).length === 0 || subjects.length === 0) {
       toast.error('No data to export. Select a class and ensure scores are entered.')
       return
     }
 
     const rows: any[] = []
 
-    students.forEach(student => {
+    (Array.isArray(students) ? students : []).forEach(student => {
       subjects.forEach(sub => {
         const cell = scoreGrid[student.id]?.[sub.id]
         if (!cell) return
@@ -366,7 +366,7 @@ export default function BECEMasterPage() {
     const wb = utils.book_new()
     utils.book_append_sheet(wb, ws, 'BECE Portal Upload')
 
-    const className = classes.find(c => c.id === selectedClass)?.name || 'Class'
+    const className = (Array.isArray(classes) ? classes : []).find(c => c.id === selectedClass)?.name || 'Class'
     const fileName = `WAEC_BECE_Portal_${className}_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.xlsx`
     writeFile(wb, fileName)
     toast.success(`✅ Exported ${rows.length} records in Narrow Format.`)
@@ -374,12 +374,12 @@ export default function BECEMasterPage() {
 
   // ── Master Summary Export (Wide Format) ──────────────────
   const handleExportMasterSummary = async () => {
-    if (students.length === 0 || subjects.length === 0) {
+    if ((Array.isArray(students) ? students : []).length === 0 || subjects.length === 0) {
       toast.error('No data to export.')
       return
     }
 
-    const rows = students.map((student, index) => {
+    const rows = (Array.isArray(students) ? students : []).map((student, index) => {
       const row: Record<string, any> = {
         'S/N': index + 1,
         'Candidate Name': student.full_name,
@@ -402,13 +402,13 @@ export default function BECEMasterPage() {
     const wb = utils.book_new()
     utils.book_append_sheet(wb, ws, 'BECE Master Summary')
 
-    const className = classes.find(c => c.id === selectedClass)?.name || 'Class'
+    const className = (Array.isArray(classes) ? classes : []).find(c => c.id === selectedClass)?.name || 'Class'
     const fileName = `BECE_Master_Summary_${className}_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.xlsx`
     writeFile(wb, fileName)
     toast.success('Master Summary exported successfully.')
   }
 
-  const filteredStudents = students.filter(s => 
+  const filteredStudents = (Array.isArray(students) ? students : []).filter(s => 
     s.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.student_id?.toLowerCase().includes(searchQuery.toLowerCase())
   )
@@ -471,42 +471,42 @@ export default function BECEMasterPage() {
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button 
             onClick={handleExportMasterSummary}
-            disabled={students.length === 0}
+            disabled={(Array.isArray(students) ? students : []).length === 0}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12, 
-              background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: students.length === 0 ? 'not-allowed' : 'pointer',
-              opacity: students.length === 0 ? 0.5 : 1
+              background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: (Array.isArray(students) ? students : []).length === 0 ? 'not-allowed' : 'pointer',
+              opacity: (Array.isArray(students) ? students : []).length === 0 ? 0.5 : 1
             }}>
             <FileSpreadsheet size={18} /> Master Summary
           </button>
           <button 
             onClick={handleExportPortal}
-            disabled={students.length === 0}
+            disabled={(Array.isArray(students) ? students : []).length === 0}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12, 
-              background: '#ecfdf5', border: `1.5px solid #10b981`, color: '#065f46', fontWeight: 700, cursor: students.length === 0 ? 'not-allowed' : 'pointer',
-              opacity: students.length === 0 ? 0.5 : 1
+              background: '#ecfdf5', border: `1.5px solid #10b981`, color: '#065f46', fontWeight: 700, cursor: (Array.isArray(students) ? students : []).length === 0 ? 'not-allowed' : 'pointer',
+              opacity: (Array.isArray(students) ? students : []).length === 0 ? 0.5 : 1
             }}>
             <LayoutGrid size={18} /> Portal Export
           </button>
           <button 
             onClick={() => setIsPrintModalOpen(true)}
-            disabled={students.length === 0}
+            disabled={(Array.isArray(students) ? students : []).length === 0}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12, 
               background: 'var(--bg-card)', border: `1.5px solid ${T.border}`, color: T.slate, fontWeight: 700, cursor: 'pointer',
-              opacity: students.length === 0 ? 0.5 : 1
+              opacity: (Array.isArray(students) ? students : []).length === 0 ? 0.5 : 1
             }}>
             <Printer size={18} /> Result Slips / PDF
           </button>
           <button 
             onClick={handleSave}
-            disabled={isSaving || students.length === 0}
+            disabled={isSaving || (Array.isArray(students) ? students : []).length === 0}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderRadius: 12, 
               background: T.primary, color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer',
               boxShadow: '0 4px 12px rgba(109, 40, 217, 0.2)',
-              opacity: students.length === 0 ? 0.5 : 1,
+              opacity: (Array.isArray(students) ? students : []).length === 0 ? 0.5 : 1,
               position: 'relative'
             }}>
             <Save size={18} /> {isSaving ? 'Saving...' : 'Save All Scores'}
@@ -530,7 +530,7 @@ export default function BECEMasterPage() {
             onChange={e => setSelectedClass(e.target.value)}
             style={{ width: '100%', padding: '12px', borderRadius: 12, border: `1.5px solid ${T.border}`, background: T.bg, outline: 'none', fontWeight: 600 }}>
             <option value="">Select Class...</option>
-            {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
         <div style={{ flex: 2 }}>
@@ -688,7 +688,7 @@ export default function BECEMasterPage() {
           zIndex: -1,
         }}
       >
-        {students.map(student => {
+        {(Array.isArray(students) ? students : []).map(student => {
           // Prepare scores for the report card
           const studentScores = subjects.map(sub => {
             const cell = scoreGrid[student.id]?.[sub.id] || { class_score: '', exam_score: '' }
@@ -727,7 +727,7 @@ export default function BECEMasterPage() {
       >
         <div style={{ padding: '10px 0' }}>
           <p style={{ fontSize: 14, color: T.slate, lineHeight: 1.6 }}>
-            You are about to generate <strong>{students.length} report slips</strong> for the class <strong>{classes.find(c => c.id === selectedClass)?.name}</strong>.
+            You are about to generate <strong>{(Array.isArray(students) ? students : []).length} report slips</strong> for the class <strong>{(Array.isArray(classes) ? classes : []).find(c => c.id === selectedClass)?.name}</strong>.
           </p>
           <div style={{ marginTop: 16, background: '#f8fafc', padding: 16, borderRadius: 12, border: `1.5px solid ${T.border}` }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: T.muted, textTransform: 'uppercase', marginBottom: 8 }}>Export Details:</div>

@@ -215,6 +215,13 @@ const CSS = `
     .hero-art path, .hero-art circle, .hero-art rect { stroke: #fbbf24; stroke-width: 2.5; fill: none; stroke-dasharray: 2000; stroke-dashoffset: 2000; animation: drawArt 20s cubic-bezier(0.4, 0, 0.2, 1) forwards infinite alternate; }
   }
 
+  .logo-text-desktop { display: none; }
+  .logo-text-mobile { display: inline; }
+  @media (min-width: 1024px) {
+    .logo-text-desktop { display: inline; }
+    .logo-text-mobile { display: none; }
+  }
+
   /* ── NAV ── */
   .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; transition: all 0.3s ease; padding: 1rem 0; }
   @media (min-width: 768px) { .nav { padding: 1.25rem 0; } }
@@ -254,15 +261,37 @@ const CSS = `
   .nav.scrolled .mobile-toggle { color: var(--primary); }
   @media (min-width: 860px) { .mobile-toggle { display: none; } }
 
-  /* ── HERO ── */
+  /* ── HERO SLIDER ── */
   .hero { 
-    position: relative; min-height: 100vh; display: flex; align-items: center;
+    position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center;
     background: var(--primary); overflow: hidden;
-    padding: 6rem 0 3rem; /* Tighter on mobile */
-    animation: colorFade 15s infinite alternate ease-in-out;
+    padding: 7rem 0 4rem;
   }
   @media (min-width: 768px) { .hero { padding: 8rem 0 4rem; } }
+
+  .hero-slide {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1.05); pointer-events: none;
+  }
+  .hero-slide.active { opacity: 1; transform: scale(1); pointer-events: auto; z-index: 2; }
   
+  .hero-slide-bg {
+    position: absolute; inset: 0; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  }
+  .hero-slide.active .hero-slide-bg {
+    animation: colorFade 15s infinite alternate ease-in-out;
+  }
+  .slide-indicators {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 0.75rem; z-index: 20;
+  }
+  .slide-indicator {
+    width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.2);
+    cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: none; padding: 0;
+  }
+  .slide-indicator.active { background: var(--accent); transform: scale(1.5); box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+
   .hero-shapes { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; opacity: 0.3; }
   @media (min-width: 768px) { .hero-shapes { opacity: 0.4; } }
   .shape { position: absolute; background: rgba(255,255,255,0.03); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.05); }
@@ -279,8 +308,9 @@ const CSS = `
     .shape-polygon { width: 180px; height: 180px; top: 20%; left: 10%; }
   }
 
-  .hero .container { position: relative; z-index: 10; }
-  .hero-content { max-width: 700px; margin: 0 auto; text-align: center; overflow: visible; }
+  .hero .container { position: relative; z-index: 10; width: 100%; display: flex; justify-content: center; }
+  .hero-content { max-width: 750px; text-align: center; overflow: visible; opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease 0.4s, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s; }
+  .hero-slide.active .hero-content { opacity: 1; transform: translateY(0); }
   
   .hero-badge {
     display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.8rem;
@@ -292,11 +322,11 @@ const CSS = `
   @media (min-width: 768px) { .hero-badge { padding: 0.5rem 1rem; font-size: 0.75rem; } }
   
   .hero-title { 
-    font-family: var(--sans); font-size: clamp(2.5rem, 10vw, 4.5rem); line-height: 1.15; font-weight: 900; letter-spacing: -0.02em;
+    font-family: var(--sans); font-size: clamp(2.5rem, 9vw, 4.5rem); line-height: 1.15; font-weight: 900; letter-spacing: -0.02em;
     margin-bottom: 1.25rem; color: white;
   }
-  .hero-subtitle { font-size: 1.05rem; color: rgba(255,255,255,0.7); margin-bottom: 2rem; line-height: 1.6; max-width: 600px; margin-inline: auto; font-weight: 600; padding: 0 0.5rem; }
-  @media (min-width: 768px) { .hero-subtitle { font-size: 1.2rem; margin-bottom: 2.5rem; } }
+  .hero-subtitle { font-size: 1.05rem; color: rgba(255,255,255,0.8); margin-bottom: 2rem; line-height: 1.6; max-width: 650px; margin-inline: auto; font-weight: 500; padding: 0 0.5rem; }
+  @media (min-width: 768px) { .hero-subtitle { font-size: 1.25rem; margin-bottom: 2.5rem; } }
   
   .hero-search {
     display: block; width: 100%; max-width: 420px; margin: 0 auto 1.5rem; padding: 0 1rem;
@@ -581,7 +611,7 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
         <div className="nav-inner">
           <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="logo" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: 0 }}>
             <img loading="lazy" src="/icon-512.png" alt="Acadera Logo" className="logo-icon" style={{ background: 'transparent' }} />
-            <span>Acadera</span>
+            <span>ASOS</span>
           </button>
 
           <div className="nav-links">
@@ -613,7 +643,34 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
   );
 }
 
+const HERO_SLIDES = [
+  {
+    badge: 'Welcome to ASOS',
+    title: <>Education <br/><span className="accent-gradient">Reimagined.</span></>,
+    subtitle: 'Empower students, equip educators, and automate administrative GES reporting from a single unified OS built specifically for modern schools.',
+  },
+  {
+    badge: 'Total Control',
+    title: <>Seamless <br/><span className="accent-gradient">Management.</span></>,
+    subtitle: 'Manage fees, attendance, fleet tracking, and complex academic records through the intuitive Acadera School Operating System (ASOS).',
+  },
+  {
+    badge: 'Engage & Inspire',
+    title: <>Next-Gen <br/><span className="accent-gradient">Learning.</span></>,
+    subtitle: 'Provide an exceptional digital experience for students and parents with instant updates, digital libraries, and smart reporting.',
+  }
+];
+
 function Hero() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % HERO_SLIDES.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section className="hero">
       <svg className="hero-art" viewBox="0 0 1000 1000" preserveAspectRatio="none">
@@ -630,28 +687,41 @@ function Hero() {
         <div className="shape shape-polygon" />
       </div>
 
-      <div className="container">
-        <div className="hero-content">
-          <div className="hero-badge">
-            <span className="marquee-dot" style={{ background: '#fbbf24' }} />
-            <span>Next-Gen School Ecosystem</span>
-          </div>
-          <h1 className="hero-title">
-            Education <br />
-            <span className="accent-gradient">Reimagined.</span>
-          </h1>
-          <p className="hero-subtitle">
-            Empower students, equip educators, and automate administrative GES reporting
-            from a single unified platform built specifically for Ghanaian and West African schools.
-          </p>
-          <LandingSchoolSearch variant="hero" placeholder="Find a school…" />
-          <div className="hero-btns">
-            <a href="/register-school" className="btn-primary" style={{ padding: '1.2rem 2.5rem', fontSize: '1.05rem', borderRadius: '14px' }}>Get Started Free</a>
-            <a href="/login" className="btn-login" style={{ fontSize: '1.05rem', padding: '1.2rem 2.5rem', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', transition: 'all 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}>Sign In to Portal</a>
+      {HERO_SLIDES.map((slide, index) => (
+        <div key={index} className={`hero-slide ${index === currentSlide ? 'active' : ''}`}>
+          <div className="hero-slide-bg" />
+          <div className="container">
+            <div className="hero-content">
+              <div className="hero-badge">
+                <span className="marquee-dot" style={{ background: '#fbbf24' }} />
+                <span>{slide.badge}</span>
+              </div>
+              <h1 className="hero-title">
+                {slide.title}
+              </h1>
+              <p className="hero-subtitle">
+                {slide.subtitle}
+              </p>
+              {index === 0 && <LandingSchoolSearch variant="hero" placeholder="Find a school…" />}
+              <div className="hero-btns">
+                <a href="/register-school" className="btn-primary" style={{ padding: '1.2rem 2.5rem', fontSize: '1.05rem', borderRadius: '14px' }}>Get Started Free</a>
+                <a href="/login" className="btn-login" style={{ fontSize: '1.05rem', padding: '1.2rem 2.5rem', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', transition: 'all 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}>Sign In to ASOS</a>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      ))}
 
+      <div className="slide-indicators">
+        {HERO_SLIDES.map((_, idx) => (
+          <button 
+            key={idx} 
+            className={`slide-indicator ${idx === currentSlide ? 'active' : ''}`}
+            onClick={() => setCurrentSlide(idx)}
+            aria-label={`Go to slide ${idx + 1}`}
+          />
+        ))}
+      </div>
     </section>
   );
 }
@@ -879,7 +949,7 @@ export default function LandingPage() {
       <section className="section download-section" id="download">
         <div className="container">
           <Reveal>
-            <SectionHeader eyebrow="Desktop App" title="Take Acadera with you, everywhere." />
+            <SectionHeader eyebrow="Desktop App" title="Take ASOS with you, everywhere." />
             <p style={{ color: 'var(--text-light)', fontSize: '1.1rem', maxWidth: 560, margin: '0 auto' }}>
               Download the native desktop app for a faster, always-available experience — even with limited internet.
             </p>
@@ -964,7 +1034,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>© {new Date().getFullYear()} Acadera Platform. Built by NovaraTech for Africa.</p>
+            <p>© {new Date().getFullYear()} Acadera School Operating System (ASOS). Built by NovaraTech for Africa.</p>
             <div style={{ display: 'flex', gap: '1.5rem' }}>
               <span>GES Compliant</span>
               <span>Secure Cloud Storage</span>

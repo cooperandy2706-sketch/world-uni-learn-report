@@ -90,7 +90,7 @@ export default function ParentsPage() {
   })
 
   const filteredStudents = useMemo(() => {
-    return students.filter(s => {
+    return (Array.isArray(students) ? students : []).filter(s => {
       const matchSearch = !search || s.full_name.toLowerCase().includes(search.toLowerCase()) || s.student_id?.toLowerCase().includes(search.toLowerCase())
       const hasParent = links.some(l => l.student_id === s.id)
       

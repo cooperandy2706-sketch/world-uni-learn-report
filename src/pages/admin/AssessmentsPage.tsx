@@ -213,7 +213,7 @@ export default function AssessmentsPage() {
   const exportForPortal = (portal: 'WAEC' | 'BECE' | 'CAMBRIDGE') => {
     // Generate CSV data
     const headers = ['Index Number', 'Student Name', 'Subject', 'Class Score', 'Exam Score', 'Total', 'Grade']
-    const rows = students.map((s: any) => {
+    const rows = (Array.isArray(students) ? students : []).map((s: any) => {
       const entry = scoreMap[s.id]
       const total = entry?.total_score || 0
       const grade = getGradeInfo(total).grade
@@ -289,7 +289,7 @@ export default function AssessmentsPage() {
               onChange={e => setSelectedClass(e.target.value)}
               style={{ width: '100%', padding: '12px', borderRadius: 12, border: `1.5px solid ${T.border}`, background: T.bg, outline: 'none', fontWeight: 600 }}>
               <option value="">Select a class...</option>
-              {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
 
@@ -365,7 +365,7 @@ export default function AssessmentsPage() {
               </tr>
             </thead>
             <tbody>
-              {students.map((s: any, idx: number) => {
+              {(Array.isArray(students) ? students : []).map((s: any, idx: number) => {
                 const entry = scoreMap[s.id] || { class_score: '', exam_score: '', total_score: 0, remarks: '', submitted: false }
                 const g = getGradeInfo(entry.total_score)
                 

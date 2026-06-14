@@ -107,7 +107,7 @@ export default function SMSPage() {
     
     if (activeTab === 'broadcast') {
       // Add parents
-      students.forEach((s: any) => {
+      (Array.isArray(students) ? students : []).forEach((s: any) => {
         if (s.guardian_phone) {
           list.push({
             id: s.id,
@@ -135,7 +135,7 @@ export default function SMSPage() {
       }
     } else {
       // Fee Reminders Tab (Bursar) - Corrected logic to match scholarship policy
-      students.forEach((s: any) => {
+      (Array.isArray(students) ? students : []).forEach((s: any) => {
         const classStrs = structures.filter((st: any) => st.class_id === s.class_id);
         const netTermCharges = classStrs.reduce((acc, st: any) => {
           const discount = st.is_discountable !== false ? (s.scholarship_percentage || 0) / 100 : 0;
@@ -168,7 +168,7 @@ export default function SMSPage() {
   const filteredRecipients = useMemo(() => {
     let res = allRecipients
     if (selectedClass) {
-      const studentIdsInClass = new Set(students.filter((s: any) => s.class_id === selectedClass).map((s: any) => s.id))
+      const studentIdsInClass = new Set((Array.isArray(students) ? students : []).filter((s: any) => s.class_id === selectedClass).map((s: any) => s.id))
       res = res.filter(r => r.type === 'staff' ? false : studentIdsInClass.has(r.id))
     }
     if (searchQ) {
@@ -360,7 +360,7 @@ export default function SMSPage() {
                   style={{ padding: '9px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', background: 'var(--bg-card)' }}
                 >
                   <option value="">All Community (Incl. Staff)</option>
-                  {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name} Parents</option>)}
+                  {(Array.isArray(classes) ? classes : []).map((c: any) => <option key={c.id} value={c.id}>{c.name} Parents</option>)}
                 </select>
               )}
 

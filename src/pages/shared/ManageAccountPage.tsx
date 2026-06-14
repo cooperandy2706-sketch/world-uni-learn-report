@@ -146,6 +146,10 @@ export default function ManageAccountPage() {
         .acc-btn-primary { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; box-shadow: 0 4px 12px rgba(79,70,229,0.2); }
         .acc-btn-primary:hover:not(:disabled) { box-shadow: 0 6px 16px rgba(79,70,229,0.3); transform: translateY(-1px); }
         .acc-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .acc-layout { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start; }
+        @media (min-width: 768px) { .acc-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); } }
+        .acc-form-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        @media (min-width: 640px) { .acc-form-grid { grid-template-columns: 1fr 1fr; } }
       `}</style>
 
       {/* Top Navigation */}
@@ -158,7 +162,7 @@ export default function ManageAccountPage() {
         <p style={{ color: '#64748b', fontSize: 15, marginTop: 4 }}>Manage your personal details, security, and preferences.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.5fr)', gap: 24, alignItems: 'start' }}>
+      <div className="acc-layout">
         
         {/* Left Column: Avatar Card */}
         <div className="acc-card" style={{ textAlign: 'center', padding: '40px 24px' }}>
@@ -201,7 +205,7 @@ export default function ManageAccountPage() {
             </div>
             <div className="acc-body">
               <form onSubmit={handleSubmit(handleUpdateProfile)}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div className="acc-form-grid">
                   <div className="input-group" style={{ gridColumn: '1 / -1' }}>
                     <label className="input-label">Full Name</label>
                     <input {...register('full_name')} className="acc-input" placeholder="e.g. Jane Doe" />
@@ -242,7 +246,7 @@ export default function ManageAccountPage() {
             </div>
             <div className="acc-body">
               <form onSubmit={handlePwdSubmit(handleUpdatePassword)}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div className="acc-form-grid">
                   <div className="input-group">
                     <label className="input-label">New Password</label>
                     <div style={{ position: 'relative' }}>

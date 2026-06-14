@@ -274,13 +274,13 @@ export default function DriverRoutesPage() {
                          <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1e0646', margin: 0 }}>Live Student Manifest</h3>
                       </div>
                       
-                      {students.length === 0 ? (
+                      {(Array.isArray(students) ? students : []).length === 0 ? (
                          <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, background: '#f8fafc', borderRadius: 12, border: '1px dashed #e2e8f0' }}>
                             No students assigned to this route.
                          </div>
                       ) : (
                          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            {students.map(s => {
+                            {(Array.isArray(students) ? students : []).map(s => {
                                const log = studentLogs[s.student_id]
                                const status = log?.status || 'pending'
                                return (

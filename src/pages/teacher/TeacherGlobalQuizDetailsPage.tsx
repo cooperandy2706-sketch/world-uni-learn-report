@@ -127,11 +127,11 @@ export default function TeacherGlobalQuizDetailsPage() {
 
   if (!quiz) return null
 
-  const submittedCount = students.filter(s => s.has_submitted).length
-  const totalCount = students.length
+  const submittedCount = (Array.isArray(students) ? students : []).filter(s => s.has_submitted).length
+  const totalCount = (Array.isArray(students) ? students : []).length
   let avgPct = 0
   if (submittedCount > 0) {
-    const sum = students.filter(s=>s.has_submitted).reduce((acc, curr) => curr.total_possible > 0 ? acc + (curr.score / curr.total_possible) : acc, 0)
+    const sum = (Array.isArray(students) ? students : []).filter(s=>s.has_submitted).reduce((acc, curr) => curr.total_possible > 0 ? acc + (curr.score / curr.total_possible) : acc, 0)
     avgPct = (sum / submittedCount) * 100
   }
 
@@ -210,7 +210,7 @@ export default function TeacherGlobalQuizDetailsPage() {
         {/* Student List */}
         <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16 }}>Student Breakdown</h3>
         
-        {students.length === 0 ? (
+        {(Array.isArray(students) ? students : []).length === 0 ? (
           <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
              <div style={{ fontSize: 40, marginBottom: 12 }}>🤷‍♀️</div>
              <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>No Students Found</div>
@@ -218,7 +218,7 @@ export default function TeacherGlobalQuizDetailsPage() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {students.map(s => (
+            {(Array.isArray(students) ? students : []).map(s => (
               <div key={s.id} className="s-card" style={{ 
                 background: 'var(--bg-card)', borderRadius: 8, padding: '16px 20px', border: '1px solid #f0eefe',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16

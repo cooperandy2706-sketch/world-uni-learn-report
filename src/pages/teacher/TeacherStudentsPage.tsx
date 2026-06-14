@@ -208,7 +208,7 @@ export default function TeacherStudentsPage() {
     }
   }
 
-  const filtered = useMemo(() => students.filter(s => {
+  const filtered = useMemo(() => (Array.isArray(students) ? students : []).filter(s => {
     const q = search.toLowerCase()
     const matchSearch = !q || s.full_name.toLowerCase().includes(q) || s.student_id?.toLowerCase().includes(q)
     const matchClass = !filterClass || s.class_id === filterClass
@@ -335,7 +335,7 @@ export default function TeacherStudentsPage() {
 
           <StyledSelect value={filterClass} onChange={e => setFilterClass(e.target.value)} style={{ flex: '1 1 160px', maxWidth: 200 }}>
             <option value="">All My Classes</option>
-            {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </StyledSelect>
 
           <StyledSelect value={filterGender} onChange={e => setFilterGender(e.target.value)} style={{ flex: '1 1 130px', maxWidth: 160 }}>

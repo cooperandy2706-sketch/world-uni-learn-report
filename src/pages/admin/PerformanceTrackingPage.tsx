@@ -77,23 +77,23 @@ export default function PerformanceTrackingPage() {
   const [loadingHistory, setLoadingHistory] = useState(false)
   
   const selectedStudent = useMemo(() => 
-    students.find(s => s.id === selectedStudentId), 
+    (Array.isArray(students) ? students : []).find(s => s.id === selectedStudentId), 
   [students, selectedStudentId])
 
   const selectedClass = useMemo(() => 
-    classes.find(c => c.id === selectedClassId), 
+    (Array.isArray(classes) ? classes : []).find(c => c.id === selectedClassId), 
   [classes, selectedClassId])
 
   const filteredStudents = useMemo(() => {
     if (!searchQuery) return []
     const q = searchQuery.toLowerCase()
-    return students.filter(s => s.full_name.toLowerCase().includes(q) || s.student_id?.toLowerCase().includes(q)).slice(0, 5)
+    return (Array.isArray(students) ? students : []).filter(s => s.full_name.toLowerCase().includes(q) || s.student_id?.toLowerCase().includes(q)).slice(0, 5)
   }, [students, searchQuery])
 
   const filteredClasses = useMemo(() => {
     if (!searchQuery) return []
     const q = searchQuery.toLowerCase()
-    return classes.filter(c => c.name.toLowerCase().includes(q)).slice(0, 5)
+    return (Array.isArray(classes) ? classes : []).filter(c => c.name.toLowerCase().includes(q)).slice(0, 5)
   }, [classes, searchQuery])
 
   // Fetch performance data when student changes

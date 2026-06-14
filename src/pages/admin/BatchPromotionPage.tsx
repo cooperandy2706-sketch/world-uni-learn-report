@@ -60,7 +60,7 @@ export default function BatchPromotionPage() {
         setSelectedIds(next)
     }
 
-    const selectAll = () => setSelectedIds(new Set(students.map(s => s.id)))
+    const selectAll = () => setSelectedIds(new Set((Array.isArray(students) ? students : []).map(s => s.id)))
     const deselectAll = () => setSelectedIds(new Set())
 
     async function handlePromotion() {
@@ -68,7 +68,7 @@ export default function BatchPromotionPage() {
         if (fromClass === toClass) return toast.error('Source and destination classes cannot be the same')
         if (selectedIds.size === 0) return toast.error('No students selected for promotion')
 
-        if (!confirm(`Are you sure you want to promote ${selectedIds.size} students to ${classes.find(c => c.id === toClass)?.name}?`)) return
+        if (!confirm(`Are you sure you want to promote ${selectedIds.size} students to ${(Array.isArray(classes) ? classes : []).find(c => c.id === toClass)?.name}?`)) return
 
         setPromoting(true)
         const { error } = await supabase
@@ -103,7 +103,7 @@ export default function BatchPromotionPage() {
                         style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1.5px solid var(--border-color)', fontSize: 15, fontWeight: 600, outline: 'none' }}
                     >
                         <option value="">Select Current Class</option>
-                        {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                 </div>
                 <div className="card" style={{ padding: '24px' }}>
@@ -114,7 +114,7 @@ export default function BatchPromotionPage() {
                         style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1.5px solid var(--border-color)', fontSize: 15, fontWeight: 600, outline: 'none' }}
                     >
                         <option value="">Select Destination Class</option>
-                        {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                         <option value="graduated">-- Graduated / Completed --</option>
                     </select>
                 </div>
@@ -124,7 +124,7 @@ export default function BatchPromotionPage() {
                 <div className="card" style={{ overflow: 'hidden', animation: 'fadeIn 0.3s ease' }}>
                     <div style={{ padding: '20px 24px', background: 'var(--bg-input)', borderBottom: '1px solid #f0eefe', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{students.length} Students Found</span>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{(Array.isArray(students) ? students : []).length} Students Found</span>
                             <span style={{ fontSize: 13, color: 'var(--text-muted)', marginLeft: 12 }}>{selectedIds.size} selected for promotion</span>
                         </div>
                         <div style={{ display: 'flex', gap: 12 }}>
@@ -136,14 +136,14 @@ export default function BatchPromotionPage() {
                     <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
                         {loading ? (
                             <div style={{ padding: '60px', textAlign: 'center' }}>Loading students...</div>
-                        ) : students.length === 0 ? (
+                        ) : (Array.isArray(students) ? students : []).length === 0 ? (
                             <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>No students in this class.</div>
-                        ) : students.map((s, i) => (
+                        ) : (Array.isArray(students) ? students : []).map((s, i) => (
                             <div 
                                 key={i} 
                                 onClick={() => toggleStudent(s.id)}
                                 className="student-row"
-                                style={{ padding: '14px 24px', borderBottom: i === students.length - 1 ? 'none' : '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}
+                                style={{ padding: '14px 24px', borderBottom: i === (Array.isArray(students) ? students : []).length - 1 ? 'none' : '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}
                             >
                                 <div style={{ 
                                     width: 22, height: 22, borderRadius: '6px', border: '2px solid var(--border-color)', 

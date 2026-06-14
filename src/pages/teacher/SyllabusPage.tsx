@@ -53,7 +53,7 @@ export default function TeacherSyllabusPage() {
 
     // Group by class
     const generalItems = filtered.filter(s => s.class_id === null)
-    const grouped = classes.map(c => ({
+    const grouped = (Array.isArray(classes) ? classes : []).map(c => ({
         class: c,
         items: filtered.filter(s => s.class_id === c.id),
     })).filter(g => g.items.length > 0)
@@ -118,7 +118,7 @@ export default function TeacherSyllabusPage() {
                             <select value={filterClass} onChange={e => setFilterClass(e.target.value)}
                                 style={{ padding: '8px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, outline: 'none', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', background: '#faf5ff' }}>
                                 <option value="">All Classes</option>
-                                {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                             </select>
                             <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 'auto' }}>{filtered.length} file{filtered.length !== 1 ? 's' : ''}</span>
                         </div>
@@ -148,7 +148,7 @@ export default function TeacherSyllabusPage() {
                                             </h3>
                                             <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{items.length} file{items.length !== 1 ? 's' : ''}</span>
                                         </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 12 }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                                             {items.map((s, i) => {
                                                 const isImage = s.file_name?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
                                                 const isPDF = s.file_name?.match(/\.pdf$/i)

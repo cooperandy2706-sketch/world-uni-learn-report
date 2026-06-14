@@ -61,7 +61,7 @@ function RecordTab({ schoolId, term, students, configArray, user, school }: any)
   const isRegisterSubmitted = dayAttendance.length > 0
   const isAbsent = (sid: string) => dayAttendance.find(a => a.student_id === sid)?.status === 'absent'
 
-  const recStudents = useMemo(() => students.filter((s:any) => s.class?.id === recClass), [students, recClass])
+  const recStudents = useMemo(() => (Array.isArray(students) ? students : []).filter((s:any) => s.class?.id === recClass), [students, recClass])
   
   const classRate = useMemo(() => (configArray || []).find((c: any) => c.class_id === recClass), [configArray, recClass])
 
@@ -389,7 +389,7 @@ export default function DailyFeesPage() {
     const attMap: Record<string, number> = {}
     for (const a of (attendance as any[])) attMap[a.student_id] = a.days_present || 0
 
-    students.forEach((s: any) => {
+    (Array.isArray(students) ? students : []).forEach((s: any) => {
       if (ovClassFilter && s.class?.id !== ovClassFilter) return
 
       const classRateObj = config.find((c: any) => c.class_id === s.class?.id)

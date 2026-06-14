@@ -107,7 +107,7 @@ export default function BehaviorTrackingPage() {
         setSubmitting(false)
     }
 
-    const filteredStudents = students.filter(s => 
+    const filteredStudents = (Array.isArray(students) ? students : []).filter(s => 
         s.full_name.toLowerCase().includes(search.toLowerCase()) || 
         s.student_id?.toLowerCase().includes(search.toLowerCase())
     )

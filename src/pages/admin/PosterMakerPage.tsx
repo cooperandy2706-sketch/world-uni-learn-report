@@ -1772,7 +1772,7 @@ export default function PosterMakerPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <div>
                   <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}><Users size={14} style={{ verticalAlign: 'middle', marginRight: 5 }} />Students / People</span>
-                  <span style={{ fontSize: 11, color: 'var(--text-subtle)', marginLeft: 8 }}>{students.length} total</span>
+                  <span style={{ fontSize: 11, color: 'var(--text-subtle)', marginLeft: 8 }}>{(Array.isArray(students) ? students : []).length} total</span>
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button className="ctrl-btn" style={{ fontSize: 11 }} onClick={() => setShowBulk(b => !b)}>Bulk Import</button>
@@ -1806,7 +1806,7 @@ export default function PosterMakerPage() {
                   <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-subtle)', padding: '20px 0' }}>Loading students...</div>
                 ) : (
                   <>
-                    {students.map(s => (
+                    {(Array.isArray(students) ? students : []).map(s => (
                       <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 8, background: 'var(--bg-input)', border: '1px solid var(--border-light)' }}>
                         <div style={{ width: 30, height: 30, borderRadius: '50%', background: tagConfig.front.primaryColor + '20', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: tagConfig.front.primaryColor, flexShrink: 0 }}>{s.name.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -1819,26 +1819,26 @@ export default function PosterMakerPage() {
                         </div>
                       </div>
                     ))}
-                    {students.length === 0 && <div style={{ textAlign: 'center', fontSize: 13, color: '#d1d5db', padding: '16px 0' }}>No students added yet</div>}
+                    {(Array.isArray(students) ? students : []).length === 0 && <div style={{ textAlign: 'center', fontSize: 13, color: '#d1d5db', padding: '16px 0' }}>No students added yet</div>}
                   </>
                 )}
               </div>
             </div>
 
             {/* A4 pack info */}
-            {students.length > 0 && (() => {
+            {(Array.isArray(students) ? students : []).length > 0 && (() => {
               const tagW = mmToPx(tagConfig.width), tagH = mmToPx(tagConfig.height)
               const pageW = mmToPx(210), pageH = mmToPx(297)
               const margin = mmToPx(8), gap = mmToPx(4)
               const cols = Math.floor((pageW - margin * 2 + gap) / (tagW + gap))
               const rows = Math.floor((pageH - margin * 2 + gap) / (tagH + gap))
               const perPage = cols * rows
-              const pages = Math.ceil(students.length / perPage)
+              const pages = Math.ceil((Array.isArray(students) ? students : []).length / perPage)
               return (
                 <div style={{ background: '#f5f3ff', border: '1px solid #e0d9fa', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 13 }}>
                   <strong style={{ color: '#6d28d9' }}>{cols} × {rows}</strong> <span style={{ color: '#7c3aed' }}>= {perPage} tags per A4 page</span>
                   {' · '}
-                  <span style={{ color: 'var(--text-muted)' }}>{students.length} people → <strong>{pages} page{pages !== 1 ? 's' : ''} front</strong> + <strong>{pages} page{pages !== 1 ? 's' : ''} back</strong> = <strong>{pages * 2} total pages</strong></span>
+                  <span style={{ color: 'var(--text-muted)' }}>{(Array.isArray(students) ? students : []).length} people → <strong>{pages} page{pages !== 1 ? 's' : ''} front</strong> + <strong>{pages} page{pages !== 1 ? 's' : ''} back</strong> = <strong>{pages * 2} total pages</strong></span>
                 </div>
               )
             })()}
@@ -1851,13 +1851,13 @@ export default function PosterMakerPage() {
                   <RotateCcw size={11} /> Click any tag to flip front/back
                 </div>
               </div>
-              {students.length === 0
+              {(Array.isArray(students) ? students : []).length === 0
                 ? <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
                   <TagPreview showBothSides s={{ id: 'demo', name: 'Sample Student', role: 'Head Prefect', className: 'Class 3A', studentId: 'STU-001' }} />
                 </div>
                 : <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
-                  {students.slice(0, 6).map(s => <TagPreview key={s.id} s={s} showBothSides />)}
-                  {students.length > 6 && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: 'var(--text-subtle)', width: 80 }}>+{students.length - 6} more</div>}
+                  {(Array.isArray(students) ? students : []).slice(0, 6).map(s => <TagPreview key={s.id} s={s} showBothSides />)}
+                  {(Array.isArray(students) ? students : []).length > 6 && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: 'var(--text-subtle)', width: 80 }}>+{(Array.isArray(students) ? students : []).length - 6} more</div>}
                 </div>
               }
             </div>

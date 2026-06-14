@@ -112,7 +112,7 @@ export default function ClassesPage() {
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({ resolver: zodResolver(schema) as any })
 
   const filtered = useMemo(() =>
-    classes.filter(c => !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.level?.toLowerCase().includes(search.toLowerCase())),
+    (Array.isArray(classes) ? classes : []).filter(c => !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.level?.toLowerCase().includes(search.toLowerCase())),
     [classes, search]
   )
 
@@ -149,18 +149,18 @@ export default function ClassesPage() {
   }
 
   async function handleDelete(c: any) {
-    const count = students.filter(s => s.class_id === c.id).length
+    const count = (Array.isArray(students) ? students : []).filter(s => s.class_id === c.id).length
     if (count > 0 && !confirm(`"${c.name}" has ${count} student(s). Delete anyway?`)) return
     if (count === 0 && !confirm(`Delete class "${c.name}"?`)) return
     await deleteClass.mutateAsync(c.id)
   }
 
   // stats
-  const totalStudents = students.length
-  const avgPerClass = classes.length ? Math.round(totalStudents / classes.length) : 0
-  const largestClass = classes.reduce((max, c) => {
-    const cnt = students.filter(s => s.class_id === c.id).length
-    return cnt > (students.filter(s => s.class_id === max?.id).length ?? 0) ? c : max
+  const totalStudents = (Array.isArray(students) ? students : []).length
+  const avgPerClass = (Array.isArray(classes) ? classes : []).length ? Math.round(totalStudents / (Array.isArray(classes) ? classes : []).length) : 0
+  const largestClass = (Array.isArray(classes) ? classes : []).reduce((max, c) => {
+    const cnt = (Array.isArray(students) ? students : []).filter(s => s.class_id === c.id).length
+    return cnt > ((Array.isArray(students) ? students : []).filter(s => s.class_id === max?.id).length ?? 0) ? c : max
   }, classes[0])
 
   return (
@@ -184,7 +184,7 @@ export default function ClassesPage() {
         {/* ── Summary strip ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 14, marginBottom: 22 }}>
           {[
-            { label: 'Total Classes',   value: classes.length,  icon: '🏫', color: '#6d28d9', bg: '#f5f3ff' },
+            { label: 'Total Classes',   value: (Array.isArray(classes) ? classes : []).length,  icon: '🏫', color: '#6d28d9', bg: '#f5f3ff' },
             { label: 'Total Students',  value: totalStudents,   icon: '👥', color: '#0891b2', bg: '#ecfeff' },
             { label: 'Avg per Class',   value: avgPerClass,     icon: '📊', color: '#16a34a', bg: '#f0fdf4' },
             { label: 'Total Subjects',  value: subjects.length, icon: '📚', color: '#d97706', bg: '#fffbeb' },
@@ -229,10 +229,10 @@ export default function ClassesPage() {
         {!isLoading && filtered.length > 0 && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 18 }}>
             {filtered.map((cls, i) => {
-              const studentCount = students.filter(s => s.class_id === cls.id).length
+              const studentCount = (Array.isArray(students) ? students : []).filter(s => s.class_id === cls.id).length
               const palette = CLASS_COLORS[i % CLASS_COLORS.length]
               const fillPct = cls.capacity ? Math.min(100, Math.round((studentCount / cls.capacity) * 100)) : null
-              const isLargest = largestClass?.id === cls.id && classes.length > 1
+              const isLargest = largestClass?.id === cls.id && (Array.isArray(classes) ? classes : []).length > 1
               const classTeacherAssignment = assignments.find(a => a.class_id === cls.id && a.is_class_teacher)
               const classTeacherName = classTeacherAssignment?.teacher?.user?.full_name
 
@@ -373,13 +373,13 @@ export default function ClassesPage() {
           size="md"
         >
           {viewingClass && (() => {
-            const studentCount = students.filter(s => s.class_id === viewingClass.id).length
-            const classStudents = students.filter(s => s.class_id === viewingClass.id).slice(0, 8)
-            const maleCount = students.filter(s => s.class_id === viewingClass.id && s.gender === 'male').length
-            const femaleCount = students.filter(s => s.class_id === viewingClass.id && s.gender === 'female').length
+            const studentCount = (Array.isArray(students) ? students : []).filter(s => s.class_id === viewingClass.id).length
+            const classStudents = (Array.isArray(students) ? students : []).filter(s => s.class_id === viewingClass.id).slice(0, 8)
+            const maleCount = (Array.isArray(students) ? students : []).filter(s => s.class_id === viewingClass.id && s.gender === 'male').length
+            const femaleCount = (Array.isArray(students) ? students : []).filter(s => s.class_id === viewingClass.id && s.gender === 'female').length
             const classTeacherAssignment = assignments.find(a => a.class_id === viewingClass.id && a.is_class_teacher)
             const classTeacherName = classTeacherAssignment?.teacher?.user?.full_name
-            const palette = CLASS_COLORS[classes.findIndex(c => c.id === viewingClass.id) % CLASS_COLORS.length]
+            const palette = CLASS_COLORS[(Array.isArray(classes) ? classes : []).findIndex(c => c.id === viewingClass.id) % CLASS_COLORS.length]
             return (
               <div>
                 {/* Header banner */}

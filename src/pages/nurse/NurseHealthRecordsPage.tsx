@@ -70,7 +70,7 @@ export default function NurseHealthRecordsPage() {
     }
   }
 
-  const filtered = students.filter(s => 
+  const filtered = (Array.isArray(students) ? students : []).filter(s => 
     s.full_name.toLowerCase().includes(search.toLowerCase()) || 
     s.student_id?.toLowerCase().includes(search.toLowerCase())
   )

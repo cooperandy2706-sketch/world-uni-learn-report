@@ -465,7 +465,7 @@ export default function FleetManagementPage() {
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Filter by Class</label>
                 <select value={assignClassFilter} onChange={e => setAssignClassFilter(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #d1d5db', background: 'var(--bg-card)' }}>
                   <option value="">-- All Classes --</option>
-                  {Array.from(new Set(students.map(s => s.class?.name).filter(Boolean))).sort().map(c => (
+                  {Array.from(new Set((Array.isArray(students) ? students : []).map(s => s.class?.name).filter(Boolean))).sort().map(c => (
                     <option key={String(c)} value={String(c)}>{String(c)}</option>
                   ))}
                 </select>
@@ -474,7 +474,7 @@ export default function FleetManagementPage() {
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Select Students * ({aForm.student_ids.length} selected)</label>
                 <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid #d1d5db', borderRadius: 10, padding: 12, background: '#f8fafc' }}>
-                  {students.filter(s => assignClassFilter ? s.class?.name === assignClassFilter : true).map(s => (
+                  {(Array.isArray(students) ? students : []).filter(s => assignClassFilter ? s.class?.name === assignClassFilter : true).map(s => (
                     <label key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', cursor: 'pointer', borderBottom: '1px solid #e2e8f0', fontSize: 14 }}>
                       <input 
                         type="checkbox" 
@@ -487,7 +487,7 @@ export default function FleetManagementPage() {
                       {s.full_name} <span style={{ color: '#64748b', fontSize: 12 }}>({s.class?.name})</span>
                     </label>
                   ))}
-                  {students.filter(s => assignClassFilter ? s.class?.name === assignClassFilter : true).length === 0 && (
+                  {(Array.isArray(students) ? students : []).filter(s => assignClassFilter ? s.class?.name === assignClassFilter : true).length === 0 && (
                     <div style={{ color: '#64748b', fontSize: 13, textAlign: 'center', padding: 10 }}>No students found in this class.</div>
                   )}
                 </div>

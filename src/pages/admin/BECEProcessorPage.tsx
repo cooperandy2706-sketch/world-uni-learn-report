@@ -84,7 +84,7 @@ export default function BECEProcessorPage() {
 
   // ── Calculation Logic ──────────────────────────────────────
   const processBECE = useCallback(async () => {
-    if (!selectedClass || !selectedSubject || !term?.id || students.length === 0) return
+    if (!selectedClass || !selectedSubject || !term?.id || (Array.isArray(students) ? students : []).length === 0) return
     setIsLoading(true)
     
     try {
@@ -125,7 +125,7 @@ export default function BECEProcessorPage() {
         .eq('term_id', term.id)
 
       // 4. Aggregate and Calculate
-      const results: CAData[] = students.map(student => {
+      const results: CAData[] = (Array.isArray(students) ? students : []).map(student => {
         // Normalize Tests (Scale to 100)
         const sTestScores = (testScores || [])
           .filter(ts => ts.student_id === student.id)
@@ -172,7 +172,7 @@ export default function BECEProcessorPage() {
 
   // Auto-trigger when class and subject are ready
   useEffect(() => {
-    if (selectedClass && selectedSubject && term?.id && students.length > 0) {
+    if (selectedClass && selectedSubject && term?.id && (Array.isArray(students) ? students : []).length > 0) {
       processBECE()
     }
   }, [selectedClass, selectedSubject, term?.id, students])
@@ -261,7 +261,7 @@ export default function BECEProcessorPage() {
               onChange={e => setSelectedClass(e.target.value)}
               style={{ width: '100%', padding: '12px', borderRadius: 12, border: `1.5px solid ${T.border}`, background: T.bg, outline: 'none', fontWeight: 600 }}>
               <option value="">Select Class</option>
-              {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
           <div>
@@ -344,10 +344,10 @@ export default function BECEProcessorPage() {
         </div>
       ) : (
         <div style={{ height: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', borderRadius: 12, border: `1.5px solid ${T.border}` }}>
-          {selectedClass && students.length > 0 ? (
+          {selectedClass && (Array.isArray(students) ? students : []).length > 0 ? (
             <>
               <Users size={48} color={T.primary} style={{ marginBottom: 16, opacity: 0.8 }} />
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: T.slate, margin: '0 0 8px' }}>{students.length} Students Found</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: T.slate, margin: '0 0 8px' }}>{(Array.isArray(students) ? students : []).length} Students Found</h3>
               <p style={{ color: T.muted, fontSize: 14 }}>Now select a <b>subject</b> to calculate the BECE Continuous Assessment.</p>
             </>
           ) : (

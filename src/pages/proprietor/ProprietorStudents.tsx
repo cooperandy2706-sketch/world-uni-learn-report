@@ -38,7 +38,7 @@ export default function ProprietorStudents() {
         let active = 0
         const classMap: Record<string, number> = {}
 
-        students.forEach(s => {
+        (Array.isArray(students) ? students : []).forEach(s => {
           if (s.is_active) active++
           const cName = (s.class as any)?.name || 'Unassigned'
           classMap[cName] = (classMap[cName] || 0) + 1
@@ -49,9 +49,9 @@ export default function ProprietorStudents() {
           .sort((a, b) => b.count - a.count)
 
         setStudentStats({
-          total: students.length,
+          total: (Array.isArray(students) ? students : []).length,
           active,
-          inactive: students.length - active,
+          inactive: (Array.isArray(students) ? students : []).length - active,
           byClass
         })
       }

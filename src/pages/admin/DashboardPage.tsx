@@ -453,7 +453,7 @@ export default function DashboardPage() {
   async function loadClassStats() {
     const { data: classes } = await supabase.from('classes').select('id, name').eq('school_id', user!.school_id)
     if (!classes) return
-    const results: ClassStat[] = await Promise.all(classes.map(async (cls) => {
+    const results: ClassStat[] = await Promise.all((Array.isArray(classes) ? classes : []).map(async (cls) => {
       const { count: sc } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('class_id', cls.id).eq('is_active', true)
       let avg = null, done = 0
       if (term?.id) {

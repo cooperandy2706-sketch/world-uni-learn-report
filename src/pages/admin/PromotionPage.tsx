@@ -50,7 +50,7 @@ export default function PromotionPage() {
 
   // Filter students by class and search
   const classStudents = useMemo(() => {
-    return students.filter(s => s.class_id === fromClassId && s.is_active)
+    return (Array.isArray(students) ? students : []).filter(s => s.class_id === fromClassId && s.is_active)
   }, [students, fromClassId])
 
   const filteredStudents = useMemo(() => {
@@ -83,7 +83,7 @@ export default function PromotionPage() {
     try {
       if (isGraduating) {
         // 1. Move to Alumni
-        const graduatingStudents = students.filter(s => selectedIds.includes(s.id))
+        const graduatingStudents = (Array.isArray(students) ? students : []).filter(s => selectedIds.includes(s.id))
         const alumniData = graduatingStudents.map(s => ({
           school_id: user?.school_id,
           full_name: s.full_name,
@@ -114,7 +114,7 @@ export default function PromotionPage() {
         
         if (error) throw error
 
-        const targetClassName = classes.find(c => c.id === targetClassId)?.name
+        const targetClassName = (Array.isArray(classes) ? classes : []).find(c => c.id === targetClassId)?.name
         toast.success(`${selectedIds.length} students promoted to ${targetClassName}`)
       }
 
@@ -128,8 +128,8 @@ export default function PromotionPage() {
     }
   }
 
-  const fromClassName = classes.find(c => c.id === fromClassId)?.name
-  const targetClassName = isGraduating ? 'Alumni (Graduate)' : classes.find(c => c.id === targetClassId)?.name
+  const fromClassName = (Array.isArray(classes) ? classes : []).find(c => c.id === fromClassId)?.name
+  const targetClassName = isGraduating ? 'Alumni (Graduate)' : (Array.isArray(classes) ? classes : []).find(c => c.id === targetClassId)?.name
 
   return (
     <div style={{ fontFamily: '"DM Sans", system-ui, sans-serif', animation: '_fadeIn 0.4s ease' }}>
@@ -177,7 +177,7 @@ export default function PromotionPage() {
                 style={{ width: '100%', padding: '12px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none', background: '#fcfaff', color: 'var(--text-main)', cursor: 'pointer' }}
               >
                 <option value="">Select a class...</option>
-                {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
 
@@ -192,7 +192,7 @@ export default function PromotionPage() {
               >
                 <option value="">Select target class...</option>
                 <optgroup label="Promote To">
-                  {classes.filter(c => c.id !== fromClassId).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {(Array.isArray(classes) ? classes : []).filter(c => c.id !== fromClassId).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </optgroup>
                 <optgroup label="Exit Strategy">
                   <option value="GRADUATE" style={{ fontWeight: 700, color: '#d97706' }}>🎓 GRADUATE (Move to Alumni)</option>

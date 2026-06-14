@@ -216,7 +216,7 @@ export default function TeacherVideoAssignmentsPage() {
                   <label className="t-label">Target Class *</label>
                   <select className="t-select" required value={classId} onChange={e => setClassId(e.target.value)}>
                     <option value="">Select a class...</option>
-                    {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
                 <div className="t-field" style={{ flex: 1 }}>

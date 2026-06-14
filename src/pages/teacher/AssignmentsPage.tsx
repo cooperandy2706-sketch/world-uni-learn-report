@@ -396,7 +396,7 @@ export default function AssignmentsPage() {
                   <Field label="Target Class *">
                     <StyledSelect value={form.class_id} onChange={e => setForm(prev => ({ ...prev, class_id: e.target.value }))} style={{ fontSize: 15 }}>
                       <option value="">Select class...</option>
-                      {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </StyledSelect>
                   </Field>
                   <Field label="Subject *">

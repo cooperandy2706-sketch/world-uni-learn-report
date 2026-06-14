@@ -101,7 +101,7 @@ export default function PastoralCarePage() {
               <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 6, letterSpacing: '0.05em' }}>Student *</label>
               <select value={form.student_id} onChange={e => setForm(p => ({ ...p, student_id: e.target.value }))} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid #e2e8f0', fontSize: 14, outline: 'none', background: 'var(--bg-card)', boxSizing: 'border-box' }} disabled={!!editingLog}>
                 <option value="">Select Student...</option>
-                {students.map(s => <option key={s.id} value={s.id}>{s.full_name} ({s.student_id || 'No ID'})</option>)}
+                {(Array.isArray(students) ? students : []).map(s => <option key={s.id} value={s.id}>{s.full_name} ({s.student_id || 'No ID'})</option>)}
               </select>
             </div>
             
@@ -163,7 +163,7 @@ export default function PastoralCarePage() {
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
-              {logs.map((log: any) => {
+              {(Array.isArray(logs) ? logs : []).map((log: any) => {
                 const config = CATEGORY_ICONS[log.category] || CATEGORY_ICONS.other
                 const canViewDetails = !log.is_private || log.counselor_id === user?.id || user?.role === 'admin'
                 

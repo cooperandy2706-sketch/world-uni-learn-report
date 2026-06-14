@@ -78,7 +78,7 @@ export default function TeacherDailyFeesPage() {
   useEffect(() => {
     // When students or collections change, we auto-populate the inputs based on existing collections
     const newEntries: Record<string, string> = {}
-    students.forEach((s: any) => {
+    (Array.isArray(students) ? students : []).forEach((s: any) => {
       const existing = collections.find((c: any) => c.student_id === s.id && c.fee_type === feeType)
       if (existing) newEntries[s.id] = String(existing.amount)
     })
@@ -157,7 +157,7 @@ export default function TeacherDailyFeesPage() {
           <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Class</label>
           <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 9, border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)' }}>
             <option value="">Select a class...</option>
-            {classes.map((c:any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            {(Array.isArray(classes) ? classes : []).map((c:any) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
         <div style={{ flex: '1 1 100%' }}>
@@ -183,12 +183,12 @@ export default function TeacherDailyFeesPage() {
             <span style={{ fontWeight: 700, color: '#5b21b6', fontSize: 14 }}>Record {feeType === 'feeding' ? 'Feeding' : 'Studies'} Fee — {date}</span>
             <button onClick={() => {
               const nd: Record<string,string> = {}
-              students.forEach((s: any) => nd[s.id] = String(defaultAmount))
+              (Array.isArray(students) ? students : []).forEach((s: any) => nd[s.id] = String(defaultAmount))
               setEntries(nd)
             }} style={{ background: '#e0e7ff', color: '#4338ca', border: 'none', padding: '5px 10px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Set All to GH₵ {defaultAmount}</button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {students.map((stu: any) => {
+            {(Array.isArray(students) ? students : []).map((stu: any) => {
               const existingAmount = entries[stu.id] || ''
               const hasExisting = collections.some((c:any) => c.student_id === stu.id && c.fee_type === feeType)
               return (

@@ -365,7 +365,7 @@ export default function DormitoryPage() {
             <label style={labelStyle}>Student *</label>
             <select value={assignForm.student_id} onChange={e => setAssignForm(p => ({ ...p, student_id: e.target.value }))} style={inputStyle}>
               <option value="">Select Student...</option>
-              {students.map(s => <option key={s.id} value={s.id}>{s.full_name}</option>)}
+              {(Array.isArray(students) ? students : []).map(s => <option key={s.id} value={s.id}>{s.full_name}</option>)}
             </select>
           </div>
           <div>

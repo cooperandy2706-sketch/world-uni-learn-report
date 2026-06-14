@@ -391,7 +391,7 @@ export default function TeacherReportsPage() {
               <option value="">Choose class…</option>
               {(classOptions as any[]).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
-            {selectedClass && <p style={{ fontSize: 11, color: '#16a34a', marginTop: 5, fontWeight: 600 }}>✓ {students.length} students</p>}
+            {selectedClass && <p style={{ fontSize: 11, color: '#16a34a', marginTop: 5, fontWeight: 600 }}>✓ {(Array.isArray(students) ? students : []).length} students</p>}
           </div>
 
           {/* Student */}
@@ -399,12 +399,12 @@ export default function TeacherReportsPage() {
             <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>
               Step 2 — Select Student <span style={{ fontWeight: 600, textTransform: 'none', color: 'var(--text-subtle)' }}>— scores & details auto-fill</span>
             </label>
-            <select value={selectedStudent?.id ?? ''} onChange={e => setSelectedStudent(students.find(s => s.id === e.target.value) ?? null)}
-              disabled={!selectedClass || students.length === 0}
+            <select value={selectedStudent?.id ?? ''} onChange={e => setSelectedStudent((Array.isArray(students) ? students : []).find(s => s.id === e.target.value) ?? null)}
+              disabled={!selectedClass || (Array.isArray(students) ? students : []).length === 0}
               onFocus={() => setStudentFocused(true)} onBlur={() => setStudentFocused(false)}
               style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 14, fontWeight: 600, border: `1.5px solid ${studentFocused ? '#7c3aed' : '#e5e7eb'}`, boxShadow: studentFocused ? '0 0 0 3px rgba(109,40,217,.1)' : 'none', outline: 'none', background: selectedClass ? '#faf5ff' : '#f9fafb', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', cursor: selectedClass ? 'pointer' : 'not-allowed', opacity: selectedClass ? 1 : 0.6 }}>
               <option value="">Choose student…</option>
-              {students.map(s => <option key={s.id} value={s.id}>{s.full_name}{s.student_id ? ` — ${s.student_id}` : ''}</option>)}
+              {(Array.isArray(students) ? students : []).map(s => <option key={s.id} value={s.id}>{s.full_name}{s.student_id ? ` — ${s.student_id}` : ''}</option>)}
             </select>
             {selectedStudent && !loadingReport && scores.length > 0 && (
               <p style={{ fontSize: 11, color: '#16a34a', marginTop: 5, fontWeight: 600 }}>✓ {scores.length} subjects loaded</p>
@@ -413,13 +413,13 @@ export default function TeacherReportsPage() {
         </div>
 
         {/* ── Quick-select pills ───────────────────────────────────────── */}
-        {selectedClass && students.length > 0 && !selectedStudent && (
+        {selectedClass && (Array.isArray(students) ? students : []).length > 0 && !selectedStudent && (
           <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 18, animation: '_rp_fu .35s ease' }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>
               Quick select — {selectedClassName}
             </p>
             <div className="resp-pills" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {students.map((s, i) => (
+              {(Array.isArray(students) ? students : []).map((s, i) => (
                 <button key={s.id} onClick={() => setSelectedStudent(s)} className="rp-std"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 13px', borderRadius: 99, border: '1.5px solid #ddd6fe', background: '#f5f3ff', cursor: 'pointer', transition: 'all .15s' }}>
                   <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{i + 1}</span>
@@ -472,16 +472,16 @@ export default function TeacherReportsPage() {
                   </div>
                   {/* Prev / Next */}
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                    {students.findIndex(s => s.id === selectedStudent.id) > 0 && (
-                      <button onClick={() => setSelectedStudent(students[students.findIndex(s => s.id === selectedStudent.id) - 1])}
+                    {(Array.isArray(students) ? students : []).findIndex(s => s.id === selectedStudent.id) > 0 && (
+                      <button onClick={() => setSelectedStudent(students[(Array.isArray(students) ? students : []).findIndex(s => s.id === selectedStudent.id) - 1])}
                         style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,.2)', background: 'rgba(255,255,255,.1)', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all .15s' }}
                         onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,.2)'}
                         onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,.1)'}>
                         ← Prev
                       </button>
                     )}
-                    {students.findIndex(s => s.id === selectedStudent.id) < students.length - 1 && (
-                      <button onClick={() => setSelectedStudent(students[students.findIndex(s => s.id === selectedStudent.id) + 1])}
+                    {(Array.isArray(students) ? students : []).findIndex(s => s.id === selectedStudent.id) < (Array.isArray(students) ? students : []).length - 1 && (
+                      <button onClick={() => setSelectedStudent(students[(Array.isArray(students) ? students : []).findIndex(s => s.id === selectedStudent.id) + 1])}
                         style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,.2)', background: 'rgba(255,255,255,.1)', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all .15s' }}
                         onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,.2)'}
                         onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,.1)'}>
@@ -727,7 +727,7 @@ export default function TeacherReportsPage() {
               <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '14px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', maxHeight: 260, overflowY: 'auto' }}>
                 <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>All Students</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {students.map((s, i) => (
+                  {(Array.isArray(students) ? students : []).map((s, i) => (
                     <button key={s.id} onClick={() => setSelectedStudent(s)}
                       style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 9, border: 'none', background: selectedStudent?.id === s.id ? 'linear-gradient(135deg,#7c3aed,#6d28d9)' : '#faf5ff', cursor: 'pointer', transition: 'all .15s', textAlign: 'left' }}
                       onMouseEnter={e => { if (selectedStudent?.id !== s.id) e.currentTarget.style.background = '#ede9fe' }}

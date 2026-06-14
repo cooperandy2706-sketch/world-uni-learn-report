@@ -230,7 +230,7 @@ export default function ClassTestsPage() {
           </div>
 
           <div style={{ maxHeight: 450, overflowY: 'auto', paddingRight: 4, marginBottom: 16 }}>
-            {students.map(s => (
+            {(Array.isArray(students) ? students : []).map(s => (
               <div key={s.id} style={{ background: 'var(--bg-input)', borderRadius: 12, padding: 12, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12, border: '1px solid var(--border-color)' }}>
                 <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#7c3aed', fontSize: 13 }}>
                   {s.full_name.charAt(0)}

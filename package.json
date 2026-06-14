@@ -16,7 +16,7 @@
   },
   "build": {
     "appId": "com.acadera.app",
-    "productName": "Acadera",
+    "productName": "ASOS",
     "directories": {
       "output": "dist-electron"
     },

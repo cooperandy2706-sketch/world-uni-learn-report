@@ -363,11 +363,11 @@ export default function LibrarianDashboard() {
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: T.text, marginBottom: 8 }}>Select Student *</label>
                 <select
                   value={selectedStudent?.id || ''}
-                  onChange={e => setSelectedStudent(students.find((s:any) => s.id === e.target.value))}
+                  onChange={e => setSelectedStudent((Array.isArray(students) ? students : []).find((s:any) => s.id === e.target.value))}
                   style={{ width: '100%', padding: 12, borderRadius: 8, border: `1px solid ${T.border}`, outline: 'none', fontSize: 14 }}
                 >
                   <option value="">-- Choose Student --</option>
-                  {students.map((s:any) => (
+                  {(Array.isArray(students) ? students : []).map((s:any) => (
                     <option key={s.id} value={s.id}>{s.full_name} ({s.class?.name})</option>
                   ))}
                 </select>

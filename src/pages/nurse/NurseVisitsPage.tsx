@@ -310,7 +310,7 @@ export default function NurseVisitsPage() {
                     <input autoFocus placeholder="Start typing name..." value={studentSearch} onChange={e => setStudentSearch(e.target.value)} style={{ width: '100%', padding: '10px 12px 10px 38px', borderRadius: 10, border: `1px solid ${T.border}`, outline: 'none' }} />
                   </div>
                   <div style={{ maxHeight: 200, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {students.filter((s:any) => s.full_name.toLowerCase().includes(studentSearch.toLowerCase())).slice(0, 5).map((s:any) => (
+                    {(Array.isArray(students) ? students : []).filter((s:any) => s.full_name.toLowerCase().includes(studentSearch.toLowerCase())).slice(0, 5).map((s:any) => (
                       <div key={s.id} onClick={() => setSelectedStudent(s)} style={{ padding: '10px 14px', borderRadius: 8, border: `1px solid ${T.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${T.primary}20`, color: T.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{s.full_name[0]}</div>
                         <div style={{ fontSize: 13, fontWeight: 600 }}>{s.full_name} <span style={{ color: T.muted, fontWeight: 600 }}>({s.class?.name})</span></div>

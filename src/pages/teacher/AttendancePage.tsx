@@ -191,13 +191,13 @@ export default function TeacherAttendancePage() {
 
   function markAll(mark: Mark) {
     const m: Record<string, Mark> = {}
-    students.forEach(s => { m[s.id] = mark })
+    (Array.isArray(students) ? students : []).forEach(s => { m[s.id] = mark })
     setMarks(m)
   }
 
   // ── Submit ────────────────────────────────────────────────────────────────
   async function submit() {
-    if (!term || !myClass || students.length === 0) return
+    if (!term || !myClass || (Array.isArray(students) ? students : []).length === 0) return
     setSaving(true)
 
     try {
@@ -218,7 +218,7 @@ export default function TeacherAttendancePage() {
       const alreadyMarkedIds = new Set((existingRecs || []).map(r => r.student_id))
 
       // Students who still need manual marking
-      const pendingStudents = students.filter(s => !alreadyMarkedIds.has(s.id))
+      const pendingStudents = (Array.isArray(students) ? students : []).filter(s => !alreadyMarkedIds.has(s.id))
 
       if (pendingStudents.length === 0) {
         toast.success('✅ All students are already marked for today (via Gate Scanner or previous submit)!')
@@ -457,7 +457,7 @@ export default function TeacherAttendancePage() {
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.12em', opacity: .7, marginBottom: 4 }}>YOUR HOME CLASS</div>
                 <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 22, fontWeight: 700, margin: '0 0 4px' }}>{myClass.name}</h2>
-                <p style={{ fontSize: 13, opacity: .8, margin: 0 }}>{students.length} students enrolled</p>
+                <p style={{ fontSize: 13, opacity: .8, margin: 0 }}>{(Array.isArray(students) ? students : []).length} students enrolled</p>
               </div>
               {submittedToday ? (
                 <div className="att-header-right" style={{ background: 'rgba(255,255,255,.15)', borderRadius: 12, padding: '10px 18px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -480,7 +480,7 @@ export default function TeacherAttendancePage() {
                   <div style={{ fontWeight: 800, marginBottom: 2 }}>Register complete for today</div>
                   <div style={{ fontWeight: 600, opacity: 0.85 }}>
                     {Object.keys(dbMarks).length > 0
-                      ? `${Object.keys(dbMarks).length} of ${students.length} students were auto-marked via Gate Scanner. No further action needed.`
+                      ? `${Object.keys(dbMarks).length} of ${(Array.isArray(students) ? students : []).length} students were auto-marked via Gate Scanner. No further action needed.`
                       : `The morning register has been submitted. Term totals below are up to date.`
                     }
                   </div>
@@ -546,14 +546,14 @@ export default function TeacherAttendancePage() {
               </div>
 
               <div className="att-list">
-                {students.map((s, i) => {
+                {(Array.isArray(students) ? students : []).map((s, i) => {
                   const mark = marks[s.id] ?? 'present'
                   const totals = termTotals[s.id]
                   const pct = totals && totals.total > 0 ? Math.round((totals.present / totals.total) * 100) : null
 
                   return (
                     <div key={s.id} className="att-row"
-                      style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: i < students.length - 1 ? '1px solid #fafafa' : 'none', background: 'var(--bg-card)', transition: 'background .12s', animation: `_att_up .3s ease ${i * .03}s both` }}>
+                      style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: i < (Array.isArray(students) ? students : []).length - 1 ? '1px solid #fafafa' : 'none', background: 'var(--bg-card)', transition: 'background .12s', animation: `_att_up .3s ease ${i * .03}s both` }}>
 
                       {/* Avatar + name */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
@@ -636,7 +636,7 @@ export default function TeacherAttendancePage() {
             </div>
 
             {/* Submit button */}
-            {!submittedToday && students.length > 0 && (
+            {!submittedToday && (Array.isArray(students) ? students : []).length > 0 && (
               <div className="att-submit-bar">
                 <div style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', fontWeight: 600 }}>
                   Today: {presentCount} Present · {absentCount} Absent

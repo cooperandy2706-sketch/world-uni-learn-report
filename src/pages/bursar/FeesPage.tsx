@@ -511,7 +511,7 @@ export default function FeesPage() {
       toast.error('Select a student and at least one item')
       return
     }
-    const stu = students.find((s: any) => s.id === pf.student_id) as any
+    const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === pf.student_id) as any
     
     setStoreModal(true)
     try {
@@ -554,7 +554,7 @@ export default function FeesPage() {
   }
 
   function generateTextReceipt(payment: any) {
-    const stu = students.find((s: any) => s.id === payment.student_id) as any
+    const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === payment.student_id) as any
     const arrPaid = Number(payment.arrears_paid || 0)
     const arrRemain = Number(payment.arrears_balance_after || 0)
     const currentPaid = Number(payment.amount_paid) - arrPaid
@@ -707,7 +707,7 @@ export default function FeesPage() {
   }
 
   function handlePrint(payment: any) {
-    const stu = students.find((s: any) => s.id === payment.student_id) as any
+    const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === payment.student_id) as any
     const struct = structures.find((s: any) => s.id === payment.fee_structure_id) as any
     const win = window.open('', '_blank', 'width=800,height=900')
     if (!win) return
@@ -875,7 +875,7 @@ export default function FeesPage() {
   }
 
   function handlePrintSimplified(payment: any) {
-    const stu = students.find((s: any) => s.id === payment.student_id) as any
+    const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === payment.student_id) as any
     const win = window.open('', '_blank', 'width=800,height=900')
     if (!win) return
 
@@ -1195,7 +1195,7 @@ export default function FeesPage() {
                 </div>
               ) : (
                 (() => {
-                  const selStu = students.find((s: any) => s.id === pf.student_id) as any;
+                  const selStu = (Array.isArray(students) ? students : []).find((s: any) => s.id === pf.student_id) as any;
                   if (!selStu) return null;
 
                   const classStrs = structures.filter((x: any) => x.class_id === selStu.class?.id);
@@ -1435,7 +1435,7 @@ export default function FeesPage() {
               {pf.student_id && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {(() => {
-                    const sel = students.find((s: any) => s.id === pf.student_id) as any;
+                    const sel = (Array.isArray(students) ? students : []).find((s: any) => s.id === pf.student_id) as any;
                     if (!sel) return null;
 
                     // Calculate student balance
@@ -1687,7 +1687,7 @@ export default function FeesPage() {
                   <h3 style={{ fontSize: 16, fontWeight: 800, color: '#1e0646', margin: 0 }}>Available Items</h3>
                   {pf.student_id && (
                     <span style={{ fontSize: 10, color: '#6d28d9', fontWeight: 700, background: '#f5f3ff', padding: '2px 8px', borderRadius: 8 }}>
-                      Filtered for {(students.find((s:any) => s.id === pf.student_id) as any)?.class?.name}
+                      Filtered for {((Array.isArray(students) ? students : []).find((s:any) => s.id === pf.student_id) as any)?.class?.name}
                     </span>
                   )}
                 </div>
@@ -1703,7 +1703,7 @@ export default function FeesPage() {
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
                 {filteredStoreItems
-                  .filter((i: any) => !pf.student_id || !i.class_id || i.class_id === (students.find((s:any) => s.id === pf.student_id) as any)?.class?.id)
+                  .filter((i: any) => !pf.student_id || !i.class_id || i.class_id === ((Array.isArray(students) ? students : []).find((s:any) => s.id === pf.student_id) as any)?.class?.id)
                   .map((item: any) => {
                     const inCart = storeCart.find(x => x.id === item.id)
                     return (

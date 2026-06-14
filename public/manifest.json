@@ -1,7 +1,7 @@
 {
-  "name": "Acadera",
-  "short_name": "Acadera",
-  "description": "Acadera — GES School Report Card Management System",
+  "name": "Acadera School Operating System",
+  "short_name": "ASOS",
+  "description": "Acadera School Operating System — The premier GES school management platform",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

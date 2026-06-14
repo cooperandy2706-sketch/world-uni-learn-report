@@ -415,7 +415,7 @@ export default function InventoryPage() {
                          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6, display: 'block' }}>Target Class (Optional)</label>
                          <select value={itemModal.class_id || ''} onChange={e => setItemModal({...itemModal, class_id: e.target.value || null})} style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)' }}>
                            <option value="">General (All Classes)</option>
-                           {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                           {(Array.isArray(classes) ? classes : []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                          </select>
                       </div>
                       <div>
@@ -469,7 +469,7 @@ export default function InventoryPage() {
                        style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)' }}
                      >
                        <option value="">Counter Sale (Anonymous)</option>
-                       {students.map(s => <option key={s.id} value={s.id}>{s.full_name} ({s.student_id})</option>)}
+                       {(Array.isArray(students) ? students : []).map(s => <option key={s.id} value={s.id}>{s.full_name} ({s.student_id})</option>)}
                      </select>
                    </div>
                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -526,7 +526,7 @@ export default function InventoryPage() {
                        <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>Target Class</label>
                        <select value={supplyModal.class_id || ''} onChange={e => setSupplyModal({...supplyModal, class_id: e.target.value || null})} style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)' }}>
                          <option value="">All Classes</option>
-                         {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                         {(Array.isArray(classes) ? classes : []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                        </select>
                     </div>
                   </div>

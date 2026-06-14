@@ -104,7 +104,7 @@ export default function AnnouncementsPage(){
 
     // Student notifications
     if (form.target_role === 'all' || form.target_role === 'student') {
-      students.forEach((s: any) => {
+      (Array.isArray(students) ? students : []).forEach((s: any) => {
         if (s.user_id) notifs.push({
           school_id: user!.school_id, user_id: s.user_id,
           title: form.title, body: form.body.slice(0, 120), type: form.type,
@@ -174,7 +174,7 @@ export default function AnnouncementsPage(){
             {label:'Total Posts',value:announcements.length,icon:'📢',color:'#6d28d9'},
             {label:'Meetings',value:announcements.filter(a=>a.type==='meeting').length,icon:'📅',color:'#0369a1'},
             {label:'Staff',value:teachers.length,icon:'👨‍🏫',color:'#16a34a'},
-            {label:'Students',value:students.length,icon:'🎓',color:'#a21caf'},
+            {label:'Students',value:(Array.isArray(students) ? students : []).length,icon:'🎓',color:'#a21caf'},
           ].map(s=>(
             <div key={s.label} style={{background: 'var(--bg-card)',borderRadius:14,padding:'14px 16px',border:'1.5px solid #f0eefe',boxShadow:'0 1px 4px rgba(109,40,217,.06)'}}>
               <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>

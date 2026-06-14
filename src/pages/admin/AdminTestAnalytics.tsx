@@ -109,7 +109,7 @@ export default function AdminTestAnalytics() {
     }
   }
 
-  if (loading && classes.length === 0) return <div style={{ padding: 40 }}>Loading data...</div>
+  if (loading && (Array.isArray(classes) ? classes : []).length === 0) return <div style={{ padding: 40 }}>Loading data...</div>
 
   return (
     <div style={{ padding: '24px', fontFamily: '"DM Sans", sans-serif', maxWidth: 1200, margin: '0 auto' }}>
@@ -139,7 +139,7 @@ export default function AdminTestAnalytics() {
               style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid #e2e8f0', appearance: 'none', background: '#f8fafc', outline: 'none' }}
             >
               <option value="">Select Class</option>
-              {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
         </div>

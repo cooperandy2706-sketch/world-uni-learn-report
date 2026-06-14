@@ -879,11 +879,11 @@ export default function StudentsPage() {
   }
 
   async function exportData() {
-    if (students.length === 0) {
+    if ((Array.isArray(students) ? students : []).length === 0) {
       toast.error('No students found to export')
       return
     }
-    const data = students.map((s: any) => ({
+    const data = (Array.isArray(students) ? students : []).map((s: any) => ({
       'Full Name': s.full_name,
       'Student ID': s.student_id || '',
       'Gender': s.gender || '',
@@ -901,8 +901,8 @@ export default function StudentsPage() {
     XLSX.writeFile(wb, `Students_Export_${new Date().toISOString().split('T')[0]}.xlsx`)
   }
 
-  const totalMale = students.filter(s => s.gender === 'male').length
-  const totalFemale = students.filter(s => s.gender === 'female').length
+  const totalMale = (Array.isArray(students) ? students : []).filter(s => s.gender === 'male').length
+  const totalFemale = (Array.isArray(students) ? students : []).filter(s => s.gender === 'female').length
 
   return (
     <>
@@ -955,10 +955,10 @@ export default function StudentsPage() {
             {/* ── Summary cards ── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 14, marginBottom: 22 }}>
               {[
-                { label: 'Total Students', value: students.length, icon: '👥', color: '#6d28d9', bg: '#f5f3ff' },
+                { label: 'Total Students', value: (Array.isArray(students) ? students : []).length, icon: '👥', color: '#6d28d9', bg: '#f5f3ff' },
                 { label: 'Male Students', value: totalMale, icon: '👦', color: '#0891b2', bg: '#ecfeff' },
                 { label: 'Female Students', value: totalFemale, icon: '👧', color: '#db2777', bg: '#fdf2f8' },
-                { label: 'Classes', value: classes.length, icon: '🏫', color: '#16a34a', bg: '#f0fdf4' },
+                { label: 'Classes', value: (Array.isArray(classes) ? classes : []).length, icon: '🏫', color: '#16a34a', bg: '#f0fdf4' },
               ].map((s, i) => (
                 <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.4s ease ${i * 0.07}s both` }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -994,7 +994,7 @@ export default function StudentsPage() {
               {/* Class filter */}
               <StyledSelect value={filterClass} onChange={e => setFilterClass(e.target.value)} style={{ flex: '1 1 160px', maxWidth: 200 }}>
                 <option value="">All Classes</option>
-                {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </StyledSelect>
 
               {/* Gender filter */}
@@ -1029,7 +1029,7 @@ export default function StudentsPage() {
             )}
 
             {/* ── Empty state ── */}
-            {!isLoading && students.length === 0 && (
+            {!isLoading && (Array.isArray(students) ? students : []).length === 0 && (
               <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>🎓</div>
                 <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>
@@ -1043,7 +1043,7 @@ export default function StudentsPage() {
             )}
 
             {/* ── TABLE VIEW ── */}
-            {!isLoading && students.length > 0 && viewMode === 'table' && (
+            {!isLoading && (Array.isArray(students) ? students : []).length > 0 && viewMode === 'table' && (
               <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,0.06)', height: '70vh' }}>
                 <TableVirtuoso
                   data={students}
@@ -1116,7 +1116,7 @@ export default function StudentsPage() {
             )}
 
             {/* ── GRID VIEW ── */}
-            {!isLoading && students.length > 0 && viewMode === 'grid' && (
+            {!isLoading && (Array.isArray(students) ? students : []).length > 0 && viewMode === 'grid' && (
               <VirtuosoGrid
                 data={students}
                 endReached={() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage() }}
@@ -1173,14 +1173,14 @@ export default function StudentsPage() {
                   <select 
                     value={hrStudent?.id ?? ''} 
                     onChange={e => {
-                      const s = students.find(x => x.id === e.target.value)
+                      const s = (Array.isArray(students) ? students : []).find(x => x.id === e.target.value)
                       setHrStudent(s ?? null)
                       setHrFields({ letterDate: new Date().toISOString().split('T')[0] })
                     }}
                     style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid var(--border-color)', fontSize: 13, fontFamily: '"DM Sans",sans-serif', cursor: 'pointer', color: 'var(--text-main)', background: 'var(--bg-card)' }}
                   >
                     <option value="">— Choose a student —</option>
-                    {students.map(s => <option key={s.id} value={s.id}>{s.full_name} {s.student_id ? `(${s.student_id})` : ''}</option>)}
+                    {(Array.isArray(students) ? students : []).map(s => <option key={s.id} value={s.id}>{s.full_name} {s.student_id ? `(${s.student_id})` : ''}</option>)}
                   </select>
                 </Field>
 
@@ -1319,7 +1319,7 @@ export default function StudentsPage() {
               <Field label="Class">
                 <StyledSelect {...register('class_id')}>
                   <option value="">Select class…</option>
-                  {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </StyledSelect>
               </Field>
               <Field label="Gender">

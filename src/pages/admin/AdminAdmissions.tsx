@@ -172,7 +172,7 @@ interface CrossTabBannerProps {
 
 function CrossTabBanner({ mode, otherTotal, otherCount, selClass, classes, onSwitchTab }: CrossTabBannerProps) {
   if (otherCount === 0) return null
-  const className = selClass ? classes.find((c: any) => c.id === selClass)?.name : 'all classes'
+  const className = selClass ? (Array.isArray(classes) ? classes : []).find((c: any) => c.id === selClass)?.name : 'all classes'
   const isBills = mode === 'bills-showing-supplies'
   return (
     <div style={{
@@ -363,7 +363,7 @@ function BillsTab({ schoolId, selClass, selYear, onClassChange, onYearChange, cl
                   <td style={{ padding: '11px 16px', fontSize: 13, color: 'var(--text-muted)' }}>{f.term?.name || '—'}</td>
                   <td style={{ padding: '11px 16px' }}>
                     {f.class_id
-                      ? <span style={{ background: '#eff6ff', color: '#2563eb', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 99 }}>{f.class?.name || f.class?.name || classes.find((c: any) => c.id === f.class_id)?.name || 'Class'}</span>
+                      ? <span style={{ background: '#eff6ff', color: '#2563eb', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 99 }}>{f.class?.name || f.class?.name || (Array.isArray(classes) ? classes : []).find((c: any) => c.id === f.class_id)?.name || 'Class'}</span>
                       : <span style={{ color: 'var(--text-subtle)', fontSize: 12 }}>All Classes</span>}
                   </td>
                   <td style={{ padding: '11px 16px', fontWeight: 700, color: '#1e0646', fontSize: 14 }}>{GHS(f.amount)}</td>
@@ -690,7 +690,7 @@ function EnquiriesTab({ schoolId, classes, academicYears }: any) {
             <div><Field label="Class Applying For">
               <select style={selectStyle} value={form.applying_class_id || ''} onChange={e => setForm(p => ({ ...p, applying_class_id: e.target.value }))}>
                 <option value="">Select class</option>
-                {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {(Array.isArray(classes) ? classes : []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </Field></div>
             <div style={{ gridColumn: '1/-1', borderTop: '1.5px dashed var(--border-color)', paddingTop: 16, marginTop: 4 }}>
@@ -842,7 +842,7 @@ function AdmissionFormTab({ schoolId, classes, academicYears, school }: any) {
             <div><Field label="Class Applying For">
               <select style={selectStyle} value={form.applying_class_id || ''} onChange={e => setForm(p => ({ ...p, applying_class_id: e.target.value }))}>
                 <option value="">Select</option>
-                {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {(Array.isArray(classes) ? classes : []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </Field></div>
             <div><Field label="Blood Group"><input style={inputStyle} value={form.blood_group || ''} onChange={e => setForm(p => ({ ...p, blood_group: e.target.value }))} /></Field></div>
@@ -1021,7 +1021,7 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
 
   const billsTotal = (billsForBanner as any[]).reduce((s, i) => !i.is_optional ? s + Number(i.amount) : s, 0)
 
-  const classCounts = classes.map((c: any) => ({
+  const classCounts = (Array.isArray(classes) ? classes : []).map((c: any) => ({
     ...c,
     count: allSupplies.filter((i: any) => i.class_id === c.id).length
   }))
@@ -1178,7 +1178,7 @@ function SuppliesTab({ schoolId, selClass, selYear, onClassChange, onYearChange,
               <Field label="Class">
                 <select style={selectStyle} value={form.class_id || selClass || ''} onChange={e => setForm(p => ({ ...p, class_id: e.target.value || null }))}>
                   <option value="">All Classes (school-wide)</option>
-                  {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {(Array.isArray(classes) ? classes : []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </Field>
             </div>

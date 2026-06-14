@@ -267,7 +267,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
   }
 
   function getSubjectAvg(subId: string): number {
-    const totals = students.map(s => getTotal(s.id, subId)).filter(t => t > 0)
+    const totals = (Array.isArray(students) ? students : []).map(s => getTotal(s.id, subId)).filter(t => t > 0)
     return totals.length ? totals.reduce((a,b) => a+b, 0) / totals.length : 0
   }
 
@@ -296,7 +296,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
     setSaving(true)
     try {
       const upserts: any[] = []
-      students.forEach(s => {
+      (Array.isArray(students) ? students : []).forEach(s => {
         subjects.forEach(sub => {
           const sc = scoreMap[s.id]?.[sub.id]
           if (!sc) return
@@ -370,7 +370,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
   }
 
   async function handleSubmit() {
-    const entered = students.filter(s => subjects.some(sub => gradingCategories.some(c => scoreMap[s.id]?.[sub.id]?.scores[c.id] !== ''))).length
+    const entered = (Array.isArray(students) ? students : []).filter(s => subjects.some(sub => gradingCategories.some(c => scoreMap[s.id]?.[sub.id]?.scores[c.id] !== ''))).length
     if (!entered) { toast.error('No scores entered yet'); return }
     if (!confirm(`Submit all scores for this class to admin?`)) return
     await handleSave(false)
@@ -551,7 +551,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
   }
 
   const overallPos = getOverallPositions()
-  const enteredCount = students.filter(s => subjects.some(sub => gradingCategories.some(c => scoreMap[s.id]?.[sub.id]?.scores[c.id] !== ''))).length
+  const enteredCount = (Array.isArray(students) ? students : []).filter(s => subjects.some(sub => gradingCategories.some(c => scoreMap[s.id]?.[sub.id]?.scores[c.id] !== ''))).length
 
   const COL_STUDENT = 180
   const COL_SUBJECT = (gradingCategories.length * 56) + 52 + 38
@@ -589,7 +589,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
             </p>
           </div>
           {/* Actions moved to next block so they are still available if needed, or maybe they are kept here? */}
-          {selectedClass && students.length > 0 && !isLocked && (
+          {selectedClass && (Array.isArray(students) ? students : []).length > 0 && !isLocked && (
             <div style={{ display:'flex', gap:8 }}>
               {selectedSubjectId !== 'all' && (
                 <>
@@ -619,7 +619,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
         </div>
       )}
 
-      {isAdminView && selectedClass && students.length > 0 && !isLocked && (
+      {isAdminView && selectedClass && (Array.isArray(students) ? students : []).length > 0 && !isLocked && (
         <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
             {selectedSubjectId !== 'all' && (
               <>
@@ -679,7 +679,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
 
       {loading && selectedClass && <div style={{ padding:40, textAlign:'center' }}>Loading...</div>}
 
-      {!loading && selectedClass && students.length > 0 && subjects.length > 0 && (() => {
+      {!loading && selectedClass && (Array.isArray(students) ? students : []).length > 0 && subjects.length > 0 && (() => {
         const subjectsToRender = selectedSubjectId === 'all' ? subjects : subjects.filter(s => s.id === selectedSubjectId)
         return (
           <div className="se-desktop-table" style={{ overflowX: 'auto', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 14 }}>
@@ -717,7 +717,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
                 </tr>
               </thead>
               <tbody>
-                {students.map((stu, rowIdx) => {
+                {(Array.isArray(students) ? students : []).map((stu, rowIdx) => {
                   const avg = getStudentAvg(stu.id)
                   const overallGrade = avg > 0 ? getGrade(avg) : null
                   const pos = overallPos[stu.id]
@@ -759,7 +759,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
       })()}
 
       {/* Mobile wizard view: one student at a time (shown only below 640px) */}
-      {!loading && selectedClass && students.length > 0 && subjects.length > 0 && (
+      {!loading && selectedClass && (Array.isArray(students) ? students : []).length > 0 && subjects.length > 0 && (
         <div className="se-mobile-card" style={{ paddingBottom: 80 }}>
           {(() => {
             const subjectsToRender = selectedSubjectId === 'all' ? subjects : subjects.filter(s => s.id === selectedSubjectId)
@@ -783,16 +783,16 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
                   </button>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.08em', opacity: 0.8, textTransform: 'uppercase' }}>
-                      Student {mobileStudentIndex + 1} of {students.length}
+                      Student {mobileStudentIndex + 1} of {(Array.isArray(students) ? students : []).length}
                     </div>
                     <div style={{ width: 100, height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: 99, margin: '6px auto 0', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${((mobileStudentIndex + 1) / students.length) * 100}%`, background: '#34d399', borderRadius: 99, transition: 'width 0.3s ease' }} />
+                      <div style={{ height: '100%', width: `${((mobileStudentIndex + 1) / (Array.isArray(students) ? students : []).length) * 100}%`, background: '#34d399', borderRadius: 99, transition: 'width 0.3s ease' }} />
                     </div>
                   </div>
                   <button 
-                    onClick={() => setMobileStudentIndex(i => Math.min(students.length - 1, i + 1))}
-                    disabled={mobileStudentIndex === students.length - 1}
-                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: mobileStudentIndex === students.length - 1 ? 'default' : 'pointer', opacity: mobileStudentIndex === students.length - 1 ? 0.3 : 1 }}
+                    onClick={() => setMobileStudentIndex(i => Math.min((Array.isArray(students) ? students : []).length - 1, i + 1))}
+                    disabled={mobileStudentIndex === (Array.isArray(students) ? students : []).length - 1}
+                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: mobileStudentIndex === (Array.isArray(students) ? students : []).length - 1 ? 'default' : 'pointer', opacity: mobileStudentIndex === (Array.isArray(students) ? students : []).length - 1 ? 0.3 : 1 }}
                   >
                     →
                   </button>
@@ -860,7 +860,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
                   })}
                   
                   {/* Next Student Button at bottom of scroll */}
-                  {mobileStudentIndex < students.length - 1 && (
+                  {mobileStudentIndex < (Array.isArray(students) ? students : []).length - 1 && (
                     <button 
                       onClick={() => {
                         setMobileStudentIndex(i => i + 1);
@@ -878,7 +878,7 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
           })()}
 
           {/* Sticky save bar for mobile */}
-          {!isLocked && students.length > 0 && (
+          {!isLocked && (Array.isArray(students) ? students : []).length > 0 && (
             <div className="t-sticky-bar" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', padding: '12px 16px', borderTop: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, textAlign: 'center' }}>
                 {dirty ? '● Unsaved changes' : '✓ All saved'}
