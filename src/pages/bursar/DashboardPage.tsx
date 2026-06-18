@@ -1,5 +1,5 @@
 import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
@@ -11,7 +11,7 @@ import { formatCurrency } from '../../utils/currency'
 import {
   DollarSign, TrendingUp, TrendingDown, AlertCircle, Users,
   CreditCard, PiggyBank, Receipt, GraduationCap, FileText, Banknote,
-  ArrowRight, Activity
+  ArrowRight, Activity, ChevronDown, Zap
 } from 'lucide-react'
 import FlaskLoader from '../../components/ui/FlaskLoader'
 import { getEngagingGreeting } from '../../lib/utils'
@@ -34,6 +34,16 @@ export default function BursarDashboard() {
   const [loading, setLoading] = useState(true)
   useStuckLoadingReload(loading)
   const [flippedCards, setFlippedCards] = useState<number[]>([])
+  
+  const [qaOpen, setQaOpen] = useState(false)
+  const qaRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (qaRef.current && !qaRef.current.contains(e.target as Node)) setQaOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   const toggleFlip = (idx: number) => {
     setFlippedCards(prev => 
@@ -307,10 +317,34 @@ export default function BursarDashboard() {
                 {roleMessage} Track {currentYear} performance, monitor arrears, and manage payroll across the platform.
               </p>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 13, color: '#c7d2fe', fontWeight: 600, marginBottom: 4 }}>Net Term Balance</div>
-              <div style={{ fontFamily: '"Outfit", sans-serif', fontSize: 42, fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
-                {!loading ? formatCurrency(net, schoolCurrency) : '---'}
+            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 16 }}>
+              <div>
+                <div style={{ fontSize: 13, color: '#c7d2fe', fontWeight: 600, marginBottom: 4 }}>Net Term Balance</div>
+                <div style={{ fontFamily: '"Outfit", sans-serif', fontSize: 42, fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
+                  {!loading ? formatCurrency(net, schoolCurrency) : '---'}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Link to={ROUTES.BURSAR_FEES} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#10b981', color: '#fff', textDecoration: 'none', padding: '10px 18px', borderRadius: 10, fontSize: 14, fontWeight: 700, boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)', transition: 'all 0.2s', border: '1px solid #059669' }}>
+                  <CreditCard size={18} /> Pay School Fees
+                </Link>
+                <div ref={qaRef} style={{ position: 'relative' }}>
+                  <button onClick={() => setQaOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', padding: '10px 18px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', backdropFilter: 'blur(10px)' }}>
+                    <Zap size={18} color="#f59e0b" /> Quick Action <ChevronDown size={16} />
+                  </button>
+                  {qaOpen && (
+                    <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 8, width: 220, background: 'var(--bg-card)', borderRadius: 12, padding: 8, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', border: '1px solid var(--border-color)', zIndex: 100, textAlign: 'left' }}>
+                      {quickLinks.map(q => (
+                        <Link key={q.to} to={q.to} onClick={() => setQaOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', textDecoration: 'none', borderRadius: 8, color: 'var(--text-main)', fontSize: 13, fontWeight: 600, transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                          <div style={{ width: 28, height: 28, borderRadius: 8, background: `${q.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <q.icon size={14} color={q.color} />
+                          </div>
+                          {q.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

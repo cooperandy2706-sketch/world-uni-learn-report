@@ -114,6 +114,7 @@ export default function ReportsPage() {
     // All Transactions for Audit Ledger
     const ledger = [
       ...reportsData.fees.map(x => ({ date: x.payment_date, desc: `Fee: ${(x.student as any)?.full_name}`, type: 'Revenue', cat: 'Fees', amount: x.amount_paid, method: x.payment_method })),
+      ...reportsData.daily.map(x => ({ date: x.created_at, desc: `Daily Collection`, type: 'Revenue', cat: x.fee_type === 'feeding' ? 'Daily Feeding' : 'Daily Studies', amount: x.amount, method: 'cash' })),
       ...reportsData.income.map(x => ({ date: x.date, desc: x.description || x.category, type: 'Revenue', cat: x.category, amount: x.amount, method: x.payment_method })),
       ...reportsData.expenses.map(x => ({ date: x.date, desc: x.description || x.category, type: 'Expenditure', cat: x.category, amount: x.amount, method: x.payment_method })),
       ...reportsData.payroll.map(x => ({ date: x.paid_date, desc: `Salary: ${(x.user as any)?.full_name}`, type: 'Expenditure', cat: 'Payroll', amount: x.net_salary, method: 'bank_transfer' })),

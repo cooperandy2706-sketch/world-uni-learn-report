@@ -156,7 +156,7 @@ export default function TeacherDashboardPage() {
           const { data: students } = await supabase.from('students').select('id').eq('class_id', cls.id).eq('is_active', true)
           const { data: scores } = await supabase.from('scores').select('total_score,is_submitted').eq('class_id', cls.id).eq('term_id', term!.id).eq('teacher_id', teacher.id)
           const subjectIds = [...new Set(assigns.filter((a: any) => a.class?.id === cls.id).map((a: any) => a.subject?.id))]
-          const studentCount = students?.length ?? 0
+          const studentCount = (Array.isArray(students) ? students : []).length ?? 0
           const submitted = scores?.filter((s: any) => s.is_submitted).length ?? 0
           const totals = scores?.map((s: any) => s.total_score ?? 0) ?? []
           const avg = calculateAverage(totals)

@@ -232,7 +232,7 @@ export const settingsService = {
       .from('school_settings')
       .select('*, school:schools(*)')
       .eq('school_id', schoolId)
-      .single()
+      .maybeSingle()
   },
   async upsert(schoolId: string, data: any) {
     return supabase

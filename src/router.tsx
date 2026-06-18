@@ -93,6 +93,7 @@ export const router = createRouter([
           { path: 'branches', element: lazyPage(() => import('./pages/admin/BranchesPage')) },
           { path: 'public-profile', element: lazyPage(() => import('./pages/admin/PublicProfilePage')) },
           { path: 'admissions', element: lazyPage(() => import('./pages/admin/AdminAdmissions')) },
+          { path: 'daily-fees', element: lazyPage(() => import('./pages/bursar/DailyFeesPage')) },
           { path: 'sms', element: lazyPage(() => import('./pages/shared/SMSPage')) },
           { path: 'test-analytics', element: lazyPage(() => import('./pages/admin/AdminTestAnalytics')) },
           { path: 'assessments', element: lazyPage(() => import('./pages/admin/AssessmentsPage')) },

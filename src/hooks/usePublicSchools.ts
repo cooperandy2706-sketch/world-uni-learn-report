@@ -41,24 +41,6 @@ async function fetchSchoolRows(): Promise<SchoolRow[]> {
 async function fetchDirectoryMeta(): Promise<Map<string, { school_type: string; has_branches: boolean }>> {
   const map = new Map<string, { school_type: string; has_branches: boolean }>()
 
-  const { data: viewData, error: viewError } = await supabase
-    .from('school_directory_meta')
-    .select('school_id, school_type, has_branches')
-
-  if (!viewError && viewData) {
-    for (const row of viewData) {
-      map.set(row.school_id, {
-        school_type: row.school_type ?? 'basic',
-        has_branches: !!row.has_branches,
-      })
-    }
-    return map
-  }
-
-  if (viewError) {
-    console.warn('[directory] school_directory_meta unavailable:', viewError.message)
-  }
-
   const { data: settingsData, error: settingsError } = await supabase
     .from('school_settings')
     .select('school_id, has_branches')

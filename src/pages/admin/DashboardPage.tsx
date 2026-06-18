@@ -15,7 +15,7 @@ import { useSettings } from '../../hooks/useSettings'
 import { useBranches } from '../../hooks/useBranches'
 import { AreaChart, Area, BarChart, Bar, Cell, Legend, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare, Users, FolderLock, Settings, Bed, HeartHandshake, ClipboardCheck, PencilLine } from 'lucide-react'
+import { Phone, MessageSquare, MapPin, Activity, BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, Navigation, Calendar, UserCheck, Clock, Award, ShieldAlert, CheckSquare, Users, FolderLock, Settings, Bed, HeartHandshake, ClipboardCheck, PencilLine, Banknote } from 'lucide-react'
 import { useThemeStore } from '../../store/themeStore'
 
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
@@ -1156,6 +1156,7 @@ export default function DashboardPage() {
                   { icon: <Settings size={20} color="#64748b" />, label: 'Settings', to: ROUTES.ADMIN_SETTINGS, color: '#64748b' },
                   { icon: <Bed size={20} color="#10b981" />, label: 'Boarding', to: '/admin/boarding', color: '#10b981' },
                   { icon: <HeartHandshake size={20} color="#ef4444" />, label: 'Pastoral', to: '/admin/pastoral', color: '#ef4444' },
+                  { icon: <Banknote size={20} color="#3b82f6" />, label: 'Daily Fees', to: ROUTES.ADMIN_DAILY_FEES, color: '#3b82f6' },
                 ].map(({ icon, label, to, color }) => (
                   <Link key={label} to={to} className="ops-action-card">
                     <div style={{ width: 40, height: 40, borderRadius: 12, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</div>

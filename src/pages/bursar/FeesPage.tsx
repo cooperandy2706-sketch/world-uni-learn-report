@@ -10,7 +10,7 @@ import { inventoryService } from '../../services/inventory.service'
 import { supabase } from '../../lib/supabase'
 import Modal from '../../components/ui/Modal'
 import toast from 'react-hot-toast'
-import { Plus, Trash2, Printer, CreditCard, Settings, GraduationCap, MessageCircle, Mail, Smartphone, AlertTriangle, CheckCircle2, Send, Loader2, Download, Bell, ShoppingCart, History, Trash, Minus, Search, Users, Check, Lock, Shield, X, Coins } from 'lucide-react'
+import { Plus, Trash2, Printer, CreditCard, Settings, GraduationCap, MessageCircle, Mail, Smartphone, AlertTriangle, CheckCircle2, Send, Loader2, Download, Bell, ShoppingCart, History, Trash, Minus, Search, Users, Check, Lock, Shield, X, Coins, BarChart3, Scale, Receipt, Banknote, Landmark, FileText } from 'lucide-react'
 import { formatCurrency } from '../../utils/currency'
 
 const METHODS = ['cash', 'momo', 'bank', 'cheque'] as const
@@ -48,11 +48,28 @@ export default function FeesPage() {
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
   const { data: classes = [] } = useClasses()
-  const [tab, setTab] = useState<'structures' | 'record' | 'history' | 'balances' | 'store' | 'revenue'>('record')
+  const [tab, setTab] = useState<'structures' | 'record' | 'history' | 'balances' | 'store' | 'revenue' | 'settings'>('record')
   const [structureModal, setStructureModal] = useState(false)
   const [paymentModal, setPaymentModal] = useState(false)
   const [printReceipt, setPrintReceipt] = useState<any>(null)
   const [allocationResult, setAllocationResult] = useState<any>(null)
+
+  // ── Settings State ────────────────────────────────────────────────
+  const [printSettings, setPrintSettings] = useState<{
+    size: 'a4' | 'a5' | 'thermal'
+    orientation: 'portrait' | 'landscape'
+    copies: 'single' | 'duplicate'
+    style: 'breakdown' | 'simple'
+  }>(() => {
+    try {
+      const saved = localStorage.getItem(`bursar_print_settings_${user?.id}`)
+      if (saved) return JSON.parse(saved)
+    } catch (e) {}
+    return { size: 'a5', orientation: 'landscape', copies: 'duplicate', style: 'breakdown' }
+  })
+
+  const [pinSetup, setPinSetup] = useState({ oldPin: '', newPin: '', confirmPin: '' })
+
   const [isSendingSMS, setIsSendingSMS] = useState(false)
   const [sendingReminders, setSendingReminders] = useState(false)
   const [studentSearch, setStudentSearch] = useState('')
@@ -432,6 +449,41 @@ export default function FeesPage() {
     }
   }
 
+  function handleSavePrintSettings(newSettings: typeof printSettings) {
+    setPrintSettings(newSettings)
+    localStorage.setItem(`bursar_print_settings_${user?.id}`, JSON.stringify(newSettings))
+    toast.success('Print preferences saved successfully')
+  }
+
+  function handleSavePin(e: React.FormEvent) {
+    e.preventDefault()
+    if (!user) return
+    const currentSaved = localStorage.getItem(`bursar_pin_${user.id}`)
+    if (currentSaved && pinSetup.oldPin !== currentSaved) {
+      toast.error('Current PIN is incorrect')
+      return
+    }
+    if (pinSetup.newPin !== pinSetup.confirmPin) {
+      toast.error('New PINs do not match')
+      return
+    }
+    if (pinSetup.newPin.length !== 4) {
+      toast.error('PIN must be exactly 4 digits')
+      return
+    }
+    localStorage.setItem(`bursar_pin_${user.id}`, pinSetup.newPin)
+    setPinSetup({ oldPin: '', newPin: '', confirmPin: '' })
+    toast.success('Security PIN updated successfully')
+  }
+
+  function handleRemovePin() {
+    if (!user) return
+    if (!confirm('Are you sure you want to remove your security PIN? This makes transactions less secure.')) return
+    localStorage.removeItem(`bursar_pin_${user.id}`)
+    setPinSetup({ oldPin: '', newPin: '', confirmPin: '' })
+    toast.success('Security PIN removed')
+  }
+
   async function sendReceiptSMS(payment: any) {
     const stu = (students as any[]).find((s: any) => s.id === payment.student_id) as any
     const phone = stu?.guardian_phone
@@ -706,36 +758,50 @@ export default function FeesPage() {
     XLSX.writeFile(wb, `Payment_History_${new Date().toISOString().split('T')[0]}.xlsx`)
   }
 
-  function handlePrint(payment: any) {
+  // ── Unified print dispatcher ──────────────────────────────────────────
+  function handlePrintWithSavedSettings(payment: any) {
+    if (!payment) return
+
+    const { size, orientation, copies, style } = printSettings
+    if (size === 'thermal') { handlePrintThermal(payment, copies); return }
+    if (size === 'a4' && style === 'breakdown') { handlePrint(payment, copies); return }
+    if (size === 'a4' && style === 'simple') { handlePrintSimplified(payment, copies); return }
+    if (size === 'a5' && orientation === 'portrait') { handlePrintA5(payment, copies); return }
+    if (size === 'a5' && orientation === 'landscape') { handlePrintA5LandscapeSimplified(payment, copies); return }
+    
+    // Fallback
+    handlePrintA5LandscapeSimplified(payment, copies)
+  }
+
+  // ── Shared financial summary helper ────────────────────────────────────
+  function buildFinancials(payment: any, stu: any) {
+    const arrPaid = Number(payment.arrears_paid || 0)
+    const classStructures = structures.filter((s: any) => s.class_id === stu?.class?.id)
+    const termCharges = classStructures.reduce((acc, s: any) => acc + (s.amount || 0), 0)
+    const prevPayments = (payments as any[]).filter((p: any) => p.student_id === stu?.id && p.id !== payment.id)
+    const totalPaidBeforeCurrent = prevPayments.reduce((acc, p: any) => acc + (p.amount_paid || 0), 0)
+    const totalArrearsPaidBefore = prevPayments.reduce((acc, p: any) => acc + (p.arrears_paid || 0), 0)
+    const totalPaidToDate = totalPaidBeforeCurrent + Number(payment.amount_paid)
+    const totalArrearsPaidToDate = totalArrearsPaidBefore + arrPaid
+    const pct = stu?.scholarship_percentage || 0
+    const netTermCharges = termCharges * (1 - pct / 100)
+    const openingArrears = Number(stu?.fees_arrears || 0) + totalArrearsPaidToDate
+    const totalBill = openingArrears + netTermCharges
+    const finalBalance = totalBill - totalPaidToDate
+    return { arrPaid, classStructures, termCharges, pct, netTermCharges, openingArrears, totalBill, totalPaidToDate, finalBalance }
+  }
+
+  function handlePrint(payment: any, copies: 'single' | 'duplicate' = 'duplicate') {
     const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === payment.student_id) as any
     const struct = structures.find((s: any) => s.id === payment.fee_structure_id) as any
+    void struct
     const win = window.open('', '_blank', 'width=800,height=900')
     if (!win) return
 
     const txCurrency = payment.currency_code || schoolCurrency
     const CUR = (n: number) => formatCurrency(n, txCurrency)
 
-    const arrPaid = Number(payment.arrears_paid || 0)
-    const arrRemain = Number(payment.arrears_balance_after || 0)
-    const currentPaid = Number(payment.amount_paid) - arrPaid
-
-    // Financial Summary for Receipt
-    const classStructures = structures.filter((s: any) => s.class_id === stu?.class?.id)
-    const termCharges = classStructures.reduce((acc, s: any) => acc + (s.amount || 0), 0)
-    const prevPayments = (payments as any[]).filter((p: any) => p.student_id === stu?.id && p.id !== payment.id)
-    const totalPaidBeforeCurrent = prevPayments.reduce((acc, p: any) => acc + (p.amount_paid || 0), 0)
-    const totalArrearsPaidBefore = prevPayments.reduce((acc, p: any) => acc + (p.arrears_paid || 0), 0)
-    
-    const totalPaidToDate = totalPaidBeforeCurrent + Number(payment.amount_paid)
-    const totalArrearsPaidToDate = totalArrearsPaidBefore + arrPaid
-    
-    // Scholarship effect
-    const pct = stu?.scholarship_percentage || 0
-    const netTermCharges = termCharges * (1 - (pct / 100))
-    
-    const openingArrears = Number(stu?.fees_arrears || 0) + totalArrearsPaidToDate
-    const totalBill = openingArrears + netTermCharges
-    const finalBalance = totalBill - totalPaidToDate
+    const { arrPaid, classStructures, termCharges, pct, netTermCharges, openingArrears, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
 
     const logoHtml = school?.logo_url 
       ? `<img loading="lazy" src="${school.logo_url}" alt="Logo" style="width: 70px; height: 70px; object-fit: contain; border-radius: 12px; background: #ffffff; padding: 4px; border: 1.5px solid #ede9fe;" />`
@@ -864,45 +930,25 @@ export default function FeesPage() {
       </head><body onload="setTimeout(() => window.print(), 500)">
         <div class="container">
           ${buildReceiptHTML('Original \u2014 Parent/Student Copy')}
+          ${copies === 'duplicate' ? `
           <div style="border-top:1px dashed #cbd5e1; width:100%; margin: 0; position:relative;">
             <div style="position:absolute; top:-10px; left:-10px; width:20px; height:20px; border-radius:50%; background:#fff; border:1px solid #cbd5e1;"></div>
             <div style="position:absolute; top:-10px; right:-10px; width:20px; height:20px; border-radius:50%; background:#fff; border:1px solid #cbd5e1;"></div>
           </div>
-          ${buildReceiptHTML('Duplicate \u2014 School Copy')}
+          ${buildReceiptHTML('Duplicate \u2014 School Copy')}` : ''}
         </div>
       </body></html>`)
     win.document.close()
   }
 
-  function handlePrintSimplified(payment: any) {
+  function handlePrintSimplified(payment: any, copies: 'single' | 'duplicate' = 'duplicate') {
     const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === payment.student_id) as any
     const win = window.open('', '_blank', 'width=800,height=900')
     if (!win) return
 
     const txCurrency = payment.currency_code || schoolCurrency
     const CUR = (n: number) => formatCurrency(n, txCurrency)
-
-    const arrPaid = Number(payment.arrears_paid || 0)
-    const arrRemain = Number(payment.arrears_balance_after || 0)
-    const currentPaid = Number(payment.amount_paid) - arrPaid
-
-    // Financial Summary
-    const classStructures = structures.filter((s: any) => s.class_id === stu?.class?.id)
-    const termCharges = classStructures.reduce((acc, s: any) => acc + (s.amount || 0), 0)
-    const prevPayments = (payments as any[]).filter((p: any) => p.student_id === stu?.id && p.id !== payment.id)
-    const totalPaidBeforeCurrent = prevPayments.reduce((acc, p: any) => acc + (p.amount_paid || 0), 0)
-    const totalArrearsPaidBefore = prevPayments.reduce((acc, p: any) => acc + (p.arrears_paid || 0), 0)
-    
-    const totalPaidToDate = totalPaidBeforeCurrent + Number(payment.amount_paid)
-    const totalArrearsPaidToDate = totalArrearsPaidBefore + arrPaid
-    
-    // Scholarship effect
-    const pct = stu?.scholarship_percentage || 0
-    const netTermCharges = termCharges * (1 - (pct / 100))
-    
-    const openingArrears = Number(stu?.fees_arrears || 0) + totalArrearsPaidToDate
-    const totalBill = openingArrears + netTermCharges
-    const finalBalance = totalBill - totalPaidToDate
+    const { arrPaid, netTermCharges, openingArrears, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
 
     const logoHtml = school?.logo_url 
       ? `<img loading="lazy" src="${school.logo_url}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #ffffff; padding: 2px; border: 1px solid #ede9fe;" />`
@@ -1014,24 +1060,416 @@ export default function FeesPage() {
       </head><body onload="setTimeout(() => window.print(), 500)">
         <div class="container">
           ${buildReceiptHTML('Original \u2014 Simplified Parent Copy')}
-          <div style="border-top:1px dashed #cbd5e1; width:420px; margin: 15px 0; position:relative;"></div>
-          ${buildReceiptHTML('Duplicate \u2014 Simplified School Copy')}
+          ${copies === 'duplicate' ? `
+          <div style="border-top:1px dashed #cbd5e1; width:420px; margin: 15px 0;"></div>
+          ${buildReceiptHTML('Duplicate \u2014 Simplified School Copy')}` : ''}
         </div>
       </body></html>`)
     win.document.close()
   }
 
+  function handlePrintA5(payment: any, copies: 'single' | 'duplicate' = 'single') {
+    const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === payment.student_id) as any
+    const win = window.open('', '_blank', 'width=600,height=800')
+    if (!win) return
+
+    const txCurrency = payment.currency_code || schoolCurrency
+    const CUR = (n: number) => formatCurrency(n, txCurrency)
+
+    const { arrPaid, classStructures, termCharges, pct, netTermCharges, openingArrears, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
+
+    const logoHtml = school?.logo_url 
+      ? `<img src="${school.logo_url}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #ffffff; padding: 2px; border: 1.5px solid #ede9fe;" />`
+      : CREST_SVG
+
+    const buildReceiptHTML = () => `
+      <div style="padding: 12mm 15mm; background: #ffffff; box-sizing: border-box; min-height: 210mm; display: flex; flex-direction: column; justify-content: space-between; position: relative; font-family: 'DM Sans', sans-serif;">
+        <!-- Colored top gradient border -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(135deg, #7c3aed, #4c1d95);"></div>
+        
+        <!-- Watermark -->
+        <div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); font-size: 70px; font-weight: 900; color: rgba(124, 58, 237, 0.03); white-space: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
+
+        <div style="position: relative; z-index: 1; flex-grow: 1; display: flex; flex-direction: column;">
+          <!-- Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 2px solid #ede9fe; padding-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="flex-shrink: 0; background: #fff; border: 1px solid #f3f4f6; border-radius: 8px; padding: 2px;">
+                ${logoHtml}
+              </div>
+              <div>
+                <div style="font-size: 16px; font-weight: 800; color: #1e0646; font-family: 'Playfair Display', serif; line-height: 1.2;">${school?.name || 'School Fee Receipt'}</div>
+                ${school?.motto ? `<div style="font-size: 8px; color: #7c3aed; font-style: italic; font-weight: 600; margin-top: 2px;">&ldquo;${school.motto}&rdquo;</div>` : ''}
+                <div style="font-size: 8px; color: #6b7280; margin-top: 3px; display: flex; flex-direction: column; gap: 1px;">
+                  ${school?.address ? `<span>📍 ${school.address}</span>` : ''}
+                  ${school?.phone ? `<span>📞 ${school.phone}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            
+            <div style="text-align: right;">
+              <span style="font-size: 8px; font-weight: 800; color: #7c3aed; background: #f5f3ff; padding: 3px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 6px;">Official Receipt</span>
+              <div style="font-size: 9px; color: #6b7280; font-weight: 600;">No: <strong style="color: #1e0646;">#${payment.id?.slice(0, 8).toUpperCase()}</strong></div>
+              <div style="font-size: 8px; color: #9ca3af; margin-top: 2px;">Date: ${new Date(payment.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+            </div>
+          </div>
+
+          <!-- Student & Payment Meta -->
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 12px; background: #fdfdfd; border: 1px solid #f3f4f6; padding: 10px; border-radius: 8px;">
+            <div>
+              <div style="font-size: 8px; color: #9ca3af; text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em;">Student Details</div>
+              <div style="font-size: 12px; font-weight: 800; color: #1e0646; margin-top: 2px;">${stu?.full_name ?? '—'}</div>
+              <div style="font-size: 9px; color: #7c3aed; font-weight: 700; margin-top: 1px;">${(stu?.class as any)?.name ?? 'No Class'} &middot; ${stu?.student_id || 'N/A'}</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 8px; color: #9ca3af; text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em;">Payment Details</div>
+              <div style="font-size: 10px; font-weight: 700; color: #1e0646; margin-top: 2px; text-transform: capitalize;">Method: ${payment.payment_method}</div>
+              ${payment.reference_number ? `<div style="font-size: 9px; color: #6b7280; margin-top: 1px;">Ref: ${payment.reference_number}</div>` : ''}
+            </div>
+          </div>
+
+          <!-- Amount Paid Hero Banner -->
+          <div style="background: linear-gradient(135deg, #7c3aed, #4c1d95); border-radius: 8px; padding: 12px 15px; color: #ffffff; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.15);">
+            <div>
+              <div style="font-size: 9px; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.05em;">Amount Paid</div>
+              <div style="font-size: 22px; font-weight: 900; margin-top: 2px;">${CUR(payment.amount_paid)}</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 8px; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.05em;">${finalBalance < 0 ? 'Credit Balance' : 'Outstanding Balance'}</div>
+              <div style="font-size: 14px; font-weight: 900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'}; margin-top: 4px;">
+                ${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          ${payment.notes ? `
+          <div style="background: #faf5ff; border-left: 3px solid #7c3aed; padding: 6px 10px; margin-bottom: 12px; border-radius: 0 6px 6px 0;">
+            <div style="font-size: 8px; font-weight: 800; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Payment Notes</div>
+            <div style="font-size: 9.5px; color: #4b5563; font-weight: 600; line-height: 1.3;">${payment.notes}</div>
+          </div>
+          ` : ''}
+
+          <!-- Fee Breakdown Table -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+            <thead>
+              <tr style="border-bottom: 1.5px solid #ede9fe;">
+                <th style="text-align: left; padding: 5px 0; font-size: 8px; font-weight: 800; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Item Description</th>
+                <th style="text-align: right; padding: 5px 0; font-size: 8px; font-weight: 800; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${openingArrears !== 0 ? `
+              <tr style="border-bottom: 1px solid #f9fafb;">
+                <td style="padding: 5px 0; font-size: 10px; color: ${openingArrears > 0 ? '#4b5563' : '#16a34a'};">${openingArrears > 0 ? 'Outstanding Arrears (B/F)' : 'Prepayment / Credit (B/F)'}</td>
+                <td style="padding: 5px 0; text-align: right; font-size: 10px; font-weight: 600; color: ${openingArrears > 0 ? '#4b5563' : '#16a34a'};">${openingArrears > 0 ? CUR(openingArrears) : '-' + CUR(Math.abs(openingArrears))}</td>
+              </tr>
+              ` : ''}
+              ${classStructures.map((s: any) => `
+              <tr style="border-bottom: 1px solid #f9fafb;">
+                <td style="padding: 5px 0; font-size: 10px; color: #4b5563;">${s.fee_name}</td>
+                <td style="padding: 5px 0; text-align: right; font-size: 10px; font-weight: 600; color: #111827;">${CUR(s.amount)}</td>
+              </tr>
+              `).join('')}
+              ${pct > 0 ? `
+              <tr style="border-bottom: 1px solid #f9fafb;">
+                <td style="padding: 5px 0; font-size: 10px; color: #16a34a; font-weight: 700;">Scholarship Discount (${pct}%)</td>
+                <td style="padding: 5px 0; text-align: right; font-size: 10px; font-weight: 700; color: #16a34a;">-${CUR(termCharges - netTermCharges)}</td>
+              </tr>
+              ` : ''}
+              <tr style="border-top: 1.5px solid #ede9fe; background: #fafafa;">
+                <td style="padding: 6px 8px; font-size: 10px; font-weight: 800; color: #1e0646;">Gross Bill (Term + Arrears)</td>
+                <td style="padding: 6px 8px; text-align: right; font-size: 10px; font-weight: 800; color: #1e0646;">${CUR(totalBill)}</td>
+              </tr>
+              <tr style="border-top: 1.5px solid #7c3aed; background: #f5f3ff;">
+                <td style="padding: 7px 8px; font-size: 10px; font-weight: 800; color: #7c3aed; text-transform: uppercase;">Remaining Balance</td>
+                <td style="padding: 7px 8px; text-align: right; font-size: 11px; font-weight: 900; color: ${finalBalance > 0 ? '#dc2626' : '#16a34a'};">
+                  ${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Signature Section -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; padding: 0 10px; margin-bottom: 10px;">
+            <div style="text-align: center; width: 130px;">
+              <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 2px;">...........................</div>
+              <div style="font-size: 8px; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Bursar's Signature</div>
+              <div style="font-size: 9px; font-weight: 700; color: #1e0646; margin-top: 2px;">${user?.full_name || 'Bursar'}</div>
+            </div>
+            <div style="border: 1px dashed #cbd5e1; border-radius: 6px; padding: 12px; font-size: 7px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; text-align: center; width: 70px; height: 35px; display: flex; align-items: center; justify-content: center; opacity: 0.6;">
+              OFFICIAL STAMP
+            </div>
+            <div style="text-align: center; width: 130px;">
+              <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 2px;">...........................</div>
+              <div style="font-size: 8px; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Payer's Signature</div>
+              <div style="font-size: 9px; font-weight: 700; color: #1e0646; margin-top: 2px;">&nbsp;</div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="font-size: 7.5px; color: #9ca3af; text-align: center; padding-top: 10px; border-top: 1px dashed #ede9fe; display: flex; justify-content: space-between; align-items: center;">
+            <span>Generated electronically. &copy; ${new Date().getFullYear()} ${school?.name || 'School'}</span>
+            <span style="font-family: monospace; font-weight: 700;">STU-${stu?.id?.slice(0, 6).toUpperCase()}-TX</span>
+          </div>
+        </div>
+      </div>
+    `
+
+    win.document.write(`<!DOCTYPE html><html><head><title>A5 Receipt - ${stu?.full_name ?? ''}</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+      <style>
+        @page { size: A5 portrait; margin: 0; }
+        body{font-family:'DM Sans',sans-serif;margin:0;padding:0;background:#fff; width: 148mm; ${copies === 'duplicate' ? 'height: auto;' : 'height: 210mm;'}} 
+        @media print{ body{padding:0;background:#fff;} button{display:none;} }
+        .container { width: 100%; }
+        .page-break { page-break-before: always; }
+      </style>
+      </head><body onload="setTimeout(() => window.print(), 600)">
+        <div class="container">
+          ${buildReceiptHTML()}
+          ${copies === 'duplicate' ? `<div class="page-break"></div>${buildReceiptHTML()}` : ''}
+        </div>
+      </body></html>`)
+    win.document.close()
+  }
+
+  function handlePrintA5LandscapeSimplified(payment: any, copies: 'single' | 'duplicate' = 'duplicate') {
+    const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === payment.student_id) as any
+    const win = window.open('', '_blank', 'width=850,height=600')
+    if (!win) return
+
+    const txCurrency = payment.currency_code || schoolCurrency
+    const CUR = (n: number) => formatCurrency(n, txCurrency)
+
+    const { openingArrears, netTermCharges, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
+
+    const logoHtml = school?.logo_url 
+      ? `<img src="${school.logo_url}" alt="Logo" style="width: 38px; height: 38px; object-fit: contain; border-radius: 6px; background: #ffffff; padding: 1.5px; border: 1px solid #ede9fe;" />`
+      : CREST_SVG
+
+    const buildCopyHTML = (type: string) => `
+      <div style="width: 100mm; height: 148mm; padding: 8mm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; position: relative; font-family: 'DM Sans', sans-serif; background: #ffffff;">
+        <!-- Watermark -->
+        <div style="position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); font-size: 44px; font-weight: 900; color: rgba(124, 58, 237, 0.02); white-space: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
+
+        <div style="position: relative; z-index: 1; display: flex; flex-direction: column; gap: 8px; height: 100%;">
+          <!-- Header -->
+          <div style="display: flex; gap: 8px; align-items: center; border-bottom: 1px solid #ede9fe; padding-bottom: 6px; margin-bottom: 4px;">
+            <div style="flex-shrink: 0;">
+              ${logoHtml}
+            </div>
+            <div style="flex-grow: 1; min-width: 0;">
+              <div style="font-size: 11px; font-weight: 800; color: #1e0646; font-family: 'Playfair Display', serif; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${school?.name || 'School Fee Receipt'}</div>
+              <div style="font-size: 7px; color: #6b7280; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                ${school?.phone ? `📞 ${school.phone}` : ''} ${school?.address ? ` &middot; 📍 ${school.address.slice(0, 20)}...` : ''}
+              </div>
+            </div>
+          </div>
+
+          <!-- Type label -->
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 7px; font-weight: 800; color: #7c3aed; background: #f5f3ff; padding: 2px 6px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em;">${type}</span>
+            <span style="font-size: 7.5px; color: #6b7280;">No: <strong style="color: #1e0646;">#${payment.id?.slice(0, 8).toUpperCase()}</strong></span>
+          </div>
+
+          <!-- Student & Date -->
+          <div style="background: #f8fafc; border: 1px solid #f1f5f9; padding: 8px; border-radius: 6px; font-size: 9px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 4px;">
+            <div>
+              <div style="font-size: 6.5px; color: #9ca3af; text-transform: uppercase; font-weight: 800; letter-spacing: 0.02em;">Student</div>
+              <div style="font-weight: 800; color: #1e0646; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${stu?.full_name ?? '—'}</div>
+              <div style="font-size: 7.5px; color: #7c3aed; font-weight: 700; margin-top: 1px;">${(stu?.class as any)?.name ?? '—'}</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 6.5px; color: #9ca3af; text-transform: uppercase; font-weight: 800; letter-spacing: 0.02em;">Date / ID</div>
+              <div style="font-weight: 700; color: #1e0646; margin-top: 1px;">${new Date(payment.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+              <div style="font-size: 7.5px; color: #6b7280; margin-top: 1px;">ID: ${stu?.student_id || 'N/A'}</div>
+            </div>
+          </div>
+
+          <!-- Hero Payment Details -->
+          <div style="background: linear-gradient(135deg, #7c3aed, #4c1d95); border-radius: 6px; padding: 8px 10px; color: #ffffff; display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+            <div>
+              <div style="font-size: 7px; font-weight: 700; opacity: 0.85; text-transform: uppercase;">Amount Paid</div>
+              <div style="font-size: 16px; font-weight: 900; margin-top: 1px;">${CUR(payment.amount_paid)}</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 7px; font-weight: 700; opacity: 0.85; text-transform: uppercase;">${finalBalance < 0 ? 'Credit Balance' : 'Outstanding'}</div>
+              <div style="font-size: 11px; font-weight: 900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'}; margin-top: 1px;">
+                ${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CR: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Transaction details -->
+          <div style="font-size: 8px; color: #4b5563; display: flex; flex-direction: column; gap: 4px; padding: 4px 2px; margin-top: 4px;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f3f4f6; padding-bottom: 3px;">
+              <span>Payment Method:</span>
+              <strong style="text-transform: uppercase; color: #111827;">${payment.payment_method}</strong>
+            </div>
+            ${payment.reference_number ? `
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f3f4f6; padding-bottom: 3px;">
+              <span>Reference Number:</span>
+              <strong style="color: #111827;">${payment.reference_number}</strong>
+            </div>` : ''}
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f3f4f6; padding-bottom: 3px;">
+              <span>Term Balance Status:</span>
+              <strong style="color: ${finalBalance > 0 ? '#dc2626' : '#16a34a'};">${finalBalance > 0 ? 'Arrears Pending' : 'Account Cleared'}</strong>
+            </div>
+            ${payment.notes ? `
+            <div style="display: flex; flex-direction: column; gap: 1px; padding-top: 2px;">
+              <span style="font-size: 6.5px; color: #9ca3af; text-transform: uppercase; font-weight: 800;">Notes</span>
+              <span style="color: #4b5563; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${payment.notes}</span>
+            </div>` : ''}
+          </div>
+
+          <!-- Signatures (pushed to bottom) -->
+          <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 4px; padding-bottom: 2px;">
+            <div style="text-align: center; width: 42mm;">
+              <div style="font-size: 8px; color: #cbd5e1; margin-bottom: 1px;">...........................</div>
+              <div style="font-size: 6.5px; font-weight: 800; color: #6b7280; text-transform: uppercase;">Bursar Signature</div>
+              <div style="font-size: 7px; color: #1e0646; font-weight: 700; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${user?.full_name || 'Bursar'}</div>
+            </div>
+            <div style="text-align: center; width: 42mm;">
+              <div style="font-size: 8px; color: #cbd5e1; margin-bottom: 1px;">...........................</div>
+              <div style="font-size: 6.5px; font-weight: 800; color: #6b7280; text-transform: uppercase;">Payer Signature</div>
+              <div style="font-size: 7px; color: #1e0646; font-weight: 700; margin-top: 1px;">&nbsp;</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `
+
+    win.document.write(`<!DOCTYPE html><html><head><title>A5 Simplified Receipt - ${stu?.full_name ?? ''}</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+      <style>
+        @page { size: A5 landscape; margin: 0; }
+        body{font-family:'DM Sans',sans-serif;margin:0;padding:0;background:#fff; width: 210mm; height: 148mm;} 
+        @media print{
+          body{padding:0;background:#fff;}
+          button{display:none;}
+        }
+        .container { 
+          width: 210mm; 
+          height: 148mm; 
+          display: flex; 
+          box-sizing: border-box;
+          overflow: hidden;
+        }
+        .divider {
+          width: 0;
+          border-left: 1px dashed #cbd5e1;
+          height: 148mm;
+          position: relative;
+        }
+        .divider::after {
+          content: '✂️';
+          position: absolute;
+          top: 10px;
+          left: -7px;
+          font-size: 10px;
+        }
+      </style>
+      </head><body onload="setTimeout(() => window.print(), 600)">
+        <div class="container">
+          ${buildCopyHTML('Parent Copy \u2014 Simplified')}
+          ${copies === 'duplicate' ? `<div class="divider"></div>${buildCopyHTML('School Copy \u2014 Simplified')}` : ''}
+        </div>
+      </body></html>`)
+    win.document.close()
+  }
+
+  // ── Thermal (80mm roll) renderer ─────────────────────────────────────
+  function handlePrintThermal(payment: any, copies: 'single' | 'duplicate' = 'single') {
+    const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === payment.student_id) as any
+    const win = window.open('', '_blank', 'width=380,height=700')
+    if (!win) return
+    const txCurrency = payment.currency_code || schoolCurrency
+    const CUR = (n: number) => formatCurrency(n, txCurrency)
+    const { classStructures, netTermCharges, openingArrears, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
+    const line = (label: string, val: string) => `<div class="row"><span>${label}</span><span>${val}</span></div>`
+    const divider = () => `<div class="dashes">--------------------------------</div>`
+
+    const buildSlip = (copyLabel: string) => `
+      <div class="slip">
+        <div class="center bold school">${school?.name || 'SCHOOL'}</div>
+        ${school?.address ? `<div class="center small">${school.address}</div>` : ''}
+        ${school?.phone ? `<div class="center small">${school.phone}</div>` : ''}
+        ${divider()}
+        <div class="center bold">OFFICIAL FEE RECEIPT</div>
+        <div class="center small">${copyLabel}</div>
+        ${divider()}
+        ${line('Student:', stu?.full_name ?? '—')}
+        ${line('Class:', (stu?.class as any)?.name ?? '—')}
+        ${line('ID:', stu?.student_id || 'N/A')}
+        ${divider()}
+        ${line('Receipt #:', '#' + (payment.id?.slice(0, 8).toUpperCase() || ''))}
+        ${line('Date:', new Date(payment.payment_date).toLocaleDateString('en-GB'))}
+        ${line('Method:', payment.payment_method?.toUpperCase() || '')}
+        ${payment.reference_number ? line('Ref:', payment.reference_number) : ''}
+        ${divider()}
+        <div class="section-label">TERM FEES</div>
+        ${classStructures.map((s: any) => line(s.fee_name + ':', CUR(s.amount))).join('')}
+        ${openingArrears > 0 ? line('Prior Arrears:', CUR(openingArrears)) : ''}
+        ${line('Term Total:', CUR(netTermCharges))}
+        ${line('Gross Bill:', CUR(totalBill))}
+        ${divider()}
+        <div class="row big"><span>AMOUNT PAID</span><span>${CUR(payment.amount_paid)}</span></div>
+        <div class="row ${finalBalance > 0 ? 'red' : 'green'}"><span>${finalBalance > 0 ? 'BALANCE DUE' : finalBalance < 0 ? 'CREDIT' : 'CLEARED'}</span><span>${finalBalance > 0 ? CUR(finalBalance) : finalBalance < 0 ? CUR(Math.abs(finalBalance)) : '✓'}</span></div>
+        ${divider()}
+        ${payment.notes ? `<div class="small">Note: ${payment.notes}</div>${divider()}` : ''}
+        <div class="center small">Bursar: ${user?.full_name || 'Bursar'}</div>
+        <div class="center small">Thank you for your payment.</div>
+        <div class="center tiny">Generated electronically.</div>
+        <br/>
+      </div>
+    `
+
+    win.document.write(`<!DOCTYPE html><html><head><title>Thermal Receipt - ${stu?.full_name ?? ''}</title>
+      <style>
+        @page { size: 80mm auto; margin: 2mm 3mm; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Courier New', monospace; font-size: 11px; color: #000; background: #fff; margin: 0; padding: 0; width: 80mm; }
+        .slip { width: 80mm; padding: 4px 0; }
+        .center { text-align: center; }
+        .bold { font-weight: 900; }
+        .school { font-size: 13px; font-weight: 900; margin-bottom: 2px; }
+        .small { font-size: 9px; }
+        .tiny { font-size: 8px; color: #555; }
+        .dashes { text-align: center; letter-spacing: 0; color: #555; font-size: 10px; margin: 3px 0; }
+        .row { display: flex; justify-content: space-between; padding: 1px 0; }
+        .section-label { font-weight: 900; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; margin: 4px 0 2px; }
+        .big { font-weight: 900; font-size: 13px; background: #000; color: #fff; padding: 3px 4px; margin: 4px 0; }
+        .red { font-weight: 900; color: #c00; }
+        .green { font-weight: 900; color: #060; }
+        @media print { body { padding: 0; } }
+        .cut { border-top: 1px dashed #000; margin: 4px 0; text-align: center; font-size: 9px; color: #555; }
+      </style>
+      </head><body onload="setTimeout(() => window.print(), 600)">
+        ${buildSlip('PARENT COPY')}
+        ${copies === 'duplicate' ? `<div class="cut">✂ ── ── ── ── ── ── ── ──</div>${buildSlip('SCHOOL COPY')}` : ''}
+      </body></html>`)
+    win.document.close()
+  }
+
   function handlePrintBatch() {
-    // ...
+    // TODO: batch print
   }
 
   const tabs = [
-    { id: 'record', label: '💳 Record Payment' },
-    { id: 'store', label: '🛍️ Buy School Item' },
-    { id: 'history', label: '📋 Payment History' },
-    { id: 'revenue', label: '📊 Daily Revenue' },
-    { id: 'balances', label: '⚖️ Balances' },
-    { id: 'structures', label: '⚙️ Structures' },
+    { id: 'record', label: 'Record Payment', icon: CreditCard },
+    { id: 'store', label: 'Buy School Item', icon: ShoppingCart },
+    { id: 'history', label: 'Payment History', icon: History },
+    { id: 'revenue', label: 'Daily Revenue', icon: BarChart3 },
+    { id: 'balances', label: 'Balances', icon: Scale },
+    { id: 'structures', label: 'Structures', icon: FileText },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ] as const
 
   return (
@@ -1040,7 +1478,31 @@ export default function FeesPage() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
         @keyframes _fp_spin { to{transform:rotate(360deg)} }
         @keyframes _fp_fi { from{opacity:0} to{opacity:1} }
+        @keyframes shimmer_btn { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        @keyframes pulse_ring { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
+        @keyframes float_up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .fp-row:hover { background: #faf5ff !important; }
+        .student-card { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .student-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(109, 40, 217, 0.08); border-color: #ddd6fe !important; }
+        .check-item { transition: all 0.2s ease; }
+        .check-item:hover { transform: translateX(2px); }
+        .method-pill { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .method-pill:hover:not(:disabled) { transform: scale(1.02); }
+        .method-pill:active:not(:disabled) { transform: scale(0.98); }
+        .glow-input:focus { box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important; border-color: #8b5cf6 !important; }
+        .shimmer-btn {
+          background: linear-gradient(90deg, #7c3aed, #6d28d9, #8b5cf6, #7c3aed) !important;
+          background-size: 200% auto !important;
+          animation: shimmer_btn 4s linear infinite;
+          transition: all 0.2s ease;
+        }
+        .shimmer-btn:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(109, 40, 217, 0.3) !important;
+        }
+        .shimmer-btn:active:not(:disabled) {
+          transform: translateY(1px);
+        }
       `}</style>
       <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_fp_fi .4s ease' }}>
 
@@ -1063,13 +1525,17 @@ export default function FeesPage() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 4, background: '#f5f3ff', borderRadius: 12, padding: 4, marginBottom: 22, width: 'fit-content' }}>
-          {tabs.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ padding: '8px 18px', borderRadius: 9, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all .15s', background: tab === t.id ? '#6d28d9' : 'transparent', color: tab === t.id ? '#fff' : '#6d28d9', fontFamily: '"DM Sans",sans-serif' }}>
-              {t.label}
-            </button>
-          ))}
+        <div style={{ display: 'flex', gap: 4, background: '#f5f3ff', borderRadius: 12, padding: 4, marginBottom: 22, width: 'fit-content', overflowX: 'auto', maxWidth: '100%', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
+          {tabs.map(t => {
+            const isActive = tab === t.id;
+            return (
+              <button key={t.id} onClick={() => setTab(t.id)}
+                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 18px', borderRadius: 9, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all .25s cubic-bezier(0.4, 0, 0.2, 1)', background: isActive ? 'linear-gradient(135deg, #7c3aed, #6d28d9)' : 'transparent', color: isActive ? '#fff' : '#6d28d9', fontFamily: '"DM Sans",sans-serif', whiteSpace: 'nowrap', boxShadow: isActive ? '0 2px 8px rgba(109, 40, 217, 0.2)' : 'none' }}>
+                <t.icon size={15} strokeWidth={isActive ? 2.5 : 2} style={{ opacity: isActive ? 1 : 0.8 }} />
+                {t.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* ── RECORD PAYMENT TAB ── */}
@@ -1128,45 +1594,78 @@ export default function FeesPage() {
                   const totalBill = openingArrears + netTermCharges;
                   const balance = totalBill - totalPaid;
 
+                  const initials = s.full_name
+                    ? s.full_name
+                        .split(' ')
+                        .filter(Boolean)
+                        .map((n: string) => n[0])
+                        .join('')
+                        .slice(0, 2)
+                        .toUpperCase()
+                    : 'ST';
+
                   return (
                     <div
                       key={s.id}
                       onClick={() => setPf(prev => ({ ...prev, student_id: s.id, selected_fee_ids: [] }))}
+                      className="student-card"
                       style={{
                         padding: '12px 14px',
-                        borderRadius: 12,
-                        border: isSelected ? '2px solid #7c3aed' : '1.5px solid #f3f4f6',
-                        background: isSelected ? '#f5f3ff' : '#fff',
+                        borderRadius: 14,
+                        border: isSelected ? '2px solid #7c3aed' : '1.5px solid var(--border-color)',
+                        background: isSelected ? '#f5f3ff' : 'var(--bg-card)',
                         cursor: 'pointer',
-                        transition: 'all 0.15s',
                         position: 'relative',
                         display: 'flex',
-                        flexDirection: 'column',
-                        gap: 4
+                        alignItems: 'center',
+                        gap: 12
                       }}
                     >
                       {isSelected && (
-                        <div style={{ position: 'absolute', top: 12, right: 12, background: '#7c3aed', borderRadius: '50%', padding: 2, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ position: 'absolute', top: 8, right: 8, background: '#7c3aed', borderRadius: '50%', padding: 2, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <Check size={10} strokeWidth={3} />
                         </div>
                       )}
-                      <div style={{ fontSize: 13, fontWeight: 700, color: isSelected ? '#6d28d9' : '#1f2937', paddingRight: 18 }}>
-                        {s.full_name}
-                      </div>
-                      <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
-                        {(s.class as any)?.name ?? 'No Class'} &middot; {s.student_id || 'No ID'}
-                      </div>
                       
-                      <div style={{ marginTop: 4 }}>
-                        {balance <= 0 ? (
-                          <span style={{ fontSize: 10, fontWeight: 700, color: '#16a34a', background: '#f0fdf4', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>
-                            ✓ CLEARED
-                          </span>
-                        ) : (
-                          <span style={{ fontSize: 10, fontWeight: 700, color: '#dc2626', background: '#fef2f2', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>
-                            ⚠️ Balance: {CUR(balance)}
-                          </span>
-                        )}
+                      {/* Avatar initials with glowing ring animation if they have balance */}
+                      <div style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        background: isSelected ? 'linear-gradient(135deg, #7c3aed, #6d28d9)' : 'linear-gradient(135deg, #f5f3ff, #ede9fe)',
+                        color: isSelected ? '#fff' : '#6d28d9',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 800,
+                        fontSize: 13,
+                        flexShrink: 0,
+                        position: 'relative',
+                        border: isSelected ? '2px solid #fff' : '1.5px solid #ddd6fe',
+                        boxShadow: (balance > 0 && !isSelected) ? '0 0 0 2px #fff, 0 0 0 4px #fee2e2' : 'none',
+                        animation: (balance > 0 && !isSelected) ? 'pulse_ring 2s infinite' : 'none'
+                      }}>
+                        {initials}
+                      </div>
+
+                      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: isSelected ? '#6d28d9' : 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: isSelected ? 16 : 0 }}>
+                          {s.full_name}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                          {(s.class as any)?.name ?? 'No Class'} &middot; {s.student_id || 'No ID'}
+                        </div>
+                        <div style={{ marginTop: 2 }}>
+                          {balance <= 0 ? (
+                            <span style={{ fontSize: 9, fontWeight: 800, color: '#16a34a', background: '#e8f5e9', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>
+                              CLEARED ✓
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: 9, fontWeight: 800, color: '#dc2626', background: '#fef2f2', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>
+                              DUE: {CUR(balance)}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -1197,6 +1696,9 @@ export default function FeesPage() {
                 (() => {
                   const selStu = (Array.isArray(students) ? students : []).find((s: any) => s.id === pf.student_id) as any;
                   if (!selStu) return null;
+
+                  // Compute stuPayments here so both sub-blocks can reference it
+                  const stuPayments = (Array.isArray(payments) ? payments : []).filter((p: any) => p.student_id === selStu.id);
 
                   const classStrs = structures.filter((x: any) => x.class_id === selStu.class?.id);
                   const hasArrears = Number(selStu.fees_arrears) > 0;
@@ -1233,48 +1735,72 @@ export default function FeesPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                           
                           {/* Arrears allocation row */}
-                          {hasArrears && (
-                            <label
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 12,
-                                padding: '12px 16px',
-                                background: pf.selected_fee_ids.includes('arrears') ? '#fef2f2' : '#fff',
-                                borderRadius: 12,
-                                border: `1.5px solid ${pf.selected_fee_ids.includes('arrears') ? '#fecaca' : '#f3f4f6'}`,
-                                cursor: 'pointer',
-                                transition: 'all 0.15s'
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={pf.selected_fee_ids.includes('arrears')}
-                                onChange={e => {
-                                  setPf(p => {
-                                    const checked = e.target.checked;
-                                    const nextIds = checked 
-                                      ? [...p.selected_fee_ids, 'arrears']
-                                      : p.selected_fee_ids.filter(id => id !== 'arrears');
-                                    return { ...p, selected_fee_ids: nextIds };
-                                  });
+                          {hasArrears && (() => {
+                            const isSelected = pf.selected_fee_ids.includes('arrears');
+                            const totalPaid = stuPayments.reduce((a, b: any) => a + (b.amount_paid || 0), 0);
+                            const arrearsPaid = stuPayments.reduce((a, b: any) => a + (b.arrears_paid || 0), 0);
+                            const openingArrears = Number(selStu.fees_arrears || 0) + arrearsPaid;
+                            const arrearsPct = openingArrears > 0 ? Math.min(100, Math.max(0, (arrearsPaid / openingArrears) * 100)) : 0;
+                            
+                            return (
+                              <label
+                                className="check-item"
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: 8,
+                                  padding: '16px',
+                                  background: isSelected ? '#fff5f5' : 'var(--bg-card)',
+                                  borderRadius: 14,
+                                  border: `1.5px solid ${isSelected ? '#fee2e2' : 'var(--border-color)'}`,
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s ease'
                                 }}
-                                style={{ accentColor: '#dc2626', width: 16, height: 16 }}
-                              />
-                              <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: '#991b1b', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                  ⚠️ Outstanding Arrears
+                              >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={e => {
+                                      setPf(p => {
+                                        const checked = e.target.checked;
+                                        const nextIds = checked 
+                                          ? [...p.selected_fee_ids, 'arrears']
+                                          : p.selected_fee_ids.filter(id => id !== 'arrears');
+                                        return { ...p, selected_fee_ids: nextIds };
+                                      });
+                                    }}
+                                    style={{ accentColor: '#dc2626', width: 18, height: 18, cursor: 'pointer' }}
+                                  />
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ fontSize: 13, fontWeight: 800, color: '#dc2626', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                      ⚠️ Outstanding Arrears
+                                    </div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Balance carried forward from prior terms</div>
+                                  </div>
+                                  <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontSize: 14, fontWeight: 900, color: '#dc2626' }}>{CUR(Number(selStu.fees_arrears))}</div>
+                                    <span style={{ fontSize: 9, fontWeight: 800, background: '#fef2f2', color: '#b91c1c', padding: '2px 8px', borderRadius: 6, display: 'inline-block', marginTop: 4 }}>
+                                      ARREARS
+                                    </span>
+                                  </div>
                                 </div>
-                                <div style={{ fontSize: 11, color: '#b91c1c', marginTop: 1 }}>Balance carried forward from prior terms</div>
-                              </div>
-                              <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: 13, fontWeight: 800, color: '#dc2626' }}>{CUR(Number(selStu.fees_arrears))}</div>
-                                <span style={{ fontSize: 9, fontWeight: 700, background: '#fef2f2', color: '#b91c1c', padding: '1px 6px', borderRadius: 4, display: 'inline-block', marginTop: 3 }}>
-                                  ARREARS
-                                </span>
-                              </div>
-                            </label>
-                          )}
+
+                                {/* Arrears Progress Bar */}
+                                {openingArrears > 0 && (
+                                  <div style={{ marginTop: 4 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4 }}>
+                                      <span>Arrears Paid: {CUR(arrearsPaid)} / {CUR(openingArrears)}</span>
+                                      <span>{arrearsPct.toFixed(0)}%</span>
+                                    </div>
+                                    <div style={{ width: '100%', height: 6, background: '#fee2e2', borderRadius: 3, overflow: 'hidden' }}>
+                                      <div style={{ width: `${arrearsPct}%`, height: '100%', background: '#dc2626', borderRadius: 3, transition: 'width 0.4s ease' }}></div>
+                                    </div>
+                                  </div>
+                                )}
+                              </label>
+                            );
+                          })()}
 
                           {/* Term charges allocation rows */}
                           {classStrs.map((s: any) => {
@@ -1287,72 +1813,89 @@ export default function FeesPage() {
                             const isCleared = allocation.status === 'cleared';
                             const isPartial = allocation.status === 'partial';
                             const isSelected = pf.selected_fee_ids.includes(s.id);
+                            const itemPct = allocation.net > 0 ? Math.min(100, Math.max(0, (allocation.paid / allocation.net) * 100)) : 0;
 
                             return (
                               <label
                                 key={s.id}
+                                className="check-item"
                                 style={{
                                   display: 'flex',
-                                  alignItems: 'center',
-                                  gap: 12,
-                                  padding: '12px 16px',
-                                  background: isCleared ? '#fafafa' : (isSelected ? '#f5f3ff' : '#fff'),
-                                  borderRadius: 12,
-                                  border: `1.5px solid ${isCleared ? '#e5e7eb' : (isSelected ? '#7c3aed' : '#f3f4f6')}`,
+                                  flexDirection: 'column',
+                                  gap: 8,
+                                  padding: '16px',
+                                  background: isCleared ? '#f9fafb' : (isSelected ? '#f5f3ff' : 'var(--bg-card)'),
+                                  borderRadius: 14,
+                                  border: `1.5px solid ${isCleared ? 'var(--border-color)' : (isSelected ? '#ddd6fe' : 'var(--border-color)')}`,
                                   cursor: isCleared ? 'not-allowed' : 'pointer',
-                                  transition: 'all 0.15s',
-                                  opacity: isCleared ? 0.6 : 1
+                                  transition: 'all 0.2s ease',
+                                  opacity: isCleared ? 0.75 : 1
                                 }}
                               >
-                                <input
-                                  type="checkbox"
-                                  disabled={isCleared}
-                                  checked={isCleared || isSelected}
-                                  onChange={e => {
-                                    setPf(p => {
-                                      const checked = e.target.checked;
-                                      const nextIds = checked
-                                        ? [...p.selected_fee_ids, s.id]
-                                        : p.selected_fee_ids.filter(id => id !== s.id);
-                                      return { ...p, selected_fee_ids: nextIds };
-                                    });
-                                  }}
-                                  style={{ accentColor: '#6d28d9', width: 16, height: 16, cursor: isCleared ? 'not-allowed' : 'pointer' }}
-                                />
-                                <div style={{ flex: 1 }}>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: isCleared ? '#6b7280' : '#1f2937', textDecoration: isCleared ? 'line-through' : 'none' }}>
-                                    {s.fee_name}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                  <input
+                                    type="checkbox"
+                                    disabled={isCleared}
+                                    checked={isCleared || isSelected}
+                                    onChange={e => {
+                                      setPf(p => {
+                                        const checked = e.target.checked;
+                                        const nextIds = checked
+                                          ? [...p.selected_fee_ids, s.id]
+                                          : p.selected_fee_ids.filter(id => id !== s.id);
+                                        return { ...p, selected_fee_ids: nextIds };
+                                      });
+                                    }}
+                                    style={{ accentColor: '#6d28d9', width: 18, height: 18, cursor: isCleared ? 'not-allowed' : 'pointer' }}
+                                  />
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ fontSize: 13, fontWeight: 800, color: isCleared ? 'var(--text-muted)' : 'var(--text-main)', textDecoration: isCleared ? 'line-through' : 'none' }}>
+                                      {s.fee_name}
+                                    </div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                                      {s.description || 'Current term fee item'}
+                                    </div>
                                   </div>
-                                  <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 1 }}>
-                                    {s.description || 'Current term fee item'}
+                                  <div style={{ textAlign: 'right' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end' }}>
+                                      {pct > 0 && isDiscountable && (
+                                        <span style={{ fontSize: 11, color: 'var(--text-muted)', textDecoration: 'line-through' }}>{CUR(original)}</span>
+                                      )}
+                                      <strong style={{ fontSize: 14, fontWeight: 950, color: isCleared ? 'var(--text-muted)' : '#6d28d9' }}>{CUR(net)}</strong>
+                                    </div>
+                                    
+                                    <div style={{ marginTop: 4 }}>
+                                      {isCleared && (
+                                        <span style={{ fontSize: 9, fontWeight: 800, background: '#e8f5e9', color: '#1b5e20', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>
+                                          CLEARED ✓
+                                        </span>
+                                      )}
+                                      {isPartial && (
+                                        <span style={{ fontSize: 9, fontWeight: 800, background: '#fff3e0', color: '#e65100', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>
+                                          PARTIAL
+                                        </span>
+                                      )}
+                                      {allocation.status === 'unpaid' && (
+                                        <span style={{ fontSize: 9, fontWeight: 800, background: '#f5f5f5', color: '#616161', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>
+                                          UNPAID
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
-                                <div style={{ textAlign: 'right' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end' }}>
-                                    {pct > 0 && isDiscountable && (
-                                      <span style={{ fontSize: 11, color: 'var(--text-subtle)', textDecoration: 'line-through' }}>{CUR(original)}</span>
-                                    )}
-                                    <strong style={{ fontSize: 13, fontWeight: 800, color: isCleared ? '#6b7280' : '#6d28d9' }}>{CUR(net)}</strong>
-                                  </div>
-                                  
+
+                                {/* Progress bar for term charge */}
+                                {allocation.net > 0 && (
                                   <div style={{ marginTop: 4 }}>
-                                    {isCleared && (
-                                      <span style={{ fontSize: 9, fontWeight: 800, background: '#e8f5e9', color: '#2e7d32', padding: '1px 6px', borderRadius: 4, display: 'inline-block' }}>
-                                        ✓ CLEARED
-                                      </span>
-                                    )}
-                                    {isPartial && (
-                                      <span style={{ fontSize: 9, fontWeight: 800, background: '#fff3e0', color: '#ef6c00', padding: '1px 6px', borderRadius: 4, display: 'inline-block' }}>
-                                        Paid: {CUR(allocation.paid)} / {CUR(net)}
-                                      </span>
-                                    )}
-                                    {allocation.status === 'unpaid' && (
-                                      <span style={{ fontSize: 9, fontWeight: 800, background: '#f5f5f5', color: '#616161', padding: '1px 6px', borderRadius: 4, display: 'inline-block' }}>
-                                        UNPAID
-                                      </span>
-                                    )}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4 }}>
+                                      <span>Paid: {CUR(allocation.paid)} / {CUR(net)}</span>
+                                      <span>{itemPct.toFixed(0)}%</span>
+                                    </div>
+                                    <div style={{ width: '100%', height: 6, background: 'var(--border-color)', borderRadius: 3, overflow: 'hidden' }}>
+                                      <div style={{ width: `${itemPct}%`, height: '100%', background: isCleared ? '#10b981' : '#f59e0b', borderRadius: 3, transition: 'width 0.4s ease' }}></div>
+                                    </div>
                                   </div>
-                                </div>
+                                )}
                               </label>
                             );
                           })}
@@ -1371,7 +1914,7 @@ export default function FeesPage() {
             </div>
 
             {/* COLUMN 3: CHECKOUT SUMMARY SLIP */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: 24, boxShadow: '0 4px 20px rgba(109,40,217,.06)', display: 'flex', flexDirection: 'column', gap: 18, position: 'sticky', top: 20 }}>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid var(--border-color)', padding: 24, boxShadow: '0 8px 30px rgba(109,40,217,.06)', display: 'flex', flexDirection: 'column', gap: 18, position: 'sticky', top: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1.5px solid #f5f3ff', paddingBottom: 14 }}>
                 <div style={{ background: '#faf5ff', borderRadius: 8, padding: 8, color: '#6d28d9' }}>
                   <CreditCard size={18} />
@@ -1398,8 +1941,9 @@ export default function FeesPage() {
                       borderRadius: 10,
                       border: '1.5px solid var(--border-color)',
                       fontSize: 13,
-                      fontWeight: 600,
+                      fontWeight: 700,
                       background: 'var(--bg-input)',
+                      color: 'var(--text-main)',
                       outline: 'none',
                       cursor: 'pointer'
                     }}
@@ -1416,16 +1960,20 @@ export default function FeesPage() {
                     placeholder="0.00"
                     value={pf.amount_paid}
                     onChange={e => setPf(p => ({ ...p, amount_paid: e.target.value }))}
+                    className="glow-input"
                     style={{
                       flex: 1,
                       padding: '10px 12px',
                       borderRadius: 10,
                       border: '1.5px solid var(--border-color)',
                       fontSize: 13,
-                      fontWeight: 600,
+                      fontWeight: 700,
                       outline: 'none',
                       fontFamily: '"DM Sans",sans-serif',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      background: 'var(--bg-input)',
+                      color: 'var(--text-main)',
+                      transition: 'all 0.2s ease'
                     }}
                   />
                 </div>
@@ -1444,9 +1992,9 @@ export default function FeesPage() {
                       const discount = b.is_discountable !== false ? (sel.scholarship_percentage || 0) / 100 : 0;
                       return a + (b.amount || 0) * (1 - discount);
                     }, 0);
-                    const stuPayments = (payments as any[]).filter((p: any) => p.student_id === sel.id);
-                    const totalPaid = stuPayments.reduce((a, b: any) => a + (b.amount_paid || 0), 0);
-                    const arrearsPaid = stuPayments.reduce((a, b: any) => a + (b.arrears_paid || 0), 0);
+                    const selStuPayments = (Array.isArray(payments) ? payments : []).filter((p: any) => p.student_id === sel.id);
+                    const totalPaid = selStuPayments.reduce((a, b: any) => a + (b.amount_paid || 0), 0);
+                    const arrearsPaid = selStuPayments.reduce((a, b: any) => a + (b.arrears_paid || 0), 0);
                     const openingArrears = Number(sel.fees_arrears || 0) + arrearsPaid;
                     const totalBill = openingArrears + netTermCharges;
                     const balance = totalBill - totalPaid;
@@ -1479,52 +2027,73 @@ export default function FeesPage() {
               )}
 
               {/* Payment Details form elements */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)', marginBottom: 5 }}>
-                    Method
-                  </label>
-                  <select
-                    value={pf.payment_method}
-                    onChange={e => setPf(p => ({ ...p, payment_method: e.target.value as any }))}
-                    style={{
-                      width: '100%',
-                      padding: '9px 12px',
-                      borderRadius: 10,
-                      border: '1.5px solid var(--border-color)',
-                      fontSize: 13,
-                      outline: 'none',
-                      background: 'var(--bg-card)',
-                      fontFamily: '"DM Sans",sans-serif'
-                    }}
-                  >
-                    {METHODS.map(m => (
-                      <option key={m} value={m}>
-                        {m.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)', marginBottom: 8 }}>
+                  Payment Method
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                  {METHODS.map(m => {
+                    const isSelected = pf.payment_method === m;
+                    const Icon = m === 'cash' ? Banknote 
+                                : m === 'momo' ? Smartphone 
+                                : m === 'bank' ? Landmark 
+                                : FileText;
+                    return (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setPf(p => ({ ...p, payment_method: m }))}
+                        className="method-pill"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 6,
+                          padding: '10px 8px',
+                          borderRadius: 10,
+                          border: isSelected ? '2.5px solid #7c3aed' : '1.5px solid var(--border-color)',
+                          background: isSelected ? '#f5f3ff' : 'var(--bg-card)',
+                          color: isSelected ? '#6d28d9' : 'var(--text-main)',
+                          fontSize: 12,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.03em',
+                          outline: 'none'
+                        }}
+                      >
+                        <Icon size={14} strokeWidth={2.5} />
+                        {m}
+                      </button>
+                    );
+                  })}
                 </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)', marginBottom: 5 }}>
-                    Date
-                  </label>
-                  <input
-                    type="date"
-                    value={pf.payment_date}
-                    onChange={e => setPf(p => ({ ...p, payment_date: e.target.value }))}
-                    style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      borderRadius: 10,
-                      border: '1.5px solid var(--border-color)',
-                      fontSize: 13,
-                      outline: 'none',
-                      fontFamily: '"DM Sans",sans-serif',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)', marginBottom: 5 }}>
+                  Payment Date
+                </label>
+                <input
+                  type="date"
+                  value={pf.payment_date}
+                  onChange={e => setPf(p => ({ ...p, payment_date: e.target.value }))}
+                  className="glow-input"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: 10,
+                    border: '1.5px solid var(--border-color)',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    outline: 'none',
+                    fontFamily: '"DM Sans",sans-serif',
+                    boxSizing: 'border-box',
+                    background: 'var(--bg-input)',
+                    color: 'var(--text-main)',
+                    transition: 'all 0.2s ease'
+                  }}
+                />
               </div>
 
               <div>
@@ -1535,15 +2104,20 @@ export default function FeesPage() {
                   placeholder="Reference, Momo ID, Cheque No..."
                   value={pf.reference_number}
                   onChange={e => setPf(p => ({ ...p, reference_number: e.target.value }))}
+                  className="glow-input"
                   style={{
                     width: '100%',
-                    padding: '9px 12px',
+                    padding: '10px 12px',
                     borderRadius: 10,
                     border: '1.5px solid var(--border-color)',
                     fontSize: 13,
+                    fontWeight: 600,
                     outline: 'none',
                     fontFamily: '"DM Sans",sans-serif',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    background: 'var(--bg-input)',
+                    color: 'var(--text-main)',
+                    transition: 'all 0.2s ease'
                   }}
                 />
               </div>
@@ -1557,16 +2131,21 @@ export default function FeesPage() {
                   value={pf.notes}
                   onChange={e => setPf(p => ({ ...p, notes: e.target.value }))}
                   rows={2}
+                  className="glow-input"
                   style={{
                     width: '100%',
-                    padding: '9px 12px',
+                    padding: '10px 12px',
                     borderRadius: 10,
                     border: '1.5px solid var(--border-color)',
                     fontSize: 13,
+                    fontWeight: 600,
                     outline: 'none',
                     fontFamily: '"DM Sans",sans-serif',
                     boxSizing: 'border-box',
-                    resize: 'none'
+                    resize: 'none',
+                    background: 'var(--bg-input)',
+                    color: 'var(--text-main)',
+                    transition: 'all 0.2s ease'
                   }}
                 />
               </div>
@@ -1618,6 +2197,7 @@ export default function FeesPage() {
                   type="button"
                   onClick={initiatePayment}
                   disabled={!pf.student_id || !pf.amount_paid || recordPayment.isPending}
+                  className={(!pf.student_id || !pf.amount_paid) ? "" : "shimmer-btn"}
                   style={{
                     width: '100%',
                     padding: '14px',
@@ -1911,7 +2491,7 @@ export default function FeesPage() {
               <Btn variant="secondary" onClick={() => {
                 const csvRows = [
                   ['Student Name', 'Class', 'Arrears', 'Term Fees', 'Total Payable', 'Paid to Date', 'Balance'].join(','),
-                  ...students.map((s: any) => {
+                  ...(Array.isArray(students) ? students : []).map((s: any) => {
                     const classStrs = structures.filter((x: any) => x.class_id === s.class?.id);
                     const netTermCharges = classStrs.reduce((a, b: any) => {
                       const discount = b.is_discountable !== false ? (s.scholarship_percentage || 0) / 100 : 0;
@@ -2126,6 +2706,115 @@ export default function FeesPage() {
             })()}
           </div>
         )}
+
+        {/* ── SETTINGS TAB ── */}
+        {tab === 'settings' && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 24, alignItems: 'start' }}>
+            
+            {/* Print Settings Card */}
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <div style={{ background: '#f5f3ff', padding: 10, borderRadius: 12 }}><Printer size={20} color="#7c3aed" /></div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>Print Preferences</h3>
+                  <p style={{ margin: 0, fontSize: 13, color: 'var(--text-subtle)' }}>Default format for physical receipts</p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Paper Size</label>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    {[{ val: 'a4', label: 'A4' }, { val: 'a5', label: 'A5' }, { val: 'thermal', label: 'Thermal' }].map(o => (
+                      <button key={o.val} onClick={() => handleSavePrintSettings({ ...printSettings, size: o.val as any })}
+                        style={{ flex: 1, padding: '10px', borderRadius: 8, border: `2px solid ${printSettings.size === o.val ? '#7c3aed' : '#e2e8f0'}`, background: printSettings.size === o.val ? '#f5f3ff' : 'transparent', color: printSettings.size === o.val ? '#5b21b6' : 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {printSettings.size === 'a5' && (
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Orientation</label>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <button onClick={() => handleSavePrintSettings({ ...printSettings, orientation: 'portrait' })}
+                        style={{ flex: 1, padding: '10px', borderRadius: 8, border: `2px solid ${printSettings.orientation === 'portrait' ? '#7c3aed' : '#e2e8f0'}`, background: printSettings.orientation === 'portrait' ? '#f5f3ff' : 'transparent', color: printSettings.orientation === 'portrait' ? '#5b21b6' : 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Portrait</button>
+                      <button onClick={() => handleSavePrintSettings({ ...printSettings, orientation: 'landscape' })}
+                        style={{ flex: 1, padding: '10px', borderRadius: 8, border: `2px solid ${printSettings.orientation === 'landscape' ? '#7c3aed' : '#e2e8f0'}`, background: printSettings.orientation === 'landscape' ? '#f5f3ff' : 'transparent', color: printSettings.orientation === 'landscape' ? '#5b21b6' : 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Landscape</button>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Copies</label>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <button onClick={() => handleSavePrintSettings({ ...printSettings, copies: 'single' })}
+                      style={{ flex: 1, padding: '10px', borderRadius: 8, border: `2px solid ${printSettings.copies === 'single' ? '#7c3aed' : '#e2e8f0'}`, background: printSettings.copies === 'single' ? '#f5f3ff' : 'transparent', color: printSettings.copies === 'single' ? '#5b21b6' : 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Single</button>
+                    <button onClick={() => handleSavePrintSettings({ ...printSettings, copies: 'duplicate' })}
+                      style={{ flex: 1, padding: '10px', borderRadius: 8, border: `2px solid ${printSettings.copies === 'duplicate' ? '#7c3aed' : '#e2e8f0'}`, background: printSettings.copies === 'duplicate' ? '#f5f3ff' : 'transparent', color: printSettings.copies === 'duplicate' ? '#5b21b6' : 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Duplicate</button>
+                  </div>
+                </div>
+
+                {printSettings.size !== 'thermal' && (
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Content Detail</label>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <button onClick={() => handleSavePrintSettings({ ...printSettings, style: 'simple' })}
+                        style={{ flex: 1, padding: '10px', borderRadius: 8, border: `2px solid ${printSettings.style === 'simple' ? '#7c3aed' : '#e2e8f0'}`, background: printSettings.style === 'simple' ? '#f5f3ff' : 'transparent', color: printSettings.style === 'simple' ? '#5b21b6' : 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Simplified</button>
+                      <button onClick={() => handleSavePrintSettings({ ...printSettings, style: 'breakdown' })}
+                        style={{ flex: 1, padding: '10px', borderRadius: 8, border: `2px solid ${printSettings.style === 'breakdown' ? '#7c3aed' : '#e2e8f0'}`, background: printSettings.style === 'breakdown' ? '#f5f3ff' : 'transparent', color: printSettings.style === 'breakdown' ? '#5b21b6' : 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Full Breakdown</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Security Settings Card */}
+            <div style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1.5px solid #f0eefe', padding: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <div style={{ background: '#fef2f2', padding: 10, borderRadius: 12 }}><Shield size={20} color="#dc2626" /></div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>Transaction PIN</h3>
+                  <p style={{ margin: 0, fontSize: 13, color: 'var(--text-subtle)' }}>Require PIN before receiving payments</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSavePin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {localStorage.getItem(`bursar_pin_${user?.id}`) && (
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>Current PIN</label>
+                    <input type="password" maxLength={4} placeholder="••••" value={pinSetup.oldPin} onChange={e => setPinSetup({ ...pinSetup, oldPin: e.target.value.replace(/\D/g, '') })}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
+                  </div>
+                )}
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>New 4-Digit PIN</label>
+                  <input type="password" maxLength={4} placeholder="0000" value={pinSetup.newPin} onChange={e => setPinSetup({ ...pinSetup, newPin: e.target.value.replace(/\D/g, '') })} required
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>Confirm PIN</label>
+                  <input type="password" maxLength={4} placeholder="0000" value={pinSetup.confirmPin} onChange={e => setPinSetup({ ...pinSetup, confirmPin: e.target.value.replace(/\D/g, '') })} required
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                
+                <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                  <button type="submit" disabled={pinSetup.newPin.length < 4 || pinSetup.confirmPin.length < 4}
+                    style={{ flex: 1, padding: '12px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: (pinSetup.newPin.length < 4) ? 'not-allowed' : 'pointer', opacity: (pinSetup.newPin.length < 4) ? 0.6 : 1 }}>
+                    Save PIN
+                  </button>
+                  {localStorage.getItem(`bursar_pin_${user?.id}`) && (
+                    <button type="button" onClick={handleRemovePin}
+                      style={{ padding: '12px 16px', borderRadius: 10, border: '1.5px solid #fecaca', background: '#fef2f2', color: '#dc2626', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                      Remove
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Create Structure Modal ── */}
@@ -2185,13 +2874,23 @@ export default function FeesPage() {
       <Modal open={!!printReceipt} onClose={() => { setPrintReceipt(null); setAllocationResult(null) }} title={allocationResult ? "Payment Transaction Successful!" : "Payment Receipt"} size="md">
         {printReceipt && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div style={{ background: '#f8fafc', borderRadius: 12, padding: 24, textAlign: 'center', border: '1.5px solid #e2e8f0' }}>
-              <div style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.08em', fontWeight: 700, marginBottom: 8 }}>
+            <div style={{ 
+              background: '#ffffff', 
+              borderRadius: 16, 
+              padding: 24, 
+              textAlign: 'center', 
+              border: '1.5px solid #e2e8f0',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}></div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.12em', fontWeight: 800, marginBottom: 8, marginTop: 4 }}>
                 {allocationResult ? 'Transaction Successfully Recorded' : 'Official Payment Record'}
               </div>
-              <div style={{ fontSize: 36, fontWeight: 900, color: '#16a34a', fontFamily: '"Playfair Display",serif' }}>{CUR(printReceipt.amount_paid, printReceipt.currency_code)}</div>
-              <div style={{ fontSize: 14, color: 'var(--text-main)', marginTop: 8, fontWeight: 600 }}>{(students as any[]).find(s => s.id === printReceipt.student_id)?.full_name ?? 'Student'}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 4 }}>Receipt ID: {printReceipt.id?.slice(0,8).toUpperCase()}</div>
+              <div style={{ fontSize: 36, fontWeight: 900, color: '#10b981', fontFamily: '"Playfair Display",serif', margin: '10px 0' }}>{CUR(printReceipt.amount_paid, printReceipt.currency_code)}</div>
+              <div style={{ fontSize: 14, color: 'var(--text-main)', fontWeight: 800 }}>{(students as any[]).find(s => s.id === printReceipt.student_id)?.full_name ?? 'Student'}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 4, fontFamily: 'monospace' }}>Receipt ID: #{printReceipt.id?.slice(0,8).toUpperCase()}</div>
             </div>
 
             {/* Allocation breakdown */}
@@ -2227,27 +2926,53 @@ export default function FeesPage() {
 
             <div>
               <p style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 600, marginBottom: 12, textAlign: 'center' }}>How would you like to share this receipt?</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <button onClick={() => handlePrint(printReceipt)} style={{ padding: '13px', borderRadius: 12, border: 'none', background: '#1e0646', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Printer size={16} /> Print Detailed (Duplex)
-                </button>
-                <button onClick={() => handlePrintSimplified(printReceipt)} style={{ padding: '13px', borderRadius: 12, border: 'none', background: '#6d28d9', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Printer size={16} /> Print Simplified
-                </button>
-                <button onClick={() => { window.open(`https://wa.me/?text=${encodeURIComponent(generateTextReceipt(printReceipt))}`, '_blank') }} style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#ecfdf5', color: '#059669', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <MessageCircle size={16} /> WhatsApp
-                </button>
-                <button
-                  onClick={() => sendReceiptSMS(printReceipt)}
-                  disabled={isSendingSMS}
-                  style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#f5f3ff', color: '#6d28d9', fontSize: 13, fontWeight: 700, cursor: isSendingSMS ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: isSendingSMS ? 0.7 : 1 }}
+              
+              {/* Print options */}
+              <div style={{ marginBottom: 16 }}>
+                <button 
+                  onClick={() => handlePrintWithSavedSettings(printReceipt)} 
+                  className="shimmer-btn"
+                  style={{ 
+                    width: '100%',
+                    padding: '14px', 
+                    borderRadius: 12, 
+                    border: 'none', 
+                    color: '#fff', 
+                    fontSize: 14, 
+                    fontWeight: 800, 
+                    cursor: 'pointer', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    gap: 8,
+                    boxShadow: '0 4px 14px rgba(109,40,217,.2)'
+                  }}
                 >
-                  {isSendingSMS ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                  {isSendingSMS ? 'Sending…' : 'Send SMS to Guardian'}
+                  <Printer size={16} strokeWidth={2.5} /> Print Receipt (Using Saved Preferences)
                 </button>
-                <button onClick={() => { window.open(`mailto:?subject=Official School Fee Receipt&body=${encodeURIComponent(generateTextReceipt(printReceipt))}`, '_self') }} style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#f8fafc', color: 'var(--text-main)', borderBottom: '2px solid #e2e8f0', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, gridColumn: 'span 2' }}>
-                  <Mail size={16} /> Send via Email
-                </button>
+                <div style={{ textAlign: 'center', marginTop: 8 }}>
+                  <button onClick={() => setTab('settings')} style={{ background: 'none', border: 'none', color: '#6d28d9', fontSize: 11, cursor: 'pointer', textDecoration: 'underline' }}>Change Print Preferences</button>
+                </div>
+              </div>
+
+              {/* Digital sharing */}
+              <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: 14 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <button onClick={() => { window.open(`https://wa.me/?text=${encodeURIComponent(generateTextReceipt(printReceipt))}`, '_blank') }} style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#ecfdf5', color: '#059669', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    <MessageCircle size={16} /> WhatsApp
+                  </button>
+                  <button
+                    onClick={() => sendReceiptSMS(printReceipt)}
+                    disabled={isSendingSMS}
+                    style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#f5f3ff', color: '#6d28d9', fontSize: 13, fontWeight: 700, cursor: isSendingSMS ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: isSendingSMS ? 0.7 : 1 }}
+                  >
+                    {isSendingSMS ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                    {isSendingSMS ? 'Sending…' : 'SMS Guardian'}
+                  </button>
+                  <button onClick={() => { window.open(`mailto:?subject=Official School Fee Receipt&body=${encodeURIComponent(generateTextReceipt(printReceipt))}`, '_self') }} style={{ padding: '12px', borderRadius: 12, border: 'none', background: '#f8fafc', color: 'var(--text-main)', borderBottom: '2px solid #e2e8f0', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, gridColumn: 'span 2' }}>
+                    <Mail size={16} /> Send via Email
+                  </button>
+                </div>
               </div>
             </div>
 

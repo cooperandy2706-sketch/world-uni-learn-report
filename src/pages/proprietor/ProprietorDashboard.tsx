@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useCurrentTerm, useCurrentAcademicYear } from '../../hooks/useSettings'
 import FlaskLoader from '../../components/ui/FlaskLoader'
-import { Users, UserCheck, TrendingUp, TrendingDown, Wallet, BookOpen, GraduationCap, LayoutDashboard, Target } from 'lucide-react'
-import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import { Users, UserCheck, TrendingUp, Wallet, ArrowRight, Banknote, Calendar, BarChart3, Receipt } from 'lucide-react'
+import { useAutoRefresh } from "../../hooks/useAutoRefresh"
 import { useProprietorScope } from '../../hooks/useProprietorScope'
 import ProprietorBranchSelector from './ProprietorBranchSelector'
+import { formatCurrency } from '../../utils/currency'
 
-function AnimNum({ to, duration = 900, prefix = '', suffix = '' }: { to: number; duration?: number; prefix?: string; suffix?: string }) {
+function AnimNum({ to, duration = 900, prefix = '', suffix = '', currency = '' }: { to: number; duration?: number; prefix?: string; suffix?: string; currency?: string }) {
   const [val, setVal] = useState(0)
   const ref = useRef(false)
   
@@ -26,12 +27,14 @@ function AnimNum({ to, duration = 900, prefix = '', suffix = '' }: { to: number;
     requestAnimationFrame(tick)
   }, [to, duration])
   
-  return <>{prefix}{val.toLocaleString()}{suffix}</>
+  const displayVal = currency ? formatCurrency(val, currency) : val.toLocaleString()
+  return <>{prefix}{displayVal}{suffix}</>
 }
 
 export default function ProprietorDashboard() {
-    useAutoRefresh(loadDashboardData);
+  useAutoRefresh(loadDashboardData)
   const { user } = useAuth()
+  const navigate = useNavigate()
   const userSchool = user?.school as any
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
@@ -39,17 +42,18 @@ export default function ProprietorDashboard() {
   const [mounted, setMounted] = useState(false)
   const { activeSchoolIds } = useProprietorScope()
 
+  const [schoolCurrency, setSchoolCurrency] = useState('GHS')
+
   // Metrics
   const [stats, setStats] = useState({
     students: 0,
     teachers: 0,
     staff: 0,
-    revenue: 0,
-    expenses: 0,
-    outstanding: 0,
+    revenueToday: 0,
+    revenueWeek: 0,
+    revenueOverall: 0,
+    dailyFeesToday: 0,
   })
-
-  const [financeData, setFinanceData] = useState<{ month: string, revenue: number, expenses: number }[]>([])
 
   useEffect(() => { setTimeout(() => setMounted(true), 60) }, [])
 
@@ -59,8 +63,18 @@ export default function ProprietorDashboard() {
   }, [activeSchoolIds, term?.id])
 
   async function loadDashboardData() {
-    
     try {
+      const now = new Date()
+      // Local date string for today
+      const todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0')
+      const sevenDaysAgoTime = now.getTime() - (7 * 24 * 60 * 60 * 1000)
+
+      // Fetch school currency
+      if (activeSchoolIds.length > 0) {
+        const { data: sch } = await supabase.from('schools').select('currency_code').eq('id', activeSchoolIds[0]).maybeSingle()
+        if (sch?.currency_code) setSchoolCurrency(sch.currency_code)
+      }
+
       // Basic counts
       const [
         { count: students },
@@ -69,58 +83,69 @@ export default function ProprietorDashboard() {
       ] = await Promise.all([
         supabase.from('students').select('*', { count: 'exact', head: true }).in('school_id', activeSchoolIds).eq('is_active', true),
         supabase.from('users').select('*', { count: 'exact', head: true }).in('school_id', activeSchoolIds).eq('role', 'teacher'),
-        supabase.from('users').select('*', { count: 'exact', head: true }).in('school_id', activeSchoolIds).in('role', ['bursar', 'security', 'driver', 'nurse', 'librarian', 'staff']),
+        supabase.from('users').select('*', { count: 'exact', head: true }).in('school_id', activeSchoolIds).in('role', ['bursar', 'security', 'driver', 'nurse', 'librarian', 'staff', 'admin']),
       ])
 
-      // High-level financials for the current year (simplified)
-      // Since we don't have a complex aggregated view, we will fetch recent payments and expenses
-      const sixMonthsAgo = new Date()
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
-      
-      const [
-        { data: payments },
-        { data: expenses }
-      ] = await Promise.all([
-        supabase.from('fee_payments').select('amount_paid, payment_date').in('school_id', activeSchoolIds).gte('payment_date', sixMonthsAgo.toISOString()),
-        supabase.from('expense_records').select('amount, date').in('school_id', activeSchoolIds).gte('date', sixMonthsAgo.toISOString())
-      ])
+      // High-level financials for the active term
+      // If term is active, fetch from term. If not, fetch last 3 months to be safe.
+      let queryCol = term?.id ? 'term_id' : null
+      let queryVal = term?.id ? term.id : null
 
-      let totalRev = 0
-      let totalExp = 0
-      
-      const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
-      const last6Months = []
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date()
-        d.setMonth(d.getMonth() - i)
-        last6Months.push({ 
-          key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
-          label: months[d.getMonth()]
-        })
+      const fallbackDate = new Date()
+      fallbackDate.setMonth(fallbackDate.getMonth() - 3)
+      const fallbackStr = fallbackDate.toISOString()
+
+      let qPayments = supabase.from('fee_payments').select('amount_paid, payment_date').in('school_id', activeSchoolIds)
+      let qDaily = supabase.from('daily_fees_collected').select('amount, date').in('school_id', activeSchoolIds)
+      let qIncome = supabase.from('income_records').select('amount, date').in('school_id', activeSchoolIds)
+
+      if (queryCol && queryVal) {
+        qPayments = qPayments.eq(queryCol, queryVal)
+        qDaily = qDaily.eq(queryCol, queryVal)
+        qIncome = qIncome.eq(queryCol, queryVal)
+      } else {
+        qPayments = qPayments.gte('payment_date', fallbackStr)
+        qDaily = qDaily.gte('date', fallbackStr)
+        qIncome = qIncome.gte('date', fallbackStr)
       }
 
-      const aggregated = last6Months.map(m => {
-        const rev = (payments || [])
-          .filter(p => p.payment_date.startsWith(m.key))
-          .reduce((sum, p) => sum + Number(p.amount_paid), 0)
-        const exp = (expenses || [])
-          .filter(e => e.date.startsWith(m.key))
-          .reduce((sum, e) => sum + Number(e.amount), 0)
-          
-        totalRev += rev
-        totalExp += exp
-        
-        return { month: m.label, revenue: rev, expenses: exp }
-      })
+      const [
+        { data: payments },
+        { data: dailyFees },
+        { data: incomes }
+      ] = await Promise.all([qPayments, qDaily, qIncome])
 
-      setFinanceData(aggregated)
+      let todayRev = 0
+      let weekRev = 0
+      let overallRev = 0
+      let todayDailyFees = 0
+
+      const processRecord = (amt: any, dateStr: string, isDaily: boolean = false) => {
+        const value = Number(amt) || 0
+        overallRev += value
+        
+        if (dateStr) {
+          const recDate = new Date(dateStr)
+          if (recDate.getTime() >= sevenDaysAgoTime) weekRev += value
+          if (dateStr.startsWith(todayStr)) {
+            todayRev += value
+            if (isDaily) todayDailyFees += value
+          }
+        }
+      }
+
+      (payments || []).forEach(p => processRecord(p.amount_paid, p.payment_date));
+      (dailyFees || []).forEach(d => processRecord(d.amount, d.date, true));
+      (incomes || []).forEach(i => processRecord(i.amount, i.date));
+
       setStats({
         students: students ?? 0,
         teachers: teachers ?? 0,
         staff: staff ?? 0,
-        revenue: totalRev,
-        expenses: totalExp,
-        outstanding: 0 // Mocked for now to avoid complex query on dashboard init
+        revenueToday: todayRev,
+        revenueWeek: weekRev,
+        revenueOverall: overallRev,
+        dailyFeesToday: todayDailyFees,
       })
       
     } finally {
@@ -133,262 +158,179 @@ export default function ProprietorDashboard() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Outfit:wght@600;700;800;900&display=swap');
         
         .proprietor-portal {
           font-family: 'DM Sans', system-ui, sans-serif;
           opacity: ${mounted ? 1 : 0};
           transition: opacity 0.5s ease-out;
-          max-width: 1440px;
+          max-width: 800px; /* Kept narrow for optimal mobile reading / single column */
           margin: 0 auto;
           color: #0f172a;
-          padding: 12px 12px 100px;
+          padding: 16px 16px 100px;
           min-height: 100vh;
-          min-height: 100dvh;
         }
 
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        .exec-card {
-          background: rgba(255, 255, 255, 0.7);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          border-radius: 0;
-          margin: 0 -12px;
-          border-left: none;
-          border-right: none;
-          box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1);
-          padding: 20px;
-          animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        .senior-card {
+          background: #ffffff;
+          border-radius: 20px;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+          padding: 24px;
+          margin-bottom: 20px;
+          border: 2px solid #f1f5f9;
+          transition: transform 0.2s, box-shadow 0.2s;
+          cursor: pointer;
           position: relative;
           overflow: hidden;
+          display: block;
+          text-decoration: none;
         }
 
-        .exec-card::before {
-          content: '';
+        .senior-card:active {
+          transform: scale(0.98);
+        }
+
+        .senior-card::after {
+          content: '→';
           position: absolute;
-          top: 0; left: 0; right: 0; height: 4px;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
-          opacity: 0;
-          transition: opacity 0.3s;
-        }
-        
-        .exec-card:hover::before {
-          opacity: 1;
+          right: 24px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 28px;
+          color: #cbd5e1;
+          font-weight: 900;
+          opacity: 0.5;
         }
 
-        .metric-value {
-          font-size: 36px;
+        .value-large {
+          font-family: 'Outfit', sans-serif;
+          font-size: 42px;
           font-weight: 900;
           letter-spacing: -0.03em;
           line-height: 1.1;
-          margin: 12px 0 4px;
+          margin: 8px 0;
+          color: #0f172a;
         }
 
-        .chart-container {
-          display: flex;
-          align-items: flex-end;
-          height: 160px;
-          gap: 8px;
-          margin-top: 32px;
-          padding-top: 20px;
-          border-top: 1px dashed rgba(0,0,0,0.1);
+        .label-large {
+          font-size: 18px;
+          font-weight: 800;
+          color: #475569;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
 
-        .chart-col {
-          flex: 1;
+        .icon-box {
+          width: 56px;
+          height: 56px;
+          border-radius: 16px;
           display: flex;
-          flex-direction: column;
           align-items: center;
-          gap: 12px;
-          height: 100%;
-          justify-content: flex-end;
-        }
-
-        .bar-group {
-          display: flex;
-          gap: 4px;
-          align-items: flex-end;
-          width: 100%;
           justify-content: center;
-          height: 100%;
+          margin-bottom: 16px;
         }
 
-        .bar {
-          width: 12px;
-          border-radius: 8px 8px 0 0;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .bar:hover {
-          filter: brightness(1.1);
-          transform: scaleY(1.05);
-          transform-origin: bottom;
-        }
-
-        .charts-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 16px;
-        }
-
-        @media (min-width: 480px) {
-          .proprietor-portal { padding: 20px; }
-          .exec-card { 
-            padding: 20px; 
-            border-radius: 12px;
-            margin: 0;
-            border-left: 1px solid rgba(255, 255, 255, 0.8);
-            border-right: 1px solid rgba(255, 255, 255, 0.8);
-          }
-          .metric-value { font-size: 32px; }
-        }
-
-        @media (min-width: 768px) {
-          .proprietor-portal { padding: 20px 40px 60px; }
-          .exec-card { padding: 32px; }
-          .metric-value { font-size: 42px; }
-          .chart-container { height: 200px; gap: 16px; }
-          .bar { width: 16px; }
-          .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important; gap: 24px !important; }
-          .charts-grid { grid-template-columns: 2fr 1fr !important; gap: 24px !important; }
+        /* Responsive bumps for extremely large screens, but mostly optimized for mobile/tablets */
+        @media (min-width: 600px) {
+          .proprietor-portal { padding: 32px 24px 100px; }
+          .value-large { font-size: 52px; }
+          .label-large { font-size: 20px; }
+          .senior-card { padding: 32px; border-radius: 24px; }
         }
       `}</style>
 
       <div className="proprietor-portal">
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32, animation: 'slideUp 0.4s ease both', flexWrap: 'wrap', gap: 16 }}>
-          <div>
-            <h1 style={{ fontSize: 32, fontWeight: 900, color: '#0f172a', margin: '0 0 8px', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-              Executive Overview
-            </h1>
-            <p style={{ fontSize: 14, color: '#64748b', margin: 0, fontWeight: 600 }}>
-              {userSchool?.name || 'Acadera'} • {year?.name} • {term?.name}
-            </p>
+        <div style={{ marginBottom: 32 }}>
+          <h1 style={{ fontSize: 36, fontWeight: 900, color: '#0f172a', margin: '0 0 12px', letterSpacing: '-0.02em', lineHeight: 1.1, fontFamily: '"Outfit", sans-serif' }}>
+            My School Summary
+          </h1>
+          <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: 12, border: '1.5px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ fontSize: 16, color: '#475569', fontWeight: 700 }}>
+              {userSchool?.name || 'Acadera'} 
+            </div>
+            <ProprietorBranchSelector />
           </div>
-          <ProprietorBranchSelector />
         </div>
 
-        {/* Top KPIs */}
-        <div className="kpi-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginBottom: 24 }}>
-          
-          <div className="exec-card" style={{ animationDelay: '0.1s' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div style={{ width: 48, height: 48, borderRadius: 8, background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb' }}>
-                <Users size={24} strokeWidth={2.5} />
-              </div>
-              <span style={{ background: '#ecfdf5', color: '#059669', padding: '4px 10px', borderRadius: 99, fontSize: 12, fontWeight: 700 }}>Active</span>
-            </div>
-            <div className="metric-value" style={{ color: '#0f172a' }}>
-              <AnimNum to={stats.students} />
-            </div>
-            <div style={{ fontSize: 15, color: '#64748b', fontWeight: 600 }}>Total Enrolled Students</div>
-          </div>
+        {/* ── MASSIVE METRIC BUTTONS (MOBILE FIRST) ── */}
 
-          <div className="exec-card" style={{ animationDelay: '0.2s' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div style={{ width: 48, height: 48, borderRadius: 8, background: 'linear-gradient(135deg, #f5f3ff, #ede9fe)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7c3aed' }}>
-                <UserCheck size={24} strokeWidth={2.5} />
-              </div>
-            </div>
-            <div className="metric-value" style={{ color: '#0f172a' }}>
-              <AnimNum to={stats.teachers + stats.staff} />
-            </div>
-            <div style={{ fontSize: 15, color: '#64748b', fontWeight: 600 }}>Total Staff Members</div>
-            <div style={{ display: 'flex', gap: 12, marginTop: 12, fontSize: 13, color: '#94a3b8', fontWeight: 600 }}>
-              <span>{stats.teachers} Teachers</span>
-              <span>•</span>
-              <span>{stats.staff} Admin/Ops</span>
-            </div>
+        {/* TODAY'S INCOME */}
+        <div className="senior-card" onClick={() => navigate('/proprietor/finances')} style={{ background: '#f0fdf4', borderColor: '#bbf7d0' }}>
+          <div className="icon-box" style={{ background: '#16a34a', color: '#fff', boxShadow: '0 8px 16px rgba(22, 163, 74, 0.2)' }}>
+            <Banknote size={32} strokeWidth={2.5} />
           </div>
-
-          <div className="exec-card" style={{ animationDelay: '0.3s', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: '#fff', border: 'none' }}>
-            <div style={{ position: 'absolute', top: -20, right: -20, width: 150, height: 150, background: 'radial-gradient(circle, rgba(56,189,248,0.2) 0%, transparent 70%)', borderRadius: '50%' }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 8, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#38bdf8' }}>
-                <Wallet size={24} strokeWidth={2.5} />
-              </div>
-              <span style={{ background: 'rgba(56,189,248,0.2)', color: '#38bdf8', padding: '4px 10px', borderRadius: 99, fontSize: 12, fontWeight: 700 }}>6 Months</span>
-            </div>
-            <div className="metric-value" style={{ color: '#fff', position: 'relative', zIndex: 1 }}>
-              <AnimNum prefix="GH₵ " to={stats.revenue} />
-            </div>
-            <div style={{ fontSize: 15, color: '#94a3b8', fontWeight: 600, position: 'relative', zIndex: 1 }}>Gross Revenue</div>
+          <div className="label-large" style={{ color: '#16a34a' }}>Today's Income</div>
+          <div className="value-large">
+            <AnimNum to={stats.revenueToday} currency={schoolCurrency} />
           </div>
-
+          <p style={{ margin: 0, fontSize: 15, color: '#15803d', fontWeight: 600 }}>Fees & Daily Collections</p>
         </div>
 
-        {/* Charts & Deep Dives */}
-        <div className="charts-grid">
-          
-          <div className="exec-card" style={{ animationDelay: '0.4s' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h3 style={{ fontSize: 20, fontWeight: 800, margin: '0 0 4px', color: '#0f172a' }}>Financial Health</h3>
-                <p style={{ margin: 0, color: '#64748b', fontSize: 14, fontWeight: 600 }}>Revenue vs Expenses (Last 6 Months)</p>
-              </div>
-              <div style={{ display: 'flex', gap: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#64748b' }}>
-                  <span style={{ width: 12, height: 12, borderRadius: 4, background: '#3b82f6' }} /> Revenue
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#64748b' }}>
-                  <span style={{ width: 12, height: 12, borderRadius: 4, background: '#f43f5e' }} /> Expenses
-                </div>
-              </div>
-            </div>
-
-            <div className="chart-container">
-              {financeData.map((d, i) => {
-                const maxVal = Math.max(...financeData.map(m => Math.max(m.revenue, m.expenses)), 1000)
-                const revH = Math.max(5, (d.revenue / maxVal) * 100)
-                const expH = Math.max(5, (d.expenses / maxVal) * 100)
-                
-                return (
-                  <div key={i} className="chart-col">
-                    <div className="bar-group">
-                      <div className="bar" style={{ height: `${revH}%`, background: 'linear-gradient(to top, #2563eb, #60a5fa)' }} title={`Revenue: ${d.revenue}`} />
-                      <div className="bar" style={{ height: `${expH}%`, background: 'linear-gradient(to top, #e11d48, #fb7185)' }} title={`Expenses: ${d.expenses}`} />
-                    </div>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8' }}>{d.month}</span>
-                  </div>
-                )
-              })}
-            </div>
+        {/* DAILY FEES TODAY */}
+        <div className="senior-card" onClick={() => navigate('/proprietor/finances')} style={{ background: '#f0fdfa', borderColor: '#ccfbf1' }}>
+          <div className="icon-box" style={{ background: '#0d9488', color: '#fff', boxShadow: '0 8px 16px rgba(13, 148, 136, 0.2)' }}>
+            <Receipt size={32} strokeWidth={2.5} />
           </div>
-
-          <div className="exec-card" style={{ animationDelay: '0.5s', display: 'flex', flexDirection: 'column' }}>
-            <h3 style={{ fontSize: 20, fontWeight: 800, margin: '0 0 24px', color: '#0f172a' }}>Quick Deep Dives</h3>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
-              {[
-                { to: '/proprietor/analytics', label: 'Academic Performance', icon: GraduationCap, color: '#8b5cf6', bg: '#f5f3ff' },
-                { to: '/proprietor/finances', label: 'Financial Reports', icon: TrendingUp, color: '#10b981', bg: '#ecfdf5' },
-                { to: '/proprietor/students', label: 'Student Demographics', icon: Users, color: '#3b82f6', bg: '#eff6ff' },
-                { to: '/proprietor/staff', label: 'Staff & Payroll', icon: UserCheck, color: '#f59e0b', bg: '#fffbeb' },
-              ].map(link => (
-                <Link key={link.to} to={link.to} style={{ 
-                  display: 'flex', alignItems: 'center', gap: 16, padding: '16px', 
-                  background: 'rgba(255,255,255,0.5)', borderRadius: 8, textDecoration: 'none',
-                  border: '1px solid rgba(0,0,0,0.05)', transition: 'all 0.2s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.transform = 'translateX(4px)' }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.5)'; e.currentTarget.style.transform = 'none' }}
-                >
-                  <div style={{ width: 40, height: 40, borderRadius: 12, background: link.bg, color: link.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <link.icon size={20} strokeWidth={2.5} />
-                  </div>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: '#334155' }}>{link.label}</span>
-                  <span style={{ marginLeft: 'auto', color: '#cbd5e1' }}>→</span>
-                </Link>
-              ))}
-            </div>
+          <div className="label-large" style={{ color: '#0d9488' }}>Total Daily Fees (Today)</div>
+          <div className="value-large">
+            <AnimNum to={stats.dailyFeesToday} currency={schoolCurrency} />
           </div>
-
+          <p style={{ margin: 0, fontSize: 15, color: '#0f766e', fontWeight: 600 }}>Feeding & Studies collected today</p>
         </div>
+
+        {/* WEEK'S INCOME */}
+        <div className="senior-card" onClick={() => navigate('/proprietor/finances')} style={{ background: '#eff6ff', borderColor: '#bfdbfe' }}>
+          <div className="icon-box" style={{ background: '#2563eb', color: '#fff', boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}>
+            <Calendar size={32} strokeWidth={2.5} />
+          </div>
+          <div className="label-large" style={{ color: '#2563eb' }}>Last 7 Days</div>
+          <div className="value-large">
+            <AnimNum to={stats.revenueWeek} currency={schoolCurrency} />
+          </div>
+          <p style={{ margin: 0, fontSize: 15, color: '#1d4ed8', fontWeight: 600 }}>Total weekly collections</p>
+        </div>
+
+        {/* OVERALL REVENUE */}
+        <div className="senior-card" onClick={() => navigate('/proprietor/finances')} style={{ background: '#fdf4ff', borderColor: '#fbcfe8' }}>
+          <div className="icon-box" style={{ background: '#c026d3', color: '#fff', boxShadow: '0 8px 16px rgba(192, 38, 211, 0.2)' }}>
+            <Wallet size={32} strokeWidth={2.5} />
+          </div>
+          <div className="label-large" style={{ color: '#c026d3' }}>Overall Amount (Term)</div>
+          <div className="value-large">
+            <AnimNum to={stats.revenueOverall} currency={schoolCurrency} />
+          </div>
+          <p style={{ margin: 0, fontSize: 15, color: '#a21caf', fontWeight: 600 }}>Total revenue recorded this term</p>
+        </div>
+
+        {/* STAFF & TEACHERS */}
+        <div className="senior-card" onClick={() => navigate('/proprietor/staff')} style={{ background: '#fffbeb', borderColor: '#fde68a' }}>
+          <div className="icon-box" style={{ background: '#d97706', color: '#fff', boxShadow: '0 8px 16px rgba(217, 119, 6, 0.2)' }}>
+            <UserCheck size={32} strokeWidth={2.5} />
+          </div>
+          <div className="label-large" style={{ color: '#d97706' }}>Total Staff Members</div>
+          <div className="value-large">
+            <AnimNum to={stats.teachers + stats.staff} />
+          </div>
+          <div style={{ display: 'flex', gap: 16, marginTop: 4 }}>
+            <span style={{ fontSize: 16, color: '#b45309', fontWeight: 700 }}>{stats.teachers} Teachers</span>
+            <span style={{ fontSize: 16, color: '#b45309', fontWeight: 700 }}>{stats.staff} Support Staff</span>
+          </div>
+        </div>
+
+        {/* STUDENTS */}
+        <div className="senior-card" onClick={() => navigate('/proprietor/students')} style={{ background: '#f8fafc', borderColor: '#e2e8f0' }}>
+          <div className="icon-box" style={{ background: '#475569', color: '#fff' }}>
+            <Users size={32} strokeWidth={2.5} />
+          </div>
+          <div className="label-large" style={{ color: '#475569' }}>Active Students</div>
+          <div className="value-large">
+            <AnimNum to={stats.students} />
+          </div>
+          <p style={{ margin: 0, fontSize: 15, color: '#334155', fontWeight: 600 }}>Currently enrolled</p>
+        </div>
+
+        <div style={{ height: 40 }} />
       </div>
     </>
   )

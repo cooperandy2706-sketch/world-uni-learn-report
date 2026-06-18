@@ -66,9 +66,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
       supabase.auth.getSession(),
       new Promise<{ data: { session: null } }>((resolve) =>
         setTimeout(() => {
-          console.warn('[Acadera Auth] getSession() timed out after 8s — proceeding to login')
+          console.warn('[Acadera Auth] getSession() timed out after 15s — proceeding to login')
           resolve({ data: { session: null } })
-        }, 8_000)
+        }, 15_000)
       ),
     ])
     const session = sessionResult.data.session

@@ -14,7 +14,8 @@ import {
   LogOut, User, Shield, Calendar, AlertTriangle, CreditCard,
   FileText, BarChart3, MessageSquare, Command, BookOpen, Users,
   GraduationCap, LayoutDashboard, Zap, Tv, ExternalLink, Building2,
-  Clock, Package, Newspaper, History, ClipboardList, Smartphone, Wallet, CheckCircle, School, UserCheck
+  Clock, Package, Newspaper, History, ClipboardList, Smartphone, Wallet, CheckCircle, School, UserCheck,
+  Receipt, TrendingUp, AlertCircle, Banknote
 } from 'lucide-react'
 import { ROUTES } from '../../constants/routes'
 import { resolveIntents, extractClassHint, extractPersonIntent, intentToPath } from '../../lib/commandSearch'
@@ -305,6 +306,57 @@ function NavItem({ group }: { group: any }) {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+// ─── Bursar Quick Actions ───────────────────────────────────────────────────────
+function BursarHeaderActions() {
+  const [qaOpen, setQaOpen] = useState(false)
+  const qaRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (qaRef.current && !qaRef.current.contains(e.target as Node)) setQaOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const quickLinks = [
+    { to: ROUTES.BURSAR_DAILY_FEES, label: 'Record Daily Fees', icon: Banknote, color: '#10b981' },
+    { to: ROUTES.BURSAR_DEBTORS, label: 'View Debtors', icon: AlertCircle, color: '#ef4444' },
+    { to: ROUTES.BURSAR_INCOME, label: 'Add Income', icon: TrendingUp, color: '#0ea5e9' },
+    { to: ROUTES.BURSAR_EXPENSES, label: 'Add Expense', icon: Receipt, color: '#f59e0b' },
+    { to: ROUTES.BURSAR_PAYROLL, label: 'Run Payroll', icon: Users, color: '#8b5cf6' },
+  ]
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginRight: 12 }}>
+      <button onClick={() => navigate(ROUTES.BURSAR_FEES)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#10b981', color: '#fff', border: 'none', padding: '6px 14px', borderRadius: 99, fontSize: 13, fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px rgba(16,185,129,0.3)', transition: 'all 0.15s' }}>
+        <CreditCard size={14} /> Pay Fees
+      </button>
+
+      <div ref={qaRef} style={{ position: 'relative' }}>
+        <button onClick={() => setQaOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: qaOpen ? 'var(--bg-hover)' : 'transparent', color: qaOpen ? '#f59e0b' : 'var(--text-main)', border: 'none', padding: '6px 14px', borderRadius: 99, fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s' }}>
+          <Zap size={14} color={qaOpen ? '#f59e0b' : 'var(--text-muted)'} /> Quick Action <ChevronDown size={14} />
+        </button>
+
+        {qaOpen && (
+          <div style={{ position: 'absolute', top: 'calc(100% + 6px)', right: 0, minWidth: 200, background: 'var(--bg-card)', borderRadius: 12, padding: 8, boxShadow: '0 10px 25px rgba(0,0,0,0.12)', border: '1px solid var(--border-color)', zIndex: 100, animation: 'fadeDown 0.15s ease' }}>
+            {quickLinks.map((q: any) => (
+              <div key={q.to} onClick={() => { navigate(q.to); setQaOpen(false) }} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 8, fontSize: 13, fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer', transition: 'background 0.15s' }} onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)' }} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <div style={{ width: 26, height: 26, borderRadius: 8, background: `${q.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <q.icon size={14} color={q.color} />
+                </div>
+                {q.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div style={{ width: 1, height: 20, background: 'var(--border-color)', marginLeft: 2 }} />
     </div>
   )
 }
@@ -721,7 +773,8 @@ export default function Header() {
         }}>
 
           {/* Nav Groups */}
-          <nav className="top-nav-pill">
+          <nav className="top-nav-pill" style={{ display: 'flex', alignItems: 'center' }}>
+            {isBursar && <BursarHeaderActions />}
             {navGroups.map((group: any, i: number) => (
               <NavItem key={i} group={group} />
             ))}

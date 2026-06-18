@@ -28,6 +28,7 @@ export const ROUTES = {
   ADMIN_AGENDA: '/admin/agenda',
   ADMIN_SMS: '/admin/sms',
   ADMIN_ADMISSIONS: '/admin/admissions',
+  ADMIN_DAILY_FEES: '/admin/daily-fees',
 
   ADMIN_TEST_ANALYTICS: '/admin/test-analytics',
   ADMIN_VISITORS: '/admin/visitors',

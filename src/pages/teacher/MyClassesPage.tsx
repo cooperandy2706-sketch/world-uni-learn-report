@@ -47,7 +47,7 @@ export default function MyClassesPage() {
 
         const totals = (scores ?? []).map((s: any) => s.total_score ?? 0)
         const submitted = (scores ?? []).filter((s: any) => s.is_submitted).length
-        const studentCount = students?.length ?? 0
+        const studentCount = (Array.isArray(students) ? students : []).length ?? 0
         const totalExpected = subjectIds.length * studentCount
 
         // Per-student summary

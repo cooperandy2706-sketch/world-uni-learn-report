@@ -36,9 +36,10 @@ export function useCreateClass() {
 
 export function useUpdateClass() {
   const qc = useQueryClient()
+  const { user } = useAuth()
 
   return useMutation({
-    mutationFn: ({ id, ...data }: any) => classesService.update(id, data),
+    mutationFn: ({ id, ...data }: any) => classesService.update(user?.school_id ?? '', id, data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['classes'] })
       toast.success('Class updated')
@@ -49,9 +50,10 @@ export function useUpdateClass() {
 
 export function useDeleteClass() {
   const qc = useQueryClient()
+  const { user } = useAuth()
 
   return useMutation({
-    mutationFn: (id: string) => classesService.delete(id),
+    mutationFn: (id: string) => classesService.delete(user?.school_id ?? '', id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['classes'] })
       toast.success('Class deleted')

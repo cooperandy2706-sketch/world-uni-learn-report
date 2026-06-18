@@ -14,6 +14,7 @@ import { useSearchParams } from 'react-router-dom'
 
 // ── Score Submission Status Board ──────────────────────────
 interface ScoreRow {
+  id: string
   class_id: string
   class_name: string
   subject_id: string
@@ -88,6 +89,7 @@ function ScoreStatusBoard() {
           const scoreCount = scoreMap[key] || 0
           const studentCount = countByClass[a.class.id] || 0
           return {
+            id: a.id,
             class_id: a.class.id,
             class_name: a.class.name,
             subject_id: a.subject.id,
@@ -203,7 +205,7 @@ function ScoreStatusBoard() {
       {term && !loading && filtered.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {filtered.map((r, i) => (
-            <div key={`${r.class_id}-${r.subject_id}`} style={{
+            <div key={r.id} style={{
               background: 'var(--bg-card)',
               borderRadius: 12,
               border: `1.5px solid ${r.submitted ? '#bbf7d0' : '#fca5a5'}`,
