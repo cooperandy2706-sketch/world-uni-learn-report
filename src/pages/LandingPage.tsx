@@ -331,7 +331,7 @@ const CSS = `
   .hero-search {
     display: block; width: 100%; max-width: 420px; margin: 0 auto 1.5rem; padding: 0 1rem;
   }
-  @media (min-width: 768px) { .hero-search { display: none; } }
+  @media (min-width: 1024px) { .hero-search { margin: 0 0 1.5rem 0; padding: 0; } }
   .mobile-search-wrap { width: 100%; max-width: 340px; margin: 0 0 0.5rem; }
 
   .hero-btns { display: flex; flex-direction: column; gap: 1rem; justify-content: center; width: 100%; padding: 0 1rem; }
@@ -339,6 +339,29 @@ const CSS = `
   @media (min-width: 640px) { 
     .hero-btns { flex-direction: row; align-items: center; width: auto; padding: 0; } 
     .hero-btns .btn-primary, .hero-btns .btn-login { width: auto; }
+  }
+
+  .hero-container-flex { display: flex; flex-direction: column; align-items: center; gap: 3rem; position: relative; z-index: 10; width: 100%; padding-bottom: 3rem; }
+  @media (min-width: 1024px) {
+    .hero-container-flex { flex-direction: row; justify-content: space-between; align-items: center; gap: 4rem; max-width: 1200px; text-align: left; padding-bottom: 0; }
+    .hero-content { text-align: left; margin: 0; }
+    .hero-subtitle { margin-inline: 0; }
+    .hero-btns { justify-content: flex-start; }
+  }
+
+  .hero-learning-wrapper { width: 100%; max-width: 450px; }
+  .learning-hub-card {
+    background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 24px;
+    padding: 2.5rem; color: white; display: flex; flex-direction: column; gap: 1.25rem;
+    text-decoration: none; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    position: relative; overflow: hidden;
+  }
+  .learning-hub-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%); pointer-events: none; }
+  .learning-hub-card:hover {
+    transform: translateY(-8px); background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
   }
   
   /* ── MARQUEE ── */
@@ -629,6 +652,7 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
           </div>
 
           <div className="nav-actions">
+            <Link to="/learn" className="btn-login">Free Learning</Link>
             <Link to="/schools" className="btn-login">Explore Schools</Link>
             <Link to="/login" className="btn-login">Sign In</Link>
             <Link to="/register-school" className="btn-primary">Register School</Link>
@@ -688,10 +712,15 @@ function Hero() {
       </div>
 
       {HERO_SLIDES.map((slide, index) => (
-        <div key={index} className={`hero-slide ${index === currentSlide ? 'active' : ''}`}>
+        <div key={`bg-${index}`} className={`hero-slide ${index === currentSlide ? 'active' : ''}`} style={{ zIndex: 0 }}>
           <div className="hero-slide-bg" />
-          <div className="container">
-            <div className="hero-content">
+        </div>
+      ))}
+
+      <div className="container hero-container-flex">
+        <div className="hero-content-slider" style={{ flex: 1, position: 'relative', width: '100%', minHeight: 380, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          {HERO_SLIDES.map((slide, index) => (
+            <div key={`text-${index}`} className={`hero-content ${index === currentSlide ? 'active' : ''}`} style={{ position: index === 0 ? 'relative' : 'absolute', top: 0, left: 0, right: 0, opacity: index === currentSlide ? 1 : 0, transition: 'opacity 0.8s ease, transform 0.8s ease', transform: index === currentSlide ? 'translateY(0)' : 'translateY(30px)', pointerEvents: index === currentSlide ? 'auto' : 'none' }}>
               <div className="hero-badge">
                 <span className="marquee-dot" style={{ background: '#fbbf24' }} />
                 <span>{slide.badge}</span>
@@ -708,9 +737,20 @@ function Hero() {
                 <a href="/login" className="btn-login" style={{ fontSize: '1.05rem', padding: '1.2rem 2.5rem', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', transition: 'all 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}>Sign In to ASOS</a>
               </div>
             </div>
-          </div>
+          ))}
         </div>
-      ))}
+
+        <div className="hero-learning-wrapper">
+          <Link to="/learn" className="learning-hub-card">
+            <div style={{ background: '#fbbf24', color: '#1e0646', padding: '0.4rem 1rem', borderRadius: 100, fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', alignSelf: 'flex-start', boxShadow: '0 4px 10px rgba(251,191,36,0.3)' }}>Free Guest Access</div>
+            <h3 style={{ fontSize: '2rem', fontWeight: 900, lineHeight: 1.1, fontFamily: 'var(--serif)' }}>ASOS Learning Hub</h3>
+            <p style={{ fontSize: '1.05rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6 }}>Access high-quality practice quizzes and study materials curated by experts. No account required to start learning.</p>
+            <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: '#fbbf24', fontSize: '1.1rem' }}>
+              Enter Hub <span style={{ fontSize: '1.4rem' }}>→</span>
+            </div>
+          </Link>
+        </div>
+      </div>
 
       <div className="slide-indicators">
         {HERO_SLIDES.map((_, idx) => (
@@ -851,6 +891,9 @@ export default function LandingPage() {
           variant="menu"
           onNavigate={() => setMenuOpen(false)}
         />
+        <Link to="/learn" className="mobile-link" onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none' }}>
+          Free Learning
+        </Link>
         {['Features', 'Pillars', 'Workflow', 'Pricing', 'Download'].map(item => (
           <button
             key={item}
@@ -1021,6 +1064,7 @@ export default function LandingPage() {
                     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                   }}>{l}</button></li>
                 ))}
+                <li><Link to="/learn" className="footer-link">Free Learning Hub</Link></li>
                 <li><Link to="/register-school" className="footer-link">Register School</Link></li>
               </ul>
             </div>

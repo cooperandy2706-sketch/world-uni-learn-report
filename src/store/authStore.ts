@@ -66,9 +66,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
       supabase.auth.getSession(),
       new Promise<{ data: { session: null } }>((resolve) =>
         setTimeout(() => {
-          console.warn('[Acadera Auth] getSession() timed out after 15s — proceeding to login')
+          console.warn('[Acadera Auth] getSession() timed out after 2 min — proceeding to login')
           resolve({ data: { session: null } })
-        }, 15_000)
+        }, 120_000)  // 2 minutes — generous for slow school networks
       ),
     ])
     const session = sessionResult.data.session
@@ -98,6 +98,26 @@ export const useAuthStore = create<AuthStore>((set) => ({
         // Clear all cached data so the next user gets a clean slate
         queryClient.clear()
         set({ user: null, session: null })
+
+        // Nuclear fallback ONLY for genuine mid-session sign-outs.
+        // INITIAL_SESSION with no user just means no one is logged in —
+        // React's <Navigate> handles that cleanly without a hard reload.
+        // We also debounce so React has 600ms to handle it first.
+        if (event === 'SIGNED_OUT') {
+          setTimeout(() => {
+            const isOnProtectedRoute = !window.location.pathname.startsWith('/login') &&
+              !window.location.pathname.startsWith('/register') &&
+              !window.location.pathname.startsWith('/forgot') &&
+              window.location.pathname !== '/' &&
+              !window.location.pathname.startsWith('/schools') &&
+              !window.location.pathname.startsWith('/privacy') &&
+              !window.location.pathname.startsWith('/terms')
+
+            if (isOnProtectedRoute) {
+              window.location.replace('/login')
+            }
+          }, 600)  // give React 600ms to handle it via <Navigate> first
+        }
         return
       }
 

@@ -1,4 +1,5 @@
 // src/pages/ErrorPages.tsx
+import { useEffect } from 'react'
 import { useNavigate, useRouteError } from 'react-router-dom'
 
 const BASE = `
@@ -244,8 +245,55 @@ export function RouteErrorPage() {
   const error: any = useRouteError()
   const navigate = useNavigate()
   const status = error?.status ?? error?.statusCode ?? 500
+
+  // Detect chunk-load / dynamic-import failures.
+  // These look like: TypeError: "Failed to fetch dynamically imported module"
+  // A simple reload (NOT hard-refresh) is enough to recover — Vite/the CDN
+  // will serve a fresh chunk. We auto-retry once to avoid showing an error
+  // page at all for transient network blips.
+  const isChunkError =
+    error instanceof TypeError &&
+    (error.message.includes('dynamically imported module') ||
+      error.message.includes('Failed to fetch') ||
+      error.message.includes('Loading chunk'))
+
+  useEffect(() => {
+    if (!isChunkError) return
+    // Mark that we already tried once so we don't loop forever
+    const alreadyRetried = sessionStorage.getItem('_chunk_retry')
+    if (!alreadyRetried) {
+      sessionStorage.setItem('_chunk_retry', '1')
+      window.location.reload()
+    } else {
+      // Clean up so the next genuine error can retry again
+      sessionStorage.removeItem('_chunk_retry')
+    }
+  }, [isChunkError])
+
   if (status === 404) return <NotFoundPage />
   if (status === 403) return <UnauthorizedPage />
+
+  // For chunk errors, show a brief "reconnecting" message while reload fires
+  if (isChunkError) {
+    return (
+      <>
+        <style>{BASE}</style>
+        <div className="ep" style={{ background: 'linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%)', color: '#fff' }}>
+          <div className="ep-card">
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🔄</div>
+            <div className="ep-title">Reconnecting...</div>
+            <p className="ep-sub" style={{ color: '#94a3b8' }}>
+              A resource failed to load. Refreshing automatically…
+            </p>
+            <div style={{ marginTop: 20 }}>
+              <Btn onClick={() => window.location.reload()} primary>Reload Now</Btn>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
   return <ServerErrorPage />
 }
 

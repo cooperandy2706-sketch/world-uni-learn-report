@@ -33,8 +33,22 @@ export default function AuthLayout() {
   }
 
   if (user) {
-    const redirect = user.role === 'admin' ? ROUTES.ADMIN_DASHBOARD : ROUTES.TEACHER_DASHBOARD
-    return <Navigate to={redirect} replace />
+    // Redirect each role to their own home page
+    const roleHome: Record<string, string> = {
+      admin: ROUTES.ADMIN_DASHBOARD,
+      super_admin: '/super-admin/dashboard',
+      teacher: ROUTES.TEACHER_DASHBOARD,
+      bursar: ROUTES.BURSAR_DASHBOARD,
+      proprietor: '/proprietor/dashboard',
+      student: '/student/dashboard',
+      parent: '/parent/dashboard',
+      staff: ROUTES.STAFF_DASHBOARD,
+      security: ROUTES.SECURITY_DASHBOARD,
+      driver: '/driver/dashboard',
+      nurse: '/nurse/dashboard',
+      librarian: '/librarian/dashboard',
+    }
+    return <Navigate to={roleHome[user.role] ?? ROUTES.ADMIN_DASHBOARD} replace />
   }
 
 

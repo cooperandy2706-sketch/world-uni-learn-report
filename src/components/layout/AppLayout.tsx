@@ -45,6 +45,21 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
     return () => document.removeEventListener('visibilitychange', handleVis)
   }, [])
 
+  // ── Detect mid-session sign-outs and redirect to login ─────────────────────
+  // prevUserRef tracks what `user` was on the PREVIOUS render.
+  // IMPORTANT: we check first, then update — if we updated first the ref
+  // would already be null by the time we compared, so the redirect never fires.
+  const prevUserRef = useRef<typeof user>(null)
+  useEffect(() => {
+    const prevUser = prevUserRef.current
+    prevUserRef.current = user  // update for next render's comparison
+
+    if (initialized && !loading && prevUser !== null && user === null) {
+      console.info('[Acadera] Session ended — redirecting to login')
+      navigate(ROUTES.LOGIN, { replace: true })
+    }
+  }, [user, initialized, loading, navigate])
+
   // ── Safety watchdog: if auth is STILL pending after 12 s, go to login ──
   // This catches: slow network, Supabase cold-start, fetchProfile hang, etc.
   useEffect(() => {
@@ -52,9 +67,9 @@ export default function AppLayout({ requiredRole }: AppLayoutProps) {
     if (initialized && !loading) return
 
     const timer = setTimeout(() => {
-      console.warn('[Acadera] Auth initialization stuck after 12 s — redirecting to login')
+      console.warn('[Acadera] Auth initialization stuck after 2 min — redirecting to login')
       navigate(ROUTES.LOGIN, { replace: true })
-    }, 12_000)
+    }, 120_000)  // 2 minutes — generous for slow school networks
 
     // Cancel the watchdog as soon as auth resolves normally
     return () => clearTimeout(timer)

@@ -329,6 +329,8 @@ export const router = createRouter([
           { path: 'messages', element: lazyPage(() => import('./pages/messaging/MessagingPage')) },
         ],
       },
+      { path: '/learn', element: lazyPage(() => import('./pages/public/GuestLearnHub')) },
+      { path: '/learn/quiz/:id', element: lazyPage(() => import('./pages/public/GuestTakeQuizPage')) },
       { path: '/:handle', element: lazyPage(() => import('./pages/public/SchoolProfilePage')) },
       { path: '*', element: <NotFoundPage /> },
     ],
