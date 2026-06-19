@@ -27,8 +27,9 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } }
     });
 
-    const { data: { user: callerToken }, error: callerAuthErr } = await callerClient.auth.getUser();
-    if (callerAuthErr || !callerToken) throw new Error("Unauthorized caller");
+    const token = authHeader.replace('Bearer ', '').trim();
+    const { data: { user: callerToken }, error: callerAuthErr } = await callerClient.auth.getUser(token);
+    if (callerAuthErr || !callerToken) throw new Error(`Unauthorized caller: ${callerAuthErr?.message || 'No user found'}`);
 
     const { data: callerProfile } = await callerClient
       .from('users')
@@ -38,7 +39,7 @@ Deno.serve(async (req) => {
 
     if (!callerProfile) throw new Error("Could not verify caller profile");
 
-    const isAdmin = callerProfile.role === 'admin' || callerProfile.role === 'super_admin';
+    const isAdmin = callerProfile.role === 'admin' || callerProfile.role === 'super_admin' || callerProfile.role === 'proprietor';
     const isTeacher = callerProfile.role === 'teacher';
 
     const body = await req.json();
@@ -49,7 +50,7 @@ Deno.serve(async (req) => {
     });
 
     if (action === 'create-user') {
-      const { email, password, full_name, role, phone, metadata, target_school_id } = payload;
+      const { email, password, full_name, role, phone, designation, metadata, target_school_id } = payload;
       const schoolId = callerProfile.role === 'super_admin' ? target_school_id : callerProfile.school_id;
 
       if (!isAdmin && !(isTeacher && (role === 'student' || role === 'parent'))) {
@@ -67,7 +68,8 @@ Deno.serve(async (req) => {
         newUserId = authData.user.id;
 
         const { error: profError } = await adminClient.from('users').upsert({
-          id: newUserId, school_id: schoolId, full_name, email, phone: phone || null, role, is_active: true
+          id: newUserId, school_id: schoolId, full_name, email, phone: phone || null,
+          role, is_active: true, designation: designation || null
         });
         if (profError) {
           await adminClient.auth.admin.deleteUser(newUserId)
@@ -89,15 +91,25 @@ Deno.serve(async (req) => {
 
       if (role === 'teacher') {
          if (metadata?.link_id) {
-           await adminClient.from('teachers').update({ user_id: newUserId }).eq('id', metadata.link_id);
+           const { error } = await adminClient.from('teachers').update({ user_id: newUserId }).eq('id', metadata.link_id);
+           if (error) throw error;
          } else {
-           await adminClient.from('teachers').insert({ user_id: newUserId, school_id: schoolId, staff_id: metadata?.staff_id || null, department_id: metadata?.department_id || null });
+           const { error } = await adminClient.from('teachers').insert({
+             user_id: newUserId,
+             school_id: schoolId,
+             staff_id: metadata?.staff_id || null,
+             department_id: metadata?.department_id || null,
+             employment_type: metadata?.employment_type || 'full_time',
+           });
+           if (error) throw error;
          }
       } else if (role === 'student') {
          if (metadata?.link_id) {
-           await adminClient.from('students').update({ user_id: newUserId }).eq('id', metadata.link_id);
+           const { error } = await adminClient.from('students').update({ user_id: newUserId }).eq('id', metadata.link_id);
+           if (error) throw error;
          } else {
-           await adminClient.from('students').insert({ user_id: newUserId, school_id: schoolId, class_id: metadata?.class_id, student_id: metadata?.student_id, full_name, is_active: true });
+           const { error } = await adminClient.from('students').insert({ user_id: newUserId, school_id: schoolId, class_id: metadata?.class_id, student_id: metadata?.student_id, full_name, is_active: true });
+           if (error) throw error;
          }
       } else if (role === 'parent') {
          if (metadata?.link_id) {
