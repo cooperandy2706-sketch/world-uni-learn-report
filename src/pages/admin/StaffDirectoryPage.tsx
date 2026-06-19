@@ -3,12 +3,12 @@ import { useState, useMemo, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
-import { useSettings } from '../../hooks/useSettings'
+import { useSettings, useCurrentTerm } from '../../hooks/useSettings'
 import Modal from '../../components/ui/Modal'
 import toast from 'react-hot-toast'
 import {
   Users, UserPlus, FileText, Printer, KeyRound, Edit2, 
-  Trash2, Briefcase, ShieldCheck, Download, Search
+  Trash2, Briefcase, ShieldCheck, Download, Search, Eye, EyeOff
 } from 'lucide-react'
 
 // Letter Generation Imports
@@ -47,9 +47,12 @@ function Avatar({ name, size = 48 }: { name: string; size?: number }) {
   )
 }
 
+const INITIAL_FORM = { full_name: '', email: '', phone: '', designation: '', password: '', role: 'teacher', employment_type: 'full_time' }
+
 export default function StaffDirectoryPage() {
   const { user } = useAuth()
   const { data: settings } = useSettings()
+  const { data: term } = useCurrentTerm()
   const qc = useQueryClient()
   const schoolId = user?.school_id ?? ''
 
@@ -59,10 +62,19 @@ export default function StaffDirectoryPage() {
   const [createModal, setCreateModal] = useState(false)
   const [resetModal, setResetModal] = useState(false)
   const [letterModal, setLetterModal] = useState(false)
+  const [assignModal, setAssignModal] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   
   const [selectedStaff, setSelectedStaff] = useState<any>(null)
   const [newPw, setNewPw] = useState('')
-  const [form, setForm] = useState({ full_name: '', email: '', phone: '', designation: '', password: '', role: 'teacher', employment_type: 'full_time' })
+  const [form, setForm] = useState(INITIAL_FORM)
+  const [isSaving, setIsSaving] = useState(false)
+
+  // Assignment State (for teacher)
+  const [assignTeacherId, setAssignTeacherId] = useState<string | null>(null)
+  const [selectedClasses, setSelectedClasses] = useState<string[]>([])
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([])
+  const [isSavingAssign, setIsSavingAssign] = useState(false)
 
   // HR Letter State
   const [lType, setLType] = useState<LetterTypeId>('appointment')
@@ -76,10 +88,9 @@ export default function StaffDirectoryPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('teachers')
-        .select('id, staff_id, qualification, user:users!inner(id, full_name, email, phone, role)')
+        .select('id, staff_id, qualification, employment_type, user:users!inner(id, full_name, email, phone, role)')
         .eq('school_id', schoolId)
       if (error) throw error
-      // Map to flat structure for unified viewing
       return (data || []).map(t => ({
         ...t.user,
         teacher_id: t.id,
@@ -113,6 +124,25 @@ export default function StaffDirectoryPage() {
     enabled: !!schoolId,
   })
 
+  // Classes and Subjects for assignment
+  const { data: classes = [] } = useQuery({
+    queryKey: ['classes-list', schoolId],
+    queryFn: async () => {
+      const { data } = await supabase.from('classes').select('id, name').eq('school_id', schoolId).order('name')
+      return data ?? []
+    },
+    enabled: !!schoolId,
+  })
+
+  const { data: subjects = [] } = useQuery({
+    queryKey: ['subjects-list', schoolId],
+    queryFn: async () => {
+      const { data } = await supabase.from('subjects').select('id, name, code').eq('school_id', schoolId).order('name')
+      return data ?? []
+    },
+    enabled: !!schoolId,
+  })
+
   const allStaff = useMemo(() => [...teachers, ...nonTeachers], [teachers, nonTeachers])
   const isLoading = isLoadingT || isLoadingNT
 
@@ -133,36 +163,117 @@ export default function StaffDirectoryPage() {
   // -- Actions
   async function handleCreate() {
     if (!form.full_name || !form.email) { toast.error('Name and email required'); return }
+    if (!form.password || form.password.length < 6) { toast.error('Password must be at least 6 characters'); return }
+    setIsSaving(true)
     const toastId = toast.loading('Creating staff account...')
     try {
-      const pw = form.password || 'staff123'
-      
-      // If Teacher, call create-teacher. Else call create-user
-      if (form.role === 'teacher') {
-        const { data, error } = await supabase.functions.invoke('admin-ops', {
-          body: {
-            action: 'create-teacher',
-            payload: { email: form.email, password: pw, full_name: form.full_name, phone: form.phone, target_school_id: schoolId }
+      // ALL roles (including teacher) now correctly use 'create-user'
+      const { data, error } = await supabase.functions.invoke('admin-ops', {
+        body: {
+          action: 'create-user',
+          payload: {
+            email: form.email,
+            password: form.password,
+            full_name: form.full_name,
+            role: form.role,
+            phone: form.phone,
+            designation: form.designation,
+            target_school_id: schoolId,
+            metadata: {
+              employment_type: form.employment_type,
+            }
           }
-        })
-        if (error || data?.error) throw new Error(error?.message || data?.error)
-      } else {
-        const { data, error } = await supabase.functions.invoke('admin-ops', {
-          body: {
-            action: 'create-user',
-            payload: { email: form.email, password: pw, full_name: form.full_name, role: form.role, phone: form.phone, designation: form.designation, target_school_id: schoolId }
-          }
-        })
-        if (error || data?.error) throw new Error(error?.message || data?.error)
-      }
+        }
+      })
+      if (error || data?.error) throw new Error(error?.message || data?.error)
 
-      toast.success('Staff account created', { id: toastId })
-      qc.invalidateQueries({ queryKey: ['staff-teachers'] })
-      qc.invalidateQueries({ queryKey: ['staff-non-teachers'] })
+      toast.success('Staff account created! You can now assign classes & subjects.', { id: toastId, duration: 4000 })
+      qc.invalidateQueries({ queryKey: ['staff-teachers', schoolId] })
+      qc.invalidateQueries({ queryKey: ['staff-non-teachers', schoolId] })
       setCreateModal(false)
-      setForm({ full_name: '', email: '', phone: '', designation: '', password: '', role: 'teacher', employment_type: 'full_time' })
+      setForm(INITIAL_FORM)
+      setShowPassword(false)
+
+      // If it's a teacher, open assignment panel after a short delay
+      if (form.role === 'teacher') {
+        // Re-fetch teachers to get the new teacher record, then open assign modal
+        setTimeout(async () => {
+          await qc.invalidateQueries({ queryKey: ['staff-teachers', schoolId] })
+        }, 1000)
+        toast('💡 Tip: Use the 📚 button on the teacher card to assign classes & subjects.', { duration: 6000 })
+      }
     } catch (e: any) {
       toast.error(e.message || 'Failed to create staff', { id: toastId })
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  async function handleSaveAssignments() {
+    if (!assignTeacherId || !term?.id) {
+      toast.error('No active term found. Please set a current term first.')
+      return
+    }
+    setIsSavingAssign(true)
+    const toastId = toast.loading('Saving assignments...')
+    try {
+      // Delete existing assignments for this teacher in this term
+      await supabase.from('teacher_assignments')
+        .delete()
+        .eq('teacher_id', assignTeacherId)
+        .eq('term_id', term.id)
+
+      // Create new cross product of class × subject assignments
+      const rows: any[] = []
+      for (const classId of selectedClasses) {
+        for (const subjectId of selectedSubjects) {
+          rows.push({
+            teacher_id: assignTeacherId,
+            class_id: classId,
+            subject_id: subjectId,
+            term_id: term.id,
+            school_id: schoolId,
+            is_class_teacher: false,
+          })
+        }
+      }
+
+      if (rows.length > 0) {
+        const { error } = await supabase.from('teacher_assignments').insert(rows)
+        if (error) throw error
+      }
+
+      toast.success(`Saved ${rows.length} assignment(s) for this teacher`, { id: toastId })
+      setAssignModal(false)
+      setAssignTeacherId(null)
+      setSelectedClasses([])
+      setSelectedSubjects([])
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to save assignments', { id: toastId })
+    } finally {
+      setIsSavingAssign(false)
+    }
+  }
+
+  function openAssignModal(s: any) {
+    setSelectedStaff(s)
+    setAssignTeacherId(s.teacher_id)
+    setSelectedClasses([])
+    setSelectedSubjects([])
+    setAssignModal(true)
+
+    // Pre-load existing assignments
+    if (s.teacher_id && term?.id) {
+      supabase.from('teacher_assignments')
+        .select('class_id, subject_id')
+        .eq('teacher_id', s.teacher_id)
+        .eq('term_id', term.id)
+        .then(({ data }) => {
+          if (data) {
+            setSelectedClasses([...new Set(data.map(r => r.class_id).filter(Boolean))])
+            setSelectedSubjects([...new Set(data.map(r => r.subject_id).filter(Boolean))])
+          }
+        })
     }
   }
 
@@ -172,7 +283,7 @@ export default function StaffDirectoryPage() {
     try {
       if (s.role === 'teacher') {
         const { error } = await supabase.functions.invoke('admin-ops', {
-          body: { action: 'delete-user', payload: { target_user_id: s.id, role: 'teacher', teacher_id: s.teacher_id } }
+          body: { action: 'delete-user', payload: { target_user_id: s.id, role: 'teacher', specific_ids: { teacher_id: s.teacher_id } } }
         })
         if (error) throw error
       } else {
@@ -182,8 +293,8 @@ export default function StaffDirectoryPage() {
         if (error) throw error
       }
       toast.success('Account removed', { id: toastId })
-      qc.invalidateQueries({ queryKey: ['staff-teachers'] })
-      qc.invalidateQueries({ queryKey: ['staff-non-teachers'] })
+      qc.invalidateQueries({ queryKey: ['staff-teachers', schoolId] })
+      qc.invalidateQueries({ queryKey: ['staff-non-teachers', schoolId] })
     } catch (e: any) { toast.error(e.message, { id: toastId }) }
   }
 
@@ -209,6 +320,13 @@ export default function StaffDirectoryPage() {
     }, 800)
   }
 
+  function toggleClass(id: string) {
+    setSelectedClasses(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+  function toggleSubject(id: string) {
+    setSelectedSubjects(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+
   return (
     <div style={{ animation: '_fadein .4s ease', paddingBottom: 60 }}>
       <style>{`
@@ -220,6 +338,10 @@ export default function StaffDirectoryPage() {
         .staff-card:hover { border-color: #c7d2fe; box-shadow: 0 8px 24px rgba(99,102,241,.08); transform: translateY(-2px); }
         .action-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; border: none; background: transparent; }
         .action-btn:hover { background: var(--bg-input); }
+        .chip-btn { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; border: 1.5px solid; }
+        .chip-btn.selected { background: #ede9fe; border-color: #7c3aed; color: #5b21b6; }
+        .chip-btn:not(.selected) { background: var(--bg-card); border-color: var(--border-color); color: var(--text-muted); }
+        .chip-btn:not(.selected):hover { border-color: #c4b5fd; color: #7c3aed; }
       `}</style>
 
       {/* Header */}
@@ -228,7 +350,7 @@ export default function StaffDirectoryPage() {
           <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 28, fontWeight: 700, margin: '0 0 4px', color: 'var(--text-main)' }}>Staff Directory</h1>
           <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 14 }}>Unified management for all teaching and non-teaching personnel.</p>
         </div>
-        <Btn onClick={() => setCreateModal(true)}><UserPlus size={16} /> Add Staff Member</Btn>
+        <Btn onClick={() => { setForm(INITIAL_FORM); setShowPassword(false); setCreateModal(true) }}><UserPlus size={16} /> Add Staff Member</Btn>
       </div>
 
       {/* Tabs & Search */}
@@ -296,6 +418,11 @@ export default function StaffDirectoryPage() {
                 <button className="action-btn" onClick={() => { setSelectedStaff(s); setLType('appointment'); setLFields({}); setLetterModal(true) }} style={{ flex: 1, color: '#4f46e5', background: 'rgba(79,70,229,0.08)' }}>
                   <FileText size={14} /> HR Letter
                 </button>
+                {s.role === 'teacher' && (
+                  <button className="action-btn" onClick={() => openAssignModal(s)} style={{ color: '#059669', border: '1px solid #bbf7d0' }} title="Assign Classes & Subjects">
+                    📚
+                  </button>
+                )}
                 <button className="action-btn" onClick={() => { setSelectedStaff(s); setNewPw(''); setResetModal(true) }} style={{ color: '#d97706', border: '1px solid #fde68a' }}>
                   <KeyRound size={14} />
                 </button>
@@ -308,18 +435,18 @@ export default function StaffDirectoryPage() {
         </div>
       )}
 
-      {/* Create Modal */}
-      <Modal open={createModal} onClose={() => setCreateModal(false)} title="Add Staff Member" size="md"
-        footer={<><Btn variant="secondary" onClick={() => setCreateModal(false)}>Cancel</Btn><Btn onClick={handleCreate}>Save Record</Btn></>}>
+      {/* ── CREATE MODAL ── */}
+      <Modal open={createModal} onClose={() => { setCreateModal(false); setShowPassword(false) }} title="Add Staff Member" size="md"
+        footer={<><Btn variant="secondary" onClick={() => { setCreateModal(false); setShowPassword(false) }}>Cancel</Btn><Btn onClick={handleCreate} loading={isSaving}>Create Account</Btn></>}>
         <div style={{ display: 'grid', gap: 16 }}>
           <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>System Role</label>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>System Role *</label>
             <select value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value }))} style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 14 }}>
               <option value="teacher">Teacher (Academic Access)</option>
               <option value="bursar">Bursar (Finance Access)</option>
               <option value="nurse">Nurse (Medical Access)</option>
               <option value="librarian">Librarian (Library Access)</option>
-              <option value="staff">General Support Staff (No Access)</option>
+              <option value="staff">General Support Staff (No Portal Access)</option>
               <option value="driver">Driver (Fleet Access)</option>
               <option value="security">Security (Gate Access)</option>
               <option value="proprietor">Proprietor (Executive Access)</option>
@@ -328,26 +455,48 @@ export default function StaffDirectoryPage() {
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Full Name</label>
-              <input type="text" value={form.full_name} onChange={e => setForm(p => ({ ...p, full_name: e.target.value }))} placeholder="John Doe" style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 14 }} />
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Full Name *</label>
+              <input type="text" value={form.full_name} onChange={e => setForm(p => ({ ...p, full_name: e.target.value }))} placeholder="John Doe" style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 14, boxSizing: 'border-box' }} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Email</label>
-              <input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="email@school.com" style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 14 }} />
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Email Address *</label>
+              <input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="email@school.com" style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 14, boxSizing: 'border-box' }} />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Phone Number</label>
-              <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="024 000 0000" style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 14 }} />
+              <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="024 000 0000" style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 14, boxSizing: 'border-box' }} />
             </div>
             {form.role !== 'teacher' && (
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Job Title / Designation</label>
-                <input type="text" value={form.designation} onChange={e => setForm(p => ({ ...p, designation: e.target.value }))} placeholder="e.g. Head Cook" style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 14 }} />
+                <input type="text" value={form.designation} onChange={e => setForm(p => ({ ...p, designation: e.target.value }))} placeholder="e.g. Head Cook" style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 14, boxSizing: 'border-box' }} />
               </div>
             )}
+          </div>
+
+          {/* Password Field */}
+          <div>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>Login Password *</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
+                placeholder="Min. 6 characters"
+                style={{ width: '100%', padding: '10px 42px 10px 14px', borderRadius: 10, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 14, boxSizing: 'border-box' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>The staff member will use this password to log in to their portal.</p>
           </div>
 
           {form.role === 'teacher' && (
@@ -364,7 +513,81 @@ export default function StaffDirectoryPage() {
               </div>
             </div>
           )}
+
+          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#16a34a' }}>
+            ✅ Account will be created immediately. {form.role === 'teacher' ? 'After saving, use the 📚 button to assign classes and subjects.' : 'The staff member can log in right away.'}
+          </div>
         </div>
+      </Modal>
+
+      {/* ── ASSIGN CLASSES & SUBJECTS MODAL ── */}
+      <Modal
+        open={assignModal}
+        onClose={() => { setAssignModal(false); setAssignTeacherId(null) }}
+        title="Assign Classes & Subjects"
+        subtitle={selectedStaff?.full_name}
+        size="lg"
+        footer={<><Btn variant="secondary" onClick={() => { setAssignModal(false); setAssignTeacherId(null) }}>Cancel</Btn><Btn onClick={handleSaveAssignments} loading={isSavingAssign}>Save Assignments</Btn></>}
+      >
+        {!term && (
+          <div style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: 10, padding: '12px 16px', color: '#92400e', marginBottom: 16 }}>
+            ⚠️ No active term found. Please set a current academic term first before making assignments.
+          </div>
+        )}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+          {/* Classes */}
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#7c3aed', marginBottom: 12 }}>
+              🏫 Classes ({selectedClasses.length} selected)
+            </p>
+            {classes.length === 0 ? (
+              <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>No classes created yet.</p>
+            ) : (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxHeight: 280, overflowY: 'auto' }}>
+                {(classes as any[]).map((cls: any) => (
+                  <button
+                    key={cls.id}
+                    className={`chip-btn ${selectedClasses.includes(cls.id) ? 'selected' : ''}`}
+                    onClick={() => toggleClass(cls.id)}
+                  >
+                    {selectedClasses.includes(cls.id) ? '✓ ' : ''}{cls.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Subjects */}
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#059669', marginBottom: 12 }}>
+              📚 Subjects ({selectedSubjects.length} selected)
+            </p>
+            {subjects.length === 0 ? (
+              <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>No subjects created yet.</p>
+            ) : (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxHeight: 280, overflowY: 'auto' }}>
+                {(subjects as any[]).map((sub: any) => (
+                  <button
+                    key={sub.id}
+                    className={`chip-btn ${selectedSubjects.includes(sub.id) ? 'selected' : ''}`}
+                    onClick={() => toggleSubject(sub.id)}
+                    style={selectedSubjects.includes(sub.id) ? { background: '#ecfdf5', borderColor: '#10b981', color: '#065f46' } : {}}
+                  >
+                    {selectedSubjects.includes(sub.id) ? '✓ ' : ''}{sub.name} {sub.code ? `(${sub.code})` : ''}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {selectedClasses.length > 0 && selectedSubjects.length > 0 && (
+          <div style={{ marginTop: 16, padding: '12px 16px', background: '#f5f3ff', borderRadius: 10, border: '1px solid #ede9fe' }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: '#5b21b6', margin: 0 }}>
+              📝 This will create <strong>{selectedClasses.length * selectedSubjects.length}</strong> assignments — teaching <strong>{selectedSubjects.length}</strong> subject(s) across <strong>{selectedClasses.length}</strong> class(es) for the current term.
+            </p>
+          </div>
+        )}
       </Modal>
 
       {/* HR Letter Modal */}
