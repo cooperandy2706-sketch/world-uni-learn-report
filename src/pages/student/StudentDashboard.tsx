@@ -1,6 +1,6 @@
 import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
@@ -24,12 +24,22 @@ const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
 
 function timeToMins(t: string) { const [h, m] = (t ?? '00:00').split(':').map(Number); return h * 60 + m }
 
+const WORLD_UNI_SCHOOL_ID = '392a6abc-8f9b-44dd-a4bd-adf1cfc19dd5'
+
 export default function StudentDashboard() {
     useAutoRefresh(loadAll);
+  const navigate = useNavigate()
   const { setFirstLoadComplete } = useAuthStore()
   const { user } = useAuth()
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
+
+  // Redirect independent (World Uni-Learn) students to their dedicated portal
+  useEffect(() => {
+    if (user?.school_id === WORLD_UNI_SCHOOL_ID) {
+      navigate('/student/independent-portal', { replace: true })
+    }
+  }, [user?.school_id])
 
   const [studentData, setStudentData] = useState<any>(null)
   const [reportCard, setReportCard] = useState<any>(null)

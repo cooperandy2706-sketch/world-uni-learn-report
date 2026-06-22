@@ -836,9 +836,9 @@ export default function StudentsPage() {
             student_id:     (r['Student ID']     ?? r['student_id']     ?? '').toString().trim() || null,
             gender:         ['male','female'].includes(gender) ? gender : null,
             house:          (r['House']          ?? r['house']          ?? '').toString().trim() || null,
-            guardian_name:  (r['Guardian Name']  ?? r['guardian_name']  ?? '').toString().trim() || null,
-            guardian_phone: (r['Guardian Phone'] ?? r['guardian_phone'] ?? '').toString().trim() || null,
-            guardian_email: (r['Guardian Email'] ?? r['guardian_email'] ?? '').toString().trim() || null,
+            guardian_name:  (r['Guardian Name']  ?? r['guardian_name']  ?? r['Guardian / Parent Name'] ?? '').toString().trim() || null,
+            guardian_phone: (r["Mother's Contact"] ?? r['Guardian Phone'] ?? r['guardian_phone'] ?? '').toString().trim() || null,
+            guardian_email: (r["Father's Contact"] ?? r['Guardian Email'] ?? r['guardian_email'] ?? '').toString().trim() || null,
             school_id: user!.school_id,
             is_active: true,
           }
@@ -870,8 +870,8 @@ export default function StudentsPage() {
       'Gender': 'male',
       'House': 'Blue House',
       'Guardian Name': 'Jane Doe',
-      'Guardian Phone': '0240000000',
-      'Guardian Email': 'jane@example.com'
+      "Mother's Contact": '0240000000',
+      "Father's Contact": '0240000001'
     }])
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Template')
@@ -890,8 +890,8 @@ export default function StudentsPage() {
       'Class': s.class?.name || '',
       'House': s.house || '',
       'Guardian Name': s.guardian_name || '',
-      'Guardian Phone': s.guardian_phone || '',
-      'Guardian Email': s.guardian_email || '',
+      "Mother's Contact": s.guardian_phone || '',
+      "Father's Contact": s.guardian_email || '',
       'Arrears': s.fees_arrears || 0
     }))
     const XLSX = await import('xlsx')
@@ -1346,11 +1346,11 @@ export default function StudentsPage() {
             <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>👨‍👩‍👦 Guardian Information</p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-              <Field label="Guardian Name"><StyledInput {...register('guardian_name')} placeholder="e.g. Mr. Kwame Mensah" /></Field>
-              <Field label="Phone"><StyledInput {...register('guardian_phone')} placeholder="024 000 0000" /></Field>
               <div style={{ gridColumn: '1 / -1' }}>
-                <Field label="Guardian Email"><StyledInput {...register('guardian_email')} type="email" placeholder="guardian@email.com" error={errors.guardian_email?.message} /></Field>
+                <Field label="Guardian / Parent Name"><StyledInput {...register('guardian_name')} placeholder="e.g. Mr. & Mrs. Mensah" /></Field>
               </div>
+              <Field label="Mother's Contact (Phone)"><StyledInput {...register('guardian_phone')} placeholder="024 000 0000" /></Field>
+              <Field label="Father's Contact (Phone)"><StyledInput {...register('guardian_email')} placeholder="024 000 0000" error={errors.guardian_email?.message} /></Field>
               <div style={{ gridColumn: '1 / -1' }}>
                 <Field label="Address"><StyledInput {...register('address')} placeholder="Student's home address" /></Field>
               </div>
@@ -1393,9 +1393,9 @@ export default function StudentsPage() {
                 {[
                   { label: 'Date of Birth', value: formatDate(viewingStudent.date_of_birth) },
                   { label: 'Enrolled', value: formatDate(viewingStudent.created_at) },
-                  { label: 'Guardian', value: viewingStudent.guardian_name },
-                  { label: 'Guardian Phone', value: viewingStudent.guardian_phone },
-                  { label: 'Guardian Email', value: viewingStudent.guardian_email },
+                  { label: 'Guardian / Parent', value: viewingStudent.guardian_name },
+                  { label: "Mother's Contact", value: viewingStudent.guardian_phone },
+                  { label: "Father's Contact", value: viewingStudent.guardian_email },
                   { label: 'Address', value: viewingStudent.address },
                 ].map(({ label, value }) => value && (
                   <div key={label} style={{ background: '#faf5ff', borderRadius: 10, padding: '10px 12px' }}>

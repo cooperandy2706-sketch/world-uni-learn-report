@@ -10,6 +10,14 @@ import toast from 'react-hot-toast'
 const AIQuizGenerator = lazy(() => import('../../components/admin/AIQuizGenerator'))
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
+interface QuizQuestion {
+  id: string
+  text: string
+  options: string[]
+  correctAnswer: string
+  points: number
+}
+
 interface GlobalResourceData {
   title: string
   description: string
@@ -19,6 +27,7 @@ interface GlobalResourceData {
   is_published: boolean
   topic: string
   cover_image_url: string
+  quiz_questions: QuizQuestion[]
 }
 
 // ── Markdown Components ─────────────────────────────────────
@@ -171,7 +180,8 @@ export default function GlobalResourcesPage() {
     content: '',
     is_published: false,
     topic: '',
-    cover_image_url: ''
+    cover_image_url: '',
+    quiz_questions: []
   })
 
   // Textarea Ref for cursor control
@@ -349,6 +359,7 @@ export default function GlobalResourcesPage() {
         is_published: publish,
         topic: form.topic,
         cover_image_url: form.cover_image_url,
+        quiz_questions: form.quiz_questions && form.quiz_questions.length > 0 ? form.quiz_questions : null,
         school_id: null
       }
 
@@ -378,7 +389,8 @@ export default function GlobalResourcesPage() {
         content: '',
         is_published: false,
         topic: '',
-        cover_image_url: ''
+        cover_image_url: '',
+        quiz_questions: []
       })
       loadResources()
     } catch (err: any) {
@@ -444,7 +456,8 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
         content: parsed.content || '',
         is_published: false,
         topic: parsed.topic || aiTopic,
-        cover_image_url: ''
+        cover_image_url: '',
+        quiz_questions: []
       })
       
       toast.success("Textbook chapter generated successfully!")
@@ -609,6 +622,84 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
                </div>
             </div>
             
+            {/* Sec 4: Embedded Practice Quiz */}
+            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 12, border: '1.5px solid #f0eefe' }}>
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                 <div>
+                   <h2 style={{ fontSize: 13, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', margin: 0 }}>📝 Embedded Practice Quiz (Optional)</h2>
+                   <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>Add questions that will appear as a mini-quiz at the end of this material on the guest portal.</p>
+                 </div>
+                 <button onClick={() => {
+                   const newQ: QuizQuestion = {
+                     id: Math.random().toString(36).slice(2, 9),
+                     text: '',
+                     options: ['', '', '', ''],
+                     correctAnswer: '',
+                     points: 1
+                   }
+                   setForm(p => ({ ...p, quiz_questions: [...(p.quiz_questions || []), newQ] }))
+                 }} style={{ background: '#f5f3ff', color: '#7c3aed', border: '1.5px solid #ede9fe', borderRadius: 8, padding: '8px 14px', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                   + Add Question
+                 </button>
+               </div>
+
+               {(!form.quiz_questions || form.quiz_questions.length === 0) ? (
+                 <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8' }}>
+                   <div style={{ fontSize: 32, marginBottom: 8 }}>💡</div>
+                   <p style={{ fontSize: 12, margin: 0 }}>No questions yet. Click "+ Add Question" to embed a practice quiz.</p>
+                 </div>
+               ) : (
+                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                   {form.quiz_questions.map((q, qi) => (
+                     <div key={q.id} style={{ background: '#faf5ff', borderRadius: 12, padding: 20, border: '1.5px solid #ede9fe', position: 'relative' }}>
+                       <button onClick={() => setForm(p => ({ ...p, quiz_questions: (p.quiz_questions || []).filter(x => x.id !== q.id) }))}
+                         style={{ position: 'absolute', top: 12, right: 12, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, color: '#f87171' }}>🗑️</button>
+                       <div style={{ fontSize: 10, fontWeight: 800, color: '#7c3aed', marginBottom: 10, textTransform: 'uppercase' }}>Question {qi + 1}</div>
+                       <Field label="Question Text *">
+                         <StyledInput
+                           value={q.text}
+                           onChange={e => setForm(p => ({ ...p, quiz_questions: (p.quiz_questions || []).map(x => x.id === q.id ? { ...x, text: e.target.value } : x) }))}
+                           placeholder="Enter your question..."
+                         />
+                       </Field>
+                       <div style={{ marginBottom: 10 }}>
+                         <FieldLabel>Options &amp; Correct Answer (click radio to mark correct)</FieldLabel>
+                         {q.options.map((opt, oi) => (
+                           <div key={oi} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                             <input
+                               type="radio"
+                               name={`correct-${q.id}`}
+                               checked={q.correctAnswer === opt && opt !== ''}
+                               onChange={() => setForm(p => ({ ...p, quiz_questions: (p.quiz_questions || []).map(x => x.id === q.id ? { ...x, correctAnswer: opt } : x) }))}
+                               title="Mark as correct answer"
+                             />
+                             <StyledInput
+                               value={opt}
+                               onChange={e => {
+                                 const newOpts = [...q.options]
+                                 newOpts[oi] = e.target.value
+                                 setForm(p => ({ ...p, quiz_questions: (p.quiz_questions || []).map(x => x.id === q.id ? { ...x, options: newOpts } : x) }))
+                               }}
+                               placeholder={`Option ${String.fromCharCode(65 + oi)}`}
+                               style={{ padding: '6px 10px' }}
+                             />
+                           </div>
+                         ))}
+                       </div>
+                       <Field label="Points">
+                         <StyledInput
+                           type="number"
+                           value={q.points}
+                           onChange={e => setForm(p => ({ ...p, quiz_questions: (p.quiz_questions || []).map(x => x.id === q.id ? { ...x, points: parseInt(e.target.value) || 1 } : x) }))}
+                           style={{ maxWidth: 100 }}
+                         />
+                       </Field>
+                     </div>
+                   ))}
+                 </div>
+               )}
+            </div>
+
             <div style={{ background: '#ecfdf5', border: '1.5px solid #a7f3d0', padding: '24px', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                <div>
                   <h3 style={{ fontSize: 14, fontWeight: 800, color: '#065f46', margin: 0 }}>Final Publication Status</h3>
@@ -689,7 +780,8 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
                 content: '',
                 is_published: false,
                 topic: '',
-                cover_image_url: ''
+                cover_image_url: '',
+                quiz_questions: []
               })
               setEditorMode(true)
             }}>➕ Upload Material</Btn>
@@ -746,7 +838,8 @@ IMPORTANT INSTRUCTIONS FOR RICH CONTENT:
                         setForm({
                           ...res,
                           // Extra mapping to ensure no objects are passed
-                          id: res.id
+                          id: res.id,
+                          quiz_questions: Array.isArray(res.quiz_questions) ? res.quiz_questions : []
                         })
                         setEditorMode(true)
                       }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, color: '#64748b' }}>✏️</button>

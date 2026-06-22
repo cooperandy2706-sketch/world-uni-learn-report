@@ -271,9 +271,11 @@ export default function AdminGlobalQuizzesPage() {
 
     setIsSubmitting(true)
     try {
+      // Super-admin creates truly global quizzes (school_id = null)
+      // Other admins create school-scoped quizzes
       const payload = {
         ...form,
-        school_id: user!.school_id,
+        school_id: user?.role === 'super_admin' ? null : (user?.school_id || null),
       }
 
       const { error } = await supabase.from('global_quizzes').insert(payload)
@@ -301,9 +303,10 @@ export default function AdminGlobalQuizzesPage() {
   async function togglePublish(quiz: any) {
     try {
       const newStatus = !quiz.is_published
-      const { error } = await supabase.from('global_quizzes').update({ is_published: newStatus }).eq('id', quiz.id).eq('school_id', user!.school_id)
+      // Use only id filter — school_id can be null for global public quizzes
+      const { error } = await supabase.from('global_quizzes').update({ is_published: newStatus }).eq('id', quiz.id)
       if (error) throw error
-      toast.success(newStatus ? 'Quiz published to all students' : 'Quiz unpublished')
+      toast.success(newStatus ? '✅ Quiz published — visible on guest portal' : 'Quiz unpublished')
       loadQuizzes()
     } catch (err: any) {
       toast.error(err.message)
@@ -313,7 +316,7 @@ export default function AdminGlobalQuizzesPage() {
   async function handleDelete(id: string) {
     if (!confirm('Are you sure you want to delete this global quiz?')) return
     try {
-      const { error } = await supabase.from('global_quizzes').delete().eq('id', id).eq('school_id', user!.school_id)
+      const { error } = await supabase.from('global_quizzes').delete().eq('id', id)
       if (error) throw error
       toast.success('Global quiz deleted')
       loadQuizzes()

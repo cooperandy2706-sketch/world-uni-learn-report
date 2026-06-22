@@ -79,11 +79,13 @@ export default function AuthPage() {
   
   const [isAnimating, setIsAnimating] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
+  const [isIndependent, setIsIndependent] = useState(false)
 
   const [form, setForm] = useState({
     school_code: '', full_name: '', email: '', password: '', confirm_password: '',
     phone: '', staff_id: '', qualification: '', student_id: '', class_name: '',
   })
+  const [independentGrade, setIndependentGrade] = useState('')
 
   function update(k: string, v: string) { setForm(f => ({ ...f, [k]: v })) }
 
@@ -133,14 +135,15 @@ export default function AuthPage() {
     e.preventDefault()
     setError('')
 
-    if (!form.school_code) { setError('Required'); return }
+    if (!isIndependent && !form.school_code) { setError('Required'); return }
     if (!form.full_name || !form.email || !form.password) { setError('Please complete fields'); return }
     if (form.password.length < 6) { setError('Min 6 characters'); return }
     if (form.password !== form.confirm_password) { setError('Passwords do not match'); return }
 
     setLoading(true)
     try {
-      const { data: schoolCheck, error: verifyErr } = await supabase.from('schools').select('id').eq('id', form.school_code).maybeSingle()
+      const selectedSchoolId = isIndependent ? '392a6abc-8f9b-44dd-a4bd-adf1cfc19dd5' : form.school_code
+      const { data: schoolCheck, error: verifyErr } = await supabase.from('schools').select('id').eq('id', selectedSchoolId).maybeSingle()
       if (verifyErr || !schoolCheck) { throw new Error('Invalid school code.') }
 
       const { data: authData, error: authErr } = await supabase.auth.signUp({
@@ -152,12 +155,15 @@ export default function AuthPage() {
       if (!authData.user) throw new Error('Signup failed.')
 
       const uid = authData.user.id
-      const selectedSchoolId = form.school_code
+
+      // Independent students are instantly approved — no admin gating
+      const autoApprove = isIndependent && role === 'student'
 
       await supabase.from('users').insert({
         id: uid, school_id: selectedSchoolId,
         full_name: form.full_name, email: form.email,
-        role: role, phone: form.phone || null, is_active: false,
+        role: role, phone: form.phone || null,
+        is_active: autoApprove ? true : false,
       })
 
       if (role === 'teacher') {
@@ -165,6 +171,25 @@ export default function AuthPage() {
           user_id: uid, school_id: selectedSchoolId,
           staff_id: form.staff_id || null, qualification: form.qualification || null,
         })
+      } else if (role === 'student') {
+        await supabase.from('students').insert({
+          user_id: uid, school_id: selectedSchoolId,
+          full_name: form.full_name,
+          is_active: autoApprove ? true : false,
+        })
+      }
+
+      if (autoApprove) {
+        // Save grade choice so portal loads it immediately
+        const { data: authUser } = await supabase.auth.getUser()
+        if (independentGrade && authUser?.user?.id) {
+          localStorage.setItem(`wul_grade_${authUser.user.id}`, independentGrade)
+        }
+        // Sign them in and go straight to their portal
+        await signIn(form.email, form.password)
+        navigate(ROUTES.STUDENT_DASHBOARD, { replace: true })
+        toast.success(`Welcome to World Uni-Learn, ${form.full_name}! 🎉`)
+        return
       }
 
       setSuccess('Account pending admin approval.')
@@ -463,9 +488,56 @@ export default function AuthPage() {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <UnderlineField label="School Code" type="text" value={form.school_code} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('school_code',e.target.value)} required />
+                  {isIndependent ? (
+                    <UnderlineField label="School Code" type="text" value="World Uni-Learn" disabled />
+                  ) : (
+                    <UnderlineField label="School Code" type="text" value={form.school_code} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('school_code',e.target.value)} required />
+                  )}
                   <UnderlineField label="Full Name" type="text" value={form.full_name} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('full_name',e.target.value)} required />
                 </div>
+                
+                {role === 'student' && (
+                  <div style={{ marginBottom: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: isIndependent ? 14 : 0 }}>
+                      <input 
+                        type="checkbox" 
+                        id="independent-check" 
+                        checked={isIndependent} 
+                        onChange={(e) => {
+                          setIsIndependent(e.target.checked)
+                          if (e.target.checked) update('school_code', '')
+                        }}
+                        style={{ cursor: 'pointer', width: 16, height: 16, accentColor: '#f59e0b' }} 
+                      />
+                      <label htmlFor="independent-check" style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', cursor: 'pointer' }}>
+                        My school is not registered (Sign up as an Independent Student)
+                      </label>
+                    </div>
+                    {isIndependent && (
+                      <div style={{ marginTop: 4 }}>
+                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>📚 Select Your Grade Level</label>
+                        <select
+                          value={independentGrade}
+                          onChange={e => setIndependentGrade(e.target.value)}
+                          required
+                          style={{
+                            width: '100%', padding: '10px 14px', borderRadius: 8,
+                            background: 'rgba(255,255,255,0.08)', border: `1.5px solid ${independentGrade ? '#f59e0b' : 'rgba(255,255,255,0.3)'}`,
+                            color: '#fff', fontSize: 14, outline: 'none', cursor: 'pointer',
+                          }}
+                        >
+                          <option value="" style={{ background: '#1e0646' }}>— Choose your grade —</option>
+                          {[['G1','Grade 1 (Basic 1)'],['G2','Grade 2 (Basic 2)'],['G3','Grade 3 (Basic 3)'],
+                            ['G4','Grade 4 (Basic 4)'],['G5','Grade 5 (Basic 5)'],['G6','Grade 6 (Basic 6)'],
+                            ['G7','Grade 7 (JHS 1)'],['G8','Grade 8 (JHS 2)'],['G9','Grade 9 (JHS 3)']]
+                          .map(([v, l]) => (
+                            <option key={v} value={v} style={{ background: '#1e0646' }}>{l}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                )}
                 
                 <UnderlineField label="Email Address" type="email" value={form.email} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>update('email',e.target.value)} required />
                 

@@ -36,6 +36,22 @@ export default function DebtorsPage() {
   const [filter, setFilter] = useState<'all' | 'debtors' | 'paid' | 'scholarship'>('all')
   const [searchQ, setSearchQ] = useState('')
 
+  const [showPrintModal, setShowPrintModal] = useState(false)
+  const [printCols, setPrintCols] = useState({
+    id: true,
+    class: true,
+    guardianName: false,
+    motherPhone: false,
+    fatherPhone: false,
+    arrears: true,
+    paid: true,
+    tuitionOwed: true,
+    dailyOwed: true,
+    totalDebt: true,
+    status: true,
+  })
+  const [printSummary, setPrintSummary] = useState(true)
+
 
 
   // staleTime: 0 — always refetch when navigating back from a different term
@@ -177,14 +193,50 @@ export default function DebtorsPage() {
   const scholarshipCount = rows.filter(r => r.scholarship_type && r.scholarship_type !== 'none').length
 
   function printDebtors() {
+    setShowPrintModal(false)
     const cls = (classes as any[]).find((c: any) => c.id === selectedClass)
     const win = window.open('', '_blank', 'width=800,height=700')
     if (!win) return
     const tbody = filtered.map(r => {
       const schBadge = r.scholarship_type && r.scholarship_type !== 'none'
         ? ' <span style="background:#f0fdf4;color:#16a34a;padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700">' + (r.scholarship_type === 'full' ? 'FULL' : r.scholarshipPct + '%') + '</span>' : ''
-      return '<tr><td>' + r.full_name + schBadge + '</td><td>' + (r.student_id ?? '\u2014') + '</td><td>' + ((r.class as any)?.name ?? '\u2014') + '</td><td style="color:' + (r.feesArrears > 0 ? '#dc2626' : '#374151') + '">' + CUR(r.feesArrears) + '</td><td>' + CUR(r.totalPaid) + '</td><td>' + CUR(r.tuitionOwed) + '</td><td>' + CUR(r.dailyOwed) + '</td><td style="font-weight:800;color:' + (r.totalOwed > 0 ? '#dc2626' : '#16a34a') + '">' + CUR(r.totalOwed) + '</td><td><span style="background:' + (r.status === 'paid' ? '#f0fdf4' : r.status === 'partial' ? '#fef3c7' : '#fef2f2') + ';color:' + (r.status === 'paid' ? '#16a34a' : r.status === 'partial' ? '#92400e' : '#dc2626') + ';padding:2px 8px;border-radius:99px;font-weight:700;font-size:11px">' + r.status.toUpperCase() + '</span></td></tr>'
+      return '<tr><td>' + r.full_name + schBadge + '</td>' + 
+      (printCols.id ? '<td>' + (r.student_id ?? '\u2014') + '</td>' : '') +
+      (printCols.class ? '<td>' + ((r.class as any)?.name ?? '\u2014') + '</td>' : '') +
+      (printCols.guardianName ? '<td>' + (r.guardian_name ?? '\u2014') + '</td>' : '') +
+      (printCols.motherPhone ? '<td>' + (r.guardian_phone ?? '\u2014') + '</td>' : '') +
+      (printCols.fatherPhone ? '<td>' + (r.guardian_email ?? '\u2014') + '</td>' : '') +
+      (printCols.arrears ? '<td style="color:' + (r.feesArrears > 0 ? '#dc2626' : '#374151') + '">' + CUR(r.feesArrears) + '</td>' : '') +
+      (printCols.paid ? '<td>' + CUR(r.totalPaid) + '</td>' : '') +
+      (printCols.tuitionOwed ? '<td>' + CUR(r.tuitionOwed) + '</td>' : '') +
+      (printCols.dailyOwed ? '<td>' + CUR(r.dailyOwed) + '</td>' : '') +
+      (printCols.totalDebt ? '<td style="font-weight:800;color:' + (r.totalOwed > 0 ? '#dc2626' : '#16a34a') + '">' + CUR(r.totalOwed) + '</td>' : '') +
+      (printCols.status ? '<td><span style="background:' + (r.status === 'paid' ? '#f0fdf4' : r.status === 'partial' ? '#fef3c7' : '#fef2f2') + ';color:' + (r.status === 'paid' ? '#16a34a' : r.status === 'partial' ? '#92400e' : '#dc2626') + ';padding:2px 8px;border-radius:99px;font-weight:700;font-size:11px">' + r.status.toUpperCase() + '</span></td>' : '') +
+      '</tr>'
     }).join('')
+
+    const thead = '<tr><th>Student</th>' +
+      (printCols.id ? '<th>ID</th>' : '') +
+      (printCols.class ? '<th>Class</th>' : '') +
+      (printCols.guardianName ? '<th>Guardian Name</th>' : '') +
+      (printCols.motherPhone ? '<th>Mother\u2019s Contact</th>' : '') +
+      (printCols.fatherPhone ? '<th>Father\u2019s Contact</th>' : '') +
+      (printCols.arrears ? '<th>Arrears</th>' : '') +
+      (printCols.paid ? '<th>Paid</th>' : '') +
+      (printCols.tuitionOwed ? '<th>Tuition Owed</th>' : '') +
+      (printCols.dailyOwed ? '<th>Daily Owed</th>' : '') +
+      (printCols.totalDebt ? '<th>Total Debt</th>' : '') +
+      (printCols.status ? '<th>Status</th>' : '') +
+      '</tr>'
+
+    const summaryHtml = printSummary ? [
+      '<div class="summary">',
+      '<div class="sum-card"><div class="sum-val">' + debtorCount + '</div><div class="sum-label">Total Debtors</div></div>',
+      '<div class="sum-card"><div class="sum-val" style="color:#dc2626">' + CUR(totalOwed) + '</div><div class="sum-label">Total Outstanding</div></div>',
+      '<div class="sum-card"><div class="sum-val" style="color:#16a34a">' + CUR(totalCollected) + '</div><div class="sum-label">Total Collected</div></div>',
+      '</div>',
+    ].join('') : ''
+
     const html = [
       '<!DOCTYPE html><html><head><title>Debtors List</title>',
       '<style>body{font-family:system-ui,sans-serif;padding:24px}h1{font-size:20px;margin-bottom:4px}',
@@ -195,12 +247,8 @@ export default function DebtorsPage() {
       '<body onload="window.print()">',
       '<h1>Debtors List' + (cls ? ' \u2014 ' + cls.name : '') + '</h1>',
       '<p style="color:#6b7280;font-size:12px">' + (term?.name ?? '') + ' \u00B7 Printed ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + '</p>',
-      '<div class="summary">',
-      '<div class="sum-card"><div class="sum-val">' + debtorCount + '</div><div class="sum-label">Total Debtors</div></div>',
-      '<div class="sum-card"><div class="sum-val" style="color:#dc2626">' + CUR(totalOwed) + '</div><div class="sum-label">Total Outstanding</div></div>',
-      '<div class="sum-card"><div class="sum-val" style="color:#16a34a">' + CUR(totalCollected) + '</div><div class="sum-label">Total Collected</div></div>',
-      '</div>',
-      '<table><thead><tr><th>Student</th><th>ID</th><th>Class</th><th>Arrears</th><th>Paid</th><th>Tuition Owed</th><th>Daily Owed</th><th>Total Debt</th><th>Status</th></tr></thead><tbody>' + tbody + '</tbody></table>',
+      summaryHtml,
+      '<table><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table>',
       '</body></html>',
     ].join('\n')
     win.document.write(html)
@@ -246,7 +294,7 @@ export default function DebtorsPage() {
             >
               💬 Notify via WhatsApp
             </button>
-            <button onClick={printDebtors} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', background: '#1e0646', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+            <button onClick={() => setShowPrintModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', background: '#1e0646', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
               <Printer size={14} /> Print Debtors List
             </button>
           </div>
@@ -374,6 +422,54 @@ export default function DebtorsPage() {
           )}
         </div>
       </div>
+
+      <Modal open={showPrintModal} onClose={() => setShowPrintModal(false)} title="Print Options" subtitle="Select the columns to include on the printed list.">
+        <div style={{ padding: '16px 20px' }}>
+          <div style={{ marginBottom: 16, fontWeight: 700, fontSize: 14, color: 'var(--text-main)' }}>Columns to Include</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            {Object.entries(printCols).map(([key, val]) => (
+              <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-main)', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={val} 
+                  onChange={e => setPrintCols(p => ({ ...p, [key]: e.target.checked }))} 
+                  style={{ width: 16, height: 16, accentColor: '#6d28d9', cursor: 'pointer' }}
+                />
+                <span style={{ fontWeight: 500 }}>
+                  {key === 'id' ? 'Student ID' : 
+                   key === 'class' ? 'Class' : 
+                   key === 'guardianName' ? 'Guardian / Parent Name' :
+                   key === 'motherPhone' ? "Mother's Contact (guardian phone)" :
+                   key === 'fatherPhone' ? "Father's Contact (guardian email field)" :
+                   key === 'arrears' ? 'Arrears (prev. term carry-over)' : 
+                   key === 'paid' ? 'Total Paid' : 
+                   key === 'tuitionOwed' ? 'Tuition Owed (current term)' : 
+                   key === 'dailyOwed' ? 'Daily Owed (feeding/studies)' : 
+                   key === 'totalDebt' ? 'Total Debt (everything owed)' : 
+                   'Status'}
+                </span>
+              </label>
+            ))}
+          </div>
+
+          <div style={{ marginTop: 24, marginBottom: 16, fontWeight: 700, fontSize: 14, color: 'var(--text-main)' }}>Options</div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-main)', cursor: 'pointer' }}>
+            <input 
+              type="checkbox" 
+              checked={printSummary} 
+              onChange={e => setPrintSummary(e.target.checked)} 
+              style={{ width: 16, height: 16, accentColor: '#6d28d9', cursor: 'pointer' }}
+            />
+            <span style={{ fontWeight: 500 }}>Show Summary Cards (Total Debtors, Outstanding, Collected)</span>
+          </label>
+          <div style={{ marginTop: 32, display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+            <button onClick={() => setShowPrintModal(false)} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+            <button onClick={printDebtors} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#6d28d9', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Printer size={16} /> Generate Printout
+            </button>
+          </div>
+        </div>
+      </Modal>
 
     </>
   )

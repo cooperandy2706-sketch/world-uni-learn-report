@@ -13,6 +13,7 @@ import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 interface PlatformStats {
   totalSchools: number; pendingSchools: number
   totalTeachers: number; totalStudents: number
+  independentStudents: number
 }
 type SchoolStatus = 'pending' | 'active' | 'suspended'
 interface School {
@@ -121,10 +122,11 @@ export default function SuperAdminDashboard() {
         supabase.from('schools').select('*').order('created_at', { ascending: false }),
         supabase.from('teachers').select('*', { count: 'exact', head: true }),
         supabase.from('students').select('*', { count: 'exact', head: true }),
-        supabase.from('school_invoices').select('*, school:schools(id, name)').eq('status', 'requested_approval').order('created_at', { ascending: false })
+        supabase.from('school_invoices').select('*, school:schools(id, name)').eq('status', 'requested_approval').order('created_at', { ascending: false }),
+        supabase.from('students').select('*', { count: 'exact', head: true }).eq('school_id', '392a6abc-8f9b-44dd-a4bd-adf1cfc19dd5')
       ])
 
-      const [{ data: sData, error: sErr }, { count: tCount }, { count: stCount }, { data: invData }] = results
+      const [{ data: sData, error: sErr }, { count: tCount }, { count: stCount }, { data: invData }, { count: indepCount }] = results
 
       if (sErr) throw sErr
       
@@ -134,7 +136,8 @@ export default function SuperAdminDashboard() {
         totalSchools: scl.length,
         pendingSchools: scl.filter(s => s.status === 'pending').length,
         totalTeachers: tCount || 0,
-        totalStudents: stCount || 0
+        totalStudents: stCount || 0,
+        independentStudents: indepCount || 0
       })
       setPendingInvoices(invData || [])
     } catch (err: any) {
@@ -319,11 +322,14 @@ export default function SuperAdminDashboard() {
       </header>
 
       {/* Stats Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24, marginBottom: 48 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 24, marginBottom: 48 }}>
         <StatCard icon="🏫" label="Total Schools" value={stats?.totalSchools || 0} color="#6d28d9" bg="#f5f3ff" />
         <StatCard icon="⏳" label="Pending Approvals" value={stats?.pendingSchools || 0} color="#f59e0b" bg="#fffbeb" pulse={(stats?.pendingSchools || 0) > 0} />
         <StatCard icon="👨‍🏫" label="Total Teachers" value={stats?.totalTeachers || 0} color="#0891b2" bg="#ecfeff" />
         <StatCard icon="🎓" label="Total Students" value={stats?.totalStudents || 0} color="#059669" bg="#f0fdf4" />
+        <Link to="/super-admin/schools" state={{ search: 'World Uni-Learn' }} style={{ textDecoration: 'none' }}>
+          <StatCard icon="🌍" label="Independent Students" value={stats?.independentStudents || 0} color="#f43f5e" bg="#fff1f2" />
+        </Link>
       </div>
 
       {/* AI Usage Summary */}

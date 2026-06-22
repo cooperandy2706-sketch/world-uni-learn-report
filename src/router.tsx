@@ -213,6 +213,7 @@ export const router = createRouter([
         children: [
           { index: true, element: <Navigate to="/student/dashboard" replace /> },
           { path: 'dashboard', element: lazyPage(() => import('./pages/student/StudentDashboard')) },
+          { path: 'independent-portal', element: lazyPage(() => import('./pages/student/IndependentStudentDashboard')) },
           { path: 'results', element: lazyPage(() => import('./pages/student/ResultsPage')) },
           { path: 'assignments', element: lazyPage(() => import('./pages/student/StudentAssignmentsPage')) },
           { path: 'assignments/:id', element: lazyPage(() => import('./pages/student/TakeAssignmentPage')) },
