@@ -533,8 +533,49 @@ export default function GuestLearnHub() {
         </div>
       </div>
 
+
       {/* ── CONTENT ── */}
       <main className='hub-main'>
+
+        {/* ── WAEC EXAM HUB BANNER ── */}
+        <a href="/learn/waec" style={{ textDecoration: 'none', display: 'block', marginBottom: '2rem' }}>
+          <div style={{ background: 'linear-gradient(135deg, #1e0646 0%, #3730a3 60%, #7c3aed 100%)', borderRadius: 20, padding: '2rem', position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = '0.95')}
+            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
+            <div style={{ position: 'absolute', right: -20, top: -20, width: 180, height: 180, background: 'rgba(255,255,255,0.04)', borderRadius: '50%' }} />
+            <div style={{ position: 'absolute', right: 30, bottom: -30, width: 120, height: 120, background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }} />
+            <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.5rem' }}>
+              <div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', padding: '0.3rem 0.875rem', borderRadius: 20, fontSize: '0.75rem', color: 'white', fontWeight: 700, marginBottom: '0.875rem', backdropFilter: 'blur(10px)' }}>
+                  🎓 NEW — BECE & WAEC Standard
+                </div>
+                <h3 style={{ color: 'white', margin: '0 0 0.5rem', fontSize: '1.5rem', fontWeight: 900, fontFamily: '"Playfair Display", serif' }}>
+                  Timed Exam Hub
+                </h3>
+                <p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, fontSize: '0.95rem', maxWidth: 480, lineHeight: 1.6 }}>
+                  Practice with authentic WAEC-style timed mock exams — 40 objectives + 5-from-7 essay questions. Basic 1 to Basic 9 (BECE).
+                </p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  {[
+                    { label: 'Class Levels', val: '9' },
+                    { label: 'Subjects', val: '8+' },
+                    { label: 'Questions/Exam', val: '47' },
+                  ].map(s => (
+                    <div key={s.label} style={{ textAlign: 'center', background: 'rgba(255,255,255,0.1)', padding: '0.5rem 0.75rem', borderRadius: 10 }}>
+                      <p style={{ margin: 0, color: 'white', fontSize: '1.25rem', fontWeight: 900 }}>{s.val}</p>
+                      <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.65rem', fontWeight: 700 }}>{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ background: 'white', color: '#1e0646', padding: '0.625rem 1.5rem', borderRadius: 10, fontWeight: 800, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                  Start an Exam →
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
 
         {isSearching ? (
           // SEARCH RESULTS VIEW
