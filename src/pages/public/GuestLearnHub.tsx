@@ -257,7 +257,6 @@ function getTypeInfo(type: string) {
 export default function GuestLearnHub() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<'quizzes' | 'resources'>('quizzes')
-  const [selectedResource, setSelectedResource] = useState<any | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
 
   const { data: quizzes, isLoading: loadingQuizzes } = useQuery({
@@ -424,7 +423,7 @@ export default function GuestLearnHub() {
           </div>
           <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1e0646', marginBottom: '0.4rem', lineHeight: 1.35 }}>{res.title}</h4>
           <p style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: 1.55, marginBottom: '1.25rem', flex: 1 }}>{res.description || 'Explore this study material to learn more.'}</p>
-          <button onClick={() => setSelectedResource(res)}
+          <button onClick={() => navigate(`/learn/resource/${res.id}`)}
             style={{ width: '100%', background: '#f5f3ff', color: '#7c3aed', border: '1.5px solid #ede9fe', padding: '0.75rem', borderRadius: 10, fontWeight: 800, cursor: 'pointer', fontSize: '0.875rem', transition: 'all 0.2s' }}
             onMouseEnter={e => { e.currentTarget.style.background = '#ede9fe'; e.currentTarget.style.color = '#5b21b6' }}
             onMouseLeave={e => { e.currentTarget.style.background = '#f5f3ff'; e.currentTarget.style.color = '#7c3aed' }}>
@@ -452,8 +451,8 @@ export default function GuestLearnHub() {
         .hub-hero-section { padding:2rem 1rem 3rem; }
         .hub-main         { padding:1.25rem 1rem 5rem; max-width:1200px; margin:0 auto; }
         .hub-page-h2      { font-size:1.4rem !important; }
-        .modal-wrap       { align-items:flex-end !important; }
-        .modal-inner      { border-radius:16px 16px 0 0 !important; max-height:95vh !important; width:100% !important; max-width:100% !important; margin-top:auto; }
+        .modal-wrap       { align-items:center !important; padding:1rem !important; }
+        .modal-inner      { border-radius:20px !important; max-height:92vh !important; width:100% !important; max-width:860px !important; margin:auto !important; }
         @media(min-width:480px){
           .hub-subject-grid { grid-template-columns:1fr 1fr; gap:1rem; }
           .hub-card-grid    { grid-template-columns:1fr 1fr; }
@@ -462,8 +461,8 @@ export default function GuestLearnHub() {
           .hub-hero-section { padding:4rem 1.5rem 6rem; }
           .hub-main         { padding:2rem 1.5rem 6rem; }
           .hub-page-h2      { font-size:2rem !important; }
-          .modal-wrap       { align-items:center !important; }
-          .modal-inner      { border-radius:20px !important; max-height:92vh !important; max-width:860px !important; margin:auto !important; }
+          .modal-wrap       { padding:1.5rem !important; }
+          .modal-inner      { max-height:90vh !important; max-width:900px !important; }
         }
         @media(min-width:1024px){
           .hub-subject-grid { grid-template-columns:repeat(3,1fr); gap:1.25rem; }
@@ -840,66 +839,6 @@ export default function GuestLearnHub() {
           </div>
         )}
       </main>
-
-      {/* ── RESOURCE MODAL ── */}
-      {selectedResource && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)', zIndex: 1000, display: 'flex', justifyContent: 'center', padding: '0' }}
-          className='modal-wrap' onClick={e => { if (e.target === e.currentTarget) setSelectedResource(null) }}>
-          <div className='modal-inner' style={{ background: 'white', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 32px 64px -12px rgba(0,0,0,0.4)', animation: 'fadeUp 0.25s ease' }}>
-
-            {/* Modal Header */}
-            <div style={{ padding: '1.25rem 1.75rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'white', flexShrink: 0, gap: '1rem' }}>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.375rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <span style={{ background: getTypeInfo(selectedResource.content_type).bg, color: getTypeInfo(selectedResource.content_type).color, padding: '0.2rem 0.6rem', borderRadius: 100, fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase' }}>
-                    {getTypeInfo(selectedResource.content_type).icon} {selectedResource.content_type.replace('_', ' ')}
-                  </span>
-                  <span style={{ background: '#f5f3ff', color: '#7c3aed', padding: '0.2rem 0.6rem', borderRadius: 100, fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase' }}>
-                    {(selectedResource.subjects as any)?.name || 'General'}
-                  </span>
-                  {selectedResource.topic && <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>• {selectedResource.topic}</span>}
-                </div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#1e0646', margin: 0, lineHeight: 1.35 }}>{selectedResource.title}</h3>
-              </div>
-              <button onClick={() => setSelectedResource(null)}
-                style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid #e2e8f0', background: '#f8fafc', color: '#475569', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s' }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#fee2e2'; e.currentTarget.style.color = '#dc2626' }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.color = '#475569' }}>
-                ✕
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div style={{ padding: '1.75rem 2rem', overflowY: 'auto', flex: 1 }}>
-              {/* Description */}
-              {selectedResource.description && (
-                <div style={{ marginBottom: '1.75rem', padding: '1.25rem 1.5rem', background: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)', borderRadius: 14, border: '1px solid #c4b5fd' }}>
-                  <h4 style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#7c3aed', margin: '0 0 0.375rem 0' }}>📌 Overview</h4>
-                  <p style={{ margin: 0, color: '#4c1d95', lineHeight: 1.65, fontSize: '0.95rem' }}>{selectedResource.description}</p>
-                </div>
-              )}
-
-              {/* Main content */}
-              {renderResourceContent(selectedResource)}
-
-              {/* Embedded Practice Quiz (if resource has linked_quiz_id or quiz content) */}
-              {selectedResource.content_type === 'passage' && selectedResource.quiz_questions && selectedResource.quiz_questions.length > 0 && (
-                <InlineMiniQuiz questions={selectedResource.quiz_questions} />
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div style={{ padding: '1rem 1.75rem', borderTop: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-              <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>ASOS Learning Hub · Free Resource</span>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <Link to="/login" style={{ background: '#1e0646', color: 'white', textDecoration: 'none', padding: '0.6rem 1.25rem', borderRadius: 8, fontWeight: 700, fontSize: '0.85rem' }}>
-                  Sign In for More →
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

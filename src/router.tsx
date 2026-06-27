@@ -332,6 +332,7 @@ export const router = createRouter([
       },
       { path: '/learn', element: lazyPage(() => import('./pages/public/GuestLearnHub')) },
       { path: '/learn/quiz/:id', element: lazyPage(() => import('./pages/public/GuestTakeQuizPage')) },
+      { path: '/learn/resource/:id', element: lazyPage(() => import('./pages/public/GuestResourcePage')) },
       { path: '/learn/waec', element: lazyPage(() => import('./pages/public/WAECExamHub')) },
       { path: '/learn/waec/:id', element: lazyPage(() => import('./pages/public/WAECExamSession')) },
       { path: '/:handle', element: lazyPage(() => import('./pages/public/SchoolProfilePage')) },

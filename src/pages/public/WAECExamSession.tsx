@@ -3,6 +3,72 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 
+const CHAT_REMARKS = [
+  "Nice choice! 🚀",
+  "You're on fire! 🔥",
+  "Great selection! 🌟",
+  "Got it! 🧠",
+  "Locked in! 🎯",
+  "Good one! 👏",
+  "Awesome! ✨",
+  "Keep it up! 💪",
+  "Brilliant! 💡",
+  "You got this! 🏆",
+  "Nailed it! 🔨",
+  "Spot on! 🎯",
+  "Genius move! 🤯",
+  "Smooth! 🏄‍♂️",
+  "Cooking! 👨‍🍳",
+  "Let's go! 🏎️",
+  "Perfect! 👌",
+  "Big brain energy! 🧠⚡",
+  "Ooo, confident! 😎",
+  "I see you! 👀",
+  "Taking notes! 📝",
+  "Solid pick! 🧱",
+  "Absolutely smashing! 💥",
+  "Top tier answer! 👑",
+  "No hesitation! ⚡",
+  "You're making this look easy! 🏄‍♀️",
+  "That's the spirit! 🎉",
+  "Masterclass! 🎓",
+  "A+ energy! ⭐",
+  "We love to see it! 🤩",
+  "Boom! 💥",
+  "Expert level! 🥇",
+  "Unstoppable! 🚂",
+  "Level up! 🆙",
+  "Flawless! 💎",
+  "In the zone! 🌀",
+  "Easy peasy! 🍋",
+  "Elite! 🦅",
+  "Too good! 🤌",
+  "Legendary! 🐉",
+  "Big W! 🏆",
+  "On point! 🎯",
+  "Spectacular! 🎇",
+  "100% focused! 💯",
+  "Sharp! 🔪",
+  "You dropped this 👑",
+  "Absolutely goated! 🐐",
+  "They're not ready for you! 😤",
+  "A natural! 🌱",
+  "Just warming up! 🏃",
+  "Untouchable! 🛡️",
+  "Nothing can stop you! 🚀",
+  "Too fast, too furious! 🏎️💨",
+  "Simply magical! 🪄",
+  "Crushing it! 🦍",
+  "Mind-blowing! 🤯",
+  "You're a wizard! 🧙‍♂️",
+  "Straight up genius! 🧠📈",
+  "Excellence! 🌟",
+  "Pro gamer move! 🎮",
+  "That's how it's done! 👏",
+  "Built different! 🏗️",
+  "Calculated! 🧮"
+]
+
 export default function WAECExamSession() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -11,6 +77,8 @@ export default function WAECExamSession() {
   const [objAnswers, setObjAnswers] = useState<Record<string, string>>({})
   const [subjAnswers, setSubjAnswers] = useState<Record<string, string>>({})
   const [selectedSubjQuestions, setSelectedSubjQuestions] = useState<Record<string, boolean>>({})
+  const [toastRemark, setToastRemark] = useState<{ text: string, id: number, type: 'A' | 'B' } | null>(null)
+  const remarkCounter = useRef(0)
   
   const [submitted, setSubmitted] = useState(false)
   const [objScore, setObjScore] = useState(0)
@@ -77,6 +145,15 @@ export default function WAECExamSession() {
   const handleObjSelect = (questionId: string, option: string) => {
     if (submitted) return
     setObjAnswers(prev => ({ ...prev, [questionId]: option }))
+    
+    remarkCounter.current += 1
+    const id = remarkCounter.current
+    const randomRemark = CHAT_REMARKS[Math.floor(Math.random() * CHAT_REMARKS.length)]
+    setToastRemark({ text: randomRemark, id, type: 'A' })
+    
+    setTimeout(() => {
+      setToastRemark(prev => prev?.id === id ? null : prev)
+    }, 2500)
   }
 
   const handleSubjToggle = (questionId: string) => {
@@ -89,6 +166,20 @@ export default function WAECExamSession() {
         alert(`You can only select ${sectionB.required || 5} questions in Section B. Unselect one first.`)
         return prev
       }
+
+      if (!isSelected) {
+        remarkCounter.current += 1
+        const id = remarkCounter.current
+        const randomRemark = CHAT_REMARKS[Math.floor(Math.random() * CHAT_REMARKS.length)]
+        setToastRemark({ text: randomRemark, id, type: 'B' })
+        
+        setTimeout(() => {
+          setToastRemark(prev => prev?.id === id ? null : prev)
+        }, 2500)
+      } else {
+        setToastRemark(null)
+      }
+
       return { ...prev, [questionId]: !isSelected }
     })
   }
@@ -128,7 +219,22 @@ export default function WAECExamSession() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f1f5f9', fontFamily: '"DM Sans", sans-serif', paddingBottom: '4rem' }}>
+    <div style={{ minHeight: '100vh', background: '#f1f5f9', fontFamily: '"DM Sans", sans-serif', paddingBottom: '4rem', position: 'relative' }}>
+      <style>{`
+        @keyframes popInBubbleFixed {
+          0% { opacity: 0; transform: translateY(30px) scale(0.8); }
+          60% { opacity: 1; transform: translateY(-5px) scale(1.05); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes popOutBubbleFixed {
+          0% { opacity: 1; transform: translateY(0) scale(1); }
+          100% { opacity: 0; transform: translateY(20px) scale(0.9); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
       {/* Header */}
       <header style={{ background: 'white', padding: '1rem 2rem', position: 'sticky', top: 0, zIndex: 50, borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
         <div>
@@ -311,6 +417,35 @@ export default function WAECExamSession() {
           </div>
         )}
       </main>
+
+      {/* Floating Toast Remark */}
+      {toastRemark && (
+        <div 
+          key={toastRemark.id} 
+          style={{
+            position: 'fixed',
+            bottom: '2.5rem',
+            right: '2.5rem',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            background: toastRemark.type === 'A' ? 'linear-gradient(135deg, #f3e8ff, #e9d5ff)' : 'linear-gradient(135deg, #fef3c7, #fde68a)',
+            color: toastRemark.type === 'A' ? '#581c87' : '#92400e',
+            padding: '1rem 1.5rem',
+            borderRadius: '24px 24px 0 24px',
+            fontWeight: 800,
+            fontSize: '1.1rem',
+            animation: 'popInBubbleFixed 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+            boxShadow: toastRemark.type === 'A' ? '0 10px 25px rgba(107, 33, 168, 0.2)' : '0 10px 25px rgba(245, 158, 11, 0.2)',
+            transformOrigin: 'bottom right'
+          }}
+        >
+          <div style={{ marginRight: '0.75rem', display: 'flex', alignItems: 'center' }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: toastRemark.type === 'A' ? '#a855f7' : '#d97706', animation: 'pulse 1.5s infinite' }} />
+          </div>
+          {toastRemark.text}
+        </div>
+      )}
     </div>
   )
 }
