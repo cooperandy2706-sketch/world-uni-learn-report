@@ -10,8 +10,11 @@ import { inventoryService } from '../../services/inventory.service'
 import { supabase } from '../../lib/supabase'
 import Modal from '../../components/ui/Modal'
 import toast from 'react-hot-toast'
-import { Plus, Trash2, Printer, CreditCard, Settings, GraduationCap, MessageCircle, Mail, Smartphone, AlertTriangle, CheckCircle2, Send, Loader2, Download, Bell, ShoppingCart, History, Trash, Minus, Search, Users, Check, Lock, Shield, X, Coins, BarChart3, Scale, Receipt, Banknote, Landmark, FileText } from 'lucide-react'
+import { Plus, Trash2, Printer, CreditCard, Settings, GraduationCap, MessageCircle, Mail, Smartphone, AlertTriangle, CheckCircle2, Send, Loader2, Download, Bell, ShoppingCart, History, Trash, Minus, Search, Users, Check, Lock, Shield, X, Coins, BarChart3, Scale, Receipt, Banknote, Landmark, FileText, Layers } from 'lucide-react'
 import { formatCurrency } from '../../utils/currency'
+import ReceiptTemplateSelector from './ReceiptTemplateSelector'
+import { RECEIPT_TEMPLATES, getThemeFromColorId } from './receiptTemplates'
+import type { ReceiptData } from './receiptTemplates'
 
 const METHODS = ['cash', 'momo', 'bank', 'cheque'] as const
 
@@ -48,7 +51,7 @@ export default function FeesPage() {
   const { data: term } = useCurrentTerm()
   const { data: year } = useCurrentAcademicYear()
   const { data: classes = [] } = useClasses()
-  const [tab, setTab] = useState<'structures' | 'record' | 'history' | 'balances' | 'store' | 'revenue' | 'settings'>('record')
+  const [tab, setTab] = useState<'structures' | 'record' | 'history' | 'balances' | 'store' | 'revenue' | 'settings' | 'templates'>('record')
   const [structureModal, setStructureModal] = useState(false)
   const [paymentModal, setPaymentModal] = useState(false)
   const [printReceipt, setPrintReceipt] = useState<any>(null)
@@ -60,12 +63,18 @@ export default function FeesPage() {
     orientation: 'portrait' | 'landscape'
     copies: 'single' | 'duplicate'
     style: 'breakdown' | 'simple'
+    thermalWidth: '58mm' | '80mm'
+    templateId: string
+    accentColor: string
   }>(() => {
     try {
       const saved = localStorage.getItem(`bursar_print_settings_${user?.id}`)
-      if (saved) return JSON.parse(saved)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        return { thermalWidth: '80mm', templateId: 'a5-landscape-split', accentColor: 'violet', ...parsed }
+      }
     } catch (e) {}
-    return { size: 'a5', orientation: 'landscape', copies: 'duplicate', style: 'breakdown' }
+    return { size: 'a5', orientation: 'landscape', copies: 'duplicate', style: 'breakdown', thermalWidth: '80mm', templateId: 'a5-landscape-split', accentColor: 'violet' }
   })
 
   const [pinSetup, setPinSetup] = useState({ oldPin: '', newPin: '', confirmPin: '' })
@@ -762,7 +771,61 @@ export default function FeesPage() {
   function handlePrintWithSavedSettings(payment: any) {
     if (!payment) return
 
-    const { size, orientation, copies, style } = printSettings
+    const { copies, templateId, accentColor, size, orientation, style } = printSettings
+    
+    // ── Template engine path ──────────────────────────────────────────
+    if (templateId) {
+      const tpl = RECEIPT_TEMPLATES.find(t => t.id === templateId)
+      if (tpl) {
+        const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === payment.student_id) as any
+        const { arrPaid, classStructures, termCharges, pct, netTermCharges, openingArrears, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
+        const txCurrency = payment.currency_code || schoolCurrency
+        const CUR = (n: number) => formatCurrency(n, txCurrency)
+        const logoHtml = school?.logo_url
+          ? `<img src="${school.logo_url}" alt="Logo" style="width:56px;height:56px;object-fit:contain;border-radius:10px;" />`
+          : CREST_SVG
+
+        const data: ReceiptData = {
+          schoolName: school?.name || 'School',
+          schoolAddress: school?.address || '',
+          schoolPhone: school?.phone || '',
+          schoolEmail: school?.email || '',
+          logoHtml,
+          studentName: stu?.full_name || '—',
+          studentId: stu?.student_id || '—',
+          className: stu?.class?.name || '—',
+          guardianName: stu?.guardian_name || '',
+          receiptNo: payment.id?.slice(0, 8).toUpperCase() || 'XXXXXXXX',
+          payDate: new Date(payment.payment_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+          payTime: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+          payMethod: payment.payment_method || 'cash',
+          reference: payment.reference_number || '',
+          term: (term as any)?.name || 'Current Term',
+          academicYear: (year as any)?.name || '',
+          currency: txCurrency,
+          amountPaid: Number(payment.amount_paid),
+          arrearsPaid: arrPaid,
+          openingArrears,
+          termCharges,
+          netTermCharges,
+          totalBill,
+          totalPaidToDate,
+          finalBalance,
+          pct,
+          feeLines: classStructures.map((s: any) => ({ name: s.fee_name, amount: s.amount })),
+        }
+
+        const theme = getThemeFromColorId(accentColor || 'violet')
+        const html = tpl.generateHTML(data, theme, copies)
+        const win = window.open('', '_blank', 'width=900,height=700')
+        if (!win) return
+        win.document.write(html)
+        win.document.close()
+        return
+      }
+    }
+
+    // ── Legacy fallback ────────────────────────────────────────────────
     if (size === 'thermal') { handlePrintThermal(payment, copies); return }
     if (size === 'a4' && style === 'breakdown') { handlePrint(payment, copies); return }
     if (size === 'a4' && style === 'simple') { handlePrintSimplified(payment, copies); return }
@@ -772,6 +835,7 @@ export default function FeesPage() {
     // Fallback
     handlePrintA5LandscapeSimplified(payment, copies)
   }
+
 
   // ── Shared financial summary helper ────────────────────────────────────
   function buildFinancials(payment: any, stu: any) {
@@ -793,122 +857,143 @@ export default function FeesPage() {
 
   function handlePrint(payment: any, copies: 'single' | 'duplicate' = 'duplicate') {
     const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === payment.student_id) as any
-    const struct = structures.find((s: any) => s.id === payment.fee_structure_id) as any
-    void struct
     const win = window.open('', '_blank', 'width=800,height=900')
     if (!win) return
 
     const txCurrency = payment.currency_code || schoolCurrency
     const CUR = (n: number) => formatCurrency(n, txCurrency)
-
     const { arrPaid, classStructures, termCharges, pct, netTermCharges, openingArrears, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
 
     const logoHtml = school?.logo_url 
-      ? `<img loading="lazy" src="${school.logo_url}" alt="Logo" style="width: 70px; height: 70px; object-fit: contain; border-radius: 12px; background: #ffffff; padding: 4px; border: 1.5px solid #ede9fe;" />`
+      ? `<img src="${school.logo_url}" alt="Logo" style="width: 70px; height: 70px; object-fit: contain; border-radius: 12px; background: #ffffff; padding: 4px; border: 1.5px solid #ede9fe;" />`
       : CREST_SVG
 
     const buildReceiptHTML = (type: string) => `
-      <div style="height: 147mm; padding: 6px 20px; display: flex; flex-direction: column; justify-content: flex-start; position: relative; overflow: hidden; background: #ffffff; box-sizing: border-box;">
+      <div style="height: 148.5mm; width: 210mm; padding: 15mm 20mm; box-sizing: border-box; display: flex; flex-direction: column; position: relative; background: #fff; overflow: hidden; font-family: 'DM Sans', sans-serif;">
+        <!-- Accent bar -->
+        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: linear-gradient(to bottom, #7c3aed, #4c1d95);"></div>
         <!-- Watermark -->
-        <div style="position: absolute; top: 15%; left: 50%; transform: translate(-50%, -15%) rotate(-15deg); font-size: 80px; font-weight: 900; color: rgba(76, 29, 149, 0.03); whiteSpace: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); font-size: 80px; font-weight: 900; color: rgba(76, 29, 149, 0.03); white-space: nowrap; pointer-events: none; z-index: 0; text-transform: uppercase;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
 
-        <div style="position: relative; z-index: 1;">
-          <div style="font-size:7.5px; font-weight:800; color:#6d28d9; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:5px; text-align:center; background: #f5f3ff; padding: 2px 0; border-radius: 4px;">${type}</div>
-          
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1.5px solid #4c1d95; padding-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: 18px;">
-              <div style="flex-shrink: 0; background: #fff; border: 1.5px solid #f3f4f6; border-radius: 12px; padding: 4px;">
-                ${logoHtml}
-              </div>
+        <div style="position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column;">
+          <!-- Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8mm; border-bottom: 2px solid #f1f5f9; padding-bottom: 6mm;">
+            <div style="display: flex; gap: 15px; align-items: center;">
+              ${logoHtml}
               <div>
-                <div style="font-size:19px; font-weight:900; color:#1e0646; margin-bottom:1px; font-family:'Playfair Display',serif; line-height: 1.1;">${school?.name || 'OFFICIAL RECEIPT'}</div>
-                ${school?.motto ? `<div style="font-size:10px; color:#6d28d9; margin-bottom:6px; font-style: italic; font-weight: 600; opacity: 0.8;">&ldquo;${school.motto}&rdquo;</div>` : ''}
-                <div style="display: flex; flex-direction: column; gap: 2px;">
-                  ${school?.address ? `<div style="font-size:9.5px; color:#6b7280; display: flex; align-items: center; gap: 4px;"><span>📍</span> ${school.address}</div>` : ''}
-                  ${school?.phone ? `<div style="font-size:9.5px; color:#6b7280; display: flex; align-items: center; gap: 4px;"><span>📞</span> ${school.phone}</div>` : ''}
+                <div style="font-size: 20px; font-weight: 900; color: #1e0646; font-family: 'Playfair Display', serif; line-height: 1.1;">${school?.name || 'SCHOOL FEE RECEIPT'}</div>
+                ${school?.motto ? `<div style="font-size: 11px; color: #7c3aed; font-style: italic; margin-top: 2px; font-weight: 600;">"${school.motto}"</div>` : ''}
+                <div style="font-size: 10px; color: #64748b; margin-top: 4px;">
+                  ${school?.address ? `📍 ${school.address}<br/>` : ''}
+                  ${school?.phone ? `📞 ${school.phone}` : ''}
                 </div>
               </div>
             </div>
+            <div style="text-align: right;">
+              <div style="display: inline-block; background: #f5f3ff; color: #6d28d9; padding: 4px 12px; border-radius: 20px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">${type}</div>
+              <div style="font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Receipt No.</div>
+              <div style="font-size: 14px; font-weight: 900; color: #0f172a;">#${payment.id?.slice(0, 8).toUpperCase()}</div>
+              <div style="font-size: 11px; color: #475569; margin-top: 2px; font-weight: 500;">${new Date(payment.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+            </div>
+          </div>
 
-            <div style="text-align: right; border-left: 1px dashed #e5e7eb; padding-left: 20px;">
-              <div style="margin-bottom: 8px;">
-                <div style="font-size:8px; font-weight:800; color:#9ca3af; text-transform:uppercase; letter-spacing:0.1em; margin-bottom: 4px;">Issued To</div>
-                <div style="font-size:15px; font-weight:900; color:#111827; line-height: 1.1;">${stu?.full_name ?? '—'}</div>
-                <div style="font-size:10px; color:#6d28d9; font-weight: 700; margin-top: 2px;">${(stu?.class as any)?.name ?? '—'} &middot; ${stu?.student_id || 'N/A'}</div>
+          <!-- Grid: Student & Payment Info -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15mm; margin-bottom: 8mm;">
+            <div>
+              <div style="font-size: 9px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 6px;">Billed To</div>
+              <div style="font-size: 14px; font-weight: 800; color: #0f172a;">${stu?.full_name ?? '—'}</div>
+              <div style="font-size: 11px; color: #6d28d9; font-weight: 600; margin-top: 2px;">Class: ${(stu?.class as any)?.name ?? '—'}</div>
+              <div style="font-size: 11px; color: #475569; margin-top: 1px;">ID: ${stu?.student_id || 'N/A'}</div>
+            </div>
+            <div>
+              <div style="font-size: 9px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 6px;">Payment Info</div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span style="font-size: 11px; color: #475569;">Method</span>
+                <strong style="font-size: 11px; color: #0f172a; text-transform: uppercase;">${payment.payment_method}</strong>
               </div>
-              <div>
-                <div style="font-size:8px; font-weight:800; color:#9ca3af; text-transform:uppercase; letter-spacing:0.1em; margin-bottom: 4px;">Transaction ID</div>
-                <div style="font-size:11px; font-weight:800; color:#374151;">#${payment.id?.slice(0, 8).toUpperCase()}</div>
-                <div style="font-size:9.5px; color:#6b7280; font-weight: 600;">${new Date(payment.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+              ${payment.reference_number ? `
+              <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span style="font-size: 11px; color: #475569;">Reference</span>
+                <strong style="font-size: 11px; color: #0f172a;">${payment.reference_number}</strong>
+              </div>` : ''}
+              <div style="display: flex; justify-content: space-between;">
+                <span style="font-size: 11px; color: #475569;">Status</span>
+                <strong style="font-size: 11px; color: ${finalBalance > 0 ? '#dc2626' : '#16a34a'};">${finalBalance > 0 ? 'Balance Pending' : 'Account Cleared'}</strong>
               </div>
             </div>
           </div>
 
-          <div style="background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 8px; padding: 10px 18px; color: #ffffff; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <!-- Hero Banner -->
+          <div style="background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 8px; padding: 4mm 6mm; color: #ffffff; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6mm; box-shadow: 0 4px 15px rgba(76,29,149,0.15);">
             <div>
-              <div style="font-size:10px; font-weight:700; opacity: 0.8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom: 2px;">Total Amount Paid</div>
-              <div style="font-size:20px; font-weight:900; letter-spacing: -0.01em;">${CUR(payment.amount_paid)}</div>
+              <div style="font-size: 10px; font-weight: 700; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.05em;">Amount Paid</div>
+              <div style="font-size: 24px; font-weight: 900;">${CUR(payment.amount_paid)}</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-size:10px; font-weight:700; opacity: 0.8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom: 2px;">${finalBalance < 0 ? 'Credit Balance' : 'Remaining Balance'}</div>
-              <div style="font-size:15px; font-weight:900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'};">${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}</div>
+              <div style="font-size: 10px; font-weight: 700; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.05em;">${finalBalance < 0 ? 'Credit Balance' : 'Remaining Balance'}</div>
+              <div style="font-size: 18px; font-weight: 900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'};">${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CR: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}</div>
             </div>
           </div>
 
-          ${payment.notes ? `
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px; padding: 6px 10px; margin-bottom: 6px;">
-            <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Payment Notes / Coverage</div>
-            <div style="font-size: 11px; color: #1e293b; font-weight: 600; line-height: 1.4;">${payment.notes}</div>
-          </div>` : ''}
-
-          <table style="width:100%; border-collapse:collapse; margin-bottom: 8px;">
-            <thead>
-              <tr>
-                <th style="text-align: left; padding: 6px 0; font-size: 9px; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #e5e7eb;">Charge Description</th>
-                <th style="text-align: right; padding: 6px 0; font-size: 9px; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #e5e7eb;">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${openingArrears !== 0 ? `
-              <tr>
-                <td style="padding: 3px 0; font-size: 11px; color: ${openingArrears > 0 ? '#64748b' : '#16a34a'};">${openingArrears > 0 ? 'Previous Arrears (B/F)' : 'Credit / Prepayment (B/F)'}</td>
-                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 600; color: ${openingArrears > 0 ? '#64748b' : '#16a34a'};">${openingArrears > 0 ? CUR(openingArrears) : '-' + CUR(Math.abs(openingArrears))}</td>
-              </tr>` : ''}
-              ${classStructures.map((s: any) => `
-              <tr>
-                <td style="padding: 3px 0; font-size: 11px; color: #1e293b;">${s.fee_name}</td>
-                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 600; color: #1e293b;">${CUR(s.amount)}</td>
-              </tr>`).join('')}
-              ${pct > 0 ? `
-              <tr>
-                <td style="padding: 3px 0; font-size: 11px; color: #16a34a; font-weight: 700;">Scholarship Discount (${pct}%)</td>
-                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 700; color: #16a34a;">-${CUR(termCharges - netTermCharges)}</td>
-              </tr>` : ''}
-              <tr style="border-top: 1.5px solid #e5e7eb;">
-                <td style="padding: 3px 0; font-size: 11px; font-weight: 800; color: #1e0646;">Gross Bill</td>
-                <td style="padding: 3px 0; text-align: right; font-size: 11px; font-weight: 800; color: #1e0646;">${CUR(totalBill)}</td>
-              </tr>
-              <tr style="border-top: 1.5px solid #4c1d95; background: #f8fafc;">
-                <td style="padding: 10px 4px; font-size: 12px; font-weight: 800; color: #1e0646; text-transform: uppercase;">${finalBalance < 0 ? 'Credit Balance' : 'Remaining Balance'}</td>
-                <td style="padding: 10px 4px; text-align: right; font-size: 14px; font-weight: 900; color: ${finalBalance > 0 ? '#dc2626' : '#16a34a'};">${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div style="display: flex; justify-content: space-between; margin-top: 6px; padding: 0 10px;">
-            <div style="text-align: center; width: 160px;">
-              <div style="font-size: 16px; color: #94a3b8; letter-spacing: 2px; margin-bottom: 2px;">...........................</div>
-              <div style="font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Bursar's Signature</div>
-              <div style="font-size: 11px; font-weight: 700; color: #1e293b; margin-top: 4px;">${user?.full_name || 'Bursar'}</div>
+          <!-- Two Columns for Breakdown & Notes -->
+          <div style="display: grid; grid-template-columns: 1fr 220px; gap: 15mm; flex: 1;">
+            <!-- Table -->
+            <div>
+              <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr>
+                    <th style="text-align: left; padding: 4px 0; font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; border-bottom: 1.5px solid #e2e8f0;">Charge Description</th>
+                    <th style="text-align: right; padding: 4px 0; font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; border-bottom: 1.5px solid #e2e8f0;">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${openingArrears !== 0 ? `
+                  <tr>
+                    <td style="padding: 6px 0; font-size: 12px; color: ${openingArrears > 0 ? '#475569' : '#16a34a'}; border-bottom: 1px solid #f1f5f9;">${openingArrears > 0 ? 'Arrears Brought Forward' : 'Credit Brought Forward'}</td>
+                    <td style="padding: 6px 0; text-align: right; font-size: 12px; font-weight: 600; color: ${openingArrears > 0 ? '#0f172a' : '#16a34a'}; border-bottom: 1px solid #f1f5f9;">${openingArrears > 0 ? CUR(openingArrears) : '-' + CUR(Math.abs(openingArrears))}</td>
+                  </tr>` : ''}
+                  ${classStructures.map((s: any) => `
+                  <tr>
+                    <td style="padding: 6px 0; font-size: 12px; color: #475569; border-bottom: 1px solid #f1f5f9;">${s.fee_name}</td>
+                    <td style="padding: 6px 0; text-align: right; font-size: 12px; font-weight: 600; color: #0f172a; border-bottom: 1px solid #f1f5f9;">${CUR(s.amount)}</td>
+                  </tr>`).join('')}
+                  ${pct > 0 ? `
+                  <tr>
+                    <td style="padding: 6px 0; font-size: 12px; color: #16a34a; font-weight: 600; border-bottom: 1px solid #f1f5f9;">Scholarship Discount (${pct}%)</td>
+                    <td style="padding: 6px 0; text-align: right; font-size: 12px; font-weight: 700; color: #16a34a; border-bottom: 1px solid #f1f5f9;">-${CUR(termCharges - netTermCharges)}</td>
+                  </tr>` : ''}
+                  <tr>
+                    <td style="padding: 8px 0; font-size: 13px; font-weight: 800; color: #1e0646;">Gross Bill Total</td>
+                    <td style="padding: 8px 0; text-align: right; font-size: 13px; font-weight: 800; color: #1e0646;">${CUR(totalBill)}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div style="text-align: center; width: 160px;">
-              <div style="font-size: 16px; color: #94a3b8; letter-spacing: 2px; margin-bottom: 2px;">...........................</div>
-              <div style="font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Payer's Signature</div>
+
+            <!-- Notes & Signatures -->
+            <div style="display: flex; flex-direction: column;">
+              ${payment.notes ? `
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; margin-bottom: 15px;">
+                <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Notes</div>
+                <div style="font-size: 11px; color: #334155; font-style: italic;">${payment.notes}</div>
+              </div>` : ''}
+              
+              <div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px;">
+                <div style="text-align: center;">
+                  <div style="border-bottom: 1px solid #cbd5e1; width: 100%; margin-bottom: 4px;"></div>
+                  <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Bursar Signature</div>
+                  <div style="font-size: 11px; font-weight: 600; color: #1e0646; margin-top: 2px;">${user?.full_name || 'Bursar'}</div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="border-bottom: 1px solid #cbd5e1; width: 100%; margin-bottom: 4px; margin-top: 15px;"></div>
+                  <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Payer Signature</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div style="font-size:9px; color:#9ca3af; text-align:center; padding-top:12px; margin-top:8px; border-top: 1px dashed #e5e7eb;">
-            Electronically generated receipt. &copy; ${new Date().getFullYear()} ${school?.name || 'School'}.
+          <div style="font-size: 9px; color: #94a3b8; text-align: center; margin-top: 5mm; padding-top: 3mm; border-top: 1px dashed #e2e8f0;">
+            Generated electronically on ${new Date().toLocaleString()}
           </div>
         </div>
       </div>
@@ -917,25 +1002,21 @@ export default function FeesPage() {
     win.document.write(`<!DOCTYPE html><html><head><title>Receipt - ${stu?.full_name ?? ''}</title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
       <style>
-        @page { size: A4; margin: 0; }
-        body{font-family:'DM Sans',sans-serif;margin:0;padding:0;background:#fff; width: 210mm; height: 297mm;} 
-        @media print{
-          body{padding:0;background:#fff;}
-          button{display:none;}
-        }
+        @page { size: A4 portrait; margin: 0; }
+        body { margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; background: #fff; width: 210mm; height: 297mm; } 
+        @media print { body { padding: 0; background: #fff; } button { display: none; } }
         .container { width: 100%; height: 100%; display: flex; flex-direction: column; }
+        .cut-line { height: 0; border-bottom: 1px dashed #cbd5e1; position: relative; margin: 0 15mm; }
+        .cut-line::after { content: '✂'; position: absolute; left: 50%; top: -8px; background: #fff; padding: 0 6px; font-size: 14px; color: #94a3b8; transform: translateX(-50%); }
       </style>
       </head><body onload="setTimeout(() => window.print(), 500)">
         <div class="container">
-          ${buildReceiptHTML('Original \u2014 Parent/Student Copy')}
+          ${buildReceiptHTML('Parent/Student Copy')}
           ${copies === 'duplicate' ? `
-          <div style="border-top:1px dashed #cbd5e1; width:100%; margin: 0; position:relative;">
-            <div style="position:absolute; top:-10px; left:-10px; width:20px; height:20px; border-radius:50%; background:#fff; border:1px solid #cbd5e1;"></div>
-            <div style="position:absolute; top:-10px; right:-10px; width:20px; height:20px; border-radius:50%; background:#fff; border:1px solid #cbd5e1;"></div>
-          </div>
-          ${buildReceiptHTML('Duplicate \u2014 School Copy')}` : ''}
+          <div class="cut-line"></div>
+          ${buildReceiptHTML('School Copy')}` : ''}
         </div>
       </body></html>`)
     win.document.close()
@@ -951,92 +1032,75 @@ export default function FeesPage() {
     const { arrPaid, netTermCharges, openingArrears, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
 
     const logoHtml = school?.logo_url 
-      ? `<img loading="lazy" src="${school.logo_url}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #ffffff; padding: 2px; border: 1px solid #ede9fe;" />`
+      ? `<img src="${school.logo_url}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #ffffff; padding: 2px; border: 1px solid #ede9fe;" />`
       : CREST_SVG
 
     const buildReceiptHTML = (type: string) => `
-      <div style="padding: 24px; max-width: 420px; margin: 0 auto; background: #ffffff; box-sizing: border-box; border: 1.5px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); position: relative; overflow: hidden; height: 130mm; display: flex; flex-direction: column; justify-content: space-between;">
-        <!-- Watermark -->
-        <div style="position: absolute; top: 10%; left: 50%; transform: translate(-50%, -10%) rotate(-10deg); font-size: 60px; font-weight: 900; color: rgba(76, 29, 149, 0.02); white-space: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
+      <div style="height: 148.5mm; width: 210mm; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 10mm; font-family: 'DM Sans', sans-serif;">
+        <div style="width: 120mm; padding: 8mm; background: #ffffff; box-sizing: border-box; border: 1.5px solid #e2e8f0; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); position: relative; overflow: hidden;">
+          <!-- Watermark -->
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); font-size: 50px; font-weight: 900; color: rgba(76, 29, 149, 0.02); white-space: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
 
-        <div style="position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="font-size: 8px; font-weight: 800; color: #6d28d9; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 12px; text-align: center; background: #f5f3ff; padding: 4px 0; border-radius: 6px;">${type}</div>
-            
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px; border-bottom: 1.5px solid #ede9fe; padding-bottom: 14px;">
-              <div style="flex-shrink: 0;">${logoHtml}</div>
-              <div style="flex: 1;">
-                <div style="font-size: 17px; font-weight: 900; color: #1e0646; line-height: 1.2; font-family:'Playfair Display',serif;">${school?.name || 'School Fee Receipt'}</div>
-                ${school?.phone ? `<div style="font-size: 9px; color: #6b7280; margin-top: 3px; display: flex; align-items: center; gap: 4px;"><span>📞</span> ${school.phone}</div>` : ''}
+          <div style="position: relative; z-index: 1;">
+            <div style="text-align: center; margin-bottom: 6mm;">
+              <div style="display: inline-block; font-size: 8px; font-weight: 800; color: #6d28d9; background: #f5f3ff; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">${type}</div>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                ${logoHtml}
+                <div style="text-align: left;">
+                  <div style="font-size: 16px; font-weight: 900; color: #1e0646; font-family:'Playfair Display',serif; line-height: 1.1;">${school?.name || 'School Fee Receipt'}</div>
+                  ${school?.phone ? `<div style="font-size: 10px; color: #64748b; margin-top: 2px;">📞 ${school.phone}</div>` : ''}
+                </div>
               </div>
             </div>
 
-            <div style="margin-bottom: 18px; font-size: 11px; color: #374151; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; background: #f8fafc; padding: 12px; border-radius: 10px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; background: #f8fafc; padding: 4mm; border-radius: 8px; margin-bottom: 6mm;">
               <div>
-                <span style="color: #6b7280; font-size: 8px; text-transform: uppercase; display: block; font-weight: 800; letter-spacing: 0.05em; margin-bottom: 2px;">Student</span>
-                <strong style="font-size: 12px; color: #111827;">${stu?.full_name ?? '—'}</strong>
-                <span style="color: #6d28d9; font-weight: 700; font-size: 9px; display: block; margin-top: 1px;">${(stu?.class as any)?.name ?? '—'} &middot; ${stu?.student_id || 'N/A'}</span>
+                <div style="font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Student</div>
+                <div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-top: 2px;">${stu?.full_name ?? '—'}</div>
+                <div style="font-size: 11px; color: #6d28d9; font-weight: 600; margin-top: 1px;">${(stu?.class as any)?.name ?? '—'} &middot; ${stu?.student_id || 'N/A'}</div>
               </div>
               <div style="text-align: right;">
-                <span style="color: #6b7280; font-size: 8px; text-transform: uppercase; display: block; font-weight: 800; letter-spacing: 0.05em; margin-bottom: 2px;">Receipt Info</span>
-                <strong style="color: #111827; font-size: 11px;">#${payment.id?.slice(0, 8).toUpperCase()}</strong>
-                <span style="color: #6b7280; display: block; font-size: 9px; margin-top: 1px;">${new Date(payment.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                <div style="font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Receipt Info</div>
+                <div style="font-size: 12px; font-weight: 800; color: #0f172a; margin-top: 2px;">#${payment.id?.slice(0, 8).toUpperCase()}</div>
+                <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 1px;">${new Date(payment.payment_date).toLocaleDateString('en-GB')}</div>
               </div>
             </div>
 
-            <div style="background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 12px; padding: 14px 18px; color: #ffffff; margin-bottom: 18px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 10px; margin-bottom: 10px;">
+            <div style="background: linear-gradient(135deg, #4c1d95, #2e1065); border-radius: 8px; padding: 4mm 5mm; color: #ffffff; margin-bottom: 6mm;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 8px; margin-bottom: 8px;">
                 <div>
-                  <div style="font-size: 9px; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Amount Paid</div>
-                  <div style="font-size: 20px; font-weight: 900;">${CUR(payment.amount_paid)}</div>
+                  <div style="font-size: 10px; font-weight: 700; opacity: 0.8; text-transform: uppercase;">Amount Paid</div>
+                  <div style="font-size: 22px; font-weight: 900;">${CUR(payment.amount_paid)}</div>
                 </div>
                 <div style="text-align: right;">
-                  <div style="font-size: 9px; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">${finalBalance < 0 ? 'Credit Balance' : 'Outstanding Balance'}</div>
-                  <div style="font-size: 16px; font-weight: 900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'};">${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}</div>
+                  <div style="font-size: 10px; font-weight: 700; opacity: 0.8; text-transform: uppercase;">${finalBalance < 0 ? 'Credit Balance' : 'Outstanding'}</div>
+                  <div style="font-size: 16px; font-weight: 900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'};">${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CR: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}</div>
                 </div>
               </div>
-              <div style="display: flex; justify-content: space-between; font-size: 10px; opacity: 0.9;">
+              <div style="display: flex; justify-content: space-between; font-size: 11px;">
                 <span>Method: <strong style="text-transform: uppercase;">${payment.payment_method}</strong></span>
                 ${payment.reference_number ? `<span>Ref: <strong>${payment.reference_number}</strong></span>` : ''}
               </div>
             </div>
 
-            <div style="background: #f8fafc; border: 1.5px solid #ede9fe; border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; font-size: 11px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #475569;">
-                <span>Current Term Bill:</span>
-                <strong style="color: #1e293b;">${CUR(netTermCharges)}</strong>
-              </div>
-              ${arrPaid > 0 ? `
-              <div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #dc2626; font-weight: 600;">
-                <span>Arrears Paid:</span>
-                <span>-${CUR(arrPaid)}</span>
-              </div>` : ''}
-              <div style="display: flex; justify-content: space-between; color: #16a34a; font-weight: 700; border-top: 1.5px dashed #ede9fe; padding-top: 6px; margin-top: 4px;">
-                <span>Total Credited:</span>
-                <span>${CUR(payment.amount_paid)}</span>
-              </div>
-            </div>
-
             ${payment.notes ? `
-            <div style="background: #fdfbf7; border: 1.5px solid #fef3c7; border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; font-size: 10px; color: #78350f;">
-              <span style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px;">Payment Notes</span>
-              <div style="line-height: 1.4; font-weight: 600;">${payment.notes}</div>
+            <div style="background: #fdfbf7; border: 1px solid #fef3c7; border-radius: 8px; padding: 3mm 4mm; margin-bottom: 5mm;">
+              <div style="font-size: 9px; font-weight: 800; color: #d97706; text-transform: uppercase; margin-bottom: 2px;">Notes</div>
+              <div style="font-size: 11px; color: #92400e; font-style: italic;">${payment.notes}</div>
             </div>` : ''}
-          </div>
 
-          <div>
-            <div style="display: flex; justify-content: space-between; margin-top: 12px; padding: 0 10px; border-top: 1px dashed #cbd5e1; padding-top: 14px; margin-bottom: 8px;">
-              <div style="text-align: center; width: 140px;">
-                <div style="font-size: 10px; color: #94a3b8; margin-bottom: 2px;">...........................</div>
-                <div style="font-size: 9px; font-weight: 800; color: #475569; text-transform: uppercase;">Bursar Signature</div>
+            <div style="display: flex; justify-content: space-between; margin-top: 6mm;">
+              <div style="text-align: center; width: 35mm;">
+                <div style="border-bottom: 1px solid #cbd5e1; margin-bottom: 4px;"></div>
+                <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Bursar Signature</div>
               </div>
-              <div style="text-align: center; width: 140px;">
-                <div style="font-size: 10px; color: #94a3b8; margin-bottom: 2px;">...........................</div>
-                <div style="font-size: 9px; font-weight: 800; color: #475569; text-transform: uppercase;">Payer Signature</div>
+              <div style="text-align: center; width: 35mm;">
+                <div style="border-bottom: 1px solid #cbd5e1; margin-bottom: 4px;"></div>
+                <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Payer Signature</div>
               </div>
             </div>
 
-            <div style="text-align: center; font-size: 8.5px; color: #94a3b8;">
+            <div style="text-align: center; font-size: 9px; color: #94a3b8; margin-top: 5mm;">
               Electronically generated receipt. Thank you.
             </div>
           </div>
@@ -1045,24 +1109,21 @@ export default function FeesPage() {
     `
 
     win.document.write(`<!DOCTYPE html><html><head><title>Receipt - ${stu?.full_name ?? ''}</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
       <style>
-        @page { size: A4; margin: 0; }
-        body{font-family:'DM Sans',sans-serif;margin:0;padding:0;background:#fff; width: 210mm; height: 297mm;} 
-        @media print{
-          body{padding:0;background:#fff;}
-          button{display:none;}
-        }
-        .container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; }
+        @page { size: A4 portrait; margin: 0; }
+        body { font-family: 'DM Sans', sans-serif; margin: 0; padding: 0; background: #fff; width: 210mm; height: 297mm; } 
+        @media print { body { padding: 0; background: #fff; } button { display: none; } }
+        .container { width: 100%; height: 100%; display: flex; flex-direction: column; }
+        .cut-line { height: 0; border-bottom: 1px dashed #cbd5e1; position: relative; margin: 0 20mm; }
+        .cut-line::after { content: '✂'; position: absolute; left: 50%; top: -8px; background: #fff; padding: 0 6px; font-size: 14px; color: #94a3b8; transform: translateX(-50%); }
       </style>
       </head><body onload="setTimeout(() => window.print(), 500)">
         <div class="container">
-          ${buildReceiptHTML('Original \u2014 Simplified Parent Copy')}
+          ${buildReceiptHTML('Parent/Student Copy')}
           ${copies === 'duplicate' ? `
-          <div style="border-top:1px dashed #cbd5e1; width:420px; margin: 15px 0;"></div>
-          ${buildReceiptHTML('Duplicate \u2014 Simplified School Copy')}` : ''}
+          <div class="cut-line"></div>
+          ${buildReceiptHTML('School Copy')}` : ''}
         </div>
       </body></html>`)
     win.document.close()
@@ -1075,165 +1136,141 @@ export default function FeesPage() {
 
     const txCurrency = payment.currency_code || schoolCurrency
     const CUR = (n: number) => formatCurrency(n, txCurrency)
-
     const { arrPaid, classStructures, termCharges, pct, netTermCharges, openingArrears, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
 
     const logoHtml = school?.logo_url 
       ? `<img src="${school.logo_url}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #ffffff; padding: 2px; border: 1.5px solid #ede9fe;" />`
       : CREST_SVG
 
-    const buildReceiptHTML = () => `
-      <div style="padding: 12mm 15mm; background: #ffffff; box-sizing: border-box; min-height: 210mm; display: flex; flex-direction: column; justify-content: space-between; position: relative; font-family: 'DM Sans', sans-serif;">
-        <!-- Colored top gradient border -->
-        <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(135deg, #7c3aed, #4c1d95);"></div>
-        
+    const buildReceiptHTML = (type: string) => `
+      <div class="page-a5">
+        <!-- Accent Line -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(to right, #7c3aed, #4c1d95);"></div>
         <!-- Watermark -->
-        <div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); font-size: 70px; font-weight: 900; color: rgba(124, 58, 237, 0.03); white-space: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
+        <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); font-size: 60px; font-weight: 900; color: rgba(124, 58, 237, 0.03); white-space: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
 
         <div style="position: relative; z-index: 1; flex-grow: 1; display: flex; flex-direction: column;">
           <!-- Header -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 2px solid #ede9fe; padding-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <div style="flex-shrink: 0; background: #fff; border: 1px solid #f3f4f6; border-radius: 8px; padding: 2px;">
-                ${logoHtml}
-              </div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5mm; border-bottom: 1.5px solid #ede9fe; padding-bottom: 4mm;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+              ${logoHtml}
               <div>
-                <div style="font-size: 16px; font-weight: 800; color: #1e0646; font-family: 'Playfair Display', serif; line-height: 1.2;">${school?.name || 'School Fee Receipt'}</div>
-                ${school?.motto ? `<div style="font-size: 8px; color: #7c3aed; font-style: italic; font-weight: 600; margin-top: 2px;">&ldquo;${school.motto}&rdquo;</div>` : ''}
-                <div style="font-size: 8px; color: #6b7280; margin-top: 3px; display: flex; flex-direction: column; gap: 1px;">
-                  ${school?.address ? `<span>📍 ${school.address}</span>` : ''}
-                  ${school?.phone ? `<span>📞 ${school.phone}</span>` : ''}
+                <div style="font-size: 15px; font-weight: 900; color: #1e0646; font-family: 'Playfair Display', serif; line-height: 1.1;">${school?.name || 'SCHOOL FEE RECEIPT'}</div>
+                <div style="font-size: 9px; color: #64748b; margin-top: 3px;">
+                  ${school?.phone ? `📞 ${school.phone}` : ''}
+                  ${school?.address ? ` | 📍 ${school.address}` : ''}
                 </div>
               </div>
             </div>
-            
             <div style="text-align: right;">
-              <span style="font-size: 8px; font-weight: 800; color: #7c3aed; background: #f5f3ff; padding: 3px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 6px;">Official Receipt</span>
-              <div style="font-size: 9px; color: #6b7280; font-weight: 600;">No: <strong style="color: #1e0646;">#${payment.id?.slice(0, 8).toUpperCase()}</strong></div>
-              <div style="font-size: 8px; color: #9ca3af; margin-top: 2px;">Date: ${new Date(payment.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+              <div style="font-size: 8px; font-weight: 800; color: #7c3aed; background: #f5f3ff; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 4px;">${type}</div>
+              <div style="font-size: 11px; font-weight: 800; color: #0f172a;">#${payment.id?.slice(0, 8).toUpperCase()}</div>
+              <div style="font-size: 9px; color: #64748b; margin-top: 1px;">${new Date(payment.payment_date).toLocaleDateString('en-GB')}</div>
             </div>
           </div>
 
-          <!-- Student & Payment Meta -->
-          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 12px; background: #fdfdfd; border: 1px solid #f3f4f6; padding: 10px; border-radius: 8px;">
+          <!-- Student & Meta Grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; background: #f8fafc; border: 1px solid #f1f5f9; padding: 3mm 4mm; border-radius: 6px; margin-bottom: 5mm;">
             <div>
-              <div style="font-size: 8px; color: #9ca3af; text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em;">Student Details</div>
-              <div style="font-size: 12px; font-weight: 800; color: #1e0646; margin-top: 2px;">${stu?.full_name ?? '—'}</div>
-              <div style="font-size: 9px; color: #7c3aed; font-weight: 700; margin-top: 1px;">${(stu?.class as any)?.name ?? 'No Class'} &middot; ${stu?.student_id || 'N/A'}</div>
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 800; text-transform: uppercase;">Billed To</div>
+              <div style="font-size: 12px; font-weight: 800; color: #0f172a; margin-top: 2px;">${stu?.full_name ?? '—'}</div>
+              <div style="font-size: 10px; color: #6d28d9; font-weight: 600; margin-top: 1px;">${(stu?.class as any)?.name ?? '—'} &middot; ${stu?.student_id || 'N/A'}</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-size: 8px; color: #9ca3af; text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em;">Payment Details</div>
-              <div style="font-size: 10px; font-weight: 700; color: #1e0646; margin-top: 2px; text-transform: capitalize;">Method: ${payment.payment_method}</div>
-              ${payment.reference_number ? `<div style="font-size: 9px; color: #6b7280; margin-top: 1px;">Ref: ${payment.reference_number}</div>` : ''}
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 800; text-transform: uppercase;">Payment Details</div>
+              <div style="font-size: 11px; font-weight: 700; color: #0f172a; margin-top: 2px; text-transform: capitalize;">Method: ${payment.payment_method}</div>
+              ${payment.reference_number ? `<div style="font-size: 10px; color: #64748b; margin-top: 1px;">Ref: ${payment.reference_number}</div>` : ''}
             </div>
           </div>
 
-          <!-- Amount Paid Hero Banner -->
-          <div style="background: linear-gradient(135deg, #7c3aed, #4c1d95); border-radius: 8px; padding: 12px 15px; color: #ffffff; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.15);">
+          <!-- Amount Banner -->
+          <div style="background: linear-gradient(135deg, #7c3aed, #4c1d95); border-radius: 6px; padding: 4mm 5mm; color: #ffffff; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5mm; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.15);">
             <div>
-              <div style="font-size: 9px; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.05em;">Amount Paid</div>
-              <div style="font-size: 22px; font-weight: 900; margin-top: 2px;">${CUR(payment.amount_paid)}</div>
+              <div style="font-size: 9px; font-weight: 700; opacity: 0.85; text-transform: uppercase;">Amount Paid</div>
+              <div style="font-size: 20px; font-weight: 900; margin-top: 1px;">${CUR(payment.amount_paid)}</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-size: 8px; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.05em;">${finalBalance < 0 ? 'Credit Balance' : 'Outstanding Balance'}</div>
-              <div style="font-size: 14px; font-weight: 900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'}; margin-top: 4px;">
-                ${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}
+              <div style="font-size: 9px; font-weight: 700; opacity: 0.85; text-transform: uppercase;">${finalBalance < 0 ? 'Credit Balance' : 'Outstanding Balance'}</div>
+              <div style="font-size: 14px; font-weight: 900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'}; margin-top: 2px;">
+                ${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CR: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}
               </div>
             </div>
           </div>
 
-          <!-- Notes -->
-          ${payment.notes ? `
-          <div style="background: #faf5ff; border-left: 3px solid #7c3aed; padding: 6px 10px; margin-bottom: 12px; border-radius: 0 6px 6px 0;">
-            <div style="font-size: 8px; font-weight: 800; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Payment Notes</div>
-            <div style="font-size: 9.5px; color: #4b5563; font-weight: 600; line-height: 1.3;">${payment.notes}</div>
-          </div>
-          ` : ''}
-
-          <!-- Fee Breakdown Table -->
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+          <!-- Table -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 5mm;">
             <thead>
-              <tr style="border-bottom: 1.5px solid #ede9fe;">
-                <th style="text-align: left; padding: 5px 0; font-size: 8px; font-weight: 800; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Item Description</th>
-                <th style="text-align: right; padding: 5px 0; font-size: 8px; font-weight: 800; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Amount</th>
+              <tr style="border-bottom: 1px solid #ede9fe;">
+                <th style="text-align: left; padding: 3px 0; font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Description</th>
+                <th style="text-align: right; padding: 3px 0; font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Amount</th>
               </tr>
             </thead>
             <tbody>
               ${openingArrears !== 0 ? `
-              <tr style="border-bottom: 1px solid #f9fafb;">
-                <td style="padding: 5px 0; font-size: 10px; color: ${openingArrears > 0 ? '#4b5563' : '#16a34a'};">${openingArrears > 0 ? 'Outstanding Arrears (B/F)' : 'Prepayment / Credit (B/F)'}</td>
-                <td style="padding: 5px 0; text-align: right; font-size: 10px; font-weight: 600; color: ${openingArrears > 0 ? '#4b5563' : '#16a34a'};">${openingArrears > 0 ? CUR(openingArrears) : '-' + CUR(Math.abs(openingArrears))}</td>
-              </tr>
-              ` : ''}
+              <tr style="border-bottom: 1px solid #f8fafc;">
+                <td style="padding: 4px 0; font-size: 11px; color: ${openingArrears > 0 ? '#475569' : '#16a34a'};">${openingArrears > 0 ? 'Arrears B/F' : 'Prepayment B/F'}</td>
+                <td style="padding: 4px 0; text-align: right; font-size: 11px; font-weight: 600; color: ${openingArrears > 0 ? '#475569' : '#16a34a'};">${openingArrears > 0 ? CUR(openingArrears) : '-' + CUR(Math.abs(openingArrears))}</td>
+              </tr>` : ''}
               ${classStructures.map((s: any) => `
-              <tr style="border-bottom: 1px solid #f9fafb;">
-                <td style="padding: 5px 0; font-size: 10px; color: #4b5563;">${s.fee_name}</td>
-                <td style="padding: 5px 0; text-align: right; font-size: 10px; font-weight: 600; color: #111827;">${CUR(s.amount)}</td>
-              </tr>
-              `).join('')}
+              <tr style="border-bottom: 1px solid #f8fafc;">
+                <td style="padding: 4px 0; font-size: 11px; color: #475569;">${s.fee_name}</td>
+                <td style="padding: 4px 0; text-align: right; font-size: 11px; font-weight: 600; color: #0f172a;">${CUR(s.amount)}</td>
+              </tr>`).join('')}
               ${pct > 0 ? `
-              <tr style="border-bottom: 1px solid #f9fafb;">
-                <td style="padding: 5px 0; font-size: 10px; color: #16a34a; font-weight: 700;">Scholarship Discount (${pct}%)</td>
-                <td style="padding: 5px 0; text-align: right; font-size: 10px; font-weight: 700; color: #16a34a;">-${CUR(termCharges - netTermCharges)}</td>
-              </tr>
-              ` : ''}
+              <tr style="border-bottom: 1px solid #f8fafc;">
+                <td style="padding: 4px 0; font-size: 11px; color: #16a34a; font-weight: 600;">Scholarship (${pct}%)</td>
+                <td style="padding: 4px 0; text-align: right; font-size: 11px; font-weight: 600; color: #16a34a;">-${CUR(termCharges - netTermCharges)}</td>
+              </tr>` : ''}
               <tr style="border-top: 1.5px solid #ede9fe; background: #fafafa;">
-                <td style="padding: 6px 8px; font-size: 10px; font-weight: 800; color: #1e0646;">Gross Bill (Term + Arrears)</td>
-                <td style="padding: 6px 8px; text-align: right; font-size: 10px; font-weight: 800; color: #1e0646;">${CUR(totalBill)}</td>
-              </tr>
-              <tr style="border-top: 1.5px solid #7c3aed; background: #f5f3ff;">
-                <td style="padding: 7px 8px; font-size: 10px; font-weight: 800; color: #7c3aed; text-transform: uppercase;">Remaining Balance</td>
-                <td style="padding: 7px 8px; text-align: right; font-size: 11px; font-weight: 900; color: ${finalBalance > 0 ? '#dc2626' : '#16a34a'};">
-                  ${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CREDIT: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}
-                </td>
+                <td style="padding: 5px 4px; font-size: 11px; font-weight: 800; color: #1e0646;">Gross Bill Total</td>
+                <td style="padding: 5px 4px; text-align: right; font-size: 11px; font-weight: 800; color: #1e0646;">${CUR(totalBill)}</td>
               </tr>
             </tbody>
           </table>
-        </div>
 
-        <!-- Signature Section -->
-        <div>
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; padding: 0 10px; margin-bottom: 10px;">
-            <div style="text-align: center; width: 130px;">
-              <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 2px;">...........................</div>
-              <div style="font-size: 8px; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Bursar's Signature</div>
+          ${payment.notes ? `
+          <div style="background: #faf5ff; border-left: 3px solid #7c3aed; padding: 4px 8px; margin-bottom: 5mm; border-radius: 0 4px 4px 0;">
+            <div style="font-size: 9px; font-weight: 800; color: #7c3aed; text-transform: uppercase;">Notes</div>
+            <div style="font-size: 10px; color: #475569; font-style: italic;">${payment.notes}</div>
+          </div>` : ''}
+
+          <!-- Footer/Signatures -->
+          <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div style="text-align: center; width: 35mm;">
+              <div style="border-bottom: 1px solid #cbd5e1; margin-bottom: 3px;"></div>
+              <div style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase;">Bursar Signature</div>
               <div style="font-size: 9px; font-weight: 700; color: #1e0646; margin-top: 2px;">${user?.full_name || 'Bursar'}</div>
             </div>
-            <div style="border: 1px dashed #cbd5e1; border-radius: 6px; padding: 12px; font-size: 7px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; text-align: center; width: 70px; height: 35px; display: flex; align-items: center; justify-content: center; opacity: 0.6;">
-              OFFICIAL STAMP
+            
+            <div style="border: 1px dashed #cbd5e1; border-radius: 4px; padding: 6px; font-size: 8px; color: #94a3b8; font-weight: 800; text-align: center; width: 25mm; height: 18mm; display: flex; align-items: center; justify-content: center; text-transform: uppercase;">
+              Stamp
             </div>
-            <div style="text-align: center; width: 130px;">
-              <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 2px;">...........................</div>
-              <div style="font-size: 8px; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Payer's Signature</div>
-              <div style="font-size: 9px; font-weight: 700; color: #1e0646; margin-top: 2px;">&nbsp;</div>
+
+            <div style="text-align: center; width: 35mm;">
+              <div style="border-bottom: 1px solid #cbd5e1; margin-bottom: 3px;"></div>
+              <div style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase;">Payer Signature</div>
             </div>
           </div>
-
-          <!-- Footer -->
-          <div style="font-size: 7.5px; color: #9ca3af; text-align: center; padding-top: 10px; border-top: 1px dashed #ede9fe; display: flex; justify-content: space-between; align-items: center;">
-            <span>Generated electronically. &copy; ${new Date().getFullYear()} ${school?.name || 'School'}</span>
-            <span style="font-family: monospace; font-weight: 700;">STU-${stu?.id?.slice(0, 6).toUpperCase()}-TX</span>
+          
+          <div style="font-size: 8px; color: #94a3b8; text-align: center; padding-top: 4mm; margin-top: 4mm; border-top: 1px dashed #ede9fe; display: flex; justify-content: space-between;">
+            <span>Generated electronically &copy; ${new Date().getFullYear()}</span>
+            <span>TX-${stu?.id?.slice(0, 6).toUpperCase()}</span>
           </div>
         </div>
       </div>
     `
 
     win.document.write(`<!DOCTYPE html><html><head><title>A5 Receipt - ${stu?.full_name ?? ''}</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
       <style>
         @page { size: A5 portrait; margin: 0; }
-        body{font-family:'DM Sans',sans-serif;margin:0;padding:0;background:#fff; width: 148mm; ${copies === 'duplicate' ? 'height: auto;' : 'height: 210mm;'}} 
-        @media print{ body{padding:0;background:#fff;} button{display:none;} }
-        .container { width: 100%; }
-        .page-break { page-break-before: always; }
+        body { font-family: 'DM Sans', sans-serif; margin: 0; padding: 0; background: #fff; width: 148mm; ${copies === 'duplicate' ? 'height: auto;' : 'height: 210mm;'} } 
+        @media print { body { padding: 0; background: #fff; } button { display: none; } }
+        .page-a5 { width: 148mm; height: 210mm; box-sizing: border-box; padding: 12mm 15mm; display: flex; flex-direction: column; position: relative; overflow: hidden; page-break-after: always; }
       </style>
-      </head><body onload="setTimeout(() => window.print(), 600)">
-        <div class="container">
-          ${buildReceiptHTML()}
-          ${copies === 'duplicate' ? `<div class="page-break"></div>${buildReceiptHTML()}` : ''}
-        </div>
+      </head><body onload="setTimeout(() => window.print(), 500)">
+        ${buildReceiptHTML('Parent Copy')}
+        ${copies === 'duplicate' ? buildReceiptHTML('School Copy') : ''}
       </body></html>`)
     win.document.close()
   }
@@ -1245,7 +1282,6 @@ export default function FeesPage() {
 
     const txCurrency = payment.currency_code || schoolCurrency
     const CUR = (n: number) => formatCurrency(n, txCurrency)
-
     const { openingArrears, netTermCharges, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
 
     const logoHtml = school?.logo_url 
@@ -1253,91 +1289,84 @@ export default function FeesPage() {
       : CREST_SVG
 
     const buildCopyHTML = (type: string) => `
-      <div style="width: 100mm; height: 148mm; padding: 8mm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; position: relative; font-family: 'DM Sans', sans-serif; background: #ffffff;">
+      <div style="width: 105mm; height: 148mm; padding: 10mm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; position: relative; font-family: 'DM Sans', sans-serif; background: #ffffff;">
         <!-- Watermark -->
-        <div style="position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); font-size: 44px; font-weight: 900; color: rgba(124, 58, 237, 0.02); white-space: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-25deg); font-size: 40px; font-weight: 900; color: rgba(124, 58, 237, 0.03); white-space: nowrap; pointer-events: none; text-transform: uppercase; z-index: 0;">${school?.name?.split(' ')[0] || 'OFFICIAL'}</div>
 
-        <div style="position: relative; z-index: 1; display: flex; flex-direction: column; gap: 8px; height: 100%;">
+        <div style="position: relative; z-index: 1; display: flex; flex-direction: column; gap: 6px; height: 100%;">
           <!-- Header -->
-          <div style="display: flex; gap: 8px; align-items: center; border-bottom: 1px solid #ede9fe; padding-bottom: 6px; margin-bottom: 4px;">
-            <div style="flex-shrink: 0;">
-              ${logoHtml}
-            </div>
+          <div style="display: flex; gap: 8px; align-items: center; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 6px; margin-bottom: 2px;">
+            <div style="flex-shrink: 0;">${logoHtml}</div>
             <div style="flex-grow: 1; min-width: 0;">
-              <div style="font-size: 11px; font-weight: 800; color: #1e0646; font-family: 'Playfair Display', serif; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${school?.name || 'School Fee Receipt'}</div>
-              <div style="font-size: 7px; color: #6b7280; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                ${school?.phone ? `📞 ${school.phone}` : ''} ${school?.address ? ` &middot; 📍 ${school.address.slice(0, 20)}...` : ''}
+              <div style="font-size: 13px; font-weight: 900; color: #1e0646; font-family: 'Playfair Display', serif; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${school?.name || 'School Fee Receipt'}</div>
+              <div style="font-size: 9px; color: #64748b; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                ${school?.phone ? `📞 ${school.phone}` : ''}
               </div>
             </div>
           </div>
 
           <!-- Type label -->
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 7px; font-weight: 800; color: #7c3aed; background: #f5f3ff; padding: 2px 6px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em;">${type}</span>
-            <span style="font-size: 7.5px; color: #6b7280;">No: <strong style="color: #1e0646;">#${payment.id?.slice(0, 8).toUpperCase()}</strong></span>
+            <span style="font-size: 8px; font-weight: 800; color: #7c3aed; background: #f5f3ff; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em;">${type}</span>
+            <span style="font-size: 9px; color: #64748b; font-weight: 600;">No: <strong style="color: #0f172a;">#${payment.id?.slice(0, 8).toUpperCase()}</strong></span>
           </div>
 
           <!-- Student & Date -->
-          <div style="background: #f8fafc; border: 1px solid #f1f5f9; padding: 8px; border-radius: 6px; font-size: 9px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 4px;">
+          <div style="background: #f8fafc; border: 1px solid #f1f5f9; padding: 6px 8px; border-radius: 6px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 4px; margin-top: 2px;">
             <div>
-              <div style="font-size: 6.5px; color: #9ca3af; text-transform: uppercase; font-weight: 800; letter-spacing: 0.02em;">Student</div>
-              <div style="font-weight: 800; color: #1e0646; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${stu?.full_name ?? '—'}</div>
-              <div style="font-size: 7.5px; color: #7c3aed; font-weight: 700; margin-top: 1px;">${(stu?.class as any)?.name ?? '—'}</div>
+              <div style="font-size: 7px; color: #94a3b8; text-transform: uppercase; font-weight: 800;">Student</div>
+              <div style="font-size: 11px; font-weight: 800; color: #0f172a; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${stu?.full_name ?? '—'}</div>
+              <div style="font-size: 9px; color: #6d28d9; font-weight: 700; margin-top: 1px;">${(stu?.class as any)?.name ?? '—'}</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-size: 6.5px; color: #9ca3af; text-transform: uppercase; font-weight: 800; letter-spacing: 0.02em;">Date / ID</div>
-              <div style="font-weight: 700; color: #1e0646; margin-top: 1px;">${new Date(payment.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-              <div style="font-size: 7.5px; color: #6b7280; margin-top: 1px;">ID: ${stu?.student_id || 'N/A'}</div>
+              <div style="font-size: 7px; color: #94a3b8; text-transform: uppercase; font-weight: 800;">Date / ID</div>
+              <div style="font-size: 10px; font-weight: 700; color: #0f172a; margin-top: 1px;">${new Date(payment.payment_date).toLocaleDateString('en-GB')}</div>
+              <div style="font-size: 9px; color: #64748b; margin-top: 1px;">ID: ${stu?.student_id || 'N/A'}</div>
             </div>
           </div>
 
           <!-- Hero Payment Details -->
-          <div style="background: linear-gradient(135deg, #7c3aed, #4c1d95); border-radius: 6px; padding: 8px 10px; color: #ffffff; display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+          <div style="background: linear-gradient(135deg, #7c3aed, #4c1d95); border-radius: 6px; padding: 6px 8px; color: #ffffff; display: flex; justify-content: space-between; align-items: center; margin-top: 2px; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.1);">
             <div>
-              <div style="font-size: 7px; font-weight: 700; opacity: 0.85; text-transform: uppercase;">Amount Paid</div>
-              <div style="font-size: 16px; font-weight: 900; margin-top: 1px;">${CUR(payment.amount_paid)}</div>
+              <div style="font-size: 8px; font-weight: 700; opacity: 0.85; text-transform: uppercase;">Amount Paid</div>
+              <div style="font-size: 18px; font-weight: 900; margin-top: 1px;">${CUR(payment.amount_paid)}</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-size: 7px; font-weight: 700; opacity: 0.85; text-transform: uppercase;">${finalBalance < 0 ? 'Credit Balance' : 'Outstanding'}</div>
-              <div style="font-size: 11px; font-weight: 900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'}; margin-top: 1px;">
+              <div style="font-size: 8px; font-weight: 700; opacity: 0.85; text-transform: uppercase;">${finalBalance < 0 ? 'Credit Balance' : 'Outstanding'}</div>
+              <div style="font-size: 13px; font-weight: 900; color: ${finalBalance > 0 ? '#fca5a5' : '#86efac'}; margin-top: 1px;">
                 ${finalBalance > 0 ? CUR(finalBalance) : (finalBalance < 0 ? 'CR: ' + CUR(Math.abs(finalBalance)) : 'CLEARED ✓')}
               </div>
             </div>
           </div>
 
           <!-- Transaction details -->
-          <div style="font-size: 8px; color: #4b5563; display: flex; flex-direction: column; gap: 4px; padding: 4px 2px; margin-top: 4px;">
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f3f4f6; padding-bottom: 3px;">
+          <div style="font-size: 10px; color: #475569; display: flex; flex-direction: column; gap: 4px; padding: 4px 2px; margin-top: 2px;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f8fafc; padding-bottom: 3px;">
               <span>Payment Method:</span>
-              <strong style="text-transform: uppercase; color: #111827;">${payment.payment_method}</strong>
+              <strong style="text-transform: uppercase; color: #0f172a;">${payment.payment_method}</strong>
             </div>
             ${payment.reference_number ? `
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f3f4f6; padding-bottom: 3px;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f8fafc; padding-bottom: 3px;">
               <span>Reference Number:</span>
-              <strong style="color: #111827;">${payment.reference_number}</strong>
+              <strong style="color: #0f172a;">${payment.reference_number}</strong>
             </div>` : ''}
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f3f4f6; padding-bottom: 3px;">
-              <span>Term Balance Status:</span>
-              <strong style="color: ${finalBalance > 0 ? '#dc2626' : '#16a34a'};">${finalBalance > 0 ? 'Arrears Pending' : 'Account Cleared'}</strong>
-            </div>
             ${payment.notes ? `
             <div style="display: flex; flex-direction: column; gap: 1px; padding-top: 2px;">
-              <span style="font-size: 6.5px; color: #9ca3af; text-transform: uppercase; font-weight: 800;">Notes</span>
-              <span style="color: #4b5563; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${payment.notes}</span>
+              <span style="font-size: 8px; color: #94a3b8; text-transform: uppercase; font-weight: 800;">Notes</span>
+              <span style="color: #475569; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${payment.notes}</span>
             </div>` : ''}
           </div>
 
-          <!-- Signatures (pushed to bottom) -->
+          <!-- Signatures -->
           <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 4px; padding-bottom: 2px;">
-            <div style="text-align: center; width: 42mm;">
-              <div style="font-size: 8px; color: #cbd5e1; margin-bottom: 1px;">...........................</div>
-              <div style="font-size: 6.5px; font-weight: 800; color: #6b7280; text-transform: uppercase;">Bursar Signature</div>
-              <div style="font-size: 7px; color: #1e0646; font-weight: 700; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${user?.full_name || 'Bursar'}</div>
+            <div style="text-align: center; width: 35mm;">
+              <div style="border-bottom: 1px solid #cbd5e1; margin-bottom: 3px;"></div>
+              <div style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase;">Bursar Signature</div>
+              <div style="font-size: 9px; color: #1e0646; font-weight: 700; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${user?.full_name || 'Bursar'}</div>
             </div>
-            <div style="text-align: center; width: 42mm;">
-              <div style="font-size: 8px; color: #cbd5e1; margin-bottom: 1px;">...........................</div>
-              <div style="font-size: 6.5px; font-weight: 800; color: #6b7280; text-transform: uppercase;">Payer Signature</div>
-              <div style="font-size: 7px; color: #1e0646; font-weight: 700; margin-top: 1px;">&nbsp;</div>
+            <div style="text-align: center; width: 35mm;">
+              <div style="border-bottom: 1px solid #cbd5e1; margin-bottom: 3px;"></div>
+              <div style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase;">Payer Signature</div>
             </div>
           </div>
         </div>
@@ -1345,16 +1374,11 @@ export default function FeesPage() {
     `
 
     win.document.write(`<!DOCTYPE html><html><head><title>A5 Simplified Receipt - ${stu?.full_name ?? ''}</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
       <style>
         @page { size: A5 landscape; margin: 0; }
-        body{font-family:'DM Sans',sans-serif;margin:0;padding:0;background:#fff; width: 210mm; height: 148mm;} 
-        @media print{
-          body{padding:0;background:#fff;}
-          button{display:none;}
-        }
+        body { font-family: 'DM Sans', sans-serif; margin: 0; padding: 0; background: #fff; width: 210mm; height: 148mm; } 
+        @media print { body { padding: 0; background: #fff; } button { display: none; } }
         .container { 
           width: 210mm; 
           height: 148mm; 
@@ -1369,92 +1393,438 @@ export default function FeesPage() {
           position: relative;
         }
         .divider::after {
-          content: '✂️';
+          content: '✂';
           position: absolute;
           top: 10px;
-          left: -7px;
-          font-size: 10px;
+          left: -6px;
+          font-size: 14px;
+          color: #94a3b8;
+          background: #fff;
+          padding: 4px 0;
         }
       </style>
-      </head><body onload="setTimeout(() => window.print(), 600)">
+      </head><body onload="setTimeout(() => window.print(), 500)">
         <div class="container">
-          ${buildCopyHTML('Parent Copy \u2014 Simplified')}
-          ${copies === 'duplicate' ? `<div class="divider"></div>${buildCopyHTML('School Copy \u2014 Simplified')}` : ''}
+          ${buildCopyHTML('Parent Copy')}
+          ${copies === 'duplicate' ? `<div class="divider"></div>${buildCopyHTML('School Copy')}` : ''}
         </div>
       </body></html>`)
     win.document.close()
   }
 
-  // ── Thermal (80mm roll) renderer ─────────────────────────────────────
+
+  // ── Thermal Receipt Renderer (58mm / 80mm roll) ───────────────────────
   function handlePrintThermal(payment: any, copies: 'single' | 'duplicate' = 'single') {
     const stu = (Array.isArray(students) ? students : []).find((s: any) => s.id === payment.student_id) as any
-    const win = window.open('', '_blank', 'width=380,height=700')
+    const thermalW = printSettings.thermalWidth || '80mm'
+    const pageW = thermalW === '58mm' ? '58mm' : '80mm'
+    const contentW = thermalW === '58mm' ? '52mm' : '74mm'
+    const charWidth = thermalW === '58mm' ? 28 : 38  // chars per line for dividers
+    const baseFontSize = thermalW === '58mm' ? 9 : 11  // px
+    const titleFontSize = thermalW === '58mm' ? 11 : 14
+    const amountFontSize = thermalW === '58mm' ? 14 : 17
+
+    const win = window.open('', '_blank', `width=${thermalW === '58mm' ? 300 : 400},height=800`)
     if (!win) return
+
     const txCurrency = payment.currency_code || schoolCurrency
     const CUR = (n: number) => formatCurrency(n, txCurrency)
-    const { classStructures, netTermCharges, openingArrears, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
-    const line = (label: string, val: string) => `<div class="row"><span>${label}</span><span>${val}</span></div>`
-    const divider = () => `<div class="dashes">--------------------------------</div>`
+    const { arrPaid, classStructures, termCharges, pct, netTermCharges, openingArrears, totalBill, totalPaidToDate, finalBalance } = buildFinancials(payment, stu)
 
-    const buildSlip = (copyLabel: string) => `
-      <div class="slip">
-        <div class="center bold school">${school?.name || 'SCHOOL'}</div>
-        ${school?.address ? `<div class="center small">${school.address}</div>` : ''}
-        ${school?.phone ? `<div class="center small">${school.phone}</div>` : ''}
-        ${divider()}
-        <div class="center bold">OFFICIAL FEE RECEIPT</div>
-        <div class="center small">${copyLabel}</div>
-        ${divider()}
-        ${line('Student:', stu?.full_name ?? '—')}
-        ${line('Class:', (stu?.class as any)?.name ?? '—')}
-        ${line('ID:', stu?.student_id || 'N/A')}
-        ${divider()}
-        ${line('Receipt #:', '#' + (payment.id?.slice(0, 8).toUpperCase() || ''))}
-        ${line('Date:', new Date(payment.payment_date).toLocaleDateString('en-GB'))}
-        ${line('Method:', payment.payment_method?.toUpperCase() || '')}
-        ${payment.reference_number ? line('Ref:', payment.reference_number) : ''}
-        ${divider()}
-        <div class="section-label">TERM FEES</div>
-        ${classStructures.map((s: any) => line(s.fee_name + ':', CUR(s.amount))).join('')}
-        ${openingArrears > 0 ? line('Prior Arrears:', CUR(openingArrears)) : ''}
-        ${line('Term Total:', CUR(netTermCharges))}
-        ${line('Gross Bill:', CUR(totalBill))}
-        ${divider()}
-        <div class="row big"><span>AMOUNT PAID</span><span>${CUR(payment.amount_paid)}</span></div>
-        <div class="row ${finalBalance > 0 ? 'red' : 'green'}"><span>${finalBalance > 0 ? 'BALANCE DUE' : finalBalance < 0 ? 'CREDIT' : 'CLEARED'}</span><span>${finalBalance > 0 ? CUR(finalBalance) : finalBalance < 0 ? CUR(Math.abs(finalBalance)) : '✓'}</span></div>
-        ${divider()}
-        ${payment.notes ? `<div class="small">Note: ${payment.notes}</div>${divider()}` : ''}
-        <div class="center small">Bursar: ${user?.full_name || 'Bursar'}</div>
-        <div class="center small">Thank you for your payment.</div>
-        <div class="center tiny">Generated electronically.</div>
-        <br/>
-      </div>
+    const receiptNo = payment.id?.slice(0, 8).toUpperCase() || 'XXXXXXXX'
+    const payDate = new Date(payment.payment_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    const payTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+    const dasher = (ch = '-') => ch.repeat(charWidth)
+
+    // Pad line for mono-spaced two-column layout
+    const padLine = (left: string, right: string, fill = ' ') => {
+      const total = charWidth
+      const available = total - right.length
+      const label = left.length > available - 1 ? left.slice(0, available - 2) + '.' : left
+      return label + fill.repeat(Math.max(1, available - label.length)) + right
+    }
+
+    // Logo: if school has a logo URL use it; otherwise print school initials as ASCII block
+    const initials = (school?.name || 'SCHOOL').split(' ').slice(0, 3).map((w: string) => w[0]).join('')
+    const logoBlock = school?.logo_url
+      ? `<img src="${school.logo_url}" alt="Logo" class="logo-img" />`
+      : `<div class="logo-initials">${initials}</div>`
+
+    const buildSlip = (copyType: 'PARENT COPY' | 'SCHOOL COPY') => {
+      const isParent = copyType === 'PARENT COPY'
+      return `
+<div class="slip">
+  <!-- ═══ HEADER ═══ -->
+  <div class="header-block">
+    ${logoBlock}
+    <div class="school-name">${school?.name || 'SCHOOL'}</div>
+    ${school?.motto ? `<div class="school-motto">&ldquo;${school.motto}&rdquo;</div>` : ''}
+    ${school?.address ? `<div class="school-sub">${school.address}</div>` : ''}
+    ${school?.phone ? `<div class="school-sub">Tel: ${school.phone}</div>` : ''}
+    ${school?.email ? `<div class="school-sub">${school.email}</div>` : ''}
+  </div>
+
+  <div class="divider-double">${dasher('=')}</div>
+  <div class="receipt-title">OFFICIAL FEE RECEIPT</div>
+  <div class="copy-badge">${copyType}</div>
+  <div class="divider-double">${dasher('=')}</div>
+
+  <!-- ═══ STUDENT DETAILS ═══ -->
+  <div class="section-head">STUDENT DETAILS</div>
+  <div class="divider">${dasher()}</div>
+  <div class="mono-line">${padLine('Name:', stu?.full_name ?? '—')}</div>
+  <div class="mono-line">${padLine('Class:', (stu?.class as any)?.name ?? '—')}</div>
+  <div class="mono-line">${padLine('ID:', stu?.student_id || 'N/A')}</div>
+  ${stu?.guardian_name ? `<div class="mono-line">${padLine('Guardian:', stu.guardian_name)}</div>` : ''}
+
+  <div class="divider">${dasher()}</div>
+
+  <!-- ═══ TRANSACTION INFO ═══ -->
+  <div class="section-head">TRANSACTION DETAILS</div>
+  <div class="divider">${dasher()}</div>
+  <div class="mono-line">${padLine('Receipt No:', '#' + receiptNo)}</div>
+  <div class="mono-line">${padLine('Date:', payDate)}</div>
+  <div class="mono-line">${padLine('Time:', payTime)}</div>
+  <div class="mono-line">${padLine('Method:', payment.payment_method?.toUpperCase() || '—')}</div>
+  ${payment.reference_number ? `<div class="mono-line">${padLine('Ref No:', payment.reference_number)}</div>` : ''}
+  <div class="mono-line">${padLine('Recorded by:', user?.full_name || 'Bursar')}</div>
+
+  <div class="divider">${dasher()}</div>
+
+  <!-- ═══ FEE BREAKDOWN ═══ -->
+  <div class="section-head">FEE BREAKDOWN</div>
+  <div class="divider">${dasher()}</div>
+  ${openingArrears > 0 ? `<div class="mono-line">${padLine('Prior Arrears (B/F):', CUR(openingArrears))}</div>` : ''}
+  ${openingArrears < 0 ? `<div class="mono-line credit-line">${padLine('Prepayment (B/F):', '-' + CUR(Math.abs(openingArrears)))}</div>` : ''}
+  ${classStructures.map((s: any) => `<div class="mono-line">${padLine(s.fee_name + ':', CUR(s.amount))}</div>`).join('')}
+  ${pct > 0 ? `<div class="mono-line credit-line">${padLine(`Scholarship (${pct}%):`, '-' + CUR(termCharges - netTermCharges))}</div>` : ''}
+  <div class="divider">${dasher()}</div>
+  <div class="mono-line subtotal-line">${padLine('Term Net Charges:', CUR(netTermCharges))}</div>
+  <div class="mono-line subtotal-line">${padLine('Total Bill:', CUR(totalBill))}</div>
+  <div class="divider">${dasher()}</div>
+
+  <!-- ═══ PAYMENT SUMMARY ═══ -->
+  <div class="paid-block">
+    <div class="paid-label">AMOUNT PAID</div>
+    <div class="paid-amount">${CUR(payment.amount_paid)}</div>
+    <div class="paid-method">${payment.payment_method?.toUpperCase()}</div>
+  </div>
+
+  ${arrPaid > 0 ? `
+  <div class="divider">${dasher()}</div>
+  <div class="mono-line">${padLine('Applied to Arrears:', CUR(arrPaid))}</div>
+  <div class="mono-line">${padLine('Applied to Term:', CUR(Number(payment.amount_paid) - arrPaid))}</div>
+  ` : ''}
+
+  <div class="divider-double">${dasher('=')}</div>
+  <div class="balance-block ${finalBalance > 0 ? 'balance-due' : 'balance-clear'}">
+    <div class="balance-label">${finalBalance > 0 ? 'OUTSTANDING BALANCE' : finalBalance < 0 ? 'CREDIT BALANCE' : 'ACCOUNT STATUS'}</div>
+    <div class="balance-amount">${finalBalance > 0 ? CUR(finalBalance) : finalBalance < 0 ? CUR(Math.abs(finalBalance)) : 'FULLY CLEARED'}</div>
+    ${finalBalance === 0 ? '<div class="cleared-msg">*** ALL FEES PAID ***</div>' : ''}
+    ${finalBalance < 0 ? '<div class="cleared-msg">*** CREDIT ON ACCOUNT ***</div>' : ''}
+  </div>
+  <div class="divider-double">${dasher('=')}</div>
+
+  ${payment.notes ? `
+  <div class="section-head">NOTES</div>
+  <div class="divider">${dasher()}</div>
+  <div class="notes-text">${payment.notes}</div>
+  <div class="divider">${dasher()}</div>
+  ` : ''}
+
+  <!-- ═══ SIGNATURES ═══ -->
+  ${isParent ? `
+  <div class="sig-row">
+    <div class="sig-box">
+      <div class="sig-line">${dasher('_')}</div>
+      <div class="sig-label">Cashier / Bursar</div>
+      <div class="sig-name">${user?.full_name || 'Bursar'}</div>
+    </div>
+  </div>
+  <div class="sig-row">
+    <div class="sig-box">
+      <div class="sig-line">${dasher('_')}</div>
+      <div class="sig-label">Payer Signature</div>
+    </div>
+  </div>
+  ` : ''}
+
+  <!-- ═══ FOOTER ═══ -->
+  <div class="footer-block">
+    <div>Thank you for your payment!</div>
+    <div>Keep this receipt for your records.</div>
+    <div class="footer-legal">Electronically generated &bull; ${new Date().getFullYear()} ${school?.name || 'School'}</div>
+    <div class="footer-code">TX-${receiptNo}-${stu?.id?.slice(0, 6).toUpperCase() || 'XXXXXX'}</div>
+  </div>
+
+  <!-- Feed space for tear-off -->
+  <div style="height: 12mm;"></div>
+</div>
+`}
+
+    const CSS = `
+      @page {
+        size: ${pageW} auto;
+        margin: 2mm 2mm 5mm 2mm;
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      body {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: ${baseFontSize}px;
+        color: #000;
+        background: #fff;
+        margin: 0;
+        padding: 0;
+        width: ${pageW};
+        line-height: 1.3;
+      }
+      .slip {
+        width: ${contentW};
+        margin: 0 auto;
+        padding: 3mm 0 0;
+      }
+      /* ── Logo ── */
+      .logo-img {
+        display: block;
+        width: ${thermalW === '58mm' ? '32px' : '40px'};
+        height: ${thermalW === '58mm' ? '32px' : '40px'};
+        object-fit: contain;
+        margin: 0 auto 3px;
+        filter: grayscale(1) contrast(2);
+      }
+      .logo-initials {
+        display: block;
+        width: ${thermalW === '58mm' ? '32px' : '40px'};
+        height: ${thermalW === '58mm' ? '32px' : '40px'};
+        line-height: ${thermalW === '58mm' ? '32px' : '40px'};
+        border: 2px solid #000;
+        border-radius: 50%;
+        text-align: center;
+        font-size: ${thermalW === '58mm' ? '11px' : '14px'};
+        font-weight: 900;
+        margin: 0 auto 3px;
+        letter-spacing: -0.5px;
+      }
+      /* ── Header ── */
+      .header-block {
+        text-align: center;
+        margin-bottom: 2mm;
+      }
+      .school-name {
+        font-size: ${titleFontSize}px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 2px 0 1px;
+        line-height: 1.15;
+      }
+      .school-motto {
+        font-size: ${baseFontSize - 1}px;
+        font-style: italic;
+        margin-bottom: 1px;
+      }
+      .school-sub {
+        font-size: ${baseFontSize - 1}px;
+        color: #333;
+      }
+      /* ── Title strip ── */
+      .receipt-title {
+        text-align: center;
+        font-size: ${baseFontSize + 1}px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        margin: 2px 0 1px;
+      }
+      .copy-badge {
+        text-align: center;
+        font-size: ${baseFontSize - 1}px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 1px;
+      }
+      /* ── Dividers ── */
+      .divider {
+        font-size: ${baseFontSize - 1}px;
+        color: #555;
+        margin: 2px 0;
+        letter-spacing: 0;
+        white-space: pre;
+      }
+      .divider-double {
+        font-size: ${baseFontSize - 1}px;
+        font-weight: 900;
+        margin: 2px 0;
+        letter-spacing: 0;
+        white-space: pre;
+      }
+      /* ── Section headers ── */
+      .section-head {
+        font-size: ${baseFontSize - 1}px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin: 2px 0 1px;
+      }
+      /* ── Data lines ── */
+      .mono-line {
+        font-size: ${baseFontSize}px;
+        white-space: pre;
+        display: block;
+        letter-spacing: 0;
+        margin: 0.5px 0;
+        overflow: hidden;
+      }
+      .subtotal-line {
+        font-weight: 700;
+      }
+      .credit-line {
+        font-weight: 700;
+      }
+      /* ── Paid block ── */
+      .paid-block {
+        border: 2px solid #000;
+        padding: 2mm 2mm;
+        margin: 2mm 0;
+        text-align: center;
+      }
+      .paid-label {
+        font-size: ${baseFontSize - 1}px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 1px;
+      }
+      .paid-amount {
+        font-size: ${amountFontSize}px;
+        font-weight: 900;
+        letter-spacing: -0.5px;
+        line-height: 1.1;
+      }
+      .paid-method {
+        font-size: ${baseFontSize - 1}px;
+        margin-top: 1px;
+      }
+      /* ── Balance block ── */
+      .balance-block {
+        padding: 2mm 2mm;
+        margin: 2mm 0;
+        text-align: center;
+      }
+      .balance-due {
+        border: 2px solid #000;
+      }
+      .balance-clear {
+        border: 2px solid #000;
+      }
+      .balance-label {
+        font-size: ${baseFontSize - 1}px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 1px;
+      }
+      .balance-amount {
+        font-size: ${baseFontSize + 2}px;
+        font-weight: 900;
+        letter-spacing: -0.3px;
+      }
+      .balance-due .balance-amount {
+        /* Inverted for outstanding balance - grab attention */
+        background: #000;
+        color: #fff;
+        display: inline-block;
+        padding: 0 4px;
+      }
+      .cleared-msg {
+        font-size: ${baseFontSize - 1}px;
+        font-weight: 700;
+        margin-top: 1px;
+        letter-spacing: 0.05em;
+      }
+      /* ── Notes ── */
+      .notes-text {
+        font-size: ${baseFontSize - 1}px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        margin: 1px 0;
+        font-style: italic;
+      }
+      /* ── Signatures ── */
+      .sig-row {
+        margin: 3mm 0 1mm;
+      }
+      .sig-box {
+        width: 100%;
+      }
+      .sig-line {
+        font-size: ${baseFontSize - 2}px;
+        color: #555;
+        white-space: pre;
+        letter-spacing: 0;
+        margin-bottom: 1px;
+      }
+      .sig-label {
+        font-size: ${baseFontSize - 1}px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .sig-name {
+        font-size: ${baseFontSize - 1}px;
+      }
+      /* ── Footer ── */
+      .footer-block {
+        text-align: center;
+        font-size: ${baseFontSize - 2}px;
+        color: #444;
+        margin-top: 2mm;
+        line-height: 1.4;
+      }
+      .footer-legal {
+        margin-top: 1px;
+        font-style: italic;
+      }
+      .footer-code {
+        font-size: ${baseFontSize - 2}px;
+        letter-spacing: 0.5px;
+        margin-top: 2px;
+        font-weight: 700;
+      }
+      /* ── Cut line ── */
+      .cut-line {
+        border-top: 1px dashed #000;
+        margin: 4mm 0 2mm;
+        text-align: center;
+        font-size: ${baseFontSize - 1}px;
+        color: #555;
+        padding-top: 1mm;
+        letter-spacing: 0.5px;
+      }
+      @media print {
+        body { padding: 0; }
+        button { display: none !important; }
+      }
     `
 
-    win.document.write(`<!DOCTYPE html><html><head><title>Thermal Receipt - ${stu?.full_name ?? ''}</title>
-      <style>
-        @page { size: 80mm auto; margin: 2mm 3mm; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Courier New', monospace; font-size: 11px; color: #000; background: #fff; margin: 0; padding: 0; width: 80mm; }
-        .slip { width: 80mm; padding: 4px 0; }
-        .center { text-align: center; }
-        .bold { font-weight: 900; }
-        .school { font-size: 13px; font-weight: 900; margin-bottom: 2px; }
-        .small { font-size: 9px; }
-        .tiny { font-size: 8px; color: #555; }
-        .dashes { text-align: center; letter-spacing: 0; color: #555; font-size: 10px; margin: 3px 0; }
-        .row { display: flex; justify-content: space-between; padding: 1px 0; }
-        .section-label { font-weight: 900; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; margin: 4px 0 2px; }
-        .big { font-weight: 900; font-size: 13px; background: #000; color: #fff; padding: 3px 4px; margin: 4px 0; }
-        .red { font-weight: 900; color: #c00; }
-        .green { font-weight: 900; color: #060; }
-        @media print { body { padding: 0; } }
-        .cut { border-top: 1px dashed #000; margin: 4px 0; text-align: center; font-size: 9px; color: #555; }
-      </style>
-      </head><body onload="setTimeout(() => window.print(), 600)">
-        ${buildSlip('PARENT COPY')}
-        ${copies === 'duplicate' ? `<div class="cut">✂ ── ── ── ── ── ── ── ──</div>${buildSlip('SCHOOL COPY')}` : ''}
-      </body></html>`)
+    win.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thermal Receipt - ${stu?.full_name ?? ''}</title>
+  <style>${CSS}</style>
+</head>
+<body onload="setTimeout(() => window.print(), 700)">
+  ${buildSlip('PARENT COPY')}
+  ${copies === 'duplicate' ? `
+  <div class="cut-line">&#9988; ---- CUT HERE ----</div>
+  ${buildSlip('SCHOOL COPY')}
+  ` : ''}
+</body>
+</html>`)
     win.document.close()
   }
 
@@ -1469,8 +1839,10 @@ export default function FeesPage() {
     { id: 'revenue', label: 'Daily Revenue', icon: BarChart3 },
     { id: 'balances', label: 'Balances', icon: Scale },
     { id: 'structures', label: 'Structures', icon: FileText },
+    { id: 'templates', label: 'Receipt Templates', icon: Layers },
     { id: 'settings', label: 'Settings', icon: Settings },
   ] as const
+
 
   return (
     <>
@@ -2707,7 +3079,18 @@ export default function FeesPage() {
           </div>
         )}
 
-        {/* ── SETTINGS TAB ── */}
+        {/* ── TEMPLATES TAB ── */}
+        {tab === 'templates' && (
+          <div style={{ height: 'calc(100vh - 180px)', display: 'flex', flexDirection: 'column' }}>
+            <ReceiptTemplateSelector
+              selectedTemplateId={printSettings.templateId}
+              selectedColorId={printSettings.accentColor}
+              onSelectTemplate={(templateId) => handleSavePrintSettings({ ...printSettings, templateId, size: RECEIPT_TEMPLATES.find(t => t.id === templateId)?.paperSize || printSettings.size })}
+              onSelectColor={(accentColor) => handleSavePrintSettings({ ...printSettings, accentColor })}
+            />
+          </div>
+        )}
+
         {tab === 'settings' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 24, alignItems: 'start' }}>
             
@@ -2756,6 +3139,23 @@ export default function FeesPage() {
                   </div>
                 </div>
 
+                {printSettings.size === 'thermal' && (
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Thermal Roll Width</label>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      {([{ val: '58mm', label: '58 mm', desc: 'Compact' }, { val: '80mm', label: '80 mm', desc: 'Standard' }] as const).map(o => (
+                        <button key={o.val} onClick={() => handleSavePrintSettings({ ...printSettings, thermalWidth: o.val })}
+                          style={{ flex: 1, padding: '10px 6px', borderRadius: 8, border: `2px solid ${printSettings.thermalWidth === o.val ? '#7c3aed' : '#e2e8f0'}`, background: printSettings.thermalWidth === o.val ? '#f5f3ff' : 'transparent', color: printSettings.thermalWidth === o.val ? '#5b21b6' : 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer', lineHeight: 1.3 }}>
+                          <div>{o.label}</div>
+                          <div style={{ fontSize: 10, fontWeight: 500, opacity: 0.7 }}>{o.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 8, marginBottom: 0 }}>
+                      Select the paper roll width matching your thermal printer. Most school printers use 80 mm.
+                    </p>
+                  </div>
+                )}
                 {printSettings.size !== 'thermal' && (
                   <div>
                     <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Content Detail</label>
