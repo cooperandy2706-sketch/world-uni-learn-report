@@ -139,116 +139,128 @@ export default function BehaviorTrackingPage() {
     )
 
     return (
-        <div className="t-page">
-            <style>{`
-                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .card { background: var(--bg-card); border-radius: 8px; border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-                .type-btn { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--bg-card); color: var(--text-main); cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-                .type-btn.active.merit { border-color: #10b981; background: #ecfdf5; color: #065f46; }
-                .type-btn.active.demerit { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
-                .type-btn.active.counseling { border-color: #6366f1; background: #eef2ff; color: #3730a3; }
-                .student-row:hover { background: var(--bg-input); cursor: pointer; }
-                @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr !important; } .resp-grid-2 { grid-template-columns: 1fr !important; } }
-            `}</style>
+        <div className="tp-page">
+            <link rel="stylesheet" href="/src/styles/teacher-portal.css" />
 
-            <div className="t-header" style={{ marginBottom: 32 }}>
-                <div>
-                    <h1 className="t-title">Behavior & Discipline</h1>
-                    <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 4 }}>Log student merits, demerits, and private counseling sessions.</p>
+            {/* ── Header ───────────────────────────────────────────────────── */}
+            <div className="tp-hero" style={{ marginBottom: 20 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
+                    <div>
+                        <div className="tp-hero-label">Classroom Management</div>
+                        <h1 className="tp-hero-title">🛡️ Behavior & Discipline</h1>
+                        <p className="tp-hero-sub">Log student merits, demerits, and private counseling sessions.</p>
+                    </div>
                 </div>
             </div>
 
-            <div className="main-grid" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 24, '@media (minWidth: 1024px)': { gridTemplateColumns: '380px 1fr' } } as any}>
                 {/* Left Column: Student Selector */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                    <div className="card" style={{ padding: '20px', position: 'sticky', top: 20 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, background: 'var(--bg-input)', padding: '10px 14px', borderRadius: '10px' }}>
-                            <Search size={18} color="#9ca3af" />
+                    <div className="tp-card" style={{ padding: 20, position: 'sticky', top: 20 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, background: 'var(--bg-hover)', padding: '12px 16px', borderRadius: 12, border: '1px solid var(--border-color)' }}>
+                            <Search size={20} style={{ color: 'var(--text-muted)' }} />
                             <input 
                                 type="text" 
                                 placeholder="Search students..." 
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                style={{ background: 'none', border: 'none', outline: 'none', width: '100%', fontSize: 14 }}
+                                style={{ background: 'none', border: 'none', outline: 'none', width: '100%', fontSize: 15, color: 'var(--text-primary)', fontFamily: "'DM Sans', sans-serif" }}
                             />
                         </div>
 
-                        <div style={{ maxHeight: '500px', overflowY: 'auto', paddingRight: 4 }}>
+                        <div style={{ maxHeight: 500, overflowY: 'auto', paddingRight: 4, display: 'flex', flexDirection: 'column', gap: 8 }}>
                             {filteredStudents.map((s, i) => (
-                                <div 
+                                <button 
                                     key={i} 
                                     onClick={() => setSelectedStudent(s)}
-                                    className="student-row"
                                     style={{ 
-                                        display: 'flex', alignItems: 'center', gap: 12, padding: '12px', borderRadius: '12px', marginBottom: 4,
-                                        background: selectedStudent?.id === s.id ? 'var(--bg-input)' : 'transparent',
-                                        border: selectedStudent?.id === s.id ? '1.5px solid var(--border-color)' : '1.5px solid transparent'
+                                        display: 'flex', alignItems: 'center', gap: 12, padding: 12, borderRadius: 12, border: 'none',
+                                        background: selectedStudent?.id === s.id ? 'linear-gradient(135deg, var(--primary-color), var(--primary-color-dark))' : 'var(--bg-hover)',
+                                        cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left', width: '100%'
                                     }}
                                 >
-                                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#ede9fe', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 }}>
+                                    <div className="tp-avatar tp-avatar-md" style={{ background: selectedStudent?.id === s.id ? 'rgba(255,255,255,0.2)' : 'linear-gradient(135deg, #F59E0B, #FBBF24)', color: selectedStudent?.id === s.id ? '#fff' : '#fff' }}>
                                         {s.full_name.charAt(0)}
                                     </div>
                                     <div style={{ minWidth: 0 }}>
-                                        <div style={{ fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.full_name}</div>
-                                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.class?.name} · {s.student_id}</div>
+                                        <div style={{ fontSize: 14, fontWeight: 700, color: selectedStudent?.id === s.id ? '#fff' : 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.full_name}</div>
+                                        <div style={{ fontSize: 12, color: selectedStudent?.id === s.id ? 'rgba(255,255,255,0.8)' : 'var(--text-muted)' }}>{s.class?.name} · {s.student_id}</div>
                                     </div>
-                                </div>
+                                </button>
                             ))}
+                            {filteredStudents.length === 0 && (
+                                <div style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-subtle)', fontSize: 14 }}>No students found</div>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* Right Column: Form or History */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                     {/* Tabs */}
-                    <div style={{ display: 'flex', gap: 24, borderBottom: '1px solid var(--border-color)' }}>
-                        <button onClick={() => setActiveTab('log')} style={{ padding: '12px 4px', background: 'none', border: 'none', fontSize: 15, fontWeight: activeTab === 'log' ? 700 : 500, color: activeTab === 'log' ? '#7c3aed' : '#6b7280', borderBottom: activeTab === 'log' ? '2px solid #7c3aed' : '2px solid transparent', cursor: 'pointer' }}>
+                    <div className="tp-tabs" style={{ marginBottom: 0 }}>
+                        <button 
+                            className={`tp-tab ${activeTab === 'log' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('log')}
+                        >
                             Log Incident
                         </button>
-                        <button onClick={() => setActiveTab('history')} style={{ padding: '12px 4px', background: 'none', border: 'none', fontSize: 15, fontWeight: activeTab === 'history' ? 700 : 500, color: activeTab === 'history' ? '#7c3aed' : '#6b7280', borderBottom: activeTab === 'history' ? '2px solid #7c3aed' : '2px solid transparent', cursor: 'pointer' }}>
+                        <button 
+                            className={`tp-tab ${activeTab === 'history' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('history')}
+                        >
                             My Log History
                         </button>
                     </div>
 
                     {activeTab === 'log' ? (
                         selectedStudent ? (
-                            <div className="card" style={{ padding: '32px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32 }}>
-                                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#7c3aed', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 700 }}>
+                            <div className="tp-card" style={{ animation: 'tp-fade-in 0.3s ease' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid var(--border-color)' }}>
+                                    <div className="tp-avatar tp-avatar-lg" style={{ background: 'linear-gradient(135deg, var(--primary-color), var(--primary-color-dark))', color: '#fff' }}>
                                         {selectedStudent.full_name.charAt(0)}
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: 20, fontWeight: 700 }}>{selectedStudent.full_name}</div>
+                                        <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>{selectedStudent.full_name}</div>
                                         <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>Logging behavior for {selectedStudent.class?.name}</div>
                                     </div>
                                 </div>
 
                                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                                     <div>
-                                        <label style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 12 }}>What are you logging?</label>
-                                        <div style={{ display: 'flex', gap: 12 }}>
-                                            <button type="button" onClick={() => setLogType('merit')} className={`type-btn ${logType === 'merit' ? 'active merit' : ''}`}>
-                                                <ShieldCheck size={24} />
-                                                <span style={{ fontSize: 13, fontWeight: 700 }}>Merit</span>
-                                            </button>
-                                            <button type="button" onClick={() => setLogType('demerit')} className={`type-btn ${logType === 'demerit' ? 'active demerit' : ''}`}>
-                                                <ShieldAlert size={24} />
-                                                <span style={{ fontSize: 13, fontWeight: 700 }}>Demerit</span>
-                                            </button>
-                                            <button type="button" onClick={() => setLogType('counseling')} className={`type-btn ${logType === 'counseling' ? 'active counseling' : ''}`}>
-                                                <MessageSquare size={24} />
-                                                <span style={{ fontSize: 13, fontWeight: 700 }}>Counseling</span>
-                                            </button>
+                                        <div className="tp-label">What are you logging?</div>
+                                        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                                            {[
+                                                { id: 'merit', label: 'Merit', icon: ShieldCheck, color: 'var(--success-color)', bg: '#ECFDF5' },
+                                                { id: 'demerit', label: 'Demerit', icon: ShieldAlert, color: 'var(--danger-color)', bg: '#FEF2F2' },
+                                                { id: 'counseling', label: 'Counseling', icon: MessageSquare, color: 'var(--info-color)', bg: '#EFF6FF' }
+                                            ].map(type => (
+                                                <button 
+                                                    key={type.id}
+                                                    type="button" 
+                                                    onClick={() => setLogType(type.id as LogType)} 
+                                                    style={{ 
+                                                        flex: '1 1 120px', padding: '16px', borderRadius: 16, 
+                                                        border: `2px solid ${logType === type.id ? type.color : 'var(--border-color)'}`,
+                                                        background: logType === type.id ? type.bg : 'var(--bg-card)', 
+                                                        color: logType === type.id ? type.color : 'var(--text-main)', 
+                                                        cursor: 'pointer', transition: 'all 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12
+                                                    }}
+                                                >
+                                                    <type.icon size={28} />
+                                                    <span style={{ fontSize: 14, fontWeight: 800 }}>{type.label}</span>
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
 
-                                    <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
                                         <div>
-                                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Category</label>
+                                            <div className="tp-label">Category</div>
                                             <select 
                                                 value={category}
                                                 onChange={(e) => setCategory(e.target.value)}
-                                                style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', outline: 'none', background: 'var(--bg-card)', color: 'var(--text-main)' }}
+                                                className="tp-select"
                                             >
                                                 <option value="">Select Category</option>
                                                 {categories[logType].map(c => <option key={c} value={c}>{c}</option>)}
@@ -256,76 +268,85 @@ export default function BehaviorTrackingPage() {
                                             </select>
                                         </div>
                                         <div>
-                                            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Privacy</label>
+                                            <div className="tp-label">Privacy</div>
                                             <button 
                                                 type="button"
                                                 onClick={() => setIsPrivate(!isPrivate)}
                                                 style={{ 
-                                                    width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border-color)', 
-                                                    background: isPrivate ? '#fef2f2' : '#f0fdf4', color: isPrivate ? '#dc2626' : '#16a34a',
-                                                    fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                                                    width: '100%', padding: '12px 16px', borderRadius: 12, border: '1px solid var(--border-color)', 
+                                                    background: isPrivate ? '#FEF2F2' : '#F0FDF4', color: isPrivate ? 'var(--danger-color)' : 'var(--success-color)',
+                                                    fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 46
                                                 }}
                                             >
-                                                {isPrivate ? <><Lock size={16} /> Private Note</> : <><Globe size={16} /> Shared with Admin</>}
+                                                {isPrivate ? <><Lock size={18} /> Private Note</> : <><Globe size={18} /> Shared with Admin</>}
                                             </button>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Description / Observation</label>
+                                        <div className="tp-label">Description / Observation</div>
                                         <textarea 
-                                            rows={4}
+                                            rows={5}
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
                                             placeholder={`Describe the ${logType} details...`}
-                                            style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid var(--border-color)', outline: 'none', resize: 'none', background: 'var(--bg-card)', color: 'var(--text-main)' }}
+                                            className="tp-input"
+                                            style={{ resize: 'vertical' }}
                                         />
                                     </div>
 
-                                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 12 }}>
-                                        <button type="button" onClick={() => setSelectedStudent(null)} style={{ padding: '12px 24px', borderRadius: '12px', border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-                                        <button type="submit" disabled={submitting} style={{ padding: '12px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(109,40,217,0.3)' }}>
+                                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', paddingTop: 16, borderTop: '1px solid var(--border-color)' }}>
+                                        <button type="button" className="tp-btn tp-btn-ghost" onClick={() => setSelectedStudent(null)} style={{ border: '1px solid var(--border-color)' }}>Cancel</button>
+                                        <button type="submit" className="tp-btn tp-btn-primary" disabled={submitting}>
                                             {submitting ? 'Saving...' : `Record ${logType.charAt(0).toUpperCase() + logType.slice(1)}`}
                                         </button>
                                     </div>
                                 </form>
                             </div>
                         ) : (
-                            <div className="card" style={{ padding: '80px 40px', textAlign: 'center', borderStyle: 'dashed', background: 'var(--bg-input)' }}>
-                                <div style={{ background: '#ede9fe', color: '#7c3aed', width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-                                    <User size={32} />
+                            <div className="tp-card" style={{ padding: '80px 40px', textAlign: 'center', background: 'var(--bg-hover)', borderStyle: 'dashed', borderWidth: 2 }}>
+                                <div className="tp-empty">
+                                    <div className="tp-empty-icon" style={{ background: 'var(--bg-card)', color: 'var(--primary-color)', width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', margin: '0 auto 24px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                                        <User size={40} />
+                                    </div>
+                                    <div className="tp-empty-title">Select a Student</div>
+                                    <div className="tp-empty-sub">Choose a student from the list on the left to start logging behavior or counseling notes.</div>
                                 </div>
-                                <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' }}>Select a Student</h3>
-                                <p style={{ color: 'var(--text-muted)', fontSize: 14, maxWidth: '300px', margin: '0 auto' }}>Choose a student from the list on the left to start logging behavior or counseling notes.</p>
                             </div>
                         )
                     ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, animation: 'tp-fade-in 0.3s ease' }}>
                             {logs.length === 0 ? (
-                                <div className="card" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>No logs recorded yet.</div>
+                                <div className="tp-card">
+                                    <div className="tp-empty">
+                                        <div className="tp-empty-sub">No logs recorded yet.</div>
+                                    </div>
+                                </div>
                             ) : logs.map((l, i) => (
-                                <div key={i} className="card" style={{ padding: '20px', display: 'flex', gap: 16 }}>
+                                <div key={i} className="tp-card" style={{ padding: 20, display: 'flex', gap: 16 }}>
                                     <div style={{ 
-                                        width: 40, height: 40, borderRadius: '12px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        background: l.type === 'merit' ? '#ecfdf5' : l.type === 'demerit' ? '#fef2f2' : '#eef2ff',
-                                        color: l.type === 'merit' ? '#10b981' : l.type === 'demerit' ? '#ef4444' : '#6366f1'
+                                        width: 48, height: 48, borderRadius: 16, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        background: l.type === 'merit' ? '#ECFDF5' : l.type === 'demerit' ? '#FEF2F2' : '#EFF6FF',
+                                        color: l.type === 'merit' ? 'var(--success-color)' : l.type === 'demerit' ? 'var(--danger-color)' : 'var(--info-color)'
                                     }}>
                                         {l.type === 'merit' ? <ShieldCheck size={24} /> : l.type === 'demerit' ? <ShieldAlert size={24} /> : <MessageSquare size={24} />}
                                     </div>
                                     <div style={{ flex: 1 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
                                             <div>
-                                                <div style={{ fontSize: 15, fontWeight: 700 }}>{l.student?.full_name}</div>
-                                                <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                                    {l.category} · {format(new Date(l.created_at), 'MMM dd, h:mm a')}
-                                                    {l.is_private && <span title="Private Note"><Lock size={10} /></span>}
+                                                <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>{l.student?.full_name}</div>
+                                                <div style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                                                    <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{l.category}</span> 
+                                                    <span>·</span>
+                                                    <span>{format(new Date(l.created_at), 'MMM dd, h:mm a')}</span>
+                                                    {l.is_private && <span title="Private Note" style={{ background: '#FEF2F2', color: 'var(--danger-color)', padding: '2px 6px', borderRadius: 4, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><Lock size={12} /> Private</span>}
                                                 </div>
                                             </div>
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: l.type === 'merit' ? '#10b981' : l.type === 'demerit' ? '#ef4444' : '#6366f1' }}>
-                                                {l.points > 0 ? `+${l.points}` : l.points < 0 ? l.points : 'Note'}
+                                            <div style={{ fontSize: 16, fontWeight: 800, color: l.type === 'merit' ? 'var(--success-color)' : l.type === 'demerit' ? 'var(--danger-color)' : 'var(--info-color)', background: l.type === 'merit' ? '#ECFDF5' : l.type === 'demerit' ? '#FEF2F2' : '#EFF6FF', padding: '6px 12px', borderRadius: 99 }}>
+                                                {l.points > 0 ? `+${l.points} pts` : l.points < 0 ? `${l.points} pts` : 'Note'}
                                             </div>
                                         </div>
-                                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.5 }}>{l.description}</p>
+                                        <p style={{ fontSize: 14, color: 'var(--text-primary)', marginTop: 12, lineHeight: 1.6 }}>{l.description}</p>
                                     </div>
                                 </div>
                             ))}

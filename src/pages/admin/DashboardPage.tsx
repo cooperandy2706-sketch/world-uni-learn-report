@@ -594,867 +594,655 @@ export default function DashboardPage() {
 
   if (loading) return <FlaskLoader fullScreen={false} label="Initializing Command Center…" />
 
+  const now = new Date()
+  const todayStr = now.toLocaleDateString('en-GH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+  const userName = user?.full_name?.split(' ')[0] || 'Admin'
+  const { timeGreeting: greeting } = getEngagingGreeting(user?.role)
+
+  // KPI definitions
+  const kpis = [
+    { label: 'Students', value: stats?.students ?? 0, icon: '🎒', color: '#2563EB', bg: 'rgba(37,99,235,0.08)', to: '/admin/student-hub', trend: '+3 this week' },
+    { label: 'Teachers', value: stats?.teachers ?? 0, icon: '👨‍🏫', color: '#7C3AED', bg: 'rgba(124,58,237,0.08)', to: '/admin/staff-hub', trend: 'Active staff' },
+    { label: 'Classes', value: stats?.classes ?? 0, icon: '🏫', color: '#0891B2', bg: 'rgba(8,145,178,0.08)', to: '/admin/academic-hub', trend: `${coverageStats.activeClasses} active now` },
+    { label: 'Present Today', value: stats?.presentToday ?? 0, icon: '✅', color: '#16A34A', bg: 'rgba(22,163,74,0.08)', to: ROUTES.ADMIN_ATTENDANCE, trend: `${stats?.absentToday ?? 0} absent` },
+    { label: 'Total Debt', value: stats?.totalDebt ?? 0, icon: '⚠️', color: '#DC2626', bg: 'rgba(220,38,38,0.08)', to: '/admin/billing', isCurrency: true, trend: 'Outstanding fees' },
+    { label: 'Messages', value: stats?.unreadMessages ?? 0, icon: '💬', color: '#F59E0B', bg: 'rgba(245,158,11,0.08)', to: '/admin/communications-hub', trend: '7-day window' },
+  ]
+
+  // Quick actions
+  const quickActions = [
+    { label: 'Take Attendance', icon: ClipboardCheck, color: '#2563EB', to: ROUTES.ADMIN_ATTENDANCE },
+    { label: 'Score Entry', icon: PencilLine, color: '#7C3AED', to: '/admin/assessment-hub' },
+    { label: 'Add Student', icon: Users, color: '#16A34A', to: '/admin/student-hub' },
+    { label: 'Add Staff', icon: UserCheck, color: '#0891B2', to: '/admin/staff-hub' },
+    { label: 'Announcement', icon: MessageSquare, color: '#F59E0B', to: '/admin/communications-hub' },
+    { label: 'Timetable', icon: Calendar, color: '#EC4899', to: ROUTES.ADMIN_TIMETABLE },
+    { label: 'Weekly Goals', icon: Award, color: '#10B981', to: ROUTES.ADMIN_WEEKLY_GOALS },
+    { label: 'Analytics', icon: Activity, color: '#6366F1', to: ROUTES.ADMIN_ANALYTICS },
+    { label: 'Billing', icon: Banknote, color: '#F97316', to: '/admin/billing' },
+    { label: 'Settings', icon: Settings, color: '#64748B', to: '/admin/settings-hub' },
+  ]
+
   return (
     <>
       {showOnboardingWizard && <SchoolOnboardingWizard onClose={() => setShowOnboardingWizard(false)} />}
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        .noc-dashboard {
-          font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-          color: var(--text-main);
-          padding-bottom: 60px;
+        .adm-dash {
+          font-family: 'Inter', system-ui, sans-serif;
+          color: var(--text-primary, #0F172A);
+          padding: 28px 32px 80px;
           max-width: 1600px;
           margin: 0 auto;
         }
-        .glass-panel {
-          background: #ffffff;
-          border: 1px solid var(--border-color);
-          border-radius: 8px;
-          overflow: hidden;
-          position: relative;
-          transition: background-color 0.3s ease, border-color 0.3s ease;
+        @media (max-width: 1024px) { .adm-dash { padding: 20px 20px 80px; } }
+        @media (max-width: 600px)  { .adm-dash { padding: 16px 14px 80px; } }
+
+        .adm-kpi-grid {
+          display: grid;
+          grid-template-columns: repeat(6, 1fr);
+          gap: 16px;
+          margin-bottom: 28px;
         }
-        html.dark .glass-panel {
-          background: var(--bg-card);
-          border: 1px solid var(--border-color);
-        }
-        .kpi-card {
-          background: var(--bg-card);
-          border-radius: 8px;
-          padding: 24px;
-          border: 1px solid var(--border-color);
-          box-shadow: none;
+        @media (max-width: 1200px) { .adm-kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 640px)  { .adm-kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+
+        .adm-kpi {
+          background: var(--bg-card, #fff);
+          border: 1px solid var(--border-color, #E5E7EB);
+          border-radius: 14px;
+          padding: 20px;
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+          text-decoration: none;
+          color: inherit;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
-          transition: all 0.2s ease;
-          text-decoration: none;
-          color: var(--text-main);
-          position: relative;
-          overflow: hidden;
-        }
-        html.dark .kpi-card {
-          background: var(--bg-card);
-          border-color: var(--border-color);
-        }
-        .kpi-card:hover {
-          background: var(--bg-hover);
-          border-color: #1a56db;
-        }
-        html.dark .kpi-card:hover {
-          background: var(--bg-hover);
-          border-color: #1a56db;
-        }
-        .btn-modern {
-          background: #0f172a;
-          color: white;
-          border: none;
-          padding: 12px 24px;
-          border-radius: 14px;
-          font-weight: 700;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.2s;
-          text-decoration: none;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
-        }
-        html.dark .btn-modern {
-          background: var(--text-main);
-          color: var(--bg-app);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .btn-modern:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 16px rgba(15, 23, 42, 0.2);
-        }
-        .btn-secondary-modern {
-          background: var(--bg-card);
-          color: var(--text-main);
-          border: 1px solid var(--border-color);
-          padding: 12px 24px;
-          border-radius: 14px;
-          font-weight: 700;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.2s;
-          text-decoration: none;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-        }
-        html.dark .btn-secondary-modern {
-          background: var(--bg-card);
-          color: var(--text-main);
-          border: 1.5px solid var(--border-color);
-        }
-        .btn-secondary-modern:hover {
-          background: #f1f5f9;
-          transform: translateY(-2px);
-        }
-        html.dark .btn-secondary-modern:hover {
-          background: var(--bg-hover);
-        }
-        .ops-action-card {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 8px;
-          padding: 16px 8px;
-          background: var(--bg-hover);
-          border-radius: 12px;
-          text-decoration: none;
-          transition: all 0.15s;
-          border: 1px solid transparent;
-        }
-        html.dark .ops-action-card {
-          background: var(--bg-hover);
-        }
-        .ops-action-card:hover {
-          background: var(--bg-card);
-          border-color: var(--border-color);
-        }
-        html.dark .ops-action-card:hover {
-          background: var(--bg-card);
-          border-color: var(--border-color);
-        }
-        .list-item-hover {
-          display: flex;
-          align-items: center;
           gap: 12px;
-          padding: 10px 12px;
-          background: transparent;
-          border-radius: 0;
-          border: none;
-          border-bottom: 1px solid var(--border-light);
-          transition: background 0.15s ease;
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        .list-item-hover:last-child {
-          border-bottom: none;
+        .adm-kpi::after {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 2px;
+          background: var(--adm-kpi-c, #2563EB);
+          opacity: 0;
+          transition: opacity 0.2s;
         }
-        html.dark .list-item-hover {
-          background: transparent;
-          border-color: var(--border-color);
+        .adm-kpi:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-color: var(--adm-kpi-c, #2563EB); }
+        .adm-kpi:hover::after { opacity: 1; }
+
+        .adm-section {
+          background: var(--bg-card, #fff);
+          border: 1px solid var(--border-color, #E5E7EB);
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
-        .list-item-hover:hover {
-          background: var(--bg-hover);
+        .adm-section-head {
+          padding: 18px 22px;
+          border-bottom: 1px solid var(--border-color, #E5E7EB);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
         }
-        html.dark .list-item-hover:hover {
-          background: var(--bg-hover);
+        .adm-section-title {
+          font-size: 15px; font-weight: 800;
+          color: var(--text-primary, #0F172A);
+          letter-spacing: -0.01em;
+          font-family: 'Outfit', 'Inter', sans-serif;
         }
-        .recharts-tooltip-wrapper {
-          outline: none;
-        }
-        .hide-scroll::-webkit-scrollbar {
-          display: none;
-        }
-        
-        .tier2-grid {
+        .adm-section-body { padding: 20px 22px; }
+
+        .adm-body-grid {
           display: grid;
           grid-template-columns: 2fr 1fr;
-          gap: 24px;
-          margin-bottom: 24px;
+          gap: 20px;
+          margin-bottom: 20px;
         }
-        .tier3-grid {
+        @media (max-width: 1100px) { .adm-body-grid { grid-template-columns: 1fr; } }
+
+        .adm-3col {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 20px;
+          margin-bottom: 20px;
+        }
+        @media (max-width: 1200px) { .adm-3col { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 768px) { .adm-3col { grid-template-columns: 1fr; } }
+
+        .adm-qa-grid {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 10px;
+        }
+        @media (max-width: 900px)  { .adm-qa-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 640px)  { .adm-qa-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
+        @media (max-width: 400px)  { .adm-qa-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .adm-qa-item {
+          display: flex; flex-direction: column; align-items: center;
+          gap: 8px; padding: 14px 8px;
+          background: var(--bg-hover, #F1F5F9);
+          border-radius: 14px;
+          text-decoration: none; color: inherit;
+          border: 1px solid transparent;
+          transition: all 0.2s;
+          cursor: pointer;
+        }
+        .adm-qa-item:hover {
+          background: var(--bg-card, #fff);
+          border-color: var(--border-color, #E5E7EB);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
         }
 
-        @media (max-width: 1024px) {
-          .tier2-grid {
-            grid-template-columns: 1fr;
-          }
-          .tier3-grid {
-            grid-template-columns: 1fr;
-          }
+        .adm-table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        .adm-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 800; color: var(--text-muted,#6B7280); text-transform: uppercase; letter-spacing: 0.06em; background: var(--bg-hover,#F1F5F9); border-bottom: 1px solid var(--border-color,#E5E7EB); }
+        .adm-table td { padding: 12px 14px; font-size: 13px; font-weight: 500; color: var(--text-primary,#0F172A); border-bottom: 1px solid var(--border-color,#E5E7EB); }
+        .adm-table tr:last-child td { border-bottom: none; }
+        .adm-table tbody tr { transition: background 0.15s; }
+        .adm-table tbody tr:hover { background: var(--bg-hover,#F1F5F9); }
+
+        .adm-activity-item {
+          display: flex; align-items: flex-start; gap: 12px;
+          padding: 12px 0;
+          border-bottom: 1px solid var(--border-color, #E5E7EB);
         }
-        .campus-block {
-          border-radius: 12px;
-          padding: 20px;
-          background: var(--bg-card);
-          border: 1px solid var(--border-color);
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.15s ease;
-          text-align: center;
+        .adm-activity-item:last-child { border-bottom: none; }
+
+        .adm-lesson-row {
+          display: flex; align-items: center; gap: 12px;
+          padding: 10px 0;
+          border-bottom: 1px solid var(--border-color, #E5E7EB);
         }
-        html.dark .campus-block {
-          background: var(--bg-card);
+        .adm-lesson-row:last-child { border-bottom: none; }
+
+        .adm-absent-row {
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 12px; padding: 10px 0;
+          border-bottom: 1px solid var(--border-color, #E5E7EB);
         }
-        .campus-block.active-block {
-          border-color: #10b981;
-          background: rgba(16, 185, 129, 0.05);
+        .adm-absent-row:last-child { border-bottom: none; }
+
+        .adm-tab-bar {
+          display: flex; gap: 4px;
+          background: var(--bg-hover, #F1F5F9);
+          padding: 4px;
+          border-radius: 10px;
+          width: fit-content;
         }
-        html.dark .campus-block.active-block {
-          background: rgba(16, 185, 129, 0.1);
+        .adm-tab {
+          padding: 7px 16px; border-radius: 8px;
+          font-size: 12px; font-weight: 700;
+          color: var(--text-muted, #6B7280);
+          cursor: pointer; transition: all 0.15s;
+          border: none; background: none;
         }
-        .pulse-dot {
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          background: #10b981;
-          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-          animation: map-pulse 1.8s infinite;
+        .adm-tab.active {
+          background: var(--bg-card, #fff);
+          color: var(--text-primary, #0F172A);
+          box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         }
-        @keyframes map-pulse {
-          0% {
-            transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-          }
-          70% {
-            transform: scale(1);
-            box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
-          }
-          100% {
-            transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-          }
-        }
-        .timetable-card {
-          background: var(--bg-card);
-          border-radius: 12px;
-          border: 1px solid var(--border-color);
-          padding: 20px;
-          transition: background 0.15s ease;
-        }
-        .timetable-card:hover {
-          background: var(--bg-hover);
-        }
+
+        @keyframes adm-fade-up { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+        .adm-anim { animation: adm-fade-up 0.4s cubic-bezier(0.2,0.8,0.2,1) both; }
       `}</style>
 
-      <motion.div className="noc-dashboard" variants={containerVariants} initial="hidden" animate="show">
+      <motion.div
+        className="adm-dash"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
 
-        {/* COMMAND CENTER HEADER */}
-        <motion.div variants={itemVariants} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32, flexWrap: 'wrap', gap: 20 }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-              <div style={{ padding: '6px 12px', background: isDark ? 'rgba(79, 70, 229, 0.2)' : '#e0e7ff', color: isDark ? '#818cf8' : '#4f46e5', borderRadius: 8, fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Activity size={14} /> Live Monitor
+        {/* ── HERO ────────────────────────────────────────────────────────── */}
+        <div style={{
+          borderRadius: 20,
+          padding: '32px 36px',
+          marginBottom: 24,
+          background: 'linear-gradient(135deg, #1E1B4B 0%, #2563EB 60%, #7C3AED 100%)',
+          color: '#fff',
+          position: 'relative',
+          overflow: 'hidden',
+        }} className="adm-anim">
+          {/* Decorative circles */}
+          <div style={{ position: 'absolute', top: -60, right: -40, width: 260, height: 260, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: -80, right: 120, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
+
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20, position: 'relative', zIndex: 1 }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.65, marginBottom: 6 }}>
+                ACADERA COMMAND CENTER
               </div>
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} • <DashboardClock /></span>
-            </div>
-            <h1 style={{ fontSize: 36, fontWeight: 800, margin: 0, letterSpacing: '-0.03em', color: 'var(--text-main)' }}>{userSchool?.name ?? 'Campus Command Center'}</h1>
-          </div>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <Link to={ROUTES.ADMIN_ANNOUNCEMENTS} className="btn-secondary-modern"><MessageSquare size={16} /> Broadcast</Link>
-            <Link to={ROUTES.ADMIN_REPORTS} className="btn-modern"><ArrowUpRight size={16} /> Generate Reports</Link>
-          </div>
-        </motion.div>
-
-        {/* TOP KPIs GRID */}
-        <motion.div variants={itemVariants} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 24 }}>
-
-          <Link to={ROUTES.ADMIN_STUDENTS} className="kpi-card" style={{ '--theme-color': '#3b82f6' } as any}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 8, background: isDark ? 'rgba(59, 130, 246, 0.2)' : '#eff6ff', color: isDark ? '#60a5fa' : '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BookOpen size={24} /></div>
-              <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
-            </div>
-            <div>
-              <div style={{ fontSize: 32, fontWeight: 800, lineHeight: 1, color: 'var(--text-main)' }}><AnimNum to={stats?.students ?? 0} /></div>
-              <div style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 600, marginTop: 8 }}>Total Students Active</div>
-            </div>
-          </Link>
-
-          <Link to={ROUTES.ADMIN_STAFF_DIRECTORY} className="kpi-card" style={{ '--theme-color': '#8b5cf6' } as any}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 8, background: isDark ? 'rgba(139, 92, 246, 0.2)' : '#f5f3ff', color: isDark ? '#a78bfa' : '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Activity size={24} /></div>
-              <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
-            </div>
-            <div>
-              <div style={{ fontSize: 32, fontWeight: 800, lineHeight: 1, color: 'var(--text-main)' }}><AnimNum to={stats?.teachers ?? 0} /></div>
-              <div style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 600, marginTop: 8 }}>Teaching Staff</div>
-            </div>
-          </Link>
-
-          <Link to={ROUTES.ADMIN_ATTENDANCE} className="kpi-card" style={{ '--theme-color': '#10b981' } as any}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 8, background: isDark ? 'rgba(16, 185, 129, 0.2)' : '#ecfdf5', color: isDark ? '#34d399' : '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CheckCircle2 size={24} /></div>
-              <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
-            </div>
-            <div>
-              <div style={{ fontSize: 32, fontWeight: 800, lineHeight: 1, color: 'var(--text-main)' }}>{stats?.students ? Math.round((stats.presentToday / stats.students) * 100) : 0}%</div>
-              <div style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 600, marginTop: 8 }}>Today's Attendance Rate</div>
-            </div>
-          </Link>
-
-          <Link to={'/bursar/fees'} className="kpi-card" style={{ '--theme-color': '#f59e0b' } as any}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 8, background: isDark ? 'rgba(245, 158, 11, 0.2)' : '#fffbeb', color: isDark ? '#fbbf24' : '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 800 }}>₵</div>
-              <ArrowUpRight size={20} color={isDark ? '#475569' : '#cbd5e1'} />
-            </div>
-            <div>
-              <div style={{ fontSize: 32, fontWeight: 800, lineHeight: 1, color: 'var(--text-main)' }}><AnimNum to={stats?.totalDebt ?? 0} /></div>
-              <div style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 600, marginTop: 8 }}>Outstanding Revenue</div>
-            </div>
-          </Link>
-
-        </motion.div>
-
-        {/* BRANCHES WIDGET */}
-        {settings?.has_branches && branches.length > 0 && (
-          <motion.div variants={itemVariants} style={{ marginBottom: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div>
-                <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  🏢 School Branches ({branches.length})
-                </h3>
-              </div>
-              <Link to="/admin/branches" style={{ fontSize: 13, fontWeight: 700, color: '#6366f1', textDecoration: 'none' }}>Manage Branches →</Link>
-            </div>
-            <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 8, margin: '0 -4px', paddingLeft: 4 }} className="hide-scroll">
-              {branches.map((branch, i) => (
-                <Link
-                  key={branch.id}
-                  to="/admin/branches"
-                  style={{
-                    flexShrink: 0, width: 280, padding: 20, borderRadius: 16, background: 'var(--bg-card)',
-                    border: '1px solid var(--border-color)', textDecoration: 'none', display: 'flex',
-                    flexDirection: 'column', position: 'relative', overflow: 'hidden',
-                  }}
-                >
-                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: `hsl(${(i * 55) % 360}, 70%, 60%)` }} />
-                  <span style={{ fontSize: 24, marginBottom: 8 }}>🏫</span>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>{branch.branch_name || branch.name}</span>
-                  <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{branch.address || 'No location set'}</span>
-                </Link>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* MAIN DASHBOARD STRUCTURED GRID */}
-        {/* Tier 2: Analytical & Operations Deck */}
-        <div className="tier2-grid">
-
-          {/* Tabbed Analytics Panel */}
-          <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 32, height: 400 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-              <div>
-                <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
-                  {activeAnalyticsTab === 'financials' ? 'Revenue Trend' : activeAnalyticsTab === 'academics' ? 'Class Academics' : 'Weekly Goals Tracker'}
-                </h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '4px 0 0' }}>
-                  {activeAnalyticsTab === 'financials'
-                    ? 'Fee collections over the last 6 months'
-                    : activeAnalyticsTab === 'academics'
-                      ? 'Academic average scores compared across all classes'
-                      : 'Weekly instruction goals set for teachers this term'}
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', background: isDark ? 'var(--bg-app)' : '#f1f5f9', borderRadius: 14, padding: 4 }}>
+              <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 'clamp(22px, 3.5vw, 34px)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 8, lineHeight: 1.1 }}>
+                {greeting}, {userName} 👋
+              </h1>
+              <p style={{ fontSize: 14, opacity: 0.78, fontWeight: 500, marginBottom: 20, maxWidth: 520 }}>
+                {term ? `${year?.name ?? ''} · ${term.name}` : 'No active academic period'} · {todayStr}
+              </p>
+              {/* Stat pills */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {[
-                  { id: 'financials', label: '📈 Revenue' },
-                  { id: 'academics', label: '🎓 Academics' },
-                  { id: 'goals', label: '🎯 Goals' }
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveAnalyticsTab(tab.id as any)}
-                    className="tab-button"
-                    style={{
-                      background: activeAnalyticsTab === tab.id ? 'var(--bg-card)' : 'transparent',
-                      color: activeAnalyticsTab === tab.id ? 'var(--text-main)' : 'var(--text-muted)',
-                      boxShadow: activeAnalyticsTab === tab.id ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
-                      borderRadius: 10,
-                      padding: '6px 12px',
-                      fontSize: 12,
-                      fontWeight: 700,
-                      border: 'none',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease'
-                    }}
-                  >
-                    {tab.label}
-                  </button>
+                  { label: `${stats?.students ?? 0} Students`, bg: 'rgba(255,255,255,0.15)' },
+                  { label: `${stats?.classes ?? 0} Classes`, bg: 'rgba(255,255,255,0.12)' },
+                  { label: `${stats?.presentToday ?? 0} Present`, bg: 'rgba(34,197,94,0.25)' },
+                  { label: `${coverageStats.activeClasses} Active Now`, bg: 'rgba(255,200,0,0.2)' },
+                ].map(p => (
+                  <span key={p.label} style={{ background: p.bg, color: '#fff', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 99, backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.15)' }}>
+                    {p.label}
+                  </span>
                 ))}
               </div>
             </div>
 
+            {/* Clock + pending alerts */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-end', minWidth: 180 }}>
+              <div style={{ fontFamily: "'Outfit', monospace", fontSize: 42, fontWeight: 900, letterSpacing: -2, opacity: 0.95, lineHeight: 1 }}>
+                <DashboardClock />
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {pendingLeavesCount > 0 && (
+                  <span onClick={() => navigate('/admin/staff-hub')} style={{ cursor: 'pointer', background: 'rgba(245,158,11,0.25)', color: '#fde68a', fontSize: 11, fontWeight: 800, padding: '5px 10px', borderRadius: 8, border: '1px solid rgba(245,158,11,0.4)' }}>
+                    ⏳ {pendingLeavesCount} Leave{pendingLeavesCount !== 1 ? 's' : ''}
+                  </span>
+                )}
+                {pendingExeatsCount > 0 && (
+                  <span onClick={() => navigate('/admin/campus-hub')} style={{ cursor: 'pointer', background: 'rgba(99,102,241,0.25)', color: '#c7d2fe', fontSize: 11, fontWeight: 800, padding: '5px 10px', borderRadius: 8, border: '1px solid rgba(99,102,241,0.4)' }}>
+                    🚪 {pendingExeatsCount} Exeat{pendingExeatsCount !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+              <Link to="/admin/tasks" style={{ textDecoration: 'none' }}>
+                <div style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 6, backdropFilter: 'blur(4px)' }}>
+                  <CheckSquare size={14} /> Admin Tasks
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* ── KPI ROW ──────────────────────────────────────────────────────── */}
+        <div className="adm-kpi-grid adm-anim" style={{ animationDelay: '0.06s' }}>
+          {kpis.map((k, i) => (
+            <Link key={k.label} to={k.to} className="adm-kpi" style={{ '--adm-kpi-c': k.color } as any}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: k.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
+                  {k.icon}
+                </div>
+                <ArrowUpRight size={14} color="var(--text-subtle, #9CA3AF)" />
+              </div>
+              <div>
+                <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--text-primary, #0F172A)', lineHeight: 1 }}>
+                  {k.isCurrency ? `₵${(k.value / 1000).toFixed(0)}K` : <AnimNum to={k.value} duration={800 + i * 80} />}
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted, #6B7280)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{k.label}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-subtle, #9CA3AF)', marginTop: 3, fontWeight: 500 }}>{k.trend}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* ── QUICK ACTIONS ────────────────────────────────────────────────── */}
+        <div className="adm-section adm-anim" style={{ marginBottom: 20, animationDelay: '0.12s' }}>
+          <div className="adm-section-head">
+            <span className="adm-section-title">⚡ Quick Actions</span>
+          </div>
+          <div style={{ padding: '16px 20px' }}>
+            <div className="adm-qa-grid">
+              {quickActions.map(({ label, icon: Icon, color, to }) => (
+                <div key={label} className="adm-qa-item" onClick={() => navigate(to)} role="button" tabIndex={0} onKeyDown={e => e.key === 'Enter' && navigate(to)}>
+                  <div style={{ width: 42, height: 42, borderRadius: 12, background: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${color}25` }}>
+                    <Icon size={20} color={color} strokeWidth={2} />
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #374151)', textAlign: 'center', lineHeight: 1.3 }}>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── ANALYTICS TABS ───────────────────────────────────────────────── */}
+        <div className="adm-section adm-anim" style={{ marginBottom: 20, animationDelay: '0.18s' }}>
+          <div className="adm-section-head">
+            <span className="adm-section-title">📊 Analytics</span>
+            <div className="adm-tab-bar">
+              {(['financials', 'academics', 'goals'] as const).map(tab => (
+                <button key={tab} className={`adm-tab${activeAnalyticsTab === tab ? ' active' : ''}`} onClick={() => setActiveAnalyticsTab(tab)}>
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="adm-section-body">
+
             {activeAnalyticsTab === 'financials' && (
-              <div style={{ width: '100%', height: 280 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={financeData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6366f1" stopOpacity={isDark ? 0.45 : 0.3} />
-                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255, 255, 255, 0.06)' : '#e2e8f0'} />
-                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} tickFormatter={val => `₵${val / 1000}k`} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: isDark ? 'var(--bg-card)' : 'white',
-                        borderColor: 'var(--border-color)',
-                        borderRadius: 12,
-                        border: '1.5px solid var(--border-color)',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                        color: 'var(--text-main)'
-                      }}
-                      itemStyle={{ color: 'var(--text-main)' }}
-                      labelStyle={{ color: 'var(--text-muted)' }}
-                      formatter={(value: number) => [`GH₵ ${value.toLocaleString()}`, 'Collected']}
-                    />
-                    <Area type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorAmount)" activeDot={{ r: 6, strokeWidth: 0, fill: '#6366f1' }} />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 14 }}>Fee Collections — Last 6 Months</div>
+                {financeData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={200}>
+                    <AreaChart data={financeData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="adm-fee-grad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#2563EB" stopOpacity={0.25} />
+                          <stop offset="95%" stopColor="#2563EB" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color, #E5E7EB)" vertical={false} />
+                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted, #6B7280)', fontWeight: 600 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted, #6B7280)' }} axisLine={false} tickLine={false} tickFormatter={v => `₵${(v / 1000).toFixed(0)}K`} />
+                      <Tooltip formatter={(v: any) => [`₵${Number(v).toLocaleString()}`, 'Collected']} contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 10, fontSize: 12, fontFamily: 'Inter' }} />
+                      <Area type="monotone" dataKey="amount" stroke="#2563EB" strokeWidth={2.5} fill="url(#adm-fee-grad)" dot={{ fill: '#2563EB', r: 3 }} activeDot={{ r: 5 }} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div style={{ height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                    No payment data yet
+                  </div>
+                )}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 16 }}>
+                  {[
+                    { label: 'Total Debt', value: `₵${((stats?.totalDebt ?? 0) / 1000).toFixed(1)}K`, color: '#DC2626' },
+                    { label: 'Subjects', value: stats?.subjects ?? 0, color: '#7C3AED' },
+                    { label: 'Announcements', value: stats?.totalAnnouncements ?? 0, color: '#F59E0B' },
+                  ].map(m => (
+                    <div key={m.label} style={{ background: 'var(--bg-hover)', borderRadius: 10, padding: '12px 16px', textAlign: 'center' }}>
+                      <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 22, fontWeight: 800, color: m.color }}>{m.value}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{m.label}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
             {activeAnalyticsTab === 'academics' && (
-              <div style={{ width: '100%', height: 280 }}>
-                {classStats.length === 0 ? (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-subtle)', fontSize: 14 }}>No academic averages found.</div>
-                ) : (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={classStats.map(c => ({
-                        name: c.name,
-                        average: c.avg_score ? Math.round(c.avg_score) : 0
-                      }))}
-                      margin={{ top: 10, right: 0, left: -20, bottom: 0 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255, 255, 255, 0.06)' : '#e2e8f0'} />
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} dy={10} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }} tickFormatter={val => `${val}%`} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: isDark ? 'var(--bg-card)' : 'white',
-                          borderColor: 'var(--border-color)',
-                          borderRadius: 12,
-                          border: '1.5px solid var(--border-color)',
-                          boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                          color: 'var(--text-main)'
-                        }}
-                        itemStyle={{ color: 'var(--text-main)' }}
-                        labelStyle={{ color: 'var(--text-muted)' }}
-                        formatter={(value: number) => [`${value}%`, 'Class Average']}
-                      />
-                      <Bar dataKey="average" radius={[6, 6, 0, 0]}>
-                        {classStats.map((entry, index) => {
-                          const score = entry.avg_score || 0
-                          const color = score >= 75 ? '#10b981' : score >= 50 ? '#6366f1' : '#f59e0b'
-                          return <Cell key={`cell-${index}`} fill={color} />
-                        })}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                )}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                {/* Top Students */}
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Top Students</div>
+                  {topStudents.length > 0 ? topStudents.map((s, i) => (
+                    <div key={s.student_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < topStudents.length - 1 ? '1px solid var(--border-color)' : 'none' }}>
+                      <div style={{ width: 24, height: 24, borderRadius: 8, background: i === 0 ? '#FEF3C7' : i === 1 ? '#F1F5F9' : 'var(--bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, color: i === 0 ? '#D97706' : i === 1 ? '#64748B' : 'var(--text-muted)', flexShrink: 0 }}>
+                        {i + 1}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.full_name}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>{s.class_name}</div>
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: getGradeInfo(s.average_score).color, background: `${getGradeInfo(s.average_score).color}15`, padding: '2px 8px', borderRadius: 6 }}>
+                        {s.average_score.toFixed(1)}%
+                      </div>
+                    </div>
+                  )) : <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: '24px 0', textAlign: 'center' }}>No scores recorded yet</div>}
+                </div>
+                {/* Top Subjects */}
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Top Subjects</div>
+                  {topSubjects.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={180}>
+                      <BarChart data={topSubjects} layout="vertical" margin={{ left: 0, right: 16, top: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" horizontal={false} />
+                        <XAxis type="number" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} domain={[0, 100]} />
+                        <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-primary)', fontWeight: 600 }} axisLine={false} tickLine={false} width={80} />
+                        <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 10, fontSize: 12 }} formatter={(v: any) => [`${Number(v).toFixed(1)}%`, 'Avg Score']} />
+                        <Bar dataKey="average" radius={[0, 6, 6, 0]}>
+                          {topSubjects.map((_, i) => (
+                            <Cell key={i} fill={['#2563EB', '#7C3AED', '#0891B2', '#16A34A', '#F59E0B'][i % 5]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: '24px 0', textAlign: 'center' }}>No scores recorded yet</div>}
+                </div>
               </div>
             )}
 
             {activeAnalyticsTab === 'goals' && (
-              <div style={{ display: 'flex', height: 280, gap: 24, alignItems: 'center' }}>
-                <div style={{ width: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ position: 'relative', width: 140, height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <svg style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-                      <circle
-                        cx="70" cy="70" r="55"
-                        stroke={isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}
-                        strokeWidth="12" fill="transparent"
-                      />
-                      <circle
-                        cx="70" cy="70" r="55"
-                        stroke="#f59e0b" strokeWidth="12" fill="transparent"
-                        strokeDasharray={2 * Math.PI * 55}
-                        strokeDashoffset={2 * Math.PI * 55 * (1 - (weeklyGoalsStats.percentage / 100))}
-                        strokeLinecap="round"
-                        style={{ transition: 'stroke-dashoffset 0.6s ease' }}
-                      />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                {/* Goals ring */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+                  <div style={{ position: 'relative', width: 120, height: 120, flexShrink: 0 }}>
+                    <svg viewBox="0 0 120 120" style={{ transform: 'rotate(-90deg)' }}>
+                      <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border-color)" strokeWidth="10" />
+                      <circle cx="60" cy="60" r="50" fill="none" stroke="#2563EB" strokeWidth="10"
+                        strokeDasharray={`${2 * Math.PI * 50 * weeklyGoalsStats.percentage / 100} ${2 * Math.PI * 50}`}
+                        strokeLinecap="round" style={{ transition: 'stroke-dasharray 1s ease' }} />
                     </svg>
-                    <div style={{ position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <span style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)' }}>{weeklyGoalsStats.percentage}%</span>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Completed</span>
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                      <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: 24, fontWeight: 900, color: '#2563EB' }}>{weeklyGoalsStats.percentage}%</span>
                     </div>
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 6 }}>
+                      {weeklyGoalsStats.completed} / {weeklyGoalsStats.total} Goals
+                    </div>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500, marginBottom: 14 }}>Weekly term goals completed</div>
+                    <Link to={ROUTES.ADMIN_WEEKLY_GOALS} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, background: '#2563EB', color: '#fff', fontWeight: 700, fontSize: 13, padding: '9px 18px', borderRadius: 10, transition: 'all 0.2s' }}>
+                      Manage Goals →
+                    </Link>
                   </div>
                 </div>
-                <div style={{ width: '60%', display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 8, border: '1.5px solid var(--border-color)' }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Set</div>
-                      <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', marginTop: 4 }}>{weeklyGoalsStats.total}</div>
-                    </div>
-                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 8, border: '1.5px solid var(--border-color)' }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Achieved</div>
-                      <div style={{ fontSize: 24, fontWeight: 800, color: '#10b981', marginTop: 4 }}>{weeklyGoalsStats.completed}</div>
-                    </div>
+                {/* Reports progress */}
+                <div style={{ background: 'var(--bg-hover)', borderRadius: 12, padding: '16px 20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    <span>Report Cards Generated</span>
+                    <span style={{ color: '#2563EB' }}>{reportPct}%</span>
                   </div>
-                  <Link
-                    to="/admin/weekly-goals"
-                    style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                      padding: 12, background: 'var(--text-main)', color: 'var(--bg-app)',
-                      borderRadius: 12, fontWeight: 700, fontSize: 13, textDecoration: 'none',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)', transition: 'all 0.2s'
-                    }}
-                    onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-                    onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}
-                  >
-                    <CheckSquare size={16} /> Manage Weekly Goals
-                  </Link>
+                  <div style={{ height: 8, borderRadius: 99, background: 'var(--border-color)', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${reportPct}%`, borderRadius: 99, background: 'linear-gradient(90deg, #2563EB, #7C3AED)', transition: 'width 1s ease' }} />
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6, fontWeight: 500 }}>
+                    {stats?.reportsGenerated ?? 0} of {stats?.totalStudentsForReports ?? 0} students
+                  </div>
                 </div>
               </div>
             )}
-          </motion.div>
-
-          {/* Operations Deck */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            {/* Attention Required (System Alerts) */}
-            {(stats?.pendingApproval || stats?.pendingScores || stats?.unreadMessages || pendingLeavesCount > 0 || pendingExeatsCount > 0) ? (
-              <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, background: isDark ? 'rgba(225, 29, 72, 0.08)' : 'linear-gradient(135deg, #fff1f2 0%, #fff 100%)', border: isDark ? '1.5px solid rgba(225, 29, 72, 0.2)' : '1px solid #ffe4e6' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-                  <AlertCircle color="#e11d48" size={20} />
-                  <h3 style={{ fontSize: 16, fontWeight: 800, color: '#e11d48', margin: 0 }}>Attention Required</h3>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {stats && stats.pendingApproval > 0 && (
-                    <Link to={ROUTES.ADMIN_REPORTS} style={{ display: 'flex', justifyContent: 'space-between', padding: 12, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 12, textDecoration: 'none', color: 'var(--text-main)', fontWeight: 600, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                      <span>Reports awaiting approval</span>
-                      <span style={{ background: '#e11d48', color: 'white', padding: '2px 8px', borderRadius: 99, fontSize: 12 }}>{stats.pendingApproval}</span>
-                    </Link>
-                  )}
-                  {stats && stats.pendingScores > 0 && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: 12, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 12, color: 'var(--text-main)', fontWeight: 600, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                      <span>Missing teacher scores</span>
-                      <span style={{ background: '#f59e0b', color: 'white', padding: '2px 8px', borderRadius: 99, fontSize: 12 }}>{stats.pendingScores}</span>
-                    </div>
-                  )}
-                  {pendingLeavesCount > 0 && (
-                    <Link to="/admin/staff-leave" style={{ display: 'flex', justifyContent: 'space-between', padding: 12, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 12, textDecoration: 'none', color: 'var(--text-main)', fontWeight: 600, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                      <span>Staff leave requests pending</span>
-                      <span style={{ background: '#d97706', color: 'white', padding: '2px 8px', borderRadius: 99, fontSize: 12 }}>{pendingLeavesCount}</span>
-                    </Link>
-                  )}
-                  {pendingExeatsCount > 0 && (
-                    <Link to="/admin/exeats" style={{ display: 'flex', justifyContent: 'space-between', padding: 12, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 12, textDecoration: 'none', color: 'var(--text-main)', fontWeight: 600, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                      <span>Student exeat requests pending</span>
-                      <span style={{ background: '#2563eb', color: 'white', padding: '2px 8px', borderRadius: 99, fontSize: 12 }}>{pendingExeatsCount}</span>
-                    </Link>
-                  )}
-                </div>
-              </motion.div>
-            ) : null}
-
-            {/* Quick Actions Deck */}
-            <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 16px', color: 'var(--text-main)' }}>Operations</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-                {[
-                  { icon: <FolderLock size={20} color="#facc15" />, label: 'Vault', to: '/admin/staff-vault', color: '#facc15' },
-                  { icon: <Calendar size={20} color="#ef4444" />, label: 'Calendar', to: ROUTES.ADMIN_CALENDAR, color: '#ef4444' },
-                  { icon: <MessageSquare size={20} color="#14b8a6" />, label: 'SMS', to: ROUTES.ADMIN_SMS, color: '#14b8a6' },
-                  { icon: <Settings size={20} color="#64748b" />, label: 'Settings', to: ROUTES.ADMIN_SETTINGS, color: '#64748b' },
-                  { icon: <Bed size={20} color="#10b981" />, label: 'Boarding', to: '/admin/boarding', color: '#10b981' },
-                  { icon: <HeartHandshake size={20} color="#ef4444" />, label: 'Pastoral', to: '/admin/pastoral', color: '#ef4444' },
-                  { icon: <Banknote size={20} color="#3b82f6" />, label: 'Daily Fees', to: ROUTES.ADMIN_DAILY_FEES, color: '#3b82f6' },
-                ].map(({ icon, label, to, color }) => (
-                  <Link key={label} to={to} className="ops-action-card">
-                    <div style={{ width: 40, height: 40, borderRadius: 12, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-main)' }}>{label}</span>
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
           </div>
         </div>
 
+        {/* ── BODY: Timetable + Activity | Right Panel ─────────────────────── */}
+        <div className="adm-body-grid adm-anim" style={{ animationDelay: '0.24s' }}>
 
-        {/* Tier 3: Campus Vital Signs Grid */}
-        <div className="tier3-grid">
+          {/* LEFT: Today's Timetable + Recent Activity */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-          {/* Column 1: Academic Standings */}
-          <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', minHeight: 380 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Academic Leaders</h3>
-              <div style={{ display: 'flex', background: isDark ? 'var(--bg-app)' : '#f1f5f9', borderRadius: 12, padding: 4 }}>
-                <button
-                  onClick={() => setTopTab('students')}
-                  className="tab-button"
-                  style={{
-                    background: topTab === 'students' ? 'var(--bg-card)' : 'transparent',
-                    color: topTab === 'students' ? 'var(--text-main)' : 'var(--text-muted)',
-                    boxShadow: topTab === 'students' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'
-                  }}
-                >
-                  Students
-                </button>
-                <button
-                  onClick={() => setTopTab('subjects')}
-                  className="tab-button"
-                  style={{
-                    background: topTab === 'subjects' ? 'var(--bg-card)' : 'transparent',
-                    color: topTab === 'subjects' ? 'var(--text-main)' : 'var(--text-muted)',
-                    boxShadow: topTab === 'subjects' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'
-                  }}
-                >
-                  Subjects
-                </button>
+            {/* Today's Timetable */}
+            <div className="adm-section">
+              <div className="adm-section-head">
+                <span className="adm-section-title">📅 Today's Timetable</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  {coverageStats.totalClasses > 0 && (
+                    <span style={{ fontSize: 11, fontWeight: 700, background: 'rgba(22,163,74,0.1)', color: '#16A34A', padding: '4px 10px', borderRadius: 99, border: '1px solid rgba(22,163,74,0.2)' }}>
+                      🟢 {coverageStats.activeClasses}/{coverageStats.totalClasses} Active
+                    </span>
+                  )}
+                  <Link to={ROUTES.ADMIN_TIMETABLE} style={{ textDecoration: 'none', fontSize: 12, fontWeight: 700, color: '#2563EB' }}>View All →</Link>
+                </div>
+              </div>
+              <div style={{ padding: '0 22px 4px', maxHeight: 260, overflowY: 'auto' }}>
+                {todayLessons.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', fontSize: 13 }}>
+                    <div style={{ fontSize: 32, marginBottom: 8 }}>📋</div>
+                    No lessons scheduled today
+                  </div>
+                ) : todayLessons.slice(0, 8).map((lesson, i) => (
+                  <div key={lesson.id} className="adm-lesson-row">
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: lesson.isNow ? '#16A34A' : 'var(--border-color)', flexShrink: 0, ...(lesson.isNow ? { boxShadow: '0 0 6px #16A34A', animation: 'pulse 1.5s ease infinite' } : {}) }} />
+                    <div style={{ width: 88, flexShrink: 0 }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: lesson.isNow ? '#16A34A' : 'var(--text-muted)' }}>
+                        {lesson.period?.start_time?.slice(0, 5)} – {lesson.period?.end_time?.slice(0, 5)}
+                      </div>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {(lesson.subject as any)?.name ?? '—'}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
+                        {(lesson.class as any)?.name ?? '—'} · {(lesson.teacher as any)?.user?.full_name ?? 'Unassigned'}
+                      </div>
+                    </div>
+                    {lesson.isNow && (
+                      <span style={{ fontSize: 10, fontWeight: 800, background: 'rgba(22,163,74,0.12)', color: '#16A34A', padding: '3px 8px', borderRadius: 6, flexShrink: 0 }}>NOW</span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }} className="hide-scroll">
-              <AnimatePresence mode="wait">
-                {topTab === 'students' ? (
-                  <motion.div key="students" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {topStudents.length ? topStudents.map((s, i) => {
-                      const g = getGradeInfo(s.average_score)
-                      return (
-                        <div key={s.student_id} className="list-item-hover">
-                          <div style={{ width: 36, height: 36, borderRadius: 12, background: i === 0 ? (isDark ? '#854d0e' : '#fef3c7') : (isDark ? '#334155' : '#fff'), color: i === 0 ? (isDark ? '#fef08a' : '#d97706') : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, border: '1.5px solid var(--border-light)', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>#{i + 1}</div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{s.full_name}</div>
-                            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{s.class_name}</div>
-                          </div>
-                          <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: 16, fontWeight: 800, color: g.color }}>{(s.average_score / 20).toFixed(2)}</div>
-                            <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 700 }}>GPA</div>
-                          </div>
-                        </div>
-                      )
-                    }) : <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-subtle)' }}>No scores available</div>}
-                  </motion.div>
-                ) : (
-                  <motion.div key="subjects" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {topSubjects.length ? topSubjects.map((s, i) => (
-                      <div key={s.subject_id} className="list-item-hover">
-                        <div style={{ width: 36, height: 36, borderRadius: 12, background: isDark ? 'rgba(99,102,241,0.2)' : '#e0e7ff', color: isDark ? '#a5b4fc' : '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, border: '1.5px solid var(--border-light)', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>#{i + 1}</div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{s.name}</div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: 16, fontWeight: 800, color: '#10b981' }}>{s.average.toFixed(1)}%</div>
-                          <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 700 }}>AVG SCORE</div>
-                        </div>
-                      </div>
-                    )) : <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-subtle)' }}>No subject data available</div>}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-
-          {/* Column 2: Gate Security Monitor */}
-          <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', minHeight: 380 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-main)' }}>
-                <Navigation size={18} color="#6366f1" /> Campus Security
-              </h3>
-              <Link to={'/admin/exeats'} style={{ fontSize: 12, fontWeight: 700, color: '#6366f1', textDecoration: 'none' }}>View Log</Link>
-            </div>
-
-            <div className="hide-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {outOfCampus.length === 0 ? (
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14, padding: 40 }}>All personnel on campus.</div>
-              ) : outOfCampus.map(o => (
-                <div key={o.id} className="list-item-hover">
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{o.name}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)', textTransform: 'capitalize' }}>{o.type} • Left at {new Date(o.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            {/* Recent Activity */}
+            <div className="adm-section">
+              <div className="adm-section-head">
+                <span className="adm-section-title">🕐 Recent Activity</span>
+              </div>
+              <div style={{ padding: '0 22px 8px', maxHeight: 260, overflowY: 'auto' }}>
+                {recentActivities.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', fontSize: 13 }}>No recent activity</div>
+                ) : recentActivities.map((a, i) => (
+                  <div key={i} className="adm-activity-item">
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: `${a.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: a.color }}>
+                      {a.icon}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.label}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>{a.sub}</div>
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 500, flexShrink: 0 }}>{timeAgo(a.time)}</div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Column 3: Attendance Welfare */}
-          <motion.div variants={itemVariants} className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', minHeight: 380 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Absentee Alert</h3>
-              <span style={{ background: isDark ? 'rgba(239,68,68,0.2)' : '#fef2f2', color: '#ef4444', padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 800 }}>{absentStudents.length} Students</span>
+          {/* RIGHT: Announcements + Absent Students + Gate Activity */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+            {/* Announcements */}
+            <div className="adm-section">
+              <div className="adm-section-head">
+                <span className="adm-section-title">📣 Announcements</span>
+                <Link to="/admin/communications-hub" style={{ textDecoration: 'none', fontSize: 12, fontWeight: 700, color: '#2563EB' }}>+ New</Link>
+              </div>
+              <div style={{ padding: '4px 0 8px' }}>
+                {announcements.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)', fontSize: 13 }}>No announcements yet</div>
+                ) : announcements.map((a, i) => (
+                  <div key={a.id} style={{ display: 'flex', gap: 12, padding: '12px 20px', borderBottom: i < announcements.length - 1 ? '1px solid var(--border-color)' : 'none' }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#7C3AED', marginTop: 6, flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>{a.title}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>{timeAgo(a.created_at)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="hide-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {absentStudents.length === 0 ? (
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14, padding: 40 }}>No absences reported today.</div>
-              ) : absentStudents.map(a => (
-                <div key={a.student_id} className="list-item-hover" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 8 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            {/* Absent Students */}
+            <div className="adm-section">
+              <div className="adm-section-head">
+                <span className="adm-section-title">🔴 Absent Today</span>
+                <span style={{ fontSize: 11, fontWeight: 800, background: 'rgba(220,38,38,0.1)', color: '#DC2626', padding: '3px 10px', borderRadius: 99 }}>
+                  {absentStudents.length}
+                </span>
+              </div>
+              <div style={{ padding: '4px 22px 8px', maxHeight: 200, overflowY: 'auto' }}>
+                {absentStudents.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)', fontSize: 13 }}>
+                    <span style={{ fontSize: 24 }}>✅</span><br />No absences recorded yet
+                  </div>
+                ) : absentStudents.slice(0, 6).map(s => (
+                  <div key={s.student_id} className="adm-absent-row">
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)' }}>{a.full_name}</div>
-                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{a.class_name}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{s.full_name}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>{s.class_name}</div>
                     </div>
+                    {s.guardian_phone && (
+                      <a href={`tel:${s.guardian_phone}`} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#16A34A', fontWeight: 700, textDecoration: 'none', background: 'rgba(22,163,74,0.08)', padding: '4px 8px', borderRadius: 8 }}>
+                        <Phone size={11} /> Call
+                      </a>
+                    )}
                   </div>
-
-                  <div style={{ background: 'var(--bg-card)', padding: 12, borderRadius: 12, border: '1.5px solid var(--border-light)' }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>Contact Guardian</div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      👤 {a.guardian_name || 'N/A'}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#6366f1' }}>{a.guardian_phone || 'No phone'}</span>
-                      {a.guardian_phone && (
-                        <a href={`tel:${a.guardian_phone}`} style={{ width: 28, height: 28, background: isDark ? 'rgba(99,102,241,0.2)' : '#e0e7ff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isDark ? '#a5b4fc' : '#4f46e5', textDecoration: 'none' }}>
-                          <Phone size={14} />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </motion.div>
 
+            {/* Out of Campus */}
+            {outOfCampus.length > 0 && (
+              <div className="adm-section">
+                <div className="adm-section-head">
+                  <span className="adm-section-title">🚪 Out of Campus</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, background: 'rgba(245,158,11,0.1)', color: '#F59E0B', padding: '3px 10px', borderRadius: 99 }}>
+                    {outOfCampus.length}
+                  </span>
+                </div>
+                <div style={{ padding: '4px 22px 8px', maxHeight: 160, overflowY: 'auto' }}>
+                  {outOfCampus.slice(0, 5).map(g => (
+                    <div key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--border-color)' }}>
+                      <Navigation size={14} color="#F59E0B" />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{g.name}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{g.type} · {g.time?.slice(0, 5)}</div>
+                      </div>
+                      <span style={{ fontSize: 10, fontWeight: 700, background: 'rgba(245,158,11,0.1)', color: '#F59E0B', padding: '2px 8px', borderRadius: 6 }}>OUT</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* MAP MODAL */}
-        {locateClass && (
-          <div
-            onClick={() => setLocateClass(null)}
-            style={{
-              position: 'fixed', inset: 0, zIndex: 1000,
-              background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(8px)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24
-            }}
-          >
-            <div
-              onClick={e => e.stopPropagation()}
-              style={{
-                background: 'var(--bg-card)', borderRadius: 12, width: '100%', maxWidth: 840,
-                maxHeight: 'calc(100vh - 48px)',
-                boxShadow: '0 24px 64px rgba(0,0,0,0.2)', border: '1.5px solid var(--border-color)',
-                display: 'flex', flexDirection: 'column', overflow: 'hidden',
-                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif"
-              }}
-            >
-              {/* Modal Header */}
-              <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Navigation color="#6366f1" size={20} />
-                  <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Campus Classroom Directory</h3>
-                </div>
-                <button onClick={() => setLocateClass(null)} style={{ background: isDark ? 'var(--bg-app)' : '#f1f5f9', border: 'none', borderRadius: 10, padding: 8, cursor: 'pointer', color: 'var(--text-muted)', fontWeight: 'bold' }}>✕</button>
-              </div>
-
-              {/* Modal Body */}
-              <div style={{ padding: 24, display: 'flex', gap: 24, flexWrap: 'wrap', overflowY: 'auto', flex: 1 }}>
-                {/* Visual Map Column (Left) */}
-                <div style={{ flex: '1 1 450px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Visual Location Map</div>
-
-                  {/* Outer Map Grid */}
-                  <div style={{
-                    background: isDark ? 'rgba(15,23,42,0.4)' : '#f8fafc',
-                    border: '1.5px dashed var(--border-color)', borderRadius: 8,
-                    padding: 24, minHeight: 260, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16,
-                    position: 'relative'
-                  }}>
-                    {/* Block A */}
-                    <div className={`campus-block ${locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A') ? 'active-block' : ''}`}>
-                      <span style={{ fontSize: 24 }}>🏫</span>
-                      <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-main)' }}>Block A</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Science & Admin</div>
-                      {(locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A')) && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
-                          <div className="pulse-dot" />
-                          <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981' }}>{locateClass.class?.name} Room</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Block B */}
-                    <div className={`campus-block ${locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B') ? 'active-block' : ''}`}>
-                      <span style={{ fontSize: 24 }}>📚</span>
-                      <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-main)' }}>Block B</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Humanities & Library</div>
-                      {(locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')) && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
-                          <div className="pulse-dot" />
-                          <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981' }}>{locateClass.class?.name} Room</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Block C */}
-                    <div className={`campus-block ${!(locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A') || locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')) ? 'active-block' : ''}`}>
-                      <span style={{ fontSize: 24 }}>💻</span>
-                      <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-main)' }}>Block C</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Math & Technology</div>
-                      {!(locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A') || locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')) && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
-                          <div className="pulse-dot" />
-                          <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981' }}>{locateClass.class?.name} Room</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Gate to Block directions */}
-                  <div style={{ background: isDark ? 'var(--bg-app)' : '#f1f5f9', padding: '12px 16px', borderRadius: 12, fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    📍 <strong>Main Gate Entrance</strong> ────────▶ <strong>Administration Archway</strong> ────────▶ <strong>Active Building Highlighted</strong>
-                  </div>
-                </div>
-
-                {/* Details Column (Right) */}
-                <div style={{ flex: '1 1 280px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>Class Details</div>
-                    <div style={{ background: isDark ? 'var(--bg-app)' : '#f8fafc', padding: 16, borderRadius: 8, border: '1.5px solid var(--border-color)' }}>
-                      <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>{locateClass.class?.name}</div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: '#6366f1', marginBottom: 12 }}>{locateClass.subject?.name}</div>
-                      <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: 'var(--text-muted)' }}>Instructor:</span>
-                          <strong style={{ color: 'var(--text-main)' }}>{locateClass.teacher?.user?.full_name ?? 'Substitute Assigned'}</strong>
-                        </div>
-                        <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: 'var(--text-muted)' }}>Period:</span>
-                          <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{locateClass.period?.name} ({locateClass.period?.start_time?.slice(0, 5)} - {locateClass.period?.end_time?.slice(0, 5)})</span>
-                        </div>
-                        <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: 'var(--text-muted)' }}>Session:</span>
-                          <span style={{ color: locateClass.isNow ? '#10b981' : '#f59e0b', fontWeight: 800, textTransform: 'uppercase', fontSize: 11 }}>
-                            {locateClass.isNow ? '● IN SESSION' : '○ UPCOMING'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>Directions from Office</div>
-                    <div style={{ border: '1.5px solid var(--border-color)', padding: 16, borderRadius: 8, background: 'var(--bg-card)' }}>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12 }}>
-                        <div style={{ background: '#6366f1', color: 'white', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 'bold', flexShrink: 0 }}>1</div>
-                        <div style={{ fontSize: 12, color: 'var(--text-main)', lineHeight: 1.4 }}>
-                          {locateClass.class?.name?.includes('10') || locateClass.class?.name?.includes('A')
-                            ? 'Head to Block A (Administration & Science Block).'
-                            : locateClass.class?.name?.includes('11') || locateClass.class?.name?.includes('B')
-                              ? 'Proceed past Block A towards Block B (Humanities Block).'
-                              : 'Head straight to Block C (Math & Tech Block) near the labs.'}
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12 }}>
-                        <div style={{ background: '#6366f1', color: 'white', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 'bold', flexShrink: 0 }}>2</div>
-                        <div style={{ fontSize: 12, color: 'var(--text-main)', lineHeight: 1.4 }}>
-                          Take the central stairwell to the <strong>2nd Floor</strong>.
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                        <div style={{ background: '#6366f1', color: 'white', width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 'bold', flexShrink: 0 }}>3</div>
-                        <div style={{ fontSize: 12, color: 'var(--text-main)', lineHeight: 1.4 }}>
-                          Room is on your immediate left, designated as <strong>Room {locateClass.class?.name?.match(/\d+/)?.[0] ?? '20'}{locateClass.class?.name?.slice(-1) || 'A'}</strong>.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div style={{ padding: '16px 24px', background: isDark ? 'rgba(15,23,42,0.4)' : '#f8fafc', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'flex-end' }}>
-                <button onClick={() => setLocateClass(null)} style={{ background: '#6366f1', color: 'white', border: 'none', borderRadius: 12, padding: '10px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Close Directory</button>
-              </div>
+        {/* ── CLASS PERFORMANCE TABLE ─────────────────────────────────────── */}
+        {classStats.length > 0 && (
+          <div className="adm-section adm-anim" style={{ marginBottom: 20, animationDelay: '0.3s' }}>
+            <div className="adm-section-head">
+              <span className="adm-section-title">🏆 Class Performance</span>
+              <Link to="/admin/academic-hub" style={{ textDecoration: 'none', fontSize: 12, fontWeight: 700, color: '#2563EB' }}>View All →</Link>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table className="adm-table">
+                <thead>
+                  <tr>
+                    <th>Class</th>
+                    <th>Students</th>
+                    <th>Avg Score</th>
+                    <th>Reports Done</th>
+                    <th>Performance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {classStats.slice(0, 8).map(cls => {
+                    const gi = getGradeInfo(cls.avg_score ?? 0)
+                    const pct = cls.student_count > 0 ? Math.round(cls.reports_done / cls.student_count * 100) : 0
+                    return (
+                      <tr key={cls.id}>
+                        <td style={{ fontWeight: 700 }}>{cls.name}</td>
+                        <td>{cls.student_count}</td>
+                        <td>
+                          {cls.avg_score != null ? (
+                            <span style={{ fontWeight: 800, color: gi.color, background: `${gi.color}15`, padding: '2px 8px', borderRadius: 6 }}>
+                              {cls.avg_score.toFixed(1)}%
+                            </span>
+                          ) : <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>—</span>}
+                        </td>
+                        <td>{cls.reports_done} / {cls.student_count}</td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 120 }}>
+                            <div style={{ flex: 1, height: 6, borderRadius: 99, background: 'var(--bg-hover)', overflow: 'hidden' }}>
+                              <div style={{ height: '100%', width: `${pct}%`, borderRadius: 99, background: pct >= 80 ? '#16A34A' : pct >= 50 ? '#F59E0B' : '#DC2626', transition: 'width 0.8s ease' }} />
+                            </div>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', minWidth: 32 }}>{pct}%</span>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

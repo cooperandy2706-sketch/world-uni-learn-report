@@ -106,42 +106,38 @@ export default function TeacherAgendaPage() {
   }
 
   return (
-    <div className="t-page">
+    <div className="tp-page">
+      <link rel="stylesheet" href="/src/styles/teacher-portal.css" />
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes tap_spin{to{transform:rotate(360deg)}}
         @keyframes tap_fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-        .timeline-item:before{content:"";position:absolute;left:27px;top:0;bottom:0;width:2px;background:#ddd6fe;z-index:0}
+        .timeline-item:before{content:"";position:absolute;left:27px;top:0;bottom:0;width:2px;background:var(--border-color);z-index:0}
         .timeline-item:first-child:before{top:30px}
         .timeline-item:last-child:before{bottom:calc(100% - 30px)}
-        .agenda-card-teacher:hover{border-color:#7c3aed !important;box-shadow:0 10px 25px rgba(124,58,237,0.06) !important}
-        @media (max-width: 768px) {
-          .resp-grid-3 { grid-template-columns: 1fr !important; }
-        }
       `}</style>
 
-      <div style={{ fontFamily: '"DM Sans",sans-serif', animation: 'tap_fi .4s ease' }}>
-        <div className="t-header" style={{ marginBottom: 24 }}>
+      <div style={{ animation: 'tap_fi .4s ease' }}>
+        <div className="tp-hero" style={{ marginBottom: 24 }}>
           <div>
-            <h1 className="t-title">School Roadmap</h1>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Track your progress through the term's key milestones and sync with admin guidance.</p>
+            <h1 className="tp-hero-title">School Roadmap</h1>
+            <p className="tp-hero-sub">Track your progress through the term's key milestones and sync with admin guidance.</p>
           </div>
         </div>
 
         {!term ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '40px 20px', textAlign: 'center', border: '1px solid #f0eefe' }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>📆</div>
-            <p style={{ color: 'var(--text-muted)' }}>No active term detected. Agendas will appear here once a term is set.</p>
+          <div className="tp-card" style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-hover)' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>📆</div>
+            <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>No active term detected. Agendas will appear here once a term is set.</p>
           </div>
         ) : loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 100 }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: 'tap_spin .8s linear infinite' }} />
+            <div className="tp-spinner" style={{ width: 40, height: 40, borderWidth: 3 }} />
           </div>
         ) : agendas.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
+          <div className="tp-card" style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-hover)' }}>
              <div style={{ fontSize: 48, marginBottom: 16 }}>🎯</div>
-             <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>Welcome to {term.name}</h3>
-             <p style={{ fontSize: 13, color: 'var(--text-subtle)', maxWidth: 300, marginInline: 'auto' }}>The school agenda hasn't been published yet. Check back soon for milestones and goals.</p>
+             <h3 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8 }}>Welcome to {term.name}</h3>
+             <p style={{ fontSize: 15, color: 'var(--text-muted)', maxWidth: 400, marginInline: 'auto' }}>The school agenda hasn't been published yet. Check back soon for milestones and goals.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -156,30 +152,30 @@ export default function TeacherAgendaPage() {
                   {/* Timeline Dot */}
                   <div style={{ 
                     width: 56, height: 56, borderRadius: '50%', flexShrink: 0, zIndex: 1,
-                    background: isCompleted ? '#22c55e' : isStruggling ? '#ef4444' : '#7c3aed',
-                    border: '4px solid #fff', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    background: isCompleted ? 'var(--success-color)' : isStruggling ? 'var(--danger-color)' : 'var(--primary-color)',
+                    border: '4px solid var(--bg-body)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff'
                   }}>
                     {isCompleted ? <CheckCircle size={24} /> : isStruggling ? <AlertTriangle size={24} /> : <span style={{ fontWeight: 800, fontSize: 18 }}>{item.week_number}</span>}
                   </div>
 
                   {/* Card */}
-                  <div className="agenda-card-teacher" style={{ 
-                    flex: 1, background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: '20px 24px', 
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.03)', transition: 'all .25s ease'
+                  <div className="tp-card" style={{ 
+                    flex: 1, padding: '20px 24px', 
+                    transition: 'all .25s ease', cursor: 'default'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10, flexWrap: 'wrap', gap: 12 }}>
                       <div>
-                         <div style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Week {item.week_number} Milestone</div>
-                         <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{item.title}</h3>
+                         <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Week {item.week_number} Milestone</div>
+                         <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', margin: 0, lineHeight: 1.3 }}>{item.title}</h3>
                       </div>
                       <div style={{ display: 'flex', gap: 6 }}>
                          {resp && (
                            <span style={{ 
-                             fontSize: 10, fontWeight: 800, padding: '3px 10px', borderRadius: 99, 
-                             background: isCompleted ? '#f0fdf4' : isStruggling ? '#fff1f2' : '#fefce8',
-                             color: isCompleted ? '#16a34a' : isStruggling ? '#e11d48' : '#d97706',
-                             border: `1px solid ${isCompleted ? '#bbf7d0' : isStruggling ? '#fecdd3' : '#fef08a'}`
+                             fontSize: 10, fontWeight: 800, padding: '4px 12px', borderRadius: 99, 
+                             background: isCompleted ? 'rgba(34,197,94,0.1)' : isStruggling ? 'rgba(239,68,68,0.1)' : 'rgba(234,179,8,0.1)',
+                             color: isCompleted ? 'var(--success-color)' : isStruggling ? 'var(--danger-color)' : '#d97706',
+                             border: `1px solid ${isCompleted ? 'var(--success-color)' : isStruggling ? 'var(--danger-color)' : '#fef08a'}`
                            }}>
                              {resp.status.toUpperCase()}
                            </span>
@@ -187,24 +183,24 @@ export default function TeacherAgendaPage() {
                       </div>
                     </div>
 
-                    <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 20 }}>{item.description}</p>
+                    <p style={{ fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 20 }}>{item.description}</p>
                     
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                        {/* Admin Reply Banner */}
                        {hasReply && (
-                         <div style={{ background: '#f5f3ff', border: '1.5px solid #ddd6fe', borderRadius: 14, padding: '14px 16px', position: 'relative' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                               <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 10 }}>A</div>
-                               <span style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase' }}>Admin Guidance</span>
+                         <div style={{ background: 'rgba(124,58,237,0.05)', border: '1.5px solid rgba(124,58,237,0.2)', borderRadius: 12, padding: '16px', position: 'relative' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                               <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--primary-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 700 }}>A</div>
+                               <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Admin Guidance</span>
                             </div>
-                            <p style={{ fontSize: 13, color: '#4c1d95', margin: 0, fontWeight: 600 }}>"{resp.admin_reply}"</p>
+                            <p style={{ fontSize: 14, color: 'var(--text-primary)', margin: 0, fontWeight: 600, lineHeight: 1.5 }}>"{resp.admin_reply}"</p>
                          </div>
                        )}
 
                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                          <Btn variant="secondary" onClick={() => openStruggleModal(item)}>
-                            {resp ? <Edit2 size={14} /> : <MessageSquare size={14} />} {resp ? 'Update Status / Report' : 'Send Update / Struggle'}
-                          </Btn>
+                          <button className="tp-btn tp-btn-ghost" onClick={() => openStruggleModal(item)}>
+                            {resp ? <Edit2 size={16} /> : <MessageSquare size={16} />} {resp ? 'Update Status / Report' : 'Send Update / Struggle'}
+                          </button>
                        </div>
                     </div>
                   </div>
@@ -218,50 +214,51 @@ export default function TeacherAgendaPage() {
         <Modal open={struggleModalOpen} onClose={() => setStruggleModalOpen(false)} title="Update Progress & Feedback">
             <div style={{ paddingTop: 10 }}>
                {selectedAgenda && (
-                 <div style={{ background: '#f8fafc', borderRadius: 12, padding: '12px', border: '1px solid #e2e8f0', marginBottom: 18 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>Week {selectedAgenda.week_number}: {selectedAgenda.title}</div>
+                 <div style={{ background: 'var(--bg-hover)', borderRadius: 12, padding: '16px', border: '1px solid var(--border-color)', marginBottom: 20 }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>Week {selectedAgenda.week_number}: {selectedAgenda.title}</div>
                  </div>
                )}
 
-               <div style={{ marginBottom: 18 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>How are you doing with this plan? *</label>
-                  <div className="resp-grid-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+               <div style={{ marginBottom: 24 }}>
+                  <label className="tp-label">How are you doing with this plan? *</label>
+                  <div className="tp-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12 }}>
                      {[
-                       { v: 'pending', label: 'Working on it', icon: <Clock size={14} />, color: '#6d28d9', bg: '#f5f3ff' },
-                       { v: 'completed', label: 'Done & Success', icon: <CheckCircle size={14} />, color: '#16a34a', bg: '#f0fdf4' },
-                       { v: 'struggling', label: 'Struggling', icon: <AlertTriangle size={14} />, color: '#dc2626', bg: '#fef2f2' },
+                       { v: 'pending', label: 'Working on it', icon: <Clock size={16} />, color: '#6d28d9', bg: '#f5f3ff' },
+                       { v: 'completed', label: 'Done & Success', icon: <CheckCircle size={16} />, color: '#16a34a', bg: '#f0fdf4' },
+                       { v: 'struggling', label: 'Struggling', icon: <AlertTriangle size={16} />, color: '#dc2626', bg: '#fef2f2' },
                      ].map(opt => (
                        <button key={opt.v} onClick={() => setStatus(opt.v as any)}
                          style={{ 
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '10px 4px', borderRadius: 12,
-                            border: `2px solid ${status === opt.v ? opt.color : '#f1f5f9'}`,
-                            background: status === opt.v ? opt.bg : '#fff',
-                            color: status === opt.v ? opt.color : '#94a3b8',
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '16px 8px', borderRadius: 12,
+                            border: `2px solid ${status === opt.v ? opt.color : 'var(--border-color)'}`,
+                            background: status === opt.v ? opt.bg : 'var(--bg-card)',
+                            color: status === opt.v ? opt.color : 'var(--text-muted)',
                             transition: 'all .2s', cursor: 'pointer', outline: 'none'
                          }}>
                          {opt.icon}
-                         <span style={{ fontSize: 10, fontWeight: 700 }}>{opt.label}</span>
+                         <span style={{ fontSize: 12, fontWeight: 700 }}>{opt.label}</span>
                        </button>
                      ))}
                   </div>
                </div>
 
-               <div style={{ marginBottom: 20 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Share your feedback or struggles (to Admin)</label>
+               <div style={{ marginBottom: 24 }}>
+                  <label className="tp-label">Share your feedback or struggles (to Admin)</label>
                   <textarea value={feedbackText} onChange={e => setFeedbackText(e.target.value)} rows={4}
                     placeholder="e.g. Students are finding the fractions difficult, I might need more time..."
-                    style={{ width: '100%', padding: '12px', borderRadius: 12, border: '1.5px solid #e2e8f0', fontSize: 13.5, outline: 'none', fontFamily: '"DM Sans",sans-serif', resize: 'vertical', boxSizing: 'border-box' }} />
-                  <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 8, color: '#94a3b8' }}>
-                    <Info size={12} />
-                    <span style={{ fontSize: 11 }}>This message is sent directly to the school administration.</span>
+                    className="tp-input"
+                    style={{ resize: 'vertical' }} />
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 8, color: 'var(--text-muted)' }}>
+                    <Info size={14} />
+                    <span style={{ fontSize: 12 }}>This message is sent directly to the school administration.</span>
                   </div>
                </div>
 
-               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                  <Btn variant="secondary" onClick={() => setStruggleModalOpen(false)}>Cancel</Btn>
-                  <Btn onClick={submitResponse} loading={saving}>
-                    <Send size={14} /> {responses[selectedAgenda?.id] ? 'Update Message' : 'Send Message'}
-                  </Btn>
+               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <button className="tp-btn tp-btn-ghost" onClick={() => setStruggleModalOpen(false)} style={{ flex: '1 1 120px', justifyContent: 'center' }}>Cancel</button>
+                  <button className="tp-btn tp-btn-primary" onClick={submitResponse} disabled={saving} style={{ flex: '2 1 200px', justifyContent: 'center' }}>
+                    {saving ? 'Sending...' : <><Send size={16} /> {responses[selectedAgenda?.id] ? 'Update Message' : 'Send Message'}</>}
+                  </button>
                </div>
             </div>
         </Modal>

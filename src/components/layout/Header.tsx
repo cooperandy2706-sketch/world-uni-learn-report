@@ -672,8 +672,7 @@ export default function Header() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
-        @keyframes fadeDown { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: translateY(0) } }
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-8px) } to { opacity: 1; transform: translateY(0) } }
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
         @keyframes slideInRight { from { transform: translateX(100%) } to { transform: translateX(0) } }
         @keyframes spin { to { transform: rotate(360deg) } }
@@ -695,9 +694,9 @@ export default function Header() {
           .search-input-pill svg { position: static !important; }
         }
         @media (max-width: 480px) {
-          .app-header-container { height: 48px !important; padding: 0 12px !important; gap: 8px !important; }
-          .profile-avatar-btn { width: 44px !important; height: 44px !important; }
-          .mobile-menu-btn { width: 44px !important; height: 44px !important; }
+          .app-header-container { height: 56px !important; padding: 0 12px !important; gap: 8px !important; }
+          .profile-avatar-btn { width: 40px !important; height: 40px !important; }
+          .mobile-menu-btn { width: 40px !important; height: 40px !important; }
           .mobile-menu-overlay { width: 100% !important; max-width: 100% !important; }
         }
       `}</style>
@@ -706,9 +705,12 @@ export default function Header() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         background: 'var(--bg-card)', flexShrink: 0,
         borderBottom: '1px solid var(--border-color)',
-        fontFamily: '"DM Sans", system-ui, sans-serif',
+        fontFamily: "'Inter', system-ui, sans-serif",
         position: 'sticky', top: 0, zIndex: 200,
         gap: 16,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: '0 1px 0 var(--border-color)',
       }}>
 
         {/* ── LEFT: Standalone School Branding ── */}
@@ -795,12 +797,12 @@ export default function Header() {
                 onFocus={() => setShowResults(true)}
                 placeholder="Search or type a command…"
                 style={{
-                  width: 160, background: 'var(--bg-hover)', border: '1.5px solid transparent',
-                  borderRadius: 99, padding: '7px 36px 7px 30px', fontSize: 13, color: 'var(--text-main)',
-                  outline: 'none', transition: 'all 0.25s',
+                  width: 180, background: 'var(--bg-input, #F8FAFC)', border: '1.5px solid var(--border-color)',
+                  borderRadius: 99, padding: '8px 36px 8px 32px', fontSize: 13, color: 'var(--text-primary, #0F172A)',
+                  outline: 'none', transition: 'all 0.25s', fontFamily: "'Inter', sans-serif", fontWeight: 500,
                 }}
-                onFocusCapture={e => { e.currentTarget.style.background = 'var(--bg-accent-hover)'; e.currentTarget.style.borderColor = '#1a56db'; e.currentTarget.style.width = '240px' }}
-                onBlurCapture={e => { e.currentTarget.style.background = 'var(--bg-hover)'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.width = '160px' }}
+                onFocusCapture={e => { e.currentTarget.style.background = 'var(--bg-card, #fff)'; e.currentTarget.style.borderColor = 'var(--color-primary, #2563EB)'; e.currentTarget.style.width = '260px'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)' }}
+                onBlurCapture={e => { e.currentTarget.style.background = 'var(--bg-input, #F8FAFC)'; e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.width = '180px'; e.currentTarget.style.boxShadow = 'none' }}
               />
               {/* ⌘K badge */}
               {!searching && !searchQuery && (

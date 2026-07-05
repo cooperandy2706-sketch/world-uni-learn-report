@@ -1,43 +1,46 @@
 /* src/index.css */
+/* ── Design System (must be first) ── */
+@import './styles/design-system.css';
+
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Theme Variables ── */
+/* ── Legacy Theme Variables (kept for backward-compat with existing pages) ── */
 :root {
-  --bg-app: #f0f2f5;
+  --bg-app: #F1F5F9;
   --bg-card: #ffffff;
-  --bg-input: #f9fafb;
-  --bg-hover: #f5f6f6;
-  --bg-accent-hover: #f0eefe;
-  --text-main: #111827;
-  --text-muted: #6b7280;
-  --text-subtle: #9ca3af;
-  --border-color: #e9edef;
-  --border-light: #f0f2f5;
+  --bg-input: #F8FAFC;
+  --bg-hover: #F1F5F9;
+  --bg-accent-hover: #F0EEFE;
+  --text-main: #0F172A;
+  --text-muted: #6B7280;
+  --text-subtle: #9CA3AF;
+  --border-color: #E5E7EB;
+  --border-light: #F1F5F9;
 }
 
 html.dark {
-  --bg-app: #111b21;       /* WhatsApp dark background */
-  --bg-card: #202c33;      /* WhatsApp dark panel */
-  --bg-input: #2a3942;
-  --bg-hover: #2a3942;
-  --bg-accent-hover: #1e1b4b;
-  --text-main: #e9edef;    /* WhatsApp dark text */
-  --text-muted: #aebac1;   /* Increased contrast for readability */
-  --text-subtle: #8696a0;  /* Increased contrast */
-  --border-color: #2a3942;
-  --border-light: #202c33;
+  --bg-app: #0F172A;
+  --bg-card: #1E293B;
+  --bg-input: #1A2333;
+  --bg-hover: #243245;
+  --bg-accent-hover: rgba(124,58,237,0.12);
+  --text-main: #F1F5F9;
+  --text-muted: #94A3B8;
+  --text-subtle: #64748B;
+  --border-color: #334155;
+  --border-light: #1E293B;
 }
 
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 15px; -webkit-font-smoothing: antialiased; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-weight: bold;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 400;
   background: var(--bg-app);
   color: var(--text-main);
   line-height: 1.6;

@@ -82,187 +82,183 @@ export default function MyClassesPage() {
   }
 
   if (loading) return (
-    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'60vh', flexDirection:'column', gap:16, fontFamily:'"DM Sans",sans-serif' }}>
-      <style>{`@keyframes _sp{to{transform:rotate(360deg)}}`}</style>
-      <div style={{ width:40, height:40, borderRadius:'50%', border:'4px solid #ede9fe', borderTopColor:'#6d28d9', animation:'_sp .8s linear infinite' }} />
+    <div className="tp-page">
+      <div className="tp-loading">
+        <div className="tp-spinner" />
+        Loading your classes…
+      </div>
     </div>
   )
 
   return (
-    <div className="t-page">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
-        @keyframes _sp{to{transform:rotate(360deg)}}
-        @keyframes _fi{from{opacity:0}to{opacity:1}}
-        @keyframes _fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        .std-row:hover{background:#faf5ff !important}
-        @media (max-width: 640px) {
-          .resp-grid { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; }
-          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
-          .resp-header > div:last-child { display: flex !important; flex-direction: column !important; gap: 8px !important; }
-          .resp-header > div:last-child a,
-          .resp-header > div:last-child button { width: 100% !important; justify-content: center !important; text-align: center !important; }
-          .resp-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
-          .resp-table-min { min-width: 560px; }
-          .resp-stat-grid { grid-template-columns: 1fr !important; gap: 4px !important; }
-        }
-      `}</style>
+    <div className="tp-page">
+      <link rel="stylesheet" href="/src/styles/teacher-portal.css" />
 
-      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_fi .4s ease' }}>
+      {/* ── HERO ── */}
+      <div className="tp-hero" style={{ marginBottom: 16 }}>
+        <div className="tp-hero-label">Class Management</div>
+        <h1 className="tp-hero-title">🏫 My Classes</h1>
+        <p className="tp-hero-sub">
+          {(term as any)?.name} · {(year as any)?.name} · {classData.length} class{classData.length !== 1 ? 'es' : ''} assigned
+        </p>
+      </div>
 
-        <div className="t-header" style={{ marginBottom: 24 }}>
-          <div>
-            <h1 className="t-title">My Classes</h1>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>{(term as any)?.name} · {(year as any)?.name} · {classData.length} class{classData.length !== 1 ? 'es' : ''} assigned</p>
+      {classData.length === 0 ? (
+        <div className="tp-card">
+          <div className="tp-empty">
+            <div className="tp-empty-icon">🏫</div>
+            <div className="tp-empty-title">No classes assigned</div>
+            <p className="tp-empty-sub">Ask your admin to assign classes to you for this term.</p>
           </div>
         </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {classData.map((cls, i) => {
+            const completionPct = cls.totalExpected > 0 ? Math.min(100, Math.round((cls.submitted / cls.totalExpected) * 100)) : 0
+            const isExpanded = expandedClass === cls.classId
 
-        {classData.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding:'60px 20px', textAlign:'center', border:'1.5px solid #f0eefe' }}>
-            <div style={{ fontSize:52, marginBottom:12 }}>🏫</div>
-            <h3 style={{ fontFamily:'"Playfair Display",serif', fontSize:18, fontWeight:700, color: 'var(--text-main)', marginBottom:6 }}>No classes assigned</h3>
-            <p style={{ fontSize:13, color: 'var(--text-subtle)' }}>Ask your admin to assign classes to you for this term.</p>
-          </div>
-        ) : (
-          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-            {classData.map((cls, i) => {
-              const completionPct = cls.totalExpected > 0 ? Math.min(100, Math.round((cls.submitted / cls.totalExpected) * 100)) : 0
-              const isExpanded = expandedClass === cls.classId
+            return (
+              <div key={cls.classId} className="tp-card" style={{ animationDelay: `${i * 0.08}s`, overflow: 'hidden' }}>
 
-              return (
-                <div key={cls.classId} style={{ background: 'var(--bg-card)', borderRadius:18, border:'1.5px solid #f0eefe', overflow:'hidden', boxShadow:'0 1px 4px rgba(109,40,217,.07)', animation:`_fu .4s ease ${i*.08}s both` }}>
-
-                  {/* Class header */}
-                  <div className="resp-header" style={{ background:'linear-gradient(135deg,#faf5ff,#f5f3ff)', padding:'20px', borderBottom:'1px solid #ede9fe', display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
-                    <div style={{ display:'flex', alignItems:'flex-start', gap:14 }}>
-                      <div style={{ width:52, height:52, borderRadius:14, background:'linear-gradient(135deg,#7c3aed,#6d28d9)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, flexShrink:0 }}>🏫</div>
-                      <div>
-                        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gap: 10, animation: '_fu .5s ease both', alignItems: 'center' }}>
-                          <h2 style={{ fontFamily:'"Playfair Display",serif', fontSize:20, fontWeight:700, color: 'var(--text-main)', margin:0 }}>{cls.className}</h2>
-                          {cls.level && <span style={{ fontSize:11, color: 'var(--text-muted)', background: 'var(--bg-card)', padding:'2px 8px', borderRadius:99, border: '1px solid var(--border-color)' }}>{cls.level}</span>}
-                          {cls.isClassTeacher && <span style={{ fontSize:11, fontWeight:700, background:'#f0fdf4', color:'#16a34a', padding:'2px 8px', borderRadius:99 }}>👨‍🏫 Class Teacher</span>}
-                        </div>
-                        <div style={{ display:'flex', gap:14, marginTop:6, flexWrap:'wrap' }}>
-                          <span style={{ fontSize:12, color: 'var(--text-muted)' }}>👥 {cls.studentCount} students</span>
-                          <span style={{ fontSize:12, color: 'var(--text-muted)' }}>📚 {cls.subjects.length} subject{cls.subjects.length !== 1 ? 's' : ''}</span>
-                          <span style={{ fontSize:12, color: 'var(--text-muted)' }}>♂ {cls.maleCount} · ♀ {cls.femaleCount}</span>
-                          {cls.avg > 0 && <span style={{ fontSize:12, fontWeight:700, color: cls.gradeInfo.color }}>Avg: {cls.avg.toFixed(1)}%</span>}
-                        </div>
-                      </div>
+                {/* Card Header (Clickable for mobile to expand) */}
+                <div style={{ background: 'linear-gradient(135deg, #F8FAFC, #F1F5F9)', padding: '18px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+                    <div className="tp-avatar" style={{ width: 52, height: 52, fontSize: 24, background: 'linear-gradient(135deg, #4338CA, #312E81)', boxShadow: '0 4px 12px rgba(67,56,202,0.2)' }}>
+                      🏫
                     </div>
-
-                    <div className="t-btn-group" style={{ flexShrink: 0 }}>
-                      <Link to={`${ROUTES.TEACHER_SCORE_ENTRY}?class=${cls.classId}`}
-                        style={{ padding: '8px 16px', borderRadius: 9, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', fontSize: 12, fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}>
-                        ✏️ Enter Scores
-                      </Link>
-                      <button onClick={() => setExpandedClass(isExpanded ? null : cls.classId)}
-                        style={{ padding: '8px 14px', borderRadius: 9, border: '1.5px solid #ddd6fe', background: 'var(--bg-card)', color: '#6d28d9', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44 }}>
-                        {isExpanded ? '▲ Hide' : '▼ Students'}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Progress + subjects */}
-                  <div style={{ padding:'16px 20px', display:'flex', flexWrap:'wrap', gap:16, alignItems:'center', borderBottom: isExpanded ? '1px solid #faf5ff' : 'none' }}>
-                    {/* Completion */}
-                    <div style={{ flex:'1 1 200px', minWidth:0 }}>
-                      <div className="resp-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 8 }}>
-                        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Score Completion</span>
-                        <span style={{ fontSize: 12, textAlign: 'right', fontWeight:700, color: completionPct === 100 ? '#16a34a' : '#6d28d9' }}>{completionPct}%</span>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+                        <h2 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>{cls.className}</h2>
+                        {cls.level && <span className="tp-badge tp-badge-gray">{cls.level}</span>}
+                        {cls.isClassTeacher && <span className="tp-badge tp-badge-green">👨‍🏫 Class Teacher</span>}
                       </div>
-                      <div style={{ height:7, background:'#f0eefe', borderRadius:99, overflow:'hidden' }}>
-                        <div style={{ height:'100%', width:completionPct+'%', background: completionPct === 100 ? 'linear-gradient(90deg,#16a34a,#22c55e)' : 'linear-gradient(90deg,#7c3aed,#a78bfa)', borderRadius:99, transition:'width 1s ease' }} />
-                      </div>
-                      <div style={{ fontSize:11, color: 'var(--text-subtle)', marginTop:3 }}>{cls.submitted} of {cls.totalExpected} entries submitted</div>
-                    </div>
-
-                    {/* Subjects */}
-                    <div style={{ flex:'2 1 300px' }}>
-                      <div style={{ fontSize:11, fontWeight:700, color: 'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.05em', marginBottom:6 }}>Assigned Subjects</div>
-                      <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
-                        {cls.subjects.map((s: any) => (
-                          <div key={s.id} style={{ display:'flex', alignItems:'center', gap:4 }}>
-                            <Link to={`${ROUTES.TEACHER_SCORE_ENTRY}?class=${cls.classId}&subject=${s.id}`}
-                              style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:12, fontWeight:600, background:'#f5f3ff', color:'#6d28d9', padding:'4px 10px', borderRadius:99, textDecoration:'none', border:'1px solid #ddd6fe', transition:'all .15s' }}
-                              onMouseEnter={e => { e.currentTarget.style.background='#6d28d9'; e.currentTarget.style.color='#fff' }}
-                              onMouseLeave={e => { e.currentTarget.style.background='#f5f3ff'; e.currentTarget.style.color='#6d28d9' }}>
-                              {s.name}{s.code ? ` (${s.code})` : ''}
-                            </Link>
-                            <Link to={`/teacher/class-tests?class=${cls.classId}&subject=${s.id}`} 
-                              title="Manage Class Tests"
-                              style={{ textDecoration:'none', fontSize:14, padding:'4px', background: 'var(--bg-card)', borderRadius:6, border:'1px solid #e2e8f0', display:'flex', alignItems:'center' }}>
-                              📝
-                            </Link>
-                          </div>
-                        ))}
+                      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
+                        <span>👥 {cls.studentCount} students</span>
+                        <span>📚 {cls.subjects.length} subject{cls.subjects.length !== 1 ? 's' : ''}</span>
+                        <span>♂ {cls.maleCount} · ♀ {cls.femaleCount}</span>
+                        {cls.avg > 0 && <span style={{ fontWeight: 700, color: cls.gradeInfo.color }}>Avg: {cls.avg.toFixed(1)}%</span>}
                       </div>
                     </div>
                   </div>
 
-                  {/* Expanded student list */}
-                  {isExpanded && cls.studentSummaries.length > 0 && (
-                    <div style={{ animation:'_fi .3s ease' }}>
-                      <div style={{ padding:'12px 20px', background:'#fafafa', borderBottom:'1px solid #f0eefe', fontSize:11, fontWeight:700, color: 'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.06em' }}>
-                        Student Rankings
-                      </div>
-                      <div className="resp-table-wrap">
-                      <table className="resp-table-min" style={{ borderCollapse:'collapse', width: '100%' }}>
-                        <thead>
-                          <tr style={{ background:'#f9f9ff' }}>
-                            {['Rank','Student','ID','Gender','Avg Score','Grade','Progress'].map(h => (
-                              <th key={h} style={{ padding:'9px 14px', textAlign:'left', fontSize:10, fontWeight:700, color: 'var(--text-subtle)', textTransform:'uppercase', letterSpacing:'.05em', borderBottom:'1px solid #f0eefe' }}>{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {cls.studentSummaries.map((s: any, idx: number) => (
-                            <tr key={s.id} className="std-row" style={{ borderBottom:'1px solid #faf5ff', transition:'background .12s' }}>
-                              <td style={{ padding:'9px 14px', fontSize:13, fontWeight:700, color:'#6d28d9' }}>
-                                {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`}
-                              </td>
-                              <td style={{ padding:'9px 14px' }}>
-                                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                                  <div style={{ width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg,#7c3aed,#6d28d9)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800,color:'#fff',flexShrink:0 }}>
-                                    {s.full_name.charAt(0)}
-                                  </div>
-                                  <span style={{ fontSize:13, fontWeight:600, color: 'var(--text-main)' }}>{s.full_name}</span>
-                                </div>
-                              </td>
-                              <td style={{ padding:'9px 14px', fontSize:11, fontFamily:'monospace', color: 'var(--text-subtle)' }}>{s.student_id ?? '—'}</td>
-                              <td style={{ padding:'9px 14px' }}>
-                                <span style={{ fontSize:11, fontWeight:700, background: s.gender === 'male' ? '#eff6ff' : s.gender === 'female' ? '#fdf2f8' : '#f3f4f6', color: s.gender === 'male' ? '#2563eb' : s.gender === 'female' ? '#db2777' : '#6b7280', padding:'2px 7px', borderRadius:99 }}>
-                                  {s.gender === 'male' ? '♂' : s.gender === 'female' ? '♀' : '—'}
-                                </span>
-                              </td>
-                              <td style={{ padding:'9px 14px' }}>
-                                {s.avg > 0 ? <span style={{ fontSize:14, fontWeight:800, color:s.gradeInfo.color }}>{s.avg.toFixed(1)}%</span> : <span style={{ color:'#d1d5db' }}>—</span>}
-                              </td>
-                              <td style={{ padding:'9px 14px' }}>
-                                {s.avg > 0 ? (
-                                  <span style={{ width:28,height:28,borderRadius:8,background:s.gradeInfo.color+'18',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800,color:s.gradeInfo.color }}>
-                                    {s.gradeInfo.grade}
-                                  </span>
-                                ) : <span style={{ color:'#d1d5db' }}>—</span>}
-                              </td>
-                              <td style={{ padding:'9px 14px' }}>
-                                <div style={{ width:80, height:5, background:'#f0eefe', borderRadius:99, overflow:'hidden' }}>
-                                  <div style={{ height:'100%', width:Math.min(100,s.avg)+'%', background:s.gradeInfo.color, borderRadius:99 }} />
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      </div>
-                    </div>
-                  )}
+                  {/* Actions */}
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', width: '100%', '@media (minWidth: 640px)': { width: 'auto' } } as any}>
+                    <Link 
+                      to={`${ROUTES.TEACHER_SCORE_ENTRY}?class=${cls.classId}`}
+                      className="tp-btn tp-btn-primary"
+                      style={{ flex: 1, textDecoration: 'none' }}
+                    >
+                      ✏️ Score Entry
+                    </Link>
+                    <button 
+                      onClick={() => setExpandedClass(isExpanded ? null : cls.classId)}
+                      className="tp-btn tp-btn-ghost"
+                      style={{ flex: 1 }}
+                    >
+                      {isExpanded ? '▲ Hide' : '▼ Students'}
+                    </button>
+                  </div>
                 </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
+
+                {/* Progress & Subjects */}
+                <div style={{ padding: '16px 20px', display: 'flex', flexWrap: 'wrap', gap: 20, borderBottom: isExpanded ? '1px solid var(--border-color)' : 'none' }}>
+                  {/* Completion Bar */}
+                  <div style={{ flex: '1 1 200px', minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, fontSize: 12, fontWeight: 700 }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Grading Progress</span>
+                      <span style={{ color: completionPct === 100 ? '#16A34A' : '#4338CA' }}>{completionPct}%</span>
+                    </div>
+                    <div style={{ height: 6, background: 'var(--bg-hover)', borderRadius: 99, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${completionPct}%`, background: completionPct === 100 ? '#16A34A' : '#4338CA', borderRadius: 99, transition: 'width 0.5s ease' }} />
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, fontWeight: 500 }}>
+                      {cls.submitted} of {cls.totalExpected} entries submitted
+                    </div>
+                  </div>
+
+                  {/* Subject Pills */}
+                  <div style={{ flex: '2 1 300px' }}>
+                    <div className="tp-label" style={{ marginBottom: 8 }}>Assigned Subjects</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {cls.subjects.map((s: any) => (
+                        <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <Link 
+                            to={`${ROUTES.TEACHER_SCORE_ENTRY}?class=${cls.classId}&subject=${s.id}`}
+                            style={{ display: 'inline-flex', alignItems: 'center', fontSize: 12, fontWeight: 700, background: 'rgba(67,56,202,0.08)', color: '#4338CA', padding: '6px 12px', borderRadius: 99, textDecoration: 'none', border: '1px solid rgba(67,56,202,0.15)', transition: 'all 0.15s' }}
+                          >
+                            {s.name}{s.code ? ` (${s.code})` : ''}
+                          </Link>
+                          <Link 
+                            to={`/teacher/class-tests?class=${cls.classId}&subject=${s.id}`} 
+                            title="Manage Class Tests"
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, textDecoration: 'none', background: 'var(--bg-hover)', borderRadius: 8, border: '1px solid var(--border-color)', fontSize: 14 }}
+                          >
+                            📝
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Expanded Student List */}
+                {isExpanded && cls.studentSummaries.length > 0 && (
+                  <div style={{ animation: 'tp-fade-in 0.3s ease' }}>
+                    <div style={{ padding: '14px 20px', background: 'var(--bg-hover)', borderBottom: '1px solid var(--border-color)' }}>
+                      <span className="tp-label" style={{ margin: 0 }}>Student Performance Ranking</span>
+                    </div>
+                    
+                    {/* List view better for mobile than table */}
+                    <div style={{ padding: '8px 0' }}>
+                      {cls.studentSummaries.map((s: any, idx: number) => (
+                        <div key={s.id} className="tp-student-row" style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                          <div style={{ width: 28, fontSize: 14, fontWeight: 800, color: '#4338CA', textAlign: 'center', flexShrink: 0 }}>
+                            {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`}
+                          </div>
+                          
+                          <div className="tp-avatar" style={{ width: 36, height: 36, fontSize: 13, background: 'linear-gradient(135deg, #312E81, #4C1D95)' }}>
+                            {s.full_name.charAt(0)}
+                          </div>
+                          
+                          <div style={{ flex: '1 1 120px', minWidth: 0 }}>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {s.full_name}
+                            </div>
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                              <span style={{ fontFamily: 'monospace' }}>{s.student_id ?? '—'}</span>
+                              <span style={{ margin: '0 6px' }}>•</span>
+                              <span>{s.gender === 'male' ? '♂ Male' : s.gender === 'female' ? '♀ Female' : '—'}</span>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+                            {s.avg > 0 ? (
+                              <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontSize: 15, fontWeight: 800, color: s.gradeInfo.color }}>{s.avg.toFixed(1)}%</div>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)' }}>{s.scoreCount} scores</div>
+                              </div>
+                            ) : (
+                              <span style={{ color: 'var(--text-muted)', fontSize: 14, fontWeight: 700 }}>—</span>
+                            )}
+                            
+                            {s.avg > 0 ? (
+                              <div style={{ width: 36, height: 36, borderRadius: 10, background: `${s.gradeInfo.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: s.gradeInfo.color }}>
+                                {s.gradeInfo.grade}
+                              </div>
+                            ) : (
+                              <div style={{ width: 36, height: 36 }} />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

@@ -227,307 +227,341 @@ export default function BursarDashboard() {
     { to: ROUTES.BURSAR_ANALYTICS, label: 'Analytics', icon: Activity, color: '#ec4899' },
   ]
 
+  if (loading) return <FlaskLoader fullScreen={false} label="Loading Financial Hub…" />
+
+  const userName = user?.full_name?.split(' ')[0] || 'Bursar'
+
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .card-perspective {
-          perspective: 1000px;
-          height: 160px;
-          cursor: pointer;
+        .bur-dash {
+          font-family: 'Inter', system-ui, sans-serif;
+          color: var(--text-primary, #0F172A);
+          padding: 28px 32px 80px;
+          max-width: 1600px;
+          margin: 0 auto;
+        }
+        @media (max-width: 1024px) { .bur-dash { padding: 20px 20px 80px; } }
+        @media (max-width: 600px)  { .bur-dash { padding: 16px 14px 80px; } }
+
+        .bur-kpi-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin-bottom: 24px;
+        }
+        @media (max-width: 900px)  { .bur-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 540px)  { .bur-kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; } }
+
+        .bur-kpi {
+          background: var(--bg-card, #fff);
+          border: 1px solid var(--border-color, #E5E7EB);
+          border-radius: 14px;
+          padding: 20px;
+          transition: all 0.2s;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+          display: flex; flex-direction: column; gap: 14px;
+        }
+        .bur-kpi:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+
+        .bur-section {
+          background: var(--bg-card, #fff);
+          border: 1px solid var(--border-color, #E5E7EB);
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+          margin-bottom: 20px;
+        }
+        .bur-section-head {
+          padding: 18px 22px;
+          border-bottom: 1px solid var(--border-color, #E5E7EB);
+          display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        }
+        .bur-section-title {
+          font-size: 15px; font-weight: 800;
+          color: var(--text-primary, #0F172A);
+          letter-spacing: -0.01em;
+          font-family: 'Outfit', 'Inter', sans-serif;
+        }
+        .bur-section-body { padding: 20px 22px; }
+
+        .bur-chart-grid {
+          display: grid;
+          grid-template-columns: 2fr 1fr;
+          gap: 20px;
+          margin-bottom: 20px;
+        }
+        @media (max-width: 1100px) { .bur-chart-grid { grid-template-columns: 1fr; } }
+
+        .bur-qa-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 8px;
+        }
+        @media (max-width: 900px)  { .bur-qa-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 500px)  { .bur-qa-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .bur-qa-item {
+          display: flex; flex-direction: column; align-items: center;
+          gap: 6px; padding: 12px 6px;
+          background: var(--bg-hover, #F1F5F9);
+          border-radius: 12px;
+          text-decoration: none; color: inherit;
+          border: 1px solid transparent;
+          transition: all 0.2s; cursor: pointer;
+        }
+        .bur-qa-item:hover {
+          background: var(--bg-card); border-color: var(--border-color);
+          transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08);
         }
 
-        .card-inner {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-          transform-style: preserve-3d;
+        .bur-txn-row {
+          display: flex; align-items: center; gap: 12px;
+          padding: 12px 22px;
+          border-bottom: 1px solid var(--border-color, #E5E7EB);
+          transition: background 0.15s;
         }
+        .bur-txn-row:last-child { border-bottom: none; }
+        .bur-txn-row:hover { background: var(--bg-hover); }
 
-        .card-flipped .card-inner {
-          transform: rotateY(180deg);
-        }
-
-        .card-front, .card-back {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          backface-visibility: hidden;
-          border-radius: 8px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          padding: 24px;
-          border: 1px solid var(--border-color);
-          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-        }
-        
-        .card-back {
-          transform: rotateY(180deg);
-          background: #1e1b4b !important;
-          border-color: #312e81;
-        }
-
-        .bursar-card { 
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-
-        .bursar-card:hover { 
-          transform: translateY(-4px); 
-          box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08) !important; 
-        }
-        
-        .ql-btn { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-        .ql-btn:hover { background: var(--bg-hover) !important; transform: translateY(-2px); box-shadow: 0 10px 20px -10px rgba(0,0,0,0.05); }
-        
-        .stat-icon-wrap {
-          transition: transform 0.3s ease;
-        }
-        .bursar-card:hover .stat-icon-wrap {
-          transform: scale(1.1) rotate(-5deg);
-        }
+        @keyframes bur-fade-up { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+        .bur-anim { animation: bur-fade-up 0.4s cubic-bezier(0.2,0.8,0.2,1) both; }
       `}</style>
-      <div style={{ fontFamily: '"Inter", system-ui, sans-serif', animation: 'fadeIn .4s ease' }}>
 
-        {/* Hero Section */}
-        <div style={{ 
-          background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)', 
-          borderRadius: 12, 
-          padding: '32px 40px', 
-          marginBottom: 32,
-          color: 'white',
+      <div className="bur-dash">
+
+        {/* ── HERO ── */}
+        <div style={{
+          borderRadius: 20,
+          padding: '32px 36px',
+          marginBottom: 24,
+          background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #1E3A8A 100%)',
+          color: '#fff',
           position: 'relative',
           overflow: 'hidden',
-          boxShadow: '0 20px 40px -10px rgba(49, 46, 129, 0.3)'
-        }}>
-          <div style={{ position: 'absolute', top: -50, right: -50, width: 250, height: 250, background: 'radial-gradient(circle, rgba(99,102,241,0.4) 0%, rgba(99,102,241,0) 70%)', borderRadius: '50%' }} />
-          <div style={{ position: 'absolute', bottom: -100, right: 100, width: 300, height: 300, background: 'radial-gradient(circle, rgba(139,92,246,0.3) 0%, rgba(139,92,246,0) 70%)', borderRadius: '50%' }} />
-          
-          <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        }} className="bur-anim">
+          <div style={{ position: 'absolute', top: -80, right: -60, width: 300, height: 300, borderRadius: '50%', background: 'rgba(16,185,129,0.07)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: -60, left: 100, width: 200, height: 200, borderRadius: '50%', background: 'rgba(6,182,212,0.06)', pointerEvents: 'none' }} />
+
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20, position: 'relative', zIndex: 1 }}>
             <div>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#c7d2fe', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Financial Command Center</p>
-              <h1 style={{ fontFamily: '"Outfit", sans-serif', fontSize: 36, fontWeight: 800, margin: '8px 0 12px', letterSpacing: '-0.02em' }}>
-                {timeGreeting}, {user?.full_name?.split(' ')[0]}
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.55, marginBottom: 6 }}>FINANCIAL COMMAND CENTER</div>
+              <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 'clamp(20px, 3vw, 30px)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 8, lineHeight: 1.1 }}>
+                {timeGreeting}, {userName} 💼
               </h1>
-              <p style={{ margin: 0, fontSize: 15, color: '#e0e7ff', fontWeight: 600, maxWidth: 450, lineHeight: 1.5 }}>
-                {roleMessage} Track {currentYear} performance, monitor arrears, and manage payroll across the platform.
+              <p style={{ fontSize: 14, opacity: 0.72, fontWeight: 500, marginBottom: 20 }}>
+                {term?.name ?? 'No active term'} · {new Date().toLocaleDateString('en-GH', { weekday: 'long', month: 'long', day: 'numeric' })}
               </p>
-            </div>
-            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 16 }}>
-              <div>
-                <div style={{ fontSize: 13, color: '#c7d2fe', fontWeight: 600, marginBottom: 4 }}>Net Term Balance</div>
-                <div style={{ fontFamily: '"Outfit", sans-serif', fontSize: 42, fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
-                  {!loading ? formatCurrency(net, schoolCurrency) : '---'}
-                </div>
+              {/* Net balance pill */}
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: net >= 0 ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)', padding: '10px 20px', borderRadius: 12, border: `1px solid ${net >= 0 ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
+                <span style={{ fontSize: 13, opacity: 0.8, fontWeight: 600 }}>Net Balance:</span>
+                <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: 22, fontWeight: 900, color: net >= 0 ? '#34D399' : '#FCA5A5' }}>
+                  {formatCurrency(net, schoolCurrency)}
+                </span>
+                {net >= 0 ? <TrendingUp size={18} color="#34D399" /> : <TrendingDown size={18} color="#FCA5A5" />}
               </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <Link to={ROUTES.BURSAR_FEES} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#10b981', color: '#fff', textDecoration: 'none', padding: '10px 18px', borderRadius: 10, fontSize: 14, fontWeight: 700, boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)', transition: 'all 0.2s', border: '1px solid #059669' }}>
-                  <CreditCard size={18} /> Pay School Fees
-                </Link>
-                <div ref={qaRef} style={{ position: 'relative' }}>
-                  <button onClick={() => setQaOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', padding: '10px 18px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', backdropFilter: 'blur(10px)' }}>
-                    <Zap size={18} color="#f59e0b" /> Quick Action <ChevronDown size={16} />
-                  </button>
-                  {qaOpen && (
-                    <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 8, width: 220, background: 'var(--bg-card)', borderRadius: 12, padding: 8, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', border: '1px solid var(--border-color)', zIndex: 100, textAlign: 'left' }}>
-                      {quickLinks.map(q => (
-                        <Link key={q.to} to={q.to} onClick={() => setQaOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', textDecoration: 'none', borderRadius: 8, color: 'var(--text-main)', fontSize: 13, fontWeight: 600, transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                          <div style={{ width: 28, height: 28, borderRadius: 8, background: `${q.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <q.icon size={14} color={q.color} />
-                          </div>
-                          {q.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
+            </div>
+
+            {/* Quick CTAs */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <Link to={ROUTES.BURSAR_FEES} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, background: '#16A34A', color: '#fff', fontWeight: 800, fontSize: 14, padding: '12px 22px', borderRadius: 12, transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(22,163,74,0.4)' }}>
+                <CreditCard size={16} /> Pay Fees
+              </Link>
+              <div ref={qaRef} style={{ position: 'relative' }}>
+                <button onClick={() => setQaOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.1)', color: '#fff', fontWeight: 700, fontSize: 13, padding: '10px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer', transition: 'all 0.2s', backdropFilter: 'blur(4px)' }}>
+                  <Zap size={14} /> Quick Action <ChevronDown size={13} style={{ transform: qaOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                </button>
+                {qaOpen && (
+                  <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, minWidth: 210, background: 'var(--bg-card)', borderRadius: 14, padding: 8, boxShadow: '0 16px 40px rgba(0,0,0,0.16)', border: '1px solid var(--border-color)', zIndex: 100, animation: 'bur-fade-up 0.15s ease' }}>
+                    {quickLinks.map((q: any) => (
+                      <Link key={q.to} to={q.to} onClick={() => setQaOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 10, fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', textDecoration: 'none', transition: 'background 0.15s' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 9, background: `${q.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <q.icon size={16} color={q.color} />
+                        </div>
+                        {q.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {loading ? (
-          <div style={{ padding: '60px 0', display: 'flex', justifyContent: 'center' }}>
-            <FlaskLoader fullScreen={false} label="Syncing financial ledgers…" />
-          </div>
-        ) : (
-          <>
-            {/* KPI Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 32 }}>
-              {cards.map((c, i) => (
-                <div 
-                  key={c.label} 
-                  className={`card-perspective ${flippedCards.includes(i) ? 'card-flipped' : ''}`}
-                  onClick={() => toggleFlip(i)}
-                >
-                  <div className="card-inner">
-                    {/* Front */}
-                    <div className="card-front bursar-card glass-card" style={{ background: 'var(--bg-card)' }}>
-                      <div className="stat-icon-wrap" style={{ width: 40, height: 40, borderRadius: 12, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                        <c.icon size={20} color={c.color} strokeWidth={2.5} />
-                      </div>
-                      <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-main)', fontFamily: '"Outfit", sans-serif', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-                        {c.nativeValue}
-                      </div>
-                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, fontWeight: 600 }}>
-                        {c.label}
-                      </div>
-                    </div>
-
-                    {/* Back */}
-                    <div className="card-back" style={{ background: '#1e1b4b' }}>
-                      <div style={{ fontSize: 11, color: '#c7d2fe', fontWeight: 600, textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.05em' }}>
-                        USD Equivalent
-                      </div>
-                      <div style={{ fontSize: 24, fontWeight: 800, color: '#fff', fontFamily: '"Outfit", sans-serif', letterSpacing: '-0.02em' }}>
-                        {c.usdValue}
-                      </div>
-                      <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 8 }}>
-                        Click to flip back
-                      </div>
-                    </div>
-                  </div>
+        {/* ── KPI CARDS ── */}
+        <div className="bur-kpi-grid bur-anim" style={{ animationDelay: '0.08s' }}>
+          {cards.map((card, i) => (
+            <div key={card.label} className="bur-kpi">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: `${card.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <card.icon size={20} color={card.color} strokeWidth={2} />
                 </div>
-              ))}
-            </div>
-
-            {/* Quick Actions Strip */}
-            <div style={{ marginBottom: 32 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16, fontFamily: '"Outfit", sans-serif' }}>Quick Actions</h3>
-              <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 10, scrollbarWidth: 'none' }}>
-                {quickLinks.map((q, i) => (
-                  <Link key={q.to} to={q.to} style={{ textDecoration: 'none', flexShrink: 0 }}>
-                    <div className="ql-btn glass-card" style={{ 
-                      background: 'var(--bg-card)', 
-                      borderRadius: 8, 
-                      padding: '14px 20px', 
-                      border: '1px solid var(--border-color)', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 12,
-                      animation: `fadeUp 0.4s ease ${i * 0.05}s both`
-                    }}>
-                      <div style={{ width: 36, height: 36, borderRadius: 10, background: `${q.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <q.icon size={18} color={q.color} strokeWidth={2} />
-                      </div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{q.label}</div>
-                    </div>
-                  </Link>
-                ))}
+                <ArrowRight size={14} color="var(--text-subtle, #9CA3AF)" />
               </div>
-            </div>
-
-            {/* Main Content Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, marginBottom: 32 }}>
-              
-              {/* Income vs Expenses Bar Chart */}
-              <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '28px', border: '1px solid var(--border-color)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
-                <div style={{ marginBottom: 24 }}>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Income vs Expenses</h3>
-                  <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Monthly financial flow for {currentYear}</p>
+              <div>
+                <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 'clamp(18px,2.5vw,24px)', fontWeight: 900, letterSpacing: '-0.02em', color: card.color, lineHeight: 1 }}>
+                  {card.nativeValue}
                 </div>
-                <ResponsiveContainer width="100%" height={260}>
-                  <BarChart data={monthlyData} barSize={12}>
-                    <defs>
-                      <linearGradient id="colorInc" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={1}/>
-                        <stop offset="95%" stopColor="#34d399" stopOpacity={0.8}/>
-                      </linearGradient>
-                      <linearGradient id="colorExp" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ef4444" stopOpacity={1}/>
-                        <stop offset="95%" stopColor="#f87171" stopOpacity={0.8}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="4 4" stroke="#f1f5f9" vertical={false} />
-                    <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} axisLine={false} tickLine={false} dy={10} />
-                    <YAxis tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} axisLine={false} tickLine={false} dx={-10} tickFormatter={v => `${v/1000}k`} />
-                    <Tooltip 
-                      formatter={(v: any) => formatCurrency(v, schoolCurrency)} 
-                      cursor={{ fill: 'var(--bg-hover)' }}
-                      contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: 13, fontWeight: 600, padding: '12px 16px' }} 
-                    />
-                    <Legend iconType="circle" wrapperStyle={{ paddingTop: 20, fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }} />
-                    <Bar dataKey="income" name="Income" fill="url(#colorInc)" radius={[6, 6, 0, 0]} />
-                    <Bar dataKey="expenses" name="Expenses" fill="url(#colorExp)" radius={[6, 6, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Expenses by category */}
-              <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '28px', border: '1px solid var(--border-color)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
-                <div style={{ marginBottom: 24 }}>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px', fontFamily: '"Outfit", sans-serif' }}>Expense Distribution</h3>
-                  <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Where is the money going?</p>
-                </div>
-                {expenseByCategory.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={260}>
-                    <PieChart>
-                      <Pie data={expenseByCategory} cx="50%" cy="50%" innerRadius={70} outerRadius={100} dataKey="value" nameKey="name" paddingAngle={5}>
-                        {expenseByCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="none" />)}
-                      </Pie>
-                      <Legend iconType="circle" iconSize={8} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }} />
-                      <Tooltip 
-                        formatter={(v: any) => formatCurrency(v, schoolCurrency)} 
-                        contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: 13, fontWeight: 600 }} 
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div style={{ height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14, fontWeight: 600 }}>No expense data recorded</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{card.label}</div>
+                {exchangeRate !== 1 && (
+                  <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 3, fontWeight: 500 }}>≈ {card.usdValue}</div>
                 )}
               </div>
             </div>
+          ))}
+        </div>
 
-            {/* Recent payments Data Table */}
-            <div className="glass-card" style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-color)', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)' }}>
-              <div style={{ padding: '24px 28px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0, fontFamily: '"Outfit", sans-serif' }}>Recent Transactions</h3>
-                <Link to={ROUTES.BURSAR_FEES} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#6366f1', textDecoration: 'none', padding: '6px 12px', background: 'var(--bg-accent-hover)', borderRadius: 99 }}>
-                  View Ledger <ArrowRight size={14} />
-                </Link>
-              </div>
-              {recentPayments.length === 0 ? (
-                <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 14, fontWeight: 600 }}>No recent transactions</div>
-              ) : (
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', whiteSpace: 'nowrap' }}>
-                    <thead>
-                      <tr style={{ background: 'var(--bg-app)' }}>
-                        {['Student', 'Class', 'Fee Category', 'Amount', 'Method', 'Date'].map(h => (
-                          <th key={h} style={{ padding: '16px 28px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+        {/* ── CHARTS ── */}
+        <div className="bur-chart-grid bur-anim" style={{ animationDelay: '0.14s' }}>
+          {/* Income vs Expenses */}
+          <div className="bur-section" style={{ margin: 0 }}>
+            <div className="bur-section-head">
+              <span className="bur-section-title">📈 Income vs Expenses ({new Date().getFullYear()})</span>
+              <Link to={ROUTES.BURSAR_ANALYTICS} style={{ fontSize: 12, fontWeight: 700, color: '#2563EB', textDecoration: 'none' }}>Full Analytics →</Link>
+            </div>
+            <div className="bur-section-body">
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={monthlyData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }} barGap={4}>
+                  <defs>
+                    <linearGradient id="bur-inc-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#16A34A" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="#16A34A" stopOpacity={0.5} />
+                    </linearGradient>
+                    <linearGradient id="bur-exp-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#DC2626" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="#DC2626" stopOpacity={0.5} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)', fontWeight: 600 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} tickFormatter={v => `₵${(v / 1000).toFixed(0)}K`} />
+                  <Tooltip formatter={(v: any, name: string) => [`${formatCurrency(Number(v), schoolCurrency)}`, name === 'income' ? 'Income' : 'Expenses']} contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 10, fontSize: 12 }} />
+                  <Bar dataKey="income" fill="url(#bur-inc-grad)" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                  <Bar dataKey="expenses" fill="url(#bur-exp-grad)" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                  <Legend formatter={v => v === 'income' ? 'Income' : 'Expenses'} wrapperStyle={{ fontSize: 12, paddingTop: 12 }} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Expense Distribution */}
+          <div className="bur-section" style={{ margin: 0 }}>
+            <div className="bur-section-head">
+              <span className="bur-section-title">💸 Expense Breakdown</span>
+            </div>
+            <div className="bur-section-body">
+              {expenseByCategory.length > 0 ? (
+                <>
+                  <ResponsiveContainer width="100%" height={180}>
+                    <PieChart>
+                      <Pie data={expenseByCategory} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={3} dataKey="value">
+                        {expenseByCategory.map((_: any, i: number) => (
+                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
                         ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentPayments.map((p: any, i) => (
-                        <tr key={p.id} style={{ borderBottom: i < recentPayments.length - 1 ? '1px solid var(--border-color)' : 'none', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                          <td style={{ padding: '16px 28px', fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{p.student?.full_name ?? '—'}</td>
-                          <td style={{ padding: '16px 28px' }}>
-                            <span style={{ fontSize: 12, background: 'var(--bg-input)', color: 'var(--text-main)', padding: '4px 10px', borderRadius: 6, fontWeight: 600 }}>{(p.student as any)?.class?.name ?? '—'}</span>
-                          </td>
-                          <td style={{ padding: '16px 28px', fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{p.fee_structure?.fee_name ?? 'General'}</td>
-                          <td style={{ padding: '16px 28px', fontSize: 14, fontWeight: 700, color: '#10b981' }}>{formatCurrency(p.amount_paid, schoolCurrency)}</td>
-                          <td style={{ padding: '16px 28px' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, background: '#ecfdf5', color: '#10b981', padding: '4px 10px', borderRadius: 99, textTransform: 'capitalize' }}>
-                              {p.payment_method}
-                            </span>
-                          </td>
-                          <td style={{ padding: '16px 28px', fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>
-                            {new Date(p.payment_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </Pie>
+                      <Tooltip formatter={(v: any) => [formatCurrency(Number(v), schoolCurrency), 'Amount']} contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 10, fontSize: 12 }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {expenseByCategory.slice(0, 4).map((cat: any, i: number) => (
+                      <div key={cat.name} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ width: 8, height: 8, borderRadius: 2, background: COLORS[i % COLORS.length], flexShrink: 0 }} />
+                        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat.name}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>{formatCurrency(cat.value, schoolCurrency)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>No expense data yet</div>
               )}
             </div>
-          </>
-        )}
+          </div>
+        </div>
+
+        {/* ── QUICK ACTIONS ── */}
+        <div className="bur-section bur-anim" style={{ animationDelay: '0.2s' }}>
+          <div className="bur-section-head">
+            <span className="bur-section-title">⚡ Quick Actions</span>
+          </div>
+          <div style={{ padding: '14px 18px' }}>
+            <div className="bur-qa-grid">
+              {quickLinks.map(({ to, label, icon: Icon, color }) => (
+                <Link key={to} to={to} className="bur-qa-item" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 11, background: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${color}25` }}>
+                    <Icon size={19} color={color} strokeWidth={2} />
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #374151)', textAlign: 'center', lineHeight: 1.3 }}>{label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── RECENT TRANSACTIONS ── */}
+        <div className="bur-section bur-anim" style={{ animationDelay: '0.26s' }}>
+          <div className="bur-section-head">
+            <span className="bur-section-title">🧾 Recent Payments</span>
+            <Link to={ROUTES.BURSAR_FEES} style={{ fontSize: 12, fontWeight: 700, color: '#2563EB', textDecoration: 'none' }}>View Ledger →</Link>
+          </div>
+          {recentPayments.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 13 }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>📋</div>
+              No payments recorded yet
+            </div>
+          ) : (
+            <div>
+              {recentPayments.map((p: any) => {
+                const initials = (p.student?.full_name ?? 'UN').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
+                const colors = ['#2563EB', '#7C3AED', '#16A34A', '#F59E0B', '#DC2626', '#0891B2']
+                const color = colors[initials.charCodeAt(0) % colors.length]
+                return (
+                  <div key={p.id} className="bur-txn-row">
+                    <div style={{ width: 38, height: 38, borderRadius: 10, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Outfit', sans-serif", fontSize: 13, fontWeight: 800, color, flexShrink: 0 }}>
+                      {initials}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {p.student?.full_name ?? 'Unknown'}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
+                        {p.student?.class?.name ?? '—'} · {p.fee_structure?.fee_name ?? 'Payment'} · {new Date(p.created_at).toLocaleDateString('en-GH')}
+                      </div>
+                    </div>
+                    <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 15, fontWeight: 900, color: '#16A34A', flexShrink: 0 }}>
+                      +{formatCurrency(p.amount_paid, schoolCurrency)}
+                    </div>
+                    <div style={{ fontSize: 10, fontWeight: 700, background: 'rgba(22,163,74,0.1)', color: '#16A34A', padding: '3px 8px', borderRadius: 6, flexShrink: 0 }}>
+                      {p.payment_method ?? 'Cash'}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* ── SUMMARY METRICS ROW ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 20 }} className="bur-anim" style={{ animationDelay: '0.3s' } as any}>
+          {[
+            { label: 'Payroll Paid', value: formatCurrency(stats.payrollPaid, schoolCurrency), icon: '💰', color: '#7C3AED', to: ROUTES.BURSAR_PAYROLL },
+            { label: 'Scholarships', value: `${stats.scholarshipCount} Students`, icon: '🎓', color: '#0891B2', to: ROUTES.BURSAR_STUDENTS },
+            { label: 'Last Term Arrears', value: formatCurrency(stats.lastTermArrears, schoolCurrency), icon: '⚠️', color: '#F59E0B', to: ROUTES.BURSAR_DEBTORS },
+          ].map(m => (
+            <Link key={m.label} to={m.to} style={{ textDecoration: 'none', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 14, padding: '18px 20px', display: 'flex', gap: 14, alignItems: 'center', transition: 'all 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 20px rgba(0,0,0,0.08)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)' }}>
+              <div style={{ fontSize: 28 }}>{m.icon}</div>
+              <div>
+                <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 900, color: m.color }}>{m.value}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 2 }}>{m.label}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
       </div>
     </>
   )

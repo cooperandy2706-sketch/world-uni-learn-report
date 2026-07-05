@@ -289,266 +289,276 @@ export default function TeacherStudentsPage() {
   }
 
   return (
-    <div className="t-page">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
-        @keyframes _spin { to{transform:rotate(360deg)} }
-        @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes _fadeIn { from{opacity:0} to{opacity:1} }
-        .std-row:hover { background:#faf5ff !important; }
-        .action-btn:hover { background:#f5f3ff !important; color:#6d28d9 !important; }
-        @media (max-width: 768px) {
-          .resp-table-wrap { overflow-x: auto !important; padding-bottom: 12px; }
-          .resp-table-min { min-width: 800px; display: table; width: 100%; }
-          .resp-grid-2 { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
+    <div className="tp-page">
+      <link rel="stylesheet" href="/src/styles/teacher-portal.css" />
+      
+      {/* ── HERO ── */}
+      <div className="tp-hero" style={{ marginBottom: 16 }}>
+        <div className="tp-hero-label">Class Roster</div>
+        <h1 className="tp-hero-title">🧑‍🎓 My Students</h1>
+        <p className="tp-hero-sub">Manage portal logins and profiles for students in your classes</p>
+      </div>
 
-      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_fadeIn 0.4s ease' }}>
-        
-        <div className="t-header" style={{ marginBottom: 24 }}>
-          <div>
-            <h1 className="t-title">My Students</h1>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Manage portal logins and profiles for students in your classes</p>
-          </div>
-        </div>
-
-        {/* ── Filters bar ── */}
-        <div className="t-filter-bar">
-          <div style={{ position: 'relative', flex: '1 1 220px' }}>
-            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 15, pointerEvents: 'none' }}>🔍</span>
+      {/* ── FILTERS ── */}
+      <div className="tp-card" style={{ marginBottom: 16, padding: '14px 18px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+          <div style={{ flex: '1 1 200px', position: 'relative' }}>
+            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>🔍</span>
             <input
               placeholder="Search by name or ID…"
+              className="tp-input"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              onFocus={() => setSearchFocused(true)}
-              onBlur={() => setSearchFocused(false)}
-              style={{
-                width: '100%', padding: '9px 12px 9px 36px', borderRadius: 9, fontSize: 13,
-                border: `1.5px solid ${searchFocused ? '#7c3aed' : '#e5e7eb'}`,
-                boxShadow: searchFocused ? '0 0 0 3px rgba(109,40,217,0.1)' : 'none',
-                outline: 'none', background: '#faf5ff', color: 'var(--text-main)',
-                fontFamily: '"DM Sans",sans-serif', transition: 'all 0.15s',
-              }}
+              style={{ paddingLeft: 36, minHeight: 44 }}
             />
           </div>
-
-          <StyledSelect value={filterClass} onChange={e => setFilterClass(e.target.value)} style={{ flex: '1 1 160px', maxWidth: 200 }}>
-            <option value="">All My Classes</option>
-            {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </StyledSelect>
-
-          <StyledSelect value={filterGender} onChange={e => setFilterGender(e.target.value)} style={{ flex: '1 1 130px', maxWidth: 160 }}>
-            <option value="">All Genders</option>
-            <option value="male">♂ Male</option>
-            <option value="female">♀ Female</option>
-          </StyledSelect>
-
-          <span style={{ fontSize: 12, color: 'var(--text-subtle)', whiteSpace: 'nowrap', marginLeft: 'auto' }}>
-            {filtered.length} result{filtered.length !== 1 ? 's' : ''}
-          </span>
+          <div style={{ flex: '1 1 140px' }}>
+            <select className="tp-select" value={filterClass} onChange={e => setFilterClass(e.target.value)} style={{ minHeight: 44 }}>
+              <option value="">All My Classes</option>
+              {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+          <div style={{ flex: '0 0 130px' }}>
+            <select className="tp-select" value={filterGender} onChange={e => setFilterGender(e.target.value)} style={{ minHeight: 44 }}>
+              <option value="">All Genders</option>
+              <option value="male">♂ Male</option>
+              <option value="female">♀ Female</option>
+            </select>
+          </div>
         </div>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginTop: 10 }}>
+          Showing {filtered.length} student{filtered.length !== 1 ? 's' : ''}
+        </div>
+      </div>
 
-        {/* ── Table View ── */}
-        {isLoading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading your students…</p>
+      {/* ── LIST VIEW ── */}
+      {isLoading ? (
+        <div className="tp-loading">
+          <div className="tp-spinner" />
+          Loading your students…
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="tp-card">
+          <div className="tp-empty">
+            <div className="tp-empty-icon">🎓</div>
+            <div className="tp-empty-title">No students found</div>
+            <p className="tp-empty-sub">Try adjusting your filters or ask admin to assign classes.</p>
           </div>
-        ) : filtered.length === 0 ? (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🎓</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No students found</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Ask your administrator to assign classes to you.</p>
-          </div>
-        ) : (
-          <div className="t-table-scroll t-table-card" style={{ background: 'var(--bg-card)', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,0.06)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom: '1.5px solid #ede9fe' }}>
-                  {['Student', 'ID', 'Class', 'Gender', 'Status', 'Actions'].map(h => (
-                    <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((s, i) => (
-                  <tr key={s.id} className="std-row"
-                    style={{ borderBottom: i < filtered.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background 0.12s', animation: `_fadeUp 0.3s ease ${i * 0.03}s both` }}>
-                    <td data-label="Student" style={{ padding: '12px 16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        {s.photo_url ? (
-                          <img loading="lazy" src={s.photo_url} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
-                        ) : (
-                          <Avatar name={s.full_name} size={34} />
-                        )}
-                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{s.full_name}</div>
+        </div>
+      ) : (
+        <div className="tp-card">
+          <div style={{ padding: '0' }}>
+            {filtered.map((s, i) => (
+              <div key={s.id} className="tp-student-row" style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'stretch' }}>
+                
+                {/* Main Info Row */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ position: 'relative' }}>
+                    {s.photo_url ? (
+                      <img loading="lazy" src={s.photo_url} alt="" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }} />
+                    ) : (
+                      <div className="tp-avatar" style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #4C1D95, #312E81)', fontSize: 16 }}>
+                        {s.full_name.charAt(0)}
                       </div>
-                    </td>
-                    <td data-label="ID" style={{ padding: '12px 16px' }}>
-                      <span style={{ fontSize: 12, fontFamily: 'monospace', background: '#f5f3ff', color: '#6d28d9', padding: '2px 7px', borderRadius: 5 }}>{s.student_id ?? '—'}</span>
-                    </td>
-                    <td data-label="Class" style={{ padding: '12px 16px' }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, background: '#ede9fe', color: '#5b21b6', padding: '3px 9px', borderRadius: 99 }}>{s.class?.name ?? 'Unassigned'}</span>
-                    </td>
-                    <td data-label="Gender" style={{ padding: '12px 16px' }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, background: s.gender === 'male' ? '#eff6ff' : s.gender === 'female' ? '#fdf2f8' : '#f3f4f6', color: s.gender === 'male' ? '#2563eb' : s.gender === 'female' ? '#db2777' : '#6b7280', padding: '3px 9px', borderRadius: 99 }}>
-                        {s.gender === 'male' ? '♂ Male' : s.gender === 'female' ? '♀ Female' : '—'}
-                      </span>
-                    </td>
-                    <td data-label="Status" style={{ padding: '12px 16px' }}>
+                    )}
+                  </div>
+                  
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {s.full_name}
+                      </div>
                       {s.user_id ? (
-                        <span style={{ fontSize: 12, color: '#10b981', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>✅ Account Ready</span>
+                        <span className="tp-badge tp-badge-green" style={{ fontSize: 9 }}>Login OK</span>
                       ) : (
-                        <span style={{ fontSize: 12, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>⏳ No Login</span>
+                        <span className="tp-badge tp-badge-amber" style={{ fontSize: 9 }}>No Login</span>
                       )}
-                    </td>
-                    <td data-label="Actions" style={{ padding: '12px 16px' }}>
-                      <div className="t-btn-group" style={{ display: 'flex', gap: 6 }}>
-                        <button className="action-btn" onClick={() => { setViewingStudent(s); setViewModal(true) }}
-                          style={{ padding: '6px 12px', borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: 'pointer', fontSize: 12, fontWeight: 600, transition: 'all 0.15s' }}>Profile</button>
-                        
-                        {!s.user_id && (
-                          <button className="action-btn" onClick={() => { setAccountStudent(s); setAccountData(prev => ({ ...prev, email: s.guardian_email || '' })); setAccountModalOpen(true) }}
-                            style={{ padding: '6px 12px', borderRadius: 8, border: 'none', background: '#ecfdf5', color: '#059669', cursor: 'pointer', fontSize: 12, fontWeight: 600, transition: 'all 0.15s' }}>🗝️ Create Login</button>
-                        )}
-                        <button className="action-btn" onClick={() => { setAccountStudent(s); setParentData(prev => ({ ...prev, email: s.guardian_email || '' })); setParentModalOpen(true) }}
-                          style={{ padding: '6px 12px', borderRadius: 8, border: 'none', background: '#e0f2fe', color: '#0284c7', cursor: 'pointer', fontSize: 12, fontWeight: 600, transition: 'all 0.15s' }}>👨‍👩‍👦 Parent Portal</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'var(--text-muted)' }}>{s.student_id ?? 'No ID'}</span>
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>•</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)' }}>{s.class?.name ?? 'No Class'}</span>
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>•</span>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.gender === 'male' ? '♂ Male' : s.gender === 'female' ? '♀ Female' : '—'}</span>
+                    </div>
+                  </div>
+                </div>
 
-        {/* ── VIEW MODAL ── */}
-        <Modal open={viewModal} onClose={() => setViewModal(false)} title="Student Profile" size="md">
-          {viewingStudent && (
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderRadius: 12, marginBottom: 18 }}>
-                <div style={{ position: 'relative' }}>
-                  {viewingStudent.photo_url ? (
-                    <img loading="lazy" src={viewingStudent.photo_url} alt="Profile" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
-                  ) : (
-                    <Avatar name={viewingStudent.full_name} size={56} />
+                {/* Actions Row (Wraps on mobile) */}
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', paddingLeft: 58 }}>
+                  <button 
+                    className="tp-btn tp-btn-ghost" 
+                    onClick={() => { setViewingStudent(s); setViewModal(true) }}
+                    style={{ minHeight: 36, padding: '6px 12px', fontSize: 12 }}
+                  >
+                    👤 Profile
+                  </button>
+                  
+                  {!s.user_id && (
+                    <button 
+                      className="tp-btn" 
+                      onClick={() => { setAccountStudent(s); setAccountData(prev => ({ ...prev, email: s.guardian_email || '' })); setAccountModalOpen(true) }}
+                      style={{ background: '#ECFDF5', color: '#059669', border: '1px solid #A7F3D0', minHeight: 36, padding: '6px 12px', fontSize: 12 }}
+                    >
+                      🗝️ Create Login
+                    </button>
                   )}
                   <button 
-                    onClick={() => photoInputRef.current?.click()}
-                    disabled={photoUploading}
-                    style={{ position: 'absolute', bottom: -4, right: -4, width: 24, height: 24, borderRadius: '50%', background: 'var(--bg-card)', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 12 }}
-                    title="Upload Photo"
+                    className="tp-btn" 
+                    onClick={() => { setAccountStudent(s); setParentData(prev => ({ ...prev, email: s.guardian_email || '' })); setParentModalOpen(true) }}
+                    style={{ background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE', minHeight: 36, padding: '6px 12px', fontSize: 12 }}
                   >
-                    {photoUploading ? '⏳' : '📷'}
+                    👨‍👩‍👦 Parent Portal
                   </button>
-                  <input ref={photoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e, viewingStudent)} />
-                </div>
-                <div>
-                  <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{viewingStudent.full_name}</h3>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{viewingStudent.class?.name ?? 'No class assigned'}</div>
                 </div>
               </div>
-              <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                {[
-                  { label: 'Date of Birth', value: formatDate(viewingStudent.date_of_birth) },
-                  { label: 'Guardian', value: viewingStudent.guardian_name },
-                  { label: 'Guardian Phone', value: viewingStudent.guardian_phone },
-                  { label: 'Guardian Email', value: viewingStudent.guardian_email },
-                  { label: 'Address', value: viewingStudent.address },
-                ].map(({ label, value }) => value && (
-                  <div key={label} style={{ background: '#faf5ff', borderRadius: 10, padding: '10px 12px' }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{label}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 600 }}>{value}</div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── VIEW MODAL ── */}
+      <Modal open={viewModal} onClose={() => setViewModal(false)} title="Student Profile" size="md">
+        {viewingStudent && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', background: 'var(--bg-hover)', borderRadius: 12, marginBottom: 18 }}>
+              <div style={{ position: 'relative' }}>
+                {viewingStudent.photo_url ? (
+                  <img loading="lazy" src={viewingStudent.photo_url} alt="Profile" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
+                ) : (
+                  <div className="tp-avatar" style={{ width: 56, height: 56, fontSize: 20 }}>
+                    {viewingStudent.full_name.charAt(0)}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </Modal>
-
-        {/* ── CREATE ACCOUNT MODAL ── */}
-        <Modal open={accountModalOpen} onClose={() => setAccountModalOpen(false)} 
-          title="Create Student Portal Login" 
-          subtitle={`Set up a secure login for ${accountStudent?.full_name}`}
-          footer={<>
-            <Btn variant="secondary" onClick={() => setAccountModalOpen(false)}>Cancel</Btn>
-            <Btn onClick={handleCreateAccount} loading={accountLoading}>Create Account</Btn>
-          </>}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ padding: '12px 16px', background: '#fef3c7', borderRadius: 10, border: '1px solid #fde68a', color: '#92400e', fontSize: 13 }}>
-              <strong>Note:</strong> This student will be able to log in to see their dashboard and results.
-            </div>
-            
-            <Field label="Login Email">
-              <StyledInput 
-                type="email" 
-                placeholder="student@school.com" 
-                value={accountData.email}
-                onChange={e => setAccountData(prev => ({ ...prev, email: e.target.value }))}
-              />
-            </Field>
-            
-            <Field label="Set Password">
-              <div style={{ position: 'relative' }}>
-                <StyledInput 
-                  type="text" 
-                  placeholder="Choose a password" 
-                  value={accountData.password}
-                  onChange={e => setAccountData(prev => ({ ...prev, password: e.target.value }))}
-                />
+                )}
                 <button 
-                  type="button"
-                  onClick={() => setAccountData(prev => ({ ...prev, password: Math.random().toString(36).slice(-8) }))}
-                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: '#ede9fe', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#6d28d9', cursor: 'pointer' }}
-                >Generate</button>
+                  onClick={() => photoInputRef.current?.click()}
+                  disabled={photoUploading}
+                  style={{ position: 'absolute', bottom: -4, right: -4, width: 26, height: 26, borderRadius: '50%', background: 'var(--bg-card)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 12 }}
+                  title="Upload Photo"
+                >
+                  {photoUploading ? '⏳' : '📷'}
+                </button>
+                <input ref={photoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e, viewingStudent)} />
               </div>
-            </Field>
-          </div>
-        </Modal>
-
-        {/* ── CREATE PARENT ACCOUNT MODAL ── */}
-        <Modal open={parentModalOpen} onClose={() => setParentModalOpen(false)} 
-          title="Generate Parent Login" 
-          subtitle={`Set up parent access for ${accountStudent?.full_name}`}
-          footer={<>
-            <Btn variant="secondary" onClick={() => setParentModalOpen(false)}>Cancel</Btn>
-            <Btn onClick={handleCreateParentAccount} loading={accountLoading}>Link Parent Account</Btn>
-          </>}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ padding: '12px 16px', background: '#eff6ff', borderRadius: 10, border: '1px solid #bfdbfe', color: '#1e40af', fontSize: 13 }}>
-              <strong>Tip:</strong> If the parent already has an account for another child, use the same email address. The system will automatically link this student to their existing dashboard!
+              <div>
+                <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>{viewingStudent.full_name}</h3>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{viewingStudent.class?.name ?? 'No class assigned'}</div>
+              </div>
             </div>
             
-            <Field label="Parent Email Address">
-              <StyledInput 
-                type="email" 
-                placeholder="parent@example.com" 
-                value={parentData.email}
-                onChange={e => setParentData(prev => ({ ...prev, email: e.target.value }))}
-              />
-            </Field>
-            
-            <Field label="Initial Password (Required for new parents)">
-              <div style={{ position: 'relative' }}>
-                <StyledInput 
-                  type="text" 
-                  placeholder="Choose a password" 
-                  value={parentData.password}
-                  onChange={e => setParentData(prev => ({ ...prev, password: e.target.value }))}
-                />
-                <button 
-                  type="button"
-                  onClick={() => setParentData(prev => ({ ...prev, password: Math.random().toString(36).slice(-8) }))}
-                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: '#e0f2fe', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, color: '#0284c7', cursor: 'pointer' }}
-                >Generate</button>
-              </div>
-            </Field>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+              {[
+                { label: 'Date of Birth', value: formatDate(viewingStudent.date_of_birth) },
+                { label: 'Guardian', value: viewingStudent.guardian_name },
+                { label: 'Guardian Phone', value: viewingStudent.guardian_phone },
+                { label: 'Guardian Email', value: viewingStudent.guardian_email },
+                { label: 'Address', value: viewingStudent.address },
+              ].map(({ label, value }) => value && (
+                <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 12, padding: '12px 14px' }}>
+                  <div className="tp-label">{label}</div>
+                  <div style={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 600 }}>{value}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </Modal>
-      </div>
+        )}
+      </Modal>
+
+      {/* ── CREATE ACCOUNT MODAL ── */}
+      <Modal open={accountModalOpen} onClose={() => setAccountModalOpen(false)} 
+        title="Create Student Login" 
+        subtitle={`Set up a secure login for ${accountStudent?.full_name}`}
+        footer={<>
+          <button className="tp-btn tp-btn-ghost" onClick={() => setAccountModalOpen(false)}>Cancel</button>
+          <button className="tp-btn tp-btn-primary" onClick={handleCreateAccount} disabled={accountLoading}>
+            {accountLoading ? 'Creating…' : 'Create Account'}
+          </button>
+        </>}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="tp-alert tp-alert-warning">
+            <span>⚠️</span>
+            <span style={{ fontSize: 12 }}>This student will be able to log in to see their dashboard and results.</span>
+          </div>
+          
+          <div>
+            <label className="tp-label">Login Email</label>
+            <input 
+              type="email" 
+              className="tp-input"
+              placeholder="student@school.com" 
+              value={accountData.email}
+              onChange={e => setAccountData(prev => ({ ...prev, email: e.target.value }))}
+            />
+          </div>
+          
+          <div>
+            <label className="tp-label">Set Password</label>
+            <div style={{ position: 'relative' }}>
+              <input 
+                type="text" 
+                className="tp-input"
+                placeholder="Choose a password" 
+                value={accountData.password}
+                onChange={e => setAccountData(prev => ({ ...prev, password: e.target.value }))}
+              />
+              <button 
+                type="button"
+                onClick={() => setAccountData(prev => ({ ...prev, password: Math.random().toString(36).slice(-8) }))}
+                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: '#EEF2FF', border: 'none', borderRadius: 8, padding: '6px 10px', fontSize: 11, fontWeight: 800, color: '#4338CA', cursor: 'pointer' }}
+              >Generate</button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* ── CREATE PARENT ACCOUNT MODAL ── */}
+      <Modal open={parentModalOpen} onClose={() => setParentModalOpen(false)} 
+        title="Generate Parent Login" 
+        subtitle={`Set up parent access for ${accountStudent?.full_name}`}
+        footer={<>
+          <button className="tp-btn tp-btn-ghost" onClick={() => setParentModalOpen(false)}>Cancel</button>
+          <button className="tp-btn tp-btn-primary" onClick={handleCreateParentAccount} disabled={accountLoading}>
+            {accountLoading ? 'Linking…' : 'Link Parent Account'}
+          </button>
+        </>}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="tp-alert tp-alert-info">
+            <span>ℹ️</span>
+            <span style={{ fontSize: 12 }}>If the parent already has an account for another child, use the same email address to link them automatically!</span>
+          </div>
+          
+          <div>
+            <label className="tp-label">Parent Email Address</label>
+            <input 
+              type="email" 
+              className="tp-input"
+              placeholder="parent@example.com" 
+              value={parentData.email}
+              onChange={e => setParentData(prev => ({ ...prev, email: e.target.value }))}
+            />
+          </div>
+          
+          <div>
+            <label className="tp-label">Initial Password (Required for new parents)</label>
+            <div style={{ position: 'relative' }}>
+              <input 
+                type="text" 
+                className="tp-input"
+                placeholder="Choose a password" 
+                value={parentData.password}
+                onChange={e => setParentData(prev => ({ ...prev, password: e.target.value }))}
+              />
+              <button 
+                type="button"
+                onClick={() => setParentData(prev => ({ ...prev, password: Math.random().toString(36).slice(-8) }))}
+                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: '#EEF2FF', border: 'none', borderRadius: 8, padding: '6px 10px', fontSize: 11, fontWeight: 800, color: '#4338CA', cursor: 'pointer' }}
+              >Generate</button>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

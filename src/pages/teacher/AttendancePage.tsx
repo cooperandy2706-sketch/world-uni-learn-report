@@ -316,356 +316,255 @@ export default function TeacherAttendancePage() {
   const lateCount = Object.values(marks).filter(m => m === 'late').length
 
   // ── Render ────────────────────────────────────────────────────────────────
+  const todayLabel = `${DAYS[todayDay]}, ${new Date().toLocaleDateString('en-GH', { day: 'numeric', month: 'long', year: 'numeric' })}`
+
   return (
-    <div className="t-page">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
-        @keyframes _att_fi { from{opacity:0} to{opacity:1} }
-        @keyframes _att_up { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
-        @keyframes _att_spin { to{transform:rotate(360deg)} }
-        .att-row:hover { background: #faf5ff !important; }
-        .att-btn { transition: all .15s; cursor: pointer; border: none; font-family: "DM Sans",sans-serif; font-weight: 700; border-radius: 8px; }
-        .att-btn:hover { filter: brightness(1.08); transform: scale(1.04); }
-        .att-btn:active { transform: scale(0.96); }
+    <div className="tp-page">
+      <link rel="stylesheet" href="/src/styles/teacher-portal.css" />
 
-        @media (max-width: 768px) {
-          .att-grid-header { display: none !important; }
-          .att-list { 
-            display: grid !important; 
-            grid-template-columns: 1fr !important;
-            gap: 12px !important;
-          }
-          .att-row { 
-            flex-direction: column !important; 
-            align-items: stretch !important; 
-            gap: 16px !important; 
-            padding: 16px !important; 
-            border-radius: 8px !important;
-            border: 1.5px solid #f0eefe !important;
-            box-shadow: 0 2px 8px rgba(109,40,217,.04) !important;
-            background: #fff !important;
-          }
-          .att-row-mark { 
-            width: 100% !important; 
-            justify-content: space-between !important; 
-            gap: 8px !important;
-          }
-          .att-btn {
-            flex: 1 !important;
-            padding: 10px 4px !important;
-            height: auto !important;
-          }
-          .att-row-stats { 
-            width: 100% !important; 
-            justify-content: space-between !important; 
-            border-top: 1px dashed #f1f5f9; 
-            padding-top: 12px; 
-            margin-top: 4px; 
-          }
-          .att-header-right { width: 100%; justify-content: center; }
-          .att-submit-bar { 
-            position: sticky;
-            bottom: 20px;
-            z-index: 50;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            padding: 16px;
-            border-radius: 8px;
-            border: 1.5px solid #ede9fe;
-            box-shadow: 0 10px 30px rgba(109,40,217,0.15);
-            margin: 20px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-          }
-          .att-submit-btn { width: 100% !important; justify-content: center !important; }
-        }
-        @media (min-width: 769px) {
-          .show-on-mobile { display: none !important; }
-        }
-      `}</style>
-
-      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_att_fi .4s ease' }}>
-
-        {/* Header */}
-        <div className="t-header" style={{ marginBottom: 22 }}>
+      {/* ── HERO ── */}
+      <div className="tp-hero" style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
           <div>
-            <h1 className="t-title">Morning Register</h1>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>
-              {DAYS[todayDay]} · {new Date().toLocaleDateString('en-GH', { day: 'numeric', month: 'long', year: 'numeric' })}
-            </p>
+            <div className="tp-hero-label">Morning Register</div>
+            <h1 className="tp-hero-title">📋 Attendance</h1>
+            <p className="tp-hero-sub">{todayLabel}</p>
+          </div>
+          {myClass && !loading && !isWeekend && (
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              {[
+                { label: 'Present', count: presentCount, color: '#34D399' },
+                { label: 'Absent',  count: absentCount,  color: '#FCA5A5' },
+                { label: 'Late',    count: lateCount,    color: '#FDE68A' },
+              ].map(s => (
+                <div key={s.label} style={{ textAlign: 'center' }}>
+                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 24, fontWeight: 900, color: s.color }}>{s.count}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.7, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── CLASS TAB STRIP ── */}
+      {!loading && myClasses.length > 1 && !isWeekend && (
+        <div className="tp-tab-bar">
+          {myClasses.map(c => (
+            <button
+              key={c.id}
+              className={`tp-tab${selectedClassId === c.id ? ' active' : ''}`}
+              onClick={() => handleClassChange(c.id)}
+            >
+              {c.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── LOADING ── */}
+      {loading && (
+        <div className="tp-loading">
+          <div className="tp-spinner" />
+          Loading students…
+        </div>
+      )}
+
+      {/* ── NO CLASS ── */}
+      {!loading && !myClass && (
+        <div className="tp-card">
+          <div className="tp-empty">
+            <div className="tp-empty-icon">🏫</div>
+            <div className="tp-empty-title">No class assigned</div>
+            <p className="tp-empty-sub">You haven't been assigned as a class teacher yet. Ask the admin to assign your home class.</p>
           </div>
         </div>
+      )}
 
-        {/* Loading */}
-        {loading && (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_att_spin .8s linear infinite' }} />
+      {/* ── WEEKEND ── */}
+      {!loading && myClass && isWeekend && (
+        <div className="tp-alert tp-alert-success">
+          <span style={{ fontSize: 24 }}>🎉</span>
+          <div>
+            <div style={{ fontWeight: 800, marginBottom: 2 }}>Enjoy your weekend!</div>
+            <div>Morning register is only required Monday–Friday. See you on Monday!</div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Class Selection Tabs (if multiple classes) */}
-        {!loading && myClasses.length > 1 && !isWeekend && (
-            <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-              {myClasses.map(c => (
+      {/* ── MAIN CONTENT ── */}
+      {!loading && myClass && !isWeekend && (
+        <>
+          {/* Class banner */}
+          <div className="tp-card" style={{ margin: '0 0 14px', overflow: 'hidden' }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)',
+              padding: '16px 18px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12
+            }}>
+              <div style={{ color: '#fff' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Home Class</div>
+                <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 22, fontWeight: 900 }}>{myClass.name}</div>
+                <div style={{ fontSize: 13, opacity: 0.75, marginTop: 2 }}>{(Array.isArray(students) ? students : []).length} students enrolled</div>
+              </div>
+              <div style={{
+                background: submittedToday ? 'rgba(52,211,153,0.2)' : 'rgba(253,224,71,0.2)',
+                border: `1px solid ${submittedToday ? 'rgba(52,211,153,0.4)' : 'rgba(253,224,71,0.3)'}`,
+                borderRadius: 12, padding: '10px 16px', textAlign: 'center'
+              }}>
+                <div style={{ fontSize: 22 }}>{submittedToday ? '✅' : '📋'}</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: submittedToday ? '#34D399' : '#FDE68A', marginTop: 4, whiteSpace: 'nowrap' }}>
+                  {submittedToday ? 'Submitted' : 'Pending'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Submitted banner */}
+          {submittedToday && (
+            <div className="tp-alert tp-alert-success" style={{ marginBottom: 14 }}>
+              <span style={{ fontSize: 20 }}>✅</span>
+              <div>
+                <div style={{ fontWeight: 800, marginBottom: 2 }}>Register complete for today</div>
+                <div style={{ fontSize: 12 }}>
+                  {Object.keys(dbMarks).length > 0
+                    ? `${Object.keys(dbMarks).length} of ${(Array.isArray(students) ? students : []).length} students were auto-marked via Gate Scanner.`
+                    : 'The morning register has been submitted. Term totals are up to date.'
+                  }
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* QR tip */}
+          <div className="tp-alert tp-alert-info" style={{ marginBottom: 14 }}>
+            <span>🔍</span>
+            <span style={{ fontSize: 12 }}>
+              <strong>Gate Scanner:</strong> Students who scanned at the gate are auto-marked (shown with a <strong>QR</strong> badge) and locked from editing.
+            </span>
+          </div>
+
+          {/* Mark-all row */}
+          {!submittedToday && (
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', flexShrink: 0 }}>Mark all:</span>
+              {(['present', 'absent', 'late'] as Mark[]).map(m => (
                 <button
-                  key={c.id}
-                  onClick={() => handleClassChange(c.id)}
-                  style={{
-                    padding: '8px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer',
-                    background: selectedClassId === c.id ? '#6d28d9' : '#fff',
-                    color: selectedClassId === c.id ? '#fff' : '#4b5563',
-                    boxShadow: selectedClassId === c.id ? '0 4px 12px rgba(109,40,217,0.2)' : '0 1px 3px rgba(0,0,0,0.05)',
-                    transition: 'all 0.2s'
-                  }}
+                  key={m}
+                  className={`tp-att-btn ${m}`}
+                  style={{ flex: 1, minWidth: 80, padding: '8px 6px' }}
+                  onClick={() => markAll(m)}
                 >
-                  {c.name}
+                  <span style={{ fontSize: 16 }}>
+                    {m === 'present' ? '✓' : m === 'absent' ? '✗' : '⏳'}
+                  </span>
+                  <span style={{ fontSize: 11, textTransform: 'capitalize' }}>{m}</span>
                 </button>
               ))}
             </div>
-        )}
+          )}
 
-        {/* No home class assigned */}
-        {!loading && !myClass && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
-            <div style={{ fontSize: 52, marginBottom: 12 }}>🏫</div>
-            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
-              No class assigned
-            </h3>
-            <p style={{ fontSize: 13, color: 'var(--text-subtle)', maxWidth: 360, margin: '0 auto' }}>
-              You haven't been assigned as a class teacher yet. Ask the admin to set your home class in the Classes section.
-            </p>
-          </div>
-        )}
-
-        {/* Weekend */}
-        {!loading && myClass && isWeekend && (
-          <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 14, padding: '20px 24px', marginBottom: 20, display: 'flex', gap: 14, alignItems: 'center' }}>
-            <span style={{ fontSize: 32 }}>🎉</span>
+          {/* Student cards */}
+          <div className="tp-card" style={{ overflow: 'visible' }}>
+            <div className="tp-card-head">
+              <span className="tp-card-title">👥 Students</span>
+              <span className="tp-badge tp-badge-purple">{(Array.isArray(students) ? students : []).length} total</span>
+            </div>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#15803d', marginBottom: 4 }}>Enjoy your weekend!</div>
-              <div style={{ fontSize: 13, color: '#16a34a' }}>Morning register is only required Monday to Friday. See you on Monday!</div>
-            </div>
-          </div>
-        )}
+              {(Array.isArray(students) ? students : []).map((s, i) => {
+                const mark = marks[s.id] ?? 'present'
+                const totals = termTotals[s.id]
+                const pct = totals && totals.total > 0 ? Math.round((totals.present / totals.total) * 100) : null
+                const isQr = !!dbMarks[s.id]
+                const avatarColors: Record<string, string> = {
+                  present: '#16A34A', absent: '#DC2626', late: '#D97706'
+                }
 
-        {/* Main content */}
-        {!loading && myClass && !isWeekend && (
-          <>
-            {/* Class info banner */}
-            <div style={{ background: 'linear-gradient(135deg,#2e1065,#4c1d95,#6d28d9)', borderRadius: 8, padding: '18px 22px', marginBottom: 18, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.12em', opacity: .7, marginBottom: 4 }}>YOUR HOME CLASS</div>
-                <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 22, fontWeight: 700, margin: '0 0 4px' }}>{myClass.name}</h2>
-                <p style={{ fontSize: 13, opacity: .8, margin: 0 }}>{(Array.isArray(students) ? students : []).length} students enrolled</p>
-              </div>
-              {submittedToday ? (
-                <div className="att-header-right" style={{ background: 'rgba(255,255,255,.15)', borderRadius: 12, padding: '10px 18px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div style={{ fontSize: 22 }}>✅</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, marginTop: 4 }}>Submitted today</div>
-                </div>
-              ) : (
-                <div className="att-header-right" style={{ background: 'rgba(255,255,255,.12)', borderRadius: 12, padding: '10px 18px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div style={{ fontSize: 22 }}>📋</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, marginTop: 4 }}>Not submitted yet</div>
-                </div>
-              )}
-            </div>
-
-            {/* Already submitted / auto-marked banner */}
-            {submittedToday && (
-              <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 12, padding: '14px 18px', marginBottom: 18, fontSize: 13, color: '#15803d', fontWeight: 600, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span style={{ fontSize: 20 }}>✅</span>
-                <div>
-                  <div style={{ fontWeight: 800, marginBottom: 2 }}>Register complete for today</div>
-                  <div style={{ fontWeight: 600, opacity: 0.85 }}>
-                    {Object.keys(dbMarks).length > 0
-                      ? `${Object.keys(dbMarks).length} of ${(Array.isArray(students) ? students : []).length} students were auto-marked via Gate Scanner. No further action needed.`
-                      : `The morning register has been submitted. Term totals below are up to date.`
-                    }
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Info tip: Gate Scanner auto-attendance */}
-            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '10px 16px', marginBottom: 18, fontSize: 12, color: '#1e40af', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <span>🔍</span>
-              <span>
-                <strong>Gate Scanner Integration:</strong> Students who scanned their QR tag at the gate are automatically marked as <em>Present</em> or <em>Late</em> — shown with a <strong>QR SCAN</strong> badge. You only need to manually mark students who did <strong>not</strong> use the gate scanner today.
-              </span>
-            </div>
-
-            {/* Quick-mark buttons */}
-            {!submittedToday && (
-              <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 12, color: 'var(--text-muted)', alignSelf: 'center', fontWeight: 600 }}>Mark all as:</span>
-                {(['present', 'absent', 'late'] as Mark[]).map(m => (
-                  <button
-                    key={m}
-                    className="att-btn"
-                    onClick={() => markAll(m)}
-                    style={{
-                      padding: '6px 16px',
-                      fontSize: 12,
-                      background: m === 'present' ? '#f0fdf4' : m === 'absent' ? '#fef2f2' : '#fffbeb',
-                      color: m === 'present' ? '#16a34a' : m === 'absent' ? '#dc2626' : '#d97706',
-                      border: `1.5px solid ${m === 'present' ? '#bbf7d0' : m === 'absent' ? '#fca5a5' : '#fde68a'}`,
-                    }}
-                  >
-                    {m === 'present' ? '✓ All Present' : m === 'absent' ? '✗ All Absent' : '⏳ All Late'}
-                  </button>
-                ))}
-                {/* Live stats */}
-                <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                  {[
-                    { label: 'Present', count: presentCount, color: '#16a34a', bg: '#f0fdf4' },
-                    { label: 'Absent', count: absentCount, color: '#dc2626', bg: '#fef2f2' },
-                    { label: 'Late', count: lateCount, color: '#d97706', bg: '#fffbeb' },
-                  ].map(s => (
-                    <div key={s.label} style={{ background: s.bg, borderRadius: 99, padding: '4px 12px', fontSize: 12, color: s.color, fontWeight: 700 }}>
-                      {s.count} {s.label}
+                return (
+                  <div key={s.id} className="tp-student-row" style={{
+                    flexWrap: 'wrap',
+                    gap: 10,
+                    padding: '14px 18px',
+                    animation: `tp-fade-up 0.35s ease ${i * 0.025}s both`
+                  }}>
+                    {/* Avatar */}
+                    <div className="tp-avatar" style={{ background: `${avatarColors[mark]}CC` }}>
+                      {s.full_name.charAt(0)}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
-            {/* Students list */}
-            <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 6px rgba(109,40,217,.06)' }}>
-              {/* Table header */}
-              <div className="att-grid-header" style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderBottom: '1.5px solid #ede9fe', padding: '10px 18px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.08em', flex: 1 }}>Student</span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.08em', width: 60, textAlign: 'center' }}>Term %</span>
-                {!submittedToday && (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.08em', width: 220, textAlign: 'center' }}>Today's Mark</span>
-                )}
-                {submittedToday && (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.08em', width: 140, textAlign: 'center' }}>Term Total</span>
-                )}
-              </div>
-
-              <div className="att-list">
-                {(Array.isArray(students) ? students : []).map((s, i) => {
-                  const mark = marks[s.id] ?? 'present'
-                  const totals = termTotals[s.id]
-                  const pct = totals && totals.total > 0 ? Math.round((totals.present / totals.total) * 100) : null
-
-                  return (
-                    <div key={s.id} className="att-row"
-                      style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: i < (Array.isArray(students) ? students : []).length - 1 ? '1px solid #fafafa' : 'none', background: 'var(--bg-card)', transition: 'background .12s', animation: `_att_up .3s ease ${i * .03}s both` }}>
-
-                      {/* Avatar + name */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
-                        <div style={{
-                          width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                          background: mark === 'present' ? 'linear-gradient(135deg,#16a34a,#22c55e)' : mark === 'absent' ? 'linear-gradient(135deg,#dc2626,#ef4444)' : 'linear-gradient(135deg,#d97706,#f59e0b)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: '#fff',
-                        }}>
-                          {s.full_name.charAt(0)}
-                        </div>
-                        <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {s.full_name}
-                            {dbMarks[s.id] && <span style={{ marginLeft: 8, fontSize: 10, background: '#f0fdf4', color: '#16a34a', padding: '2px 6px', borderRadius: 6 }}>QR SCAN</span>}
-                          </div>
-                          <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{s.student_id ?? (s.gender ? (s.gender === 'male' ? '♂' : '♀') : '')}</div>
-                        </div>
+                    {/* Name + meta */}
+                    <div style={{ flex: 1, minWidth: 120 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        {s.full_name}
+                        {isQr && <span className="tp-badge tp-badge-green" style={{ fontSize: 10 }}>QR Scan</span>}
                       </div>
-
-                      {/* Term attendance % */}
-                      <div className="att-row-stats" style={{ width: 60, textAlign: 'center', display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', fontWeight: 700, minWidth: 60 }} className="show-on-mobile">Attendance:</div>
-                        {pct !== null ? (
-                          <div style={{ textAlign: 'left' }}>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: pct >= 75 ? '#16a34a' : pct >= 50 ? '#d97706' : '#dc2626' }}>{pct}%</div>
-                            <div style={{ fontSize: 9, color: 'var(--text-subtle)' }}>{totals!.present}/{totals!.total} days</div>
-                          </div>
-                        ) : (
-                          <span style={{ fontSize: 11, color: '#d1d5db' }}>No records yet</span>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2, display: 'flex', gap: 8 }}>
+                        <span>{s.student_id ?? (s.gender === 'male' ? '♂' : s.gender === 'female' ? '♀' : '')}</span>
+                        {pct !== null && (
+                          <span style={{
+                            fontWeight: 700,
+                            color: pct >= 75 ? '#16A34A' : pct >= 50 ? '#D97706' : '#DC2626'
+                          }}>
+                            Term: {pct}% ({totals!.present}/{totals!.total}d)
+                          </span>
                         )}
                       </div>
-
-                      {/* Mark buttons (only if not submitted today) */}
-                      {!submittedToday && (
-                        <div className="att-row-mark" style={{ display: 'flex', gap: 8, width: 220, justifyContent: 'center' }}>
-                          {( [
-                            { m: 'present' as Mark, label: 'Present', icon: '✓', active: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
-                            { m: 'absent' as Mark, label: 'Absent', icon: '✗', active: '#dc2626', bg: '#fef2f2', border: '#fca5a5' },
-                            { m: 'late' as Mark, label: 'Late', icon: '⏳', active: '#d97706', bg: '#fffbeb', border: '#fde68a' },
-                          ]).map(opt => (
-                            <button
-                              key={opt.m}
-                              className="att-btn"
-                              disabled={!!dbMarks[s.id]}
-                              onClick={() => setMark(s.id, opt.m)}
-                              style={{
-                                padding: '8px 12px',
-                                fontSize: 12,
-                                background: mark === opt.m ? opt.active : opt.bg,
-                                color: mark === opt.m ? '#fff' : opt.active,
-                                border: `1.5px solid ${opt.border}`,
-                                boxShadow: mark === opt.m ? `0 2px 8px ${opt.active}40` : 'none',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: 2,
-                                opacity: dbMarks[s.id] ? 0.5 : 1,
-                                cursor: dbMarks[s.id] ? 'default' : 'pointer'
-                              }}
-                            >
-                              <span style={{ fontSize: 16 }}>{opt.icon}</span>
-                              <span style={{ fontSize: 10, fontWeight: 900 }}>{opt.label}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Already submitted: show today mark as badge */}
-                      {submittedToday && (
-                        <div style={{ width: 140, textAlign: 'center' }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 99, background: '#f5f3ff', color: '#6d28d9' }}>
-                            {totals ? `${totals.present} present / ${totals.total} days` : '—'}
-                          </span>
-                        </div>
-                      )}
                     </div>
-                  )
-                })}
-              </div>
-            </div>
 
-            {/* Submit button */}
-            {!submittedToday && (Array.isArray(students) ? students : []).length > 0 && (
-              <div className="att-submit-bar">
-                <div style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', fontWeight: 600 }}>
-                  Today: {presentCount} Present · {absentCount} Absent
-                </div>
-                <button
-                  onClick={submit}
-                  disabled={saving}
-                  className="att-submit-btn"
-                  style={{
-                    padding: '12px 28px', borderRadius: 12, border: 'none',
-                    background: saving ? '#a78bfa' : 'linear-gradient(135deg,#7c3aed,#4f46e5)',
-                    color: '#fff', fontSize: 14, fontWeight: 700, cursor: saving ? 'default' : 'pointer',
-                    fontFamily: '"DM Sans",sans-serif', display: 'flex', alignItems: 'center', gap: 8,
-                    boxShadow: '0 4px 14px rgba(109,40,217,.35)', transition: 'all .2s',
-                    marginLeft: 'auto'
-                  }}
-                >
-                  {saving ? (
-                    <>
-                      <span style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid rgba(255,255,255,.4)', borderTopColor: '#fff', animation: '_att_spin .8s linear infinite' }} />
-                      Saving…
-                    </>
-                  ) : '📋 Submit Morning Register'}
-                </button>
+                    {/* Mark buttons */}
+                    {!submittedToday && (
+                      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                        {(['present', 'absent', 'late'] as Mark[]).map(opt => (
+                          <button
+                            key={opt}
+                            className={`tp-att-btn ${opt}${mark === opt ? ' active' : ''}`}
+                            disabled={isQr}
+                            onClick={() => setMark(s.id, opt)}
+                            style={{ minWidth: 64, padding: '8px 4px' }}
+                          >
+                            <span style={{ fontSize: 18 }}>
+                              {opt === 'present' ? '✓' : opt === 'absent' ? '✗' : '⏳'}
+                            </span>
+                            <span style={{ fontSize: 10, textTransform: 'capitalize' }}>{opt}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Submitted state: show mark as badge */}
+                    {submittedToday && (
+                      <span className={`tp-badge ${mark === 'present' ? 'tp-badge-green' : mark === 'absent' ? 'tp-badge-red' : 'tp-badge-amber'}`}>
+                        {mark === 'present' ? '✓ Present' : mark === 'absent' ? '✗ Absent' : '⏳ Late'}
+                      </span>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* ── STICKY BOTTOM BAR ── */}
+          {!submittedToday && (Array.isArray(students) ? students : []).length > 0 && (
+            <div className="tp-bottom-bar">
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', flexShrink: 0, display: 'flex', gap: 10 }}>
+                <span style={{ color: '#16A34A' }}>✓ {presentCount}</span>
+                <span style={{ color: '#DC2626' }}>✗ {absentCount}</span>
+                {lateCount > 0 && <span style={{ color: '#D97706' }}>⏳ {lateCount}</span>}
               </div>
-            )}
-          </>
-        )}
-      </div>
+              <button
+                onClick={submit}
+                disabled={saving}
+                className="tp-btn tp-btn-primary"
+                style={{ flex: 1 }}
+              >
+                {saving ? (
+                  <><div className="tp-spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> Saving…</>
+                ) : '📋 Submit Register'}
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

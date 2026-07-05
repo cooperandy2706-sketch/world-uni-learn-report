@@ -319,111 +319,87 @@ export default function TeacherReportsPage() {
 
   // ══════════════════════════════════════════════════════════════════════════
   return (
-    <div className="t-page">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
-        @keyframes _rp_spin{to{transform:rotate(360deg)}}
-        @keyframes _rp_fi{from{opacity:0}to{opacity:1}}
-        @keyframes _rp_fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        .rp-row:hover{background:#faf5ff !important}
-        .rp-std:hover{background:#ede9fe !important}
-        @media (max-width: 640px) {
-          .resp-pills { flex-wrap: nowrap !important; overflow-x: auto !important; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
-          .rp-std { flex-shrink: 0 !important; }
-          .t-grid-stack { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
+    <div className="tp-page">
+      <link rel="stylesheet" href="/src/styles/teacher-portal.css" />
 
-      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_rp_fi .4s ease' }}>
+      <div style={{ animation: 'tp-fade-in 0.4s ease' }}>
 
         {/* ── Header ───────────────────────────────────────────────────── */}
-        <div className="t-header" style={{ marginBottom: 22 }}>
-          <div>
-            <h1 className="t-title">Report Cards</h1>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>
-              {(term as any)?.name ?? '—'} · {(year as any)?.name ?? '—'}
-            </p>
-          </div>
-
-          {fakeReport && (
-            <div className="t-btn-group" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {remarksDirty && (
-                <Btn variant="success" onClick={saveRemarks} loading={savingRemarks}>
-                  💾 Save Remarks
-                </Btn>
-              )}
-              <Btn variant="secondary" onClick={() => setPreviewOpen(true)}>
-                👁️ Preview
-              </Btn>
-              {/* FIX: was printReport(name) — now calls handlePrint() which passes html */}
-              <Btn variant="info" onClick={handlePrint}>
-                🖨️ Print A4
-              </Btn>
-              {/* NEW: PDF download button */}
-              <Btn variant="teal" onClick={handleDownloadPDF} loading={downloadingPDF}>
-                ⬇ Download PDF
-              </Btn>
-              <Btn variant="orange" onClick={saveAndNotifyAdmin} loading={savingRemarks}>
-                📨 Save & Notify Admin
-              </Btn>
+        <div className="tp-hero" style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
+            <div>
+              <div className="tp-hero-label">Academics</div>
+              <h1 className="tp-hero-title">📄 Report Cards</h1>
+              <p className="tp-hero-sub">
+                {(term as any)?.name ?? '—'} · {(year as any)?.name ?? '—'}
+              </p>
             </div>
-          )}
+
+            {fakeReport && (
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {remarksDirty && (
+                  <button className="tp-btn tp-btn-primary" onClick={saveRemarks} disabled={savingRemarks}>
+                    {savingRemarks ? 'Saving...' : '💾 Save'}
+                  </button>
+                )}
+                <button className="tp-btn tp-btn-ghost" onClick={() => setPreviewOpen(true)} style={{ border: '1px solid var(--border-color)', background: 'var(--bg-card)' }}>
+                  👁️ Preview
+                </button>
+                <button className="tp-btn tp-btn-primary" onClick={handlePrint}>
+                  🖨️ Print
+                </button>
+                <button className="tp-btn tp-btn-ghost" onClick={handleDownloadPDF} disabled={downloadingPDF} style={{ border: '1px solid var(--border-color)', background: 'var(--bg-card)' }}>
+                  ⬇ PDF
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ── Admin notice ─────────────────────────────────────────────── */}
-        <div style={{ background: '#fef2f2', border: '1.5px solid #fca5a5', borderRadius: 12, padding: '10px 16px', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10, fontSize: 12 }}>
-          <span style={{ fontSize: 16, flexShrink: 0 }}>🔒</span>
-          <p style={{ margin: 0, color: '#dc2626', fontWeight: 600 }}>
-            The admin portal is restricted to administrators only. Use <strong>Save & Notify Admin</strong> to send your completed remarks to the admin for approval.
-          </p>
+        <div className="tp-alert tp-alert-warning" style={{ marginBottom: 20 }}>
+          The admin portal is restricted to administrators only. Use <strong>Save & Notify Admin</strong> to send your completed remarks to the admin for approval.
         </div>
 
         {/* ── Selectors ────────────────────────────────────────────────── */}
-        <div className="t-grid t-grid-stack" style={{ gap: 14, marginBottom: 18 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16, marginBottom: 20 }}>
           {/* Class */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.05)' }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>
-              Step 1 — Select Class
-            </label>
-            <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}
-              onFocus={() => setClassFocused(true)} onBlur={() => setClassFocused(false)}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 14, fontWeight: 600, border: `1.5px solid ${classFocused ? '#7c3aed' : '#e5e7eb'}`, boxShadow: classFocused ? '0 0 0 3px rgba(109,40,217,.1)' : 'none', outline: 'none', background: '#faf5ff', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
+          <div className="tp-card">
+            <div className="tp-label">Step 1 — Select Class</div>
+            <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)} className="tp-select">
               <option value="">Choose class…</option>
               {(classOptions as any[]).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
-            {selectedClass && <p style={{ fontSize: 11, color: '#16a34a', marginTop: 5, fontWeight: 600 }}>✓ {(Array.isArray(students) ? students : []).length} students</p>}
+            {selectedClass && <div style={{ fontSize: 13, color: 'var(--primary-color)', marginTop: 8, fontWeight: 700 }}>✓ {(Array.isArray(students) ? students : []).length} students</div>}
           </div>
 
           {/* Student */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: '1.5px solid #f0eefe', boxShadow: '0 1px 4px rgba(109,40,217,.05)' }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>
-              Step 2 — Select Student <span style={{ fontWeight: 600, textTransform: 'none', color: 'var(--text-subtle)' }}>— scores & details auto-fill</span>
-            </label>
+          <div className="tp-card" style={{ opacity: selectedClass ? 1 : 0.6 }}>
+            <div className="tp-label">Step 2 — Select Student <span style={{ color: 'var(--text-subtle)', fontWeight: 600, textTransform: 'none' }}>— details auto-fill</span></div>
             <select value={selectedStudent?.id ?? ''} onChange={e => setSelectedStudent((Array.isArray(students) ? students : []).find(s => s.id === e.target.value) ?? null)}
               disabled={!selectedClass || (Array.isArray(students) ? students : []).length === 0}
-              onFocus={() => setStudentFocused(true)} onBlur={() => setStudentFocused(false)}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 14, fontWeight: 600, border: `1.5px solid ${studentFocused ? '#7c3aed' : '#e5e7eb'}`, boxShadow: studentFocused ? '0 0 0 3px rgba(109,40,217,.1)' : 'none', outline: 'none', background: selectedClass ? '#faf5ff' : '#f9fafb', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', cursor: selectedClass ? 'pointer' : 'not-allowed', opacity: selectedClass ? 1 : 0.6 }}>
+              className="tp-select"
+            >
               <option value="">Choose student…</option>
               {(Array.isArray(students) ? students : []).map(s => <option key={s.id} value={s.id}>{s.full_name}{s.student_id ? ` — ${s.student_id}` : ''}</option>)}
             </select>
             {selectedStudent && !loadingReport && scores.length > 0 && (
-              <p style={{ fontSize: 11, color: '#16a34a', marginTop: 5, fontWeight: 600 }}>✓ {scores.length} subjects loaded</p>
+              <div style={{ fontSize: 13, color: 'var(--primary-color)', marginTop: 8, fontWeight: 700 }}>✓ {scores.length} subjects loaded</div>
             )}
           </div>
         </div>
 
         {/* ── Quick-select pills ───────────────────────────────────────── */}
         {selectedClass && (Array.isArray(students) ? students : []).length > 0 && !selectedStudent && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #f0eefe', marginBottom: 18, animation: '_rp_fu .35s ease' }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>
-              Quick select — {selectedClassName}
-            </p>
-            <div className="resp-pills" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          <div className="tp-card" style={{ marginBottom: 20, animation: 'tp-fade-in 0.3s ease' }}>
+            <div className="tp-label">Quick select — {selectedClassName}</div>
+            <div style={{ display: 'flex', flexWrap: 'nowrap', overflowX: 'auto', gap: 12, paddingBottom: 8, WebkitOverflowScrolling: 'touch' }}>
               {(Array.isArray(students) ? students : []).map((s, i) => (
-                <button key={s.id} onClick={() => setSelectedStudent(s)} className="rp-std"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 13px', borderRadius: 99, border: '1.5px solid #ddd6fe', background: '#f5f3ff', cursor: 'pointer', transition: 'all .15s' }}>
-                  <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{i + 1}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#5b21b6', whiteSpace: 'nowrap' }}>{s.full_name}</span>
+                <button key={s.id} onClick={() => setSelectedStudent(s)} 
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 99, border: '1px solid var(--border-color)', background: 'var(--bg-hover)', cursor: 'pointer', flexShrink: 0 }}
+                >
+                  <span style={{ width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-color), var(--primary-color-dark))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#fff' }}>{i + 1}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>{s.full_name}</span>
                 </button>
               ))}
             </div>
@@ -432,60 +408,59 @@ export default function TeacherReportsPage() {
 
         {/* ── Empty state ──────────────────────────────────────────────── */}
         {!selectedClass && (
-          <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
-            <div style={{ fontSize: 52, marginBottom: 12 }}>📄</div>
-            <h3 className="t-title" style={{ fontSize: 18, marginBottom: 6 }}>Select a class to begin</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Choose a class, then a student — their scores and report details fill in automatically.</p>
+          <div className="tp-card">
+            <div className="tp-empty">
+              <div className="tp-empty-icon">📄</div>
+              <div className="tp-empty-title">Select a class to begin</div>
+              <div className="tp-empty-sub">Choose a class, then a student — their scores and report details fill in automatically.</div>
+            </div>
           </div>
         )}
 
         {/* ── Loading ──────────────────────────────────────────────────── */}
         {loadingReport && (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '50px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_rp_spin .8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading {selectedStudent?.full_name}'s report…</p>
+          <div className="tp-loading">
+            <div className="tp-spinner" />
+            Loading {selectedStudent?.full_name}'s report…
           </div>
         )}
 
         {/* ── Main report panel ────────────────────────────────────────── */}
         {!loadingReport && selectedStudent && (
-          <div className="t-grid" style={{ animation: '_rp_fu .4s ease' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20, '@media (minWidth: 1024px)': { flexDirection: 'row' } } as any}>
 
             {/* ── LEFT ──────────────────────────────────────────────── */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ flex: '1 1 60%', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
               {/* Student banner */}
-              <div style={{ background: 'linear-gradient(135deg,#2e1065,#4c1d95,#5b21b6)', borderRadius: 8, padding: '18px 20px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: -16, right: -16, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,.05)' }} />
-                <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,#f59e0b,#fbbf24)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 900, color: '#fff', flexShrink: 0 }}>
+              <div style={{ background: 'linear-gradient(135deg, var(--primary-color), var(--primary-color-dark))', borderRadius: 16, padding: '24px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div className="tp-avatar tp-avatar-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)', color: '#fff' }}>
                     {selectedStudent.full_name.charAt(0)}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <h2 className="t-title" style={{ fontSize: 19, color: '#fff', margin: 0 }}>{selectedStudent.full_name}</h2>
-                    <div style={{ display: 'flex', gap: 12, marginTop: 4, flexWrap: 'wrap', fontSize: 11 }}>
-                      {selectedStudent.student_id && <span style={{ color: 'rgba(255,255,255,.6)' }}>ID: {selectedStudent.student_id}</span>}
-                      {selectedStudent.gender && <span style={{ color: 'rgba(255,255,255,.6)' }}>{selectedStudent.gender === 'male' ? '♂ Male' : '♀ Female'}</span>}
-                      {selectedStudent.house && <span style={{ color: 'rgba(255,255,255,.6)' }}>🏠 {selectedStudent.house}</span>}
-                      <span style={{ color: 'rgba(255,255,255,.6)' }}>🏫 {selectedClassName}</span>
+                    <h2 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 24, fontWeight: 800, color: '#fff', margin: 0 }}>{selectedStudent.full_name}</h2>
+                    <div style={{ display: 'flex', gap: 12, marginTop: 6, flexWrap: 'wrap', fontSize: 13, opacity: 0.9 }}>
+                      {selectedStudent.student_id && <span>ID: {selectedStudent.student_id}</span>}
+                      {selectedStudent.gender && <span>{selectedStudent.gender === 'male' ? '♂ Male' : '♀ Female'}</span>}
+                      {selectedStudent.house && <span>🏠 {selectedStudent.house}</span>}
+                      <span>🏫 {selectedClassName}</span>
                     </div>
                   </div>
                   {/* Prev / Next */}
-                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                     {(Array.isArray(students) ? students : []).findIndex(s => s.id === selectedStudent.id) > 0 && (
                       <button onClick={() => setSelectedStudent(students[(Array.isArray(students) ? students : []).findIndex(s => s.id === selectedStudent.id) - 1])}
-                        style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,.2)', background: 'rgba(255,255,255,.1)', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all .15s' }}
-                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,.2)'}
-                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,.1)'}>
-                        ← Prev
+                        style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        ←
                       </button>
                     )}
                     {(Array.isArray(students) ? students : []).findIndex(s => s.id === selectedStudent.id) < (Array.isArray(students) ? students : []).length - 1 && (
                       <button onClick={() => setSelectedStudent(students[(Array.isArray(students) ? students : []).findIndex(s => s.id === selectedStudent.id) + 1])}
-                        style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,.2)', background: 'rgba(255,255,255,.1)', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all .15s' }}
-                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,.2)'}
-                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,.1)'}>
-                        Next →
+                        style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        →
                       </button>
                     )}
                   </div>
@@ -494,248 +469,240 @@ export default function TeacherReportsPage() {
 
               {/* No scores notice */}
               {scores.length === 0 && (
-                <div style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 12, padding: '14px 18px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
-                  <div>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#92400e', margin: '0 0 2px' }}>No scores entered yet</p>
-                    <p style={{ fontSize: 12, color: '#78350f', margin: 0 }}>Go to Score Entry and fill in this student's marks first.</p>
-                  </div>
+                <div className="tp-alert tp-alert-warning">
+                  <strong>No scores entered yet.</strong> Go to Score Entry and fill in this student's marks first.
                 </div>
               )}
 
               {/* Scores table */}
               {scores.length > 0 && (
-                <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
-                  <div style={{ padding: '13px 18px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 16 }}>📊</span>
-                    <h3 className="t-title" style={{ fontSize: 15, margin: 0 }}>Subject Scores</h3>
-                    <span style={{ fontSize: 11, fontWeight: 700, background: '#f5f3ff', color: '#6d28d9', padding: '2px 8px', borderRadius: 99 }}>{scores.length} subjects</span>
+                <div className="tp-card">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <span style={{ fontSize: 20 }}>📊</span>
+                      <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>Subject Scores</h3>
+                    </div>
+                    <span className="tp-badge tp-badge-primary">{scores.length} subjects</span>
                   </div>
-                  <div className="t-table-scroll">
-                  <table className="t-table-card" style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)' }}>
-                        {/* Subject column always first */}
-                        <th style={{ padding: '9px 13px', textAlign: 'left', fontSize: 10.5, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.05em', borderBottom: '1.5px solid #ede9fe' }}>Subject</th>
-                        {/* Dynamic category score headers */}
-                        {(gradingCategories.length > 0
-                          ? gradingCategories
-                          : [
-                              { id: 'cs', name: 'Class Score', max_score: 30 },
-                              { id: 'es', name: 'Exam Score', max_score: 70 },
-                            ]
-                        ).map((cat: any) => (
-                          <th key={cat.id} style={{ padding: '9px 13px', textAlign: 'center', fontSize: 10.5, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.05em', borderBottom: '1.5px solid #ede9fe' }}>
-                            {cat.name} <span style={{ fontSize: 9, opacity: 0.7 }}>(/{cat.max_score})</span>
-                          </th>
-                        ))}
-                        {['Total', 'Grade', 'Position', 'Remark'].map(h => (
-                          <th key={h} style={{ padding: '9px 13px', textAlign: 'left', fontSize: 10.5, fontWeight: 700, color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '.05em', borderBottom: '1.5px solid #ede9fe' }}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {scores.map((sc, i) => {
-                        const g = getGrade(sc.total_score ?? 0)
-                        return (
-                          <tr key={sc.id} className="rp-row" style={{ borderBottom: i < scores.length - 1 ? '1px solid #faf5ff' : 'none', transition: 'background .12s' }}>
-                            <td data-label="Subject" style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>{sc.subject?.name}</td>
-                            {/* Dynamic category score columns */}
-                            {(gradingCategories.length > 0
-                              ? gradingCategories
-                              : [{ id: 'cs', name: 'Class Score', max_score: 30 }, { id: 'es', name: 'Exam Score', max_score: 70 }]
-                            ).map((cat: any) => {
-                              let val = '—'
-                              if (sc.category_scores?.[cat.id] !== undefined && sc.category_scores[cat.id] !== '') {
-                                val = `${sc.category_scores[cat.id]}/${cat.max_score}`
-                              } else if (cat.id === 'cs' && sc.class_score != null) {
-                                val = sc.class_score.toFixed(1)
-                              } else if (cat.id === 'es' && sc.exam_score != null) {
-                                val = sc.exam_score.toFixed(1)
-                              }
-                              return (
-                                <td key={cat.id} data-label={cat.name} style={{ padding: '9px 13px', fontSize: 13, fontWeight: 600, color: '#6d28d9', textAlign: 'center' }}>{val}</td>
-                              )
-                            })}
-                            <td data-label="Total" style={{ padding: '9px 13px', textAlign: 'center' }}>
-                              <span style={{ fontSize: 14, fontWeight: 800, color: (sc.total_score ?? 0) >= 50 ? '#16a34a' : '#dc2626' }}>{sc.total_score?.toFixed(1) ?? '—'}</span>
-                            </td>
-                            <td data-label="Grade" style={{ padding: '9px 13px', textAlign: 'center' }}>
-                              <span style={{ width: 28, height: 28, borderRadius: 8, background: g.color + '18', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: g.color }}>{g.grade}</span>
-                            </td>
-                            <td data-label="Position" style={{ padding: '9px 13px', textAlign: 'center', fontSize: 12, color: 'var(--text-main)', fontWeight: 600 }}>{sc.position ? ordinalFn(sc.position) : '—'}</td>
-                            <td data-label="Remark" style={{ padding: '9px 13px', fontSize: 11, color: 'var(--text-muted)' }}>{sc.teacher_remarks ?? '—'}</td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                    <tfoot>
-                      <tr style={{ background: 'linear-gradient(135deg,#faf5ff,#f5f3ff)', borderTop: '2px solid #ede9fe' }}>
-                        <td style={{ padding: '9px 13px', fontSize: 12, fontWeight: 800, color: '#6d28d9' }}>Summary</td>
-                        <td colSpan={2} style={{ padding: '9px 13px', fontSize: 11, color: 'var(--text-muted)' }}>{scores.length} subjects · {passCount} passed</td>
-                        <td style={{ padding: '9px 13px', textAlign: 'center' }}>
-                          <span style={{ fontSize: 14, fontWeight: 800, color: avg >= 50 ? '#16a34a' : '#dc2626' }}>{avg.toFixed(1)}%</span>
-                        </td>
-                        <td style={{ padding: '9px 13px', textAlign: 'center' }}>
-                          {overallGrade && <span style={{ width: 28, height: 28, borderRadius: 8, background: overallGrade.color + '18', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: overallGrade.color }}>{overallGrade.grade}</span>}
-                        </td>
-                        <td style={{ padding: '9px 13px', textAlign: 'center' }}>
-                          {reportCard?.overall_position && (
-                            <span style={{ fontSize: 12, fontWeight: 700, color: '#6d28d9', background: '#f5f3ff', padding: '3px 9px', borderRadius: 99 }}>
-                              {ordinalFn(reportCard.overall_position)} / {reportCard.total_students}
-                            </span>
-                          )}
-                        </td>
-                        <td />
-                      </tr>
-                    </tfoot>
-                  </table>
+                  
+                  <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', margin: '0 -20px' }}>
+                    <table style={{ width: '100%', minWidth: 600, borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ background: 'var(--bg-hover)' }}>
+                          <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Subject</th>
+                          {(gradingCategories.length > 0
+                            ? gradingCategories
+                            : [
+                                { id: 'cs', name: 'Class Score', max_score: 30 },
+                                { id: 'es', name: 'Exam Score', max_score: 70 },
+                              ]
+                          ).map((cat: any) => (
+                            <th key={cat.id} style={{ padding: '12px', textAlign: 'center', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                              {cat.name} <span style={{ opacity: 0.6 }}>(/{cat.max_score})</span>
+                            </th>
+                          ))}
+                          {['Total', 'Grade', 'Position', 'Remark'].map(h => (
+                            <th key={h} style={{ padding: '12px', textAlign: 'left', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {scores.map((sc, i) => {
+                          const g = getGrade(sc.total_score ?? 0)
+                          return (
+                            <tr key={sc.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                              <td style={{ padding: '12px 20px', fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{sc.subject?.name}</td>
+                              {(gradingCategories.length > 0
+                                ? gradingCategories
+                                : [{ id: 'cs', name: 'Class Score', max_score: 30 }, { id: 'es', name: 'Exam Score', max_score: 70 }]
+                              ).map((cat: any) => {
+                                let val = '—'
+                                if (sc.category_scores?.[cat.id] !== undefined && sc.category_scores[cat.id] !== '') {
+                                  val = `${sc.category_scores[cat.id]}/${cat.max_score}`
+                                } else if (cat.id === 'cs' && sc.class_score != null) {
+                                  val = sc.class_score.toFixed(1)
+                                } else if (cat.id === 'es' && sc.exam_score != null) {
+                                  val = sc.exam_score.toFixed(1)
+                                }
+                                return (
+                                  <td key={cat.id} style={{ padding: '12px', fontSize: 14, fontWeight: 700, color: 'var(--primary-color)', textAlign: 'center' }}>{val}</td>
+                                )
+                              })}
+                              <td style={{ padding: '12px', textAlign: 'center' }}>
+                                <span style={{ fontSize: 15, fontWeight: 800, color: (sc.total_score ?? 0) >= 50 ? 'var(--success-color)' : 'var(--danger-color)' }}>{sc.total_score?.toFixed(1) ?? '—'}</span>
+                              </td>
+                              <td style={{ padding: '12px', textAlign: 'center' }}>
+                                <span style={{ width: 32, height: 32, borderRadius: 10, background: g.color + '1A', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: g.color }}>{g.grade}</span>
+                              </td>
+                              <td style={{ padding: '12px', textAlign: 'center', fontSize: 13, color: 'var(--text-primary)', fontWeight: 700 }}>{sc.position ? ordinalFn(sc.position) : '—'}</td>
+                              <td style={{ padding: '12px', fontSize: 12, color: 'var(--text-muted)' }}>{sc.teacher_remarks ?? '—'}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                      <tfoot>
+                        <tr style={{ background: 'var(--bg-hover)' }}>
+                          <td style={{ padding: '12px 20px', fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>Summary</td>
+                          <td colSpan={2} style={{ padding: '12px', fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{scores.length} subjects · {passCount} passed</td>
+                          <td style={{ padding: '12px', textAlign: 'center' }}>
+                            <span style={{ fontSize: 15, fontWeight: 800, color: avg >= 50 ? 'var(--success-color)' : 'var(--danger-color)' }}>{avg.toFixed(1)}%</span>
+                          </td>
+                          <td style={{ padding: '12px', textAlign: 'center' }}>
+                            {overallGrade && <span style={{ width: 32, height: 32, borderRadius: 10, background: overallGrade.color + '1A', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: overallGrade.color }}>{overallGrade.grade}</span>}
+                          </td>
+                          <td style={{ padding: '12px', textAlign: 'center' }}>
+                            {reportCard?.overall_position && (
+                              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--primary-color)', background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '4px 10px', borderRadius: 99 }}>
+                                {ordinalFn(reportCard.overall_position)} / {reportCard.total_students}
+                              </span>
+                            )}
+                          </td>
+                          <td />
+                        </tr>
+                      </tfoot>
+                    </table>
                   </div>
                 </div>
               )}
 
               {/* ── Remarks editor ─────────────────────────────────────── */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', overflow: 'hidden', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
-                <div style={{ padding: '13px 18px', borderBottom: '1px solid #faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 16 }}>💬</span>
-                    <h3 className="t-title" style={{ fontSize: 15, margin: 0 }}>Remarks</h3>
-                    {remarksDirty && <span style={{ fontSize: 11, color: '#d97706', fontWeight: 600 }}>● Unsaved changes</span>}
-                    {!remarksDirty && (teacherRemark || htRemark) && <span style={{ fontSize: 11, color: '#16a34a', fontWeight: 600 }}>✓ Saved</span>}
+              <div className="tp-card">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontSize: 20 }}>💬</span>
+                    <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>Remarks</h3>
+                    {remarksDirty && <span style={{ fontSize: 12, color: 'var(--warning-color)', fontWeight: 700 }}>● Unsaved changes</span>}
+                    {!remarksDirty && (teacherRemark || htRemark) && <span style={{ fontSize: 12, color: 'var(--success-color)', fontWeight: 700 }}>✓ Saved</span>}
                   </div>
-                  {remarksDirty && (
-                    <Btn variant="success" onClick={saveRemarks} loading={savingRemarks} style={{ padding: '6px 12px', fontSize: 12 }}>
-                      💾 Save
-                    </Btn>
-                  )}
                 </div>
 
-                <div className="t-grid" style={{ padding: '16px 18px', gap: 14 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 20 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>
-                      Class Teacher's Remarks
-                    </label>
-                    <select value={teacherRemark} onChange={e => { setTeacherRemark(e.target.value); setRemarksDirty(true) }}
-                      style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 12, border: '1.5px solid var(--border-color)', outline: 'none', background: '#faf5ff', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
+                    <div className="tp-label">Class Teacher's Remarks</div>
+                    <select value={teacherRemark} onChange={e => { setTeacherRemark(e.target.value); setRemarksDirty(true) }} className="tp-select">
                       <option value="">Select remark…</option>
                       {TEACHER_REMARKS.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
-                    {teacherRemark && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 5, fontStyle: 'italic', lineHeight: 1.4 }}>"{teacherRemark}"</p>}
+                    {teacherRemark && <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8, fontStyle: 'italic' }}>"{teacherRemark}"</div>}
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5 }}>
-                      Headteacher's Remarks
-                    </label>
-                    <select value={htRemark} onChange={e => { setHtRemark(e.target.value); setRemarksDirty(true) }}
-                      style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 12, border: '1.5px solid var(--border-color)', outline: 'none', background: '#faf5ff', color: 'var(--text-main)', fontFamily: '"DM Sans",sans-serif', cursor: 'pointer' }}>
+                    <div className="tp-label">Headteacher's Remarks</div>
+                    <select value={htRemark} onChange={e => { setHtRemark(e.target.value); setRemarksDirty(true) }} className="tp-select">
                       <option value="">Select remark…</option>
                       {HEADTEACHER_REMARKS.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
-                    {htRemark && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 5, fontStyle: 'italic', lineHeight: 1.4 }}>"{htRemark}"</p>}
+                    {htRemark && <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8, fontStyle: 'italic' }}>"{htRemark}"</div>}
                   </div>
                 </div>
 
                 {/* Action bar */}
-                <div className="t-btn-group" style={{ padding: '0 18px 16px', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <Btn variant="success" onClick={saveRemarks} loading={savingRemarks} disabled={!reportCard?.id} style={{ flex: 1, justifyContent: 'center' }}>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', borderTop: '1px solid var(--border-color)', paddingTop: 20 }}>
+                  <button className="tp-btn tp-btn-primary" onClick={saveRemarks} disabled={savingRemarks || !reportCard?.id}>
                     💾 Save Remarks
-                  </Btn>
-                  <Btn variant="info" onClick={() => setPreviewOpen(true)} disabled={!reportCard} style={{ flex: 1, justifyContent: 'center' }}>
+                  </button>
+                  <button className="tp-btn tp-btn-ghost" onClick={() => setPreviewOpen(true)} disabled={!reportCard} style={{ border: '1px solid var(--border-color)' }}>
                     👁️ Preview
-                  </Btn>
-                  <Btn variant="teal" onClick={handleDownloadPDF} loading={downloadingPDF} disabled={!reportCard} style={{ flex: 1, justifyContent: 'center' }}>
+                  </button>
+                  <button className="tp-btn tp-btn-ghost" onClick={handleDownloadPDF} disabled={downloadingPDF || !reportCard} style={{ border: '1px solid var(--border-color)' }}>
                     ⬇ PDF
-                  </Btn>
-                  <Btn variant="orange" onClick={saveAndNotifyAdmin} loading={savingRemarks} disabled={!reportCard?.id} style={{ flex: 2, justifyContent: 'center' }}>
+                  </button>
+                  <button className="tp-btn tp-btn-primary" onClick={saveAndNotifyAdmin} disabled={savingRemarks || !reportCard?.id} style={{ background: 'linear-gradient(135deg, #F97316, #EA580C)' }}>
                     📨 Save & Notify Admin
-                  </Btn>
+                  </button>
                 </div>
 
                 {!reportCard && (
-                  <div style={{ margin: '0 18px 16px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '8px 12px', fontSize: 12, color: '#dc2626' }}>
-                    ⚠ No report card found for this student. Ask the admin to generate reports first.
+                  <div className="tp-alert tp-alert-error" style={{ marginTop: 16 }}>
+                    No report card found for this student. Ask the admin to generate reports first.
                   </div>
                 )}
               </div>
             </div>
 
             {/* ── RIGHT sidebar ─────────────────────────────────────────── */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ flex: '1 1 35%', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
               {/* Report status */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 12 }}>Report Status</p>
+              <div className="tp-card">
+                <div className="tp-label">Report Status</div>
                 {reportCard ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {[
                       { l: 'Average',   v: `${avg.toFixed(1)}%`, color: overallGrade?.color },
                       { l: 'Grade',     v: overallGrade ? `${overallGrade.grade} — ${overallGrade.label}` : '—' },
                       { l: 'Position',  v: reportCard.overall_position ? `${ordinalFn(reportCard.overall_position)} of ${reportCard.total_students}` : 'Not set' },
-                      { l: 'Pass/Fail', v: `${passCount}/${scores.length} passed`, color: passCount === scores.length ? '#16a34a' : '#d97706' },
+                      { l: 'Pass/Fail', v: `${passCount}/${scores.length} passed`, color: passCount === scores.length ? 'var(--success-color)' : 'var(--warning-color)' },
                     ].map(({ l, v, color }) => (
-                      <div key={l} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                      <div key={l} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
                         <span style={{ color: 'var(--text-muted)' }}>{l}</span>
-                        <span style={{ fontWeight: 700, color: color ?? '#111827' }}>{v}</span>
+                        <span style={{ fontWeight: 800, color: color ?? 'var(--text-primary)' }}>{v}</span>
                       </div>
                     ))}
-                    <div style={{ marginTop: 4 }}>
-                      <span style={{ fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 99, background: reportCard.is_approved ? '#f0fdf4' : '#fffbeb', color: reportCard.is_approved ? '#16a34a' : '#d97706', border: `1px solid ${reportCard.is_approved ? '#bbf7d0' : '#fde68a'}` }}>
+                    <div style={{ marginTop: 8 }}>
+                      <span className={`tp-badge ${reportCard.is_approved ? 'tp-badge-success' : 'tp-badge-warning'}`}>
                         {reportCard.is_approved ? '✓ Approved by admin' : '⏳ Pending admin approval'}
                       </span>
                     </div>
                   </div>
                 ) : (
-                  <div style={{ textAlign: 'center', padding: '12px 0' }}>
-                    <p style={{ fontSize: 12, color: 'var(--text-subtle)' }}>Report not generated yet</p>
-                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 3 }}>Ask admin to generate from Reports page</p>
+                  <div className="tp-empty" style={{ padding: '20px 0', minHeight: 'auto' }}>
+                    <div className="tp-empty-title" style={{ fontSize: 15 }}>Report not generated yet</div>
+                    <div className="tp-empty-sub">Ask admin to generate from Reports page</div>
                   </div>
                 )}
               </div>
 
               {/* Attendance */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Attendance</p>
+              <div className="tp-card">
+                <div className="tp-label">Attendance</div>
                 {attendance ? (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                     {[
-                      { l: 'Total',   v: attendance.total_days,   color: '#6d28d9', bg: '#f5f3ff' },
-                      { l: 'Present', v: attendance.days_present, color: '#16a34a', bg: '#f0fdf4' },
-                      { l: 'Absent',  v: attendance.days_absent,  color: '#dc2626', bg: '#fef2f2' },
+                      { l: 'Total',   v: attendance.total_days,   color: 'var(--primary-color)', bg: 'var(--bg-hover)' },
+                      { l: 'Present', v: attendance.days_present, color: 'var(--success-color)', bg: '#F0FDF4' },
+                      { l: 'Absent',  v: attendance.days_absent,  color: 'var(--danger-color)', bg: '#FEF2F2' },
                     ].map(s => (
-                      <div key={s.l} style={{ background: s.bg, borderRadius: 9, padding: '9px', textAlign: 'center' }}>
-                        <div className="t-title" style={{ fontSize: 18, color: s.color }}>{s.v}</div>
-                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{s.l}</div>
+                      <div key={s.l} style={{ background: s.bg, borderRadius: 12, padding: '12px', textAlign: 'center' }}>
+                        <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 24, fontWeight: 800, color: s.color }}>{s.v}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, fontWeight: 700 }}>{s.l}</div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p style={{ fontSize: 12, color: 'var(--text-subtle)', textAlign: 'center', padding: '6px 0' }}>No attendance recorded</p>
+                  <div className="tp-empty" style={{ padding: '20px 0', minHeight: 'auto' }}>
+                    <div className="tp-empty-sub">No attendance recorded</div>
+                  </div>
                 )}
               </div>
 
               {/* Guardian */}
               {(selectedStudent.guardian_name || selectedStudent.guardian_phone) && (
-                <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '16px', boxShadow: '0 1px 4px rgba(109,40,217,.06)' }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Guardian</p>
-                  {selectedStudent.guardian_name && <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 3 }}>{selectedStudent.guardian_name}</p>}
-                  {selectedStudent.guardian_phone && <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>📱 {selectedStudent.guardian_phone}</p>}
+                <div className="tp-card">
+                  <div className="tp-label">Guardian</div>
+                  {selectedStudent.guardian_name && <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>{selectedStudent.guardian_name}</div>}
+                  {selectedStudent.guardian_phone && <div style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 600 }}>📱 {selectedStudent.guardian_phone}</div>}
                 </div>
               )}
 
               {/* Student list */}
-              <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1.5px solid #f0eefe', padding: '14px', boxShadow: '0 1px 4px rgba(109,40,217,.06)', maxHeight: 260, overflowY: 'auto' }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>All Students</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {(Array.isArray(students) ? students : []).map((s, i) => (
-                    <button key={s.id} onClick={() => setSelectedStudent(s)}
-                      style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 9, border: 'none', background: selectedStudent?.id === s.id ? 'linear-gradient(135deg,#7c3aed,#6d28d9)' : '#faf5ff', cursor: 'pointer', transition: 'all .15s', textAlign: 'left' }}
-                      onMouseEnter={e => { if (selectedStudent?.id !== s.id) e.currentTarget.style.background = '#ede9fe' }}
-                      onMouseLeave={e => { if (selectedStudent?.id !== s.id) e.currentTarget.style.background = '#faf5ff' }}>
-                      <span style={{ fontSize: 10, color: selectedStudent?.id === s.id ? 'rgba(255,255,255,.5)' : '#9ca3af', width: 16, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: selectedStudent?.id === s.id ? '#fff' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.full_name}</span>
-                    </button>
-                  ))}
+              <div className="tp-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div className="tp-label" style={{ padding: '20px 20px 12px' }}>All Students</div>
+                <div style={{ maxHeight: 300, overflowY: 'auto', padding: '0 12px 12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {(Array.isArray(students) ? students : []).map((s, i) => (
+                      <button key={s.id} onClick={() => setSelectedStudent(s)}
+                        style={{ 
+                          display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 10, border: 'none', 
+                          background: selectedStudent?.id === s.id ? 'linear-gradient(135deg, var(--primary-color), var(--primary-color-dark))' : 'transparent',
+                          cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left' 
+                        }}
+                      >
+                        <span style={{ fontSize: 12, color: selectedStudent?.id === s.id ? 'rgba(255,255,255,0.6)' : 'var(--text-muted)', width: 20, textAlign: 'right', flexShrink: 0, fontWeight: 700 }}>{i + 1}</span>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: selectedStudent?.id === s.id ? '#fff' : 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.full_name}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -744,12 +711,7 @@ export default function TeacherReportsPage() {
         )}
       </div>
 
-      {/* ── Hidden print/PDF target  ────────────────────────────────────────
-           IMPORTANT: display:none hides it from view but html2canvas still
-           renders it by temporarily setting display:block in downloadReportPDF.
-           The ReportCard here receives scores + attendance as top-level props
-           so it doesn't need them nested on fakeReport.
-      ── */}
+      {/* ── Hidden print/PDF target  ──────────────────────────────────────── */}
       <div id="tr-report-print-wrap" style={{ display: 'none' }}>
         <div id="tr-report-print">
           {fakeReport && (
@@ -776,17 +738,17 @@ export default function TeacherReportsPage() {
         subtitle={`${selectedClassName} · ${(term as any)?.name ?? ''}`}
         size="xl"
         footer={
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Btn variant="secondary" onClick={() => setPreviewOpen(false)}>Close</Btn>
-            <Btn variant="info" onClick={() => { setPreviewOpen(false); handlePrint() }}>
-              🖨️ Print A4
-            </Btn>
-            <Btn variant="teal" onClick={() => { setPreviewOpen(false); handleDownloadPDF() }} loading={downloadingPDF}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <button className="tp-btn tp-btn-ghost" onClick={() => setPreviewOpen(false)}>Close</button>
+            <button className="tp-btn tp-btn-primary" onClick={() => { setPreviewOpen(false); handlePrint() }}>
+              🖨️ Print
+            </button>
+            <button className="tp-btn tp-btn-ghost" style={{ border: '1px solid var(--border-color)' }} onClick={() => { setPreviewOpen(false); handleDownloadPDF() }} disabled={downloadingPDF}>
               ⬇ Download PDF
-            </Btn>
-            <Btn variant="orange" onClick={() => { setPreviewOpen(false); saveAndNotifyAdmin() }} loading={savingRemarks}>
+            </button>
+            <button className="tp-btn tp-btn-primary" style={{ background: 'linear-gradient(135deg, #F97316, #EA580C)' }} onClick={() => { setPreviewOpen(false); saveAndNotifyAdmin() }} disabled={savingRemarks}>
               📨 Save & Notify Admin
-            </Btn>
+            </button>
           </div>
         }
       >

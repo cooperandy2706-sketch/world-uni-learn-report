@@ -89,6 +89,10 @@ export default function FeesPage() {
   const [storeSearch, setStoreSearch] = useState('')
   const [searchParams] = useSearchParams()
 
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+  const [deletePassword, setDeletePassword] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+
   // ── 1. Foundational Supabase & React Query Data Fetching ────────────────
   // Fee structures
   const { data: structures = [], isLoading: loadingStructures } = useQuery({
@@ -394,8 +398,33 @@ export default function FeesPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['fee-payments'] }); qc.invalidateQueries({ queryKey: ['students-all'] }); qc.invalidateQueries({ queryKey: ['students-class-debt'] }); toast.success('Payment deleted & arrears restored') },
   })
 
+  async function handleConfirmDelete(e: React.FormEvent) {
+    e.preventDefault()
+    if (!user?.email || !deleteConfirmId) return
+    setIsDeleting(true)
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: deletePassword,
+      })
+      if (error) throw new Error('Incorrect password')
+      
+      delPayment.mutate(deleteConfirmId)
+      setDeleteConfirmId(null)
+      setDeletePassword('')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to verify password')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   function handleRecordPayment() {
     if (!pf.student_id || !pf.amount_paid) { toast.error('Select student and enter amount'); return }
+    // CRITICAL: Block payment if the current term hasn't loaded yet.
+    // Without this guard, term?.id is undefined and the payment saves with term_id = null,
+    // making it invisible in all term-filtered queries.
+    if (!term?.id) { toast.error('Current term not loaded yet — please wait a moment and try again'); return }
     
     // Generate notes based on selected fees
     let autoNotes = pf.notes;
@@ -3000,7 +3029,7 @@ export default function FeesPage() {
                             <button onClick={(e) => { e.stopPropagation(); setPrintReceipt(p) }} style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#eff6ff', color: '#2563eb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="View / Print Receipt"><Printer size={13} /></button>
                             <button onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/?text=${encodeURIComponent(generateTextReceipt(p))}`, '_blank') }} style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#ecfdf5', color: '#059669', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Share via WhatsApp"><MessageCircle size={13} /></button>
                             <button onClick={(e) => { e.stopPropagation(); sendReceiptSMS(p) }} disabled={isSendingSMS} style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#f5f3ff', color: '#6d28d9', cursor: isSendingSMS ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: isSendingSMS ? 0.6 : 1 }} title="Send SMS Receipt to Guardian">{isSendingSMS ? <Loader2 size={13} className="animate-spin" /> : <Smartphone size={13} />}</button>
-                            <button onClick={(e) => { e.stopPropagation(); if (confirm('Delete this payment?')) delPayment.mutate(p.id) }} style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Delete"><Trash2 size={13} /></button>
+                            <button onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(p.id) }} style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Delete"><Trash2 size={13} /></button>
                           </div>
                         </td>
                       </tr>
@@ -3463,6 +3492,42 @@ export default function FeesPage() {
         </form>
       </Modal>
 
+      {/* ── REVERSE PAYMENT CONFIRMATION MODAL ── */}
+      {deleteConfirmId && (
+        <Modal isOpen={!!deleteConfirmId} onClose={() => { setDeleteConfirmId(null); setDeletePassword('') }} title="Reverse Payment">
+          <form onSubmit={handleConfirmDelete}>
+            <div style={{ padding: '24px', background: '#fef2f2', borderRadius: '12px', marginBottom: '24px', color: '#b91c1c', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <AlertTriangle size={24} style={{ flexShrink: 0, marginTop: '2px' }} />
+              <div style={{ fontSize: '13px', lineHeight: 1.5 }}>
+                <strong style={{ display: 'block', fontSize: '14px', marginBottom: '4px' }}>Security Verification Required</strong>
+                Reversing a payment will permanently delete the receipt and automatically restore the student's arrears balance. Please enter your login password to authorize this action.
+              </div>
+            </div>
+            
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 }}>Bursar Password</label>
+              <div style={{ position: 'relative' }}>
+                <Lock size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  style={{ width: '100%', height: 44, padding: '0 16px 0 40px', border: '1.5px solid var(--border-color)', borderRadius: 10, fontSize: 14 }}
+                  placeholder="Enter your login password"
+                  autoFocus
+                  required
+                />
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', borderTop: '1px solid var(--border-color)', paddingTop: 20 }}>
+              <Btn variant="secondary" onClick={() => { setDeleteConfirmId(null); setDeletePassword('') }} type="button">Cancel</Btn>
+              <Btn variant="danger" loading={isDeleting} type="submit">Verify & Reverse Payment</Btn>
+            </div>
+          </form>
+        </Modal>
+      )}
     </>
   )
 }
+

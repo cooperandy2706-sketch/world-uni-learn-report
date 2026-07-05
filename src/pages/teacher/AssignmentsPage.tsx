@@ -343,152 +343,163 @@ export default function AssignmentsPage() {
   }
 
   return (
-    <div className="t-page">
+    <div className="tp-page">
+      <link rel="stylesheet" href="/src/styles/teacher-portal.css" />
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
-        @keyframes _spin { to{transform:rotate(360deg)} }
-        @keyframes _fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        .q-card { background: #fff; border: 1.5px solid #f0eefe; border-radius: 14px; padding: 18px; margin-bottom: 16px; position: relative; }
-        .q-card:hover { border-color: #7c3aed; }
-        @media (max-width: 640px) {
-          .resp-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
-          .resp-view-switch { flex-direction: column !important; width: 100% !important; max-width: none !important; }
-          .resp-gap-sm { gap: 8px !important; }
-          .assign-card { padding: 16px !important; }
-          .q-card { padding: 14px !important; }
-          .modal-content-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
-          .resp-grid-2 { grid-template-columns: 1fr !important; }
-          .modal-wrapper { padding: 12px !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; margin: 0 -16px !important; }
-        }
+        .q-card { background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 16px; padding: 18px; margin-bottom: 16px; position: relative; transition: border-color 0.2s; }
+        .q-card:focus-within { border-color: var(--primary-color); }
       `}</style>
 
-      <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif' }}>
-        {modalOpen ? (
-          /* ── INLINE ASSIGNMENT BUILDER VIEW ── */
-          <div className="modal-wrapper" style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1.5px solid var(--border-color)', padding: 24, animation: '_fadeUp 0.3s ease', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid var(--border-light)', paddingBottom: 16 }}>
-              <div>
-                <button onClick={() => setModalOpen(false)} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Assignments</button>
-                <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#1e293b' }}>Create New Assignment</h2>
-                <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>Build a digital quiz with auto-grading features</p>
+      {modalOpen ? (
+        /* ── INLINE ASSIGNMENT BUILDER VIEW ── */
+        <div style={{ animation: 'tp-fade-in 0.3s ease' }}>
+          {/* Builder Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid var(--border-color)' }}>
+            <div>
+              <button 
+                onClick={() => setModalOpen(false)} 
+                className="tp-btn tp-btn-ghost"
+                style={{ padding: '0 0 8px 0', minHeight: 'auto', background: 'transparent' }}
+              >
+                ← Back to Assignments
+              </button>
+              <h2 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Create New Assignment</h2>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--text-muted)' }}>Build a digital quiz with auto-grading features</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24, '@media (minWidth: 768px)': { flexDirection: 'row' } } as any}>
+            
+            {/* Settings Column */}
+            <div style={{ flex: '1 1 300px' }}>
+              <div className="tp-label" style={{ marginBottom: 16 }}>📋 Assignment Settings</div>
+              
+              <Field label="Assignment Title *">
+                <StyledInput value={form.title} onChange={e => setForm(prev => ({ ...prev, title: e.target.value }))} placeholder="e.g. Mid-Term Science Quiz" className="tp-input" />
+              </Field>
+              
+              <Field label="Instructions / Description">
+                <textarea 
+                  value={form.description}
+                  onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Tell students what to expect..."
+                  className="tp-input"
+                  style={{ height: 90, resize: 'none' }}
+                />
+              </Field>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 16 }}>
+                <Field label="Target Class *">
+                  <StyledSelect value={form.class_id} onChange={e => setForm(prev => ({ ...prev, class_id: e.target.value }))} className="tp-select">
+                    <option value="">Select class...</option>
+                    {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </StyledSelect>
+                </Field>
+                <Field label="Subject *">
+                  <StyledSelect value={form.subject_id} onChange={e => setForm(prev => ({ ...prev, subject_id: e.target.value }))} className="tp-select">
+                    <option value="">Select subject...</option>
+                    {availableSubjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </StyledSelect>
+                </Field>
               </div>
-              <button onClick={() => setModalOpen(false)} style={{ background: 'var(--bg-hover)', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 16 }}>
+                <Field label="Due Date">
+                  <StyledInput type="datetime-local" value={form.due_date} onChange={e => setForm(prev => ({ ...prev, due_date: e.target.value }))} className="tp-input" />
+                </Field>
+                <Field label="Timer (Minutes)">
+                  <StyledInput type="number" value={form.duration_minutes} onChange={e => setForm(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) || 0 }))} placeholder="0 = No limit" className="tp-input" />
+                </Field>
+              </div>
+
+              <div style={{ background: 'var(--bg-hover)', padding: '16px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+                <input type="checkbox" checked={form.shuffle_questions} onChange={e => setForm(prev => ({ ...prev, shuffle_questions: e.target.checked }))} id="shuffle" style={{ width: 20, height: 20, cursor: 'pointer', accentColor: 'var(--primary-color)' }} />
+                <label htmlFor="shuffle" style={{ fontSize: 14, fontWeight: 700, color: 'var(--primary-color)', cursor: 'pointer' }}>Randomize question order 🔀</label>
+              </div>
             </div>
 
-            <div className="modal-content-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 24 }}>
-              <div>
-                <p style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>📋 Assignment Settings</p>
-                
-                <Field label="Assignment Title *">
-                  <StyledInput value={form.title} onChange={e => setForm(prev => ({ ...prev, title: e.target.value }))} placeholder="e.g. Mid-Term Science Quiz" style={{ fontSize: 15 }} />
-                </Field>
-                
-                <Field label="Instructions / Description">
-                  <textarea 
-                    value={form.description}
-                    onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Tell students what to expect..."
-                    style={{ width: '100%', padding: '12px 14px', borderRadius: 9, fontSize: 14, border: '1.5px solid var(--border-color)', height: 90, fontFamily: 'inherit', resize: 'none', outline: 'none', boxSizing: 'border-box' }}
-                  />
-                </Field>
-
-                <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                  <Field label="Target Class *">
-                    <StyledSelect value={form.class_id} onChange={e => setForm(prev => ({ ...prev, class_id: e.target.value }))} style={{ fontSize: 15 }}>
-                      <option value="">Select class...</option>
-                      {(Array.isArray(classes) ? classes : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </StyledSelect>
-                  </Field>
-                  <Field label="Subject *">
-                    <StyledSelect value={form.subject_id} onChange={e => setForm(prev => ({ ...prev, subject_id: e.target.value }))} style={{ fontSize: 15 }}>
-                      <option value="">Select subject...</option>
-                      {availableSubjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                    </StyledSelect>
-                  </Field>
-                </div>
-
-                <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                  <Field label="Due Date">
-                    <StyledInput type="datetime-local" value={form.due_date} onChange={e => setForm(prev => ({ ...prev, due_date: e.target.value }))} style={{ fontSize: 15 }} />
-                  </Field>
-                  <Field label="Timer (Minutes)">
-                    <StyledInput type="number" value={form.duration_minutes} onChange={e => setForm(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) || 0 }))} placeholder="0 = No limit" style={{ fontSize: 15 }} />
-                  </Field>
-                </div>
-
-                <div style={{ background: '#f5f3ff', padding: '14px 16px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
-                  <input type="checkbox" checked={form.shuffle_questions} onChange={e => setForm(prev => ({ ...prev, shuffle_questions: e.target.checked }))} id="shuffle" style={{ width: 18, height: 18, cursor: 'pointer' }} />
-                  <label htmlFor="shuffle" style={{ fontSize: 13, fontWeight: 700, color: '#4c1d95', cursor: 'pointer' }}>Randomize question order 🔀</label>
-                </div>
+            {/* Questions Column */}
+            <div style={{ flex: '1.5 1 400px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottom: '1px solid var(--border-color)', paddingBottom: 12 }}>
+                <div className="tp-label" style={{ margin: 0 }}>❓ Questions ({form.content.questions.length})</div>
+                <button 
+                  onClick={addQuestion} 
+                  className="tp-btn"
+                  style={{ minHeight: 36, padding: '0 14px', fontSize: 13, background: 'var(--bg-hover)', color: 'var(--primary-color)', border: '1px solid var(--border-color)' }}
+                >
+                  + Add Question
+                </button>
               </div>
 
-              <div style={{ maxHeight: '600px', overflowY: 'auto', paddingRight: 4 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottom: '1px solid var(--border-light)', paddingBottom: 10 }}>
-                  <p style={{ fontSize: 11, fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>❓ Questions ({form.content.questions.length})</p>
-                  <button onClick={addQuestion} style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: '#7c3aed', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer' }}>+ Add Question</button>
+              {form.content.questions.length === 0 ? (
+                <div className="tp-empty" style={{ background: 'var(--bg-hover)', borderRadius: 16 }}>
+                  <div className="tp-empty-icon">💡</div>
+                  <div className="tp-empty-title">No questions added yet</div>
+                  <p className="tp-empty-sub">Click "+ Add Question" to start building</p>
                 </div>
-
-                {form.content.questions.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-subtle)', background: 'var(--bg-input)', borderRadius: 14, border: '1.5px dashed var(--border-color)' }}>
-                    <div style={{ fontSize: 32, marginBottom: 8 }}>💡</div>
-                    <p style={{ fontSize: 13, fontWeight: 600 }}>No questions added yet</p>
-                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: '4px 0 0' }}>Click "+ Add Question" to start building</p>
-                  </div>
-                ) : (
-                  form.content.questions.map((q, qIndex) => (
-                    <div key={q.id} className="q-card" style={{ background: '#faf5ff', border: '1.5px solid #eedcff' }}>
-                      <button onClick={() => removeQuestion(q.id)} style={{ position: 'absolute', top: 12, right: 12, border: 'none', background: '#fee2e2', color: '#ef4444', width: 24, height: 24, borderRadius: '50%', cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {form.content.questions.map((q, qIndex) => (
+                    <div key={q.id} className="q-card">
+                      <button 
+                        onClick={() => removeQuestion(q.id)} 
+                        style={{ position: 'absolute', top: 16, right: 16, border: 'none', background: '#FEE2E2', color: '#EF4444', width: 28, height: 28, borderRadius: '50%', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        ×
+                      </button>
                       
-                      <div style={{ fontSize: 10, fontWeight: 800, color: '#7c3aed', marginBottom: 8 }}>QUESTION {qIndex + 1}</div>
+                      <div className="tp-label" style={{ color: 'var(--primary-color)', marginBottom: 12 }}>QUESTION {qIndex + 1}</div>
                       
                       <Field label="Question Text">
-                        <StyledInput value={q.text} onChange={e => updateQuestion(q.id, { text: e.target.value })} placeholder="Enter your question..." style={{ fontSize: 15 }} />
+                        <StyledInput value={q.text} onChange={e => updateQuestion(q.id, { text: e.target.value })} placeholder="Enter your question..." className="tp-input" />
                       </Field>
 
-                      <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 10, marginBottom: 12 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 16, marginBottom: 16 }}>
                         <Field label="Type">
-                          <StyledSelect value={q.type} onChange={e => updateQuestion(q.id, { type: e.target.value as any })}>
+                          <StyledSelect value={q.type} onChange={e => updateQuestion(q.id, { type: e.target.value as any })} className="tp-select">
                             <option value="mcq">Multiple Choice</option>
                             <option value="tf">True / False</option>
                             <option value="short">Short Answer</option>
                           </StyledSelect>
                         </Field>
                         <Field label="Points">
-                          <StyledInput type="number" value={q.points} onChange={e => updateQuestion(q.id, { points: parseInt(e.target.value) || 1 })} style={{ fontSize: 15 }} />
+                          <StyledInput type="number" value={q.points} onChange={e => updateQuestion(q.id, { points: parseInt(e.target.value) || 1 })} className="tp-input" />
                         </Field>
                       </div>
 
                       {q.type === 'mcq' && (
-                        <div style={{ marginTop: 10 }}>
+                        <div>
                           <FieldLabel>Options & Correct Answer</FieldLabel>
-                          {q.options.map((opt, oIndex) => (
-                            <div key={oIndex} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                              <input 
-                                type="radio" 
-                                name={`correct-${q.id}`} 
-                                checked={q.correctAnswer === opt && opt !== ''} 
-                                onChange={() => updateQuestion(q.id, { correctAnswer: opt })}
-                                style={{ width: 16, height: 16, cursor: 'pointer' }}
-                              />
-                              <StyledInput 
-                                value={opt} 
-                                onChange={e => {
-                                  const newOpts = [...q.options]
-                                  newOpts[oIndex] = e.target.value
-                                  updateQuestion(q.id, { options: newOpts })
-                                }} 
-                                placeholder={`Option ${String.fromCharCode(65 + oIndex)}`}
-                                style={{ padding: '8px 10px', fontSize: 14 }}
-                              />
-                            </div>
-                          ))}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {q.options.map((opt, oIndex) => (
+                              <div key={oIndex} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                <input 
+                                  type="radio" 
+                                  name={`correct-${q.id}`} 
+                                  checked={q.correctAnswer === opt && opt !== ''} 
+                                  onChange={() => updateQuestion(q.id, { correctAnswer: opt })}
+                                  style={{ width: 20, height: 20, cursor: 'pointer', accentColor: 'var(--primary-color)' }}
+                                />
+                                <StyledInput 
+                                  value={opt} 
+                                  onChange={e => {
+                                    const newOpts = [...q.options]
+                                    newOpts[oIndex] = e.target.value
+                                    updateQuestion(q.id, { options: newOpts })
+                                  }} 
+                                  placeholder={`Option ${String.fromCharCode(65 + oIndex)}`}
+                                  className="tp-input"
+                                />
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
 
                       {q.type === 'tf' && (
                         <div>
                           <FieldLabel>Correct Answer</FieldLabel>
-                          <StyledSelect value={q.correctAnswer} onChange={e => updateQuestion(q.id, { correctAnswer: e.target.value })}>
+                          <StyledSelect value={q.correctAnswer} onChange={e => updateQuestion(q.id, { correctAnswer: e.target.value })} className="tp-select">
                             <option value="">Select...</option>
                             <option value="True">True</option>
                             <option value="False">False</option>
@@ -498,170 +509,219 @@ export default function AssignmentsPage() {
 
                       {q.type === 'short' && (
                         <Field label="Correct Keyword (Auto-grade)">
-                          <StyledInput value={q.correctAnswer} onChange={e => updateQuestion(q.id, { correctAnswer: e.target.value })} placeholder="The exact answer students must type" style={{ fontSize: 14 }} />
+                          <StyledInput value={q.correctAnswer} onChange={e => updateQuestion(q.id, { correctAnswer: e.target.value })} placeholder="The exact answer students must type" className="tp-input" />
                         </Field>
                       )}
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', borderTop: '1px solid var(--border-light)', paddingTop: 16, marginTop: 24 }}>
-              <Btn variant="secondary" onClick={() => setModalOpen(false)}>Cancel & Go Back</Btn>
-              <Btn onClick={handleSubmit} loading={isSubmitting}>Publish Assignment 📤</Btn>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-        ) : (
-          /* ── REGULAR ASSIGNMENT LIST VIEW ── */
-          <>
-            <div className="t-header" style={{ marginBottom: 24 }}>
+
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', borderTop: '1px solid var(--border-color)', paddingTop: 20, marginTop: 24, paddingBottom: 24 }}>
+            <button className="tp-btn tp-btn-ghost" onClick={() => setModalOpen(false)}>Cancel</button>
+            <button className="tp-btn tp-btn-primary" onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting ? 'Publishing...' : 'Publish Assignment 📤'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* ── REGULAR ASSIGNMENT LIST VIEW ── */
+        <div style={{ animation: 'tp-fade-in 0.4s ease' }}>
+          
+          {/* HERO */}
+          <div className="tp-hero" style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
               <div>
-                <h1 className="t-title">Assignments</h1>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>Manage digital quizzes and tasks for your students</p>
+                <div className="tp-hero-label">Assessments</div>
+                <h1 className="tp-hero-title">📝 Assignments</h1>
+                <p className="tp-hero-sub">Manage digital quizzes and tasks for your students</p>
               </div>
-              <Btn onClick={() => setModalOpen(true)} style={{ whiteSpace: 'nowrap' }}>➕ Create Assignment</Btn>
+              <button className="tp-btn tp-btn-primary" onClick={() => setModalOpen(true)}>
+                ➕ Create Assignment
+              </button>
             </div>
+          </div>
 
-            {/* ── Main View Switcher ── */}
-            <div className="resp-view-switch" style={{ background: '#f5f3ff', padding: 8, borderRadius: 18, display: 'flex', gap: 8, marginBottom: 24, maxWidth: 500 }}>
-              <div onClick={() => setViewMode('class')} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'class' ? { background: 'var(--bg-card)', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: 'var(--text-muted)' }) }}>
-                🏫 My Class Assignments
-              </div>
-              <div onClick={() => { setViewMode('global'); setSelectedGlobalSubject(null); }} style={{ flex: 1, padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', borderRadius: 14, transition: 'all 0.2s', ...(viewMode === 'global' ? { background: 'var(--bg-card)', color: '#7c3aed', boxShadow: '0 4px 14px rgba(109,40,217,0.08)' } : { color: 'var(--text-muted)' }) }}>
-                🌍 Global Challenges
-              </div>
+          {/* ── Tabs ── */}
+          <div className="tp-tab-bar" style={{ marginBottom: 20 }}>
+            <button 
+              className={`tp-tab-btn ${viewMode === 'class' ? 'active' : ''}`}
+              onClick={() => setViewMode('class')}
+            >
+              🏫 My Class Assignments
+            </button>
+            <button 
+              className={`tp-tab-btn ${viewMode === 'global' ? 'active' : ''}`}
+              onClick={() => { setViewMode('global'); setSelectedGlobalSubject(null); }}
+            >
+              🌍 Global Challenges
+            </button>
+          </div>
+
+          {viewMode === 'global' && selectedGlobalSubject && (
+            <button 
+              onClick={() => setSelectedGlobalSubject(null)} 
+              className="tp-btn tp-btn-ghost"
+              style={{ marginBottom: 16, background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+            >
+              ← Back to Subjects
+            </button>
+          )}
+
+          {/* ── List ── */}
+          {isLoading ? (
+            <div className="tp-loading">
+              <div className="tp-spinner" />
+              Loading assignments…
             </div>
-
-            {viewMode === 'global' && selectedGlobalSubject && (
-               <button onClick={() => setSelectedGlobalSubject(null)} style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: 'var(--text-main)', cursor: 'pointer', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                 ← Back to Subjects
-               </button>
-            )}
-
-            {/* ── List ── */}
-            {isLoading ? (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_spin 0.8s linear infinite' }} />
-                <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Loading assignments…</p>
-              </div>
-            ) : viewMode === 'global' && !selectedGlobalSubject ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-                {globalSubjects.length === 0 ? (
-                   <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '80px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1 / -1' }}>
-                     <div style={{ fontSize: 48, marginBottom: 12 }}>🌍</div>
-                     <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No challenges yet!</h3>
-                     <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>The school hasn't published any global quizzes.</p>
-                   </div>
-                ) : globalSubjects.map(sub => (
-                  <div key={sub.id} className="assign-card" onClick={() => setSelectedGlobalSubject(sub.id)} style={{ 
-                    background: 'var(--bg-card)', borderRadius: 8, border: '1.5px solid #f0eefe', padding: 24, 
-                    boxShadow: '0 2px 8px rgba(109,40,217,0.05)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.2s'
-                  }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 14, background: '#f5f3ff', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+          ) : viewMode === 'global' && !selectedGlobalSubject ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+              {globalSubjects.length === 0 ? (
+                <div className="tp-card" style={{ gridColumn: '1 / -1' }}>
+                  <div className="tp-empty">
+                    <div className="tp-empty-icon">🌍</div>
+                    <div className="tp-empty-title">No challenges yet!</div>
+                    <p className="tp-empty-sub">The school hasn't published any global quizzes.</p>
+                  </div>
+                </div>
+              ) : globalSubjects.map((sub, i) => (
+                <div 
+                  key={sub.id} 
+                  className="tp-card" 
+                  onClick={() => setSelectedGlobalSubject(sub.id)} 
+                  style={{ cursor: 'pointer', animationDelay: `${i * 0.05}s` }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div className="tp-avatar" style={{ width: 56, height: 56, fontSize: 24, background: 'linear-gradient(135deg, #EEF2FF, #E0E7FF)', color: '#4338CA' }}>
                       📚
                     </div>
                     <div>
-                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px 0' }}>{sub.name}</h3>
-                      <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, fontWeight: 600 }}>{sub.count} Quizzes Available</p>
+                      <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>{sub.name}</h3>
+                      <p style={{ fontSize: 13, color: 'var(--primary-color)', margin: 0, fontWeight: 700 }}>{sub.count} Quizzes Available</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : viewMode === 'global' && selectedGlobalSubject ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 18 }}>
-                 {filteredGlobal.length === 0 ? (
-                   <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe', gridColumn: '1/-1' }}>No quizzes here.</div>
-                 ) : filteredGlobal.map((g, i) => (
-                   <div key={g.id} style={{ 
-                     background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
-                     boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.3s ease ${i * 0.05}s both`,
-                     position: 'relative'
-                   }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-                        <span style={{ fontSize: 10, fontWeight: 800, background: '#f5f3ff', color: '#7c3aed', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                          {g.subject?.name || 'General'}
-                        </span>
-                      </div>
-                      <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px 0' }}>{g.title}</h3>
-                      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{g.description}</p>
-                      
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
-                        <div style={{ background: '#faf5ff', borderRadius: 12, padding: '10px 12px' }}>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
-                          <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{g.content?.questions?.length || 0} items</div>
-                        </div>
-                        <div style={{ background: '#f0fdf4', borderRadius: 12, padding: '10px 12px' }}>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>School Wide</div>
-                          <div style={{ fontSize: 13, fontWeight: 800, color: '#059669' }}>{g.total_submissions || 0} Taking</div>
-                        </div>
-                      </div>
- 
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', borderTop: '1px solid #f5f3ff', paddingTop: 14, gap: 10 }}>
-                         <button onClick={() => navigate(`/teacher/global-quizzes/${g.id}/take`)} style={{ padding: '6px 12px', background: 'var(--bg-card)', color: '#4c1d95', border: '1.5px solid #e0e7ff', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Preview Quiz</button>
-                         <button onClick={() => navigate(`/teacher/global-quizzes/${g.id}`)} style={{ padding: '6px 12px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>See My Students →</button>
-                      </div>
-                   </div>
-                 ))}
-              </div>
-            ) : assignments.length === 0 ? (
-              <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
-                <div style={{ fontSize: 48, marginBottom: 12 }}>📝</div>
-                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>No assignments created</h3>
-                <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 18 }}>Start by creating your first digital quiz for your students.</p>
-                <Btn onClick={() => setModalOpen(true)}>➕ Create First Assignment</Btn>
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 18 }}>
-                {assignments.map((a, i) => (
-                  <div key={a.id} style={{ 
-                    background: 'var(--bg-card)', borderRadius: 18, border: '1.5px solid #f0eefe', padding: 20, 
-                    boxShadow: '0 1px 4px rgba(109,40,217,0.06)', animation: `_fadeUp 0.3s ease ${i * 0.05}s both`,
-                    position: 'relative'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, background: '#f5f3ff', color: '#7c3aed', padding: '4px 10px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                        {a.subject?.name}
-                      </span>
-                      <div style={{ display: 'flex', gap: 4 }}>
-                        <button onClick={() => handleDelete(a.id)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, color: '#f87171' }}>🗑️</button>
-                      </div>
+                </div>
+              ))}
+            </div>
+          ) : viewMode === 'global' && selectedGlobalSubject ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+              {filteredGlobal.length === 0 ? (
+                <div className="tp-card" style={{ gridColumn: '1/-1' }}>
+                  <div className="tp-empty">
+                    <div className="tp-empty-title">No quizzes here.</div>
+                  </div>
+                </div>
+              ) : filteredGlobal.map((g, i) => (
+                <div key={g.id} className="tp-card" style={{ animationDelay: `${i * 0.05}s`, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ marginBottom: 12 }}>
+                    <span className="tp-badge tp-badge-primary">
+                      {g.subject?.name || 'General'}
+                    </span>
+                  </div>
+                  <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 6px 0' }}>{g.title}</h3>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', flex: 1 }}>{g.description}</p>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+                    <div style={{ background: 'var(--bg-hover)', borderRadius: 12, padding: '12px' }}>
+                      <div className="tp-label">Questions</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--primary-color)' }}>{g.content?.questions?.length || 0} items</div>
                     </div>
-                    
-                    <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px 0' }}>{a.title}</h3>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>Class: <span style={{ fontWeight: 700, color: '#4c1d95' }}>{a.class?.name}</span></div>
-                    
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
-                      <div style={{ background: '#faf5ff', borderRadius: 12, padding: '10px 12px' }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Submissions</div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: '#7c3aed' }}>{a.submission_count} Submitted</div>
-                      </div>
-                      <div style={{ background: '#f0fdf4', borderRadius: 12, padding: '10px 12px' }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: 2 }}>Questions</div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: '#059669' }}>{a.content?.questions?.length || 0} items</div>
-                      </div>
+                    <div style={{ background: '#ECFDF5', borderRadius: 12, padding: '12px' }}>
+                      <div className="tp-label" style={{ color: '#047857' }}>School Wide</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#059669' }}>{g.total_submissions || 0} Taking</div>
                     </div>
- 
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f5f3ff', paddingTop: 14 }}>
-                      <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 10, marginTop: 'auto' }}>
+                    <button 
+                      onClick={() => navigate(`/teacher/global-quizzes/${g.id}/take`)} 
+                      className="tp-btn tp-btn-ghost"
+                      style={{ flex: 1, border: '1px solid var(--border-color)' }}
+                    >
+                      Preview
+                    </button>
+                    <button 
+                      onClick={() => navigate(`/teacher/global-quizzes/${g.id}`)} 
+                      className="tp-btn tp-btn-primary"
+                      style={{ flex: 1.5 }}
+                    >
+                      Students →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : assignments.length === 0 ? (
+            <div className="tp-card">
+              <div className="tp-empty">
+                <div className="tp-empty-icon">📝</div>
+                <div className="tp-empty-title">No assignments created</div>
+                <p className="tp-empty-sub" style={{ marginBottom: 20 }}>Start by creating your first digital quiz for your students.</p>
+                <button className="tp-btn tp-btn-primary" onClick={() => setModalOpen(true)}>
+                  ➕ Create Assignment
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+              {assignments.map((a, i) => (
+                <div key={a.id} className="tp-card" style={{ animationDelay: `${i * 0.05}s`, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                    <span className="tp-badge tp-badge-primary">
+                      {a.subject?.name}
+                    </span>
+                    <button 
+                      onClick={() => handleDelete(a.id)} 
+                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#EF4444', padding: 4 }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                  
+                  <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 6px 0' }}>{a.title}</h3>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
+                    Class: <span style={{ fontWeight: 700, color: 'var(--primary-color)' }}>{a.class?.name}</span>
+                  </div>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+                    <div style={{ background: 'var(--bg-hover)', borderRadius: 12, padding: '12px' }}>
+                      <div className="tp-label">Submissions</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--primary-color)' }}>{a.submission_count} Submitted</div>
+                    </div>
+                    <div style={{ background: '#ECFDF5', borderRadius: 12, padding: '12px' }}>
+                      <div className="tp-label" style={{ color: '#047857' }}>Questions</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#059669' }}>{a.content?.questions?.length || 0} items</div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: 16 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                      <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>
                         {a.due_date ? `Due: ${formatDate(a.due_date)}` : 'No due date'}
-                      </div>
-                      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                        {a.duration_minutes > 0 && (
-                          <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 4 }}>
-                             ⏱️ {a.duration_minutes}m limit
-                          </div>
-                        )}
-                        <button onClick={() => navigate(`/teacher/assignments/${a.id}`)} style={{ padding: '6px 12px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#6d28d9'} onMouseLeave={e => e.currentTarget.style.background = '#7c3aed'}>View Submissions →</button>
-                      </div>
+                      </span>
+                      {a.duration_minutes > 0 && (
+                        <span style={{ fontWeight: 700, color: '#D97706' }}>
+                          ⏱️ {a.duration_minutes}m limit
+                        </span>
+                      )}
                     </div>
+                    
+                    <button 
+                      onClick={() => navigate(`/teacher/assignments/${a.id}`)} 
+                      className="tp-btn tp-btn-primary"
+                      style={{ width: '100%' }}
+                    >
+                      View Submissions →
+                    </button>
                   </div>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

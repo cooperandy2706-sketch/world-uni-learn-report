@@ -115,38 +115,16 @@ export default function TeacherSelfServicePage() {
     )
 
     return (
-        <div className="t-page">
+        <div className="tp-page">
+            <link rel="stylesheet" href="/src/styles/teacher-portal.css" />
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .tab-btn { transition: all 0.2s ease; border-bottom: 2px solid transparent; }
-                .tab-btn.active { color: #7c3aed; border-bottom-color: #7c3aed; }
-                .card { background: var(--bg-card); border-radius: 8px; border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+                .tab-btn.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
                 .status-badge { padding: 4px 10px; border-radius: 99px; font-size: 11px; fontWeight: 700; text-transform: uppercase; }
-                .status-pending { background: #fef3c7; color: #d97706; }
-                .status-approved { background: #dcfce7; color: #16a34a; }
-                .status-rejected { background: #fee2e2; color: #dc2626; }
-
-                /* ── RESPONSIVE GRID OVERRIDES ── */
-                .stats-grid { 
-                    display: grid !important; 
-                    grid-template-columns: repeat(4, 1fr) !important; 
-                    gap: 16px !important; 
-                    margin-bottom: 24px !important; 
-                }
-                .profile-grid {
-                    display: grid !important;
-                    grid-template-columns: 1fr 1fr !important;
-                    gap: 24px !important;
-                }
-
-                @media (max-width: 900px) {
-                    .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-                }
-                @media (max-width: 640px) {
-                    .stats-grid { grid-template-columns: 1fr !important; }
-                    .profile-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
-                    .resp-grid-2 { grid-template-columns: 1fr !important; }
-                }
+                .status-pending { background: rgba(217,119,6,0.1); color: #d97706; }
+                .status-approved { background: rgba(22,163,74,0.1); color: #16a34a; }
+                .status-rejected { background: rgba(220,38,38,0.1); color: #dc2626; }
 
                 /* ── RESPONSIVE DYNAMIC TABLE TO CARD CONVERSION ── */
                 @media (max-width: 768px) {
@@ -156,7 +134,7 @@ export default function TeacherSelfServicePage() {
                         display: block !important; 
                         background: var(--bg-card) !important; 
                         border: 1.5px solid var(--border-color) !important; 
-                        border-radius: 8px !important; 
+                        border-radius: 12px !important; 
                         padding: 16px !important; 
                         margin-bottom: 14px !important; 
                         box-shadow: 0 2px 4px rgba(0,0,0,0.01) !important;
@@ -167,7 +145,7 @@ export default function TeacherSelfServicePage() {
                         align-items: center !important;
                         border: none !important; 
                         padding: 8px 0 !important; 
-                        font-size: 13px !important; 
+                        font-size: 14px !important; 
                         border-bottom: 1px solid var(--border-color) !important;
                         text-align: right !important;
                     }
@@ -175,7 +153,7 @@ export default function TeacherSelfServicePage() {
                     .responsive-table td::before { 
                         content: attr(data-label) !important; 
                         font-weight: 700 !important; 
-                        color: #6b7280 !important; 
+                        color: var(--text-muted) !important; 
                         text-transform: uppercase !important;
                         font-size: 11px !important;
                         letter-spacing: 0.05em !important;
@@ -188,23 +166,23 @@ export default function TeacherSelfServicePage() {
 
             {viewMode === 'apply-leave' ? (
                 /* ── INLINE LEAVE REQUEST CARD FORM ── */
-                <div className="card" style={{ padding: '24px 20px', animation: 'fadeIn 0.3s ease', maxWidth: 600, margin: '0 auto' }}>
+                <div className="tp-card" style={{ padding: '24px 20px', animation: 'fadeIn 0.3s ease', maxWidth: 600, margin: '0 auto' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid var(--border-color)', paddingBottom: 16 }}>
                         <div>
-                            <button onClick={() => setViewMode('dashboard')} style={{ background: 'none', border: 'none', color: '#7c3aed', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Dashboard</button>
-                            <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Apply for Leave</h2>
-                            <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>Submit a digital leave application to administration</p>
+                            <button onClick={() => setViewMode('dashboard')} style={{ background: 'none', border: 'none', color: 'var(--primary-color)', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, marginBottom: 4, display: 'block' }}>← Back to Dashboard</button>
+                            <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Apply for Leave</h2>
+                            <p style={{ margin: '2px 0 0', fontSize: 13, color: 'var(--text-muted)' }}>Submit a digital leave application to administration</p>
                         </div>
                         <button onClick={() => setViewMode('dashboard')} style={{ background: 'var(--bg-input)', color: 'var(--text-main)', border: 'none', width: 32, height: 32, borderRadius: '50%', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                     </div>
 
                     <form onSubmit={handleLeaveSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                         <div>
-                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, letterSpacing: '0.05em' }}>Leave Type</label>
+                            <label className="tp-label">Leave Type</label>
                             <select 
                                 value={leaveType} 
                                 onChange={(e) => setLeaveType(e.target.value)}
-                                style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', boxSizing: 'border-box' }}
+                                className="tp-select"
                             >
                                 <option value="personal">Personal Leave</option>
                                 <option value="sick">Sick Leave</option>
@@ -214,39 +192,40 @@ export default function TeacherSelfServicePage() {
                                 <option value="other">Other</option>
                             </select>
                         </div>
-                        <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                        <div className="tp-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
                             <div>
-                                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, letterSpacing: '0.05em' }}>Start Date</label>
+                                <label className="tp-label">Start Date</label>
                                 <input 
                                     type="date" 
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                                    className="tp-input"
                                 />
                             </div>
                             <div>
-                                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, letterSpacing: '0.05em' }}>End Date</label>
+                                <label className="tp-label">End Date</label>
                                 <input 
                                     type="date" 
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                                    className="tp-input"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, letterSpacing: '0.05em' }}>Reason / Details</label>
+                            <label className="tp-label">Reason / Details</label>
                             <textarea 
                                 rows={3}
                                 value={reason}
                                 onChange={(e) => setReason(e.target.value)}
                                 placeholder="Describe the duration and context of your leave request securely..."
-                                style={{ width: '100%', padding: '12px 14px', borderRadius: '9px', border: '1.5px solid var(--border-color)', outline: 'none', resize: 'none', fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                                className="tp-input"
+                                style={{ resize: 'vertical' }}
                             />
                         </div>
-                        <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-                            <button type="button" onClick={() => setViewMode('dashboard')} style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>Cancel</button>
-                            <button type="submit" disabled={submittingLeave} style={{ flex: 2, padding: '12px', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>
+                        <div style={{ display: 'flex', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
+                            <button type="button" onClick={() => setViewMode('dashboard')} className="tp-btn tp-btn-ghost" style={{ flex: '1 1 120px', justifyContent: 'center' }}>Cancel</button>
+                            <button type="submit" disabled={submittingLeave} className="tp-btn tp-btn-primary" style={{ flex: '2 1 200px', justifyContent: 'center' }}>
                                 {submittingLeave ? 'Submitting...' : 'Submit Request 📤'}
                             </button>
                         </div>
@@ -256,29 +235,31 @@ export default function TeacherSelfServicePage() {
                 /* ── REGULAR SELF SERVICE DASHBOARD VIEW ── */
                 <>
                     {/* Header Area */}
-                    <div className="t-header" style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-                        <div>
-                            <h1 className="t-title" style={{ margin: 0, fontSize: 26, fontWeight: 800, color: 'var(--text-main)' }}>Self Service Hub</h1>
-                            <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 4 }}>Manage your teacher portfolio, payslips, and leave requests in one secure location.</p>
-                        </div>
-                        <div className="t-btn-group">
-                            <button onClick={() => setViewMode('apply-leave')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', border: 'none', padding: '11px 20px', borderRadius: '12px', fontSize: 13, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 10px rgba(124, 58, 237, 0.25)' }}>
-                                <Plus size={18} /> Apply for Leave
-                            </button>
+                    <div className="tp-hero" style={{ marginBottom: 24 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                            <div>
+                                <h1 className="tp-hero-title">Self Service Hub</h1>
+                                <p className="tp-hero-sub">Manage your teacher portfolio, payslips, and leave requests.</p>
+                            </div>
+                            <div>
+                                <button onClick={() => setViewMode('apply-leave')} className="tp-btn tp-btn-primary">
+                                    <Plus size={18} /> Apply for Leave
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     {/* Stats Overview */}
-                    <div className="stats-grid">
+                    <div className="tp-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 24 }}>
                         {stats.map((s, i) => (
-                            <div key={i} className="card" style={{ padding: '20px' }}>
+                            <div key={i} className="tp-card" style={{ padding: '20px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <div style={{ background: `${s.color}15`, color: s.color, padding: '10px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <s.icon size={22} />
+                                    <div style={{ background: `${s.color}15`, color: s.color, padding: '12px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <s.icon size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{s.label}</div>
-                                        <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', marginTop: 2 }}>{s.value}</div>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s.label}</div>
+                                        <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', marginTop: 2 }}>{s.value}</div>
                                     </div>
                                 </div>
                             </div>
@@ -286,7 +267,7 @@ export default function TeacherSelfServicePage() {
                     </div>
 
                     {/* Tabs (Swipeable on touch screens) */}
-                    <div style={{ display: 'flex', gap: 32, borderBottom: '1px solid var(--border-color)', marginBottom: 24, overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
+                    <div className="tp-tab-bar" style={{ marginBottom: 24 }}>
                         {[
                             { id: 'profile', label: 'My Portfolio', icon: User },
                             { id: 'payroll', label: 'Payslips', icon: Wallet },
@@ -296,10 +277,10 @@ export default function TeacherSelfServicePage() {
                             <button 
                                 key={t.id} 
                                 onClick={() => setActiveTab(t.id as Tab)}
-                                className={`tab-btn ${activeTab === t.id ? 'active' : ''}`}
-                                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 4px', background: 'none', border: 'none', fontSize: 15, fontWeight: activeTab === t.id ? 700 : 500, color: activeTab === t.id ? '#7c3aed' : '#6b7280', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                                className={`tp-tab ${activeTab === t.id ? 'active' : ''}`}
+                                style={{ display: 'flex', alignItems: 'center', gap: 8 }}
                             >
-                                <t.icon size={18} /> {t.label}
+                                <t.icon size={16} /> {t.label}
                             </button>
                         ))}
                     </div>
@@ -307,42 +288,42 @@ export default function TeacherSelfServicePage() {
                     {/* Tab Content */}
                     <div style={{ minHeight: '400px', animation: 'fadeIn 0.4s ease' }}>
                         {activeTab === 'profile' && (
-                            <div className="profile-grid">
-                                <div className="card" style={{ padding: '24px' }}>
-                                    <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 20, color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)', paddingBottom: 10 }}>Professional Information</h3>
+                            <div className="tp-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+                                <div className="tp-card" style={{ padding: '24px' }}>
+                                    <h3 className="tp-section-title">Professional Information</h3>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                                         <div>
-                                            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Full Name</label>
-                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{teacher?.user?.full_name}</div>
+                                            <label className="tp-label">Full Name</label>
+                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{teacher?.user?.full_name}</div>
                                         </div>
                                         <div>
-                                            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Staff ID</label>
-                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{teacher?.staff_id}</div>
+                                            <label className="tp-label">Staff ID</label>
+                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{teacher?.staff_id}</div>
                                         </div>
                                         <div>
-                                            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Primary Qualification</label>
-                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{teacher?.qualification || 'Not set'}</div>
+                                            <label className="tp-label">Primary Qualification</label>
+                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{teacher?.qualification || 'Not set'}</div>
                                         </div>
                                         <div>
-                                            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Bio / Philosophy</label>
+                                            <label className="tp-label">Bio / Philosophy</label>
                                             <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>{teacher?.bio || 'No bio provided. Update your profile to add a professional summary.'}</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="card" style={{ padding: '24px' }}>
-                                    <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 20, color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)', paddingBottom: 10 }}>Contact & Emergency</h3>
+                                <div className="tp-card" style={{ padding: '24px' }}>
+                                    <h3 className="tp-section-title">Contact & Emergency</h3>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                                         <div>
-                                            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Email Address</label>
-                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{teacher?.user?.email}</div>
+                                            <label className="tp-label">Email Address</label>
+                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{teacher?.user?.email}</div>
                                         </div>
                                         <div>
-                                            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Phone Number</label>
-                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{teacher?.phone_number || teacher?.user?.phone || '—'}</div>
+                                            <label className="tp-label">Phone Number</label>
+                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{teacher?.phone_number || teacher?.user?.phone || '—'}</div>
                                         </div>
                                         <div>
-                                            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Emergency Contact</label>
-                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{teacher?.emergency_contact || '—'}</div>
+                                            <label className="tp-label">Emergency Contact</label>
+                                            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{teacher?.emergency_contact || '—'}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -350,9 +331,9 @@ export default function TeacherSelfServicePage() {
                         )}
 
                         {activeTab === 'payroll' && (
-                            <div className="card" style={{ overflow: 'hidden' }}>
+                            <div className="tp-card" style={{ overflow: 'hidden', padding: 0 }}>
                                 <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                    <thead style={{ background: 'var(--bg-input)', borderBottom: '1.5px solid var(--border-color)' }}>
+                                    <thead style={{ background: 'var(--bg-hover)', borderBottom: '1.5px solid var(--border-color)' }}>
                                         <tr>
                                             <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>MONTH</th>
                                             <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>GROSS PAY</th>
@@ -365,21 +346,21 @@ export default function TeacherSelfServicePage() {
                                     <tbody>
                                         {payroll.length === 0 ? (
                                             <tr>
-                                                <td colSpan={6} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>No payslips found yet.</td>
+                                                <td colSpan={6} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>No payslips found yet.</td>
                                             </tr>
                                         ) : payroll.map((p, i) => (
                                             <tr key={i} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                                <td data-label="MONTH" style={{ padding: '16px', fontWeight: 700, color: 'var(--text-main)' }}>{p.month}</td>
-                                                <td data-label="GROSS PAY" style={{ padding: '16px', color: 'var(--text-main)' }}>GH₵ {(p.basic_salary + p.allowances).toFixed(2)}</td>
-                                                <td data-label="DEDUCTIONS" style={{ padding: '16px', color: '#dc2626', fontWeight: 600 }}>- GH₵ {p.deductions.toFixed(2)}</td>
-                                                <td data-label="NET SALARY" style={{ padding: '16px', fontWeight: 800, color: '#7c3aed' }}>GH₵ {p.net_salary.toFixed(2)}</td>
+                                                <td data-label="MONTH" style={{ padding: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>{p.month}</td>
+                                                <td data-label="GROSS PAY" style={{ padding: '16px', color: 'var(--text-primary)' }}>GH₵ {(p.basic_salary + p.allowances).toFixed(2)}</td>
+                                                <td data-label="DEDUCTIONS" style={{ padding: '16px', color: 'var(--danger-color)', fontWeight: 600 }}>- GH₵ {p.deductions.toFixed(2)}</td>
+                                                <td data-label="NET SALARY" style={{ padding: '16px', fontWeight: 800, color: 'var(--primary-color)' }}>GH₵ {p.net_salary.toFixed(2)}</td>
                                                 <td data-label="STATUS" style={{ padding: '16px' }}>
                                                     <span className={`status-badge ${p.is_paid ? 'status-approved' : 'status-pending'}`}>
                                                         {p.is_paid ? 'PAID' : 'PENDING'}
                                                     </span>
                                                 </td>
                                                 <td data-label="ACTION" style={{ padding: '16px' }}>
-                                                    <button style={{ background: 'none', border: 'none', color: '#7c3aed', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 700 }}>
+                                                    <button style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700 }}>
                                                         <Download size={14} /> Payslip
                                                     </button>
                                                 </td>
@@ -391,9 +372,9 @@ export default function TeacherSelfServicePage() {
                         )}
 
                         {activeTab === 'leave' && (
-                            <div className="card" style={{ overflow: 'hidden' }}>
+                            <div className="tp-card" style={{ overflow: 'hidden', padding: 0 }}>
                                 <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                    <thead style={{ background: 'var(--bg-input)', borderBottom: '1.5px solid var(--border-color)' }}>
+                                    <thead style={{ background: 'var(--bg-hover)', borderBottom: '1.5px solid var(--border-color)' }}>
                                         <tr>
                                             <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>TYPE</th>
                                             <th style={{ padding: '16px', fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>START DATE</th>
@@ -405,14 +386,14 @@ export default function TeacherSelfServicePage() {
                                     <tbody>
                                         {leaves.length === 0 ? (
                                             <tr>
-                                                <td colSpan={5} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-subtle)' }}>You haven't submitted any leave requests yet.</td>
+                                                <td colSpan={5} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>You haven't submitted any leave requests yet.</td>
                                             </tr>
                                         ) : leaves.map((l, i) => (
                                             <tr key={i} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                                <td data-label="TYPE" style={{ padding: '16px', fontWeight: 700, color: 'var(--text-main)', textTransform: 'capitalize' }}>{l.leave_type}</td>
-                                                <td data-label="START DATE" style={{ padding: '16px', color: 'var(--text-main)' }}>{format(new Date(l.start_date), 'MMM dd, yyyy')}</td>
-                                                <td data-label="END DATE" style={{ padding: '16px', color: 'var(--text-main)' }}>{format(new Date(l.end_date), 'MMM dd, yyyy')}</td>
-                                                <td data-label="REASON" style={{ padding: '16px', fontSize: 13, color: 'var(--text-muted)' }}>{l.reason || '—'}</td>
+                                                <td data-label="TYPE" style={{ padding: '16px', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize' }}>{l.leave_type}</td>
+                                                <td data-label="START DATE" style={{ padding: '16px', color: 'var(--text-primary)' }}>{format(new Date(l.start_date), 'MMM dd, yyyy')}</td>
+                                                <td data-label="END DATE" style={{ padding: '16px', color: 'var(--text-primary)' }}>{format(new Date(l.end_date), 'MMM dd, yyyy')}</td>
+                                                <td data-label="REASON" style={{ padding: '16px', fontSize: 14, color: 'var(--text-muted)' }}>{l.reason || '—'}</td>
                                                 <td data-label="STATUS" style={{ padding: '16px' }}>
                                                     <span className={`status-badge status-${l.status}`}>
                                                         {l.status}
@@ -426,24 +407,24 @@ export default function TeacherSelfServicePage() {
                         )}
 
                         {activeTab === 'docs' && (
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
-                                <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', borderStyle: 'dashed', border: '2px dashed var(--border-color)', background: 'var(--bg-input)', cursor: 'pointer' }}>
-                                    <div style={{ background: '#7c3aed', color: 'white', width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                            <div className="tp-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+                                <div className="tp-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', borderStyle: 'dashed', border: '2px dashed var(--border-color)', background: 'var(--bg-hover)', cursor: 'pointer' }}>
+                                    <div style={{ background: 'var(--primary-color)', color: 'white', width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
                                         <Plus size={24} />
                                     </div>
-                                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>Upload Certificate</div>
-                                    <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 4 }}>PDF, JPG or PNG (Max 5MB)</div>
+                                    <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Upload Certificate</div>
+                                    <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>PDF, JPG or PNG (Max 5MB)</div>
                                 </div>
                                 {docs.map((d, i) => (
-                                    <div key={i} className="card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 180 }}>
+                                    <div key={i} className="tp-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 200 }}>
                                         <div>
-                                            <div style={{ background: 'var(--bg-input)', color: '#7c3aed', padding: '12px', borderRadius: '12px', display: 'inline-block', marginBottom: 16 }}>
+                                            <div style={{ background: 'rgba(124,58,237,0.1)', color: 'var(--primary-color)', padding: '12px', borderRadius: '12px', display: 'inline-block', marginBottom: 16 }}>
                                                 <Award size={24} />
                                             </div>
-                                            <h4 style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 4px' }}>{d.title}</h4>
-                                            <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 16px' }}>{d.document_type} · Uploaded {format(new Date(d.created_at), 'MMM dd, yyyy')}</p>
+                                            <h4 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 6px' }}>{d.title}</h4>
+                                            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '0 0 20px' }}>{d.document_type} · Uploaded {format(new Date(d.created_at), 'MMM dd, yyyy')}</p>
                                         </div>
-                                        <button style={{ width: '100%', padding: '10px', borderRadius: '9px', border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s' }}>
+                                        <button className="tp-btn tp-btn-ghost" style={{ width: '100%', justifyContent: 'center' }}>
                                             View Document
                                         </button>
                                     </div>

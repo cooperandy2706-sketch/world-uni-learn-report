@@ -189,47 +189,43 @@ function AILessonModal({
     }
 
     return (
-        <div className="t-modal-overlay open" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-            <div className="t-modal-box t-modal-box--lg">
-                <div className="t-modal-head t-modal-head--vivid">
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-                            <div>
-                                <p className="t-modal-sub" style={{ letterSpacing: '.12em', textTransform: 'uppercase', opacity: 0.7, marginBottom: 4 }}>✨ AI Lesson Planner</p>
-                                <h2 className="t-modal-title">{lesson.subject} — {lesson.class}</h2>
-                                <p className="t-modal-sub">{DAYS[lesson.dayOfWeek]} · {lesson.period} · {lesson.startTime}–{lesson.endTime}</p>
-                            </div>
-                            <button type="button" className="t-modal-close" onClick={onClose} aria-label="Close"><X size={18} strokeWidth={2.5} /></button>
-                        </div>
-                        <div className="t-step-tabs">
-                            {[
-                                { k: 'input', label: '1. Plan Input' },
-                                { k: 'plan', label: '2. Generated Plan', disabled: !plan },
-                            ].map(s => (
-                                <button
-                                    key={s.k}
-                                    type="button"
-                                    className={`t-step-tab${step === s.k ? ' is-active' : ''}`}
-                                    onClick={() => !s.disabled && setStep(s.k as 'input' | 'plan')}
-                                    disabled={s.disabled}
-                                    style={s.disabled ? { opacity: 0.4, cursor: 'default' } : undefined}
-                                >
-                                    {s.label}
-                                </button>
-                            ))}
-                        </div>
+        <div className="tp-modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+            <div className="tp-modal" style={{ maxWidth: 700 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 20 }}>
+                    <div>
+                        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--primary-color)', marginBottom: 4 }}>✨ AI Lesson Planner</div>
+                        <h2 className="tp-section-title" style={{ margin: 0, fontSize: 24 }}>{lesson.subject} — {lesson.class}</h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 4 }}>{DAYS[lesson.dayOfWeek]} · {lesson.period} · {lesson.startTime}–{lesson.endTime}</p>
                     </div>
+                    <button type="button" onClick={onClose} style={{ background: 'var(--bg-hover)', border: 'none', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-main)' }} aria-label="Close"><X size={18} strokeWidth={2.5} /></button>
                 </div>
 
-                <div className="t-modal-body">
+                <div className="tp-tabs" style={{ marginBottom: 24 }}>
+                    {[
+                        { k: 'input', label: '1. Plan Input' },
+                        { k: 'plan', label: '2. Generated Plan', disabled: !plan },
+                    ].map(s => (
+                        <button
+                            key={s.k}
+                            type="button"
+                            className={`tp-tab ${step === s.k ? 'active' : ''}`}
+                            onClick={() => !s.disabled && setStep(s.k as 'input' | 'plan')}
+                            disabled={s.disabled}
+                            style={s.disabled ? { opacity: 0.4, cursor: 'default' } : undefined}
+                        >
+                            {s.label}
+                        </button>
+                    ))}
+                </div>
 
+                <div>
                     {step === 'input' ? (
                         // ── Input Step ────────────────────────────────────────
-                        <div>
-                            <div style={{ background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 12, padding: '14px', marginBottom: 20, fontSize: 12, color: '#5b21b6', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                            <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 12, padding: 16, fontSize: 13, color: '#1E40AF', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                                 <span style={{ fontSize: 20 }}>💡</span>
                                 <div>
-                                    <div style={{ fontWeight: 700, marginBottom: 4 }}>How to get the best results:</div>
+                                    <div style={{ fontWeight: 800, marginBottom: 4 }}>How to get the best results:</div>
                                     <span style={{ lineHeight: 1.5 }}>
                                         Enter a specific topic (e.g., "Introduction to Photosynthesis") and add 2-3 key objectives. The more specific you are, the better the AI can tailor the activities for your class.
                                     </span>
@@ -237,75 +233,72 @@ function AILessonModal({
                             </div>
 
                             {/* Topic */}
-                            <label className="t-label">📌 Lesson Topic *</label>
-                            <input
-                                className="t-input"
-                                value={topic}
-                                onChange={e => setTopic(e.target.value)}
-                                placeholder="e.g. Photosynthesis, The Pythagorean Theorem, World War II causes…"
-                                style={{ marginBottom: 20 }}
-                            />
+                            <div>
+                                <label className="tp-label">📌 Lesson Topic *</label>
+                                <input
+                                    className="tp-input"
+                                    value={topic}
+                                    onChange={e => setTopic(e.target.value)}
+                                    placeholder="e.g. Photosynthesis, The Pythagorean Theorem, World War II causes…"
+                                />
+                            </div>
 
                             {/* Bullets */}
-                            <label className="t-label">📋 Key Points / Objectives to Cover</label>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
-                                {bullets.map((b, i) => (
-                                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                                        <span style={{ color: 'var(--text-subtle)', fontSize: 16, flexShrink: 0 }}>•</span>
-                                        <input
-                                            className="t-input"
-                                            value={b}
-                                            onChange={e => updateBullet(i, e.target.value)}
-                                            placeholder={`Key point ${i + 1}…`}
-                                            style={{ flex: 1 }}
-                                            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addBullet() } }}
-                                        />
-                                        {bullets.length > 1 && (
-                                            <button onClick={() => removeBullet(i)} style={{ background: 'none', border: 'none', color: 'var(--text-subtle)', cursor: 'pointer', fontSize: 16, padding: '0 4px' }}>✕</button>
-                                        )}
-                                    </div>
-                                ))}
+                            <div>
+                                <label className="tp-label">📋 Key Points / Objectives to Cover</label>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
+                                    {bullets.map((b, i) => (
+                                        <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                            <span style={{ color: 'var(--text-subtle)', fontSize: 16, flexShrink: 0 }}>•</span>
+                                            <input
+                                                className="tp-input"
+                                                value={b}
+                                                onChange={e => updateBullet(i, e.target.value)}
+                                                placeholder={`Key point ${i + 1}…`}
+                                                style={{ flex: 1 }}
+                                                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addBullet() } }}
+                                            />
+                                            {bullets.length > 1 && (
+                                                <button onClick={() => removeBullet(i)} style={{ background: 'none', border: 'none', color: 'var(--danger-color)', cursor: 'pointer', padding: '8px' }}><X size={16} /></button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                                <button onClick={addBullet} className="tp-btn tp-btn-ghost" style={{ borderStyle: 'dashed', width: '100%' }}>
+                                    + Add Key Point
+                                </button>
                             </div>
-                            <button onClick={addBullet}
-                                style={{ fontSize: 12, color: '#6d28d9', background: '#f5f3ff', border: '1.5px dashed #c4b5fd', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', fontWeight: 600, fontFamily: '"DM Sans",sans-serif', marginBottom: 20 }}>
-                                + Add Key Point
-                            </button>
 
                             {/* Teacher Notes */}
-                            <label className="t-label">📝 Personal Notes (optional, saved privately)</label>
-                            <textarea
-                                className="t-textarea"
-                                value={notes}
-                                onChange={e => setNotes(e.target.value)}
-                                rows={3}
-                                placeholder="Personal reminders, observations, what to emphasize…"
-                            />
+                            <div>
+                                <label className="tp-label">📝 Personal Notes (optional, saved privately)</label>
+                                <textarea
+                                    className="tp-input"
+                                    value={notes}
+                                    onChange={e => setNotes(e.target.value)}
+                                    rows={3}
+                                    placeholder="Personal reminders, observations, what to emphasize…"
+                                    style={{ resize: 'vertical' }}
+                                />
+                            </div>
 
-                            {error && <p style={{ fontSize: 12, color: '#dc2626', marginTop: 8 }}>⚠️ {error}</p>}
+                            {error && <p style={{ fontSize: 13, color: 'var(--danger-color)', fontWeight: 600 }}>⚠️ {error}</p>}
 
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 20 }}>
-                                <div style={{ fontSize: 11, fontWeight: 700, color: usageCount >= DAILY_LIMIT ? '#dc2626' : '#6b7280' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, paddingTop: 16, borderTop: '1px solid var(--border-color)' }}>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: usageCount >= DAILY_LIMIT ? 'var(--danger-color)' : 'var(--text-muted)' }}>
                                     Quota: {usageCount} / {DAILY_LIMIT} today
                                 </div>
-                                <div style={{ display: 'flex', gap: 10 }}>
-                                    <button onClick={handleSaveNotes}
-                                        style={{ padding: '9px 18px', borderRadius: 9, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
+                                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                                    <button onClick={handleSaveNotes} className="tp-btn tp-btn-ghost" style={{ border: '1px solid var(--border-color)' }}>
                                         💾 Save Notes Only
                                     </button>
                                     <button
                                         onClick={handleGenerate}
                                         disabled={generating || usageCount >= DAILY_LIMIT}
-                                        style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: (generating || usageCount >= DAILY_LIMIT) ? '#d1d5db' : 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: (generating || usageCount >= DAILY_LIMIT) ? 'default' : 'pointer', fontFamily: '"DM Sans",sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        {generating ? (
-                                            <>
-                                                <span style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid rgba(255,255,255,.4)', borderTopColor: '#fff', borderRadius: '50%', animation: '_lt_spin .8s linear infinite' }} />
-                                                Generating…
-                                            </>
-                                        ) : usageCount >= DAILY_LIMIT ? (
-                                            <>Limit Reached</>
-                                        ) : (
-                                            <>✨ Generate Plan</>
-                                        )}
+                                        className="tp-btn tp-btn-primary"
+                                        style={{ opacity: (generating || usageCount >= DAILY_LIMIT) ? 0.6 : 1 }}
+                                    >
+                                        {generating ? 'Generating…' : usageCount >= DAILY_LIMIT ? 'Limit Reached' : '✨ Generate Plan'}
                                     </button>
                                 </div>
                             </div>
@@ -313,61 +306,51 @@ function AILessonModal({
                     ) : (
                         // ── Plan View Step ────────────────────────────────────
                         plan && (
-                            <div>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-                                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                                    <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>
                                         Generated {new Date(plan.generatedAt).toLocaleString()}
                                     </div>
-                                    <div style={{ display: 'flex', gap: 8 }}>
-                                        <button onClick={() => setStep('input')}
-                                            style={{ padding: '6px 14px', borderRadius: 8, border: '1.5px solid #ddd6fe', background: '#f5f3ff', color: '#6d28d9', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
-                                            ✏️ Edit Inputs
+                                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                                        <button onClick={() => setStep('input')} className="tp-btn tp-btn-ghost" style={{ border: '1px solid var(--border-color)', height: 32, fontSize: 12, padding: '0 12px' }}>
+                                            ✏️ Edit
                                         </button>
-                                        <button onClick={handlePrint}
-                                            style={{ padding: '6px 14px', borderRadius: 8, border: '1.5px solid #ddd6fe', background: '#f5f3ff', color: '#6d28d9', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
+                                        <button onClick={handlePrint} className="tp-btn tp-btn-ghost" style={{ border: '1px solid var(--border-color)', height: 32, fontSize: 12, padding: '0 12px' }}>
                                             🖨️ Print
                                         </button>
-                                        <button onClick={() => { handleGenerate() }}
-                                            style={{ padding: '6px 14px', borderRadius: 8, border: 'none', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', fontSize: 12, fontWeight: 700, cursor: generating ? 'default' : 'pointer', fontFamily: '"DM Sans",sans-serif', opacity: generating ? .6 : 1 }}>
+                                        <button onClick={() => { handleGenerate() }} className="tp-btn tp-btn-primary" style={{ height: 32, fontSize: 12, padding: '0 12px', opacity: generating ? 0.6 : 1 }} disabled={generating}>
                                             {generating ? '⏳ Regenerating…' : '🔄 Regenerate'}
                                         </button>
                                     </div>
                                 </div>
 
                                 {/* Rendered Markdown */}
-                                <div style={{ background: '#fafafa', border: '1.5px solid #ede9fe', borderRadius: 14, padding: '20px 24px', maxHeight: 560, overflowY: 'auto', lineHeight: 1.75 }}>
+                                <div style={{ background: 'var(--bg-hover)', border: '1px solid var(--border-color)', borderRadius: 16, padding: '24px', maxHeight: 500, overflowY: 'auto', lineHeight: 1.75 }}>
                                     <style>{`
-                    .lp-markdown h1 { font-family: "Playfair Display",serif; font-size: 22px; color: #4c1d95; border-bottom: 2px solid #ede9fe; padding-bottom: 8px; margin-top: 0 }
-                    .lp-markdown h2 { font-size: 16px; color: #6d28d9; border-bottom: 1px solid #ede9fe; padding-bottom: 4px; margin-top: 28px }
-                    .lp-markdown h3 { font-size: 14px; color: #374151; margin-top: 18px }
-                    .lp-markdown table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px }
-                    .lp-markdown th, .lp-markdown td { border: 1px solid #e5e7eb; padding: 8px 12px; text-align: left }
-                    .lp-markdown th { background: #f5f3ff; color: #6d28d9; font-weight: 700 }
-                    .lp-markdown ul, .lp-markdown ol { padding-left: 20px }
-                    .lp-markdown li { margin-bottom: 4px; font-size: 13px; color: #374151 }
-                    .lp-markdown p { font-size: 13px; color: #374151; margin-bottom: 8px }
-                    .lp-markdown img { max-width: 100%; border-radius: 10px; margin: 12px 0; box-shadow: 0 4px 12px rgba(0,0,0,.1) }
-                    .lp-markdown code { background: #f5f3ff; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #7c3aed }
-                    .lp-markdown strong { color: #111827 }
-                    .lp-markdown hr { border: none; border-top: 1px solid #ede9fe; margin: 24px 0 }
-                    .lp-markdown blockquote { border-left: 3px solid #7c3aed; padding-left: 14px; color: #6b7280; font-style: italic }
+                    .lp-markdown h1 { font-family: 'Outfit', sans-serif; font-size: 22px; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-top: 0; font-weight: 800; }
+                    .lp-markdown h2 { font-size: 16px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-top: 28px; font-weight: 700; }
+                    .lp-markdown h3 { font-size: 14px; color: var(--text-primary); margin-top: 18px; font-weight: 700; }
+                    .lp-markdown table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+                    .lp-markdown th, .lp-markdown td { border: 1px solid var(--border-color); padding: 8px 12px; text-align: left; }
+                    .lp-markdown th { background: var(--bg-card); color: var(--text-primary); font-weight: 700; }
+                    .lp-markdown ul, .lp-markdown ol { padding-left: 20px; }
+                    .lp-markdown li { margin-bottom: 4px; font-size: 14px; color: var(--text-main); }
+                    .lp-markdown p { font-size: 14px; color: var(--text-main); margin-bottom: 8px; }
+                    .lp-markdown img { max-width: 100%; border-radius: 12px; margin: 12px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+                    .lp-markdown code { background: var(--bg-card); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: var(--primary-color); border: 1px solid var(--border-color); }
+                    .lp-markdown strong { color: var(--text-primary); font-weight: 700; }
+                    .lp-markdown hr { border: none; border-top: 1px solid var(--border-color); margin: 24px 0; }
+                    .lp-markdown blockquote { border-left: 3px solid var(--primary-color); padding-left: 14px; color: var(--text-muted); font-style: italic; }
                   `}</style>
                                     <div className="lp-markdown">
                                         <ReactMarkdown>{plan.markdown}</ReactMarkdown>
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                                    <button onClick={onClose}
-                                        style={{ padding: '9px 18px', borderRadius: 9, border: '1.5px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
-                                        Close
-                                    </button>
-                                    <button onClick={handleSaveNotes}
-                                        style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: 'var(--bg-hover)', color: 'var(--text-main)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif' }}>
-                                        💾 Save Locally
-                                    </button>
-                                    <button onClick={handleFormalSubmit} disabled={submitting}
-                                        style={{ padding: '9px 22px', borderRadius: 9, border: 'none', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: submitting ? 'default' : 'pointer', fontFamily: '"DM Sans",sans-serif', opacity: submitting ? 0.7 : 1 }}>
+                                <div style={{ display: 'flex', gap: 12, marginTop: 16, justifyContent: 'flex-end', flexWrap: 'wrap', paddingTop: 16, borderTop: '1px solid var(--border-color)' }}>
+                                    <button onClick={onClose} className="tp-btn tp-btn-ghost">Close</button>
+                                    <button onClick={handleSaveNotes} className="tp-btn tp-btn-ghost" style={{ background: 'var(--bg-hover)', border: '1px solid var(--border-color)' }}>💾 Save Locally</button>
+                                    <button onClick={handleFormalSubmit} disabled={submitting} className="tp-btn tp-btn-primary" style={{ opacity: submitting ? 0.7 : 1 }}>
                                         {submitting ? 'Submitting…' : '📨 Submit to Headmaster'}
                                     </button>
                                 </div>
@@ -576,43 +559,39 @@ export default function LessonTrackerPage() {
     }
 
     return (
-        <div className="t-page">
+        <div className="tp-page">
+            <link rel="stylesheet" href="/src/styles/teacher-portal.css" />
             <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         @keyframes _lt_fi{from{opacity:0}to{opacity:1}}
         @keyframes _lt_pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(.98)}}
         @keyframes _lt_spin{to{transform:rotate(360deg)}}
-        .lt-card:hover{box-shadow:0 6px 20px rgba(109,40,217,.1)!important;transform:translateY(-1px)}
-        @media (max-width: 768px) {
-          .resp-header { flex-direction: column !important; align-items: stretch !important; gap: 16px !important; }
-          .resp-tabs { width: 100% !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch; padding: 4px !important; }
-          .lt-card { padding: 14px !important; }
-          .resp-btn-group { flex-direction: column !important; width: 100% !important; }
-        }
       `}</style>
-            <div style={{ fontFamily: '"DM Sans",system-ui,sans-serif', animation: '_lt_fi .4s ease' }}>
+            <div style={{ animation: '_lt_fi .4s ease' }}>
 
                 {/* Header */}
-                <div className="t-header" style={{ marginBottom: 20 }}>
-                  <div>
-                    <h1 className="t-title">Lesson Tracker</h1>
-                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>
-                      {DAYS[todayDay]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                    </p>
-                  </div>
+                <div className="tp-hero" style={{ marginBottom: 20 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
+                        <div>
+                            <div className="tp-hero-label">Timetable & AI Plans</div>
+                            <h1 className="tp-hero-title">Lesson Tracker</h1>
+                            <p className="tp-hero-sub">
+                                {DAYS[todayDay]} · {now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Active lesson banner */}
                 {activeLesson && (
-                    <div style={{ background: 'linear-gradient(135deg,#14532d,#16a34a)', borderRadius: 8, padding: '18px 20px', marginBottom: 16, color: '#fff', animation: '_lt_pulse 3s ease infinite', position: 'relative', overflow: 'hidden' }}>
+                    <div className="tp-card" style={{ background: 'linear-gradient(135deg,#14532d,#16a34a)', borderRadius: 16, padding: '20px 24px', marginBottom: 20, color: '#fff', animation: '_lt_pulse 3s ease infinite', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,.06)' }} />
-                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', opacity: .8, marginBottom: 6 }}>🟢 CLASS IN PROGRESS</div>
-                        <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 22, fontWeight: 700, margin: '0 0 4px' }}>{activeLesson.subject}</h2>
-                        <p style={{ fontSize: 14, opacity: .85, margin: '0 0 12px' }}>{activeLesson.class} · {activeLesson.period} · {activeLesson.startTime}–{activeLesson.endTime}</p>
+                        <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.1em', opacity: .8, marginBottom: 8, textTransform: 'uppercase' }}>🟢 CLASS IN PROGRESS</div>
+                        <h2 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 24, fontWeight: 800, margin: '0 0 4px', color: '#fff' }}>{activeLesson.subject}</h2>
+                        <p style={{ fontSize: 15, opacity: .9, margin: '0 0 16px' }}>{activeLesson.class} · {activeLesson.period} · {activeLesson.startTime}–{activeLesson.endTime}</p>
                         <div style={{ height: 6, background: 'rgba(255,255,255,.2)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
-                            <div style={{ height: '100%', width: `${activeLesson.progress}%`, background: 'var(--bg-card)', borderRadius: 99, transition: 'width 1s linear' }} />
+                            <div style={{ height: '100%', width: `${activeLesson.progress}%`, background: '#fff', borderRadius: 99, transition: 'width 1s linear' }} />
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, opacity: .8 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, opacity: .9, fontWeight: 600 }}>
                             <span>{activeLesson.progress}% complete</span>
                             <span>{formatCountdown(activeLesson.countdown)} remaining</span>
                         </div>
@@ -620,31 +599,30 @@ export default function LessonTrackerPage() {
                 )}
 
                 {!activeLesson && nextLesson && (
-                    <div style={{ background: nextLesson.status === 'soon' ? 'linear-gradient(135deg,#78350f,#d97706)' : 'linear-gradient(135deg,#2e1065,#4c1d95)', borderRadius: 8, padding: '16px 20px', marginBottom: 16, color: '#fff' }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', opacity: .8, marginBottom: 6 }}>
+                    <div className="tp-card" style={{ background: nextLesson.status === 'soon' ? 'linear-gradient(135deg,#78350f,#d97706)' : 'linear-gradient(135deg,#2e1065,#4c1d95)', borderRadius: 16, padding: '20px 24px', marginBottom: 20, color: '#fff' }}>
+                        <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.1em', opacity: .8, marginBottom: 8, textTransform: 'uppercase' }}>
                             {nextLesson.status === 'soon' ? '⏰ STARTING IN' : '📅 NEXT CLASS'}
                         </div>
-                        <h2 style={{ fontFamily: '"Playfair Display",serif', fontSize: 20, fontWeight: 700, margin: '0 0 4px' }}>{nextLesson.subject}</h2>
-                        <p style={{ fontSize: 13, opacity: .85, margin: '0 0 10px' }}>{nextLesson.class} · {nextLesson.startTime}–{nextLesson.endTime}</p>
-                        <div style={{ fontFamily: '"Playfair Display",serif', fontSize: 32, fontWeight: 700 }}>{formatCountdown(nextLesson.countdown)}</div>
+                        <h2 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 22, fontWeight: 800, margin: '0 0 4px', color: '#fff' }}>{nextLesson.subject}</h2>
+                        <p style={{ fontSize: 14, opacity: .9, margin: '0 0 12px' }}>{nextLesson.class} · {nextLesson.startTime}–{nextLesson.endTime}</p>
+                        <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 36, fontWeight: 800 }}>{formatCountdown(nextLesson.countdown)}</div>
                     </div>
                 )}
 
                 {!activeLesson && !nextLesson && todayItems.length > 0 && (
-                    <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 14, padding: '14px 18px', marginBottom: 16, fontSize: 13, color: '#15803d', fontWeight: 600 }}>
-                        ✅ All {todayItems.length} classes done for today! Great work.
+                    <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 16, padding: '16px 20px', marginBottom: 20, fontSize: 14, color: '#15803D', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <span style={{ fontSize: 20 }}>✅</span> All {todayItems.length} classes done for today! Great work.
                     </div>
                 )}
 
                 {/* Tabs */}
-                <div className="resp-tabs" style={{ display: 'flex', gap: 4, marginBottom: 18, background: '#f5f3ff', borderRadius: 12, padding: 4, width: 'fit-content' }}>
+                <div className="tp-tabs" style={{ marginBottom: 20, overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: 4 }}>
                   {[
                     { k: 'today', label: `Today (${todayItems.length})` },
                     { k: 'week', label: 'Full Week' },
                     { k: 'tracker', label: '✨ AI Plans' },
                   ].map(t => (
-                    <button key={t.k} className="lt-tab" onClick={() => setTab(t.k as any)}
-                      style={{ padding: '7px 14px', borderRadius: 9, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans",sans-serif', background: tab === t.k ? '#fff' : 'transparent', color: tab === t.k ? '#6d28d9' : '#6b7280', boxShadow: tab === t.k ? '0 1px 4px rgba(0,0,0,.08)' : 'none', whiteSpace: 'nowrap' }}>
+                    <button key={t.k} className={`tp-tab ${tab === t.k ? 'active' : ''}`} onClick={() => setTab(t.k as any)}>
                       {t.label}
                     </button>
                   ))}
@@ -652,67 +630,69 @@ export default function LessonTrackerPage() {
 
                 {loading ? (
                     <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #ede9fe', borderTopColor: '#6d28d9', animation: '_lt_spin .8s linear infinite' }} />
+                        <div style={{ width: 40, height: 40, borderRadius: '50%', border: '4px solid var(--border-color)', borderTopColor: 'var(--primary-color)', animation: '_lt_spin .8s linear infinite' }} />
                     </div>
                 ) : tab === 'today' ? (
                     // ── TODAY ──
                     todayItems.length === 0 ? (
-                        <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
-                            <div style={{ fontSize: 52, marginBottom: 12 }}>☀️</div>
-                            <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>No classes today</h3>
-                            <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Check the Full Week tab to see your schedule.</p>
+                        <div className="tp-card" style={{ padding: '80px 20px', textAlign: 'center', background: 'var(--bg-hover)' }}>
+                            <div style={{ fontSize: 64, marginBottom: 16 }}>☀️</div>
+                            <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 8px' }}>No classes today</h3>
+                            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>Check the Full Week tab to see your schedule.</p>
                         </div>
                     ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                             {todayItems.map((l, i) => (
-                                <div key={l.id} className="lt-card"
-                                    style={{ background: statusBg[l.status], borderRadius: 14, border: `1.5px solid ${statusColor[l.status]}22`, padding: '14px 16px', boxShadow: '0 1px 4px rgba(0,0,0,.04)', animation: `_lt_fi .3s ease ${i * .05}s both` }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                        <div style={{ textAlign: 'center', flexShrink: 0, width: 56 }}>
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: statusColor[l.status] }}>{l.startTime}</div>
-                                            <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{l.endTime}</div>
+                                <div key={l.id} className="tp-card"
+                                    style={{ background: statusBg[l.status], border: `1px solid ${statusColor[l.status]}33`, padding: 20, animation: `_lt_fi .3s ease ${i * .05}s both` }}>
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+                                        <div style={{ textAlign: 'center', flexShrink: 0, width: 64 }}>
+                                            <div style={{ fontSize: 16, fontWeight: 800, color: statusColor[l.status] }}>{l.startTime}</div>
+                                            <div style={{ fontSize: 12, color: 'var(--text-subtle)', fontWeight: 600 }}>{l.endTime}</div>
                                         </div>
-                                        <div style={{ width: 2, height: 40, background: `${statusColor[l.status]}40`, borderRadius: 99, flexShrink: 0 }} />
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                                                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{l.subject}</span>
-                                                <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 99, background: statusColor[l.status] + '18', color: statusColor[l.status] }}>
+                                        <div style={{ width: 3, height: 'auto', alignSelf: 'stretch', background: `${statusColor[l.status]}40`, borderRadius: 99, flexShrink: 0 }} />
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                                                <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>{l.subject}</span>
+                                                <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 99, background: statusColor[l.status] + '18', color: statusColor[l.status] }}>
                                                     {statusLabel[l.status]}
                                                 </span>
                                             </div>
-                                            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{l.class} · {l.period}</div>
+                                            <div style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{l.class} · {l.period}</div>
                                             {storedData[l.id]?.plan && (
-                                                <div style={{ fontSize: 11, color: '#6d28d9', marginTop: 4, fontStyle: 'italic' }}>✨ AI plan: {storedData[l.id].plan!.topic}</div>
+                                                <div style={{ fontSize: 12, color: 'var(--primary-color)', marginTop: 8, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                    ✨ AI plan: {storedData[l.id].plan!.topic}
+                                                </div>
                                             )}
                                             {storedData[l.id]?.notes && !storedData[l.id]?.plan && (
-                                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>📝 {storedData[l.id].notes.slice(0, 60)}…</div>
+                                                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8, fontStyle: 'italic' }}>
+                                                    📝 {storedData[l.id].notes.slice(0, 60)}…
+                                                </div>
                                             )}
                                         </div>
                                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
                                             {l.status === 'now' && (
                                                 <div>
-                                                    <div style={{ fontSize: 18, fontWeight: 800, color: '#16a34a', fontFamily: '"Playfair Display",serif' }}>{formatCountdown(l.countdown)}</div>
-                                                    <div style={{ fontSize: 10, color: '#16a34a' }}>remaining</div>
-                                                    <div style={{ marginTop: 6, height: 4, width: 60, background: '#dcfce7', borderRadius: 99, overflow: 'hidden' }}>
-                                                        <div style={{ height: '100%', width: `${l.progress}%`, background: '#16a34a', borderRadius: 99, transition: 'width 1s' }} />
-                                                    </div>
+                                                    <div style={{ fontSize: 20, fontWeight: 800, color: '#16a34a', fontFamily: "'Outfit', sans-serif" }}>{formatCountdown(l.countdown)}</div>
+                                                    <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 600 }}>remaining</div>
                                                 </div>
                                             )}
                                             {(l.status === 'soon' || l.status === 'upcoming') && (
                                                 <div>
-                                                    <div style={{ fontSize: 16, fontWeight: 800, color: statusColor[l.status], fontFamily: '"Playfair Display",serif' }}>{formatCountdown(l.countdown)}</div>
-                                                    <div style={{ fontSize: 10, color: statusColor[l.status] }}>to start</div>
+                                                    <div style={{ fontSize: 18, fontWeight: 800, color: statusColor[l.status], fontFamily: "'Outfit', sans-serif" }}>{formatCountdown(l.countdown)}</div>
+                                                    <div style={{ fontSize: 11, color: statusColor[l.status], fontWeight: 600 }}>to start</div>
                                                 </div>
                                             )}
                                             <button onClick={() => setActiveModal(l)}
-                                                style={{ marginTop: 6, padding: '3px 10px', borderRadius: 7, border: 'none', background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', fontSize: 11, cursor: 'pointer', color: '#fff', fontWeight: 600, fontFamily: '"DM Sans",sans-serif' }}>
-                                                {storedData[l.id]?.plan ? '✨ View Plan' : '+ Plan'}
+                                                className="tp-btn"
+                                                style={{ marginTop: 12, padding: '6px 12px', background: storedData[l.id]?.plan ? 'var(--bg-hover)' : 'var(--primary-color)', color: storedData[l.id]?.plan ? 'var(--text-main)' : '#fff', border: storedData[l.id]?.plan ? '1px solid var(--border-color)' : 'none', minHeight: 'unset', height: 32, fontSize: 12 }}>
+                                                {storedData[l.id]?.plan ? '✨ View Plan' : '+ AI Plan'}
                                             </button>
                                         </div>
                                     </div>
                                     {l.status === 'now' && (
-                                        <div style={{ marginTop: 10, height: 5, background: '#dcfce7', borderRadius: 99, overflow: 'hidden' }}>
-                                            <div style={{ height: '100%', width: `${l.progress}%`, background: 'linear-gradient(90deg,#16a34a,#22c55e)', borderRadius: 99, transition: 'width 1s linear' }} />
+                                        <div style={{ marginTop: 16, height: 6, background: '#DCFCE7', borderRadius: 99, overflow: 'hidden' }}>
+                                            <div style={{ height: '100%', width: `${l.progress}%`, background: 'linear-gradient(90deg,#16A34A,#22C55E)', borderRadius: 99, transition: 'width 1s linear' }} />
                                         </div>
                                     )}
                                 </div>
@@ -721,29 +701,29 @@ export default function LessonTrackerPage() {
                     )
                 ) : tab === 'week' ? (
                     // ── FULL WEEK ──
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                         {[1, 2, 3, 4, 5].map(day => {
                             const dayLessons = computed.filter(l => l.dayOfWeek === day).sort((a, b) => a.startMinutes - b.startMinutes)
                             const isToday = day === todayDay
                             return (
-                                <div key={day} style={{ background: 'var(--bg-card)', borderRadius: 14, border: `1.5px solid ${isToday ? '#7c3aed' : '#f0eefe'}`, overflow: 'hidden' }}>
-                                    <div style={{ padding: '10px 16px', background: isToday ? 'linear-gradient(135deg,#7c3aed,#6d28d9)' : '#f8fafc', borderBottom: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        <span style={{ fontSize: 13, fontWeight: 700, color: isToday ? '#fff' : '#374151' }}>{DAYS[day]}</span>
-                                        {isToday && <span style={{ fontSize: 10, background: 'rgba(255,255,255,.2)', color: '#fff', padding: '1px 8px', borderRadius: 99, fontWeight: 700 }}>TODAY</span>}
-                                        <span style={{ fontSize: 11, color: isToday ? 'rgba(255,255,255,.7)' : '#9ca3af', marginLeft: 'auto' }}>{dayLessons.length} class{dayLessons.length !== 1 ? 'es' : ''}</span>
+                                <div key={day} className="tp-card" style={{ padding: 0, border: isToday ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', overflow: 'hidden' }}>
+                                    <div style={{ padding: '12px 20px', background: isToday ? 'linear-gradient(135deg, var(--primary-color), var(--primary-color-dark))' : 'var(--bg-hover)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        <span style={{ fontSize: 15, fontWeight: 800, color: isToday ? '#fff' : 'var(--text-primary)' }}>{DAYS[day]}</span>
+                                        {isToday && <span style={{ fontSize: 10, background: 'rgba(255,255,255,.2)', color: '#fff', padding: '2px 8px', borderRadius: 99, fontWeight: 800 }}>TODAY</span>}
+                                        <span style={{ fontSize: 13, color: isToday ? 'rgba(255,255,255,.8)' : 'var(--text-muted)', marginLeft: 'auto', fontWeight: 600 }}>{dayLessons.length} class{dayLessons.length !== 1 ? 'es' : ''}</span>
                                     </div>
                                     {dayLessons.length === 0 ? (
-                                        <div style={{ padding: '14px 16px', fontSize: 12, color: 'var(--text-subtle)', textAlign: 'center' }}>No classes</div>
+                                        <div style={{ padding: '20px', fontSize: 14, color: 'var(--text-subtle)', textAlign: 'center' }}>No classes</div>
                                     ) : (
-                                        <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                        <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                                             {dayLessons.map(l => (
-                                                <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 9, background: l.status === 'now' ? '#f0fdf4' : l.status === 'done' ? '#f9fafb' : '#f5f3ff', border: `1px solid ${l.status === 'now' ? '#bbf7d0' : l.status === 'done' ? '#e5e7eb' : '#ede9fe'}` }}>
-                                                    <span style={{ fontSize: 11, color: 'var(--text-muted)', width: 44, flexShrink: 0 }}>{l.startTime}</span>
-                                                    <span style={{ fontSize: 12, fontWeight: 700, color: l.status === 'done' ? '#9ca3af' : '#111827', flex: 1 }}>{l.subject}</span>
-                                                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{l.class}</span>
-                                                    {storedData[l.id]?.plan && <span style={{ fontSize: 10, background: '#7c3aed', color: '#fff', padding: '1px 7px', borderRadius: 99, fontWeight: 700 }}>✨ AI</span>}
-                                                    {l.status === 'now' && <span style={{ fontSize: 10, background: '#16a34a', color: '#fff', padding: '1px 7px', borderRadius: 99, fontWeight: 700 }}>LIVE</span>}
-                                                    {l.status === 'done' && <span style={{ fontSize: 14 }}>✓</span>}
+                                                <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 12, background: l.status === 'now' ? '#F0FDF4' : l.status === 'done' ? 'var(--bg-hover)' : 'var(--bg-card)', border: `1px solid ${l.status === 'now' ? '#BBF7D0' : 'var(--border-color)'}` }}>
+                                                    <span style={{ fontSize: 13, color: 'var(--text-muted)', width: 48, flexShrink: 0, fontWeight: 700 }}>{l.startTime}</span>
+                                                    <span style={{ fontSize: 14, fontWeight: 800, color: l.status === 'done' ? 'var(--text-muted)' : 'var(--text-primary)', flex: 1 }}>{l.subject}</span>
+                                                    <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{l.class}</span>
+                                                    {storedData[l.id]?.plan && <span style={{ fontSize: 10, background: 'var(--primary-color)', color: '#fff', padding: '2px 8px', borderRadius: 99, fontWeight: 800 }}>✨ AI</span>}
+                                                    {l.status === 'now' && <span style={{ fontSize: 10, background: '#16a34a', color: '#fff', padding: '2px 8px', borderRadius: 99, fontWeight: 800 }}>LIVE</span>}
+                                                    {l.status === 'done' && <span style={{ fontSize: 16, color: 'var(--success-color)' }}>✓</span>}
                                                 </div>
                                             ))}
                                         </div>
@@ -754,30 +734,30 @@ export default function LessonTrackerPage() {
                     </div>
                 ) : (
                     // ── AI PLANS / NOTES TAB ──
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                         {/* Explainer */}
-                        <div style={{ background: 'linear-gradient(135deg,#4c1d95,#7c3aed)', borderRadius: 14, padding: '16px 18px', color: '#fff', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                            <span style={{ fontSize: 28 }}>✨</span>
+                        <div style={{ background: 'linear-gradient(135deg, var(--primary-color-dark), var(--primary-color))', borderRadius: 16, padding: '20px 24px', color: '#fff', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+                            <span style={{ fontSize: 32 }}>✨</span>
                             <div>
-                                <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>AI-Powered Lesson Planner</div>
-                                <div style={{ fontSize: 12, opacity: .85, lineHeight: 1.6 }}>
+                                <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 8, fontFamily: "'Outfit', sans-serif" }}>AI-Powered Lesson Planner</div>
+                                <div style={{ fontSize: 14, opacity: .9, lineHeight: 1.6 }}>
                                     Select any lesson, enter your topic and key points, and the AI will instantly generate a full professional lesson plan — complete with objectives, activities, visual aids, and homework.
                                 </div>
                             </div>
                         </div>
-
+                        
                         {/* Stats row */}
                         {(() => {
                             const withPlans = Object.values(storedData).filter(d => d.plan).length
                             const withNotes = Object.values(storedData).filter(d => d.notes && !d.plan).length
                             return withPlans > 0 || withNotes > 0 ? (
-                                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                                    {withPlans > 0 && <div style={{ background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 10, padding: '8px 14px', fontSize: 12, color: '#6d28d9', fontWeight: 600 }}>✨ {withPlans} AI plan{withPlans !== 1 ? 's' : ''} generated</div>}
-                                    {withNotes > 0 && <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '8px 14px', fontSize: 12, color: '#16a34a', fontWeight: 600 }}>📝 {withNotes} note{withNotes !== 1 ? 's' : ''} saved</div>}
+                                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                                    {withPlans > 0 && <div style={{ background: 'rgba(124, 58, 237, 0.1)', border: '1px solid rgba(124, 58, 237, 0.2)', borderRadius: 12, padding: '10px 16px', fontSize: 13, color: 'var(--primary-color)', fontWeight: 800 }}>✨ {withPlans} AI plan{withPlans !== 1 ? 's' : ''} generated</div>}
+                                    {withNotes > 0 && <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 12, padding: '10px 16px', fontSize: 13, color: '#16A34A', fontWeight: 800 }}>📝 {withNotes} note{withNotes !== 1 ? 's' : ''} saved</div>}
                                 </div>
                             ) : null
                         })()}
-
+                        
                         {/* Lessons list */}
                         {computed.filter(l => l.dayOfWeek >= 1 && l.dayOfWeek <= 5)
                             .sort((a, b) => a.dayOfWeek - b.dayOfWeek || a.startMinutes - b.startMinutes)
@@ -785,46 +765,46 @@ export default function LessonTrackerPage() {
                                 const summary = getStoreSummary(l.id)
                                 const hasPlan = !!storedData[l.id]?.plan
                                 return (
-                                    <div key={l.id} className="lt-card"
-                                        style={{ background: 'var(--bg-card)', borderRadius: 14, border: `1.5px solid ${hasPlan ? '#ddd6fe' : '#f0eefe'}`, padding: '14px 16px', boxShadow: '0 1px 4px rgba(0,0,0,.04)' }}>
-                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                                    <div key={l.id} className="tp-card"
+                                        style={{ border: `1px solid ${hasPlan ? 'var(--primary-color)' : 'var(--border-color)'}`, padding: 20 }}>
+                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
                                             {/* Left icon */}
-                                            <div style={{ width: 42, height: 42, borderRadius: 11, background: hasPlan ? 'linear-gradient(135deg,#7c3aed,#4f46e5)' : '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
+                                            <div style={{ width: 48, height: 48, borderRadius: 16, background: hasPlan ? 'linear-gradient(135deg, var(--primary-color), var(--primary-color-dark))' : 'var(--bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>
                                                 {hasPlan ? '✨' : '📚'}
                                             </div>
-
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
-                                                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{l.subject}</span>
-                                                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{l.class}</span>
-                                                    <span style={{ fontSize: 10, background: '#f5f3ff', color: '#6d28d9', padding: '1px 7px', borderRadius: 99 }}>{DAYS[l.dayOfWeek]} {l.startTime}</span>
-                                                    {hasPlan && <span style={{ fontSize: 10, background: '#7c3aed', color: '#fff', padding: '1px 7px', borderRadius: 99, fontWeight: 700 }}>AI PLAN READY</span>}
+                                            
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
+                                                    <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{l.subject}</span>
+                                                    <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{l.class}</span>
+                                                    <span style={{ fontSize: 11, background: 'var(--bg-hover)', color: 'var(--text-main)', padding: '2px 8px', borderRadius: 99, fontWeight: 700 }}>{DAYS[l.dayOfWeek]} {l.startTime}</span>
+                                                    {hasPlan && <span style={{ fontSize: 10, background: 'var(--primary-color)', color: '#fff', padding: '2px 8px', borderRadius: 99, fontWeight: 800 }}>AI PLAN READY</span>}
                                                 </div>
                                                 {summary ? (
-                                                    <p style={{ fontSize: 12, color: hasPlan ? '#6d28d9' : '#374151', margin: 0, lineHeight: 1.5, fontStyle: hasPlan ? 'normal' : 'italic' }}>
+                                                    <p style={{ fontSize: 13, color: hasPlan ? 'var(--primary-color)' : 'var(--text-main)', margin: 0, lineHeight: 1.5, fontWeight: hasPlan ? 600 : 400 }}>
                                                         {summary.label}
                                                     </p>
                                                 ) : (
-                                                    <p style={{ fontSize: 12, color: 'var(--text-subtle)', margin: 0, fontStyle: 'italic' }}>No plan yet — click to generate one with AI</p>
+                                                    <p style={{ fontSize: 13, color: 'var(--text-subtle)', margin: 0, fontStyle: 'italic' }}>No plan yet — click to generate one with AI</p>
                                                 )}
                                             </div>
-
+                                            
                                             <button
                                                 onClick={() => setActiveModal(l)}
-                                                className="lt-ai-btn"
-                                                style={{ padding: '8px 14px', borderRadius: 10, border: 'none', background: hasPlan ? 'linear-gradient(135deg,#7c3aed,#6d28d9)' : 'linear-gradient(135deg,#4f46e5,#7c3aed)', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0, fontFamily: '"DM Sans",sans-serif', transition: 'all .2s', whiteSpace: 'nowrap' }}>
+                                                className="tp-btn"
+                                                style={{ background: hasPlan ? 'var(--bg-hover)' : 'var(--primary-color)', color: hasPlan ? 'var(--text-main)' : '#fff', border: hasPlan ? '1px solid var(--border-color)' : 'none', padding: '8px 16px', height: 'auto', minHeight: 40, flexShrink: 0, whiteSpace: 'nowrap' }}>
                                                 {hasPlan ? '✨ View Plan' : '✨ Generate'}
                                             </button>
                                         </div>
                                     </div>
                                 )
                             })}
-
+                            
                         {computed.filter(l => l.dayOfWeek >= 1 && l.dayOfWeek <= 5).length === 0 && (
-                            <div style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '60px 20px', textAlign: 'center', border: '1.5px solid #f0eefe' }}>
-                                <div style={{ fontSize: 52, marginBottom: 12 }}>📋</div>
-                                <h3 style={{ fontFamily: '"Playfair Display",serif', fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>No lessons in timetable</h3>
-                                <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Once your timetable is set up, lessons will appear here for AI planning.</p>
+                            <div className="tp-card" style={{ padding: '80px 20px', textAlign: 'center', background: 'var(--bg-hover)' }}>
+                                <div style={{ fontSize: 64, marginBottom: 16 }}>📋</div>
+                                <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 8px' }}>No lessons in timetable</h3>
+                                <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>Once your timetable is set up, lessons will appear here for AI planning.</p>
                             </div>
                         )}
                     </div>

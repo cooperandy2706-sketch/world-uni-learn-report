@@ -46,7 +46,7 @@ export default function StaffRequestsPage() {
                 { data: lData },
                 { data: dData }
             ] = await Promise.all([
-                supabase.from('leave_requests').select('*, user:users(full_name, role)').eq('school_id', adminUser!.school_id).order('created_at', { ascending: false }),
+                supabase.from('leave_requests').select('*, user:users!leave_requests_user_id_fkey(full_name, role)').eq('school_id', adminUser!.school_id).order('created_at', { ascending: false }),
                 supabase.from('staff_documents').select('*, user:users(full_name)').eq('school_id', adminUser!.school_id).order('created_at', { ascending: false })
             ])
 

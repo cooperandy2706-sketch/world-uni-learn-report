@@ -2,6 +2,7 @@ import { useStuckLoadingReload } from '../../hooks/useStuckLoadingReload'
 // src/pages/teacher/ScoreEntryPage.tsx
 // Flexible Gradebook Version
 import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
+import { Maximize2, Minimize2 } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
@@ -556,133 +557,188 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
   const COL_STUDENT = 180
   const COL_SUBJECT = (gradingCategories.length * 56) + 52 + 38
 
-  return (
-    <div className="t-page">
-      <style>{`
-        @keyframes _spin{to{transform:rotate(360deg)}}
-        input[type=number]::-webkit-inner-spin-button{opacity:0}
-        .sba-table{border-collapse:collapse;font-family:"DM Sans",sans-serif}
-        .sba-table th{background:linear-gradient(135deg,#faf5ff,#f5f3ff);font-size:10px;font-weight:700;color:#6d28d9;text-transform:uppercase;padding:8px 6px;border:1px solid #ede9fe;white-space:nowrap;text-align:center}
-        .sba-table td{border:1px solid #f0eefe;padding:4px 6px;vertical-align:middle}
-        .sba-row:hover td{background:#faf5ff !important}
-        .sticky-std{position:sticky;left:0;background:#fff;z-index:4;border-right:2px solid #ddd6fe !important}
-        .sub-header{background:linear-gradient(135deg,#ede9fe,#ddd6fe) !important;color:#5b21b6 !important}
-        .grade-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;font-size:11px;font-weight:800}
-        /* Score entry mobile card */
-        .se-mobile-card{display:none}
-        .se-desktop-table{display:block}
-        @media(max-width:639px){
-          .se-mobile-card{display:block}
-          .se-desktop-table{display:none}
-          .se-action-row{flex-direction:column !important;align-items:stretch !important;}
-          .se-action-row>*{width:100% !important;justify-content:center !important;}
-        }
-      `}</style>
+  // ── Fullscreen ──────────────────────────────────────────────────────────────
+  const sheetRef = useRef<HTMLDivElement>(null)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
-      {!isAdminView && (
-        <div style={{ marginBottom:20, display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
-          <div>
-            <h1 style={{ fontFamily:'"Playfair Display",serif', fontSize:24, fontWeight:700, margin:0 }}>Flexible Score Entry</h1>
-            <p style={{ fontSize:13, color: 'var(--text-muted)', marginTop:3 }}>
-              {dirty && !saving && <span style={{ color:'#d97706' }}>● Unsaved changes</span>}
-              {saving && <span style={{ color:'#6d28d9' }}>Saving…</span>}
-            </p>
-          </div>
-          {/* Actions moved to next block so they are still available if needed, or maybe they are kept here? */}
-          {selectedClass && (Array.isArray(students) ? students : []).length > 0 && !isLocked && (
-            <div style={{ display:'flex', gap:8 }}>
-              {selectedSubjectId !== 'all' && (
-                <>
-                  <div style={{ display:'flex', flexDirection:'column', gap:3 }}>
-                    <label style={{ fontSize:9, fontWeight:700, color: 'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.06em' }}>Sync into</label>
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', handler)
+    return () => document.removeEventListener('fullscreenchange', handler)
+  }, [])
+
+  async function toggleFullscreen() {
+    if (!sheetRef.current) return
+    if (!document.fullscreenElement) {
+      try { await sheetRef.current.requestFullscreen() } catch { setIsFullscreen(fs => !fs) }
+    } else {
+      document.exitFullscreen()
+    }
+  }
+
+  return (
+    <div className="tp-page">
+      <link rel="stylesheet" href="/src/styles/teacher-portal.css" />
+
+      {/* ── HERO ── */}
+      <div className="tp-hero" style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+            <div>
+              <div className="tp-hero-label">Academic Grading</div>
+              <h1 className="tp-hero-title">💯 Score Entry</h1>
+              <p className="tp-hero-sub">
+                {dirty && !saving ? '● Unsaved changes' : saving ? 'Saving…' : 'All changes saved'}
+              </p>
+            </div>
+
+            {/* Quick Actions (Desktop only - mobile moves these to bottom bar) */}
+            <div className="hide-on-mobile" style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              {selectedClass && (Array.isArray(students) ? students : []).length > 0 && !isLocked && selectedSubjectId !== 'all' && (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', background: 'rgba(0,0,0,0.1)', padding: '6px 12px', borderRadius: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <label style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', opacity: 0.8 }}>Target</label>
                     <select
                       value={syncTargetCatId}
                       onChange={e => setSyncTargetCatId(e.target.value)}
-                      style={{ padding:'5px 8px', borderRadius:7, border:'1.5px solid #ddd6fe', fontSize:11, fontWeight:600, color: 'var(--text-muted)', background:'#faf5ff', outline:'none', cursor:'pointer' }}
+                      style={{ padding: '4px 8px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.15)', color: '#fff', outline: 'none', fontSize: 12 }}
                     >
-                      <option value="">Auto-detect</option>
-                      {gradingCategories.map(c => <option key={c.id} value={c.id}>{c.name} (max {c.max_score})</option>)}
-                    </select>
-                  </div>
-                  <button onClick={handleSyncClassTests} disabled={syncingTests} style={{ padding:'10px 16px', borderRadius:9, background:'#fdf2f2', color:'#dc2626', border:'1.5px solid #fecaca', cursor:'pointer', fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
-                    {syncingTests ? '⌛' : '📝 Sync Tests'}
+                    <option value="" style={{ color: '#000' }}>Auto-detect</option>
+                    {gradingCategories.map(c => <option key={c.id} value={c.id} style={{ color: '#000' }}>{c.name}</option>)}
+                  </select>
+                </div>
+                <button onClick={handleSyncClassTests} disabled={syncingTests} className="tp-btn tp-btn-ghost" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none' }}>
+                  {syncingTests ? '⌛' : '📝 Sync Tests'}
+                </button>
+                <button onClick={handleSyncAssignments} disabled={syncingTests} className="tp-btn tp-btn-ghost" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none' }}>
+                  {syncingTests ? '⌛' : '🤖 Sync Assignments'}
+                </button>
+              </div>
+            )}
+            {/* Fullscreen toggle - desktop only */}
+            {selectedClass && (Array.isArray(students) ? students : []).length > 0 && (
+              <button
+                onClick={toggleFullscreen}
+                title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen for comfortable score entry'}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px',
+                  borderRadius: 12, border: '1.5px solid rgba(255,255,255,0.3)',
+                  background: isFullscreen ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.12)',
+                  color: '#fff', fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+                  fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s',
+                  backdropFilter: 'blur(4px)'
+                }}
+              >
+                {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+              </button>
+            )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── FILTER TABS ── */}
+      <div className="tp-card" style={{ marginBottom: 16 }}>
+        <div style={{ padding: '14px 18px', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 200px' }}>
+            <label className="tp-label">Select Class</label>
+            <select className="tp-select" value={selectedClass} onChange={e => setSelectedClass(e.target.value)}>
+              <option value="">Choose a class…</option>
+              {(classOptions as any[]).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+          {selectedClass && subjects.length > 0 && (
+            <div style={{ flex: '2 1 300px', minWidth: 0 }}>
+              <label className="tp-label">Subject (Mobile view)</label>
+              <div className="tp-tab-bar" style={{ paddingBottom: 0, marginBottom: 0 }}>
+                <button
+                  className={`tp-tab${selectedSubjectId === 'all' ? ' active' : ''}`}
+                  onClick={() => setSelectedSubjectId('all')}
+                >
+                  All Subjects
+                </button>
+                {subjects.map(sub => (
+                  <button
+                    key={sub.id}
+                    className={`tp-tab${selectedSubjectId === sub.id ? ' active' : ''}`}
+                    onClick={() => setSelectedSubjectId(sub.id)}
+                  >
+                    {sub.name}
                   </button>
-                  <button onClick={handleSyncAssignments} disabled={syncingTests} style={{ padding:'10px 16px', borderRadius:9, background:'#f5f3ff', color:'#6d28d9', border:'1.5px solid #ddd6fe', cursor:'pointer', fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
-                    {syncingTests ? '⌛' : '🤖 Sync Assignments'}
-                  </button>
-                </>
-              )}
-              <button onClick={() => handleSave(true)} disabled={saving || !dirty} style={{ padding:'10px 16px', borderRadius:9, background: 'var(--bg-card)', border: '1px solid var(--border-color)', cursor:'pointer' }}>💾 Save</button>
-              <button onClick={handleSubmit} disabled={submitting || enteredCount === 0} style={{ padding:'10px 16px', borderRadius:9, background:'#6d28d9', color:'#fff', border:'none', cursor:'pointer' }}>📤 Submit</button>
+                ))}
+              </div>
             </div>
           )}
         </div>
-      )}
-
-      {isAdminView && selectedClass && (Array.isArray(students) ? students : []).length > 0 && !isLocked && (
-        <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-            {selectedSubjectId !== 'all' && (
-              <>
-                <div style={{ display:'flex', flexDirection:'column', gap:3 }}>
-                  <label style={{ fontSize:9, fontWeight:700, color: 'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.06em' }}>Sync into</label>
-                  <select
-                    value={syncTargetCatId}
-                    onChange={e => setSyncTargetCatId(e.target.value)}
-                    style={{ padding:'5px 8px', borderRadius:7, border:'1.5px solid #ddd6fe', fontSize:11, fontWeight:600, color: 'var(--text-muted)', background:'#faf5ff', outline:'none', cursor:'pointer' }}
-                  >
-                    <option value="">Auto-detect</option>
-                    {gradingCategories.map(c => <option key={c.id} value={c.id}>{c.name} (max {c.max_score})</option>)}
-                  </select>
-                </div>
-                <button onClick={handleSyncClassTests} disabled={syncingTests} style={{ padding:'10px 16px', borderRadius:9, background:'#fdf2f2', color:'#dc2626', border:'1.5px solid #fecaca', cursor:'pointer', fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
-                  {syncingTests ? '⌛' : '📝 Sync Tests'}
-                </button>
-                <button onClick={handleSyncAssignments} disabled={syncingTests} style={{ padding:'10px 16px', borderRadius:9, background:'#f5f3ff', color:'#6d28d9', border:'1.5px solid #ddd6fe', cursor:'pointer', fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
-                  {syncingTests ? '⌛' : '🤖 Sync Assignments'}
-                </button>
-              </>
-            )}
-            <button onClick={() => handleSave(true)} disabled={saving || !dirty} style={{ padding:'10px 16px', borderRadius:9, background: 'var(--bg-card)', border: '1px solid var(--border-color)', cursor:'pointer' }}>💾 Save</button>
-            <button onClick={handleSubmit} disabled={submitting || enteredCount === 0} style={{ padding:'10px 16px', borderRadius:9, background:'#6d28d9', color:'#fff', border:'none', cursor:'pointer' }}>📤 Submit</button>
-        </div>
-      )}
-
-
-      <div style={{ background: 'var(--bg-card)', borderRadius:14, padding:'16px 20px', border: '1px solid var(--border-color)', marginBottom:18, display:'flex', gap:16, flexWrap: 'wrap' }}>
-        <div style={{ flex:'1 1 200px' }}>
-          <label style={{ display:'block', fontSize:11, fontWeight:700, color: 'var(--text-muted)', marginBottom:5 }}>Class</label>
-          <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)} style={{ width:'100%', padding:'9px 12px', borderRadius:9, border: '1px solid var(--border-color)', outline:'none' }}>
-            <option value="">Select class…</option>
-            {(classOptions as any[]).map((c:any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </div>
-        {selectedClass && subjects.length > 0 && (
-          <div style={{ flex:'1 1 200px' }}>
-            <label style={{ display:'block', fontSize:11, fontWeight:700, color: 'var(--text-muted)', marginBottom:5 }}>Subject View (Mobile Friendly)</label>
-            <select value={selectedSubjectId} onChange={e => setSelectedSubjectId(e.target.value)} style={{ width:'100%', padding:'9px 12px', borderRadius:9, border: '1px solid var(--border-color)', outline:'none' }}>
-              <option value="all">All Subjects (Wide Grid)</option>
-              {subjects.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
-            </select>
-          </div>
-        )}
+        
         {gradingScaleLevels.length > 0 && (
-           <div style={{ flex:'2 1 300px' }}>
-              <label style={{ display:'block', fontSize:11, fontWeight:700, color: 'var(--text-muted)', marginBottom:5 }}>Grading Scale Applied</label>
-              <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
-                {gradingScaleLevels.map(l => (
-                   <span key={l.id} style={{ fontSize:10, fontWeight:700, color:l.color_code, background:`${l.color_code}15`, padding:'3px 6px', borderRadius:6 }}>{l.label} ({l.min_score}+)</span>
-                ))}
-              </div>
-           </div>
+          <div style={{ padding: '10px 18px', background: 'var(--bg-hover, #F8FAFC)', borderTop: '1px solid var(--border-color)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)' }}>Grading Scale:</span>
+            {gradingScaleLevels.map(l => (
+              <span key={l.id} style={{ fontSize: 10, fontWeight: 800, color: l.color_code, background: `${l.color_code}15`, padding: '2px 8px', borderRadius: 99 }}>
+                {l.label} ({l.min_score}+)
+              </span>
+            ))}
+          </div>
         )}
       </div>
 
-      {loading && selectedClass && <div style={{ padding:40, textAlign:'center' }}>Loading...</div>}
+      {loading && selectedClass && (
+        <div className="tp-loading">
+          <div className="tp-spinner" />
+          Loading gradebook…
+        </div>
+      )}
 
+      {/* ── DESKTOP GRID (Hidden on mobile) ── */}
       {!loading && selectedClass && (Array.isArray(students) ? students : []).length > 0 && subjects.length > 0 && (() => {
         const subjectsToRender = selectedSubjectId === 'all' ? subjects : subjects.filter(s => s.id === selectedSubjectId)
         return (
-          <div className="se-desktop-table" style={{ overflowX: 'auto', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 14 }}>
+          <div ref={sheetRef} className="hide-on-mobile tp-card" style={{
+            overflowX: 'auto', padding: 0,
+            // Fullscreen styles applied via CSS class and inline fallback
+            ...(isFullscreen ? {
+              position: 'fixed', inset: 0, zIndex: 9999, borderRadius: 0,
+              background: 'var(--bg-card)', display: 'flex', flexDirection: 'column'
+            } : {})
+          }}>
+            {/* Fullscreen toolbar */}
+            {isFullscreen && (
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '12px 20px', background: 'linear-gradient(135deg, var(--primary-color-dark), var(--primary-color))',
+                color: '#fff', flexShrink: 0
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span style={{ fontSize: 18 }}>💯</span>
+                  <div>
+                    <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 800 }}>Score Entry Sheet</div>
+                    <div style={{ fontSize: 12, opacity: 0.8 }}>
+                      {(classOptions as any[]).find((c: any) => c.id === selectedClass)?.name} · {subjectsToRender.length} subject{subjectsToRender.length !== 1 ? 's' : ''} · {students.length} students
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <span style={{ fontSize: 12, opacity: 0.8 }}>{dirty ? '● Unsaved' : saving ? 'Saving…' : '✓ Saved'}</span>
+                  <button
+                    onClick={handleSave}
+                    disabled={!dirty || saving}
+                    className="tp-btn"
+                    style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', height: 36, fontSize: 13 }}
+                  >
+                    {saving ? 'Saving…' : '💾 Save'}
+                  </button>
+                  <button
+                    onClick={toggleFullscreen}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.15)', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}
+                  >
+                    <Minimize2 size={16} /> Exit Fullscreen
+                  </button>
+                </div>
+              </div>
+            )}
+            <div style={{ overflowX: 'auto', overflowY: isFullscreen ? 'auto' : undefined, flex: isFullscreen ? 1 : undefined }}>
              <table className="sba-table" style={{ minWidth: COL_STUDENT + subjectsToRender.length * COL_SUBJECT + (selectedSubjectId === 'all' ? 160 : 0) }}>
                 <thead style={{ position:'sticky', top:0, zIndex:10 }}>
                   <tr>
@@ -754,13 +810,58 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
                 })}
               </tbody>
            </table>
+         </div>{/* end inner scroll wrapper */}
         </div>
         )
       })()}
 
-      {/* Mobile wizard view: one student at a time (shown only below 640px) */}
+      {/* ── MOBILE WIZARD (Shown only on mobile) & DESKTOP TABLE STYLES ── */}
+      <style>{`
+        .show-on-mobile { display: none; }
+        @media (max-width: 900px) {
+          .hide-on-mobile { display: none !important; }
+          .show-on-mobile { display: block; }
+        }
+        .sba-table {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 0;
+        }
+        .sba-table th, .sba-table td {
+          padding: 12px 16px;
+          border-right: 1px solid var(--border-color);
+          border-bottom: 1px solid var(--border-color);
+          white-space: nowrap;
+        }
+        .sba-table th {
+          font-weight: 800;
+          text-transform: uppercase;
+          font-size: 11px;
+          letter-spacing: 0.04em;
+          color: var(--text-primary);
+          padding-top: 16px;
+          padding-bottom: 16px;
+          border-top: 1px solid var(--border-color);
+        }
+        .sba-table .sticky-std {
+          position: sticky;
+          left: 0;
+          z-index: 5;
+          border-right: 2px solid var(--border-color);
+        }
+        .sba-table thead th {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+        .sba-table thead th.sticky-std {
+          z-index: 15;
+          background: #f8fafc;
+        }
+      `}</style>
+
       {!loading && selectedClass && (Array.isArray(students) ? students : []).length > 0 && subjects.length > 0 && (
-        <div className="se-mobile-card" style={{ paddingBottom: 80 }}>
+        <div className="show-on-mobile tp-card" style={{ padding: 0, overflow: 'hidden' }}>
           {(() => {
             const subjectsToRender = selectedSubjectId === 'all' ? subjects : subjects.filter(s => s.id === selectedSubjectId)
             const currentStudent = students[mobileStudentIndex]
@@ -770,133 +871,121 @@ export default function ScoreEntryPage({ isAdminView = false }: { isAdminView?: 
             const g = avg > 0 ? getGrade(avg) : null
 
             return (
-              <div className="t-student-card" style={{ animation: '_spin 0s', padding: 0, overflow: 'hidden' }}>
-                
-                {/* Wizard Header (Progress + Navigation) */}
-                <div style={{ background: 'linear-gradient(135deg, #2e1065, #4c1d95)', padding: '16px 20px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                {/* Navigation Header */}
+                <div className="tp-wizard-nav">
                   <button 
+                    className="tp-wizard-btn"
                     onClick={() => setMobileStudentIndex(i => Math.max(0, i - 1))}
                     disabled={mobileStudentIndex === 0}
-                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: mobileStudentIndex === 0 ? 'default' : 'pointer', opacity: mobileStudentIndex === 0 ? 0.3 : 1 }}
-                  >
-                    ←
-                  </button>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.08em', opacity: 0.8, textTransform: 'uppercase' }}>
+                  >←</button>
+                  <div style={{ textAlign: 'center', flex: 1 }}>
+                    <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                       Student {mobileStudentIndex + 1} of {(Array.isArray(students) ? students : []).length}
                     </div>
-                    <div style={{ width: 100, height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: 99, margin: '6px auto 0', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${((mobileStudentIndex + 1) / (Array.isArray(students) ? students : []).length) * 100}%`, background: '#34d399', borderRadius: 99, transition: 'width 0.3s ease' }} />
+                    <div className="tp-wizard-progress" style={{ margin: '0 auto' }}>
+                      <div className="tp-wizard-progress-fill" style={{ width: `${((mobileStudentIndex + 1) / (Array.isArray(students) ? students : []).length) * 100}%` }} />
                     </div>
                   </div>
                   <button 
+                    className="tp-wizard-btn"
                     onClick={() => setMobileStudentIndex(i => Math.min((Array.isArray(students) ? students : []).length - 1, i + 1))}
                     disabled={mobileStudentIndex === (Array.isArray(students) ? students : []).length - 1}
-                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: mobileStudentIndex === (Array.isArray(students) ? students : []).length - 1 ? 'default' : 'pointer', opacity: mobileStudentIndex === (Array.isArray(students) ? students : []).length - 1 ? 0.3 : 1 }}
-                  >
-                    →
-                  </button>
+                  >→</button>
                 </div>
 
                 {/* Student Info */}
-                <div style={{ padding: '20px', borderBottom: '1px solid #f0eefe', display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div style={{ width: 52, height: 52, borderRadius: 16, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, color: '#fff', flexShrink: 0, boxShadow: '0 4px 12px rgba(109,40,217,0.2)' }}>
+                <div style={{ padding: '20px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div className="tp-avatar" style={{ width: 52, height: 52, fontSize: 20, background: 'linear-gradient(135deg, #1E1B4B, #4C1D95)', boxShadow: '0 4px 12px rgba(76,29,149,0.2)' }}>
                     {currentStudent.full_name.charAt(0)}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.2 }}>{currentStudent.full_name}</div>
-                    {currentStudent.student_id && <div style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 2 }}>ID: {currentStudent.student_id}</div>}
+                    <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>{currentStudent.full_name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>ID: {currentStudent.student_id ?? '—'}</div>
                   </div>
                   {g && (
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 22, fontWeight: 900, color: g.color }}>{g.grade}</div>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)' }}>{avg.toFixed(1)}%</div>
+                      <div style={{ fontSize: 24, fontWeight: 900, color: g.color }}>{g.grade}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)' }}>{avg.toFixed(1)}%</div>
                     </div>
                   )}
                 </div>
 
-                {/* Subjects & Inputs */}
-                <div style={{ padding: '0 20px 20px', maxHeight: '60vh', overflowY: 'auto' }}>
+                {/* Score Inputs List */}
+                <div style={{ padding: '0 20px 20px' }}>
                   {subjectsToRender.map((sub, idx) => {
                     const sc = scoreMap[currentStudent.id]?.[sub.id]
                     const total = getTotal(currentStudent.id, sub.id)
                     const sg = total > 0 ? getGrade(total) : null
                     return (
-                      <div key={sub.id} style={{ marginTop: 20, paddingBottom: 20, borderBottom: idx < subjectsToRender.length - 1 ? '1px dashed #e5e7eb' : 'none' }}>
-                        <div style={{ fontSize: 13, fontWeight: 800, color: '#4c1d95', marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div key={sub.id} style={{ marginTop: 24, paddingBottom: 24, borderBottom: idx < subjectsToRender.length - 1 ? '1px dashed var(--border-color)' : 'none' }}>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: '#4338CA', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           {sub.name}
-                          {sg && <span style={{ fontSize: 12, background: sg.color + '15', color: sg.color, padding: '2px 8px', borderRadius: 6 }}>{total.toFixed(1)}</span>}
+                          {sg && <span style={{ fontSize: 13, background: sg.color + '15', color: sg.color, padding: '4px 10px', borderRadius: 8 }}>{total.toFixed(1)}</span>}
                         </div>
                         
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 12 }}>
-                          {gradingCategories.map(c => (
-                            <div key={c.id} style={{ background: '#fafafa', border: '1px solid #f3f4f6', borderRadius: 12, padding: '12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                              <div style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 600, display: 'flex', justifyContent: 'space-between' }}>
-                                <span>{c.name}</span>
-                                <span>/{c.max_score}</span>
+                          {gradingCategories.map(c => {
+                            const val = sc?.scores[c.id] ?? ''
+                            const over = parseFloat(val || '0') > c.max_score
+                            const ok = val !== '' && !over
+                            return (
+                              <div key={c.id} style={{ background: 'var(--bg-hover)', border: '1px solid var(--border-color)', borderRadius: 12, padding: '12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+                                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '60%' }}>{c.name}</span>
+                                  <span style={{ fontSize: 10 }}>Max: {c.max_score}</span>
+                                </div>
+                                <input
+                                  type="number" min={0} step={0.5}
+                                  value={val}
+                                  disabled={isLocked}
+                                  onChange={e => updateScore(currentStudent.id, sub.id, c.id, e.target.value)}
+                                  placeholder="—"
+                                  className={`tp-score-input${over ? ' over' : ok ? ' ok' : ''}`}
+                                  style={{ width: '100%', textAlign: 'center', fontSize: 16, height: 44 }}
+                                />
                               </div>
-                              <input
-                                type="number" min={0} step={0.5}
-                                value={sc?.scores[c.id] ?? ''}
-                                disabled={isLocked}
-                                onChange={e => updateScore(currentStudent.id, sub.id, c.id, e.target.value)}
-                                placeholder="—"
-                                style={{
-                                  width: '100%', height: 44, textAlign: 'center', fontSize: 16, fontWeight: 800,
-                                  borderRadius: 8, outline: 'none', transition: 'all .12s',
-                                  fontFamily: '"DM Sans",sans-serif',
-                                  border: `2px solid ${(parseFloat(sc?.scores[c.id] ?? '0') > c.max_score) ? '#f87171' : sc?.scores[c.id] ? '#86efac' : '#e5e7eb'}`,
-                                  background: (parseFloat(sc?.scores[c.id] ?? '0') > c.max_score) ? '#fef2f2' : sc?.scores[c.id] ? '#f0fdf4' : '#fff',
-                                  color: (parseFloat(sc?.scores[c.id] ?? '0') > c.max_score) ? '#dc2626' : '#111827',
-                                  cursor: isLocked ? 'not-allowed' : 'number',
-                                  opacity: isLocked ? 0.6 : 1
-                                }}
-                              />
-                            </div>
-                          ))}
+                            )
+                          })}
                         </div>
                       </div>
                     )
                   })}
                   
-                  {/* Next Student Button at bottom of scroll */}
+                  {/* Next Student CTA */}
                   {mobileStudentIndex < (Array.isArray(students) ? students : []).length - 1 && (
                     <button 
+                      className="tp-btn tp-btn-ghost"
+                      style={{ width: '100%', marginTop: 12, minHeight: 56, fontSize: 16 }}
                       onClick={() => {
                         setMobileStudentIndex(i => i + 1);
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#f5f3ff', color: '#6d28d9', border: '1.5px solid #ddd6fe', fontWeight: 700, fontSize: 14, cursor: 'pointer', marginTop: 10, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}
                     >
                       Next Student →
                     </button>
                   )}
                 </div>
-
               </div>
             )
           })()}
+        </div>
+      )}
 
-          {/* Sticky save bar for mobile */}
-          {!isLocked && (Array.isArray(students) ? students : []).length > 0 && (
-            <div className="t-sticky-bar" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', padding: '12px 16px', borderTop: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, textAlign: 'center' }}>
-                {dirty ? '● Unsaved changes' : '✓ All saved'}
-              </span>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={() => handleSave(true)} disabled={saving || !dirty}
-                  style={{ flex: 1, padding: '12px', borderRadius: 10, background: '#fff', border: '1.5px solid var(--border-color)', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-                  {saving ? 'Saving…' : '💾 Save'}
-                </button>
-                <button onClick={handleSubmit} disabled={submitting || enteredCount === 0}
-                  style={{ flex: 2, padding: '12px', borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#6d28d9)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 12px rgba(109,40,217,0.2)' }}>
-                  📤 Submit All
-                </button>
-              </div>
-            </div>
-          )}
+      {/* ── STICKY BOTTOM BAR (Mobile Save/Submit) ── */}
+      {!isLocked && (Array.isArray(students) ? students : []).length > 0 && (
+        <div className="tp-bottom-bar" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button onClick={() => handleSave(true)} disabled={saving || !dirty} className="tp-btn tp-btn-ghost">
+              {saving ? <div className="tp-spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> : '💾 Save'}
+            </button>
+            <button onClick={handleSubmit} disabled={submitting || enteredCount === 0} className="tp-btn tp-btn-primary">
+              📤 Submit All
+            </button>
+          </div>
         </div>
       )}
     </div>
   )
 }
+
