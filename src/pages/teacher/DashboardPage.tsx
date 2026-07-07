@@ -267,7 +267,7 @@ export default function TeacherDashboardPage() {
 
   if (loading) return <FlaskLoader fullScreen={false} label="Loading your dashboard…" />
 
-  const userName = user?.full_name?.split(' ')[0] || 'Teacher'
+  const userName = user?.full_name?.split(' ')?.slice(0, 2).join(' ') || 'Teacher'
   const todayName = DAYS[now.getDay()]
 
   // Quick action links

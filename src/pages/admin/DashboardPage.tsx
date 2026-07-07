@@ -596,7 +596,7 @@ export default function DashboardPage() {
 
   const now = new Date()
   const todayStr = now.toLocaleDateString('en-GH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-  const userName = user?.full_name?.split(' ')[0] || 'Admin'
+  const userName = user?.full_name?.split(' ')?.slice(0, 2).join(' ') || 'Admin'
   const { timeGreeting: greeting } = getEngagingGreeting(user?.role)
 
   // KPI definitions

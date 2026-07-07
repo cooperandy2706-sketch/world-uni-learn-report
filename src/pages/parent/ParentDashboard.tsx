@@ -26,7 +26,7 @@ export default function ParentDashboard() {
   const { data: wards = [], isLoading } = useParentWards()
   const navigate = useNavigate()
 
-  const firstName = user?.full_name?.split(' ')[0] || 'Parent'
+  const firstName = user?.full_name?.split(' ')?.slice(0, 2).join(' ') || 'Parent'
 
   if (isLoading) return <FlaskLoader fullScreen={false} label="Loading children…" />
 

@@ -179,7 +179,7 @@ export default function IndependentStudentDashboard() {
             🇬🇭 GES BECE STANDARD CURRICULUM
           </div>
           <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 leading-tight">
-            Good day, {user?.full_name?.split(' ')[0]}! 👋
+            Good day, {user?.full_name?.split(' ')?.slice(0, 2).join(' ')}! 👋
           </h1>
           <p className="text-slate-600 dark:text-slate-300 text-sm mb-6 max-w-xl">
             You're in <strong className="text-amber-600 dark:text-amber-500">{gradeInfo?.label}</strong>. Explore {subjects.length} subjects with detailed BECE-standard lessons and mock exams.

@@ -229,7 +229,7 @@ export default function BursarDashboard() {
 
   if (loading) return <FlaskLoader fullScreen={false} label="Loading Financial Hub…" />
 
-  const userName = user?.full_name?.split(' ')[0] || 'Bursar'
+  const userName = user?.full_name?.split(' ')?.slice(0, 2).join(' ') || 'Bursar'
 
   return (
     <>

@@ -225,7 +225,7 @@ export default function StudentDashboard() {
         <div className="sd-header" style={{ marginBottom: 22, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, animation: '_sfu .5s ease both' }}>
           <div>
             <h1 style={{ fontFamily: '"Playfair Display",serif', fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
-              {timeGreeting}, {user?.full_name?.split(' ')[0]} 👋
+              {timeGreeting}, {user?.full_name?.split(' ')?.slice(0, 2).join(' ')} 👋
             </h1>
             <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4, fontWeight: 600 }}>{roleMessage}</p>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>

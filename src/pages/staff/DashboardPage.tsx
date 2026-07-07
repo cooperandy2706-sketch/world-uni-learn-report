@@ -179,7 +179,7 @@ export default function StaffDashboard() {
               🏢 Staff Portal
             </div>
             <h2 style={{ fontSize: 34, fontWeight: 800, margin: '0 0 8px', lineHeight: 1.2 }}>
-              Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 17 ? 'Afternoon' : 'Evening'}, {user?.full_name?.split(' ')[0]}! 👋
+              Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 17 ? 'Afternoon' : 'Evening'}, {user?.full_name?.split(' ')?.slice(0, 2).join(' ')}! 👋
             </h2>
             <p style={{ fontSize: 15, opacity: 0.85, margin: 0, maxWidth: 520 }}>
               Here's your workspace overview — attendance, payroll history, and school notices, all in one place.
