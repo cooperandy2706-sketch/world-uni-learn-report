@@ -198,3 +198,47 @@ export default function TeacherTimetablePage(){
                     </div>
                   )
                 }
+
+                if (!slot) {
+                  return (
+                    <div key={period.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 18px', borderBottom: '1px solid var(--border-color)', opacity: 0.5 }}>
+                      <div style={{ width: 80, fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', flexShrink: 0, textAlign: 'right' }}>{start}–{end}</div>
+                      <div style={{ width: 16, display: 'flex', justifyContent: 'center' }}>
+                        <div style={{ width: 2, height: '100%', background: 'var(--border-color)' }} />
+                      </div>
+                      <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Free Period</div>
+                    </div>
+                  )
+                }
+
+                return (
+                  <div key={period.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '16px 18px', borderBottom: '1px solid var(--border-color)', background: isNow ? 'rgba(124,58,237,0.04)' : 'transparent', opacity: isPast ? 0.6 : 1 }}>
+                    <div style={{ width: 80, fontSize: 10, fontWeight: 700, color: isNow ? '#7C3AED' : 'var(--text-muted)', flexShrink: 0, textAlign: 'right', marginTop: 4 }}>
+                      {start}–{end}
+                      {isNow && <div style={{ fontSize: 9, color: '#7C3AED', marginTop: 2 }}>NOW</div>}
+                    </div>
+                    <div style={{ width: 16, display: 'flex', justifyContent: 'center', position: 'relative' }}>
+                      {isNow ? (
+                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#7C3AED', border: '2px solid #fff', boxShadow: '0 0 0 2px #7C3AED', zIndex: 2, marginTop: 4 }} />
+                      ) : (
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: isPast ? '#E5E7EB' : '#D8B4FE', zIndex: 2, marginTop: 4 }} />
+                      )}
+                      <div style={{ position: 'absolute', top: 12, bottom: -16, width: 2, background: isPast ? '#E5E7EB' : (isNow ? 'linear-gradient(to bottom, #7C3AED, #E5E7EB)' : '#F3F4F6'), zIndex: 1 }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: isNow ? '#5B21B6' : 'var(--text-color)', marginBottom: 4 }}>
+                        {slot.subject?.name}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 12, color: 'var(--text-muted)' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>👥 {slot.class?.name}</span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
