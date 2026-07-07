@@ -652,7 +652,6 @@ function Navbar({ scrolled, setMenuOpen }: { scrolled: boolean, setMenuOpen: (v:
           </div>
 
           <div className="nav-actions">
-            <Link to="/learn" className="btn-login">Free Learning</Link>
             <Link to="/schools" className="btn-login">Explore Schools</Link>
             <Link to="/login" className="btn-login">Sign In</Link>
             <Link to="/register-school" className="btn-primary">Register School</Link>
@@ -891,9 +890,6 @@ export default function LandingPage() {
           variant="menu"
           onNavigate={() => setMenuOpen(false)}
         />
-        <Link to="/learn" className="mobile-link" onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none' }}>
-          Free Learning
-        </Link>
         {['Features', 'Pillars', 'Workflow', 'Pricing', 'Download'].map(item => (
           <button
             key={item}
@@ -1064,7 +1060,6 @@ export default function LandingPage() {
                     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                   }}>{l}</button></li>
                 ))}
-                <li><Link to="/learn" className="footer-link">Free Learning Hub</Link></li>
                 <li><Link to="/register-school" className="footer-link">Register School</Link></li>
               </ul>
             </div>
